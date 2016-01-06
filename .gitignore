@@ -1,0 +1,10 @@
+node_modules
+*.log
+.DS_Store
+Thumbs.db
+
+/.idea/
+/app/spec.js
+/build/
+/releases/
+/tmp/
