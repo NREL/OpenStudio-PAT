@@ -1,4 +1,5 @@
 'use strict';
 
-require('./tasks/build');
-require('./tasks/release');
+['build', 'release', 'inject', 'scripts', 'styles'].forEach(function (name) {
+  require('./tasks/' + name);
+});

@@ -1,141 +1,97 @@
 'use strict';
 
-var pathUtil = require('path');
-var Q = require('q');
+var path = require('path');
 var gulp = require('gulp');
-var rollup = require('rollup');
-var less = require('gulp-less');
-var jetpack = require('fs-jetpack');
+var conf = require('./conf');
 
-var utils = require('./utils');
-var generateSpecsImportFile = require('./generate_specs_import');
-
-var projectDir = jetpack;
-var srcDir = projectDir.cwd('./app');
-var destDir = projectDir.cwd('./build');
-
-var paths = {
-    copyFromAppDir: [
-        './electron/**',
-        './node_modules/**',
-        './vendor/**',
-        './**/*.html',
-        './**/*.+(jpg|png|svg)'
-    ],
-}
-
-// -------------------------------------
-// Tasks
-// -------------------------------------
-
-gulp.task('clean', function (callback) {
-    return destDir.dirAsync('.', { empty: true });
+var $ = require('gulp-load-plugins')({
+  pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del']
 });
 
-
-var copyTask = function () {
-    return projectDir.copyAsync('app', destDir.path(), {
-        overwrite: true,
-        matching: paths.copyFromAppDir
-    });
-};
-gulp.task('copy', ['clean'], copyTask);
-gulp.task('copy-watch', copyTask);
-
-
-var bundle = function (src, dest) {
-    var deferred = Q.defer();
-
-    rollup.rollup({
-        entry: src,
-    }).then(function (bundle) {
-        var jsFile = pathUtil.basename(dest);
-        var result = bundle.generate({
-            format: 'cjs',
-            sourceMap: true,
-            sourceMapFile: jsFile,
-        });
-        // Wrap code in self invoking function so the variables don't
-        // pollute the global namespace.
-        var isolatedCode = '(function () {' + result.code + '\n}());';
-        return Q.all([
-            destDir.writeAsync(dest, isolatedCode + '\n//# sourceMappingURL=' + jsFile + '.map'),
-            destDir.writeAsync(dest + '.map', result.map.toString()),
-        ]);
-    }).then(function () {
-        deferred.resolve();
-    }).catch(function (err) {
-        console.error('Build: Error during rollup', err.stack);
-    });
-
-    return deferred.promise;
-};
-
-var bundleApplication = function () {
-    return Q.all([
-        bundle(srcDir.path('background.js'), destDir.path('background.js')),
-        bundle(srcDir.path('app.js'), destDir.path('app.js')),
-    ]);
-};
-
-var bundleSpecs = function () {
-    generateSpecsImportFile().then(function (specEntryPointPath) {
-        return Q.all([
-            bundle(srcDir.path('background.js'), destDir.path('background.js')),
-            bundle(specEntryPointPath, destDir.path('spec.js')),
-        ]);
-    });
-};
-
-var bundleTask = function () {
-    if (utils.getEnvName() === 'test') {
-        return bundleSpecs();
-    }
-    return bundleApplication();
-};
-gulp.task('bundle', ['clean'], bundleTask);
-gulp.task('bundle-watch', bundleTask);
-
-
-var lessTask = function () {
-    return gulp.src('app/stylesheets/main.less')
-    .pipe(less())
-    .pipe(gulp.dest(destDir.path('stylesheets')));
-};
-gulp.task('less', ['clean'], lessTask);
-gulp.task('less-watch', lessTask);
-
-
-gulp.task('finalize', ['clean'], function () {
-    var manifest = srcDir.read('package.json', 'json');
-
-    // Add "dev" or "test" suffix to name, so Electron will write all data
-    // like cookies and localStorage in separate places for each environment.
-    switch (utils.getEnvName()) {
-        case 'development':
-            manifest.name += '-dev';
-            manifest.productName += ' Dev';
-            break;
-        case 'test':
-            manifest.name += '-test';
-            manifest.productName += ' Test';
-            break;
-    }
-
-    // Copy environment variables to package.json file for easy use
-    // in the running application. This is not official way of doing
-    // things, but also isn't prohibited ;)
-    manifest.env = projectDir.read('config/env_' + utils.getEnvName() + '.json', 'json');
-
-    destDir.write('package.json', manifest);
+gulp.task('partials', function () {
+  return gulp.src([
+      path.join(conf.paths.src, '/app/**/*.html'),
+      path.join(conf.paths.tmp, '/serve/app/**/*.html')
+    ])
+    .pipe($.minifyHtml({
+      empty: true,
+      spare: true,
+      quotes: true
+    }))
+    .pipe($.angularTemplatecache('templateCacheHtml.js', {
+      module: '102Es6',
+      root: 'app'
+    }))
+    .pipe(gulp.dest(conf.paths.tmp + '/partials/'));
 });
 
+gulp.task('html', ['inject', 'partials'], function () {
+  var partialsInjectFile = gulp.src(path.join(conf.paths.tmp, '/partials/templateCacheHtml.js'), { read: false });
+  var partialsInjectOptions = {
+    starttag: '<!-- inject:partials -->',
+    ignorePath: path.join(conf.paths.tmp, '/partials'),
+    addRootSlash: false
+  };
 
-gulp.task('watch', function () {
-    gulp.watch('app/**/*.js', ['bundle-watch']);
-    gulp.watch(paths.copyFromAppDir, { cwd: 'app' }, ['copy-watch']);
-    gulp.watch('app/**/*.less', ['less-watch']);
+  var htmlFilter = $.filter('*.html', { restore: true });
+  var jsFilter = $.filter('**/*.js', { restore: true });
+  var cssFilter = $.filter('**/*.css', { restore: true });
+  var assets;
+
+  return gulp.src(path.join(conf.paths.tmp, '/serve/*.html'))
+    .pipe($.inject(partialsInjectFile, partialsInjectOptions))
+    .pipe(assets = $.useref.assets())
+    .pipe($.rev())
+    .pipe(jsFilter)
+    .pipe($.sourcemaps.init())
+    .pipe($.uglify({ preserveComments: $.uglifySaveLicense })).on('error', conf.errorHandler('Uglify'))
+    .pipe($.sourcemaps.write('maps'))
+    .pipe(jsFilter.restore)
+    .pipe(cssFilter)
+    .pipe($.sourcemaps.init())
+    .pipe($.replace('../../bower_components/bootstrap-sass/assets/fonts/bootstrap/', '../fonts/'))
+    .pipe($.minifyCss({ processImport: false }))
+    .pipe($.sourcemaps.write('maps'))
+    .pipe(cssFilter.restore)
+    .pipe(assets.restore())
+    .pipe($.useref())
+    .pipe($.revReplace())
+    .pipe(htmlFilter)
+    .pipe($.minifyHtml({
+      empty: true,
+      spare: true,
+      quotes: true,
+      conditionals: true
+    }))
+    .pipe(htmlFilter.restore)
+    .pipe(gulp.dest(path.join(conf.paths.dist, '/')))
+    .pipe($.size({ title: path.join(conf.paths.dist, '/'), showFiles: true }));
 });
 
+// Only applies for fonts from bower dependencies
+// Custom fonts are handled by the "other" task
+gulp.task('fonts', function () {
+  return gulp.src($.mainBowerFiles())
+    .pipe($.filter('**/*.{eot,svg,ttf,woff,woff2}'))
+    .pipe($.flatten())
+    .pipe(gulp.dest(path.join(conf.paths.dist, '/fonts/')));
+});
 
-gulp.task('build', ['bundle', 'less', 'copy', 'finalize']);
+gulp.task('other', function () {
+  var fileFilter = $.filter(function (file) {
+    return file.stat.isFile();
+  });
+
+  return gulp.src([
+      path.join(conf.paths.src, '/**/*'),
+      path.join('!' + conf.paths.src, '/**/*.{html,css,js,scss}')
+    ])
+    .pipe(fileFilter)
+    .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
+});
+
+gulp.task('clean', function () {
+  return $.del([path.join(conf.paths.dist, '/'), path.join(conf.paths.tmp, '/')]);
+});
+
+gulp.task('build', ['html', 'fonts', 'other']);

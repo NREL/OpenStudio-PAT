@@ -35,7 +35,7 @@ app.on('ready', function () {
     if (env.name === 'test') {
         mainWindow.loadURL('file://' + __dirname + '/spec.html');
     } else {
-        mainWindow.loadURL('file://' + __dirname + '/app.html');
+        mainWindow.loadURL('file://' + __dirname + '/index.html');
     }
 
     if (env.name !== 'production') {
