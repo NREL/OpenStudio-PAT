@@ -4,8 +4,8 @@
 // window from here.
 
 import { app, BrowserWindow } from 'electron';
-import devHelper from './vendor/electron_boilerplate/dev_helper';
-import windowStateKeeper from './vendor/electron_boilerplate/window_state';
+import devHelper from './electron/dev_helper';
+import windowStateKeeper from './electron/window_state';
 
 // Special module holding environment variables which you declared
 // in config/env_xxx.json file.

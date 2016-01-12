@@ -5,6 +5,7 @@ Thumbs.db
 
 /.idea/
 /app/spec.js
+/app/vendor/
 /build/
 /releases/
 /tmp/
