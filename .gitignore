@@ -4,8 +4,9 @@ node_modules
 Thumbs.db
 
 /.idea/
+/.tmp/
 /app/spec.js
-/app/vendor/
+/bower_components/
 /build/
 /releases/
 /tmp/
