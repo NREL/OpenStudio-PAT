@@ -3,7 +3,8 @@
 import { config } from './index.config';
 import { routerConfig } from './index.route';
 import { runBlock } from './index.run';
-import { MainController } from './main/main.controller';
+import { MainController } from './main/mainController';
+import { BCL } from './bcl/bclService'
 
 //import { GithubContributorService } from '../app/components/githubContributor/githubContributor.service';
 //import { WebDevTecService } from '../app/components/webDevTec/webDevTec.service';
@@ -16,7 +17,8 @@ angular.module('PAT', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMes
   .config(config)
   .config(routerConfig)
   .run(runBlock)
-  .controller('MainController', MainController);
+  .controller('MainController', MainController)
+  .service('BCL', BCL);
 //  .service('githubContributor', GithubContributorService)
 //  .service('webDevTec', WebDevTecService)
 //  .directive('acmeNavbar', NavbarDirective)
