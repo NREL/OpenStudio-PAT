@@ -4,6 +4,7 @@ import { config } from './index.config';
 import { routerConfig } from './index.route';
 import { runBlock } from './index.run';
 import { MainController } from './main/mainController';
+import { ProjectMeasuresController } from './projectMeasures/projectMeasuresController';
 import { BCL } from './bcl/bclService'
 
 //import { GithubContributorService } from '../app/components/githubContributor/githubContributor.service';
@@ -18,6 +19,7 @@ angular.module('PAT', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMes
   .config(routerConfig)
   .run(runBlock)
   .controller('MainController', MainController)
+  .controller('ProjectMeasuresController', ProjectMeasuresController)
   .service('BCL', BCL);
 //  .service('githubContributor', GithubContributorService)
 //  .service('webDevTec', WebDevTecService)
