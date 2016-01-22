@@ -54,6 +54,9 @@ export class ModalBclController {
 
       }
     });
+
+    this.categories = [{name: 'A', tid: '1'},{name:'B', tid:2}, {name: 'C', tid: 3}];
+
   }
 
   ok() {
