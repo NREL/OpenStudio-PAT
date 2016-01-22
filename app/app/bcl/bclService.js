@@ -33,8 +33,8 @@ export class BCL {
 
     let modalInstance = this.$uibModal.open({
       backdrop: 'static',
-      controller: 'ModalBCLCtrl',
-      templateUrl: '/bcl/bcl.html',
+      controller: 'ModalBclController',
+      templateUrl: 'app/bcl/bcl.html',
       windowClass: 'wide-modal'
 
     });

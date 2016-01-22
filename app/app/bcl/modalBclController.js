@@ -1,6 +1,6 @@
 export class ModalBclController {
 
-  constructor($modalInstance, BCL) {
+  constructor($log, $uibModalInstance, _, BCL) {
 
     'ngInject';
 
@@ -8,6 +8,10 @@ export class ModalBclController {
     this.selected = null;
     this.keyword = '';
     this.categories = [];
+
+    this.$uibModalInstance = $uibModalInstance;
+    this._ = _;
+    this.$log = $log;
 
     this.filters = {
       all: false,
@@ -20,20 +24,20 @@ export class ModalBclController {
     BCL.getCategories().then(function (response) {
 
       if (response.data['term'] != undefined) {
-        categories = [];
+        this.categories = [];
         // 3 possible levels of nesting
-        _.each(response.data['term'], function (term) {
-          cat1 = {};
+        this._.each(response.data['term'], function (term) {
+          let cat1 = {};
           cat1.name = term['name'];
           cat1.tid = term['tid'];
-          cat1_terms = [];
-          _.each(term['term'], function (term2) {
-            cat2 = {};
+          let cat1_terms = [];
+          this._.each(term['term'], function (term2) {
+            let cat2 = {};
             cat2.name = term2['name'];
             cat2.tid = term2['tid'];
-            cat2_terms = [];
-            _.each(term2['term'], function (term3) {
-              cat3 = {};
+            let cat2_terms = [];
+            this._.each(term2['term'], function (term3) {
+              let cat3 = {};
               cat3.name = term3['name'];
               cat3.tid = term3['tid'];
               cat2_terms.push(cat3);
@@ -42,24 +46,23 @@ export class ModalBclController {
             cat1_terms.push(cat2);
           });
           cat1.children = cat1_terms;
-          categories.push(cat1);
+          this.categories.push(cat1);
         });
 
-        console.log('Categories: ', categories);
-        this.categories = categories;
+        this.$log.debug('Categories: ', this.categories);
+        //this.categories = categories;
 
       }
     });
   }
 
   ok() {
-    $modalInstance.close(this.selected);
+    this.$uibModalInstance.close(this.selected);
   }
 
   cancel() {
-    $modalInstance.dismiss('cancel');
+    this.$uibModalInstance.dismiss('cancel');
   }
-
 
   search() {
 

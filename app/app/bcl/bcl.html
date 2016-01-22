@@ -5,7 +5,7 @@
 
   <div class="row pad-bot-20">
     <div class="col-xs-3">
-    	
+
 			<form ng-submit="submit()" name="form" novalidate>
 				<div class="input-group">
 		      <input type="text" name="search" id="search" ng-model="keyword" class="form-control" placeholder="Search">
@@ -17,19 +17,19 @@
 				<div class="panel panel-default">
 				  <div class="panel-heading"><div class="filter-img"><img src="assets/images/filter.png" alt="filter icon" /></div>Filters</div>
 				  <div class="panel-body">
-				    <div class="checkbox"><label><input type="checkbox" ng-model="filters.all"> All</label></div>
-	        	<div class="checkbox"><label><input type="checkbox" ng-model="filters.local"> Local</label></div>
-	        	<div class="checkbox"><label><input type="checkbox" ng-model="filters.bcl"> BCL (Online)</label></div>
-	        	<div class="checkbox"><label><input type="checkbox" ng-model="filters.measure_dir"> Measure Directory</label></div>
+				    <div class="checkbox"><label><input type="checkbox" ng-model="bcl.filters.all"> All</label></div>
+	        	<div class="checkbox"><label><input type="checkbox" ng-model="bcl.filters.local"> Local</label></div>
+	        	<div class="checkbox"><label><input type="checkbox" ng-model="bcl.filters.bcl"> BCL (Online)</label></div>
+	        	<div class="checkbox"><label><input type="checkbox" ng-model="bcl.filters.measure_dir"> Measure Directory</label></div>
 				  </div>
 				</div>
 
 				<div class="panel panel-default">
 				  <div class="panel-heading">Category</div>
 				  <div class="bcl-custom">
-				  <div class="bcl-custom panel-body">	
+				  <div class="bcl-custom panel-body">
 				  	<uib-accordion close-others="false">
-					  	<uib-accordion-group ng-repeat="cat1 in categories" is-open="cat1.open" class="bcl-custom">
+					  	<uib-accordion-group ng-repeat="cat1 in bcl.categories" is-open="cat1.open" class="bcl-custom">
 					  	  <uib-accordion-heading>
 					  	   <i class="pull-left glyphicon pad-right-5" ng-class="{'glyphicon-chevron-down': cat1.open, 'glyphicon-chevron-right': !cat1.open}"></i>
 					  			<div class="checkbox bcl-cb">
@@ -44,7 +44,7 @@
 					  							<div class="checkbox bcl-cb"><label><input type="checkbox" ng-model="cat3.tid">{{cat3.name}}</label></div>
 					  						</div>
 					  					</div>
-					  				</div>	
+					  				</div>
 					  			</div>
 					  		</div>
 						  </uib-accordion-group>
@@ -53,14 +53,14 @@
 				  </div>
 				</div>
 
-      </form> 
+      </form>
 
     </div>
     <div class="col-xs-9">
      <h3> BCL RESULTS HERE</h3>
     </div>
-  </div> 
-</div>    
+  </div>
+</div>
 
 <div class="modal-footer">
   <button type="button" class="btn btn-primary" ng-click="ok()">OK</button>

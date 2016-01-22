@@ -27,6 +27,85 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
   }
 }
 
+/* custom css */
+.container {
+  padding:20px;
+}
+
+/* increase modal size */
+.wide-Modal .modal-dialog{
+  width:95%;
+}
+
+.pad-bot-20 {
+  padding-bottom:20px;
+}
+
+.pad-top-20 {
+  padding-top:20px;
+}
+
+.search-img {
+  width: 20px;
+  height: 20px;
+}
+
+.filter-img {
+  padding:0px 10px;
+  display:inline;
+}
+.filter-img img {
+  width:20px;
+  height:20px;
+}
+.indent-once {
+  padding-left:10px;
+}
+.indent-twice {
+  padding-left:20px;
+}
+.bcl-cb {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+
+.pad-icon {
+  margin-right:5px;
+  display:inline;
+}
+.pad-right-5 {
+  padding-right:5px;
+}
+
+.bcl-custom.panel-body {
+  padding:0px;
+}
+.bcl-custom .panel-default>.panel-heading {
+  background-color: white;
+  padding:2px;
+  margin:0px;
+  font-size:14px;
+}
+.bcl-custom .panel-body {
+  padding:0px;
+  margin:0px;
+}
+.bcl-custom .panel-title {
+  font-size:14px;
+  border:0px solid;
+}
+.bcl-custom .panel, .bcl-custom .panel-default {
+  border:0px solid;
+}
+.bcl-custom .panel-default > .panel-heading + .panel-collapse > .panel-body {
+  border-top:0px solid;
+}
+
+
+
+
+
+
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject
  *  all your sass files automatically
