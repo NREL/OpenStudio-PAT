@@ -1,14 +1,16 @@
-<div class="row nav-container">
-  <div class="col-md-12 app-nav" ng-include="'./nav/nav.html'"></div>
-</div>
 <div class="container">
+  <div class="row row-same-height">
+    <div class="col-sm-1 nav-span">
+      <div class="app-nav" ng-include src="'app/nav/nav.html'"></div>
+    </div>
+    <div class="col-sm-11 main-span">
+      <div class="jumbotron text-center">
+        <h1>PAT</h1>
+      </div>
 
-  <div class="jumbotron text-center">
-    <h1>PAT</h1>
+      <p>
+        {{ analysis.test }}
+      </p>
+    </div>
   </div>
-
-  <p>
-    {{ analysis.test }}
-  </p>
-
 </div>

@@ -1,9 +1,14 @@
 export class NavController {
 
   constructor($location) {
+
+    'ngInject';
+
+    this.$location = $location;
+
     this.isActive = function (tabIndicator) {
       var tabRegex = new RegExp(tabIndicator);
-      return tabRegex.test($location.path());
+      return tabRegex.test(this.$location.path());
     };
 
     this.analysisPath = '/analysis';

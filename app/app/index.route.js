@@ -15,7 +15,7 @@ export function routerConfig ($stateProvider, $urlRouterProvider) {
     })
     .state('design_alternatives', {
       url: "/design_alternatives",
-      templateUrl: "app/design_alts/design_alternatives.html",
+      templateUrl: "app/design_alts/designAlternatives.html",
       controller: 'DesignAlternativesController',
       controllerAs: 'design_alternatives'
     })
@@ -24,6 +24,24 @@ export function routerConfig ($stateProvider, $urlRouterProvider) {
       templateUrl: "app/outputs/outputs.html",
       controller: 'OutputsController',
       controllerAs: 'outputs'
+    })
+    .state('run', {
+      url: "/run",
+      templateUrl: "app/run/run.html",
+      controller: 'RunController',
+      controllerAs: 'run'
+    })
+    .state('reports', {
+      url: "/reports",
+      templateUrl: "app/reports/reports.html",
+      controller: 'ReportsController',
+      controllerAs: 'reports'
+    })
+    .state('server', {
+      url: "/server",
+      templateUrl: "app/server/server.html",
+      controller: 'ServerController',
+      controllerAs: 'server'
     });
 
   $urlRouterProvider.otherwise('/');

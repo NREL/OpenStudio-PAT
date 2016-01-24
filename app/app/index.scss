@@ -29,7 +29,92 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 
 /* custom css */
 .container {
-  padding:20px;
+  width:100%;
+  padding:0;
+  margin:0;
+  background-color:#3F3F3F;
+}
+
+/* make rows same height? */
+.row{
+  overflow: hidden;
+}
+
+[class*="col-"]{
+  margin-bottom: -99999px;
+  padding-bottom: 99999px;
+}
+
+.nav-span {
+  width:5%;
+  padding-right:0px;
+}
+
+.main-span {
+  width:95%;
+  padding-left:1px;
+  background:#fff;
+}
+
+
+
+/* make sidebar nav vertical */
+.sidebar-nav .navbar .navbar-collapse {
+  padding: 0;
+  max-height: none;
+}
+.sidebar-nav .navbar ul {
+  float: none;
+}
+.sidebar-nav .navbar ul:not {
+  display: block;
+}
+.sidebar-nav .navbar li {
+  float: none;
+  display: block;
+}
+.sidebar-nav .navbar li a {
+  padding-top: 12px;
+  padding-bottom: 12px;
+}
+
+.nav-container {
+  border-right: 1px solid #000;
+}
+
+.app-nav {
+  background-color: #000;
+  color: white;
+
+  .navbar-test {
+    background-color: #000;
+    color: #fff;
+
+    li.active > a, .navbar-test > li.active > a:hover, .navbar-test > li.active > a:focus {
+      color: darkslategray;
+      background-color: #F6921E;
+      border-bottom: 2px solid #000;
+    }
+
+    .nav-pills {
+      font-family: 'Open Sans Condensed', 'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 1.2em;
+      text-align: center;
+      li {
+        display: inline-block;
+        float: none;
+        margin: 0;
+        a:hover{
+          background-color: #F6921E;
+        }
+      }
+      li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+        color: darkslategray;
+        background-color: #F6921E;
+        border-bottom: 2px solid #000;
+      }
+    }
+  }
 }
 
 /* increase modal size */
@@ -100,8 +185,6 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 .bcl-custom .panel-default > .panel-heading + .panel-collapse > .panel-body {
   border-top:0px solid;
 }
-
-
 
 
 

@@ -12,6 +12,9 @@ import { NavController } from '../app/nav/navController';
 import { AnalysisController } from '../app/analysis/analysisController';
 import { DesignAlternativesController } from '../app/design_alts/designAlternativesController';
 import { OutputsController } from '../app/outputs/outputsController';
+import { RunController } from '../app/run/runController';
+import { ReportsController } from '../app/reports/reportsController';
+import { ServerController } from '../app/server/serverController';
 
 //import { GithubContributorService } from '../app/components/githubContributor/githubContributor.service';
 //import { WebDevTecService } from '../app/components/webDevTec/webDevTec.service';
@@ -31,6 +34,9 @@ angular.module('PAT', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMes
   .controller('AnalysisController', AnalysisController)
   .controller('DesignAlternativesController', DesignAlternativesController)
   .controller('OutputsController', OutputsController)
+  .controller('RunController', RunController)
+  .controller('ReportsController', ReportsController)
+  .controller('ServerController', ServerController)
   .service('BCL', BCL);
 //  .service('githubContributor', GithubContributorService)
 //  .service('webDevTec', WebDevTecService)

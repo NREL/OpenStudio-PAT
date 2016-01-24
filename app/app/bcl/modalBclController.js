@@ -55,6 +55,7 @@ export class ModalBclController {
       }
     });
 
+    // for testing until electron works
     this.categories = [{name: 'A', tid: '1'},{name:'B', tid:2}, {name: 'C', tid: 3}];
 
   }
