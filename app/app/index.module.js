@@ -2,6 +2,9 @@
 
 /* global _:false */
 
+// Electron
+import * as context_menu from '../electron/context_menu';
+
 import { config } from './index.config';
 import { routerConfig } from './index.route';
 import { runBlock } from './index.run';

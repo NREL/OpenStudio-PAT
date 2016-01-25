@@ -2,7 +2,9 @@
 
 var path = require('path');
 var gulp = require('gulp');
+var jetpack = require('fs-jetpack');
 var conf = require('./conf');
+var utils = require('./utils');
 
 var $ = require('gulp-load-plugins')({
   pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del']
@@ -14,8 +16,8 @@ gulp.task('partials', function () {
       path.join(conf.paths.tmp, '/serve/app/**/*.html')
     ])
     .pipe($.minifyHtml({
-      empty: true,
-      spare: true,
+      empty: true, // retain empty elements
+      spare: true, // retain comments
       quotes: true
     }))
     .pipe($.angularTemplatecache('templateCacheHtml.js', {
@@ -25,7 +27,13 @@ gulp.task('partials', function () {
     .pipe(gulp.dest(conf.paths.tmp + '/partials/'));
 });
 
-gulp.task('html', ['inject', 'partials'], function () {
+gulp.task('background', ['scripts'], function () {
+  gulp.src(path.join(conf.paths.tmp, '/serve/app/background.js'))
+    //.pipe($.uglify({ preserveComments: $.uglifySaveLicense })).on('error', conf.errorHandler('Uglify'))
+    .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
+});
+
+gulp.task('html', ['background', 'inject', 'partials'], function () {
   var partialsInjectFile = gulp.src(path.join(conf.paths.tmp, '/partials/templateCacheHtml.js'), { read: false });
   var partialsInjectOptions = {
     starttag: '<!-- inject:partials -->',
@@ -43,9 +51,10 @@ gulp.task('html', ['inject', 'partials'], function () {
     .pipe(assets = $.useref.assets())
     .pipe($.rev())
     .pipe(jsFilter)
-    .pipe($.sourcemaps.init())
-    .pipe($.uglify({ preserveComments: $.uglifySaveLicense })).on('error', conf.errorHandler('Uglify'))
-    .pipe($.sourcemaps.write('maps'))
+    //.pipe($.sourcemaps.init())
+    .pipe($.ngAnnotate())
+    //.pipe($.uglify({ preserveComments: $.uglifySaveLicense })).on('error', conf.errorHandler('Uglify'))
+    //.pipe($.sourcemaps.write('maps'))
     .pipe(jsFilter.restore)
     .pipe(cssFilter)
     .pipe($.sourcemaps.init())
@@ -94,4 +103,27 @@ gulp.task('clean', function () {
   return $.del([path.join(conf.paths.dist, '/'), path.join(conf.paths.tmp, '/')]);
 });
 
-gulp.task('build', ['html', 'fonts', 'other']);
+gulp.task('build', ['html', 'fonts', 'other'], function () {
+  // Finalize
+  var manifest = jetpack.read(path.join(__dirname, '..', conf.paths.src, 'package.json'), 'json');
+
+  // Add "dev" or "test" suffix to name, so Electron will write all data
+  // like cookies and localStorage in separate places for each environment.
+  switch (utils.getEnvName()) {
+    case 'development':
+      manifest.name += '-dev';
+      manifest.productName += ' Dev';
+      break;
+    case 'test':
+      manifest.name += '-test';
+      manifest.productName += ' Test';
+      break;
+  }
+
+  // Copy environment variables to package.json file for easy use
+  // in the running application. This is not official way of doing
+  // things, but also isn't prohibited ;)
+  manifest.env = require('../config/env_' + utils.getEnvName());
+
+  jetpack.write(path.join(__dirname, '..', conf.paths.dist, 'package.json'), manifest);
+});
