@@ -2,16 +2,16 @@
   "name": "102Es6",
   "version": "0.0.0",
   "dependencies": {
-    "angular": "~1.4.2",
-    "angular-animate": "~1.4.2",
-    "angular-aria": "~1.4.2",
+    "angular": "~1.4.9",
+    "angular-animate": "~1.4.9",
+    "angular-aria": "~1.4.9",
     "angular-bootstrap": "~0.13.4",
-    "angular-cookies": "~1.4.2",
-    "angular-messages": "~1.4.2",
-    "angular-resource": "~1.4.2",
-    "angular-sanitize": "~1.4.2",
-    "angular-toastr": "~1.5.0",
-    "angular-touch": "~1.4.2",
+    "angular-cookies": "~1.4.9",
+    "angular-messages": "~1.4.9",
+    "angular-resource": "~1.4.9",
+    "angular-sanitize": "~1.4.9",
+    "angular-toastr": "~1.6.0",
+    "angular-touch": "~1.4.9",
     "angular-ui-router": "~0.2.15",
     "animate.css": "~3.4.0",
     "bootstrap-sass": "~3.3.5",
@@ -20,7 +20,7 @@
     "moment": "~2.10.6"
   },
   "devDependencies": {
-    "angular-mocks": "~1.4.2"
+    "angular-mocks": "~1.4.9"
   },
   "overrides": {
     "bootstrap-sass": {
@@ -36,6 +36,6 @@
   },
   "resolutions": {
     "jquery": "~2.1.4",
-    "angular": "~1.4.2"
+    "angular": "~1.4.9"
   }
 }

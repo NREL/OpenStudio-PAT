@@ -62,6 +62,6 @@ var runApp = function () {
 
 runBuild()
 .then(function () {
-    runGulpWatch();
+    //runGulpWatch();
     runApp();
 });
