@@ -1,0 +1,25 @@
+
+
+    <div class="sidebar-nav">
+      <div id="nav-container" class="navbar navbar-test">
+        <div class="navbar-header">
+          <a class="navbar-toggle" data-toggle="collapse" data-target="#pat-nav">
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+            <span class="icon-bar"></span>
+          </a>
+        </div>
+        <div class="collapse navbar-collapse sidebar-navbar-collapse" id="pat-nav" ng-controller="NavController as nav">
+          <ul class="nav nav-pills">
+            <!-- These comments prevent gaps between items -->
+            <li ng-class="{ active: nav.isActive('/analysis')}"><a ng-href="#{{nav.analysisPath}}"><img src="assets/images/measure_icon.png" alt="Analysis" /></a></li><!--
+         --><li ng-class="{ active: nav.isActive('/design_alternatives')}"><a ng-href="#{{nav.designAlternativesPath}}"><img src="assets/images/design_alts_icon.png" alt="Design Alternatives" /></a></li><!--
+         --><li ng-class="{ active: nav.isActive('/outputs')}"><a ng-href="#{{nav.outputsPath}}"><img src="assets/images/outputs_icon.png" alt="Outputs" /></a></li>
+            <li ng-class="{ active: nav.isActive('/run')}"><a ng-href="#{{nav.runPath}}"><img src="assets/images/run_icon.png" alt="Run" /></a></li>
+            <li ng-class="{ active: nav.isActive('/reports')}"><a ng-href="#{{nav.reportsPath}}"><img src="assets/images/reports_icon.png" alt="Reports" /></a></li>
+            <li ng-class="{ active: nav.isActive('/server')}"><a ng-href="#{{nav.serverPath}}"><img src="assets/images/server_icon.png" alt="Server" /></a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+

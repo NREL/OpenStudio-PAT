@@ -1,12 +1,13 @@
 export class MainController {
 
-  constructor (BCL) {
+  constructor ($log, BCL) {
     'ngInject';
 
     this.test = 'This is a test';
     this.BCL = BCL;
+    this.$log = $log;
 
-    console.log(BCL);
+    this.$log.debug(this.BCL);
 
   }
 
