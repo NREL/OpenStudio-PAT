@@ -29,50 +29,52 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 
 /* custom css */
 .container {
-  width:100%;
-  padding:0;
-  margin:0;
-  background-color:#3F3F3F;
+  width: 100%;
+  padding: 0;
+  margin: 0;
+  background-color: #3F3F3F;
 }
 
 /* make rows same height? */
-.row{
+.row {
   overflow: hidden;
 }
 
-[class*="col-"]{
+[class*="col-"] {
   margin-bottom: -99999px;
   padding-bottom: 99999px;
 }
 
 .nav-span {
-  width:5%;
-  padding-right:0px;
+  width: 5%;
+  padding-right: 0px;
 }
 
 .main-span {
-  width:95%;
-  padding-left:1px;
-  background:#fff;
+  width: 95%;
+  padding-left: 1px;
+  background: #fff;
 }
-
-
 
 /* make sidebar nav vertical */
 .sidebar-nav .navbar .navbar-collapse {
   padding: 0;
   max-height: none;
 }
+
 .sidebar-nav .navbar ul {
   float: none;
 }
+
 .sidebar-nav .navbar ul:not {
   display: block;
 }
+
 .sidebar-nav .navbar li {
   float: none;
   display: block;
 }
+
 .sidebar-nav .navbar li a {
   padding-top: 12px;
   padding-bottom: 12px;
@@ -104,7 +106,7 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
         display: inline-block;
         float: none;
         margin: 0;
-        a:hover{
+        a:hover {
           background-color: #F6921E;
         }
       }
@@ -118,16 +120,16 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 }
 
 /* increase modal size */
-.wide-Modal .modal-dialog{
-  width:95%;
+.wide-Modal .modal-dialog {
+  width: 95%;
 }
 
 .pad-bot-20 {
-  padding-bottom:20px;
+  padding-bottom: 20px;
 }
 
 .pad-top-20 {
-  padding-top:20px;
+  padding-top: 20px;
 }
 
 .search-img {
@@ -136,58 +138,65 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 }
 
 .filter-img {
-  padding:0px 10px;
-  display:inline;
+  padding: 0px 10px;
+  display: inline;
 }
+
 .filter-img img {
-  width:20px;
-  height:20px;
+  width: 20px;
+  height: 20px;
 }
+
 .indent-once {
-  padding-left:10px;
+  padding-left: 10px;
 }
+
 .indent-twice {
-  padding-left:20px;
+  padding-left: 20px;
 }
+
 .bcl-cb {
   margin-top: 5px;
   margin-bottom: 5px;
 }
 
 .pad-icon {
-  margin-right:5px;
-  display:inline;
+  margin-right: 5px;
+  display: inline;
 }
+
 .pad-right-5 {
-  padding-right:5px;
+  padding-right: 5px;
 }
 
 .bcl-custom.panel-body {
-  padding:0px;
+  padding: 0px;
 }
-.bcl-custom .panel-default>.panel-heading {
+
+.bcl-custom .panel-default > .panel-heading {
   background-color: white;
-  padding:2px;
-  margin:0px;
-  font-size:14px;
+  padding: 2px;
+  margin: 0px;
+  font-size: 14px;
 }
+
 .bcl-custom .panel-body {
-  padding:0px;
-  margin:0px;
+  padding: 0px;
+  margin: 0px;
 }
+
 .bcl-custom .panel-title {
-  font-size:14px;
-  border:0px solid;
+  font-size: 14px;
+  border: 0px solid;
 }
+
 .bcl-custom .panel, .bcl-custom .panel-default {
-  border:0px solid;
+  border: 0px solid;
 }
+
 .bcl-custom .panel-default > .panel-heading + .panel-collapse > .panel-body {
-  border-top:0px solid;
+  border-top: 0px solid;
 }
-
-
-
 
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject

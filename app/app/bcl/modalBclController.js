@@ -1,9 +1,9 @@
 export class ModalBclController {
 
   constructor($log, $uibModalInstance, _, BCL) {
-
     'ngInject';
 
+    let self = this;
     this.test = 'HELLO in Modal!';
     this.selected = null;
     this.keyword = '';
@@ -23,40 +23,38 @@ export class ModalBclController {
 
     BCL.getCategories().then(function (response) {
 
-      if (response.data['term'] != undefined) {
-        this.categories = [];
+      if (response.data.term != undefined) {
+        let categories = [];
         // 3 possible levels of nesting
-        this._.each(response.data['term'], function (term) {
-          let cat1 = {};
-          cat1.name = term['name'];
-          cat1.tid = term['tid'];
+        _.each(response.data.term, function (term) {
+          let cat1 = _.pick(term, ['name', 'tid']);
           let cat1_terms = [];
-          this._.each(term['term'], function (term2) {
-            let cat2 = {};
-            cat2.name = term2['name'];
-            cat2.tid = term2['tid'];
+          _.each(term.term, function (term2) {
+            let cat2 = _.pick(term2, ['name', 'tid']);
             let cat2_terms = [];
-            this._.each(term2['term'], function (term3) {
-              let cat3 = {};
-              cat3.name = term3['name'];
-              cat3.tid = term3['tid'];
+            _.each(term2.term, function (term3) {
+              let cat3 = _.pick(term3, ['name', 'tid']);
               cat2_terms.push(cat3);
             });
             cat2.children = cat2_terms;
             cat1_terms.push(cat2);
           });
           cat1.children = cat1_terms;
-          this.categories.push(cat1);
+          categories.push(cat1);
         });
 
-        this.$log.debug('Categories: ', this.categories);
-        //this.categories = categories;
+        self.$log.debug('Categories: ', categories);
+        self.categories = categories;
 
       }
     });
 
     // for testing until electron works
-    this.categories = [{name: 'A', tid: '1'},{name:'B', tid:2}, {name: 'C', tid: 3}];
+    this.categories = [
+      {name: 'A', tid: 1},
+      {name: 'B', tid: 2},
+      {name: 'C', tid: 3}
+    ];
 
   }
 
