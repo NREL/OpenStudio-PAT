@@ -8,10 +8,6 @@
         <h1>KAT</h1>
       </div>
 
-      <p>
-        {{ analysis.test }}
-
-
         <label for="analysisType"> Analysis Type: </label>
         <select name="analysisType" ng-model="data.analysisType">
           <option value="option-1">Manual</option>
@@ -56,48 +52,35 @@
         <button ng-click="addReportingMeasure" class="glyphicon glyphicon-plus"> Add Measure </button>
         <br>
 
-      <div ng-controller="ProjectMeasuresController">
-        <script type="text/ng-template" id="group-template.html">
-          <div class="panel {{panelClass || 'panel-default'}}">
-            <div class="panel-heading">
-              <h4 class="panel-title" style="color:#fa39c3">
-                <a href tabindex="0" class="accordion-toggle" ng-click="toggleOpen()" uib-accordion-transclude="heading"><span
-                  ng-class="{'text-muted': isDisabled}">{{heading}}</span></a>
-              </h4>
-            </div>
-            <div class="panel-collapse collapse" uib-collapse="!isOpen">
-              <div class="panel-body" style="text-align: right" ng-transclude></div>
+      <div>
+        <div class="panel panel-default">
+          <div class="panel-heading">Measures On Disk</div>
+          <div class="bcl-custom">
+            <div class="bcl-custom panel-body">
+              <uib-accordion close-others="analysis.oneAtATime">
+                <uib-accordion-group is-open="analysis.status.isFirstOpen" is-disabled="analysis.status.isFirstDisabled">
+                  <uib-accordion-heading>
+                    Standard OpenStudio Report <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': analysis.status.open, 'glyphicon-chevron-right': !analysis.status.open}"></i>
+                  </uib-accordion-heading>
+                  <button type="button" class="btn btn-default btn-sm" ng-click="analysis.addItem()">Add Item</button>
+                  <div ng-repeat="item in analysis.items">{{item}}</div>
+                </uib-accordion-group>
+                <uib-accordion-group heading="Calibration Report">
+                  <div ng-repeat="item in analysis.items">{{item}}</div>
+                </uib-accordion-group>
+                <uib-accordion-group heading="Radiance Report">
+                  <div ng-repeat="item in analysis.items">{{item}}</div>
+                </uib-accordion-group>
+                <uib-accordion-group is-open="analysis.status.open">
+                  <uib-accordion-heading>
+                    I can have markup, too! <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': analysis.status.open, 'glyphicon-chevron-right': !analysis.status.open}"></i>
+                  </uib-accordion-heading>
+                  This is just some content to illustrate fancy headings.
+                </uib-accordion-group>
+              </uib-accordion>
             </div>
           </div>
-        </script>
-
-        <uib-accordion close-others="oneAtATime">
-          <uib-accordion-group is-open="status.isFirstOpen" is-disabled="status.isFirstDisabled">
-            <uib-accordion-heading>
-              Standard OpenStudio Report <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-            </uib-accordion-heading>
-            <button type="button" class="btn btn-default btn-sm" ng-click="addItem()">Add Item</button>
-            <div ng-repeat="item in items">{{item}}</div>
-          </uib-accordion-group>
-          <uib-accordion-group heading="Calibration Report">
-            <div ng-repeat="item in items">{{item}}</div>
-          </uib-accordion-group>
-          <uib-accordion-group heading="Radiance Report">
-            <div ng-repeat="item in items">{{item}}</div>
-          </uib-accordion-group>
-          <uib-accordion-group is-open="status.open">
-            <uib-accordion-heading>
-              I can have markup, too! <i class="pull-right glyphicon" ng-class="{'glyphicon-chevron-down': status.open, 'glyphicon-chevron-right': !status.open}"></i>
-            </uib-accordion-heading>
-            This is just some content to illustrate fancy headings.
-          </uib-accordion-group>
-        </uib-accordion>
-      </div>
-
-
-
-
-      </p>
+        </div>
     </div>
   </div>
 </div>

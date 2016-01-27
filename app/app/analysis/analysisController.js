@@ -5,16 +5,16 @@ export class AnalysisController {
 
     this.test = 'Analysis Controller';
 
-    $scope.oneAtATime = true;
+    this.oneAtATime = true;
 
-    $scope.items = ['Item 1', 'Item 2', 'Item 3'];
+    this.items = ['Item 1', 'Item 2', 'Item 3'];
 
-    $scope.addItem = function() {
+    this.addItem = function() {
       var newItemNo = this.items.length + 1;
       this.items.push('Item ' + newItemNo);
     };
 
-    $scope.status = {
+    this.status = {
       isFirstOpen: true,
       isFirstDisabled: false
     };
