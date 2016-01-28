@@ -1,6 +1,6 @@
 export class OutputsController {
 
-  constructor () {
+  constructor() {
     'ngInject';
 
     this.test = 'Outputs Controller';

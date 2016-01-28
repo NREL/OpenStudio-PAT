@@ -1,7 +1,6 @@
 export class NavController {
 
   constructor($location) {
-
     'ngInject';
 
     this.$location = $location;

@@ -1,6 +1,6 @@
 export class MainController {
 
-  constructor ($log, BCL) {
+  constructor($log, BCL) {
     'ngInject';
 
     this.test = 'This is a test';

@@ -5,11 +5,22 @@ var gulp = require('gulp');
 var Q = require('q');
 var jetpack = require('fs-jetpack');
 var conf = require('./conf');
-var _ = require('lodash');
+var $ = require('gulp-load-plugins')();
 
 //var browserSync = require('browser-sync');
 var rollup = require('rollup');
 var babel = require('rollup-plugin-babel');
+
+gulp.task('lint', function () {
+  return gulp.src([
+    path.join(conf.paths.src, '**/*.js'),
+    '!' + path.join(conf.paths.src, 'node_modules/**'),
+    '!' + path.join(conf.paths.src, 'electron/jasmine/**')
+  ])
+    .pipe($.eslint())
+    .pipe($.eslint.format())
+    .pipe($.eslint.failAfterError());
+});
 
 var bundle = function (src, dest) {
   var deferred = Q.defer();
@@ -43,16 +54,14 @@ var bundle = function (src, dest) {
   return deferred.promise;
 };
 
-gulp.task('scripts', function () {
-  //return webpackWrapper(false, false);
-
+gulp.task('scripts', /*['lint'],*/ function () {
   return Q.all([
     bundle(path.join(conf.paths.src, '/electron/background.js'), path.join(conf.paths.tmp, 'serve/app/background.js')),
     bundle(path.join(conf.paths.src, '/app/index.module.js'), path.join(conf.paths.tmp, 'serve/app/index.module.js'))
   ]);
 });
 
-gulp.task('scripts:watch', ['scripts'], function (callback) {
+/*gulp.task('scripts:watch', ['scripts'], function (callback) {
   //return webpackWrapper(true, false, callback);
 });
 
@@ -62,4 +71,4 @@ gulp.task('scripts:test', function () {
 
 gulp.task('scripts:test-watch', ['scripts'], function (callback) {
   //return webpackWrapper(true, true, callback);
-});
+});*/

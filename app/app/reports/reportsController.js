@@ -1,6 +1,6 @@
 export class ReportsController {
 
-  constructor () {
+  constructor() {
     'ngInject';
 
     this.test = 'Reports Controller';

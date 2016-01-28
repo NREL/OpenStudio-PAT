@@ -1,6 +1,6 @@
 export class RunController {
 
-  constructor () {
+  constructor() {
     'ngInject';
 
     this.test = 'Run Controller';

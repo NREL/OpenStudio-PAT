@@ -1,6 +1,6 @@
 export class DesignAlternativesController {
 
-  constructor () {
+  constructor() {
     'ngInject';
 
     this.test = 'Design Alternatives Controller';

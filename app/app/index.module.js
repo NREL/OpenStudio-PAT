@@ -1,9 +1,7 @@
-///* global malarkey:false, moment:false */
-
 /* global _:false */
 
 // Electron
-import * as context_menu from '../electron/context_menu';
+import * as context_menu from '../electron/context_menu'; // eslint-disable-line no-unused-vars
 
 import { config } from './index.config';
 import { routerConfig } from './index.route';
@@ -19,14 +17,7 @@ import { RunController } from '../app/run/runController';
 import { ReportsController } from '../app/reports/reportsController';
 import { ServerController } from '../app/server/serverController';
 
-//import { GithubContributorService } from '../app/components/githubContributor/githubContributor.service';
-//import { WebDevTecService } from '../app/components/webDevTec/webDevTec.service';
-//import { NavbarDirective } from '../app/components/navbar/navbar.directive';
-//import { MalarkeyDirective } from '../app/components/malarkey/malarkey.directive';
-
-angular.module('PAT', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr'])
-//  .constant('malarkey', malarkey)
-//  .constant('moment', moment)
+angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr'])
   .constant('_', _)
   .config(config)
   .config(routerConfig)
@@ -41,7 +32,3 @@ angular.module('PAT', ['ngAnimate', 'ngCookies', 'ngTouch', 'ngSanitize', 'ngMes
   .controller('ReportsController', ReportsController)
   .controller('ServerController', ServerController)
   .service('BCL', BCL);
-//  .service('githubContributor', GithubContributorService)
-//  .service('webDevTec', WebDevTecService)
-//  .directive('acmeNavbar', NavbarDirective)
-//  .directive('acmeMalarkey', MalarkeyDirective);

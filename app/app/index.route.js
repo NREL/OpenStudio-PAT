@@ -1,4 +1,4 @@
-export function routerConfig ($stateProvider, $urlRouterProvider) {
+export function routerConfig($stateProvider, $urlRouterProvider) {
   'ngInject';
   $stateProvider
     .state('home', {
