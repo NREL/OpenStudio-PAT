@@ -1,12 +1,12 @@
 {
-  "name": "electron-boilerplate",
-  "productName": "Electron Boilerplate",
-  "identifier": "com.example.electron-boilerplate",
-  "description": "Starter for your Electron application. Out of the box ready for serious stuff.",
-  "version": "0.1.0",
-  "author": "Mr Gumby",
+  "name": "pat",
+  "productName": "ParametricAnalysisTool",
+  "identifier": "gov.nrel.openstudio.pat",
+  "description": "OpenStudio Parametric Analysis Tool",
+  "version": "0.0.1",
+  "author": "National Renewable Energy Laboratory",
   "main": "background.js",
   "dependencies": {
-    "fs-jetpack": "^0.7.0"
+    "fs-jetpack": "~0.7.1"
   }
 }
