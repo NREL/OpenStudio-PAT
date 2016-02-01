@@ -62,5 +62,8 @@
     "release": "gulp release --env=production",
     "start": "node ./tasks/start",
     "test": "node ./tasks/start --env=test"
+  },
+  "dependencies": {
+    "xml2js": "^0.4.16"
   }
 }
