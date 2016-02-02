@@ -16,9 +16,26 @@
     "module": true
   },
   "rules": {
+    // Possible errors
+    "no-console": 0, // Comment for production
+    // Best practices
     "dot-notation": 1,
+    "no-multi-spaces": 1,
     // Stylistic Issues
     "array-bracket-spacing": 1,
-    "comma-spacing": 1
+    "comma-spacing": 1,
+    "consistent-this": [2, "self"],
+    "no-mixed-spaces-and-tabs": 1,
+    "no-trailing-spaces": 1,
+    "quotes": [2, "single"],
+    "semi": [2, "always"],
+    // ES6
+    "no-const-assign": 2,
+    "no-var": 1,
+    "prefer-arrow-callback": 1,
+    "prefer-const": 1,
+    // Angular plugin
+    "angular/log": 0, // Comment for production
+    "angular/no-service-method": 0
   }
 }

@@ -11,18 +11,18 @@ var wiredep = require('wiredep').stream;
 //var browserSync = require('browser-sync');
 
 /*gulp.task('inject-reload', ['inject'], function() {
-  browserSync.reload();
-});*/
+ browserSync.reload();
+ });*/
 
 gulp.task('inject', ['scripts', 'styles'], function () {
   var injectStyles = gulp.src([
     path.join(conf.paths.tmp, '/serve/app/**/*.css'),
     path.join('!' + conf.paths.tmp, '/serve/app/vendor.css')
-  ], { read: false });
+  ], {read: false});
 
   var injectScripts = gulp.src([
     path.join(conf.paths.tmp, '/serve/app/**/*.module.js')
-  ], { read: false });
+  ], {read: false});
 
   var injectOptions = {
     ignorePath: [conf.paths.src, path.join(conf.paths.tmp, '/serve')],

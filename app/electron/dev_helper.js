@@ -1,24 +1,24 @@
 import { app, Menu, BrowserWindow } from 'electron';
 
-var setDevMenu = function () {
-  var devMenu = Menu.buildFromTemplate([{
+const setDevMenu = () => {
+  const devMenu = Menu.buildFromTemplate([{
     label: 'Development',
     submenu: [{
       label: 'Reload',
       accelerator: 'CmdOrCtrl+R',
-      click: function () {
+      click: () => {
         BrowserWindow.getFocusedWindow().webContents.reloadIgnoringCache();
       }
     }, {
       label: 'Toggle DevTools',
       accelerator: 'Alt+CmdOrCtrl+I',
-      click: function () {
+      click: () => {
         BrowserWindow.getFocusedWindow().toggleDevTools();
       }
     }, {
       label: 'Quit',
       accelerator: 'CmdOrCtrl+Q',
-      click: function () {
+      click: () => {
         app.quit();
       }
     }]
@@ -28,4 +28,4 @@ var setDevMenu = function () {
 
 export default {
   setDevMenu: setDevMenu
-}
+};

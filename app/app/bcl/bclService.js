@@ -10,9 +10,9 @@ export class BCL {
   }
 
   // DOWNLOAD COMPONENT BY UID
-  download(the_uids) {
+  download(uids) {
     return this.$http.get('http://bcl7.development.nrel.gov/api/component/download/', {
-      params: {uids: the_uids},
+      params: {uids: uids},
       responseType: 'arraybuffer'
     });
   }
@@ -29,24 +29,15 @@ export class BCL {
 
   // OPEN BCL LIBRARY MODAL
   openBCLModal() {
-    let deferred = this.$q.defer();
-
-    let modalInstance = this.$uibModal.open({
+    const modalInstance = this.$uibModal.open({
       backdrop: 'static',
       controller: 'ModalBclController',
       controllerAs: 'modal',
       templateUrl: 'app/bcl/bcl.html',
       windowClass: 'wide-modal'
-
     });
 
-    modalInstance.result.then(function () {
-      deferred.resolve();
-    }, function () {
-      // Modal canceled
-      deferred.reject();
-    });
-    return deferred.promise;
+    return modalInstance.result;
   }
 
 }

@@ -8,21 +8,21 @@ var srcDir = jetpack.cwd('app');
 
 var fileName = 'spec.js';
 var fileBanner = "// This file is generated automatically.\n"
-    + "// All your modifications to it will be lost (so don't do it).\n";
+  + "// All your modifications to it will be lost (so don't do it).\n";
 var whatToInclude = [
-    '*.spec.js',
-    '!node_modules/**',
+  '*.spec.js',
+  '!node_modules/**',
 ];
 
 module.exports = function () {
-    return srcDir.findAsync('.', { matching: whatToInclude }, 'relativePath')
+  return srcDir.findAsync('.', {matching: whatToInclude}, 'relativePath')
     .then(function (specPaths) {
-        var fileContent = specPaths.map(function (path) {
-            return 'import "' + path + '";';
-        }).join('\n');
-        return srcDir.writeAsync(fileName, fileBanner + fileContent);
+      var fileContent = specPaths.map(function (path) {
+        return 'import "' + path + '";';
+      }).join('\n');
+      return srcDir.writeAsync(fileName, fileBanner + fileContent);
     })
     .then(function () {
-        return srcDir.path(fileName);
+      return srcDir.path(fileName);
     });
 };

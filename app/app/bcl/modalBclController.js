@@ -3,7 +3,7 @@ export class ModalBclController {
   constructor($log, $uibModalInstance, _, BCL) {
     'ngInject';
 
-    let self = this;
+    const self = this;
     this.test = 'HELLO in Modal!';
     this.selected = null;
     this.keyword = '';
@@ -21,19 +21,19 @@ export class ModalBclController {
     };
 
 
-    BCL.getCategories().then(function (response) {
+    BCL.getCategories().then(response => {
 
-      if (response.data.term != undefined) {
-        let categories = [];
+      if (response.data.term) {
+        const categories = [];
         // 3 possible levels of nesting
-        _.each(response.data.term, function (term) {
-          let cat1 = _.pick(term, ['name', 'tid']);
-          let cat1_terms = [];
-          _.each(term.term, function (term2) {
-            let cat2 = _.pick(term2, ['name', 'tid']);
-            let cat2_terms = [];
-            _.each(term2.term, function (term3) {
-              let cat3 = _.pick(term3, ['name', 'tid']);
+        _.each(response.data.term, term => {
+          const cat1 = _.pick(term, ['name', 'tid']);
+          const cat1_terms = [];
+          _.each(term.term, term2 => {
+            const cat2 = _.pick(term2, ['name', 'tid']);
+            const cat2_terms = [];
+            _.each(term2.term, term3 => {
+              const cat3 = _.pick(term3, ['name', 'tid']);
               cat2_terms.push(cat3);
             });
             cat2.children = cat2_terms;

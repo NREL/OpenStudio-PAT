@@ -11,15 +11,27 @@ var $ = require('gulp-load-plugins')();
 var rollup = require('rollup');
 var babel = require('rollup-plugin-babel');
 
-gulp.task('lint', function () {
+var eslint = function (fix) {
+  fix = !!fix;
   return gulp.src([
-    path.join(conf.paths.src, '**/*.js'),
-    '!' + path.join(conf.paths.src, 'node_modules/**'),
-    '!' + path.join(conf.paths.src, 'electron/jasmine/**')
-  ])
-    .pipe($.eslint())
+      path.join(conf.paths.src, '**/*.js'),
+      '!' + path.join(conf.paths.src, 'node_modules/**'),
+      '!' + path.join(conf.paths.src, 'electron/jasmine/**')
+    ], {
+      base: '.'
+    })
+    .pipe($.eslint({fix: fix}))
     .pipe($.eslint.format())
-    .pipe($.eslint.failAfterError());
+    .pipe(fix ? gulp.dest('.') : $.util.noop());
+    //.pipe($.eslint.failAfterError());
+};
+
+gulp.task('lint', function () {
+  return eslint();
+});
+
+gulp.task('lint:fix', function () {
+  return eslint(true);
 });
 
 var bundle = function (src, dest) {
@@ -54,7 +66,7 @@ var bundle = function (src, dest) {
   return deferred.promise;
 };
 
-gulp.task('scripts', /*['lint'],*/ function () {
+gulp.task('scripts', ['lint'], function () {
   return Q.all([
     bundle(path.join(conf.paths.src, '/electron/background.js'), path.join(conf.paths.tmp, 'serve/app/background.js')),
     bundle(path.join(conf.paths.src, '/app/index.module.js'), path.join(conf.paths.tmp, 'serve/app/index.module.js'))
@@ -62,13 +74,13 @@ gulp.task('scripts', /*['lint'],*/ function () {
 });
 
 /*gulp.task('scripts:watch', ['scripts'], function (callback) {
-  //return webpackWrapper(true, false, callback);
-});
+ //return webpackWrapper(true, false, callback);
+ });
 
-gulp.task('scripts:test', function () {
-  //return webpackWrapper(false, true);
-});
+ gulp.task('scripts:test', function () {
+ //return webpackWrapper(false, true);
+ });
 
-gulp.task('scripts:test-watch', ['scripts'], function (callback) {
-  //return webpackWrapper(true, true, callback);
-});*/
+ gulp.task('scripts:test-watch', ['scripts'], function (callback) {
+ //return webpackWrapper(true, true, callback);
+ });*/

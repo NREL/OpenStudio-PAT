@@ -5,8 +5,8 @@ export class NavController {
 
     this.$location = $location;
 
-    this.isActive = function (tabIndicator) {
-      var tabRegex = new RegExp(tabIndicator);
+    this.isActive = tabIndicator => {
+      const tabRegex = new RegExp(tabIndicator);
       return tabRegex.test(this.$location.path());
     };
 
