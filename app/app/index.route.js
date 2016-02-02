@@ -1,14 +1,14 @@
 export function routerConfig($stateProvider, $urlRouterProvider) {
   'ngInject';
   $stateProvider
-    .state('home', {
+    /*.state('home', {
       url: '/',
       templateUrl: 'app/main/main.html',
       controller: 'MainController',
       controllerAs: 'main'
-    })
-    .state('analysis', {
-      url: '/analysis',
+    })*/
+    .state('home', {
+      url: '/',
       templateUrl: 'app/analysis/analysis.html',
       controller: 'AnalysisController',
       controllerAs: 'analysis'

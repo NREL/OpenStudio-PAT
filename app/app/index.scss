@@ -48,12 +48,13 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 .nav-span {
   width: 5%;
   padding-right: 0px;
+  background-color:darkslategray;
 }
 
 .main-span {
   width: 95%;
-  padding-left: 1px;
-  background: #fff;
+  padding: 10px;
+  background-color: #fff;
 }
 
 /* make sidebar nav vertical */

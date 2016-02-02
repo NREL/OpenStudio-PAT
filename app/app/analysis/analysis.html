@@ -4,13 +4,11 @@
       <div class="app-nav" ng-include="'app/nav/nav.html'"></div>
     </div>
     <div class="col-sm-11 main-span">
-      <div class="jumbotron text-center">
-        <h1>PAT</h1>
-      </div>
-
+      
       <p>
         {{ analysis.test }}
       </p>
+      <p><button type="button" class="btn btn-info" ng-click="main.BCL.openBCLModal()">Open BCL View</button>
     </div>
   </div>
 </div>

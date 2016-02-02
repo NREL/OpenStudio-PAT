@@ -6,7 +6,7 @@ import * as context_menu from '../electron/context_menu'; // eslint-disable-line
 import { config } from './index.config';
 import { routerConfig } from './index.route';
 import { runBlock } from './index.run';
-import { MainController } from '../app/main/mainController';
+/*import { MainController } from '../app/main/mainController';*/
 import { BCL } from '../app/bcl/bclService';
 import { ModalBclController } from '../app/bcl/modalBclController';
 import { NavController } from '../app/nav/navController';
@@ -22,7 +22,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .config(config)
   .config(routerConfig)
   .run(runBlock)
-  .controller('MainController', MainController)
+  /*.controller('MainController', MainController)*/
   .controller('NavController', NavController)
   .controller('ModalBclController', ModalBclController)
   .controller('AnalysisController', AnalysisController)
