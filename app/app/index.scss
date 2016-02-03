@@ -28,43 +28,46 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 }
 
 /* custom css */
-.container {
-  width: 100%;
+body {
+  height: 100%;
   padding: 0;
   margin: 0;
-  background-color: #3F3F3F;
 }
 
-/* make rows same height? */
-.row {
-  overflow: hidden;
+.container-flex {
+  display: flex;
+  height: 100%;
+  align-items: stretch;
 }
 
-[class*="col-"] {
-  margin-bottom: -99999px;
-  padding-bottom: 99999px;
+.main {
+  background: white;
+  padding-left:5px;
 }
 
-.nav-span {
-  width: 5%;
-  padding-right: 0px;
-  background-color:darkslategray;
-}
-
-.main-span {
-  width: 95%;
-  padding: 10px;
-  background-color: #fff;
+.nav {
+  background: #3f3f3f;
+  flex-direction: column;
+  width: 52px;
+  padding:100px 0px 300px 0px;
+  border-right: 1px solid #000;
 }
 
 /* make sidebar nav vertical */
+.sidebar-nav .navbar {
+  border:0px;
+}
+
 .sidebar-nav .navbar .navbar-collapse {
-  padding: 0;
+  padding: 0px 0px;
   max-height: none;
+  background-color:#000;
+  border:0px;
 }
 
 .sidebar-nav .navbar ul {
   float: none;
+  background-color:#000;
 }
 
 .sidebar-nav .navbar ul:not {
@@ -81,42 +84,27 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
   padding-bottom: 12px;
 }
 
-.nav-container {
-  border-right: 1px solid #000;
+.nav .nav-pills ul {
+  padding:0px;
 }
 
-.app-nav {
-  background-color: #000;
-  color: white;
-
-  .navbar-test {
-    background-color: #000;
-    color: #fff;
-
-    li.active > a, .navbar-test > li.active > a:hover, .navbar-test > li.active > a:focus {
-      color: darkslategray;
+.nav-pills {
+  font-family: 'Open Sans Condensed', 'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1.2em;
+  text-align: center;
+  padding:0px;
+  li {
+    display: inline-block;
+    float: none;
+    margin: 0;
+    a:hover {
       background-color: #F6921E;
-      border-bottom: 2px solid #000;
     }
-
-    .nav-pills {
-      font-family: 'Open Sans Condensed', 'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 1.2em;
-      text-align: center;
-      li {
-        display: inline-block;
-        float: none;
-        margin: 0;
-        a:hover {
-          background-color: #F6921E;
-        }
-      }
-      li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-        color: darkslategray;
-        background-color: #F6921E;
-        border-bottom: 2px solid #000;
-      }
-    }
+  }
+  li.active > a, li.active > a:hover, .nav-pills > li.active > a:focus {
+    color: darkslategray;
+    background-color: #F6921E;
+    border-bottom: 2px solid #000;
   }
 }
 

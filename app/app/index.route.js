@@ -7,8 +7,8 @@ export function routerConfig($stateProvider, $urlRouterProvider) {
       controller: 'MainController',
       controllerAs: 'main'
     })*/
-    .state('home', {
-      url: '/',
+    .state('analysis', {
+      url: '/analysis',
       templateUrl: 'app/analysis/analysis.html',
       controller: 'AnalysisController',
       controllerAs: 'analysis'
@@ -44,7 +44,7 @@ export function routerConfig($stateProvider, $urlRouterProvider) {
       controllerAs: 'server'
     });
 
-  $urlRouterProvider.otherwise('/');
+  $urlRouterProvider.otherwise('/analysis');
 }
 
 

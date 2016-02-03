@@ -1,13 +1,11 @@
-<div class="container">
-  <div class="row row-same-height">
-    <div class="col-sm-1 nav-span">
-      <div class="app-nav" ng-include="'app/nav/nav.html'"></div>
-    </div>
-    <div class="col-sm-11 main-span">
-
-      <p>
-        {{ reports.test }}
-      </p>
-    </div>
+<div class="container-flex">
+  <div class="nav">
+    <div ng-include="'app/nav/nav.html'"></div>
+  </div>
+  <div class="main">
+    <p>
+      {{ reports.test }}
+    </p>
   </div>
 </div>
+
