@@ -58,6 +58,14 @@
           <div class="bcl-custom">
             <div class="bcl-custom panel-body">
               <uib-accordion close-others="analysis.oneAtATime">
+                <uib-accordion-group heading="{{group.title}}" ng-repeat="group in analysis.groups">
+                  {{group.content}}
+                </uib-accordion-group>
+
+                <uib-accordion-group heading="{{measure.measurename}}" ng-repeat="measure in analysis.measurestuff">
+                  {{measure.measurename}}
+                </uib-accordion-group>
+
                 <uib-accordion-group is-open="analysis.status.isFirstOpen" is-disabled="analysis.status.isFirstDisabled">
                   <uib-accordion-heading>
                     Standard OpenStudio Report <i class="pull-left glyphicon" ng-class="{'glyphicon-chevron-down': analysis.status.open, 'glyphicon-chevron-right': !analysis.status.open}"></i>
