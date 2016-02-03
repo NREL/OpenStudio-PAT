@@ -199,6 +199,11 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
   border-top: 0px solid;
 }
 
+/* TODO: Please remove this later */
+.row {
+  overflow: visible;
+}
+
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject
  *  all your sass files automatically
