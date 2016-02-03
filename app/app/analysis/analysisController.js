@@ -1,4 +1,6 @@
 var jetpack = require('fs-jetpack');
+var os = require('os');
+var path = require('path');
 var parseString = require('xml2js').parseString;
 
 export class AnalysisController {
@@ -6,7 +8,7 @@ export class AnalysisController {
   constructor(_, $log) {
     'ngInject';
 
-    this.srcDir = jetpack.cwd('C:/Users/eweaver/OpenStudio/Measures');
+    this.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
 
     this._ = _;
     this.$log = $log;
