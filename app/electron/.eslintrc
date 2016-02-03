@@ -1,5 +1,6 @@
 {
   "rules": {
+    // Angular plugin
     "angular/document-service": 0
   }
 }

@@ -12,63 +12,43 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 // bower:scss
 // endbower
 
-.browsehappy {
-  margin: 0.2em 0;
-  background: #ccc;
-  color: #000;
-  padding: 0.2em 0;
-}
-
-.thumbnail {
-  height: 200px;
-
-  img.pull-right {
-    width: 50px;
-  }
-}
-
-/* custom css */
-body {
-  height: 100%;
+.container {
+  width: 100%;
   padding: 0;
   margin: 0;
+  background-color: #3F3F3F;
 }
 
-.container-flex {
-  display: flex;
-  height: 100%;
-  align-items: stretch;
+/* make rows same height? */
+.row {
+  overflow: hidden;
 }
 
-.main {
-  background: white;
-  padding-left:5px;
+[class*="col-"] {
+  margin-bottom: -99999px;
+  padding-bottom: 99999px;
 }
 
-.nav {
-  background: #3f3f3f;
-  flex-direction: column;
-  width: 40px;
-  padding:100px 0px 300px 0px;
-  border-right: 1px solid #000;
+.nav-span {
+  width: 5%;
+  padding-right: 0;
+  background-color: darkslategray;
+}
+
+.main-span {
+  width: 95%;
+  padding: 10px;
+  background-color: #fff;
 }
 
 /* make sidebar nav vertical */
-.sidebar-nav .navbar {
-  border:0px;
-  min-height:32px !important;
-}
-
 .sidebar-nav .navbar .navbar-collapse {
-  padding: 0px 0px;
+  padding: 0;
   max-height: none;
-  background-color:#000;
-  border:0px;
 }
 
 .sidebar-nav .navbar ul {
   float: none;
-  background-color:#000;
 }
 
 .sidebar-nav .navbar ul:not {
@@ -83,40 +63,44 @@ body {
 .sidebar-nav .navbar li a {
   padding-top: 12px;
   padding-bottom: 12px;
-  border-bottom:1px solid #fff;
 }
 
-.nav .nav-pills ul {
-  padding:0px;
+.nav-container {
+  border-right: 1px solid #000;
 }
 
-.nav li a {
+.app-nav {
+  background-color: #000;
+  color: white;
 
-  padding-top:5px !important; padding-bottom:5px !important;
-}
+  .navbar-test {
+    background-color: #000;
+    color: #fff;
 
-.nav-pills {
-  font-family: 'Open Sans Condensed', 'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-  font-size: 1.2em;
-  text-align: center;
-  padding:0px;
-  li {
-    padding:0;
-    display: inline-block;
-    float: none;
-    margin: 0;
-    a {
-      padding-top:5px !important; padding-bottom:5px !important;
-      padding-left:0px !important; padding-right:0px !important;
-    }
-    a:hover {
+    li.active > a, .navbar-test > li.active > a:hover, .navbar-test > li.active > a:focus {
+      color: darkslategray;
       background-color: #F6921E;
+      border-bottom: 2px solid #000;
     }
-  }
-  li.active > a, li.active > a:hover, .nav-pills > li.active > a:focus {
-    color: darkslategray;
-    background-color: #F6921E;
-    border-bottom: 2px solid #000;
+
+    .nav-pills {
+      font-family: 'Open Sans Condensed', 'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+      font-size: 1.2em;
+      text-align: center;
+      li {
+        display: inline-block;
+        float: none;
+        margin: 0;
+        a:hover {
+          background-color: #F6921E;
+        }
+      }
+      li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
+        color: darkslategray;
+        background-color: #F6921E;
+        border-bottom: 2px solid #000;
+      }
+    }
   }
 }
 
@@ -139,7 +123,7 @@ body {
 }
 
 .filter-img {
-  padding: 0px 10px;
+  padding: 0 10px;
   display: inline;
 }
 
@@ -171,32 +155,32 @@ body {
 }
 
 .bcl-custom.panel-body {
-  padding: 0px;
+  padding: 0;
 }
 
 .bcl-custom .panel-default > .panel-heading {
   background-color: white;
   padding: 2px;
-  margin: 0px;
+  margin: 0;
   font-size: 14px;
 }
 
 .bcl-custom .panel-body {
-  padding: 0px;
-  margin: 0px;
+  padding: 0;
+  margin: 0;
 }
 
 .bcl-custom .panel-title {
   font-size: 14px;
-  border: 0px solid;
+  border: 0 solid;
 }
 
 .bcl-custom .panel, .bcl-custom .panel-default {
-  border: 0px solid;
+  border: 0 solid;
 }
 
 .bcl-custom .panel-default > .panel-heading + .panel-collapse > .panel-body {
-  border-top: 0px solid;
+  border-top: 0 solid;
 }
 
 /**

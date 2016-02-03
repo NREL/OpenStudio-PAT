@@ -53,21 +53,21 @@ gulp.task('html', ['background', 'inject', 'partials'], function () {
     .pipe($.inject(partialsInjectFile, partialsInjectOptions))
     .pipe($.useref())
     .pipe(jsFilter)
-    .pipe($.sourcemaps.init())
+    //.pipe($.sourcemaps.init())
     .pipe($.ngAnnotate())
     .pipe($.rev())
     //.pipe($.uglify({preserveComments: $.uglifySaveLicense})).on('error', conf.errorHandler('Uglify'))
-    .pipe($.sourcemaps.write('maps'))
+    //.pipe($.sourcemaps.write('maps'))
     .pipe(jsFilter.restore)
     .pipe(cssFilter)
-    .pipe($.sourcemaps.init())
+    //.pipe($.sourcemaps.init())
     .pipe($.replace('../../bower_components/bootstrap-sass/assets/fonts/bootstrap/', '../fonts/'))
     .pipe($.rev())
-    .pipe($.minifyCss({processImport: false}))
-    .pipe($.sourcemaps.write('maps'))
+    //.pipe($.csso())
+    //.pipe($.sourcemaps.write('maps'))
     .pipe(cssFilter.restore)
     .pipe($.revReplace())
-    .pipe(htmlFilter)
+    /*.pipe(htmlFilter)
     .pipe($.htmlmin({
       collapseBooleanAttributes: true,
       collapseInlineTagWhitespace: true,
@@ -76,7 +76,7 @@ gulp.task('html', ['background', 'inject', 'partials'], function () {
       removeRedundantAttributes: true,
       removeTagWhitespace: true
     }))
-    .pipe(htmlFilter.restore)
+    .pipe(htmlFilter.restore)*/
     .pipe(gulp.dest(path.join(conf.paths.dist, '/')))
     .pipe($.size({
       title: path.join(conf.paths.dist, '/'),
