@@ -3,10 +3,99 @@
     <div ng-include="'app/nav/nav.html'"></div>
   </div>
   <div class="main">
+    <p>{{analysis.test}}</p>
     <p>
-      {{ analysis.test }}
+      <button type="button" class="btn btn-info" ng-click="analysis.BCL.openBCLModal()">Open BCL View</button>
     </p>
-    <p><button type="button" class="btn btn-info" ng-click="analysis.BCL.openBCLModal()">Open BCL View</button>
+    <label>Analysis Type:</label>
+    <form class="form-inline">
+      <div class="input-group">
+        <select class="form-control">
+          <option>Manual</option>
+          <option>Auto</option>
+        </select>
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-question-sign"></span></button>
+        </span>
+      </div>
+    </form>
+
+    <label>Default Seed Model</label>
+    <form class="form-inline">
+      <div class="input-group">
+        <select class="form-control">
+        </select>
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-question-sign"></span></button>
+        </span>
+      </div>
+    </form>
+
+    <label>Default Weather File</label>
+    <form class="form-inline">
+      <div class="input-group">
+        <select class="form-control">
+        </select>
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-question-sign"></span></button>
+        </span>
+      </div>
+    </form>
+
+    Project Measures and Options<br>
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-default">Check for Updates</button>
+      <button type="button" class="btn btn-default" aria-label="Help">
+        <span class="glyphicon glyphicon-question-sign"></span>
+      </button>
+    </div><br>
+
+    OpenStudio Measures<br>
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add Measure</button>
+      <button type="button" class="btn btn-default" aria-label="Help">
+        <span class="glyphicon glyphicon-question-sign"></span>
+      </button>
+    </div><br>
+
+    EnergyPlus Measures<br>
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add Measure</button>
+      <button type="button" class="btn btn-default" aria-label="Help">
+        <span class="glyphicon glyphicon-question-sign"></span>
+      </button>
+    </div><br>
+
+    Reporting Measures<br>
+    <div class="btn-group" role="group">
+      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add Measure</button>
+      <button type="button" class="btn btn-default" aria-label="Help">
+        <span class="glyphicon glyphicon-question-sign"></span>
+      </button>
+    </div><br>
+
+    <div>
+      <div class="panel panel-default">
+        <div class="panel-heading">Measures On Disk</div>
+        <div class="panel-body">
+          <uib-accordion close-others="true">
+
+            <uib-accordion-group heading="{{measure.name}}" ng-repeat="measure in analysis.measures">
+              <div ng-repeat="attribute in measure.attributes">{{attribute.name}}</div>
+            </uib-accordion-group>
+
+            <uib-accordion-group heading="Standard OpenStudio Report">
+            </uib-accordion-group>
+
+            <uib-accordion-group heading="Calibration Report">
+            </uib-accordion-group>
+
+            <uib-accordion-group heading="Radiance Report">
+            </uib-accordion-group>
+
+          </uib-accordion>
+        </div>
+      </div>
     </div>
   </div>
 </div>

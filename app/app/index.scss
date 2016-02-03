@@ -12,16 +12,16 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 // bower:scss
 // endbower
 
+/* placeholder hyperlinks */
+a:not([href]) {
+  cursor: pointer;
+}
+
 .container {
   width: 100%;
   padding: 0;
   margin: 0;
   background-color: #3F3F3F;
-}
-
-/* make rows same height? */
-.row {
-  overflow: hidden;
 }
 
 [class*="col-"] {
@@ -181,6 +181,11 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 
 .bcl-custom .panel-default > .panel-heading + .panel-collapse > .panel-body {
   border-top: 0 solid;
+}
+
+// TODO: Something is wrong, fix this later
+.input-group > select + .input-group-btn > button {
+  height: 34px;
 }
 
 /**

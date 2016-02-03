@@ -7,6 +7,7 @@
   "author": "National Renewable Energy Laboratory",
   "main": "background.js",
   "dependencies": {
-    "fs-jetpack": "~0.7.1"
+    "fs-jetpack": "~0.7.1",
+    "xml2js": "~0.4.16"
   }
 }

@@ -19,7 +19,7 @@ gulp.task('partials', function () {
     .pipe($.htmlmin({
       collapseBooleanAttributes: true,
       collapseInlineTagWhitespace: true,
-      collapseWhitespace: true,
+      collapseWhitespace: false,
       removeComments: true,
       removeRedundantAttributes: true,
       removeTagWhitespace: true
