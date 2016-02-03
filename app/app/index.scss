@@ -48,7 +48,7 @@ body {
 .nav {
   background: #3f3f3f;
   flex-direction: column;
-  width: 52px;
+  width: 40px;
   padding:100px 0px 300px 0px;
   border-right: 1px solid #000;
 }
@@ -56,6 +56,7 @@ body {
 /* make sidebar nav vertical */
 .sidebar-nav .navbar {
   border:0px;
+  min-height:32px !important;
 }
 
 .sidebar-nav .navbar .navbar-collapse {
@@ -82,10 +83,16 @@ body {
 .sidebar-nav .navbar li a {
   padding-top: 12px;
   padding-bottom: 12px;
+  border-bottom:1px solid #fff;
 }
 
 .nav .nav-pills ul {
   padding:0px;
+}
+
+.nav li a {
+
+  padding-top:5px !important; padding-bottom:5px !important;
 }
 
 .nav-pills {
@@ -94,9 +101,14 @@ body {
   text-align: center;
   padding:0px;
   li {
+    padding:0;
     display: inline-block;
     float: none;
     margin: 0;
+    a {
+      padding-top:5px !important; padding-bottom:5px !important;
+      padding-left:0px !important; padding-right:0px !important;
+    }
     a:hover {
       background-color: #F6921E;
     }
