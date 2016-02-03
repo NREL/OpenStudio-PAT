@@ -30,6 +30,7 @@
     "quotes": [2, "single"],
     "semi": [2, "always"],
     // ES6
+    "no-arrow-condition": 2,
     "no-const-assign": 2,
     "no-var": 1,
     "prefer-arrow-callback": 1,
