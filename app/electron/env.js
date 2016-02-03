@@ -2,14 +2,14 @@
 
 import jetpack from 'fs-jetpack';
 
-var app;
+let app;
 if (process.type === 'renderer') {
     app = require('electron').remote.app;
 } else {
     app = require('electron').app;
 }
-var appDir = jetpack.cwd(app.getAppPath());
+const appDir = jetpack.cwd(app.getAppPath());
 
-var manifest = appDir.read('package.json', 'json');
+const manifest = appDir.read('package.json', 'json');
 
 export default manifest.env;

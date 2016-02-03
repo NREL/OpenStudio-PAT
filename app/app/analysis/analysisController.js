@@ -8,10 +8,12 @@ export class AnalysisController {
   constructor(_, $log) {
     'ngInject';
 
-    this.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
-
-    this._ = _;
+    this.test = 'Analysis Controller';
+    this.BCL = BCL;
     this.$log = $log;
+    this._ = _;
+
+    this.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
 
     this.oneAtATime = true;
 

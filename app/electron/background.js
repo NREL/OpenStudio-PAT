@@ -11,15 +11,15 @@ import windowStateKeeper from './window_state';
 // in config/env_xxx.json file.
 import env from './env';
 
-var mainWindow;
+let mainWindow;
 
 // Preserver of the window size and position between app launches.
-var mainWindowState = windowStateKeeper('main', {
+const mainWindowState = windowStateKeeper('main', {
   width: 1000,
   height: 600
 });
 
-app.on('ready', function () {
+app.on('ready', () => {
 
   mainWindow = new BrowserWindow({
     x: mainWindowState.x,
@@ -43,11 +43,11 @@ app.on('ready', function () {
     mainWindow.openDevTools();
   }
 
-  mainWindow.on('close', function () {
+  mainWindow.on('close', () => {
     mainWindowState.saveState(mainWindow);
   });
 });
 
-app.on('window-all-closed', function () {
+app.on('window-all-closed', () => {
   app.quit();
 });
