@@ -29,25 +29,29 @@ select {
   display: flex;
   height: 100%;
   align-items: stretch;
+  > .nav {
+    height: 100vh;
+    position: fixed;
+  }
 }
 
 .main {
   background: white;
-  padding-left: 5px;
+  padding-left: 45px;
 }
 
 .nav {
   background: #3f3f3f;
-  flex-direction: column;
-  width: 40px;
-  padding: 15px 0;
   border-right: 1px solid #000;
+  flex-direction: column;
+  padding: 15px 0;
+  width: 40px;
 }
 
 /* make sidebar nav vertical */
 .sidebar-nav .navbar {
   border: 0;
-  min-height: 32px !important;
+  margin: 0;
 }
 
 .sidebar-nav .navbar .navbar-collapse {
