@@ -1,17 +1,18 @@
-const jetpack = require('fs-jetpack');
-const os = require('os');
-const path = require('path');
-const parseString = require('xml2js').parseString;
+import * as jetpack from 'fs-jetpack';
+import * as os from 'os';
+import * as path from 'path';
+import { parseString } from 'xml2js';
 
 export class AnalysisController {
 
   constructor(_, $log, BCL) {
     'ngInject';
 
-    this.test = 'Analysis Controller';
-
     this._ = _;
     this.$log = $log;
+    this.jetpack = jetpack;
+
+    this.test = 'Analysis Controller';
     this.BCL = BCL;
 
     this.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
@@ -25,9 +26,11 @@ export class AnalysisController {
 
   getMeasures() {
     const self = this;
-    //this.$log.debug(this.srcDir.cwd());
-    //this.$log.debug(this.srcDir.find('.', {matching: '*/measure.xml'}, 'relativePath'));
-    const measurePaths = this.srcDir.find('.', {matching: '*/measure.xml'}, 'relativePath');
+
+    let measurePaths = [];
+    if (this.jetpack.exists(this.srcDir.cwd())) measurePaths = this.srcDir.find('.', {matching: '*/measure.xml'}, 'relativePath');
+    else console.error('My Measures directory (%s) does not exist', this.srcDir.cwd());
+
     this._.each(measurePaths, measurePath => {
       //this.$log.debug(measurePath);
       const xml = this.srcDir.read(measurePath);
