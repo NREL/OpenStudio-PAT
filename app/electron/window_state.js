@@ -3,7 +3,7 @@
 // instances of it and give each different name.
 
 import { app } from 'electron';
-import jetpack from 'fs-jetpack';
+import * as jetpack from 'fs-jetpack';
 
 export default (name, defaults) => {
 

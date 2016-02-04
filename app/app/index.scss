@@ -2,8 +2,9 @@
  *  If you want to override some bootstrap variables, you have to change values here.
  *  The list of variables are listed here bower_components/bootstrap-sass/assets/stylesheets/bootstrap/_variables.scss
  */
-$navbar-inverse-link-color: #5AADBB;
+$grid-float-breakpoint: 0;
 $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/";
+$navbar-inverse-link-color: #5AADBB;
 
 /**
  *  Do not remove the comments below. It's the markers used by wiredep to inject
@@ -177,7 +178,7 @@ select {
     font-size: 14px;
 
     &+ .panel-collapse > .panel-body {
-      border-top: 0 solid;
+      border-top: 0 none;
     }
   }
 
@@ -188,16 +189,16 @@ select {
 
   .panel-title {
     font-size: 14px;
-    border: 0 solid;
+    border: 0 none;
   }
 
   .panel, .panel-default {
-    border: 0 solid;
+    border: 0 none;
   }
 }
 
 .bcl-custom .panel-default > .panel-heading + .panel-collapse > .panel-body {
-  border-top: 0 solid;
+  border-top: 0 none;
 }
 
 /* TODO: Something is wrong, fix this later */

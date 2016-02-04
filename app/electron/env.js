@@ -1,6 +1,6 @@
 // Simple module exposes environment variables to rest of the code.
 
-import jetpack from 'fs-jetpack';
+import * as jetpack from 'fs-jetpack';
 
 let app;
 if (process.type === 'renderer') {
