@@ -1,6 +1,5 @@
 {
   "extends": "eslint:recommended",
-  "plugins": ["angular"],
   "env": {
     "browser": true,
     "es6": true,
@@ -11,7 +10,6 @@
     "modules": true
   },
   "globals": {
-    "angular": true,
     "inject": true,
     "module": true
   },
@@ -21,6 +19,8 @@
     // Best practices
     "dot-notation": 1,
     "no-multi-spaces": 1,
+    // Variables
+    "no-unused-vars": 1,
     // Stylistic Issues
     "array-bracket-spacing": 1,
     "comma-spacing": 1,
@@ -35,8 +35,5 @@
     "no-var": 1,
     "prefer-arrow-callback": 1,
     "prefer-const": 1,
-    // Angular plugin
-    "angular/log": 0, // Comment for production
-    "angular/no-service-method": 0
   }
 }

@@ -1,0 +1,9 @@
+{
+  "plugins": ["angular"],
+  "globals": {"angular": true},
+  "rules": {
+    // Angular plugin
+    "angular/log": 0, // Comment for production
+    "angular/no-service-method": 0
+  }
+}
