@@ -12,43 +12,54 @@ $icon-font-path: "../../bower_components/bootstrap-sass/assets/fonts/bootstrap/"
 // bower:scss
 // endbower
 
+html, body {
+  height: 100%;
+}
+
 /* placeholder hyperlinks */
 a:not([href]) {
   cursor: pointer;
 }
 
-.container {
-  width: 100%;
-  padding: 0;
-  margin: 0;
-  background-color: #3F3F3F;
+select {
+  cursor: pointer;
 }
 
-[class*="col-"] {
-  margin-bottom: -99999px;
-  padding-bottom: 99999px;
+.container-flex {
+  display: flex;
+  height: 100%;
+  align-items: stretch;
 }
 
-.nav-span {
-  width: 5%;
-  padding-right: 0;
-  background-color: darkslategray;
+.main {
+  background: white;
+  padding-left: 5px;
 }
 
-.main-span {
-  width: 95%;
-  padding: 10px;
-  background-color: #fff;
+.nav {
+  background: #3f3f3f;
+  flex-direction: column;
+  width: 40px;
+  padding: 15px 0;
+  border-right: 1px solid #000;
 }
 
 /* make sidebar nav vertical */
+.sidebar-nav .navbar {
+  border: 0;
+  min-height: 32px !important;
+}
+
 .sidebar-nav .navbar .navbar-collapse {
   padding: 0;
   max-height: none;
+  background-color: #000;
+  border: 0;
 }
 
 .sidebar-nav .navbar ul {
   float: none;
+  background-color: #000;
 }
 
 .sidebar-nav .navbar ul:not {
@@ -63,44 +74,40 @@ a:not([href]) {
 .sidebar-nav .navbar li a {
   padding-top: 12px;
   padding-bottom: 12px;
+  border-bottom: 1px solid #fff;
 }
 
-.nav-container {
-  border-right: 1px solid #000;
+.nav .nav-pills ul {
+  padding: 0;
 }
 
-.app-nav {
-  background-color: #000;
-  color: white;
+.nav li a {
 
-  .navbar-test {
-    background-color: #000;
-    color: #fff;
+  padding-top: 5px !important;
+  padding-bottom: 5px !important;
+}
 
-    li.active > a, .navbar-test > li.active > a:hover, .navbar-test > li.active > a:focus {
-      color: darkslategray;
+.nav-pills {
+  font-family: 'Open Sans Condensed', 'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
+  font-size: 1.2em;
+  text-align: center;
+  padding: 0;
+  li {
+    padding: 0;
+    display: inline-block;
+    float: none;
+    margin: 0;
+    a {
+      padding: 5px 0 !important;
+    }
+    a:hover {
       background-color: #F6921E;
-      border-bottom: 2px solid #000;
     }
-
-    .nav-pills {
-      font-family: 'Open Sans Condensed', 'Droid Sans', 'Helvetica Neue', Helvetica, Arial, sans-serif;
-      font-size: 1.2em;
-      text-align: center;
-      li {
-        display: inline-block;
-        float: none;
-        margin: 0;
-        a:hover {
-          background-color: #F6921E;
-        }
-      }
-      li.active > a, .nav-pills > li.active > a:hover, .nav-pills > li.active > a:focus {
-        color: darkslategray;
-        background-color: #F6921E;
-        border-bottom: 2px solid #000;
-      }
-    }
+  }
+  li.active > a, li.active > a:hover, .nav-pills > li.active > a:focus {
+    color: darkslategray;
+    background-color: #F6921E;
+    border-bottom: 2px solid #000;
   }
 }
 
@@ -154,36 +161,42 @@ a:not([href]) {
   padding-right: 5px;
 }
 
-.bcl-custom.panel-body {
-  padding: 0;
-}
+.bcl-custom {
+  &.panel-body {
+    padding: 0;
+  }
 
-.bcl-custom .panel-default > .panel-heading {
-  background-color: white;
-  padding: 2px;
-  margin: 0;
-  font-size: 14px;
-}
+  .panel-default > .panel-heading {
+    background-color: white;
+    padding: 2px;
+    margin: 0;
+    font-size: 14px;
 
-.bcl-custom .panel-body {
-  padding: 0;
-  margin: 0;
-}
+    &+ .panel-collapse > .panel-body {
+      border-top: 0 solid;
+    }
+  }
 
-.bcl-custom .panel-title {
-  font-size: 14px;
-  border: 0 solid;
-}
+  .panel-body {
+    padding: 0;
+    margin: 0;
+  }
 
-.bcl-custom .panel, .bcl-custom .panel-default {
-  border: 0 solid;
+  .panel-title {
+    font-size: 14px;
+    border: 0 solid;
+  }
+
+  .panel, .panel-default {
+    border: 0 solid;
+  }
 }
 
 .bcl-custom .panel-default > .panel-heading + .panel-collapse > .panel-body {
   border-top: 0 solid;
 }
 
-// TODO: Something is wrong, fix this later
+/* TODO: Something is wrong, fix this later */
 .input-group > select + .input-group-btn > button {
   height: 34px;
 }
