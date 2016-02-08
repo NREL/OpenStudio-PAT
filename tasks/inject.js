@@ -7,6 +7,7 @@ var conf = require('./conf');
 var $ = require('gulp-load-plugins')();
 
 var wiredep = require('wiredep').stream;
+var _ = require('lodash');
 
 //var browserSync = require('browser-sync');
 
@@ -15,9 +16,13 @@ var wiredep = require('wiredep').stream;
  });*/
 
 gulp.task('inject', ['scripts', 'styles'], function () {
-  var injectStyles = gulp.src([
+  var injectAppStyles = gulp.src([
     path.join(conf.paths.tmp, '/serve/app/**/*.css'),
+    path.join('!' + conf.paths.tmp, '/serve/app/**/bootstrap.css'),
     path.join('!' + conf.paths.tmp, '/serve/app/vendor.css')
+  ], {read: false});
+  var injectBootstrapStyles = gulp.src([
+    path.join(conf.paths.tmp, '/serve/app/**/bootstrap.css')
   ], {read: false});
 
   var injectScripts = gulp.src([
@@ -28,9 +33,13 @@ gulp.task('inject', ['scripts', 'styles'], function () {
     ignorePath: [conf.paths.src, path.join(conf.paths.tmp, '/serve')],
     addRootSlash: false
   };
+  var bootstrapInjectOptions = _.extend({}, injectOptions, {
+    starttag: '<!-- inject:bootstrap -->'
+  });
 
   return gulp.src(path.join(conf.paths.src, '/*.html'))
-    .pipe($.inject(injectStyles, injectOptions))
+    .pipe($.inject(injectAppStyles, injectOptions))
+    .pipe($.inject(injectBootstrapStyles, bootstrapInjectOptions))
     .pipe($.inject(injectScripts, injectOptions))
     .pipe(wiredep(conf.wiredep))
     .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve')));

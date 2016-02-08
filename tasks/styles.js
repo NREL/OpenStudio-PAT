@@ -22,6 +22,7 @@ var buildStyles = function () {
 
   var injectFiles = gulp.src([
     path.join(conf.paths.src, '/app/**/*.scss'),
+    path.join('!' + conf.paths.src, '/app/bootstrap.scss'),
     path.join('!' + conf.paths.src, '/app/index.scss')
   ], {read: false});
 
@@ -35,15 +36,22 @@ var buildStyles = function () {
     addRootSlash: false
   };
 
+  var bootstrapFilter = $.filter('**/bootstrap.scss', {restore: true});
+  var indexFilter = $.filter('**/index.scss', {restore: true});
 
   return gulp.src([
+      path.join(conf.paths.src, '/app/bootstrap.scss'),
       path.join(conf.paths.src, '/app/index.scss')
     ])
-    .pipe($.inject(injectFiles, injectOptions))
+    .pipe(bootstrapFilter)
     .pipe(wiredep(_.extend({}, conf.wiredep)))
+    .pipe(bootstrapFilter.restore)
+    .pipe(indexFilter)
+    .pipe($.inject(injectFiles, injectOptions))
+    .pipe(indexFilter.restore)
     .pipe($.sourcemaps.init())
     .pipe($.sass(sassOptions)).on('error', conf.errorHandler('Sass'))
-    .pipe($.autoprefixer()).on('error', conf.errorHandler('Autoprefixer'))
+    //.pipe($.autoprefixer()).on('error', conf.errorHandler('Autoprefixer'))
     .pipe($.sourcemaps.write())
     .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app/')));
 };
