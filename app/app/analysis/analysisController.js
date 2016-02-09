@@ -35,6 +35,30 @@ export class AnalysisController {
       //this.$log.debug(measurePath);
       const xml = this.srcDir.read(measurePath);
       parseString(xml, (err, result) => {
+
+        const measureArguments = self._.result(result, 'measure.arguments[0].argument', []);
+        self._.each(measureArguments, (argument, i) => {
+
+          const choices = self._.result(argument, 'choices[0].choice', []);
+          self._.each(choices, (choice, i) => {
+            choices[i] = {
+              value: self._.result(choice, 'value[0]'),
+              displayName: self._.result(choice, 'display_name[0]')
+            };
+          });
+
+          measureArguments[i] = {
+            name: argument.name[0],
+            displayName: argument.display_name[0],
+            description: argument.description[0],
+            type: argument.type[0],
+            required: argument.required[0],
+            modelDependent: argument.model_dependent[0],
+            defaultValue: argument.default_value[0],
+            choices: choices
+          };
+        });
+
         const attributes = self._.result(result, 'measure.attributes[0].attribute', []);
         self._.each(attributes, (attribute, i) => {
           attributes[i] = {
@@ -43,14 +67,38 @@ export class AnalysisController {
             datatype: attribute.datatype[0]
           };
         });
+
+        const files = self._.result(result, 'measure.files[0].file', []);
+        self._.each(files, (file, i) => {
+
+          const version = {
+            softwareProgram: self._.result(file, 'version[0].software_program[0]'),
+            identifier: self._.result(file, 'version[0].identifier[0]'),
+            minCompatible: self._.result(file, 'version[0].min_compatible[0]')
+          };
+
+          files[i] = {
+            filename: file.filename[0],
+            filetype: file.filetype[0],
+            usageType: file.usage_type[0],
+            checksum: file.checksum[0],
+            version: version
+          };
+        });
         const measure = {
+          schemaVersion: self._.result(result, 'measure.schema_version[0]'),
           name: self._.result(result, 'measure.name[0]'),
           uid: self._.result(result, 'measure.uid[0]'),
           versionId: self._.result(result, 'measure.version_id[0]'),
+          xmlChecksum: self._.result(result, 'measure.xml_checksum[0]'),
+          className: self._.result(result, 'measure.class_name[0]'),
+          displayName: self._.result(result, 'measure.display_name[0]'),
           description: self._.result(result, 'measure.description[0]'),
           modelerDescription: self._.result(result, 'measure.modeler_description[0]'),
+          arguments: measureArguments,
           tags: self._.result(result, 'measure.tags[0].tag', []),
-          attributes: attributes
+          attributes: attributes,
+          files: files
         };
         self.measures.push(measure);
         //console.log(measure);
