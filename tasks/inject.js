@@ -3,44 +3,64 @@
 var path = require('path');
 var gulp = require('gulp');
 var conf = require('./conf');
+var utils = require('./utils');
 
 var $ = require('gulp-load-plugins')();
 
 var wiredep = require('wiredep').stream;
 var _ = require('lodash');
 
-//var browserSync = require('browser-sync');
+gulp.task('partials', function () {
+  return gulp.src([
+      path.join(conf.paths.src, '/app/**/*.html'),
+      path.join(conf.paths.tmp, '/serve/app/**/*.html')
+    ])
+    .pipe($.sort())
+    .pipe($.htmlmin({
+      collapseBooleanAttributes: true,
+      collapseInlineTagWhitespace: true,
+      collapseWhitespace: false,
+      removeComments: true,
+      removeRedundantAttributes: true,
+      removeTagWhitespace: true
+    }))
+    .pipe($.angularTemplatecache('templateCacheHtml.js', {
+      module: 'PAT',
+      root: 'app'
+    }))
+    .pipe(gulp.dest(conf.paths.tmp + '/serve/app/'));
+});
 
-/*gulp.task('inject-reload', ['inject'], function() {
- browserSync.reload();
- });*/
-
-gulp.task('inject', ['scripts', 'styles'], function () {
+gulp.task('inject', ['partials', 'scripts', 'styles'], function () {
   var injectAppStyles = gulp.src([
     path.join(conf.paths.tmp, '/serve/app/**/*.css'),
     path.join('!' + conf.paths.tmp, '/serve/app/**/bootstrap.css'),
     path.join('!' + conf.paths.tmp, '/serve/app/vendor.css')
   ], {read: false});
-  var injectBootstrapStyles = gulp.src([
-    path.join(conf.paths.tmp, '/serve/app/**/bootstrap.css')
-  ], {read: false});
-
-  var injectScripts = gulp.src([
-    path.join(conf.paths.tmp, '/serve/app/**/*.module.js')
-  ], {read: false});
+  var injectBootstrapStyles = gulp.src([path.join(conf.paths.tmp, '/serve/app/**/bootstrap.css')], {read: false});
+  var injectScripts = gulp.src([path.join(conf.paths.tmp, '/serve/app/**/*.module.js')], {read: false});
+  var partialsInjectFile = gulp.src(path.join(conf.paths.tmp, '/serve/app/templateCacheHtml.js'), {read: false});
 
   var injectOptions = {
     ignorePath: [conf.paths.src, path.join(conf.paths.tmp, '/serve')],
     addRootSlash: false
   };
-  var bootstrapInjectOptions = _.extend({}, injectOptions, {
-    starttag: '<!-- inject:bootstrap -->'
-  });
+  var bootstrapInjectOptions = _.extend({}, injectOptions, {starttag: '<!-- inject:bootstrap -->'});
+  var partialsInjectOptions = _.extend({}, injectOptions, {starttag: '<!-- inject:partials -->'});
 
-  return gulp.src(path.join(conf.paths.src, '/*.html'))
+
+  var stream = gulp.src(path.join(conf.paths.src, '/*.html'))
     .pipe($.inject(injectAppStyles, injectOptions))
     .pipe($.inject(injectBootstrapStyles, bootstrapInjectOptions))
     .pipe($.inject(injectScripts, injectOptions))
-    .pipe(wiredep(conf.wiredep))
+    .pipe($.inject(partialsInjectFile, partialsInjectOptions));
+
+  if (utils.getEnvName() == 'development') {
+    var injectBrowsersyncHelper = gulp.src(path.join(conf.paths.tmp, '/serve/app/browsersync_helper.js'), {read: false});
+    var browsersyncInjectOptions = _.extend({}, injectOptions, {starttag: '<!-- inject:browsersync -->'});
+    stream = stream.pipe($.inject(injectBrowsersyncHelper, browsersyncInjectOptions));
+  }
+
+  return stream.pipe(wiredep(conf.wiredep))
     .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve')));
 });

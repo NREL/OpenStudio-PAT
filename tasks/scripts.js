@@ -5,9 +5,9 @@ var gulp = require('gulp');
 var Q = require('q');
 var jetpack = require('fs-jetpack');
 var conf = require('./conf');
+var utils = require('./utils');
 var $ = require('gulp-load-plugins')();
 
-//var browserSync = require('browser-sync');
 var rollup = require('rollup');
 var babel = require('rollup-plugin-babel');
 
@@ -17,9 +17,7 @@ var eslint = function (fix) {
       path.join(conf.paths.src, '**/*.js'),
       '!' + path.join(conf.paths.src, 'node_modules/**'),
       '!' + path.join(conf.paths.src, 'electron/jasmine/**')
-    ], {
-      base: '.'
-    })
+    ], {base: '.'})
     .pipe($.eslint({fix: fix}))
     .pipe($.eslint.format())
     .pipe(fix ? gulp.dest('.') : $.util.noop());
@@ -36,10 +34,11 @@ gulp.task('lint:fix', function () {
 
 var bundle = function (src, dest) {
   var deferred = Q.defer();
+  var buildSourcemap = path.basename(dest) == 'index.module.js';
 
   rollup.rollup({
     entry: src,
-    external: ['electron', 'fs-jetpack'],
+    external: ['electron', 'fs-jetpack', 'os', 'path', 'xml2js'],
     plugins: [
       babel({exclude: 'node_modules/**'})
     ]
@@ -47,16 +46,24 @@ var bundle = function (src, dest) {
     var filename = path.basename(dest);
     var result = bundle.generate({
       format: 'cjs',
-      sourceMap: true,
+      sourceMap: buildSourcemap,
       sourceMapFile: filename
     });
     // Wrap code in self invoking function so the variables don't
     // pollute the global namespace.
     var isolatedCode = '(function () {' + result.code + '\n}());';
-    return Q.all([
-      jetpack.writeAsync(dest, isolatedCode + '\n//# sourceMappingURL=' + filename + '.map'),
-      jetpack.writeAsync(dest + '.map', result.map.toString())
-    ]);
+    if (buildSourcemap) {
+      return Q.all([
+        jetpack.writeAsync(dest, isolatedCode + '\n//# sourceMappingURL=' + filename + '.map'),
+        jetpack.writeAsync(dest + '.map', result.map.toString())
+      ]);
+    } else {
+      return jetpack.writeAsync(dest, isolatedCode);
+    }
+  }).then(function () {
+    return gulp.src(dest, {base: '.'})
+      .pipe($.ngAnnotate())
+      .pipe(gulp.dest('.'));
   }).then(function () {
     deferred.resolve();
   }).catch(function (err) {
@@ -66,21 +73,23 @@ var bundle = function (src, dest) {
   return deferred.promise;
 };
 
-gulp.task('scripts', ['lint'], function () {
-  return Q.all([
+var compileScripts = function () {
+  var promises = [
     bundle(path.join(conf.paths.src, '/electron/background.js'), path.join(conf.paths.tmp, 'serve/app/background.js')),
     bundle(path.join(conf.paths.src, '/app/index.module.js'), path.join(conf.paths.tmp, 'serve/app/index.module.js'))
-  ]);
+  ];
+
+  if (utils.getEnvName() == 'development') {
+    promises.push(bundle(path.join(conf.paths.src, '/electron/browsersync_helper.js'), path.join(conf.paths.tmp, 'serve/app/browsersync_helper.js')));
+  }
+
+  return Q.all(promises);
+};
+
+gulp.task('scripts', ['lint'], function () {
+  return compileScripts();
 });
 
-/*gulp.task('scripts:watch', ['scripts'], function (callback) {
- //return webpackWrapper(true, false, callback);
- });
-
- gulp.task('scripts:test', function () {
- //return webpackWrapper(false, true);
- });
-
- gulp.task('scripts:test-watch', ['scripts'], function (callback) {
- //return webpackWrapper(true, true, callback);
- });*/
+gulp.task('scripts:watch', function () {
+  return compileScripts();
+});

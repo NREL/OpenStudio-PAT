@@ -8,9 +8,11 @@ var kill = require('tree-kill');
 var util = require('util');
 var conf = require('./conf');
 var utils = require('./utils');
+
+var env = utils.getEnvName();
 var watch;
 
-var browserSync = require('browser-sync');
+var browserSync = require('browser-sync').create();
 var browserSyncSpa = require('browser-sync-spa');
 
 browserSync.use(browserSyncSpa({selector: '[ng-app]'}));
@@ -37,11 +39,17 @@ function browserSyncInit(baseDir) {
    */
   // server.middleware = proxyMiddleware('/users', {target: 'http://jsonplaceholder.typicode.com', changeOrigin: true});
 
-  browserSync.instance = browserSync.init({
-    startPath: '/',
-    server: server,
+  browserSync.init({
     browser: 'default',
-    open: false
+    files: [path.join(conf.paths.tmp, '/serve/app/index.css'), path.join(conf.paths.tmp, '/serve/app/index.module.js')],
+    open: false,
+    server: server,
+    startPath: '/',
+    ui: false,
+    watchOptions: {
+      awaitWriteFinish: true,
+      ignoreInitial: true
+    }
   });
 }
 
@@ -55,7 +63,7 @@ var runBuild = function () {
 
   var build = childProcess.spawn(gulpPath, [
     'build',
-    '--env=' + utils.getEnvName(),
+    '--env=' + env,
     '--color'
   ], {
     stdio: 'inherit'
@@ -71,7 +79,7 @@ var runBuild = function () {
 var runGulpWatch = function () {
   watch = childProcess.spawn(gulpPath, [
     'watch',
-    '--env=' + utils.getEnvName(),
+    '--env=' + env,
     '--color'
   ], {
     stdio: 'inherit'
@@ -85,7 +93,7 @@ var runGulpWatch = function () {
 };
 
 var runApp = function () {
-  browserSyncInit([path.join(conf.paths.tmp, '/serve'), conf.paths.src]);
+  if (env == 'development') browserSyncInit([path.join(conf.paths.tmp, '/serve'), conf.paths.src]);
   var app = childProcess.spawn(electron, ['./build'], {
     stdio: 'inherit'
   });

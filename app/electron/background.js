@@ -25,7 +25,10 @@ app.on('ready', () => {
     x: mainWindowState.x,
     y: mainWindowState.y,
     width: mainWindowState.width,
-    height: mainWindowState.height
+    height: mainWindowState.height,
+    webPreferences: {
+      webSecurity: false // Disable the same-origin policy when using http
+    }
   });
 
   if (mainWindowState.isMaximized) {
@@ -34,6 +37,8 @@ app.on('ready', () => {
 
   if (env.name === 'test') {
     mainWindow.loadURL('file://' + __dirname + '/spec.html');
+  } else if (env.name === 'development') {
+    mainWindow.loadURL('http://localhost:3000/index.html');
   } else {
     mainWindow.loadURL('file://' + __dirname + '/index.html');
   }
