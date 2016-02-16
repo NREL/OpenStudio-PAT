@@ -4,7 +4,7 @@
 <div class="modal-body">
 
   <div class="row pad-bot-20">
-    <div class="col-xs-3">
+    <div class="col-xs-2">
 
       <form ng-submit="submit()" name="form" novalidate>
         <div class="input-group">
@@ -61,8 +61,17 @@
       </form>
 
     </div>
-    <div class="col-xs-9">
-      <h3> BCL RESULTS HERE</h3>
+    <div class="col-xs-6">
+      <div ui-grid="modal.libraryGridOptions" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-selection></div>
+    </div>
+
+    <div class=col-xs-4">
+      <div ng-show="modal.selected" >
+        <h3>Selected Measure Details</h3>
+        <p>Measure: {{modal.selected}}</p>
+      </div>
+
+      <h3></h3>
     </div>
   </div>
 </div>

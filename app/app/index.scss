@@ -191,6 +191,17 @@ select {
   height: 34px;
 }
 
+// Increase modal size
+.wide-modal .modal-dialog {
+  min-width: 500px;
+  width: calc(100% - 180px);
+}
+
+.icon-cell {
+  text-align:center;
+  padding: 3px 0px;
+}
+
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject
  *  all your sass files automatically
