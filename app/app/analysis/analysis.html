@@ -75,24 +75,16 @@
     </div><br>
 
     <div>
+
+      <div id="grid1" ui-grid="{ data: analysis.myData }" class="grid"></div>
+
       <div class="panel panel-default">
         <div class="panel-heading">Measures On Disk</div>
         <div class="panel-body">
           <uib-accordion close-others="true">
-
             <uib-accordion-group heading="{{measure.name}}" ng-repeat="measure in analysis.measures">
               <div ng-repeat="attribute in measure.attributes">{{attribute.name}}</div>
             </uib-accordion-group>
-
-            <uib-accordion-group heading="Standard OpenStudio Report">
-            </uib-accordion-group>
-
-            <uib-accordion-group heading="Calibration Report">
-            </uib-accordion-group>
-
-            <uib-accordion-group heading="Radiance Report">
-            </uib-accordion-group>
-
           </uib-accordion>
         </div>
       </div>

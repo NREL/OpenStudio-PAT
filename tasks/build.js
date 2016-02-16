@@ -62,6 +62,7 @@ gulp.task('html', ['background', 'inject', 'partials'], function () {
     .pipe(cssFilter)
     //.pipe($.sourcemaps.init())
     .pipe($.replace('../../bower_components/bootstrap-sass/assets/fonts/bootstrap/', '../fonts/'))
+    .pipe($.replace(/url\('ui-grid.(.+?)'\)/g, 'url(\'../fonts/ui-grid.$1\')'))
     .pipe($.rev())
     //.pipe($.csso())
     //.pipe($.sourcemaps.write('maps'))

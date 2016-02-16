@@ -22,6 +22,8 @@ export class AnalysisController {
     this.analysisTypes = ['Manual', 'Auto'];
 
     this.getMeasures();
+
+    this.myData = this.measures[0].arguments;
   }
 
   getMeasures() {
