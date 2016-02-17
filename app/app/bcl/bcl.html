@@ -62,13 +62,40 @@
 
     </div>
     <div class="col-xs-6">
-      <div ui-grid="modal.libraryGridOptions" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-selection></div>
+      <div ui-grid="modal.libraryGridOptions" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-selection class="lib-grid"></div>
     </div>
 
-    <div class=col-xs-4">
-      <div ng-show="modal.selected" >
-        <h3>Selected Measure Details</h3>
-        <p>Measure: {{modal.selected}}</p>
+    <div class="col-xs-4">
+      <div ng-show="modal.selected" class="lib-details">
+        
+        <div class="row">
+          <div class="col-xs-12">
+            <h4>Description</h4>
+            <p>{{modal.selected.description}}</p>
+            <h4>Modeler Description</h4>
+            <p>{{modal.selected.modelerDescription}}</p>
+            <h4>Tags</h4>
+            <p>{{modal.selected.tags}}</p>
+            <h4>Attributes</h4>
+            <table class="table table-striped">
+              <tr ng-repeat="attr in modal.selected.attributes">
+                <th>{{attr.name}}</th>
+                <td>{{attr.value}}</td>
+              </tr>
+            </table>
+            <h4>Files</h4>
+            <table class="table table-striped">
+              <tr ng-repeat="file in modal.selected.files">
+                <td>
+                  <strong>{{file.filename}}</strong>
+                  <span ng-if="file.version.softwareProgram != null"><br/><em>{{file.version.softwareProgram}} {{file.version.identifier}}</em></span>
+                  <span ng-if="file.version.minCompatible != null"><br/><em>Min Compatible Version: {{file.version.minCompatible}}</em></span>
+                  <span ng-if="file.version.maxCompatible != null"><br/><em>Max Compatible Version: {{file.version.maxCompatible}}</em></span>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </div>
       </div>
 
       <h3></h3>

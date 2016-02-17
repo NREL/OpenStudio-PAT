@@ -8,7 +8,7 @@ export class ModalBclController {
   constructor($log, $uibModalInstance, _, BCL) {
     'ngInject';
 
-    let vm = this;
+    var vm = this;
 
     this.jetpack = jetpack;
     this.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
@@ -152,16 +152,16 @@ export class ModalBclController {
         this._.each(files, (file, i) => {
 
           const version = {
-            softwareProgram: this._.result(file, 'version[0].software_program[0]'),
-            identifier: this._.result(file, 'version[0].identifier[0]'),
-            minCompatible: this._.result(file, 'version[0].min_compatible[0]'),
-            maxCompatible: this._.result(file, 'version[0].max_compatible[0]')
+            softwareProgram: this._.result(file, 'version[0].software_program[0]', null),
+            identifier: this._.result(file, 'version[0].identifier[0]', null),
+            minCompatible: this._.result(file, 'version[0].min_compatible[0]', null),
+            maxCompatible: this._.result(file, 'version[0].max_compatible[0]', null)
           };
 
           files[i] = {
             filename: file.filename[0],
             filetype: file.filetype[0],
-            usageType: this._.result(file, 'usage_type[0]'),
+            usageType: this._.result(file, 'usage_type[0]', null),
             checksum: file.checksum[0],
             version: version
           };
@@ -179,10 +179,13 @@ export class ModalBclController {
           description: this._.result(result, 'measure.description[0]'),
           modelerDescription: this._.result(result, 'measure.modeler_description[0]'),
           arguments: measureArguments,
-          tags: this._.result(result, 'measure.tags[0].tag', []),
+          tags: this._.result(result, 'measure.tags[0].tag[0]', ''),
           attributes: attributes,
           files: files
         };
+
+        // fix tags
+        measure.tags = this._.join(this._.split(measure.tags, '.'), ' -> ');
 
         this.local_measures.push(measure);
       });
@@ -194,17 +197,12 @@ export class ModalBclController {
     this.display_measures = [];
 
     this._.each(this.local_measures, m => {
-      const measure = {
-        name: m.name,
-        uid: m.uid,
-        versionId: m.versionId,
-        displayName: m.displayName,
-        status: '',
-        description: m.description,
-        modelerDescription: m.modelerDescription,
-        location: 'My',
-        add: ''
-      };
+      const measure = m;
+
+      // add fields for display
+      measure.status = '';
+      measure.location = 'My';
+      measure.add = '';
 
       if (m.versionModified) {
         // assuming yyyy-mm-dd
