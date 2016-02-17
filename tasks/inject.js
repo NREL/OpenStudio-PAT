@@ -11,10 +11,7 @@ var wiredep = require('wiredep').stream;
 var _ = require('lodash');
 
 gulp.task('partials', function () {
-  return gulp.src([
-      path.join(conf.paths.src, '/app/**/*.html'),
-      path.join(conf.paths.tmp, '/serve/app/**/*.html')
-    ])
+  return gulp.src(path.join(conf.paths.src, '/app/**/*.html'))
     .pipe($.sort())
     .pipe($.htmlmin({
       collapseBooleanAttributes: true,

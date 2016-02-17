@@ -41,7 +41,11 @@ function browserSyncInit(baseDir) {
 
   browserSync.init({
     browser: 'default',
-    files: [path.join(conf.paths.tmp, '/serve/app/index.css'), path.join(conf.paths.tmp, '/serve/app/index.module.js')],
+    files: [
+      path.join(conf.paths.tmp, '/serve/app/index.css'),
+      path.join(conf.paths.tmp, '/serve/app/index.module.js'),
+      path.join(conf.paths.tmp, '/serve/app/templateCacheHtml.js')
+    ],
     open: false,
     server: server,
     startPath: '/',
