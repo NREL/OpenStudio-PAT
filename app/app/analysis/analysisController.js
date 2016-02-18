@@ -11,6 +11,7 @@ export class AnalysisController {
     this._ = _;
     this.$log = $log;
     this.jetpack = jetpack;
+    const self = this;
 
     this.test = 'Analysis Controller';
     this.BCL = BCL;
@@ -48,6 +49,17 @@ export class AnalysisController {
       }, {
         name: 'option1',
         displayName: 'Option 1',
+        editDropdownOptionsFunction: function(rowEntity) {
+          if (rowEntity.type === 'Choice') {
+            self.choices = [];
+            self._.each(rowEntity.choices, (choice) => {
+              self.choices.push({
+                value: choice.value
+              });
+            });
+            return self.choices;
+          }
+        },
         editableCellTemplate: '<div><form name=\"inputForm\">' +
           '<input ng-if=\"row.entity.type!=\'Choice\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
           '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
