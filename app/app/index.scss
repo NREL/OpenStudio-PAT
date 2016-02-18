@@ -2,6 +2,12 @@ html, body {
   height: 100%;
 }
 
+@media (max-width: 1000px) {
+  html,body {
+    font-size: 0.8em;
+  }
+}
+
 /* placeholder hyperlinks */
 a:not([href]) {
   cursor: pointer;
@@ -194,7 +200,7 @@ select {
 // Increase modal size
 .wide-modal .modal-dialog {
   min-width: 500px;
-  width: calc(100% - 180px);
+  width: calc(100% - 100px);
 }
 
 .icon-cell {
@@ -202,6 +208,7 @@ select {
   padding: 3px 0px;
 }
 
+/*
 .lib-grid {
   font-size: 0.8em;
 }
@@ -209,6 +216,7 @@ select {
 .lib-details {
   font-size: 0.8em;
 }
+*/
 
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject

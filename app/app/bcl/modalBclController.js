@@ -57,11 +57,11 @@ export class ModalBclController {
         enableCellEdit: false,
         cellClass: 'icon-cell',
         width:'10%',
-        cellTemplate:'<img width=\"32px\" ng-src=\"assets/images/{{grid.getCellValue(row, col)}}_icon.png\" alt=\"{{grid.getCellValue(row, col)}}\" />'
+        cellTemplate:'<img ng-src=\"assets/images/{{grid.getCellValue(row, col)}}_icon.png\" alt=\"{{grid.getCellValue(row, col)}}\" />'
       }, {
         name: 'author',
         enableCellEdit: false,
-        width:'15%'
+        width:'20%'
       }, {
         name: 'date',
         enableCellEdit: false,
@@ -80,12 +80,13 @@ export class ModalBclController {
         width:'10%'
       }],
       data: this.getMeasuresForDisplay(),
+      rowHeight: 35,
       enableCellEditOnFocus: true,
       enableHiding: false,
       enableColumnMenus: false,
       enableRowSelection: true,
+      enableRowHeaderSelection: false,
       multiSelect: false,
-      rowHeight: 35,
       onRegisterApi: function (gridApi) {
         vm.gridApi = gridApi;
         gridApi.selection.on.rowSelectionChanged(null, function (row) {
@@ -95,6 +96,9 @@ export class ModalBclController {
             // No rows selected
             vm.selected = null;
           }
+        });
+        gridApi.cellNav.on.navigate(null, function(newRowCol, oldRowCol){
+          vm.gridApi.selection.selectRow(newRowCol.row.entity);
         });
       }
     };
@@ -207,8 +211,7 @@ export class ModalBclController {
       if (m.versionModified) {
         // assuming yyyy-mm-dd
         measure.date = new Date(m.versionModified.substring(0, 4), m.versionModified.substring(5, 7), m.versionModified.substring(8, 10));
-        console.log(measure.date);
-        console.log(m.versionModified);
+
       } else {
         measure.date = '';
       }
