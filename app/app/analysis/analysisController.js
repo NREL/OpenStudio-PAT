@@ -23,7 +23,47 @@ export class AnalysisController {
 
     this.getMeasures();
 
-    this.myData = this.measures[0].arguments;
+    this.gridOptions = {
+      data: this.measures[0].arguments,
+      enableSorting: true,
+      autoResize: true,
+      enableCellEditOnFocus: true,
+      columnDefs: [{
+        name: 'displayName',
+        displayName: 'Name of Option',
+        enableHiding: false
+      }, {
+        name: 'name',
+        displayName: 'Short Name',
+        enableHiding: false
+      }, {
+        name: 'variable',
+        displayName: 'Variable',
+        enableHiding: false,
+        type: 'boolean'
+      }, {
+        name: 'type',
+        displayName: 'Type',
+        enableHiding: false
+      }, {
+        name: 'option1',
+        displayName: 'Option 1',
+        cellEditableCondition: function()
+        editableCellTemplate: '<div><form name=\"inputForm\">' +
+          '<input ng-if=\"row.entity.type!=\'Choice\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+          '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
+        ' </form></div>',
+        enableHiding: false,
+        enableCellEdit: true
+      }],
+
+      onRegisterApi: function( gridApi ) {
+        this.gridApi = gridApi;
+        const cellTemplate = 'ui-grid/selectionRowHeader';   // you could use your own template here
+        this.gridApi.core.addRowHeaderColumn( { name: 'rowHeaderCol', displayName: '', width: 50, cellTemplate: cellTemplate} );
+      }
+    };
+
   }
 
   getMeasures() {
@@ -57,7 +97,8 @@ export class AnalysisController {
             required: argument.required[0],
             modelDependent: argument.model_dependent[0],
             defaultValue: argument.default_value[0],
-            choices: choices
+            choices: choices,
+            variable: false
           };
         });
 
