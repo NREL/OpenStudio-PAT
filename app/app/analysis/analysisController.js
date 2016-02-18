@@ -48,7 +48,6 @@ export class AnalysisController {
       }, {
         name: 'option1',
         displayName: 'Option 1',
-        cellEditableCondition: function()
         editableCellTemplate: '<div><form name=\"inputForm\">' +
           '<input ng-if=\"row.entity.type!=\'Choice\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
           '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
