@@ -222,7 +222,7 @@ export class ModalBclController {
 
     // add fields for display
     measure.status = '';
-    measure.location = type;
+    measure.location = this._.capitalize(type);
     measure.add = '';
 
     if (measure.versionModified) {
@@ -275,10 +275,7 @@ export class ModalBclController {
     const types = this.getMeasureTypes();
 
     this._.each(types, type => {
-      this.$log.debug(type);
       measures = this._.concat(measures, this.lib_measures[type]);
-      this.$log.debug(measures);
-
     });
 
     return measures;
@@ -319,6 +316,15 @@ export class ModalBclController {
       {name: 'B', tid: 2},
       {name: 'C', tid: 3}
     ];*/
+  }
+
+  // process filter changes
+  resetFilters(){
+    this.$log.debug('filters:', this.filters);
+    this.display_measures = this.getDisplayMeasures();
+    this.$log.debug('display measures: ', this.display_measures);
+    // TODO: is this best way to update grid?
+    this.libraryGridOptions.data = this.display_measures;
   }
 
 

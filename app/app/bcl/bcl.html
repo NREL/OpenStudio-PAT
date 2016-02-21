@@ -8,7 +8,7 @@
 
       <form ng-submit="submit()" name="form" novalidate>
         <div class="input-group">
-          <input type="text" name="search" id="search" ng-model="keyword" class="form-control" placeholder="Search">
+          <input type="text" name="search" id="search" ng-model="modal.keyword" class="form-control" placeholder="Search">
 		      <span class="input-group-btn">
 		        <button class="btn btn-default" type="button" ng-click="search()">
               <img class="search-img" src="assets/images/search.png" alt="search button"/></button>
@@ -21,10 +21,10 @@
             Filters
           </div>
           <div class="panel-body">
-            <div class="checkbox"><label><input type="checkbox" ng-model="bcl.filters.all"> All</label></div>
-            <div class="checkbox"><label><input type="checkbox" ng-model="bcl.filters.local"> Local</label></div>
-            <div class="checkbox"><label><input type="checkbox" ng-model="bcl.filters.bcl"> BCL (Online)</label></div>
-            <div class="checkbox"><label><input type="checkbox" ng-model="bcl.filters.my"> Measure Directory</label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.all" ng-change="modal.resetFilters()"> All</label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.local" ng-change="modal.resetFilters()"> Local</label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.bcl" ng-change="modal.resetFilters()"> BCL (Online)</label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.my" ng-change="modal.resetFilters()"> Measure Directory</label></div>
           </div>
         </div>
 
