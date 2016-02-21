@@ -20,7 +20,8 @@ export class BCL {
   // GET ALL MEASURE CATEGORIES
   // TODO: SHOULD PROBABLY MOVE THAT TO MAIN ROUTING WITH PROMISES (LIKE CONSTRUCTIONS IN CBECC-COM)
   getCategories() {
-    return this.$http.get('http://bcl7.development.nrel.gov/api/taxonomy/measure.json');
+    //return this.$http.get('http://bcl7.development.nrel.gov/api/taxonomy/measure.json');
+    return this.$http.get('https://bcl.nrel.gov/api/taxonomy/measure.json');
   }
 
   // TODO: SEARCH BCL ONLINE

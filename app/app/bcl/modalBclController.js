@@ -9,37 +9,43 @@ export class ModalBclController {
     'ngInject';
 
     var vm = this;
-
-    this.jetpack = jetpack;
-    this.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
-
-    this.selected = null;
-    this.keyword = '';
-    this.categories = [];
-
     this.$uibModalInstance = $uibModalInstance;
     this._ = _;
     this.$log = $log;
     this.BCL = BCL;
 
+    this.jetpack = jetpack;
+    this.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    this.local_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
+
+    this.selected = null;
+    this.keyword = '';
+
     this.filters = {
       all: false,
-      local: false,
-      bcl: true,
-      measure_dir: false
+      local: true,
+      bcl: false,
+      my: true
     };
 
+    this.categories = [];
+    this.getBCLCategories();
+
+    // TODO: get project measures from a service
     this.project_measures = [];
 
-    this.bcl_measures = [];
-    this.local_measures = [];
+    // assign measures by type
+    this.lib_measures = {};
+    this.lib_measures.local = this.getMeasures(this.local_dir, 'local');
+    this.lib_measures.my = this.getMeasures(this.my_measures_dir, 'my');
 
-    this.getLocalMeasures();
-    //this.getBCLMeasures();
+    //this.measures.bcl = this.getBCLMeasures();
 
-    this.display_measures = [];
-    this.getMeasuresForDisplay();
+    // get measures array for Library display
+    this.display_measures = this.getDisplayMeasures();
+    this.$log.debug('measures:', this.display_measures);
 
+    // Library grid
     this.libraryGridOptions = {
       columnDefs: [{
         name: 'displayName',
@@ -79,7 +85,7 @@ export class ModalBclController {
         cellClass: 'icon-cell',
         width:'10%'
       }],
-      data: this.getMeasuresForDisplay(),
+      data: this.display_measures,
       rowHeight: 35,
       enableCellEditOnFocus: true,
       enableHiding: false,
@@ -104,137 +110,181 @@ export class ModalBclController {
     };
   }
 
-  getLocalMeasures(){
+  getMeasures(path, type){
 
     let measurePaths = [];
-    if (this.jetpack.exists(this.srcDir.cwd())) measurePaths = this.srcDir.find('.', {matching: '*/measure.xml'}, 'relativePath');
-    else console.error('My Measures directory (%s) does not exist', this.srcDir.cwd());
+    const measures = [];
+    if (this.jetpack.exists(path.cwd())) measurePaths = path.find('.', {matching: '*/measure.xml'}, 'relativePath');
+    else console.error('The (%s) Measures directory (%s) does not exist', type, path.cwd());
 
     this._.each(measurePaths, measurePath => {
-      const xml = this.srcDir.read(measurePath);
-      parseString(xml, (err, result) => {
 
-        const measureArguments = this._.result(result, 'measure.arguments[0].argument', []);
-        this._.each(measureArguments, (argument, i) => {
+      const xml = path.read(measurePath);
+      let measure = this.parseMeasure(xml);
+      measure = this.prepareMeasure(measure, type);
+      measures.push(measure);
 
-          const choices = this._.result(argument, 'choices[0].choice', []);
-          this._.each(choices, (choice, i) => {
-            choices[i] = {
-              value: this._.result(choice, 'value[0]'),
-              displayName: this._.result(choice, 'display_name[0]')
-            };
-          });
+    });
 
-          measureArguments[i] = {
-            name: argument.name[0],
-            displayName: argument.display_name[0],
-            shortName: this._.result(argument, 'short_name[0]'),
-            description: this._.result(argument, 'description[0]'),
-            type: argument.type[0],
-            required: argument.required[0],
-            modelDependent:  this._.result(argument, 'model_dependent', 'false'),
-            defaultValue:  this._.result(argument, 'default_value[0]'),
-            choices: choices,
-            minValue: this._.result(argument, 'min_value[0]'),
-            maxValue: this._.result(argument, 'max_value[0]')
+    return measures;
+  }
+
+  parseMeasure(xml){
+
+    let measure = {};
+
+    parseString(xml, (err, result) => {
+
+
+      const measureArguments = this._.result(result, 'measure.arguments[0].argument', []);
+      this._.each(measureArguments, (argument, i) => {
+
+        const choices = this._.result(argument, 'choices[0].choice', []);
+        this._.each(choices, (choice, i) => {
+          choices[i] = {
+            value: this._.result(choice, 'value[0]'),
+            displayName: this._.result(choice, 'display_name[0]')
           };
         });
 
-        // TODO: add outputs
-        // TODO: add provenances (first one only)
+        measureArguments[i] = {
+          name: argument.name[0],
+          displayName: argument.display_name[0],
+          shortName: this._.result(argument, 'short_name[0]'),
+          description: this._.result(argument, 'description[0]'),
+          type: argument.type[0],
+          required: argument.required[0],
+          modelDependent: this._.result(argument, 'model_dependent', 'false'),
+          defaultValue: this._.result(argument, 'default_value[0]'),
+          choices: choices,
+          minValue: this._.result(argument, 'min_value[0]'),
+          maxValue: this._.result(argument, 'max_value[0]')
+        };
+      });
 
-        const attributes = this._.result(result, 'measure.attributes[0].attribute', []);
-        this._.each(attributes, (attribute, i) => {
-          attributes[i] = {
-            name: attribute.name[0],
-            value: attribute.value[0],
-            datatype: attribute.datatype[0]
-          };
-        });
+      // TODO: add outputs
+      // TODO: add provenances (first one only)
 
-        const files = this._.result(result, 'measure.files[0].file', []);
-        this._.each(files, (file, i) => {
+      const attributes = this._.result(result, 'measure.attributes[0].attribute', []);
+      this._.each(attributes, (attribute, i) => {
+        attributes[i] = {
+          name: attribute.name[0],
+          value: attribute.value[0],
+          datatype: attribute.datatype[0]
+        };
+      });
 
-          const version = {
-            softwareProgram: this._.result(file, 'version[0].software_program[0]', null),
-            identifier: this._.result(file, 'version[0].identifier[0]', null),
-            minCompatible: this._.result(file, 'version[0].min_compatible[0]', null),
-            maxCompatible: this._.result(file, 'version[0].max_compatible[0]', null)
-          };
+      const files = this._.result(result, 'measure.files[0].file', []);
+      this._.each(files, (file, i) => {
 
-          files[i] = {
-            filename: file.filename[0],
-            filetype: file.filetype[0],
-            usageType: this._.result(file, 'usage_type[0]', null),
-            checksum: file.checksum[0],
-            version: version
-          };
-        });
-        const measure = {
-          schemaVersion: this._.result(result, 'measure.schema_version[0]'),
-          name: this._.result(result, 'measure.name[0]'),
-          uid: this._.result(result, 'measure.uid[0]'),
-          versionId: this._.result(result, 'measure.version_id[0]'),
-          versionModified: this._.result(result, 'measure.version_modified[0]'),
-          xmlChecksum: this._.result(result, 'measure.xml_checksum[0]'),
-          className: this._.result(result, 'measure.class_name[0]'),
-          displayName: this._.result(result, 'measure.display_name[0]'),
-          shortName: this._.result(result, 'measure.short_name[0]'),
-          description: this._.result(result, 'measure.description[0]'),
-          modelerDescription: this._.result(result, 'measure.modeler_description[0]'),
-          arguments: measureArguments,
-          tags: this._.result(result, 'measure.tags[0].tag[0]', ''),
-          attributes: attributes,
-          files: files
+        const version = {
+          softwareProgram: this._.result(file, 'version[0].software_program[0]', null),
+          identifier: this._.result(file, 'version[0].identifier[0]', null),
+          minCompatible: this._.result(file, 'version[0].min_compatible[0]', null),
+          maxCompatible: this._.result(file, 'version[0].max_compatible[0]', null)
         };
 
-        // fix tags
-        measure.tags = this._.join(this._.split(measure.tags, '.'), ' -> ');
-
-        this.local_measures.push(measure);
+        files[i] = {
+          filename: file.filename[0],
+          filetype: file.filetype[0],
+          usageType: this._.result(file, 'usage_type[0]', null),
+          checksum: file.checksum[0],
+          version: version
+        };
       });
-    });
-  }
+      measure = {
+        schemaVersion: this._.result(result, 'measure.schema_version[0]'),
+        name: this._.result(result, 'measure.name[0]'),
+        uid: this._.result(result, 'measure.uid[0]'),
+        versionId: this._.result(result, 'measure.version_id[0]'),
+        versionModified: this._.result(result, 'measure.version_modified[0]'),
+        xmlChecksum: this._.result(result, 'measure.xml_checksum[0]'),
+        className: this._.result(result, 'measure.class_name[0]'),
+        displayName: this._.result(result, 'measure.display_name[0]'),
+        shortName: this._.result(result, 'measure.short_name[0]'),
+        description: this._.result(result, 'measure.description[0]'),
+        modelerDescription: this._.result(result, 'measure.modeler_description[0]'),
+        arguments: measureArguments,
+        tags: this._.result(result, 'measure.tags[0].tag[0]', ''),
+        attributes: attributes,
+        files: files
+      };
 
-  getMeasuresForDisplay() {
-
-    this.display_measures = [];
-
-    this._.each(this.local_measures, m => {
-      const measure = m;
-
-      // add fields for display
-      measure.status = '';
-      measure.location = 'My';
-      measure.add = '';
-
-      if (m.versionModified) {
-        // assuming yyyy-mm-dd
-        measure.date = new Date(m.versionModified.substring(0, 4), m.versionModified.substring(5, 7), m.versionModified.substring(8, 10));
-
-      } else {
-        measure.date = '';
-      }
-
-      if (m.provenances && m.provenances.count > 0) {
-        measure.author = m.provenances[0].provenance.author;
-      } else {
-        measure.author = '';
-      }
-
-      this._.each(m.attributes, attr => {
-        if (attr.name == 'Measure Type') {
-          measure.type = attr.value;
-        }
-      });
-      this.display_measures.push(measure);
+      // fix tags
+      measure.tags = this._.join(this._.split(measure.tags, '.'), ' -> ');
     });
 
-    return this.display_measures;
+    return measure;
+  }
+
+  // add additional fields for display
+  prepareMeasure(measure, type){
+
+    // add fields for display
+    measure.status = '';
+    measure.location = type;
+    measure.add = '';
+
+    if (measure.versionModified) {
+      // assuming yyyy-mm-dd
+      measure.date = new Date(measure.versionModified.substring(0, 4), measure.versionModified.substring(5, 7), measure.versionModified.substring(8, 10));
+
+    } else {
+      measure.date = '';
+    }
+
+    if (measure.provenances && measure.provenances.count > 0) {
+      measure.author = measure.provenances[0].provenance.author;
+    } else {
+      measure.author = '';
+    }
+
+    this._.each(measure.attributes, attr => {
+      if (attr.name == 'Measure Type') {
+        measure.type = attr.value;
+      }
+    });
+
+    return measure;
 
   }
 
-  getBCLMeasures() {
+  // return filter types that are set; handle 'all' case
+  getMeasureTypes(){
+
+    let types = [];
+
+    if (this.filters.all) {
+      types = ['my', 'local', 'bcl'];
+    } else {
+      types = [];
+      if (this.filters.my) types.push('my');
+      if (this.filters.local) types.push('local');
+      if (this.filters.bcl) types.push('bcl');
+      // TODO: others?
+    }
+
+    return types;
+
+  }
+
+  // get measures for display
+  getDisplayMeasures(){
+
+    let measures = [];
+    const types = this.getMeasureTypes();
+
+    this._.each(types, type => {
+      this.$log.debug(type);
+      measures = this._.concat(measures, this.lib_measures[type]);
+      this.$log.debug(measures);
+
+    });
+
+    return measures;
+  }
+
+  getBCLCategories() {
     this.BCL.getCategories().then(response => {
 
       if (response.data.term) {
@@ -257,17 +307,18 @@ export class ModalBclController {
           categories.push(cat1);
         });
 
-        this.$log.debug('Categories: ', categories);
+        //this.$log.debug('Categories: ', categories);
         this.categories = categories;
 
       }
     });
     // for testing until electron works
+    /*
     this.categories = [
       {name: 'A', tid: 1},
       {name: 'B', tid: 2},
       {name: 'C', tid: 3}
-    ];
+    ];*/
   }
 
 
