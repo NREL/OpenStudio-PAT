@@ -56,12 +56,12 @@ export class ModalBclController {
         enableSorting: false,
         enableCellEdit: false,
         cellClass: 'icon-cell',
-        width:'10%',
+        width:'12%',
         cellTemplate:'<img ng-src=\"assets/images/{{grid.getCellValue(row, col)}}_icon.png\" alt=\"{{grid.getCellValue(row, col)}}\" />'
       }, {
         name: 'author',
         enableCellEdit: false,
-        width:'20%'
+        width:'18%'
       }, {
         name: 'date',
         enableCellEdit: false,
