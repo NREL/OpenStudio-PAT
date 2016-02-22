@@ -5,14 +5,15 @@ import { parseString } from 'xml2js';
 
 export class ModalBclController {
 
-  constructor($log, $uibModalInstance, _, BCL) {
+  constructor($log, $uibModalInstance, $scope, _, BCL) {
     'ngInject';
 
-    var vm = this;
+    const vm = this;
     this.$uibModalInstance = $uibModalInstance;
     this._ = _;
     this.$log = $log;
     this.BCL = BCL;
+    this.$scope = $scope;
 
     this.jetpack = jetpack;
     this.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
@@ -42,7 +43,7 @@ export class ModalBclController {
     //this.measures.bcl = this.getBCLMeasures();
 
     // get measures array for Library display
-    this.display_measures = this.getDisplayMeasures();
+    this.$scope.display_measures = this.getDisplayMeasures();
     this.$log.debug('measures:', this.display_measures);
 
     // Library grid
@@ -85,7 +86,7 @@ export class ModalBclController {
         cellClass: 'icon-cell',
         width:'10%'
       }],
-      data: this.display_measures,
+      data: 'display_measures',
       rowHeight: 35,
       enableCellEditOnFocus: true,
       enableHiding: false,
@@ -321,10 +322,7 @@ export class ModalBclController {
   // process filter changes
   resetFilters(){
     this.$log.debug('filters:', this.filters);
-    this.display_measures = this.getDisplayMeasures();
-    this.$log.debug('display measures: ', this.display_measures);
-    // TODO: is this best way to update grid?
-    this.libraryGridOptions.data = this.display_measures;
+    this.$scope.display_measures = this.getDisplayMeasures();
   }
 
 
