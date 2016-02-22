@@ -18,7 +18,6 @@ import { ReportsController } from '../app/reports/reportsController';
 import { ServerController } from '../app/server/serverController';
 
 angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'ui.router', 'ui.bootstrap', 'toastr', 'ui.grid', 'ui.grid.autoResize', 'ui.grid.cellNav', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ui.grid.selection'])
-  .constant('_', _)
   .config(config)
   .config(routerConfig)
   .run(runBlock)

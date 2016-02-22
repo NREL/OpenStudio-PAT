@@ -5,87 +5,86 @@ import { parseString } from 'xml2js';
 
 export class ModalBclController {
 
-  constructor($log, $uibModalInstance, _, BCL) {
+  constructor($log, $uibModalInstance, BCL) {
     'ngInject';
 
-    var vm = this;
-    this.$uibModalInstance = $uibModalInstance;
-    this._ = _;
-    this.$log = $log;
-    this.BCL = BCL;
+    const vm = this;
+    vm.$uibModalInstance = $uibModalInstance;
+    vm.$log = $log;
+    vm.BCL = BCL;
 
-    this.jetpack = jetpack;
-    this.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
-    this.local_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
+    vm.jetpack = jetpack;
+    vm.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    vm.local_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
 
-    this.selected = null;
-    this.keyword = '';
+    vm.selected = null;
+    vm.keyword = '';
 
-    this.filters = {
+    vm.filters = {
       all: false,
       local: true,
       bcl: false,
       my: true
     };
 
-    this.categories = [];
-    this.getBCLCategories();
+    vm.categories = [];
+    vm.getBCLCategories();
 
     // TODO: get project measures from a service
-    this.project_measures = [];
+    vm.project_measures = [];
 
     // assign measures by type
-    this.lib_measures = {};
-    this.lib_measures.local = this.getMeasures(this.local_dir, 'local');
-    this.lib_measures.my = this.getMeasures(this.my_measures_dir, 'my');
+    vm.lib_measures = {};
+    vm.lib_measures.local = vm.getMeasures(vm.local_dir, 'local');
+    vm.lib_measures.my = vm.getMeasures(vm.my_measures_dir, 'my');
 
-    //this.measures.bcl = this.getBCLMeasures();
+    //vm.measures.bcl = vm.getBCLMeasures();
 
     // get measures array for Library display
-    this.display_measures = this.getDisplayMeasures();
-    this.$log.debug('measures:', this.display_measures);
+    vm.display_measures = vm.getDisplayMeasures();
+    vm.$log.debug('measures:', vm.display_measures);
 
     // Library grid
-    this.libraryGridOptions = {
+    vm.libraryGridOptions = {
       columnDefs: [{
         name: 'displayName',
         displayName: 'Name',
         enableCellEdit: false,
-        width:'35%'
+        width: '35%'
       }, {
         name: 'location',
         displayName: '',
         enableCellEdit: false,
-        width:'5%'
+        width: '5%'
       }, {
         name: 'type',
         enableSorting: false,
         enableCellEdit: false,
         cellClass: 'icon-cell',
-        width:'12%',
-        cellTemplate:'<img ng-src=\"assets/images/{{grid.getCellValue(row, col)}}_icon.png\" alt=\"{{grid.getCellValue(row, col)}}\" />'
+        width: '12%',
+        cellTemplate: '<img ng-src="assets/images/{{grid.getCellValue(row, col)}}_icon.png" alt="{{grid.getCellValue(row, col)}}" />'
       }, {
         name: 'author',
         enableCellEdit: false,
-        width:'18%'
+        width: '18%'
       }, {
         name: 'date',
         enableCellEdit: false,
         type: 'date',
         cellFilter: 'date:"dd/MM/yyyy"',
-        width:'12%'
+        width: '12%'
       }, {
         name: 'status',
         enableCellEdit: false,
         cellClass: 'icon-cell',
-        width:'10%'
+        width: '10%'
       }, {
         name: 'add',
         enableCellEdit: false,
         cellClass: 'icon-cell',
-        width:'10%'
+        width: '10%'
       }],
-      data: this.display_measures,
+      data: vm.display_measures,
       rowHeight: 35,
       enableCellEditOnFocus: true,
       enableHiding: false,
@@ -95,7 +94,7 @@ export class ModalBclController {
       multiSelect: false,
       onRegisterApi: function (gridApi) {
         vm.gridApi = gridApi;
-        gridApi.selection.on.rowSelectionChanged(null, function (row) {
+        gridApi.selection.on.rowSelectionChanged(null, row => {
           if (row.isSelected) {
             vm.selected = row.entity;
           } else {
@@ -103,25 +102,26 @@ export class ModalBclController {
             vm.selected = null;
           }
         });
-        gridApi.cellNav.on.navigate(null, function(newRowCol, oldRowCol){
+        gridApi.cellNav.on.navigate(null, (newRowCol, oldRowCol) => {
           vm.gridApi.selection.selectRow(newRowCol.row.entity);
         });
       }
     };
   }
 
-  getMeasures(path, type){
+  getMeasures(path, type) {
+    const vm = this;
 
     let measurePaths = [];
     const measures = [];
-    if (this.jetpack.exists(path.cwd())) measurePaths = path.find('.', {matching: '*/measure.xml'}, 'relativePath');
+    if (vm.jetpack.exists(path.cwd())) measurePaths = path.find('.', {matching: '*/measure.xml'}, 'relativePath');
     else console.error('The (%s) Measures directory (%s) does not exist', type, path.cwd());
 
-    this._.each(measurePaths, measurePath => {
+    _.each(measurePaths, measurePath => {
 
       const xml = path.read(measurePath);
-      let measure = this.parseMeasure(xml);
-      measure = this.prepareMeasure(measure, type);
+      let measure = vm.parseMeasure(xml);
+      measure = vm.prepareMeasure(measure, type);
       measures.push(measure);
 
     });
@@ -129,44 +129,41 @@ export class ModalBclController {
     return measures;
   }
 
-  parseMeasure(xml){
-
+  parseMeasure(xml) {
     let measure = {};
 
     parseString(xml, (err, result) => {
+      const measureArguments = _.result(result, 'measure.arguments[0].argument', []);
+      _.each(measureArguments, (argument, i) => {
 
-
-      const measureArguments = this._.result(result, 'measure.arguments[0].argument', []);
-      this._.each(measureArguments, (argument, i) => {
-
-        const choices = this._.result(argument, 'choices[0].choice', []);
-        this._.each(choices, (choice, i) => {
+        const choices = _.result(argument, 'choices[0].choice', []);
+        _.each(choices, (choice, i) => {
           choices[i] = {
-            value: this._.result(choice, 'value[0]'),
-            displayName: this._.result(choice, 'display_name[0]')
+            value: _.result(choice, 'value[0]'),
+            displayName: _.result(choice, 'display_name[0]')
           };
         });
 
         measureArguments[i] = {
           name: argument.name[0],
           displayName: argument.display_name[0],
-          shortName: this._.result(argument, 'short_name[0]'),
-          description: this._.result(argument, 'description[0]'),
+          shortName: _.result(argument, 'short_name[0]'),
+          description: _.result(argument, 'description[0]'),
           type: argument.type[0],
           required: argument.required[0],
-          modelDependent: this._.result(argument, 'model_dependent', 'false'),
-          defaultValue: this._.result(argument, 'default_value[0]'),
+          modelDependent: _.result(argument, 'model_dependent', 'false'),
+          defaultValue: _.result(argument, 'default_value[0]'),
           choices: choices,
-          minValue: this._.result(argument, 'min_value[0]'),
-          maxValue: this._.result(argument, 'max_value[0]')
+          minValue: _.result(argument, 'min_value[0]'),
+          maxValue: _.result(argument, 'max_value[0]')
         };
       });
 
       // TODO: add outputs
       // TODO: add provenances (first one only)
 
-      const attributes = this._.result(result, 'measure.attributes[0].attribute', []);
-      this._.each(attributes, (attribute, i) => {
+      const attributes = _.result(result, 'measure.attributes[0].attribute', []);
+      _.each(attributes, (attribute, i) => {
         attributes[i] = {
           name: attribute.name[0],
           value: attribute.value[0],
@@ -174,55 +171,54 @@ export class ModalBclController {
         };
       });
 
-      const files = this._.result(result, 'measure.files[0].file', []);
-      this._.each(files, (file, i) => {
+      const files = _.result(result, 'measure.files[0].file', []);
+      _.each(files, (file, i) => {
 
         const version = {
-          softwareProgram: this._.result(file, 'version[0].software_program[0]', null),
-          identifier: this._.result(file, 'version[0].identifier[0]', null),
-          minCompatible: this._.result(file, 'version[0].min_compatible[0]', null),
-          maxCompatible: this._.result(file, 'version[0].max_compatible[0]', null)
+          softwareProgram: _.result(file, 'version[0].software_program[0]', null),
+          identifier: _.result(file, 'version[0].identifier[0]', null),
+          minCompatible: _.result(file, 'version[0].min_compatible[0]', null),
+          maxCompatible: _.result(file, 'version[0].max_compatible[0]', null)
         };
 
         files[i] = {
           filename: file.filename[0],
           filetype: file.filetype[0],
-          usageType: this._.result(file, 'usage_type[0]', null),
+          usageType: _.result(file, 'usage_type[0]', null),
           checksum: file.checksum[0],
           version: version
         };
       });
       measure = {
-        schemaVersion: this._.result(result, 'measure.schema_version[0]'),
-        name: this._.result(result, 'measure.name[0]'),
-        uid: this._.result(result, 'measure.uid[0]'),
-        versionId: this._.result(result, 'measure.version_id[0]'),
-        versionModified: this._.result(result, 'measure.version_modified[0]'),
-        xmlChecksum: this._.result(result, 'measure.xml_checksum[0]'),
-        className: this._.result(result, 'measure.class_name[0]'),
-        displayName: this._.result(result, 'measure.display_name[0]'),
-        shortName: this._.result(result, 'measure.short_name[0]'),
-        description: this._.result(result, 'measure.description[0]'),
-        modelerDescription: this._.result(result, 'measure.modeler_description[0]'),
+        schemaVersion: _.result(result, 'measure.schema_version[0]'),
+        name: _.result(result, 'measure.name[0]'),
+        uid: _.result(result, 'measure.uid[0]'),
+        versionId: _.result(result, 'measure.version_id[0]'),
+        versionModified: _.result(result, 'measure.version_modified[0]'),
+        xmlChecksum: _.result(result, 'measure.xml_checksum[0]'),
+        className: _.result(result, 'measure.class_name[0]'),
+        displayName: _.result(result, 'measure.display_name[0]'),
+        shortName: _.result(result, 'measure.short_name[0]'),
+        description: _.result(result, 'measure.description[0]'),
+        modelerDescription: _.result(result, 'measure.modeler_description[0]'),
         arguments: measureArguments,
-        tags: this._.result(result, 'measure.tags[0].tag[0]', ''),
+        tags: _.result(result, 'measure.tags[0].tag[0]', ''),
         attributes: attributes,
         files: files
       };
 
       // fix tags
-      measure.tags = this._.join(this._.split(measure.tags, '.'), ' -> ');
+      measure.tags = _.join(_.split(measure.tags, '.'), ' -> ');
     });
 
     return measure;
   }
 
   // add additional fields for display
-  prepareMeasure(measure, type){
-
+  prepareMeasure(measure, type) {
     // add fields for display
     measure.status = '';
-    measure.location = this._.capitalize(type);
+    measure.location = _.capitalize(type);
     measure.add = '';
 
     if (measure.versionModified) {
@@ -239,7 +235,7 @@ export class ModalBclController {
       measure.author = '';
     }
 
-    this._.each(measure.attributes, attr => {
+    _.each(measure.attributes, attr => {
       if (attr.name == 'Measure Type') {
         measure.type = attr.value;
       }
@@ -250,17 +246,18 @@ export class ModalBclController {
   }
 
   // return filter types that are set; handle 'all' case
-  getMeasureTypes(){
+  getMeasureTypes() {
+    const vm = this;
 
     let types = [];
 
-    if (this.filters.all) {
+    if (vm.filters.all) {
       types = ['my', 'local', 'bcl'];
     } else {
       types = [];
-      if (this.filters.my) types.push('my');
-      if (this.filters.local) types.push('local');
-      if (this.filters.bcl) types.push('bcl');
+      if (vm.filters.my) types.push('my');
+      if (vm.filters.local) types.push('local');
+      if (vm.filters.bcl) types.push('bcl');
       // TODO: others?
     }
 
@@ -269,32 +266,35 @@ export class ModalBclController {
   }
 
   // get measures for display
-  getDisplayMeasures(){
+  getDisplayMeasures() {
+    const vm = this;
 
     let measures = [];
-    const types = this.getMeasureTypes();
+    const types = vm.getMeasureTypes();
 
-    this._.each(types, type => {
-      measures = this._.concat(measures, this.lib_measures[type]);
+    _.each(types, type => {
+      measures = _.concat(measures, vm.lib_measures[type]);
     });
 
     return measures;
   }
 
   getBCLCategories() {
-    this.BCL.getCategories().then(response => {
+    const vm = this;
+
+    vm.BCL.getCategories().then(response => {
 
       if (response.data.term) {
         const categories = [];
         // 3 possible levels of nesting
-        this._.each(response.data.term, term => {
-          const cat1 = this._.pick(term, ['name', 'tid']);
+        _.each(response.data.term, term => {
+          const cat1 = _.pick(term, ['name', 'tid']);
           const cat1_terms = [];
-          this._.each(term.term, term2 => {
-            const cat2 = this._.pick(term2, ['name', 'tid']);
+          _.each(term.term, term2 => {
+            const cat2 = _.pick(term2, ['name', 'tid']);
             const cat2_terms = [];
-           this._.each(term2.term, term3 => {
-              const cat3 = this._.pick(term3, ['name', 'tid']);
+            _.each(term2.term, term3 => {
+              const cat3 = _.pick(term3, ['name', 'tid']);
               cat2_terms.push(cat3);
             });
             cat2.children = cat2_terms;
@@ -304,42 +304,46 @@ export class ModalBclController {
           categories.push(cat1);
         });
 
-        //this.$log.debug('Categories: ', categories);
-        this.categories = categories;
+        //vm.$log.debug('Categories: ', categories);
+        vm.categories = categories;
 
       }
     });
     // for testing until electron works
     /*
-    this.categories = [
-      {name: 'A', tid: 1},
-      {name: 'B', tid: 2},
-      {name: 'C', tid: 3}
-    ];*/
+     vm.categories = [
+     {name: 'A', tid: 1},
+     {name: 'B', tid: 2},
+     {name: 'C', tid: 3}
+     ];*/
   }
 
   // process filter changes
-  resetFilters(){
-    this.$log.debug('filters:', this.filters);
-    this.display_measures = this.getDisplayMeasures();
-    this.$log.debug('display measures: ', this.display_measures);
+  resetFilters() {
+    const vm = this;
+
+    vm.$log.debug('filters:', vm.filters);
+    vm.display_measures = vm.getDisplayMeasures();
+    vm.$log.debug('display measures: ', vm.display_measures);
     // TODO: is this best way to update grid?
-    this.libraryGridOptions.data = this.display_measures;
+    vm.libraryGridOptions.data = vm.display_measures;
   }
 
 
   ok() {
-    this.$uibModalInstance.close();
+    const vm = this;
+
+    vm.$uibModalInstance.close();
   }
 
   cancel() {
-    this.$uibModalInstance.dismiss('cancel');
+    const vm = this;
+
+    vm.$uibModalInstance.dismiss('cancel');
   }
 
   search() {
-
     // first just search by keyword and display results
-
   }
 
 }

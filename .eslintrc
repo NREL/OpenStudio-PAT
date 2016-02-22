@@ -1,5 +1,6 @@
 {
   "extends": "eslint:recommended",
+  "parser": "babel-eslint",
   "env": {
     "browser": true,
     "es6": true,
@@ -10,6 +11,7 @@
     "modules": true
   },
   "globals": {
+    "_": true,
     "inject": true,
     "module": true
   },
@@ -24,16 +26,16 @@
     // Stylistic Issues
     "array-bracket-spacing": 1,
     "comma-spacing": 1,
-    "consistent-this": [2, "self"],
+    "consistent-this": [2, "vm"],
     "no-mixed-spaces-and-tabs": 1,
     "no-trailing-spaces": 1,
     "quotes": [2, "single"],
     "semi": [2, "always"],
     // ES6
-    "no-arrow-condition": 2,
+    "no-confusing-arrow": 2,
     "no-const-assign": 2,
     "no-var": 1,
     "prefer-arrow-callback": 1,
-    "prefer-const": 1,
+    "prefer-const": 1
   }
 }

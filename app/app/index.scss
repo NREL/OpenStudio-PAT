@@ -3,7 +3,7 @@ html, body {
 }
 
 @media (max-width: 1200px) {
-  html,body {
+  html, body {
     font-size: 0.8em;
   }
 }
@@ -168,7 +168,7 @@ select {
     margin: 0;
     font-size: 14px;
 
-    &+ .panel-collapse > .panel-body {
+    & + .panel-collapse > .panel-body {
       border-top: 0 none;
     }
   }
@@ -204,7 +204,7 @@ select {
 }
 
 .icon-cell {
-  text-align:center;
+  text-align: center;
   padding: 3px 0px;
 }
 
