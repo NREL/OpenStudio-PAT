@@ -84,7 +84,7 @@ export class ModalBclController {
         cellClass: 'icon-cell',
         width: '10%'
       }],
-      data: vm.display_measures,
+      data: 'display_measures',
       rowHeight: 35,
       enableCellEditOnFocus: true,
       enableHiding: false,
@@ -320,6 +320,7 @@ export class ModalBclController {
 
   // process filter changes
   resetFilters() {
+    const vm = this;
     vm.$log.debug('filters:', this.filters);
     vm.$scope.display_measures = this.getDisplayMeasures();
   }
