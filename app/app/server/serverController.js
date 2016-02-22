@@ -3,7 +3,8 @@ export class ServerController {
   constructor() {
     'ngInject';
 
-    this.test = 'Server Controller';
+    const vm = this;
+    vm.test = 'Server Controller';
 
   }
 

@@ -1,7 +1,7 @@
 {
   "rules": {
     // ES6
-    "no-arrow-condition": 0,
+    "no-confusing-arrow": 0,
     "no-const-assign": 0,
     "no-var": 0,
     "prefer-arrow-callback": 0,
