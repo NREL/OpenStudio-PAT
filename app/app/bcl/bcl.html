@@ -21,10 +21,10 @@
             Filters
           </div>
           <div class="panel-body">
-            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.all" ng-change="modal.resetFilters()"> All</label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.project" ng-change="modal.resetFilters()">My Project</label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.my" ng-change="modal.resetFilters()"> Measure Directory</label></div>
             <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.local" ng-change="modal.resetFilters()"> Local</label></div>
             <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.bcl" ng-change="modal.resetFilters()"> BCL (Online)</label></div>
-            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.my" ng-change="modal.resetFilters()"> Measure Directory</label></div>
           </div>
         </div>
 
@@ -37,16 +37,16 @@
                   <uib-accordion-heading>
                     <i class="pull-left glyphicon pad-right-5" ng-class="{'glyphicon-chevron-down': cat1.open, 'glyphicon-chevron-right': !cat1.open}"></i>
                     <div class="checkbox bcl-cb">
-                      <label><input type="checkbox" ng-model="cat1.tid" ng-click="$event.stopPropagation();">{{cat1.name}}</label>
+                      <label><input type="checkbox" ng-model="cat1.tid" ng-click="$event.stopPropagation(); modal.retrieveMeasures()">{{cat1.name}}</label>
                     </div>
                   </uib-accordion-heading>
                   <div ng-show="cat1.children" class="indent-once">
                     <div ng-repeat="cat2 in cat1.children">
                       <div class="checkbox bcl-cb">
-                        <label><input type="checkbox" ng-model="cat2.tid">{{cat2.name}}</label>
+                        <label><input type="checkbox" ng-model="cat2.tid" ng-click="modal.retrieveMeasures()">{{cat2.name}}</label>
                         <div ng-show="cat1.children" class="indent-twice">
                           <div ng-repeat="cat3 in cat2.children">
-                            <div class="checkbox bcl-cb"><label><input type="checkbox" ng-model="cat3.tid">{{cat3.name}}</label>
+                            <div class="checkbox bcl-cb"><label><input type="checkbox" ng-model="cat3.tid" ng-click="modal.retrieveMeasures()">{{cat3.name}}</label>
                             </div>
                           </div>
                         </div>

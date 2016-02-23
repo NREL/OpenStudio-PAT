@@ -17,32 +17,42 @@ export class ModalBclController {
     vm.jetpack = jetpack;
     vm.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
     vm.local_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
+    // TODO: fix project dir (get from Electron settings)
+    vm.project_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
 
     vm.selected = null;
     vm.keyword = '';
 
     vm.filters = {
-      all: false,
       local: true,
       bcl: false,
-      my: true
+      my: true,
+      project: true
     };
 
     vm.categories = [];
     vm.getBCLCategories();
 
     // TODO: get project measures from a service
-    vm.project_measures = [];
+    // load project_measures before other measures
+    vm.project_measures = vm.getMeasures(vm.project_dir, 'project');
+    vm.$log.debug('PROJECT measures: ', vm.project_measures);
 
     // assign measures by type
     vm.lib_measures = {};
-    vm.lib_measures.local = vm.getMeasures(vm.local_dir, 'local');
     vm.lib_measures.my = vm.getMeasures(vm.my_measures_dir, 'my');
-
+    vm.lib_measures.local = vm.getMeasures(vm.local_dir, 'local');
+    vm.lib_measures.project = vm.getMeasures(vm.project_dir, 'project');
     //vm.measures.bcl = vm.getBCLMeasures();
+    vm.$log.debug('MEASURES: ', vm.lib_measures);
+
+    // TODO: temporary workaround until project measures service / JSON is implemented
+    // add additional info
+    vm.project_measures = vm.lib_measures.project;
 
     // get measures array for Library display
     vm.$scope.display_measures = vm.getDisplayMeasures();
+    vm.$log.debug('DISPLAYMEASURES: ', vm.$scope.display_measures);
 
     // Library grid
     vm.libraryGridOptions = {
@@ -82,6 +92,7 @@ export class ModalBclController {
         name: 'add',
         enableCellEdit: false,
         cellClass: 'icon-cell',
+        cellTemplate: '<div ng-if="row.entity.addedToProject"><span class="glyphicon glyphicon-ok-sign green-button" aria-hidden="true" aria-label="Add to Project"></span></div><div ng-if="!row.entity.addedToProject"><span class="glyphicon glyphicon-plus-sign green-button" aria-hidden="true" aria-label="Add to Project" ng-click="grid.appScope.modal.addMeasure(row.entity); $event.stopPropagation();"></span></div>',
         width: '10%'
       }],
       data: 'display_measures',
@@ -130,6 +141,7 @@ export class ModalBclController {
   }
 
   parseMeasure(xml) {
+    const vm = this;
     let measure = {};
 
     parseString(xml, (err, result) => {
@@ -207,6 +219,9 @@ export class ModalBclController {
         files: files
       };
 
+      // for old measures
+      if (measure.displayName == undefined) measure.displayName = measure.name;
+
       // fix tags
       measure.tags = _.join(_.split(measure.tags, '.'), ' -> ');
     });
@@ -216,10 +231,15 @@ export class ModalBclController {
 
   // add additional fields for display
   prepareMeasure(measure, type) {
+    const vm = this;
     // add fields for display
     measure.status = '';
-    measure.location = _.capitalize(type);
+    // TODO: if type shows up as 'Project', means there's an error? (measure is missing from local or my measures dirs)
+    measure.location = (type == 'project') ? vm.findMeasureOrigin(measure.uid) : _.capitalize(type);
     measure.add = '';
+
+    // is measure added to project?
+    measure.addedToProject = (type == 'project' || _.find(vm.project_measures, {uid: measure.uid}));
 
     if (measure.versionModified) {
       // assuming yyyy-mm-dd
@@ -245,36 +265,38 @@ export class ModalBclController {
 
   }
 
-  // return filter types that are set; handle 'all' case
-  getMeasureTypes() {
+  // find where project measure came from
+  findMeasureOrigin(id) {
     const vm = this;
-
-    let types = [];
-
-    if (vm.filters.all) {
-      types = ['my', 'local', 'bcl'];
+    vm.$log.debug("ID:", id);
+    if(vm.lib_measures && _.find(vm.lib_measures.my, {uid: id})) {
+      return 'My';
+    } else if (vm.lib_measures && _.find(vm.lib_measures.local, {uid: id})) {
+      return 'Local';
     } else {
-      types = [];
-      if (vm.filters.my) types.push('my');
-      if (vm.filters.local) types.push('local');
-      if (vm.filters.bcl) types.push('bcl');
-      // TODO: others?
+      return 'Project';
     }
-
-    return types;
-
   }
 
-  // get measures for display
+  // get measures for display based on filter values
   getDisplayMeasures() {
     const vm = this;
+    const measures = [];
 
-    let measures = [];
-    const types = vm.getMeasureTypes();
+    // add checked
+    _.each(vm.filters, (val, key) => {
+      if (val) {
 
-    _.each(types, type => {
-      measures = _.concat(measures, vm.lib_measures[type]);
+        _.each(vm.lib_measures[key], m => {
+          // add if not found
+          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+        });
+      }
     });
+
+    // TODO: then check for updates on local measures
+
+    // TODO: then prepare BCL online measures
 
     return measures;
   }
@@ -321,8 +343,48 @@ export class ModalBclController {
   // process filter changes
   resetFilters() {
     const vm = this;
-    vm.$log.debug('filters:', this.filters);
     vm.$scope.display_measures = this.getDisplayMeasures();
+  }
+
+  // retrieve measures from online BCL by category
+  retrieveMeasures() {
+    const vm = this;
+
+    // if all under a group is checked, retrieve top level
+
+    // otherwise, separate queries for each (can't get OR filter to work)
+
+  }
+
+  // add measure to project
+  addMeasure(rowEntity) {
+
+    const vm = this;
+    const measure = _.find(vm.$scope.display_measures, {uid: rowEntity.uid});
+
+    vm.$log.debug(measure);
+    measure.addedToProject = true;
+
+    // TODO: Call service to add to project
+    vm.addToProject(measure);
+
+    vm.$log.debug(vm.project_measures);
+
+  }
+
+  // TODO: this will be in a service
+  addToProject(measure) {
+    const vm = this;
+
+    // add to array
+    vm.project_measures.push(measure);
+    // TODO: more checks here? is this needed?
+    vm.lib_measures.project.push(measure);
+
+    // copy on disk
+    const src = (measure.location == 'My') ? vm.my_measures_dir : vm.local_dir;
+    src.copy(measure.name, vm.project_dir.path(measure.name));
+
   }
 
 
