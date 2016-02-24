@@ -208,10 +208,27 @@ select {
   padding: 3px 0px;
 }
 
+.icon-edit-cell {
+  overflow:visible;
+}
+
 .green-button {
   color: #6CC16F;
+}
+
+.library-grid-button {
   font-size: 25px;
 }
+
+.ui-grid-cell.dropdown-button {
+  overflow:visible;
+
+  .ui-grid-cell-contents {
+    overflow: visible;
+  }
+
+}
+
 
 /*
 .lib-grid {

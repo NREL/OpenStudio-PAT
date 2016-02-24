@@ -65,38 +65,39 @@ export class ModalBclController {
         name: 'location',
         displayName: '',
         enableCellEdit: false,
-        width: '5%'
+        width: '11%'
       }, {
         name: 'type',
         enableSorting: false,
         enableCellEdit: false,
         cellClass: 'icon-cell',
-        width: '12%',
+        width: '15%',
         cellTemplate: '<img ng-src="assets/images/{{grid.getCellValue(row, col)}}_icon.png" alt="{{grid.getCellValue(row, col)}}" />'
       }, {
         name: 'author',
         enableCellEdit: false,
-        width: '18%'
+        visible: false
       }, {
         name: 'date',
         enableCellEdit: false,
         type: 'date',
         cellFilter: 'date:"dd/MM/yyyy"',
-        width: '12%'
+        width: '15%'
       }, {
         name: 'status',
         enableCellEdit: false,
-        cellClass: 'icon-cell',
-        width: '10%'
+        cellClass: 'dropdown-button',
+        cellTemplate: '../app/bcl/editButtonTemplate.html',
+        width: '15%'
       }, {
         name: 'add',
         enableCellEdit: false,
         cellClass: 'icon-cell',
-        cellTemplate: '<div ng-if="row.entity.addedToProject"><span class="glyphicon glyphicon-ok-sign green-button" aria-hidden="true" aria-label="Add to Project"></span></div><div ng-if="!row.entity.addedToProject"><span class="glyphicon glyphicon-plus-sign green-button" aria-hidden="true" aria-label="Add to Project" ng-click="grid.appScope.modal.addMeasure(row.entity); $event.stopPropagation();"></span></div>',
+        cellTemplate: '<div ng-if="row.entity.addedToProject"><span class="glyphicon glyphicon-ok-sign library-grid-button green-button" aria-hidden="true" aria-label="Add to Project"></span></div><div ng-if="!row.entity.addedToProject"><span class="glyphicon glyphicon-plus-sign library-grid-button green-button" aria-hidden="true" aria-label="Add to Project" ng-click="grid.appScope.modal.addMeasure(row.entity); $event.stopPropagation();"></span></div>',
         width: '10%'
       }],
       data: 'display_measures',
-      rowHeight: 35,
+      rowHeight: 45,
       enableCellEditOnFocus: true,
       enableHiding: false,
       enableColumnMenus: false,
@@ -268,7 +269,7 @@ export class ModalBclController {
   // find where project measure came from
   findMeasureOrigin(id) {
     const vm = this;
-    vm.$log.debug("ID:", id);
+    vm.$log.debug('ID:', id);
     if(vm.lib_measures && _.find(vm.lib_measures.my, {uid: id})) {
       return 'My';
     } else if (vm.lib_measures && _.find(vm.lib_measures.local, {uid: id})) {
