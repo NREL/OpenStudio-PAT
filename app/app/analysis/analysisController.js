@@ -5,26 +5,25 @@ import { parseString } from 'xml2js';
 
 export class AnalysisController {
 
-  constructor(_, $log, BCL) {
+  constructor($log, BCL) {
     'ngInject';
 
-    this._ = _;
-    this.$log = $log;
-    this.jetpack = jetpack;
-    const self = this;
+    const vm = this;
+    vm.$log = $log;
+    vm.jetpack = jetpack;
 
-    this.test = 'Analysis Controller';
-    this.BCL = BCL;
+    vm.test = 'Analysis Controller';
+    vm.BCL = BCL;
 
-    this.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    vm.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
 
-    this.measures = [];
+    vm.measures = [];
 
-    this.analysisTypes = ['Manual', 'Auto'];
+    vm.analysisTypes = ['Manual', 'Auto'];
 
-    this.getMeasures();
+    vm.getMeasures();
 
-    this.gridOptions = {
+    vm.gridOptions = {
       data: this.measures[0].arguments,
       enableSorting: true,
       autoResize: true,
@@ -78,16 +77,17 @@ export class AnalysisController {
   }
 
   getMeasures() {
-    const self = this;
+    const vm = this;
 
     let measurePaths = [];
-    if (this.jetpack.exists(this.srcDir.cwd())) measurePaths = this.srcDir.find('.', {matching: '*/measure.xml'}, 'relativePath');
-    else console.error('My Measures directory (%s) does not exist', this.srcDir.cwd());
+    if (vm.jetpack.exists(vm.srcDir.cwd())) measurePaths = vm.srcDir.find('.', {matching: '*/measure.xml'}, 'relativePath');
+    else console.error('My Measures directory (%s) does not exist', vm.srcDir.cwd());
 
-    this._.each(measurePaths, measurePath => {
-      //this.$log.debug(measurePath);
-      const xml = this.srcDir.read(measurePath);
+    _.each(measurePaths, measurePath => {
+      //vm.$log.debug(measurePath);
+      const xml = vm.srcDir.read(measurePath);
       parseString(xml, (err, result) => {
+<<<<<<< HEAD
 
         const measureArguments = self._.result(result, 'measure.arguments[0].argument', []);
         self._.each(measureArguments, (argument, i) => {
@@ -113,8 +113,8 @@ export class AnalysisController {
           };
         });
 
-        const attributes = self._.result(result, 'measure.attributes[0].attribute', []);
-        self._.each(attributes, (attribute, i) => {
+        const attributes = _.result(result, 'measure.attributes[0].attribute', []);
+        _.each(attributes, (attribute, i) => {
           attributes[i] = {
             name: attribute.name[0],
             value: attribute.value[0],
@@ -140,21 +140,21 @@ export class AnalysisController {
           };
         });
         const measure = {
-          schemaVersion: self._.result(result, 'measure.schema_version[0]'),
-          name: self._.result(result, 'measure.name[0]'),
-          uid: self._.result(result, 'measure.uid[0]'),
-          versionId: self._.result(result, 'measure.version_id[0]'),
-          xmlChecksum: self._.result(result, 'measure.xml_checksum[0]'),
-          className: self._.result(result, 'measure.class_name[0]'),
-          displayName: self._.result(result, 'measure.display_name[0]'),
-          description: self._.result(result, 'measure.description[0]'),
-          modelerDescription: self._.result(result, 'measure.modeler_description[0]'),
+          schemaVersion: _.result(result, 'measure.schema_version[0]'),
+          name: _.result(result, 'measure.name[0]'),
+          uid: _.result(result, 'measure.uid[0]'),
+          versionId: _.result(result, 'measure.version_id[0]'),
+          xmlChecksum: _.result(result, 'measure.xml_checksum[0]'),
+          className: _.result(result, 'measure.class_name[0]'),
+          displayName: _.result(result, 'measure.display_name[0]'),
+          description: _.result(result, 'measure.description[0]'),
+          modelerDescription: _.result(result, 'measure.modeler_description[0]'),
           arguments: measureArguments,
-          tags: self._.result(result, 'measure.tags[0].tag', []),
+          tags: _.result(result, 'measure.tags[0].tag', []),
           attributes: attributes,
           files: files
         };
-        self.measures.push(measure);
+        vm.measures.push(measure);
         //console.log(measure);
       });
     });

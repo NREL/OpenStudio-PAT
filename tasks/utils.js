@@ -4,6 +4,8 @@ var argv = require('yargs').argv;
 var os = require('os');
 var jetpack = require('fs-jetpack');
 
+var env = argv.env || 'development';
+
 module.exports.os = function () {
   switch (os.platform()) {
     case 'darwin':
@@ -25,7 +27,7 @@ module.exports.replace = function (str, patterns) {
 };
 
 module.exports.getEnvName = function () {
-  return argv.env || 'development';
+  return env;
 };
 
 module.exports.getSigningId = function () {

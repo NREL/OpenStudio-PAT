@@ -3,7 +3,8 @@ export class RunController {
   constructor() {
     'ngInject';
 
-    this.test = 'Run Controller';
+    const vm = this;
+    vm.test = 'Run Controller';
 
   }
 

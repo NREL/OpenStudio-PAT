@@ -3,19 +3,20 @@ export class NavController {
   constructor($location) {
     'ngInject';
 
-    this.$location = $location;
+    const vm = this;
+    vm.$location = $location;
 
-    this.isActive = tabIndicator => {
+    vm.isActive = tabIndicator => {
       const tabRegex = new RegExp(tabIndicator);
-      return tabRegex.test(this.$location.path());
+      return tabRegex.test(vm.$location.path());
     };
 
-    this.analysisPath = '/analysis';
-    this.designAlternativesPath = '/design_alternatives';
-    this.outputsPath = '/outputs';
-    this.runPath = '/run';
-    this.reportsPath = '/reports';
-    this.serverPath = '/server';
+    vm.analysisPath = '/analysis';
+    vm.designAlternativesPath = '/design_alternatives';
+    vm.outputsPath = '/outputs';
+    vm.runPath = '/run';
+    vm.reportsPath = '/reports';
+    vm.serverPath = '/server';
 
   }
 

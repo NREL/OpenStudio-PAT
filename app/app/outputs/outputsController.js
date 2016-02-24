@@ -3,7 +3,8 @@ export class OutputsController {
   constructor() {
     'ngInject';
 
-    this.test = 'Outputs Controller';
+    const vm = this;
+    vm.test = 'Outputs Controller';
 
   }
 

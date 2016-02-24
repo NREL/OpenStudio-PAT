@@ -3,7 +3,8 @@ export class DesignAlternativesController {
   constructor() {
     'ngInject';
 
-    this.test = 'Design Alternatives Controller';
+    const vm = this;
+    vm.test = 'Design Alternatives Controller';
 
   }
 

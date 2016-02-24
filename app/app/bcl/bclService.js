@@ -2,16 +2,18 @@ export class BCL {
   constructor($q, $http, $uibModal) {
     'ngInject';
 
-    this.service = {};
-    this.$http = $http;
-    this.$uibModal = $uibModal;
-    this.$q = $q;
+    const vm = this;
+    vm.service = {};
+    vm.$http = $http;
+    vm.$uibModal = $uibModal;
+    vm.$q = $q;
 
   }
 
   // DOWNLOAD COMPONENT BY UID
   download(uids) {
-    return this.$http.get('http://bcl7.development.nrel.gov/api/component/download/', {
+    const vm = this;
+    return vm.$http.get('http://bcl7.development.nrel.gov/api/component/download/', {
       params: {uids: uids},
       responseType: 'arraybuffer'
     });
@@ -20,7 +22,9 @@ export class BCL {
   // GET ALL MEASURE CATEGORIES
   // TODO: SHOULD PROBABLY MOVE THAT TO MAIN ROUTING WITH PROMISES (LIKE CONSTRUCTIONS IN CBECC-COM)
   getCategories() {
-    return this.$http.get('http://bcl7.development.nrel.gov/api/taxonomy/measure.json');
+    const vm = this;
+    //return vm.$http.get('http://bcl7.development.nrel.gov/api/taxonomy/measure.json');
+    return vm.$http.get('https://bcl.nrel.gov/api/taxonomy/measure.json');
   }
 
   // TODO: SEARCH BCL ONLINE
@@ -29,7 +33,8 @@ export class BCL {
 
   // OPEN BCL LIBRARY MODAL
   openBCLModal() {
-    const modalInstance = this.$uibModal.open({
+    const vm = this;
+    const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
       controller: 'ModalBclController',
       controllerAs: 'modal',

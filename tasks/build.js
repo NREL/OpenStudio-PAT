@@ -10,65 +10,36 @@ var $ = require('gulp-load-plugins')({
   pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del']
 });
 
-gulp.task('partials', function () {
-  return gulp.src([
-      path.join(conf.paths.src, '/app/**/*.html'),
-      path.join(conf.paths.tmp, '/serve/app/**/*.html')
-    ])
-    .pipe($.sort())
-    .pipe($.htmlmin({
-      collapseBooleanAttributes: true,
-      collapseInlineTagWhitespace: true,
-      collapseWhitespace: false,
-      removeComments: true,
-      removeRedundantAttributes: true,
-      removeTagWhitespace: true
-    }))
-    .pipe($.angularTemplatecache('templateCacheHtml.js', {
-      module: 'PAT',
-      root: 'app'
-    }))
-    .pipe(gulp.dest(conf.paths.tmp + '/partials/'));
-});
-
 gulp.task('background', ['scripts'], function () {
   gulp.src(path.join(conf.paths.tmp, '/serve/app/background.js'))
-    //.pipe($.uglify({ preserveComments: $.uglifySaveLicense })).on('error', conf.errorHandler('Uglify'))
+    .pipe($.uglify()).on('error', conf.errorHandler('Uglify background.js'))
     .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
 });
 
 gulp.task('html', ['background', 'inject', 'partials'], function () {
-  var partialsInjectFile = gulp.src(path.join(conf.paths.tmp, '/partials/templateCacheHtml.js'), {read: false});
-  var partialsInjectOptions = {
-    starttag: '<!-- inject:partials -->',
-    ignorePath: path.join(conf.paths.tmp, '/partials'),
-    addRootSlash: false
-  };
-
   var htmlFilter = $.filter('*.html', {restore: true});
   var jsFilter = $.filter('**/*.js', {restore: true});
   var cssFilter = $.filter('**/*.css', {restore: true});
 
   return gulp.src(path.join(conf.paths.tmp, '/serve/*.html'))
-    .pipe($.inject(partialsInjectFile, partialsInjectOptions))
     .pipe($.useref())
     .pipe(jsFilter)
-    //.pipe($.sourcemaps.init())
+    .pipe($.sourcemaps.init())
     .pipe($.ngAnnotate())
     .pipe($.rev())
-    //.pipe($.uglify({preserveComments: $.uglifySaveLicense})).on('error', conf.errorHandler('Uglify'))
-    //.pipe($.sourcemaps.write('maps'))
+    .pipe($.uglify({preserveComments: $.uglifySaveLicense})).on('error', conf.errorHandler('Uglify'))
+    .pipe($.sourcemaps.write('maps'))
     .pipe(jsFilter.restore)
     .pipe(cssFilter)
-    //.pipe($.sourcemaps.init())
+    .pipe($.sourcemaps.init())
     .pipe($.replace('../../bower_components/bootstrap-sass/assets/fonts/bootstrap/', '../fonts/'))
     .pipe($.replace(/url\('ui-grid.(.+?)'\)/g, 'url(\'../fonts/ui-grid.$1\')'))
     .pipe($.rev())
-    //.pipe($.csso())
-    //.pipe($.sourcemaps.write('maps'))
+    .pipe($.csso())
+    .pipe($.sourcemaps.write('maps'))
     .pipe(cssFilter.restore)
     .pipe($.revReplace())
-    /*.pipe(htmlFilter)
+    .pipe(htmlFilter)
     .pipe($.htmlmin({
       collapseBooleanAttributes: true,
       collapseInlineTagWhitespace: true,
@@ -77,7 +48,7 @@ gulp.task('html', ['background', 'inject', 'partials'], function () {
       removeRedundantAttributes: true,
       removeTagWhitespace: true
     }))
-    .pipe(htmlFilter.restore)*/
+    .pipe(htmlFilter.restore)
     .pipe(gulp.dest(path.join(conf.paths.dist, '/')))
     .pipe($.size({
       title: path.join(conf.paths.dist, '/'),
