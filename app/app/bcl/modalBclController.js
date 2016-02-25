@@ -1,7 +1,6 @@
 import * as jetpack from 'fs-jetpack';
 import * as path from 'path';
 import * as os from 'os';
-//import { parseString } from 'xml2js';
 
 export class ModalBclController {
 
@@ -14,11 +13,6 @@ export class ModalBclController {
     vm.$scope = $scope;
     vm.BCL = BCL;
     vm.jetpack = jetpack;
-
-    // TODO: fix dirs (get from Electron settings)
-    vm.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
-    vm.local_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
-    vm.project_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
 
     vm.selected = null;
     vm.keyword = '';
@@ -33,24 +27,13 @@ export class ModalBclController {
     vm.categories = [];
     vm.getBCLCategories();
 
-    // TODO: get project measures from a service
-    // load project_measures before other measures
-    vm.project_measures = vm.getMeasures(vm.project_dir, 'project');
-    vm.$log.debug('PROJECT measures: ', vm.project_measures);
-
-    // assign measures by type
-    vm.lib_measures = {};
-    vm.lib_measures.my = vm.getMeasures(vm.my_measures_dir, 'my');
-    vm.lib_measures.local = vm.getMeasures(vm.local_dir, 'local');
-    vm.lib_measures.project = vm.getMeasures(vm.project_dir, 'project');
-    vm.lib_measures.bcl = vm.getBCLMeasures();
-
-    // TODO: temporary workaround until project measures service / JSON is implemented
-    // adds additional info
-    vm.project_measures = vm.lib_measures.project;
-
     // get measures array for Library display
-    vm.$scope.display_measures = vm.getDisplayMeasures();
+    vm.$scope.display_measures = [];
+
+    // get all measures
+    vm.lib_measures = [];
+    vm.lib_measures = vm.getMeasures();
+
     vm.$log.debug('DISPLAYMEASURES: ', vm.$scope.display_measures);
 
     // Library grid
@@ -120,35 +103,17 @@ export class ModalBclController {
     };
   }
 
-  getBCLMeasures() {
+  getMeasures() {
     const vm = this;
-    vm.BCL.getMeasures().then(function(response) {
-      vm.lib_measures.bcl = response;
+    vm.BCL.getAllMeasures().then(function(response) {
+      vm.lib_measures = response;
       vm.$log.debug('measures.bcl: ', vm.lib_measures.bcl);
-      vm.$log.debug("ALL MEASURES: ", vm.lib_measures);
-    });
-  }
-
-  getMeasures(path, type) {
-    const vm = this;
-
-    let measurePaths = [];
-    const measures = [];
-    if (vm.jetpack.exists(path.cwd())) measurePaths = path.find('.', {matching: '*/measure.xml'}, 'relativePath');
-    else console.error('The (%s) Measures directory (%s) does not exist', type, path.cwd());
-
-    _.each(measurePaths, measurePath => {
-
-      const xml = path.read(measurePath);
-      let measure = vm.BCL.parseMeasure(xml);
-      measure = vm.BCL.prepareMeasure(measure, type);
-      measures.push(measure);
+      vm.$log.debug('ALL MEASURES: ', vm.lib_measures);
+      // set display measures
+      vm.getDisplayMeasures();
 
     });
-
-    return measures;
   }
-
 
   // get measures for display based on filter values
   getDisplayMeasures() {
@@ -167,8 +132,7 @@ export class ModalBclController {
 
     // TODO: then check for updates on local measures
 
-    // TODO: then prepare BCL online measures
-
+    vm.$scope.display_measures = measures;
     return measures;
   }
 
@@ -218,15 +182,6 @@ export class ModalBclController {
     vm.$scope.display_measures = this.getDisplayMeasures();
   }
 
-  // retrieve measures from online BCL by category
-  retrieveMeasures() {
-    const vm = this;
-
-    // if all under a group is checked, retrieve top level
-
-    // otherwise, separate queries for each (can't get OR filter to work)
-
-  }
 
   // add measure to project
   addMeasure(rowEntity) {
@@ -248,9 +203,6 @@ export class ModalBclController {
   addToProject(measure) {
     const vm = this;
 
-    // add to array
-    vm.project_measures.push(measure);
-    // TODO: more checks here? is this needed?
     vm.lib_measures.project.push(measure);
 
     // copy on disk

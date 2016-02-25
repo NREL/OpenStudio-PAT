@@ -1,3 +1,6 @@
+import * as jetpack from 'fs-jetpack';
+import * as path from 'path';
+import * as os from 'os';
 import { parseString } from 'xml2js';
 
 export class BCL {
@@ -10,8 +13,22 @@ export class BCL {
     vm.$uibModal = $uibModal;
     vm.$q = $q;
     vm.$log = $log;
+    vm.jetpack = jetpack;
     vm.bcl_measures = [];
     vm.bcl_url = 'https://bcl.nrel.gov/api/';
+
+    // TODO: fix dirs (get from Electron settings)
+    vm.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    vm.local_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
+    vm.project_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
+
+    // TODO: get project measures from a service
+    // load project_measures before other measures
+    vm.temp_project_measures = vm.getMeasuresByType(vm.project_dir, 'project');
+    vm.$log.debug('temp PROJECT measures: ', vm.temp_project_measures);
+
+    // assign measures by type
+    vm.lib_measures = {};
 
   }
 
@@ -32,12 +49,54 @@ export class BCL {
     return vm.$http.get(vm.bcl_url + 'taxonomy/measure.json');
   }
 
-  // retrieve online BCL measures
-  getMeasures(force = false) {
+  // get all measure categories
+  getAllMeasures() {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    if (force || _.isEmpty(vm.bcl_measures)) {
+    // assign measures by type
+    vm.lib_measures.my = vm.getMeasuresByType(vm.my_measures_dir, 'my');
+    vm.lib_measures.local = vm.getMeasuresByType(vm.local_dir, 'local');
+    vm.lib_measures.project = vm.getMeasuresByType(vm.project_dir, 'project');
+
+    vm.getBCLMeasures().then( function(measures) {
+      vm.$log.debug('measures.bcl: ', vm.lib_measures.bcl);
+      vm.$log.debug('ALL MEASURES: ', vm.lib_measures);
+      deferred.resolve(vm.lib_measures);
+
+    }, function(response) {
+      vm.$log.debug('ERROR retrieving BCL online measures');
+      deferred.reject(response);
+    });
+    return deferred.promise;
+  }
+
+  getMeasuresByType(path, type) {
+    const vm = this;
+    let measurePaths = [];
+    const measures = [];
+    if (vm.jetpack.exists(path.cwd())) measurePaths = path.find('.', {matching: '*/measure.xml'}, 'relativePath');
+    else console.error('The (%s) Measures directory (%s) does not exist', type, path.cwd());
+
+    _.each(measurePaths, measurePath => {
+
+      const xml = path.read(measurePath);
+      let measure = vm.parseMeasure(xml);
+      measure = vm.prepareMeasure(measure, type);
+      measures.push(measure);
+
+    });
+
+    return measures;
+  }
+
+  // retrieve online BCL measures
+  getBCLMeasures(force = false) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    if (force || _.isEmpty(vm.lib_measures.bcl)) {
+      vm.lib_measures.bcl = [];
       vm.loadOnlineBCLMeasures().then(function(measures) {
         deferred.resolve(measures);
       }, function (response) {
@@ -46,7 +105,7 @@ export class BCL {
       });
     } else {
       // bcl_measures array is already loaded
-      deferred.resolve(vm.bcl_measures);
+      deferred.resolve(vm.lib_measures.bcl);
     }
     return deferred.promise;
 
