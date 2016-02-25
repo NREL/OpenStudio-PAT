@@ -43,10 +43,6 @@ export class AnalysisController {
         enableHiding: false,
         type: 'boolean'
       }, {
-        name: 'type',
-        displayName: 'Type',
-        enableHiding: false
-      }, {
         name: 'option1',
         displayName: 'Option 1',
         editDropdownOptionsFunction: function(rowEntity) {
