@@ -268,7 +268,7 @@ export class ModalBclController {
   // find where project measure came from
   findMeasureOrigin(id) {
     const vm = this;
-    vm.$log.debug("ID:", id);
+    vm.$log.debug('ID:', id);
     if(vm.lib_measures && _.find(vm.lib_measures.my, {uid: id})) {
       return 'My';
     } else if (vm.lib_measures && _.find(vm.lib_measures.local, {uid: id})) {
