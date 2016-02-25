@@ -5,26 +5,27 @@ import { parseString } from 'xml2js';
 
 export class AnalysisController {
 
-  constructor($log, BCL) {
+  constructor($log, BCL, $scope) {
     'ngInject';
 
     const vm = this;
     vm.$log = $log;
     vm.jetpack = jetpack;
+    vm.$scope = $scope;
 
     vm.test = 'Analysis Controller';
     vm.BCL = BCL;
 
     vm.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
 
-    vm.measures = [];
+    vm.$scope.measures = [];
 
     vm.analysisTypes = ['Manual', 'Auto'];
 
     vm.getMeasures();
 
     vm.gridOptions = {
-      data: this.measures[0].arguments,
+      data: this.$scope.measures[0].arguments,
       enableSorting: true,
       autoResize: true,
       enableCellEditOnFocus: true,
@@ -60,11 +61,11 @@ export class AnalysisController {
           }
         },
         editableCellTemplate: '<div><form name=\"inputForm\">' +
-          '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-          '<input ng-if=\"row.entity.type==\'Int\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-          '<input ng-if=\"row.entity.type==\'Double\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-          '<input ng-if=\"row.entity.type==\'String\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
           '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
+          '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />' +
+          '<input ng-if=\"row.entity.type==\'Int\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+          '<input ng-if=\"row.entity.type==\'Double\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+          '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
         ' </form></div>',
         enableHiding: false,
         enableCellEdit: true
@@ -156,7 +157,7 @@ export class AnalysisController {
           attributes: attributes,
           files: files
         };
-        vm.measures.push(measure);
+        vm.$scope.measures.push(measure);
         //console.log(measure);
       });
     });
