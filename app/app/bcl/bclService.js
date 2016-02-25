@@ -32,9 +32,29 @@ export class BCL {
     return vm.$http.get(vm.bcl_url + 'taxonomy/measure.json');
   }
 
+  // retrieve online BCL measures
+  getMeasures(force = false) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    if (force || _.isEmpty(vm.bcl_measures)) {
+      vm.loadOnlineBCLMeasures().then(function(measures) {
+        deferred.resolve(measures);
+      }, function (response) {
+        vm.$log.debug('ERROR retrieving BCL online measures');
+        deferred.reject(response);
+      });
+    } else {
+      // bcl_measures array is already loaded
+      deferred.resolve(vm.bcl_measures);
+    }
+    return deferred.promise;
+
+  }
+
   // GET ALL MEASURES
   // TODO: don't call this directly from modal controller!
-  getMeasureMetadata() {
+  loadOnlineBCLMeasures() {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.bcl_measures = [];
@@ -64,7 +84,6 @@ export class BCL {
       promises.push(promise);
     }
      vm.$q.all(promises).then(function(measures_arrays) {
-       vm.$log.debug('measures array: ', measures_arrays);
         _.each(measures_arrays, function(measures) {
           vm.bcl_measures = _.concat(vm.bcl_measures, measures);
 
@@ -72,7 +91,7 @@ export class BCL {
        deferred.resolve(vm.bcl_measures);
 
      }, function(response) {
-       vm.$log.debug('ERROR retrieving BCL online measures!');
+       vm.$log.debug('ERROR retrieving BCL online measures');
        deferred.reject(response);
      });
     return deferred.promise;
@@ -94,8 +113,7 @@ export class BCL {
       });
     }
 
-    vm.$log.debug('parsed XML: ', input);
-
+    //vm.$log.debug('parsed XML: ', input);
     const measureArguments = _.result(input, 'measure.arguments.argument', []);
     _.each(measureArguments, (argument, i) => {
 
@@ -163,8 +181,8 @@ export class BCL {
     measure = {
       schemaVersion: _.result(input, 'measure.schema_version'),
       name: _.result(input, 'measure.name'),
-      uid: _.result(input, 'measure.uid'),
-      versionId: _.result(input, 'measure.version_id'),
+      uid: input.measure.uid ? _.result(input, 'measure.uid') : _.result(input, 'measure.uuid'),
+      versionId: input.measure.version_id ? _.result(input, 'measure.version_id') : _.result(input, 'measure.vuuid'),
       versionModified: _.result(input, 'measure.version_modified'),
       xmlChecksum: _.result(input, 'measure.xml_checksum'),
       className: _.result(input, 'measure.class_name'),
@@ -194,7 +212,7 @@ export class BCL {
     // add fields for display
     measure.status = '';
     // TODO: if type shows up as 'Project', means there's an error? (measure is missing from local or my measures dirs)
-    measure.location = (type == 'project') ? vm.findMeasureOrigin(measure.uid) : _.capitalize(type);
+    measure.location = (type == 'project') ? _.upperCase(vm.findMeasureOrigin(measure.uid)) : _.upperCase(type);
     measure.add = '';
 
     // is measure added to project?
@@ -226,11 +244,11 @@ export class BCL {
   findMeasureOrigin(id) {
     const vm = this;
     if(vm.lib_measures && _.find(vm.lib_measures.my, {uid: id})) {
-      return 'My';
+      return 'my';
     } else if (vm.lib_measures && _.find(vm.lib_measures.local, {uid: id})) {
-      return 'Local';
+      return 'local';
     } else {
-      return 'Project';
+      return 'project';
     }
   }
 

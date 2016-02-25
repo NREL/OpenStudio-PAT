@@ -24,9 +24,9 @@ export class ModalBclController {
     vm.keyword = '';
 
     vm.filters = {
+      my: true,
       local: true,
       bcl: false,
-      my: true,
       project: true
     };
 
@@ -44,7 +44,6 @@ export class ModalBclController {
     vm.lib_measures.local = vm.getMeasures(vm.local_dir, 'local');
     vm.lib_measures.project = vm.getMeasures(vm.project_dir, 'project');
     vm.lib_measures.bcl = vm.getBCLMeasures();
-    vm.$log.debug('BCL: ', vm.lib_measures.bcl);
 
     // TODO: temporary workaround until project measures service / JSON is implemented
     // adds additional info
@@ -121,6 +120,15 @@ export class ModalBclController {
     };
   }
 
+  getBCLMeasures() {
+    const vm = this;
+    vm.BCL.getMeasures().then(function(response) {
+      vm.lib_measures.bcl = response;
+      vm.$log.debug('measures.bcl: ', vm.lib_measures.bcl);
+      vm.$log.debug("ALL MEASURES: ", vm.lib_measures);
+    });
+  }
+
   getMeasures(path, type) {
     const vm = this;
 
@@ -150,7 +158,6 @@ export class ModalBclController {
     // add checked
     _.each(vm.filters, (val, key) => {
       if (val) {
-
         _.each(vm.lib_measures[key], m => {
           // add if not found
           if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
@@ -163,15 +170,6 @@ export class ModalBclController {
     // TODO: then prepare BCL online measures
 
     return measures;
-  }
-
-  // get all BCL online measures
-  getBCLMeasures() {
-    const vm = this;
-    vm.BCL.getMeasureMetadata().then(function(response) {
-      vm.lib_measures.bcl = response;
-      vm.$log.debug('measures.bcl: ', vm.lib_measures.bcl);
-    });
   }
 
   // TODO: move most of this processing to BCL service

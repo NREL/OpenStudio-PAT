@@ -1,5 +1,5 @@
 <div class="ui-grid-cell-contents">
-  <div ng-if="row.entity.location != BCL">
+  <div ng-if="row.entity.location != 'BCL'">
     <div class="btn-group" dropdown>
       <button type="button" class="btn btn-xs btn-default dropdown-toggle" aria-haspopup="true"
               aria-expanded="false">
@@ -7,7 +7,7 @@
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" role="menu">
-        <li ng-if="row.entity.location == My">
+        <li ng-if="row.entity.location == 'MY'">
           <a ng-href="" ng-click="grid.appScope.modal.editMeasure(row.entity); ">Edit</a>
         </li>
         <li>
@@ -17,7 +17,7 @@
       </ul>
     </div>
   </div>
-  <div ng-if="row.entity.location == BCL">
+  <div ng-if="row.entity.location == 'BCL'">
     <span class="glyphicon glyphicon-download library-grid-button" aria-hidden="true"
           aria-label="Download Measure from BCL"></span>
   </div>
