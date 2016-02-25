@@ -1,7 +1,7 @@
 import * as jetpack from 'fs-jetpack';
 import * as path from 'path';
 import * as os from 'os';
-import { parseString } from 'xml2js';
+//import { parseString } from 'xml2js';
 
 export class ModalBclController {
 
@@ -132,8 +132,8 @@ export class ModalBclController {
     _.each(measurePaths, measurePath => {
 
       const xml = path.read(measurePath);
-      let measure = vm.parseMeasure(xml);
-      measure = vm.prepareMeasure(measure, type);
+      let measure = vm.BCL.parseMeasure(xml);
+      measure = vm.BCL.prepareMeasure(measure, type);
       measures.push(measure);
 
     });
@@ -141,142 +141,6 @@ export class ModalBclController {
     return measures;
   }
 
-  parseMeasure(xml) {
-    const vm = this;
-    let measure = {};
-
-    parseString(xml, (err, result) => {
-      const measureArguments = _.result(result, 'measure.arguments[0].argument', []);
-      _.each(measureArguments, (argument, i) => {
-
-        const choices = _.result(argument, 'choices[0].choice', []);
-        _.each(choices, (choice, i) => {
-          choices[i] = {
-            value: _.result(choice, 'value[0]'),
-            displayName: _.result(choice, 'display_name[0]')
-          };
-        });
-
-        measureArguments[i] = {
-          name: argument.name[0],
-          displayName: argument.display_name[0],
-          shortName: _.result(argument, 'short_name[0]'),
-          description: _.result(argument, 'description[0]'),
-          type: argument.type[0],
-          required: argument.required[0],
-          modelDependent: _.result(argument, 'model_dependent', 'false'),
-          defaultValue: _.result(argument, 'default_value[0]'),
-          choices: choices,
-          minValue: _.result(argument, 'min_value[0]'),
-          maxValue: _.result(argument, 'max_value[0]')
-        };
-      });
-
-      // TODO: add outputs
-      // TODO: add provenances (first one only)
-
-      const attributes = _.result(result, 'measure.attributes[0].attribute', []);
-      _.each(attributes, (attribute, i) => {
-        attributes[i] = {
-          name: attribute.name[0],
-          value: attribute.value[0],
-          datatype: attribute.datatype[0]
-        };
-      });
-
-      const files = _.result(result, 'measure.files[0].file', []);
-      _.each(files, (file, i) => {
-
-        const version = {
-          softwareProgram: _.result(file, 'version[0].software_program[0]', null),
-          identifier: _.result(file, 'version[0].identifier[0]', null),
-          minCompatible: _.result(file, 'version[0].min_compatible[0]', null),
-          maxCompatible: _.result(file, 'version[0].max_compatible[0]', null)
-        };
-
-        files[i] = {
-          filename: file.filename[0],
-          filetype: file.filetype[0],
-          usageType: _.result(file, 'usage_type[0]', null),
-          checksum: file.checksum[0],
-          version: version
-        };
-      });
-      measure = {
-        schemaVersion: _.result(result, 'measure.schema_version[0]'),
-        name: _.result(result, 'measure.name[0]'),
-        uid: _.result(result, 'measure.uid[0]'),
-        versionId: _.result(result, 'measure.version_id[0]'),
-        versionModified: _.result(result, 'measure.version_modified[0]'),
-        xmlChecksum: _.result(result, 'measure.xml_checksum[0]'),
-        className: _.result(result, 'measure.class_name[0]'),
-        displayName: _.result(result, 'measure.display_name[0]'),
-        shortName: _.result(result, 'measure.short_name[0]'),
-        description: _.result(result, 'measure.description[0]'),
-        modelerDescription: _.result(result, 'measure.modeler_description[0]'),
-        arguments: measureArguments,
-        tags: _.result(result, 'measure.tags[0].tag[0]', ''),
-        attributes: attributes,
-        files: files
-      };
-
-      // for old measures
-      if (measure.displayName == undefined) measure.displayName = measure.name;
-
-      // fix tags
-      measure.tags = _.join(_.split(measure.tags, '.'), ' -> ');
-    });
-
-    return measure;
-  }
-
-  // add additional fields for display
-  prepareMeasure(measure, type) {
-    const vm = this;
-    // add fields for display
-    measure.status = '';
-    // TODO: if type shows up as 'Project', means there's an error? (measure is missing from local or my measures dirs)
-    measure.location = (type == 'project') ? vm.findMeasureOrigin(measure.uid) : _.capitalize(type);
-    measure.add = '';
-
-    // is measure added to project?
-    measure.addedToProject = (type == 'project' || _.find(vm.project_measures, {uid: measure.uid}));
-
-    if (measure.versionModified) {
-      // assuming yyyy-mm-dd
-      measure.date = new Date(measure.versionModified.substring(0, 4), measure.versionModified.substring(5, 7), measure.versionModified.substring(8, 10));
-
-    } else {
-      measure.date = '';
-    }
-
-    if (measure.provenances && measure.provenances.count > 0) {
-      measure.author = measure.provenances[0].provenance.author;
-    } else {
-      measure.author = '';
-    }
-
-    _.each(measure.attributes, attr => {
-      if (attr.name == 'Measure Type') {
-        measure.type = attr.value;
-      }
-    });
-
-    return measure;
-
-  }
-
-  // find where project measure came from
-  findMeasureOrigin(id) {
-    const vm = this;
-    if(vm.lib_measures && _.find(vm.lib_measures.my, {uid: id})) {
-      return 'My';
-    } else if (vm.lib_measures && _.find(vm.lib_measures.local, {uid: id})) {
-      return 'Local';
-    } else {
-      return 'Project';
-    }
-  }
 
   // get measures for display based on filter values
   getDisplayMeasures() {
