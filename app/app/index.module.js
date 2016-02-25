@@ -1,7 +1,7 @@
 /* global _:false */
 
 // Electron
-import * as context_menu from '../electron/context_menu'; // eslint-disable-line no-unused-vars
+import * as contextMenu from '../electron/context_menu'; // eslint-disable-line no-unused-vars
 
 import { config } from './index.config';
 import { routerConfig } from './index.route';

@@ -113,7 +113,7 @@ export class ModalBclController {
             vm.selected = null;
           }
         });
-        gridApi.cellNav.on.navigate(null, (newRowCol, oldRowCol) => {
+        gridApi.cellNav.on.navigate(null, (newRowCol/*, oldRowCol*/) => {
           vm.gridApi.selection.selectRow(newRowCol.row.entity);
         });
       }
@@ -122,10 +122,10 @@ export class ModalBclController {
 
   getBCLMeasures() {
     const vm = this;
-    vm.BCL.getMeasures().then(function(response) {
+    vm.BCL.getMeasures().then(response => {
       vm.lib_measures.bcl = response;
       vm.$log.debug('measures.bcl: ', vm.lib_measures.bcl);
-      vm.$log.debug("ALL MEASURES: ", vm.lib_measures);
+      vm.$log.debug('ALL MEASURES: ', vm.lib_measures);
     });
   }
 
@@ -220,8 +220,6 @@ export class ModalBclController {
 
   // retrieve measures from online BCL by category
   retrieveMeasures() {
-    const vm = this;
-
     // if all under a group is checked, retrieve top level
 
     // otherwise, separate queries for each (can't get OR filter to work)

@@ -4,14 +4,9 @@
 // window from here.
 
 import { app, BrowserWindow } from 'electron';
-import devHelper from './dev_helper';
+import menu from './menu';
 import windowStateKeeper from './window_state';
-
-// Special module holding environment variables which you declared
-// in config/env_xxx.json file.
 import env from './env';
-
-let mainWindow;
 
 // Preserver of the window size and position between app launches.
 const mainWindowState = windowStateKeeper('main', {
@@ -21,7 +16,7 @@ const mainWindowState = windowStateKeeper('main', {
 
 app.on('ready', () => {
 
-  mainWindow = new BrowserWindow({
+  const mainWindow = new BrowserWindow({
     x: mainWindowState.x,
     y: mainWindowState.y,
     width: mainWindowState.width,
@@ -31,9 +26,9 @@ app.on('ready', () => {
     }
   });
 
-  if (mainWindowState.isMaximized) {
-    mainWindow.maximize();
-  }
+  if (mainWindowState.isMaximized) mainWindow.maximize();
+
+  menu.setMenu();
 
   if (env.name === 'test') {
     mainWindow.loadURL('file://' + __dirname + '/spec.html');
@@ -44,7 +39,6 @@ app.on('ready', () => {
   }
 
   if (env.name !== 'production') {
-    devHelper.setDevMenu();
     mainWindow.openDevTools();
   }
 
