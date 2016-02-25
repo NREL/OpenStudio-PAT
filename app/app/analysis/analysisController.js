@@ -60,7 +60,10 @@ export class AnalysisController {
           }
         },
         editableCellTemplate: '<div><form name=\"inputForm\">' +
-          '<input ng-if=\"row.entity.type!=\'Choice\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+          '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+          '<input ng-if=\"row.entity.type==\'Int\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+          '<input ng-if=\"row.entity.type==\'Double\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+          '<input ng-if=\"row.entity.type==\'String\'\" type=\"INPUT_TYPE\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
           '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
         ' </form></div>',
         enableHiding: false,
