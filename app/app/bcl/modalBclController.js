@@ -13,11 +13,11 @@ export class ModalBclController {
     vm.$log = $log;
     vm.$scope = $scope;
     vm.BCL = BCL;
-
     vm.jetpack = jetpack;
+
+    // TODO: fix dirs (get from Electron settings)
     vm.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
     vm.local_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
-    // TODO: fix project dir (get from Electron settings)
     vm.project_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
 
     vm.selected = null;
@@ -43,11 +43,11 @@ export class ModalBclController {
     vm.lib_measures.my = vm.getMeasures(vm.my_measures_dir, 'my');
     vm.lib_measures.local = vm.getMeasures(vm.local_dir, 'local');
     vm.lib_measures.project = vm.getMeasures(vm.project_dir, 'project');
-    //vm.measures.bcl = vm.getBCLMeasures();
-    vm.$log.debug('MEASURES: ', vm.lib_measures);
+    vm.lib_measures.bcl = vm.getBCLMeasures();
+    vm.$log.debug('BCL: ', vm.lib_measures.bcl);
 
     // TODO: temporary workaround until project measures service / JSON is implemented
-    // add additional info
+    // adds additional info
     vm.project_measures = vm.lib_measures.project;
 
     // get measures array for Library display
@@ -87,18 +87,18 @@ export class ModalBclController {
         name: 'status',
         enableCellEdit: false,
         cellClass: 'dropdown-button',
-        cellTemplate: '../app/bcl/editButtonTemplate.html',
+        cellTemplate: '../app/bcl/tempEditButtonTemplate.html',
         width: '15%'
       }, {
         name: 'add',
         enableCellEdit: false,
         cellClass: 'icon-cell',
-        cellTemplate: '<div ng-if="row.entity.addedToProject"><span class="glyphicon glyphicon-ok-sign library-grid-button green-button" aria-hidden="true" aria-label="Add to Project"></span></div><div ng-if="!row.entity.addedToProject"><span class="glyphicon glyphicon-plus-sign library-grid-button green-button" aria-hidden="true" aria-label="Add to Project" ng-click="grid.appScope.modal.addMeasure(row.entity); $event.stopPropagation();"></span></div>',
+        cellTemplate: '../app/bcl/addButtonTemplate.html',
         width: '10%'
       }],
       data: 'display_measures',
       rowHeight: 45,
-      enableCellEditOnFocus: true,
+      /*enableCellEditOnFocus: true,*/
       enableHiding: false,
       enableColumnMenus: false,
       enableRowSelection: true,
@@ -269,7 +269,6 @@ export class ModalBclController {
   // find where project measure came from
   findMeasureOrigin(id) {
     const vm = this;
-    vm.$log.debug('ID:', id);
     if(vm.lib_measures && _.find(vm.lib_measures.my, {uid: id})) {
       return 'My';
     } else if (vm.lib_measures && _.find(vm.lib_measures.local, {uid: id})) {
@@ -302,6 +301,16 @@ export class ModalBclController {
     return measures;
   }
 
+  // get all BCL online measures
+  getBCLMeasures() {
+    const vm = this;
+    vm.BCL.getMeasureMetadata().then(function(response) {
+      vm.lib_measures.bcl = response;
+      vm.$log.debug('measures.bcl: ', vm.lib_measures.bcl);
+    });
+  }
+
+  // TODO: move most of this processing to BCL service
   getBCLCategories() {
     const vm = this;
 
@@ -388,6 +397,23 @@ export class ModalBclController {
 
   }
 
+  // download from BCL (via service)
+  download() {
+    const vm = this;
+    vm.$log.debug('in DOWNLOAD function');
+  }
+
+  // edit My measure
+  editMeasure() {
+    const vm = this;
+    vm.$log.debug('in EDIT MEASURE function');
+  }
+
+  // copy from local and edit
+  copyAndEditMeasure() {
+    const vm = this;
+    vm.$log.debug('in COPY AND EDIT function');
+  }
 
   ok() {
     const vm = this;

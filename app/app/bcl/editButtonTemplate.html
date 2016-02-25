@@ -2,13 +2,13 @@
   <div ng-if="row.entity.location != BCL">
     <div class="btn-group" dropdown>
       <button type="button" class="btn btn-xs btn-default dropdown-toggle" aria-haspopup="true"
-              aria-expanded="false" ng-click="$event.stopPropagation();">
+              aria-expanded="false">
         <span class="glyphicon glyphicon-pencil library-grid-button" aria-label="Editing Options"></span>
         <span class="caret"></span>
       </button>
       <ul class="dropdown-menu" role="menu">
         <li ng-if="row.entity.location == My">
-          <a ng-href="" ng-click="grid.appScope.modal.editMeasure(row.entity);">Edit</a>
+          <a ng-href="" ng-click="grid.appScope.modal.editMeasure(row.entity); ">Edit</a>
         </li>
         <li>
           <a ng-href="" ng-click="grid.appScope.modal.copyAndEditMeasure(row.entity); $event.stopPropagation();">Edit and
