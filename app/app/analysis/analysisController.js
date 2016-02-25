@@ -87,7 +87,6 @@ export class AnalysisController {
       //vm.$log.debug(measurePath);
       const xml = vm.srcDir.read(measurePath);
       parseString(xml, (err, result) => {
-<<<<<<< HEAD
 
         const measureArguments = self._.result(result, 'measure.arguments[0].argument', []);
         self._.each(measureArguments, (argument, i) => {
