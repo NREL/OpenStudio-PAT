@@ -25,11 +25,12 @@
     "no-unused-vars": 1,
     // Stylistic Issues
     "array-bracket-spacing": 1,
+    "camelcase": [1, {"properties": "always"}],
     "comma-spacing": 1,
     "consistent-this": [2, "vm"],
     "no-mixed-spaces-and-tabs": 1,
     "no-trailing-spaces": 1,
-    "quotes": [2, "single"],
+    "quotes": [1, "single"],
     "semi": [2, "always"],
     // ES6
     "no-confusing-arrow": 2,
