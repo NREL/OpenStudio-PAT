@@ -24,6 +24,11 @@ export class ModalBclController {
       project: true
     };
 
+    // TODO: fix dirs (get from Electron settings)
+    vm.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    vm.local_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
+    vm.project_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
+
     vm.categories = [];
     vm.getBCLCategories();
 
@@ -31,8 +36,13 @@ export class ModalBclController {
     vm.$scope.display_measures = [];
 
     // get all measures
-    vm.lib_measures = [];
-    vm.lib_measures = vm.getMeasures();
+    vm.lib_measures = vm.BCL.getMeasures();
+    vm.getLocalMeasures();
+    vm.getBCLMeasures();
+
+    // temporary workaround until project measures service / JSON is implemented
+    // adds additional info
+    vm.project_measures = vm.lib_measures.project;
 
     vm.$log.debug('DISPLAYMEASURES: ', vm.$scope.display_measures);
 
@@ -96,30 +106,42 @@ export class ModalBclController {
             vm.selected = null;
           }
         });
-        gridApi.cellNav.on.navigate(null, (newRowCol, oldRowCol) => {
+        gridApi.cellNav.on.navigate(null, (newRowCol) => {
           vm.gridApi.selection.selectRow(newRowCol.row.entity);
         });
       }
     };
   }
 
-  getMeasures() {
+  getLocalMeasures() {
     const vm = this;
-    vm.BCL.getAllMeasures().then(function(response) {
-      vm.lib_measures = response;
-      vm.$log.debug('measures.bcl: ', vm.lib_measures.bcl);
-      vm.$log.debug('ALL MEASURES: ', vm.lib_measures);
-      // set display measures
-      vm.getDisplayMeasures();
+    const measures = vm.BCL.getLocalMeasures();
 
+    // set all measure keys
+    _.each(measures, (val, key) => {
+      vm.lib_measures[key] = val;
+    });
+
+    // set display measures
+    vm.setDisplayMeasures();
+  }
+
+  getBCLMeasures() {
+    const vm = this;
+    vm.BCL.getBCLMeasures().then(function(response) {
+      vm.lib_measures.bcl = response;
+      vm.$log.debug('ALL MEASURES: ', vm.lib_measures);
+
+      // (re)set display measures
+      vm.setDisplayMeasures();
     });
   }
 
   // get measures for display based on filter values
-  getDisplayMeasures() {
+  setDisplayMeasures() {
     const vm = this;
     const measures = [];
-
+    vm.$log.debug('lib_measures: ', vm.lib_measures);
     // add checked
     _.each(vm.filters, (val, key) => {
       if (val) {
@@ -167,19 +189,12 @@ export class ModalBclController {
 
       }
     });
-    // for testing until electron works
-    /*
-     vm.categories = [
-     {name: 'A', tid: 1},
-     {name: 'B', tid: 2},
-     {name: 'C', tid: 3}
-     ];*/
   }
 
   // process filter changes
   resetFilters() {
     const vm = this;
-    vm.$scope.display_measures = this.getDisplayMeasures();
+    vm.$scope.display_measures = this.setDisplayMeasures();
   }
 
 
@@ -203,10 +218,12 @@ export class ModalBclController {
   addToProject(measure) {
     const vm = this;
 
+    // add to array(s)
+    vm.project_measures.push(measure);
     vm.lib_measures.project.push(measure);
 
     // copy on disk
-    const src = (measure.location == 'My') ? vm.my_measures_dir : vm.local_dir;
+    const src = (measure.location == 'MY') ? vm.my_measures_dir : vm.local_dir;
     src.copy(measure.name, vm.project_dir.path(measure.name));
 
   }

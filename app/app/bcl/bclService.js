@@ -24,11 +24,11 @@ export class BCL {
 
     // TODO: get project measures from a service
     // load project_measures before other measures
-    vm.temp_project_measures = vm.getMeasuresByType(vm.project_dir, 'project');
-    vm.$log.debug('temp PROJECT measures: ', vm.temp_project_measures);
+    vm.project_measures = vm.getMeasuresByType(vm.project_dir, 'project');
+    vm.$log.debug('PROJECT measures: ', vm._project_measures);
 
     // assign measures by type
-    vm.lib_measures = {};
+    vm.lib_measures = {'my': [], 'local': [], 'bcl': [], 'project': []};
 
   }
 
@@ -49,28 +49,24 @@ export class BCL {
     return vm.$http.get(vm.bcl_url + 'taxonomy/measure.json');
   }
 
-  // get all measure categories
-  getAllMeasures() {
+  // returns lib_measures variable
+  getMeasures() {
     const vm = this;
-    const deferred = vm.$q.defer();
+    return vm.lib_measures;
+  }
+
+  // get local measures
+  getLocalMeasures() {
+    const vm = this;
 
     // assign measures by type
     vm.lib_measures.my = vm.getMeasuresByType(vm.my_measures_dir, 'my');
     vm.lib_measures.local = vm.getMeasuresByType(vm.local_dir, 'local');
     vm.lib_measures.project = vm.getMeasuresByType(vm.project_dir, 'project');
 
-    vm.getBCLMeasures().then( function(measures) {
-      vm.$log.debug('measures.bcl: ', vm.lib_measures.bcl);
-      vm.$log.debug('ALL MEASURES: ', vm.lib_measures);
-      deferred.resolve(vm.lib_measures);
-
-    }, function(response) {
-      vm.$log.debug('ERROR retrieving BCL online measures');
-      deferred.reject(response);
-    });
-    return deferred.promise;
   }
 
+  // retrieve measures by type
   getMeasuresByType(path, type) {
     const vm = this;
     let measurePaths = [];
@@ -90,7 +86,7 @@ export class BCL {
     return measures;
   }
 
-  // retrieve online BCL measures
+  // retrieve online BCL measures (or what's already been retrieved)
   getBCLMeasures(force = false) {
     const vm = this;
     const deferred = vm.$q.defer();
@@ -111,8 +107,7 @@ export class BCL {
 
   }
 
-  // GET ALL MEASURES
-  // TODO: don't call this directly from modal controller!
+  // "private" function.
   loadOnlineBCLMeasures() {
     const vm = this;
     const deferred = vm.$q.defer();
@@ -127,7 +122,7 @@ export class BCL {
       url = base_url + '&page=' + page;
       const promise = vm.$http.get(url).then(function (response) {
         const measures = [];
-        vm.$log.debug('RESPONSE: ', response);
+        //vm.$log.debug('RESPONSE: ', response);
         // parse response
         _.each(response.data.result, function(input) {
           let measure = vm.parseMeasure(input);
