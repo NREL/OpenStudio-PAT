@@ -2,6 +2,7 @@ import * as jetpack from 'fs-jetpack';
 import * as path from 'path';
 import * as os from 'os';
 import { parseString } from 'xml2js';
+import * as admzip from 'adm-zip';
 
 export class BCL {
   constructor($q, $http, $uibModal, $log) {
@@ -14,6 +15,7 @@ export class BCL {
     vm.$q = $q;
     vm.$log = $log;
     vm.jetpack = jetpack;
+    vm.admzip = admzip;
     vm.bcl_measures = [];
     vm.bcl_url = 'https://bcl.nrel.gov/api/';
 
@@ -72,7 +74,7 @@ export class BCL {
     let measurePaths = [];
     const measures = [];
     if (vm.jetpack.exists(path.cwd())) measurePaths = path.find('.', {matching: '*/measure.xml'}, 'relativePath');
-    else console.error('The (%s) Measures directory (%s) does not exist', type, path.cwd());
+    else vm.$log.debug.error('The (%s) Measures directory (%s) does not exist', type, path.cwd());
 
     _.each(measurePaths, measurePath => {
 
@@ -126,7 +128,7 @@ export class BCL {
         // parse response
         _.each(response.data.result, function(input) {
           let measure = vm.parseMeasure(input);
-          measure = vm.prepareMeasure(measure, 'BCL');
+          measure = vm.prepareMeasure(measure, 'bcl');
           measures.push(measure);
         });
        return measures;
@@ -266,7 +268,7 @@ export class BCL {
     // add fields for display
     measure.status = '';
     // TODO: if type shows up as 'Project', means there's an error? (measure is missing from local or my measures dirs)
-    measure.location = (type == 'project') ? _.upperCase(vm.findMeasureOrigin(measure.uid)) : _.upperCase(type);
+    measure.location = (type == 'project') ?vm.findMeasureOrigin(measure.uid) : type;
     measure.add = '';
 
     // is measure added to project?
@@ -304,6 +306,46 @@ export class BCL {
     } else {
       return 'project';
     }
+  }
+
+  // download measure
+  downloadMeasure(measure) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.measure = measure;
+
+    const url = vm.bcl_url + 'component/download?uids=' + vm.measure.uid;
+
+    vm.$http.get(url, {responseType: 'arraybuffer'}).then(function (response) {
+      //extract dir and save to disk in local measures directory
+      // convert arraybuffer to node buffer
+      let buf = new Buffer( new Uint8Array(response.data) );
+      let zip = new vm.admzip(buf);
+      // extract to location (and overwrite)
+      zip.extractAllTo(vm.local_dir.path() + '/', true);
+
+      const new_path = vm.local_dir.path() + '/' + vm.measure.name + '/measure.xml';
+      vm.$log.debug(new_path);
+
+      // parse new measure and add to local measures
+      let new_measure = {};
+      if (vm.jetpack.exists(new_path)) {
+        const xml = vm.jetpack.read(new_path);
+        new_measure = vm.parseMeasure(xml);
+        new_measure = vm.prepareMeasure(new_measure, 'local');
+        vm.lib_measures.local.push(new_measure);
+        deferred.resolve(new_measure);
+      }
+      else {
+        $log.debug.error('The Measure directory (%s) does not exist', new_path);
+        deferred.reject();
+      }
+    }, function (response) {
+      vm.$log.debug('ERROR downloading BCL measure');
+      deferred.reject(response);
+    });
+
+    return deferred.promise;
   }
 
   // OPEN BCL LIBRARY MODAL

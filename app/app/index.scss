@@ -212,6 +212,10 @@ select {
   overflow:visible;
 }
 
+.location-cell {
+  text-align: center;
+}
+
 .green-button {
   color: #6CC16F;
 }
@@ -233,15 +237,15 @@ select {
 */
 
 
-/*
 .lib-grid {
-  font-size: 0.8em;
+  /*font-size: 0.8em;*/
+  height:800px;
 }
 
 .lib-details {
-  font-size: 0.8em;
+  /*font-size: 0.8em;*/
 }
-*/
+
 
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject

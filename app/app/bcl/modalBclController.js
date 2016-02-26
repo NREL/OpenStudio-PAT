@@ -57,6 +57,8 @@ export class ModalBclController {
         name: 'location',
         displayName: '',
         enableCellEdit: false,
+        cellClass: 'location-cell',
+        cellTemplate: '../app/bcl/locationTemplate.html',
         width: '11%'
       }, {
         name: 'type',
@@ -194,7 +196,7 @@ export class ModalBclController {
   // process filter changes
   resetFilters() {
     const vm = this;
-    vm.$scope.display_measures = this.setDisplayMeasures();
+    vm.$scope.display_measures = vm.setDisplayMeasures();
   }
 
 
@@ -229,9 +231,25 @@ export class ModalBclController {
   }
 
   // download from BCL (via service)
-  download() {
+  download(measure) {
     const vm = this;
-    vm.$log.debug('in DOWNLOAD function');
+    vm.BCL.downloadMeasure(measure).then(function(new_measure){
+
+      // TODO: possible refactor.  add to measures and recalculate display, or pull from service first?
+      vm.lib_measures.local.push(new_measure);
+      vm.$scope.display_measures = vm.setDisplayMeasures();
+      // select newly added row
+      vm.selectARow(measure.uid);
+
+    });
+  }
+
+  // select row in table based on UID
+  selectARow(uid){
+    const vm = this;
+    const index = _.findIndex(vm.$scope.display_measures, {uid: uid});
+    vm.gridApi.grid.modifyRows(vm.$scope.display_measures);
+    vm.gridApi.selection.selectRow(vm.$scope.display_measures[index]);
   }
 
   // edit My measure
