@@ -246,7 +246,7 @@ export class BCL {
       modelerDescription: _.result(input, 'measure.modeler_description'),
       arguments: measureArguments,
       provenances: provenances,
-      tags: _.result(input, 'measure.tags.tag[0]', ''),
+      tags: _.result(input, 'measure.tags.tag', ''),
       attributes: attributes,
       files: files
     };
