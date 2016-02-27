@@ -27,6 +27,17 @@
             <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.bcl" ng-change="modal.resetFilters()"> BCL (Online)</label></div>
           </div>
         </div>
+        <div class="pad-top-20"></div>
+        <div class="panel panel-default">
+          <div class="panel-heading">
+            Type
+          </div>
+          <div class="panel-body">
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.types.ModelMeasure" ng-change="modal.resetFilters()">OpenStudio</label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.types.EnergyPlusMeasure" ng-change="modal.resetFilters()">EnergyPlus</label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.types.ReportingMeasure" ng-change="modal.resetFilters()">Reporting</label></div>
+          </div>
+        </div>
 
         <div class="panel panel-default">
           <div class="panel-heading">Category</div>

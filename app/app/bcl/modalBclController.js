@@ -24,6 +24,12 @@ export class ModalBclController {
       project: true
     };
 
+    vm.types = {
+      ModelMeasure: true,
+      EnergyPlusMeasure: true,
+      ReportingMeasure: true
+    };
+
     // TODO: fix dirs (get from Electron settings)
     vm.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
     vm.local_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
@@ -193,10 +199,32 @@ export class ModalBclController {
     });
   }
 
-  // process filter changes
+  // process measures filter changes
   resetFilters() {
     const vm = this;
     vm.$scope.display_measures = vm.setDisplayMeasures();
+    vm.resetTypeFilters();
+  }
+
+  // process measure type filter changes
+  resetTypeFilters(){
+    const vm = this;
+    let types_arr = [];
+    _.each(vm.types, (val, key) => {
+
+      if (val) {
+        types_arr.push(key);
+      }
+    });
+    const new_measures = [];
+    _.each(vm.$scope.display_measures, (m) => {
+      vm.$log.debug(_.includes(types_arr, m.type));
+      if (_.includes(types_arr, m.type)) new_measures.push(m);
+    });
+
+    vm.$scope.display_measures = _.filter(vm.$scope.display_measures, function(m) {
+      return _.includes(types_arr, m.type);
+    });
   }
 
 

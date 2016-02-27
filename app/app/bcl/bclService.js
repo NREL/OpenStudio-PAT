@@ -337,7 +337,7 @@ export class BCL {
         deferred.resolve(new_measure);
       }
       else {
-        $log.debug.error('The Measure directory (%s) does not exist', new_path);
+        vm.$log.debug.error('The Measure directory (%s) does not exist', new_path);
         deferred.reject();
       }
     }, function (response) {
