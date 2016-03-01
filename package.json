@@ -10,6 +10,7 @@
     "del": "~2.2.0",
     "electron-prebuilt": "~0.36.8",
     "eslint-plugin-angular": "~0.15.0",
+    "eslint-plugin-lodash": "~1.2.1",
     "estraverse": "~4.1.0",
     "fs-jetpack": "~0.7.1",
     "gulp": "~3.9.0",

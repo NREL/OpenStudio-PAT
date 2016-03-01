@@ -31,12 +31,12 @@ export class AnalysisController {
     if (vm.jetpack.exists(vm.srcDir.cwd())) measurePaths = vm.srcDir.find('.', {matching: '*/measure.xml'}, 'relativePath');
     else console.error('My Measures directory (%s) does not exist', vm.srcDir.cwd());
 
-    _.each(measurePaths, measurePath => {
+    _.forEach(measurePaths, measurePath => {
       //vm.$log.debug(measurePath);
       const xml = vm.srcDir.read(measurePath);
       parseString(xml, (err, result) => {
         const attributes = _.result(result, 'measure.attributes[0].attribute', []);
-        _.each(attributes, (attribute, i) => {
+        _.forEach(attributes, (attribute, i) => {
           attributes[i] = {
             name: attribute.name[0],
             value: attribute.value[0],

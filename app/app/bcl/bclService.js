@@ -2,7 +2,7 @@ import * as jetpack from 'fs-jetpack';
 import * as path from 'path';
 import * as os from 'os';
 import { parseString } from 'xml2js';
-import * as admzip from 'adm-zip';
+import * as AdmZip from 'adm-zip';
 
 export class BCL {
   constructor($q, $http, $uibModal, $log) {
@@ -15,29 +15,29 @@ export class BCL {
     vm.$q = $q;
     vm.$log = $log;
     vm.jetpack = jetpack;
-    vm.admzip = admzip;
-    vm.bcl_measures = [];
-    vm.bcl_url = 'https://bcl.nrel.gov/api/';
+    vm.AdmZip = AdmZip;
+    vm.bclMeasures = [];
+    vm.bclUrl = 'https://bcl.nrel.gov/api/';
 
     // TODO: fix dirs (get from Electron settings)
-    vm.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
-    vm.local_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
-    vm.project_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
+    vm.myMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    vm.localDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
+    vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
 
     // TODO: get project measures from a service
-    // load project_measures before other measures
-    vm.project_measures = vm.getMeasuresByType(vm.project_dir, 'project');
-    vm.$log.debug('PROJECT measures: ', vm._project_measures);
+    // load projectMeasures before other measures
+    vm.projectMeasures = vm.getMeasuresByType(vm.projectDir, 'project');
+    vm.$log.debug('PROJECT measures: ', vm.projectMeasures);
 
     // assign measures by type
-    vm.lib_measures = {'my': [], 'local': [], 'bcl': [], 'project': []};
+    vm.libMeasures = {'my': [], 'local': [], 'bcl': [], 'project': []};
 
   }
 
   // DOWNLOAD COMPONENT BY UID
   download(uids) {
     const vm = this;
-    return vm.$http.get(vm.bcl_url + 'component/download/', {
+    return vm.$http.get(vm.bclUrl + 'component/download/', {
       params: {uids: uids},
       responseType: 'arraybuffer'
     });
@@ -48,13 +48,13 @@ export class BCL {
   getCategories() {
     const vm = this;
     //return vm.$http.get('http://bcl7.development.nrel.gov/api/taxonomy/measure.json');
-    return vm.$http.get(vm.bcl_url + 'taxonomy/measure.json');
+    return vm.$http.get(vm.bclUrl + 'taxonomy/measure.json');
   }
 
-  // returns lib_measures variable
+  // returns libMeasures variable
   getMeasures() {
     const vm = this;
-    return vm.lib_measures;
+    return vm.libMeasures;
   }
 
   // get local measures
@@ -62,9 +62,9 @@ export class BCL {
     const vm = this;
 
     // assign measures by type
-    vm.lib_measures.my = vm.getMeasuresByType(vm.my_measures_dir, 'my');
-    vm.lib_measures.local = vm.getMeasuresByType(vm.local_dir, 'local');
-    vm.lib_measures.project = vm.getMeasuresByType(vm.project_dir, 'project');
+    vm.libMeasures.my = vm.getMeasuresByType(vm.myMeasuresDir, 'my');
+    vm.libMeasures.local = vm.getMeasuresByType(vm.localDir, 'local');
+    vm.libMeasures.project = vm.getMeasuresByType(vm.projectDir, 'project');
 
   }
 
@@ -74,9 +74,9 @@ export class BCL {
     let measurePaths = [];
     const measures = [];
     if (vm.jetpack.exists(path.cwd())) measurePaths = path.find('.', {matching: '*/measure.xml'}, 'relativePath');
-    else vm.$log.debug.error('The (%s) Measures directory (%s) does not exist', type, path.cwd());
+    else vm.$log.error('The (%s) Measures directory (%s) does not exist', type, path.cwd());
 
-    _.each(measurePaths, measurePath => {
+    _.forEach(measurePaths, measurePath => {
 
       const xml = path.read(measurePath);
       let measure = vm.parseMeasure(xml);
@@ -93,17 +93,17 @@ export class BCL {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    if (force || _.isEmpty(vm.lib_measures.bcl)) {
-      vm.lib_measures.bcl = [];
-      vm.loadOnlineBCLMeasures().then(function(measures) {
+    if (force || _.isEmpty(vm.libMeasures.bcl)) {
+      vm.libMeasures.bcl = [];
+      vm.loadOnlineBCLMeasures().then(measures => {
         deferred.resolve(measures);
-      }, function (response) {
+      }, response => {
         vm.$log.debug('ERROR retrieving BCL online measures');
         deferred.reject(response);
       });
     } else {
-      // bcl_measures array is already loaded
-      deferred.resolve(vm.lib_measures.bcl);
+      // bclMeasures array is already loaded
+      deferred.resolve(vm.libMeasures.bcl);
     }
     return deferred.promise;
 
@@ -113,43 +113,42 @@ export class BCL {
   loadOnlineBCLMeasures() {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.bcl_measures = [];
-    const num_results = 100;
+    vm.bclMeasures = [];
+    const numResults = 100;
     const promises = [];
-    const num_pages = 2; // TODO: use metadata URL to find out how many pages to retrieve
-    const base_url = vm.bcl_url + 'search/?fq[]=bundle:nrel_measure&api_version=2&show_rows=' + num_results;
+    const numPages = 2; // TODO: use metadata URL to find out how many pages to retrieve
+    const baseUrl = vm.bclUrl + 'search/?fq[]=bundle:nrel_measure&api_version=2&show_rows=' + numResults;
     let url = '';
 
-    for (let page = 0; page < num_pages; page++) {
-      url = base_url + '&page=' + page;
-      const promise = vm.$http.get(url).then(function (response) {
+    for (let page = 0; page < numPages; page++) {
+      url = baseUrl + '&page=' + page;
+      const promise = vm.$http.get(url).then(response => {
         const measures = [];
         //vm.$log.debug('RESPONSE: ', response);
         // parse response
-        _.each(response.data.result, function(input) {
+        _.forEach(response.data.result, input => {
           let measure = vm.parseMeasure(input);
           measure = vm.prepareMeasure(measure, 'bcl');
           measures.push(measure);
         });
-       return measures;
+        return measures;
 
-      }, function (error) {
+      }, error => {
         vm.$log.debug('ERROR:');
         vm.$log.debug(error);
       });
       promises.push(promise);
     }
-     vm.$q.all(promises).then(function(measures_arrays) {
-        _.each(measures_arrays, function(measures) {
-          vm.bcl_measures = _.concat(vm.bcl_measures, measures);
+    vm.$q.all(promises).then(measuresArrays => {
+      _.forEach(measuresArrays, measures => {
+        vm.bclMeasures = _.concat(vm.bclMeasures, measures);
+      });
+      deferred.resolve(vm.bclMeasures);
 
-        });
-       deferred.resolve(vm.bcl_measures);
-
-     }, function(response) {
-       vm.$log.debug('ERROR retrieving BCL online measures');
-       deferred.reject(response);
-     });
+    }, response => {
+      vm.$log.debug('ERROR retrieving BCL online measures');
+      deferred.reject(response);
+    });
     return deferred.promise;
 
   }
@@ -161,7 +160,7 @@ export class BCL {
 
     // only parse if input is a string. input may already be parsed (BCL API response)
     if (_.isString(input)) {
-      parseString(input, {explicitArray : false}, (err, result) => {
+      parseString(input, {explicitArray: false}, (err, result) => {
         if (!_.isNull(err)) {
           vm.$log.error('Error parsing XML: ', err);
         }
@@ -171,10 +170,10 @@ export class BCL {
 
     //vm.$log.debug('parsed XML: ', input);
     const measureArguments = _.result(input, 'measure.arguments.argument', []);
-    _.each(measureArguments, (argument, i) => {
+    _.forEach(measureArguments, (argument, i) => {
 
       const choices = _.result(argument, 'choices.choice', []);
-      _.each(choices, (choice, i) => {
+      _.forEach(choices, (choice, i) => {
         choices[i] = {
           value: _.result(choice, 'value'),
           displayName: _.result(choice, 'display_name')
@@ -199,7 +198,7 @@ export class BCL {
     // TODO: add outputs (right after arguments)
 
     const provenances = _.result(input, 'measures.provenances', []);
-    _.each(provenances, (prov, i) => {
+    _.forEach(provenances, (prov, i) => {
       provenances[i] = {
         author: prov.author,
         datetime: prov.datetime,
@@ -208,7 +207,7 @@ export class BCL {
     });
 
     const attributes = _.result(input, 'measure.attributes.attribute', []);
-    _.each(attributes, (attribute, i) => {
+    _.forEach(attributes, (attribute, i) => {
       attributes[i] = {
         name: attribute.name,
         value: attribute.value,
@@ -217,7 +216,7 @@ export class BCL {
     });
 
     const files = _.result(input, 'measure.files.file', []);
-    _.each(files, (file, i) => {
+    _.forEach(files, (file, i) => {
 
       const version = {
         softwareProgram: _.result(file, 'version.software_program', null),
@@ -268,11 +267,11 @@ export class BCL {
     // add fields for display
     measure.status = '';
     // TODO: if type shows up as 'Project', means there's an error? (measure is missing from local or my measures dirs)
-    measure.location = (type == 'project') ?vm.findMeasureOrigin(measure.uid) : type;
+    measure.location = (type == 'project') ? vm.findMeasureOrigin(measure.uid) : type;
     measure.add = '';
 
     // is measure added to project?
-    measure.addedToProject = (type == 'project' || _.find(vm.project_measures, {uid: measure.uid}));
+    measure.addedToProject = (type == 'project' || _.find(vm.projectMeasures, {uid: measure.uid}));
 
     if (measure.versionModified) {
       // assuming yyyy-mm-dd
@@ -288,7 +287,7 @@ export class BCL {
       measure.author = '';
     }
 
-    _.each(measure.attributes, attr => {
+    _.forEach(measure.attributes, attr => {
       if (attr.name == 'Measure Type') {
         measure.type = attr.value;
       }
@@ -299,9 +298,9 @@ export class BCL {
   // find where project measure came from
   findMeasureOrigin(id) {
     const vm = this;
-    if(vm.lib_measures && _.find(vm.lib_measures.my, {uid: id})) {
+    if (vm.libMeasures && _.find(vm.libMeasures.my, {uid: id})) {
       return 'my';
-    } else if (vm.lib_measures && _.find(vm.lib_measures.local, {uid: id})) {
+    } else if (vm.libMeasures && _.find(vm.libMeasures.local, {uid: id})) {
       return 'local';
     } else {
       return 'project';
@@ -314,33 +313,33 @@ export class BCL {
     const deferred = vm.$q.defer();
     vm.measure = measure;
 
-    const url = vm.bcl_url + 'component/download?uids=' + vm.measure.uid;
+    const url = vm.bclUrl + 'component/download?uids=' + vm.measure.uid;
 
-    vm.$http.get(url, {responseType: 'arraybuffer'}).then(function (response) {
+    vm.$http.get(url, {responseType: 'arraybuffer'}).then(response => {
       //extract dir and save to disk in local measures directory
       // convert arraybuffer to node buffer
-      let buf = new Buffer( new Uint8Array(response.data) );
-      let zip = new vm.admzip(buf);
+      const buf = new Buffer(new Uint8Array(response.data));
+      const zip = new vm.AdmZip(buf);
       // extract to location (and overwrite)
-      zip.extractAllTo(vm.local_dir.path() + '/', true);
+      zip.extractAllTo(vm.localDir.path() + '/', true);
 
-      const new_path = vm.local_dir.path() + '/' + vm.measure.name + '/measure.xml';
-      vm.$log.debug(new_path);
+      const newPath = vm.localDir.path() + '/' + vm.measure.name + '/measure.xml';
+      vm.$log.debug(newPath);
 
       // parse new measure and add to local measures
-      let new_measure = {};
-      if (vm.jetpack.exists(new_path)) {
-        const xml = vm.jetpack.read(new_path);
-        new_measure = vm.parseMeasure(xml);
-        new_measure = vm.prepareMeasure(new_measure, 'local');
-        vm.lib_measures.local.push(new_measure);
-        deferred.resolve(new_measure);
+      let newMeasure = {};
+      if (vm.jetpack.exists(newPath)) {
+        const xml = vm.jetpack.read(newPath);
+        newMeasure = vm.parseMeasure(xml);
+        newMeasure = vm.prepareMeasure(newMeasure, 'local');
+        vm.libMeasures.local.push(newMeasure);
+        deferred.resolve(newMeasure);
       }
       else {
-        vm.$log.debug.error('The Measure directory (%s) does not exist', new_path);
+        vm.$log.debug.error('The Measure directory (%s) does not exist', newPath);
         deferred.reject();
       }
-    }, function (response) {
+    }, response => {
       vm.$log.debug('ERROR downloading BCL measure');
       deferred.reject(response);
     });

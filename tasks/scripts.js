@@ -38,7 +38,7 @@ var bundle = function (src, dest) {
 
   rollup.rollup({
     entry: src,
-    external: ['electron', 'fs-jetpack', 'os', 'path', 'xml2js'],
+    external: ['adm-zip', 'electron', 'fs-jetpack', 'os', 'path', 'xml2js'],
     plugins: [
       babel({exclude: 'node_modules/**'})
     ]

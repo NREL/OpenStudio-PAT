@@ -31,26 +31,26 @@ export class ModalBclController {
     };
 
     // TODO: fix dirs (get from Electron settings)
-    vm.my_measures_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
-    vm.local_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
-    vm.project_dir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
+    vm.myMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    vm.localDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
+    vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
 
     vm.categories = [];
     vm.getBCLCategories();
 
     // get measures array for Library display
-    vm.$scope.display_measures = [];
+    vm.$scope.displayMeasures = [];
 
     // get all measures
-    vm.lib_measures = vm.BCL.getMeasures();
+    vm.libMeasures = vm.BCL.getMeasures();
     vm.getLocalMeasures();
     vm.getBCLMeasures();
 
     // temporary workaround until project measures service / JSON is implemented
     // adds additional info
-    vm.project_measures = vm.lib_measures.project;
+    vm.projectMeasures = vm.libMeasures.project;
 
-    vm.$log.debug('DISPLAYMEASURES: ', vm.$scope.display_measures);
+    vm.$log.debug('DISPLAY MEASURES', vm.$scope.displayMeasures);
 
     // Library grid
     vm.libraryGridOptions = {
@@ -96,7 +96,7 @@ export class ModalBclController {
         cellTemplate: '../app/bcl/addButtonTemplate.html',
         width: '10%'
       }],
-      data: 'display_measures',
+      data: 'displayMeasures',
       rowHeight: 45,
       /*enableCellEditOnFocus: true,*/
       enableHiding: false,
@@ -126,8 +126,8 @@ export class ModalBclController {
     const measures = vm.BCL.getLocalMeasures();
 
     // set all measure keys
-    _.each(measures, (val, key) => {
-      vm.lib_measures[key] = val;
+    _.forEach(measures, (val, key) => {
+      vm.libMeasures[key] = val;
     });
 
     // set display measures
@@ -136,9 +136,9 @@ export class ModalBclController {
 
   getBCLMeasures() {
     const vm = this;
-    vm.BCL.getBCLMeasures().then(function(response) {
-      vm.lib_measures.bcl = response;
-      vm.$log.debug('ALL MEASURES: ', vm.lib_measures);
+    vm.BCL.getBCLMeasures().then(response => {
+      vm.libMeasures.bcl = response;
+      vm.$log.debug('ALL MEASURES: ', vm.libMeasures);
 
       // (re)set display measures
       vm.setDisplayMeasures();
@@ -149,11 +149,11 @@ export class ModalBclController {
   setDisplayMeasures() {
     const vm = this;
     const measures = [];
-    vm.$log.debug('lib_measures: ', vm.lib_measures);
+    vm.$log.debug('libMeasures: ', vm.libMeasures);
     // add checked
-    _.each(vm.filters, (val, key) => {
+    _.forEach(vm.filters, (val, key) => {
       if (val) {
-        _.each(vm.lib_measures[key], m => {
+        _.forEach(vm.libMeasures[key], m => {
           // add if not found
           if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
         });
@@ -162,7 +162,7 @@ export class ModalBclController {
 
     // TODO: then check for updates on local measures
 
-    vm.$scope.display_measures = measures;
+    vm.$scope.displayMeasures = measures;
     return measures;
   }
 
@@ -175,20 +175,20 @@ export class ModalBclController {
       if (response.data.term) {
         const categories = [];
         // 3 possible levels of nesting
-        _.each(response.data.term, term => {
+        _.forEach(response.data.term, term => {
           const cat1 = _.pick(term, ['name', 'tid']);
-          const cat1_terms = [];
-          _.each(term.term, term2 => {
+          const cat1Terms = [];
+          _.forEach(term.term, term2 => {
             const cat2 = _.pick(term2, ['name', 'tid']);
-            const cat2_terms = [];
-            _.each(term2.term, term3 => {
+            const cat2Terms = [];
+            _.forEach(term2.term, term3 => {
               const cat3 = _.pick(term3, ['name', 'tid']);
-              cat2_terms.push(cat3);
+              cat2Terms.push(cat3);
             });
-            cat2.children = cat2_terms;
-            cat1_terms.push(cat2);
+            cat2.children = cat2Terms;
+            cat1Terms.push(cat2);
           });
-          cat1.children = cat1_terms;
+          cat1.children = cat1Terms;
           categories.push(cat1);
         });
 
@@ -202,28 +202,28 @@ export class ModalBclController {
   // process measures filter changes
   resetFilters() {
     const vm = this;
-    vm.$scope.display_measures = vm.setDisplayMeasures();
+    vm.$scope.displayMeasures = vm.setDisplayMeasures();
     vm.resetTypeFilters();
   }
 
   // process measure type filter changes
-  resetTypeFilters(){
+  resetTypeFilters() {
     const vm = this;
-    let types_arr = [];
-    _.each(vm.types, (val, key) => {
+    const typesArr = [];
+    _.forEach(vm.types, (val, key) => {
 
       if (val) {
-        types_arr.push(key);
+        typesArr.push(key);
       }
     });
-    const new_measures = [];
-    _.each(vm.$scope.display_measures, (m) => {
-      vm.$log.debug(_.includes(types_arr, m.type));
-      if (_.includes(types_arr, m.type)) new_measures.push(m);
+    const newMeasures = [];
+    _.forEach(vm.$scope.displayMeasures, (m) => {
+      vm.$log.debug(_.includes(typesArr, m.type));
+      if (_.includes(typesArr, m.type)) newMeasures.push(m);
     });
 
-    vm.$scope.display_measures = _.filter(vm.$scope.display_measures, function(m) {
-      return _.includes(types_arr, m.type);
+    vm.$scope.displayMeasures = _.filter(vm.$scope.displayMeasures, m => {
+      return _.includes(typesArr, m.type);
     });
   }
 
@@ -232,7 +232,7 @@ export class ModalBclController {
   addMeasure(rowEntity) {
 
     const vm = this;
-    const measure = _.find(vm.$scope.display_measures, {uid: rowEntity.uid});
+    const measure = _.find(vm.$scope.displayMeasures, {uid: rowEntity.uid});
 
     vm.$log.debug(measure);
     measure.addedToProject = true;
@@ -240,7 +240,7 @@ export class ModalBclController {
     // TODO: Call service to add to project
     vm.addToProject(measure);
 
-    vm.$log.debug(vm.project_measures);
+    vm.$log.debug(vm.projectMeasures);
 
   }
 
@@ -249,23 +249,23 @@ export class ModalBclController {
     const vm = this;
 
     // add to array(s)
-    vm.project_measures.push(measure);
-    vm.lib_measures.project.push(measure);
+    vm.projectMeasures.push(measure);
+    vm.libMeasures.project.push(measure);
 
     // copy on disk
-    const src = (measure.location == 'MY') ? vm.my_measures_dir : vm.local_dir;
-    src.copy(measure.name, vm.project_dir.path(measure.name));
+    const src = (measure.location == 'MY') ? vm.myMeasuresDir : vm.localDir;
+    src.copy(measure.name, vm.projectDir.path(measure.name));
 
   }
 
   // download from BCL (via service)
   download(measure) {
     const vm = this;
-    vm.BCL.downloadMeasure(measure).then(function(new_measure){
+    vm.BCL.downloadMeasure(measure).then(newMeasure => {
 
       // TODO: possible refactor.  add to measures and recalculate display, or pull from service first?
-      vm.lib_measures.local.push(new_measure);
-      vm.$scope.display_measures = vm.setDisplayMeasures();
+      vm.libMeasures.local.push(newMeasure);
+      vm.$scope.displayMeasures = vm.setDisplayMeasures();
       // select newly added row
       vm.selectARow(measure.uid);
 
@@ -273,11 +273,11 @@ export class ModalBclController {
   }
 
   // select row in table based on UID
-  selectARow(uid){
+  selectARow(uid) {
     const vm = this;
-    const index = _.findIndex(vm.$scope.display_measures, {uid: uid});
-    vm.gridApi.grid.modifyRows(vm.$scope.display_measures);
-    vm.gridApi.selection.selectRow(vm.$scope.display_measures[index]);
+    const index = _.findIndex(vm.$scope.displayMeasures, {uid: uid});
+    vm.gridApi.grid.modifyRows(vm.$scope.displayMeasures);
+    vm.gridApi.selection.selectRow(vm.$scope.displayMeasures[index]);
   }
 
   // edit My measure
