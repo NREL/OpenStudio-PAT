@@ -213,20 +213,44 @@ select {
   padding: 3px 0px;
 }
 
+.icon-edit-cell {
+  overflow:visible;
+}
+
+.location-cell {
+  text-align: center;
+}
+
 .green-button {
   color: #6CC16F;
+}
+
+.library-grid-button {
   font-size: 25px;
+  text-align:center;
+  vertical-align:middle;
 }
 
 /*
+.ui-grid-cell.dropdown-button {
+  overflow:visible;
+
+  .ui-grid-cell-contents {
+    overflow: visible;
+  }
+}
+*/
+
+
 .lib-grid {
-  font-size: 0.8em;
+  /*font-size: 0.8em;*/
+  height:800px;
 }
 
 .lib-details {
-  font-size: 0.8em;
+  /*font-size: 0.8em;*/
 }
-*/
+
 
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject

@@ -25,7 +25,7 @@ export class AnalysisController {
     vm.getMeasures();
 
     vm.gridOptions = {
-      data: this.$scope.measures[0].arguments,
+      data: vm.$scope.measures[0].arguments,
       enableSorting: true,
       autoResize: true,
       enableCellEditOnFocus: true,
@@ -45,32 +45,37 @@ export class AnalysisController {
       }, {
         name: 'option1',
         displayName: 'Option 1',
-        editDropdownOptionsFunction: function(rowEntity) {
+        editDropdownOptionsFunction: function (rowEntity) {
           if (rowEntity.type === 'Choice') {
-            self.choices = [];
-            self._.each(rowEntity.choices, (choice) => {
-              self.choices.push({
+            vm.choices = [];
+            _.forEach(rowEntity.choices, (choice) => {
+              vm.choices.push({
                 value: choice.value
               });
             });
-            return self.choices;
+            return vm.choices;
           }
         },
         editableCellTemplate: '<div><form name=\"inputForm\">' +
-          '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
-          '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />' +
-          '<input ng-if=\"row.entity.type==\'Int\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-          '<input ng-if=\"row.entity.type==\'Double\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-          '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+        '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
+        '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />' +
+        '<input ng-if=\"row.entity.type==\'Int\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+        '<input ng-if=\"row.entity.type==\'Double\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+        '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
         ' </form></div>',
         enableHiding: false,
         enableCellEdit: true
       }],
 
-      onRegisterApi: function( gridApi ) {
-        this.gridApi = gridApi;
+      onRegisterApi: function (gridApi) {
+        vm.gridApi = gridApi;
         const cellTemplate = 'ui-grid/selectionRowHeader';   // you could use your own template here
-        this.gridApi.core.addRowHeaderColumn( { name: 'rowHeaderCol', displayName: '', width: 50, cellTemplate: cellTemplate} );
+        vm.gridApi.core.addRowHeaderColumn({
+          name: 'rowHeaderCol',
+          displayName: '',
+          width: 50,
+          cellTemplate: cellTemplate
+        });
       }
     };
 
@@ -83,19 +88,19 @@ export class AnalysisController {
     if (vm.jetpack.exists(vm.srcDir.cwd())) measurePaths = vm.srcDir.find('.', {matching: '*/measure.xml'}, 'relativePath');
     else console.error('My Measures directory (%s) does not exist', vm.srcDir.cwd());
 
-    _.each(measurePaths, measurePath => {
+    _.forEach(measurePaths, measurePath => {
       //vm.$log.debug(measurePath);
       const xml = vm.srcDir.read(measurePath);
       parseString(xml, (err, result) => {
 
-        const measureArguments = self._.result(result, 'measure.arguments[0].argument', []);
-        self._.each(measureArguments, (argument, i) => {
+        const measureArguments = _.result(result, 'measure.arguments[0].argument', []);
+        _.forEach(measureArguments, (argument, i) => {
 
-          const choices = self._.result(argument, 'choices[0].choice', []);
-          self._.each(choices, (choice, i) => {
+          const choices = _.result(argument, 'choices[0].choice', []);
+          _.forEach(choices, (choice, i) => {
             choices[i] = {
-              value: self._.result(choice, 'value[0]'),
-              displayName: self._.result(choice, 'display_name[0]')
+              value: _.result(choice, 'value[0]'),
+              displayName: _.result(choice, 'display_name[0]')
             };
           });
 
@@ -113,7 +118,7 @@ export class AnalysisController {
         });
 
         const attributes = _.result(result, 'measure.attributes[0].attribute', []);
-        _.each(attributes, (attribute, i) => {
+        _.forEach(attributes, (attribute, i) => {
           attributes[i] = {
             name: attribute.name[0],
             value: attribute.value[0],
@@ -121,13 +126,13 @@ export class AnalysisController {
           };
         });
 
-        const files = self._.result(result, 'measure.files[0].file', []);
-        self._.each(files, (file, i) => {
+        const files = _.result(result, 'measure.files[0].file', []);
+        _.forEach(files, (file, i) => {
 
           const version = {
-            softwareProgram: self._.result(file, 'version[0].software_program[0]'),
-            identifier: self._.result(file, 'version[0].identifier[0]'),
-            minCompatible: self._.result(file, 'version[0].min_compatible[0]')
+            softwareProgram: _.result(file, 'version[0].software_program[0]'),
+            identifier: _.result(file, 'version[0].identifier[0]'),
+            minCompatible: _.result(file, 'version[0].min_compatible[0]')
           };
 
           files[i] = {
