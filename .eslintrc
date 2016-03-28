@@ -31,6 +31,7 @@
     "consistent-this": [2, "vm"],
     "no-mixed-spaces-and-tabs": 1,
     "no-trailing-spaces": 1,
+    "quote-props": [2, "as-needed", {"keywords": true}],
     "quotes": [1, "single"],
     "semi": [2, "always"],
     // ES6

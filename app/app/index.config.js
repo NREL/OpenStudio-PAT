@@ -9,7 +9,11 @@ export function config($logProvider, $translateProvider, toastrConfig) {
   $translateProvider
     .translations('en', en)
     .translations('fr', fr)
-    .preferredLanguage('en');
+    .fallbackLanguage('en')
+    .preferredLanguage('en')
+    //.determinePreferredLanguage()
+    .useMissingTranslationHandlerLog()
+    .useSanitizeValueStrategy('escape');
 
   // Set options third-party lib
   toastrConfig.allowHtml = true;
