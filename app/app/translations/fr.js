@@ -1,5 +1,5 @@
 export default {
   analysis: {
-    title: 'Contrôleur Analyse'
+    title: 'Contrôleur d\'Analyse'
   }
 };

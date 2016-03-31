@@ -30,7 +30,12 @@ export class BCL {
     vm.$log.debug('PROJECT measures: ', vm.projectMeasures);
 
     // assign measures by type
-    vm.libMeasures = {'my': [], 'local': [], 'bcl': [], 'project': []};
+    vm.libMeasures = {
+      my: [],
+      local: [],
+      bcl: [],
+      project: []
+    };
 
   }
 
