@@ -192,6 +192,11 @@ select {
   border-top: 0 none;
 }
 
+.grid {
+  width: 1000px;
+  height: 250px;
+}
+
 /* TODO: Something is wrong, fix this later */
 .input-group > select + .input-group-btn > button {
   height: 34px;
