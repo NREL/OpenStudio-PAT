@@ -24,11 +24,6 @@ export class BCL {
     vm.localDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
     vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
 
-    // TODO: get project measures from a service
-    // load projectMeasures before other measures
-    vm.projectMeasures = vm.getMeasuresByType(vm.projectDir, 'project');
-    vm.$log.debug('PROJECT measures: ', vm.projectMeasures);
-
     // assign measures by type
     vm.libMeasures = {
       my: [],
@@ -37,23 +32,28 @@ export class BCL {
       project: []
     };
 
+    // initialize measures
+    vm.getLocalMeasures();
+    vm.$log.debug('PROJECT measures: ', vm.libMeasures.project);
+    vm.getBCLMeasures();
+
   }
 
-  // DOWNLOAD COMPONENT BY UID
-  download(uids) {
+  // TODO: these may need refactor after JSON is implemented
+  setProjectMeasures(measures){
     const vm = this;
-    return vm.$http.get(vm.bclUrl + 'component/download/', {
-      params: {uids: uids},
-      responseType: 'arraybuffer'
-    });
+    vm.libMeasures.project = measures;
+    //vm.projectMeasures = vm.libMeasures.project;
   }
 
-  // GET ALL MEASURE CATEGORIES
-  // TODO: SHOULD PROBABLY MOVE THAT TO MAIN ROUTING WITH PROMISES (LIKE CONSTRUCTIONS IN CBECC-COM)
-  getCategories() {
+  getProjectMeasures() {
     const vm = this;
-    //return vm.$http.get('http://bcl7.development.nrel.gov/api/taxonomy/measure.json');
-    return vm.$http.get(vm.bclUrl + 'taxonomy/measure.json');
+    return vm.libMeasures.project;
+  }
+
+  addProjectMeasure(measure) {
+    const vm = this;
+    vm.libMeasures.project.push(measure);
   }
 
   // returns libMeasures variable
@@ -101,6 +101,7 @@ export class BCL {
     if (force || _.isEmpty(vm.libMeasures.bcl)) {
       vm.libMeasures.bcl = [];
       vm.loadOnlineBCLMeasures().then(measures => {
+        vm.libMeasures.bcl = measures;
         deferred.resolve(measures);
       }, response => {
         vm.$log.debug('ERROR retrieving BCL online measures');
@@ -276,7 +277,7 @@ export class BCL {
     measure.add = '';
 
     // is measure added to project?
-    measure.addedToProject = (type == 'project' || _.find(vm.projectMeasures, {uid: measure.uid}));
+    measure.addedToProject = (type == 'project' || _.find(vm.libMeasures.project, {uid: measure.uid}));
 
     if (measure.versionModified) {
       // assuming yyyy-mm-dd
@@ -350,6 +351,23 @@ export class BCL {
     });
 
     return deferred.promise;
+  }
+
+  // DOWNLOAD COMPONENT BY UID
+  download(uids) {
+    const vm = this;
+    return vm.$http.get(vm.bclUrl + 'component/download/', {
+      params: {uids: uids},
+      responseType: 'arraybuffer'
+    });
+  }
+
+  // GET ALL MEASURE CATEGORIES
+  // TODO: SHOULD PROBABLY MOVE THAT TO MAIN ROUTING WITH PROMISES (LIKE CONSTRUCTIONS IN CBECC-COM)
+  getCategories() {
+    const vm = this;
+    //return vm.$http.get('http://bcl7.development.nrel.gov/api/taxonomy/measure.json');
+    return vm.$http.get(vm.bclUrl + 'taxonomy/measure.json');
   }
 
   // OPEN BCL LIBRARY MODAL

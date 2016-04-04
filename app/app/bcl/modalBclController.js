@@ -43,12 +43,16 @@ export class ModalBclController {
 
     // get all measures
     vm.libMeasures = vm.BCL.getMeasures();
+
+
+    // load measures (otherwise they'll be blank?)
     vm.getLocalMeasures();
     vm.getBCLMeasures();
+    //vm.setDisplayMeasures();
 
     // temporary workaround until project measures service / JSON is implemented
     // adds additional info
-    vm.projectMeasures = vm.libMeasures.project;
+    //vm.projectMeasures = vm.libMeasures.project;
 
     vm.$log.debug('DISPLAY MEASURES', vm.$scope.displayMeasures);
 
@@ -237,23 +241,24 @@ export class ModalBclController {
     vm.$log.debug(measure);
     measure.addedToProject = true;
 
-    // TODO: Call service to add to project
+    // TODO: Call service to add to project?
     vm.addToProject(measure);
-
-    vm.$log.debug(vm.projectMeasures);
 
   }
 
-  // TODO: this will be in a service
+  // TODO: this will be in a service?
   addToProject(measure) {
     const vm = this;
 
     // add to array(s)
-    vm.projectMeasures.push(measure);
+    //vm.projectMeasures.push(measure);
     vm.libMeasures.project.push(measure);
+    // I think this is unnecessary (adds it twice?)
+    //vm.BCL.addProjectMeasure(measure);
+    vm.$log.debug('Project MEASURES IN bclService: ', vm.BCL.getProjectMeasures());
 
     // copy on disk
-    const src = (measure.location == 'MY') ? vm.myMeasuresDir : vm.localDir;
+    const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;
     src.copy(measure.name, vm.projectDir.path(measure.name));
 
   }
@@ -294,7 +299,6 @@ export class ModalBclController {
 
   ok() {
     const vm = this;
-    // TODO: push project measures back to service
     vm.$uibModalInstance.close();
   }
 
