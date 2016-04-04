@@ -294,7 +294,7 @@ export class ModalBclController {
 
   ok() {
     const vm = this;
-
+    // TODO: push project measures back to service
     vm.$uibModalInstance.close();
   }
 
