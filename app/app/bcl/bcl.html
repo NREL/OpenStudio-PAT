@@ -9,15 +9,17 @@
       <form ng-submit="submit()" name="form" novalidate>
         <div class="input-group">
           <input type="text" name="search" id="search" ng-model="modal.keyword" class="form-control" placeholder="Search">
-		      <span class="input-group-btn">
-		        <button class="btn btn-default" type="button" ng-click="search()">
-              <img class="search-img" src="assets/images/search.png" alt="search button"/></button>
-		      </span>
+          <span class="input-group-btn">
+            <button class="btn btn-default" type="button" ng-click="search()">
+              <span class="glyphicon glyphicon-search" style="padding-bottom:6px;"  aria-hidden="true" aria-label="Search">
+              </span>
+            </button>
+          </span>
         </div>
         <div class="pad-top-20"></div>
         <div class="panel panel-default">
           <div class="panel-heading">
-            <div class="filter-img"><img src="assets/images/filter.png" alt="filter icon"/></div>
+            <div class="filter-img"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span></div>
             Filters
           </div>
           <div class="panel-body">
