@@ -4,13 +4,14 @@ import * as path from 'path';
 
 export class AnalysisController {
 
-  constructor($log, BCL, $scope) {
+  constructor($log, BCL, $scope, $document) {
     'ngInject';
 
     const vm = this;
     vm.$log = $log;
     vm.jetpack = jetpack;
     vm.$scope = $scope;
+    vm.$document = $document;
     vm.BCL = BCL;
 
     vm.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
@@ -120,6 +121,20 @@ export class AnalysisController {
       vm.setGridOptions();
       vm.$log.debug('measures: ', vm.$scope.measures);
     });
+
+  }
+
+  removeMeasure(measure) {
+    const vm = this;
+    // line below also removes it from bclService 'getProjectMeasures', but not from disk
+    // TODO: fix so BCL modal doesn't restore deleted panels
+    _.remove(vm.$scope.measures, {uid: measure.uid});
+
+    const measurePanel = angular.element(vm.$document[0].querySelector('div[id="'+measure.uid+'"]'));
+    measurePanel.remove();
+
+    vm.setMeasureTypes();
+    vm.setGridOptions();
 
   }
 

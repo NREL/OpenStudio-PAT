@@ -246,6 +246,7 @@ select {
   color:#000000;
 }
 
+
 .library-grid-button {
   font-size: 25px;
   text-align: center;
@@ -284,12 +285,14 @@ select {
 
   }
 
-  .panel-default > .panel-heading {
+  a:hover, a:focus {
+    text-decoration:none;
+  }
 
+  .panel-default > .panel-heading {
     background-color:#95A5A6;
     color:#ffffff;
     border-color:#ffffff;
-
   }
 }
 
