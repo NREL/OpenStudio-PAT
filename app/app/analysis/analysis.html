@@ -66,9 +66,11 @@
                 </span>
               </span>
             </uib-accordion-heading>
-            <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)">Add Measure Option</button>
-            <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption()">2X Duplicate Option</button>
-            <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption()">2X Duplicate Measure & Option</button>
+            <div class="button-div">
+              <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)">Add Measure Option</button>
+              <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption()">2X Duplicate Option</button>
+              <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption()">2X Duplicate Measure & Option</button>
+            </div>
             <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
             </uib-accordion-group>
           </uib-accordion>
@@ -98,9 +100,11 @@
                   </span>
                 </span>
               </uib-accordion-heading>
-              <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)">Add Measure Option</button>
-              <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption()">2X Duplicate Option</button>
-              <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption()">2X Duplicate Measure & Option</button>
+              <div class="button-div">
+                <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)">Add Measure Option</button>
+                <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption()">2X Duplicate Option</button>
+                <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption()">2X Duplicate Measure & Option</button>
+              </div>
               <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
             </uib-accordion-group>
           </uib-accordion>
@@ -130,9 +134,11 @@
                   </span>
                 </span>
               </uib-accordion-heading>
-              <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)">Add Measure Option</button>
-              <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption()">2X Duplicate Option</button>
-              <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption()">2X Duplicate Measure & Option</button>
+              <div class="button-div">
+                <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)">Add Measure Option</button>
+                <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption()">2X Duplicate Option</button>
+                <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption()">2X Duplicate Measure & Option</button>
+              </div>
               <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
             </uib-accordion-group>
           </uib-accordion>
