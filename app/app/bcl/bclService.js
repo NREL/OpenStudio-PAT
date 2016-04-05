@@ -282,6 +282,8 @@ export class BCL {
     measure.location = (type == 'project') ? vm.findMeasureOrigin(measure.uid) : type;
     measure.add = '';
 
+    // measure accordion
+    measure.open = false;
     // is measure added to project?
     measure.addedToProject = (type == 'project' || _.find(vm.libMeasures.project, {uid: measure.uid}));
 
