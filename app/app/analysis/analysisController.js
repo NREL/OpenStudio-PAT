@@ -23,7 +23,7 @@ export class AnalysisController {
 
     vm.setMeasureTypes();
 
-    vm.gridOptions = [];
+    vm.$scope.gridOptions = [];
     vm.$log.debug('PROJECT MEASURES RETRIEVED: ', vm.$scope.measures);
 
     vm.analysisTypes = ['Manual', 'Auto'];
@@ -37,7 +37,7 @@ export class AnalysisController {
 
     _.forEach(vm.$scope.measures, (measure) => {
 
-      vm.gridOptions[measure.uid] = {
+      vm.$scope.gridOptions[measure.uid] = {
         data: measure.arguments,
         enableSorting: true,
         autoResize: true,
@@ -56,8 +56,8 @@ export class AnalysisController {
           enableHiding: false,
           type: 'boolean'
         }, {
-          name: 'option1',
           displayName: 'Option 1',
+          field: 'option',
           editDropdownOptionsFunction: function (rowEntity) {
             if (rowEntity.type === 'Choice') {
               vm.choices = [];
@@ -123,4 +123,19 @@ export class AnalysisController {
 
   }
 
+  addMeasureOption(measure) {
+    const vm = this;
+    vm.$log.debug('In addMeasureOption in analysis');
+    vm.$scope.gridOptions[measure.uid].columnDefs.push({field: 'option'});
+  }
+
+  duplicateOption() {
+    const vm = this;
+    vm.$log.debug('In duplicateOption in analysis');
+  }
+
+  duplicateMeasureAndOption() {
+    const vm = this;
+    vm.$log.debug('In duplicateMeasureAndOption in analysis');
+  }
 }
