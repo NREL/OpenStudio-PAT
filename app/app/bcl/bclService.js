@@ -377,17 +377,34 @@ export class BCL {
   }
 
   // OPEN BCL LIBRARY MODAL
-  openBCLModal() {
+  openBCLModal(types = [], filters = [], update = false) {
     const vm = this;
+    const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
       controller: 'ModalBclController',
       controllerAs: 'modal',
       templateUrl: 'app/bcl/bcl.html',
-      windowClass: 'wide-modal'
+      windowClass: 'wide-modal',
+      resolve: {
+        params: function () {
+          return {
+            update: update,
+            filters: filters,
+            types: types
+          };
+        }
+      }
     });
 
-    return modalInstance.result;
+    modalInstance.result.then( () => {
+      deferred.resolve();
+    }, () => {
+      // Modal canceled
+      deferred.reject();
+    });
+    return deferred.promise;
+
   }
 
 }

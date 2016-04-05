@@ -3,10 +3,6 @@
     <div ng-include="'app/nav/nav.html'"></div>
   </div>
   <div class="main">
-
-    <p>
-      <button type="button" class="btn btn-info" ng-click="analysis.openModal()">Open BCL View</button>
-    </p>
     <div class="gray-top">
       <div class="row">
         <div class="col-md-6 pad-bot-20">
@@ -53,7 +49,7 @@
       <div class="col-md-4">
         <h5 class="inline measure-type">OpenStudio Measures</h5>
         <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-        <button type="button" class="btn btn-success" ng-click="analysis.addMeasure()">+ Add Measure</button>
+        <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ModelMeasure')">+ Add Measure</button>
       </div>
     </div>
     <div class="analysis-custom">
@@ -73,7 +69,7 @@
       <div class="col-md-4">
         <h5 class="inline measure-type">EnergyPlus Measures</h5>
         <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-        <button type="button" class="btn btn-success" ng-click="analysis.addMeasure()">+ Add Measure</button>
+        <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('EnergyPlusMeasure')">+ Add Measure</button>
       </div>
     </div>
     <div class="analysis-custom">
@@ -93,7 +89,7 @@
       <div class="col-md-4">
         <h5 class="inline measure-type">Reporting Measures</h5>
         <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-        <button type="button" class="btn btn-success" ng-click="analysis.addMeasure()">+ Add Measure</button>
+        <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ReportingMeasure')">+ Add Measure</button>
       </div>
     </div>
     <div class="analysis-custom">

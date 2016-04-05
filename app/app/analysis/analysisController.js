@@ -1,7 +1,6 @@
 import * as jetpack from 'fs-jetpack';
 import * as os from 'os';
 import * as path from 'path';
-import { parseString } from 'xml2js';
 
 export class AnalysisController {
 
@@ -96,7 +95,6 @@ export class AnalysisController {
   }
 
   setMeasureTypes() {
-
     const vm = this;
     vm.$scope.osMeasures = [];
     vm.$scope.epMeasures = [];
@@ -112,17 +110,17 @@ export class AnalysisController {
     });
   }
 
-  openModal() {
+  addMeasure(type) {
     const vm = this;
-    vm.$log.debug('IN openBCLmodal in analysis');
-    vm.BCL.openBCLModal().then( function () {
+    const types = [type];
+    vm.BCL.openBCLModal(types, [], false).then( () => {
       // reset data
-      vm.$log.debug('modal is closed!');
       vm.$scope.measures = vm.BCL.getProjectMeasures();
       vm.setMeasureTypes();
       vm.setGridOptions();
       vm.$log.debug('measures: ', vm.$scope.measures);
     });
+
   }
 
 }

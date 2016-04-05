@@ -4,7 +4,7 @@ import * as os from 'os';
 
 export class ModalBclController {
 
-  constructor($log, $uibModalInstance, $scope, BCL) {
+  constructor($log, $uibModalInstance, $scope, BCL, params) {
     'ngInject';
 
     const vm = this;
@@ -13,9 +13,10 @@ export class ModalBclController {
     vm.$scope = $scope;
     vm.BCL = BCL;
     vm.jetpack = jetpack;
+    vm.params = params;
 
-    vm.selected = null;
-    vm.keyword = '';
+    vm.checkForUpdates = vm.params.update;
+    // TODO: do the check for updates
 
     vm.filters = {
       my: true,
@@ -29,6 +30,13 @@ export class ModalBclController {
       EnergyPlusMeasure: true,
       ReportingMeasure: true
     };
+
+    // set filters and types with incoming params
+    vm.setTypes();
+    vm.setFilters();
+
+    vm.selected = null;
+    vm.keyword = '';
 
     // TODO: fix dirs (get from Electron settings)
     vm.myMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
@@ -45,10 +53,10 @@ export class ModalBclController {
     vm.libMeasures = vm.BCL.getMeasures();
 
 
-    // load measures (otherwise they'll be blank?)
+    // load measures and apply filters
     vm.getLocalMeasures();
     vm.getBCLMeasures();
-    //vm.setDisplayMeasures();
+    vm.resetFilters();
 
     // temporary workaround until project measures service / JSON is implemented
     // adds additional info
@@ -125,6 +133,27 @@ export class ModalBclController {
     };
   }
 
+  // set filters from parameters (if array isn't empty)
+  setFilters() {
+    const vm = this;
+    if (!vm.params.filters.length == 0) {
+      _.forEach(vm.filters, (val, key) => {
+        vm.filters[key] = !!_.includes(vm.params.filters, key);
+      });
+    }
+
+  }
+
+  // set types from parameters (if array isn't empty)
+  setTypes() {
+    const vm = this;
+    if (!vm.params.types.length <= 0) {
+      _.forEach(vm.types, (val, key) => {
+        vm.types[key] = !!_.includes(vm.params.types, key);
+      });
+    }
+  }
+
   getLocalMeasures() {
     const vm = this;
     const measures = vm.BCL.getLocalMeasures();
@@ -133,9 +162,6 @@ export class ModalBclController {
     _.forEach(measures, (val, key) => {
       vm.libMeasures[key] = val;
     });
-
-    // set display measures
-    vm.setDisplayMeasures();
   }
 
   getBCLMeasures() {
@@ -143,9 +169,6 @@ export class ModalBclController {
     vm.BCL.getBCLMeasures().then(response => {
       vm.libMeasures.bcl = response;
       vm.$log.debug('ALL MEASURES: ', vm.libMeasures);
-
-      // (re)set display measures
-      vm.setDisplayMeasures();
     });
   }
 
