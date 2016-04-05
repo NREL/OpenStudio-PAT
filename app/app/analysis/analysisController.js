@@ -11,75 +11,118 @@ export class AnalysisController {
     const vm = this;
     vm.$log = $log;
     vm.jetpack = jetpack;
-
     vm.$scope = $scope;
-
-    vm.test = 'Analysis Controller';
-
     vm.BCL = BCL;
 
     vm.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+
     vm.$scope.measures = vm.BCL.getProjectMeasures();
 
-    vm.$log.debug('PROJECT MEASURES RETRIEVED: ', vm.measures);
+    vm.$scope.osMeasures = [];
+    vm.$scope.epMeasures = [];
+    vm.$scope.repMeasures = [];
+
+    vm.setMeasureTypes();
+
+    vm.gridOptions = [];
+    vm.$log.debug('PROJECT MEASURES RETRIEVED: ', vm.$scope.measures);
 
     vm.analysisTypes = ['Manual', 'Auto'];
 
-    vm.gridOptions = {
-      data: vm.$scope.measures[0].arguments,
-      enableSorting: true,
-      autoResize: true,
-      enableCellEditOnFocus: true,
-      columnDefs: [{
-        name: 'displayName',
-        displayName: 'Name of Option',
-        enableHiding: false
-      }, {
-        name: 'name',
-        displayName: 'Short Name',
-        enableHiding: false
-      }, {
-        name: 'variable',
-        displayName: 'Variable',
-        enableHiding: false,
-        type: 'boolean'
-      }, {
-        name: 'option1',
-        displayName: 'Option 1',
-        editDropdownOptionsFunction: function (rowEntity) {
-          if (rowEntity.type === 'Choice') {
-            vm.choices = [];
-            _.forEach(rowEntity.choices, (choice) => {
-              vm.choices.push({
-                value: choice.value
+    vm.setGridOptions();
+
+  }
+
+  setGridOptions() {
+    const vm = this;
+
+    _.forEach(vm.$scope.measures, (measure) => {
+
+      vm.gridOptions[measure.uid] = {
+        data: measure.arguments,
+        enableSorting: true,
+        autoResize: true,
+        enableCellEditOnFocus: true,
+        columnDefs: [{
+          name: 'displayName',
+          displayName: 'Name of Option',
+          enableHiding: false
+        }, {
+          name: 'name',
+          displayName: 'Short Name',
+          enableHiding: false
+        }, {
+          name: 'variable',
+          displayName: 'Variable',
+          enableHiding: false,
+          type: 'boolean'
+        }, {
+          name: 'option1',
+          displayName: 'Option 1',
+          editDropdownOptionsFunction: function (rowEntity) {
+            if (rowEntity.type === 'Choice') {
+              vm.choices = [];
+              _.forEach(rowEntity.choices, (choice) => {
+                vm.choices.push({
+                  value: choice.value
+                });
               });
-            });
-            return vm.choices;
-          }
-        },
-        editableCellTemplate: '<div><form name=\"inputForm\">' +
-        '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
-        '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />' +
-        '<input ng-if=\"row.entity.type==\'Int\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-        '<input ng-if=\"row.entity.type==\'Double\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-        '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-        ' </form></div>',
-        enableHiding: false,
-        enableCellEdit: true
-      }],
+              return vm.choices;
+            }
+          },
+          editableCellTemplate: '<div><form name=\"inputForm\">' +
+          '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
+          '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />' +
+          '<input ng-if=\"row.entity.type==\'Int\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+          '<input ng-if=\"row.entity.type==\'Double\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+          '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+          ' </form></div>',
+          enableHiding: false,
+          enableCellEdit: true
+        }],
 
-      onRegisterApi: function (gridApi) {
-        vm.gridApi = gridApi;
-        const cellTemplate = 'ui-grid/selectionRowHeader';   // you could use your own template here
-        vm.gridApi.core.addRowHeaderColumn({
-          name: 'rowHeaderCol',
-          displayName: '',
-          width: 50,
-          cellTemplate: cellTemplate
-        });
-      }
-    };
+        onRegisterApi: function (gridApi) {
+          vm.gridApi = gridApi;
+          const cellTemplate = 'ui-grid/selectionRowHeader';   // you could use your own template here
+          vm.gridApi.core.addRowHeaderColumn({
+            name: 'rowHeaderCol',
+            displayName: '',
+            width: 50,
+            cellTemplate: cellTemplate
+          });
+        }
+      };
+    });
+  }
 
+  setMeasureTypes() {
+
+    const vm = this;
+    vm.$scope.osMeasures = [];
+    vm.$scope.epMeasures = [];
+    vm.$scope.repMeasures = [];
+
+    _.forEach(vm.$scope.measures, (measure) => {
+      if (measure.type == 'ModelMeasure')
+        vm.$scope.osMeasures.push(measure);
+      else if (measure.type == 'EnergyPlusMeasure')
+        vm.$scope.epMeasures.push(measure);
+      else
+        vm.$scope.repMeasures.push(measure);
+    });
+  }
+
+  openModal() {
+    const vm = this;
+    vm.$log.debug('IN openBCLmodal in analysis');
+    vm.BCL.openBCLModal().then( function () {
+      // reset data
+      vm.$log.debug('modal is closed!');
+      vm.$scope.measures = vm.BCL.getProjectMeasures();
+      vm.setMeasureTypes();
+      vm.setGridOptions();
+      vm.$log.debug('measures: ', vm.$scope.measures);
+    });
   }
 
 }

@@ -29,7 +29,8 @@ select {
 
 .main {
   background: white;
-  padding-left: 45px;
+  padding: 10px 20px 10px 55px;
+  width:100%;
 }
 
 .nav {
@@ -107,9 +108,8 @@ select {
   }
 }
 
-/* increase modal size */
-.wide-Modal .modal-dialog {
-  width: 95%;
+.full-width {
+  width:100%;
 }
 
 .pad-bot-20 {
@@ -118,6 +118,18 @@ select {
 
 .pad-top-20 {
   padding-top: 20px;
+}
+
+.margin-top-20 {
+  margin-top:20px;
+}
+
+.margin-left-5 {
+  margin-left:5px;
+}
+
+.margin-right-5 {
+  margin-right:5px;
 }
 
 .search-img {
@@ -197,6 +209,7 @@ select {
   height: 250px;
 }
 
+
 /* TODO: Something is wrong, fix this later */
 .input-group > select + .input-group-btn > button {
   height: 34px;
@@ -252,6 +265,76 @@ select {
 
 .lib-details {
   /*font-size: 0.8em;*/
+}
+
+
+/* ANALYSIS page */
+
+.analysis-custom {
+
+  .panel {
+    border:0px;
+    /* border-radius: 0px; */
+    /* -webkit-box-shadow: 0 0px 0px rgba(0, 0, 0, 0.0); */
+    /* box-shadow: 0 0px 0px rgba(0, 0, 0, 0.0); */
+
+  }
+
+  .panel-default > .panel-heading {
+
+    background-color:#95A5A6;
+    color:#ffffff;
+    border-color:#ffffff;
+
+  }
+}
+
+.gray-top {
+  background-color:#D4D4D4;
+  padding:20px;
+  margin-bottom:20px;
+}
+
+.big-label {
+  font-size:2em;
+  display:inline;
+  padding-right:20px;
+}
+
+.medium-label {
+  font-size:1.4em;
+}
+
+.form-control-smaller-width {
+  width:50%;
+}
+
+.badge-info {
+  background-color:#6ACBE5;
+  display:inline;
+}
+
+.input-group-addon {
+  background-color:transparent;
+  border: 0px;
+}
+
+.inline {
+  display:inline;
+}
+
+h5.measure-type {
+  font-size:1.5em;
+  line-height: 1.33;
+  margin: 0;
+}
+
+.black-line {
+  border: none;
+  height: 2px;
+  /* Set the hr color */
+  color: #000; /* old IE */
+  background-color: #000; /* Modern Browsers */
 }
 
 /**

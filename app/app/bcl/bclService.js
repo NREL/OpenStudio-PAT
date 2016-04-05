@@ -48,7 +48,13 @@ export class BCL {
 
   getProjectMeasures() {
     const vm = this;
-    return vm.libMeasures.project;
+    if (vm.libMeasures.project.length > 0) {
+      return vm.libMeasures.project;
+    }
+    else {
+      vm.libMeasures.project = vm.getMeasuresByType(vm.projectDir, 'project');
+      return vm.libMeasures.project;
+    }
   }
 
   addProjectMeasure(measure) {

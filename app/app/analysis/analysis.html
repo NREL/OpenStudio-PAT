@@ -3,90 +3,110 @@
     <div ng-include="'app/nav/nav.html'"></div>
   </div>
   <div class="main">
-    <h3 translate>analysis.title</h3>
+
     <p>
-      <button type="button" class="btn btn-info" ng-click="analysis.BCL.openBCLModal()">Open BCL View</button>
+      <button type="button" class="btn btn-info" ng-click="analysis.openModal()">Open BCL View</button>
     </p>
-    <label>Analysis Type:</label>
-    <form class="form-inline">
-      <div class="input-group">
-        <select class="form-control">
-          <option>Manual</option>
-          <option>Auto</option>
-        </select>
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-question-sign"></span></button>
-        </span>
+    <div class="gray-top">
+      <div class="row">
+        <div class="col-md-6 pad-bot-20">
+          <label class="big-label">Analysis Type</label>
+          <div class="input-group">
+            <select class="form-control inline form-control-smaller-width">
+              <option>Manual</option>
+              <option>Auto</option>
+            </select>
+            <span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>
+          </div>
+        </div>
       </div>
-    </form>
-
-    <label>Default Seed Model</label>
-    <form class="form-inline">
-      <div class="input-group">
-        <select class="form-control">
-        </select>
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-question-sign"></span></button>
-        </span>
+      <div class="row">
+        <div class="col-md-3 pad-bot-20">
+          <label class="medium-label">Default Seed Model</label>
+          <div class="input-group">
+            <select class="form-control">
+              <option>Test 1</option>
+              <option>Test 2</option>
+            </select>
+            <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
+          </div>
+        </div>
+        <div class="col-md-3 pad-bot-20">
+          <label class="medium-label">Default Weather File</label>
+          <div class="input-group">
+            <select class="form-control">
+              <option>Weather 1</option>
+              <option>Weather 2</option>
+            </select>
+            <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
+          </div>
+        </div>
       </div>
-    </form>
+    </div>
 
-    <label>Default Weather File</label>
-    <form class="form-inline">
-      <div class="input-group">
-        <select class="form-control">
-        </select>
-        <span class="input-group-btn">
-          <button class="btn btn-default" type="submit"><span class="glyphicon glyphicon-question-sign"></span></button>
-        </span>
+    <div class="row pad-bot-20">
+      <div class="col-md-6"> <h4>Project Measures and Options <span class="badge badge-info margin-left-5">&nbsp;?&nbsp;</span></h4></div>
+      <div class="col-md-2 col-md-offset-2"><button type="button" class="btn btn-primary" ng-click="analysis.checkUpdates()"><span class="glyphicon glyphicon-repeat">&nbsp;</span>Check for Updates</button></div>
+    </div>
+
+    <div class="row">
+      <div class="col-md-4">
+        <h5 class="inline measure-type">OpenStudio Measures</h5>
+        <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
+        <button type="button" class="btn btn-success" ng-click="analysis.addMeasure()">+ Add Measure</button>
       </div>
-    </form>
-
-    Project Measures and Options<br>
-    <div class="btn-group" role="group">
-      <button type="button" class="btn btn-default">Check for Updates</button>
-      <button type="button" class="btn btn-default" aria-label="Help">
-        <span class="glyphicon glyphicon-question-sign"></span>
-      </button>
-    </div><br>
-
-    OpenStudio Measures<br>
-    <div class="btn-group" role="group">
-      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add Measure</button>
-      <button type="button" class="btn btn-default" aria-label="Help">
-        <span class="glyphicon glyphicon-question-sign"></span>
-      </button>
-    </div><br>
-
-    EnergyPlus Measures<br>
-    <div class="btn-group" role="group">
-      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add Measure</button>
-      <button type="button" class="btn btn-default" aria-label="Help">
-        <span class="glyphicon glyphicon-question-sign"></span>
-      </button>
-    </div><br>
-
-    Reporting Measures<br>
-    <div class="btn-group" role="group">
-      <button type="button" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span> Add Measure</button>
-      <button type="button" class="btn btn-default" aria-label="Help">
-        <span class="glyphicon glyphicon-question-sign"></span>
-      </button>
-    </div><br>
-
-    <div>
-
-      <div id="grid1" ui-grid="analysis.gridOptions" ui-grid-edit ui-grid-cellnav class="grid"></div>
-      <div class="panel panel-default">
-        <div class="panel-heading">Measures On Disk</div>
-        <div class="panel-body">
-          <uib-accordion close-others="true">
-            <uib-accordion-group heading="{{measure.name}}" ng-repeat="measure in analysis.measures">
-              <div ng-repeat="attribute in measure.attributes">{{attribute.name}}</div>
+    </div>
+    <div class="analysis-custom">
+      <div class="panel panel-default full-width margin-top-20">
+        <div class="analysis-custom panel-body">
+          <uib-accordion close-others="false">
+            <uib-accordion-group heading="{{measure.name}}" ng-repeat="measure in osMeasures" class="analysis-custom">
+              <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="analysis.gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
             </uib-accordion-group>
           </uib-accordion>
         </div>
       </div>
     </div>
+
+    <hr class="black-line" />
+    <div class="row">
+      <div class="col-md-4">
+        <h5 class="inline measure-type">EnergyPlus Measures</h5>
+        <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
+        <button type="button" class="btn btn-success" ng-click="analysis.addMeasure()">+ Add Measure</button>
+      </div>
+    </div>
+    <div class="analysis-custom">
+      <div class="panel panel-default full-width margin-top-20">
+        <div class="analysis-custom panel-body">
+          <uib-accordion close-others="false">
+            <uib-accordion-group heading="{{measure.name}}" ng-repeat="measure in epMeasures" class="analysis-custom">
+              <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="analysis.gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
+            </uib-accordion-group>
+          </uib-accordion>
+        </div>
+      </div>
+    </div>
+
+    <hr class="black-line" />
+    <div class="row">
+      <div class="col-md-4">
+        <h5 class="inline measure-type">Reporting Measures</h5>
+        <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
+        <button type="button" class="btn btn-success" ng-click="analysis.addMeasure()">+ Add Measure</button>
+      </div>
+    </div>
+    <div class="analysis-custom">
+      <div class="panel panel-default full-width margin-top-20">
+        <div class="analysis-custom panel-body">
+          <uib-accordion close-others="false">
+            <uib-accordion-group heading="{{measure.name}}" ng-repeat="measure in repMeasures" class="analysis-custom">
+              <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="analysis.gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
+            </uib-accordion-group>
+          </uib-accordion>
+        </div>
+      </div>
+    </div>
+
   </div>
 </div>
