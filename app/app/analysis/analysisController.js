@@ -15,6 +15,16 @@ export class AnalysisController {
     vm.BCL = BCL;
 
     vm.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    vm.seedDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/seeds'));
+    vm.weatherDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/weather'));
+
+    vm.seeds = [];
+    vm.weatherFiles = [];
+    vm.setSeeds();
+    vm.setWeatherFiles();
+    // fields
+    vm.selected_seed = vm.seeds.length > 0 ? vm.seeds[0] : null;
+    vm.selected_weather = vm.weatherFiles.length > 0 ? vm.weatherFiles[0] : null;
 
     vm.$scope.measures = vm.BCL.getProjectMeasures();
 
@@ -30,6 +40,8 @@ export class AnalysisController {
     vm.analysisTypes = ['Manual', 'Auto'];
 
     vm.setGridOptions();
+
+
 
   }
 
@@ -109,6 +121,28 @@ export class AnalysisController {
       else
         vm.$scope.repMeasures.push(measure);
     });
+  }
+
+  setSeeds() {
+    const vm = this;
+    if (vm.jetpack.exists(vm.seedDir.cwd())) {
+      vm.seeds = vm.seedDir.find('.', {matching: '*.osm'}, 'relativePath');
+      _.forEach(vm.seeds, (seed, index) => {
+        vm.seeds[index] = _.replace(seed, './', '');
+      });
+    }
+    else vm.$log.error('The seeds directory (%s) does not exist', vm.seedDir.cwd());
+  }
+
+  setWeatherFiles() {
+    const vm = this;
+    if (vm.jetpack.exists(vm.weatherDir.cwd())) {
+      vm.weatherFiles = vm.weatherDir.find('.', {matching: '*.epw'}, 'relativePath');
+      _.forEach(vm.weatherFiles, (w, index) => {
+        vm.weatherFiles[index] = _.replace(w, './', '');
+      });
+    }
+    else vm.$log.error('The weather file directory (%s) does not exist', vm.weatherDir.cwd());
   }
 
   addMeasure(type) {

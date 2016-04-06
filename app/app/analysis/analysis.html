@@ -20,20 +20,14 @@
         <div class="col-md-3 pad-bot-20">
           <label class="medium-label">Default Seed Model</label>
           <div class="input-group">
-            <select class="form-control">
-              <option>Test 1</option>
-              <option>Test 2</option>
-            </select>
+            <select class="form-control" ng-options="seed as seed for seed in analysis.seeds" ng-model="analysis.selected_seed"></select>
             <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
           </div>
         </div>
         <div class="col-md-3 pad-bot-20">
           <label class="medium-label">Default Weather File</label>
           <div class="input-group">
-            <select class="form-control">
-              <option>Weather 1</option>
-              <option>Weather 2</option>
-            </select>
+            <select class="form-control" ng-options="file as file for file in analysis.weatherFiles" ng-model="analysis.selected_weather"></select>
             <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
           </div>
         </div>
@@ -46,7 +40,7 @@
     </div>
 
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-12">
         <h5 class="inline measure-type">OpenStudio Measures</h5>
         <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
         <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ModelMeasure')">+ Add Measure</button>
@@ -80,7 +74,7 @@
 
     <hr class="black-line" />
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-12">
         <h5 class="inline measure-type">EnergyPlus Measures</h5>
         <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
         <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('EnergyPlusMeasure')">+ Add Measure</button>
@@ -114,7 +108,7 @@
 
     <hr class="black-line" />
     <div class="row">
-      <div class="col-md-4">
+      <div class="col-md-12">
         <h5 class="inline measure-type">Reporting Measures</h5>
         <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
         <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ReportingMeasure')">+ Add Measure</button>
