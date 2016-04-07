@@ -182,7 +182,7 @@ export class AnalysisController {
     vm.$log.debug('In addMeasureOption in analysis');
     vm.$scope.gridOptions[measure.uid].columnDefs.push({
       //displayName: 'Option 1',
-      field: 'optionW',
+      field: 'optionW',// TODO this needs to incremented
       editDropdownOptionsFunction: function (rowEntity) {
         if (rowEntity.type === 'Choice') {
           vm.choices = [];
@@ -209,9 +209,14 @@ export class AnalysisController {
 
   }
 
-  duplicateOption() {
+  duplicateOption(measure) {
     const vm = this;
     vm.$log.debug('In duplicateOption in analysis');
+    vm.addMeasureOption(measure);
+
+    _.each(vm.$scope.gridOptions[measure.uid].data, function(row){
+      row.optionW = row.option;
+    });
   }
 
   duplicateMeasureAndOption() {
