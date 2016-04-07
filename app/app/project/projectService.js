@@ -26,7 +26,24 @@ export class Project {
     vm.setSeedsDropdownOptions();
     vm.setWeatherFilesDropdownOptions();
 
+    vm.analysisType = 'Manual';
+    vm.analysisTypes = ['Manual', 'Auto'];
 
+  }
+
+  setAnalysisType(name) {
+    const vm = this;
+    vm.analysisType = name;
+  }
+
+  getAnalysisType(){
+    const vm = this;
+    return vm.analysisType;
+  }
+
+  getAnalysisTypes(){
+    const vm = this;
+    return vm.analysisTypes;
   }
 
   setDefaultSeed(name) {

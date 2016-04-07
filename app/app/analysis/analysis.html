@@ -8,10 +8,7 @@
         <div class="col-md-6 pad-bot-20">
           <label class="big-label">Analysis Type</label>
           <div class="input-group">
-            <select class="form-control inline form-control-smaller-width">
-              <option>Manual</option>
-              <option>Auto</option>
-            </select>
+            <select class="form-control inline form-control-smaller-width" ng-options="type as type for type in analysis.analysisTypes" ng-model="selectedAnalysisType" ng-change="analysis.setType()"></select>
             <span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>
           </div>
         </div>

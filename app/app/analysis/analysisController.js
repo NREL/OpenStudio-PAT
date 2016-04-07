@@ -17,11 +17,13 @@ export class AnalysisController {
 
     vm.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
 
+    vm.analysisTypes = vm.Project.getAnalysisTypes();
     vm.seeds = vm.Project.getSeeds();
     vm.weatherFiles = vm.Project.getWeatherFiles();
 
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
+    vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
     vm.$scope.measures = vm.BCL.getProjectMeasures();
 
@@ -169,6 +171,11 @@ export class AnalysisController {
   setWeatherFile() {
     const vm = this;
     vm.Project.setDefaultWeatherFile(vm.$scope.defaultWeatherFile);
+  }
+
+  setType() {
+    const vm = this;
+    vm.Project.setAnalysisType(vm.$scope.selectedAnalysisType);
   }
 
 
