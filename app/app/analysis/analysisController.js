@@ -39,7 +39,6 @@ export class AnalysisController {
     vm.analysisTypes = ['Manual', 'Auto'];
 
     vm.setGridOptions();
-
   }
 
   setGridOptions() {
@@ -55,15 +54,21 @@ export class AnalysisController {
         columnDefs: [{
           name: 'displayName',
           displayName: 'Name of Option',
-          enableHiding: false
+          enableHiding: false,
+          width: 200,
+          minWidth: 100
         }, {
           name: 'name',
           displayName: 'Short Name',
-          enableHiding: false
+          enableHiding: false,
+          width: 200,
+          minWidth: 100
         }, {
           name: 'variable',
           displayName: 'Variable',
           enableHiding: false,
+          width: 200,
+          minWidth: 100,
           type: 'boolean'
         }, {
           displayName: 'Option 1',
@@ -87,6 +92,8 @@ export class AnalysisController {
           '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
           ' </form></div>',
           enableHiding: false,
+          width: 200,
+          minWidth: 100,
           enableCellEdit: true
         }],
 
@@ -150,12 +157,43 @@ export class AnalysisController {
   addMeasureOption(measure) {
     const vm = this;
     vm.$log.debug('In addMeasureOption in analysis');
-    vm.$scope.gridOptions[measure.uid].columnDefs.push({field: 'option'});
+    vm.$scope.gridOptions[measure.uid].columnDefs.push({
+      //displayName: 'Option 1',
+      field: 'optionW',// TODO this needs to incremented
+      editDropdownOptionsFunction: function (rowEntity) {
+        if (rowEntity.type === 'Choice') {
+          vm.choices = [];
+          _.forEach(rowEntity.choices, (choice) => {
+            vm.choices.push({
+              value: choice.value
+            });
+          });
+          return vm.choices;
+        }
+      },
+      editableCellTemplate: '<div><form name=\"inputForm\">' +
+      '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
+      '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />' +
+      '<input ng-if=\"row.entity.type==\'Int\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+      '<input ng-if=\"row.entity.type==\'Double\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+      '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
+      ' </form></div>',
+      enableHiding: false,
+      width: 200,
+      minWidth: 100,
+      enableCellEdit: true
+    });
+
   }
 
-  duplicateOption() {
+  duplicateOption(measure) {
     const vm = this;
     vm.$log.debug('In duplicateOption in analysis');
+    vm.addMeasureOption(measure);
+
+    _.each(vm.$scope.gridOptions[measure.uid].data, function(row){
+      row.optionW = row.option;
+    });
   }
 
   duplicateMeasureAndOption() {
