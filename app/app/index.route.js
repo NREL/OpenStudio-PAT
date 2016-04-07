@@ -16,7 +16,7 @@ export function routerConfig($urlRouterProvider, stateHelperProvider) {
       url: '/design_alternatives',
       templateUrl: 'app/design_alts/designAlternatives.html',
       controller: 'DesignAlternativesController',
-      controllerAs: 'design_alternatives'
+      controllerAs: 'da'
     })
     .state({
       name: 'outputs',
