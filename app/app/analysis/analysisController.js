@@ -4,7 +4,7 @@ import * as path from 'path';
 
 export class AnalysisController {
 
-  constructor($log, BCL, $scope, $document) {
+  constructor($log, BCL, Project, $scope, $document) {
     'ngInject';
 
     const vm = this;
@@ -13,18 +13,15 @@ export class AnalysisController {
     vm.$scope = $scope;
     vm.$document = $document;
     vm.BCL = BCL;
+    vm.Project = Project;
 
     vm.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
-    vm.seedDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/seeds'));
-    vm.weatherDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/weather'));
 
-    vm.seeds = [];
-    vm.weatherFiles = [];
-    vm.setSeeds();
-    vm.setWeatherFiles();
-    // fields
-    vm.selected_seed = vm.seeds.length > 0 ? vm.seeds[0] : null;
-    vm.selected_weather = vm.weatherFiles.length > 0 ? vm.weatherFiles[0] : null;
+    vm.seeds = vm.Project.getSeeds();
+    vm.weatherFiles = vm.Project.getWeatherFiles();
+
+    vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
+    vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
 
     vm.$scope.measures = vm.BCL.getProjectMeasures();
 
@@ -40,8 +37,6 @@ export class AnalysisController {
     vm.analysisTypes = ['Manual', 'Auto'];
 
     vm.setGridOptions();
-
-
 
   }
 
@@ -123,28 +118,6 @@ export class AnalysisController {
     });
   }
 
-  setSeeds() {
-    const vm = this;
-    if (vm.jetpack.exists(vm.seedDir.cwd())) {
-      vm.seeds = vm.seedDir.find('.', {matching: '*.osm'}, 'relativePath');
-      _.forEach(vm.seeds, (seed, index) => {
-        vm.seeds[index] = _.replace(seed, './', '');
-      });
-    }
-    else vm.$log.error('The seeds directory (%s) does not exist', vm.seedDir.cwd());
-  }
-
-  setWeatherFiles() {
-    const vm = this;
-    if (vm.jetpack.exists(vm.weatherDir.cwd())) {
-      vm.weatherFiles = vm.weatherDir.find('.', {matching: '*.epw'}, 'relativePath');
-      _.forEach(vm.weatherFiles, (w, index) => {
-        vm.weatherFiles[index] = _.replace(w, './', '');
-      });
-    }
-    else vm.$log.error('The weather file directory (%s) does not exist', vm.weatherDir.cwd());
-  }
-
   addMeasure(type) {
     const vm = this;
     const types = [type];
@@ -187,4 +160,16 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
   }
+
+  setSeed() {
+    const vm = this;
+    vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
+  }
+
+  setWeatherFile() {
+    const vm = this;
+    vm.Project.setDefaultWeatherFile(vm.$scope.defaultWeatherFile);
+  }
+
+
 }
