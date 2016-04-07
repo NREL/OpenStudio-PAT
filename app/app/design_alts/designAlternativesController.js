@@ -10,6 +10,7 @@ export class DesignAlternativesController {
     vm.BCL = BCL;
     vm.Project = Project;
 
+    vm.selected = null;
     vm.measures = vm.BCL.getProjectMeasures();
 
     // TODO: temporary until options come in from analysis controller
@@ -171,7 +172,14 @@ export class DesignAlternativesController {
       }],
       onRegisterApi: function (gridApi) {
         vm.gridApi = gridApi;
-
+        gridApi.selection.on.rowSelectionChanged(null, row => {
+          if (row.isSelected) {
+            vm.selected = row.entity;
+          } else {
+            // No rows selected
+            vm.selected = null;
+          }
+        });
       }
     };
 
@@ -221,6 +229,16 @@ export class DesignAlternativesController {
         vm.$scope.alternatives.push(new_alt);
       });
     });
+  }
+
+  duplicateAlternative() {
+
+    const vm = this;
+    var dup_alt = angular.copy(vm.selected);
+    delete dup_alt.$$hashKey;
+    dup_alt.name = dup_alt.name + ' Duplicate';
+    vm.$scope.alternatives.push(dup_alt);
+
   }
 
   setNewAlternativeDefaults() {
