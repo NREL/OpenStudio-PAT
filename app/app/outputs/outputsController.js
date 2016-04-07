@@ -1,10 +1,15 @@
 export class OutputsController {
 
-  constructor() {
+  constructor($log, Project, $scope) {
     'ngInject';
 
     const vm = this;
-    vm.test = 'Outputs Controller';
+
+    vm.$log = $log;
+    vm.$scope = $scope;
+    vm.Project = Project;
+
+    vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
   }
 
