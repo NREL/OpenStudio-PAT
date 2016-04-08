@@ -3,14 +3,12 @@
     <div ng-include="'app/nav/nav.html'"></div>
   </div>
   <div class="main">
-    <div class="gray-top">
-      <div class="row">
-        <div class="col-md-6 pad-bot-20">
-          <label class="big-label">Reports</label>
-          <div class="input-group">
-            <select class="form-control inline form-control-smaller-width" ng-options="type as type for type in reports.reportTypes" ng-model="selectedReportType" ng-change="reports.setType()"></select>
-            <span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>
-          </div>
+    <div class="row">
+      <div class="col-md-6 pad-bot-20">
+        <label class="big-label">Reports</label>
+        <div class="input-group">
+          <select class="form-control inline form-control-smaller-width" ng-options="type as type for type in reports.reportTypes" ng-model="selectedReportType" ng-change="reports.setType()"></select>
+          <span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>
         </div>
       </div>
     </div>

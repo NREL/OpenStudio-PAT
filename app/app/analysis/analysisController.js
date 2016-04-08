@@ -155,46 +155,28 @@ export class AnalysisController {
   addMeasureOption(measure) {
     const vm = this;
     vm.$log.debug('In addMeasureOption in analysis');
-    vm.$scope.gridOptions[measure.uid].columnDefs.push({
-      //displayName: 'Option 1',
-      field: 'optionW',// TODO this needs to incremented
-      editDropdownOptionsFunction: function (rowEntity) {
-        if (rowEntity.type === 'Choice') {
-          vm.choices = [];
-          _.forEach(rowEntity.choices, (choice) => {
-            vm.choices.push({
-              value: choice.value
-            });
-          });
-          return vm.choices;
-        }
-      },
-      editableCellTemplate: '<div><form name=\"inputForm\">' +
-      '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
-      '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />' +
-      '<input ng-if=\"row.entity.type==\'Int\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-      '<input ng-if=\"row.entity.type==\'Double\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-      '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-      ' </form></div>',
-      enableHiding: false,
-      width: 200,
-      minWidth: 100,
-      enableCellEdit: true
-    });
 
+    let temp = angular.copy(vm.$scope.gridOptions[measure.uid].columnDefs[3]);
+    temp.name = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
+    temp.displayName = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
+    temp.field = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
+
+    vm.$scope.gridOptions[measure.uid].columnDefs.push(temp);
   }
 
   duplicateOption(measure) {
     const vm = this;
     vm.$log.debug('In duplicateOption in analysis');
+
     vm.addMeasureOption(measure);
 
+    const name = 'option' + (vm.$scope.gridOptions[measure.uid].columnDefs.length - 1);
     _.each(vm.$scope.gridOptions[measure.uid].data, function(row){
-      row.optionW = row.option;
+      row[name] = row.option;
     });
   }
 
-  duplicateMeasureAndOption() {
+  duplicateMeasureAndOption(measure) {
     const vm = this;
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
   }
