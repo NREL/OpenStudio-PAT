@@ -36,8 +36,6 @@ export class AnalysisController {
     vm.$scope.gridOptions = [];
     vm.$log.debug('PROJECT MEASURES RETRIEVED: ', vm.$scope.measures);
 
-    vm.analysisTypes = ['Manual', 'Auto'];
-
     vm.setGridOptions();
   }
 

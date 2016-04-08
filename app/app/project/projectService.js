@@ -29,6 +29,9 @@ export class Project {
     vm.analysisType = 'Manual';
     vm.analysisTypes = ['Manual', 'Auto'];
 
+    vm.reportType = 'Calibration Report';
+    vm.reportTypes = ['Calibration Report', 'Radiance Report', 'Parallel Coordinates', 'Radar Chart'];
+
   }
 
   setAnalysisType(name) {
@@ -44,6 +47,21 @@ export class Project {
   getAnalysisTypes(){
     const vm = this;
     return vm.analysisTypes;
+  }
+
+  setReportType(name) {
+    const vm = this;
+    vm.reportType = name;
+  }
+
+  getReportType(){
+    const vm = this;
+    return vm.reportType;
+  }
+
+  getReportTypes(){
+    const vm = this;
+    return vm.reportTypes;
   }
 
   setDefaultSeed(name) {
