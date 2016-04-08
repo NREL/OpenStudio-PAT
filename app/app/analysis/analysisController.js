@@ -36,7 +36,16 @@ export class AnalysisController {
     vm.$scope.gridOptions = [];
     vm.$log.debug('PROJECT MEASURES RETRIEVED: ', vm.$scope.measures);
 
+    vm.initMeasureOptions();
     vm.setGridOptions();
+  }
+
+  initMeasureOptions() {
+    const vm = this;
+
+    _.each(vm.$scope.measures, function(measure){
+      measure.options = [];
+    });
   }
 
   setGridOptions() {
@@ -184,6 +193,39 @@ export class AnalysisController {
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
   }
 
+  saveMeasureOption(measure) {
+    const vm = this;
+    vm.$log.debug('In saveMeasureOption in analysis');
+
+    const firstOptionColumnIndex = 3;
+    const numColumns = vm.$scope.gridOptions[measure.uid].columnDefs.length;
+
+    vm.$log.debug('numColumns: ', numColumns);
+
+    for(let i=0; i<numColumns-firstOptionColumnIndex; i++)
+    {
+      vm.$log.debug('inside loop');
+
+      //const name = 'option' + (i);
+      const name = 'option';
+
+      let columnOptions = [];
+
+      _.each(vm.$scope.gridOptions[measure.uid].data, function(row){
+        vm.$log.debug('row: ', row);
+        vm.$log.debug('row[name]: ', row[name]);
+        vm.$log.debug('row.option: ', row.option);
+        columnOptions.push(row[name]);
+      });
+
+      measure.options.push(columnOptions);
+
+    }
+
+    vm.$log.debug('measure.options: ', measure.options);
+
+  }
+
   setSeed() {
     const vm = this;
     vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
@@ -198,6 +240,5 @@ export class AnalysisController {
     const vm = this;
     vm.Project.setAnalysisType(vm.$scope.selectedAnalysisType);
   }
-
 
 }
