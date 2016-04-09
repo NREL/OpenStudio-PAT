@@ -3,8 +3,15 @@
     <div ng-include="'app/nav/nav.html'"></div>
   </div>
   <div class="main">
-    <p>
-      {{ run.test }}
-    </p>
+    <div class="row">
+      <div class="col-md-1 pad-bot-20">
+        <h4 class="pull-right">Run</h4>
+      </div>
+      <div class="col-md-3 pad-bot-20">
+        <div class="input-group">
+          <select class="form-control" ng-options="type as type for type in run.runTypes" ng-model="runType" ng-change="run.setRunType()"></select>
+        </div>
+      </div>
+    </div>
   </div>
 </div>

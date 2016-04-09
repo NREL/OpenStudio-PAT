@@ -32,6 +32,24 @@ export class Project {
     vm.reportType = 'Calibration Report';
     vm.reportTypes = ['Calibration Report', 'Radiance Report', 'Parallel Coordinates', 'Radar Chart'];
 
+    vm.runTypes = vm.getRunTypes();
+    vm.runType = vm.runTypes[0];
+
+  }
+
+  getRunTypes() {
+    const vm = this;
+    return ['Run Locally', 'Run on Cloud'];
+  }
+
+  getRunType() {
+    const vm = this;
+    return vm.runType;
+  }
+
+  setRunType(type) {
+    const vm = this;
+    vm.runType = type;
   }
 
   setAnalysisType(name) {
