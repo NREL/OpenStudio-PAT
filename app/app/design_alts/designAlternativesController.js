@@ -22,12 +22,12 @@ export class DesignAlternativesController {
     vm.defaultSeed = vm.Project.getDefaultSeed();
     vm.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
 
-    //vm.$log.debug("SEEDS: ", vm.seedsDropdownArr);
-    //vm.$log.debug("WEATHER: ", vm.weatherFilesDropdownArr);
-
     vm.$scope.alternatives = [];
     vm.$scope.gridOptions = [];
     vm.setGridOptions();
+
+    // start with drag functionality disabled
+    vm.$scope.dragDisabled = true;
 
   }
 
@@ -135,43 +135,56 @@ export class DesignAlternativesController {
 
     vm.$scope.gridOptions = {
       data: 'alternatives',
-      autoResize: true,
-      enableSorting: false,
-      enableCellEditOnFocus: true,
       enableHiding: false,
       enableColumnMenus: false,
+      enableRowSelection: true,
+      enableRowHeaderSelection: false,
+      enableSelectAll: false,
+      multiSelect: false,
       rowTemplate: '<div grid="grid" class="ui-grid-draggable-row" draggable="true"><div ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader, \'custom\': true }" ui-grid-cell></div></div>',
-      useUiGridDraggableRowsHandle: true,
       columnDefs: [{
         name: 'delete',
         displayName:'',
         enableCellEdit: false,
         cellClass: 'icon-cell',
         cellTemplate: '../app/design_alts/deleteButtonTemplate.html',
-        width:'5%'
+        cellEditableCondition: false,
+        width:'5%',
+        minWidth:'50'
       }, {
         name: 'name',
-        displayName: 'Name'
+        displayName: 'Name',
+        minWidth:'50',
+        cellEditableCondition: false
       }, {
         name: 'seed_model',
         displayName: 'Seed Model',
         editableCellTemplate: 'ui-grid/dropdownEditor',
         editDropdownIdLabel: 'name',
         editDropdownValueLabel: 'name',
-        editDropdownOptionsArray: vm.seedsDropdownArr
+        minWidth:'50',
+        editDropdownOptionsArray: vm.seedsDropdownArr,
+        cellEditableCondition: vm.$scope.dragDisabled
       }, {
         name: 'weather_file',
         displayName: 'Location or Weather File',
         editableCellTemplate: 'ui-grid/dropdownEditor',
         editDropdownIdLabel: 'name',
         editDropdownValueLabel: 'name',
-        editDropdownOptionsArray: vm.weatherFilesDropdownArr
+        minWidth:'50',
+        editDropdownOptionsArray: vm.weatherFilesDropdownArr,
+        cellEditableCondition: vm.$scope.dragDisabled
       }, {
         name: 'description',
-        displayName: 'Description'
+        displayName: 'Description',
+        minWidth:'50',
+        cellEditableCondition: vm.$scope.dragDisabled
       }],
       onRegisterApi: function (gridApi) {
-        vm.gridApi = gridApi;
+        vm.$scope.gridApi = gridApi;
+        vm.$log.debug('dragDisabled: ', vm.$scope.dragDisabled);
+        vm.$log.debug('options: ', vm.$scope.gridOptions);
+        gridApi.dragndrop.setDragDisabled(vm.$scope.dragDisabled);
         gridApi.selection.on.rowSelectionChanged(null, row => {
           if (row.isSelected) {
             vm.selected = row.entity;
@@ -180,6 +193,9 @@ export class DesignAlternativesController {
             vm.selected = null;
           }
         });
+        gridApi.cellNav.on.navigate(null, (newRowCol) => {
+          vm.gridApi.selection.selectRow(newRowCol.row.entity);
+        });
       }
     };
 
@@ -187,7 +203,7 @@ export class DesignAlternativesController {
     _.forEach(vm.measures, (measure) => {
       const optionsArr = vm.setOptionsArray(measure);
       vm.$log.debug(optionsArr);
-      vm.$scope.gridOptions.columnDefs.push({name: measure.name, display_name: measure.display_name, editableCellTemplate: 'ui-grid/dropdownEditor', editDropdownIdLabel: 'name', editDropdownValueLabel: 'name',
+      vm.$scope.gridOptions.columnDefs.push({name: measure.name, display_name: measure.display_name, minWidth:'50',cellEditableCondition: vm.$scope.dragDisabled, editableCellTemplate: 'ui-grid/dropdownEditor', editDropdownIdLabel: 'name', editDropdownValueLabel: 'name',
         editDropdownOptionsArray: optionsArr});
     });
   }
@@ -201,7 +217,6 @@ export class DesignAlternativesController {
       new_alt[measure.name] = 'None';
     });
     vm.$scope.alternatives.push(new_alt);
-    vm.$log.debug('ALTS: ', vm.$scope.alternatives);
   }
 
   deleteAlternative(alternative) {
@@ -258,7 +273,6 @@ export class DesignAlternativesController {
     var unique = _.isEmpty(_.filter(data, function (row, index) {
       return rowIndex != index && row.name == name;
     }));
-    //if (!unique && rowIndex != null) toaster.warning('Name must be unique', '"' + name + '" already exists.');
     return unique;
   }
 
@@ -269,5 +283,19 @@ export class DesignAlternativesController {
     return template({num: num});
   }
 
+  // TODO: fix this, it doesn't work
+  toggleDrag() {
+    const vm = this;
+    vm.$log.debug('in toggle function');
+    vm.clearAll(vm.$scope.gridApi);
+    vm.$log.debug('griAPI: ', vm.$scope.gridApi);
+    vm.$scope.dragDisabled = vm.$scope.dragDisabled ? false: true;
+    vm.$log.debug('dragDisabled: ', vm.$scope.dragDisabled);
+    vm.$scope.gridApi.dragndrop.setDragDisabled(vm.$scope.dragDisabled);
+  }
+
+  clearAll(gridApi) {
+    gridApi.selection.clearSelectedRows();
+  }
 
 }
