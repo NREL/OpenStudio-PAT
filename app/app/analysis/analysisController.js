@@ -43,7 +43,7 @@ export class AnalysisController {
   initMeasureOptions() {
     const vm = this;
 
-    _.each(vm.$scope.measures, function(measure){
+    _.forEach(vm.$scope.measures, (measure) => {
       measure.options = [];
     });
   }
@@ -168,7 +168,7 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In addMeasureOption in analysis');
 
-    let temp = angular.copy(vm.$scope.gridOptions[measure.uid].columnDefs[3]);
+    const temp = angular.copy(vm.$scope.gridOptions[measure.uid].columnDefs[3]);
     temp.name = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
     temp.displayName = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
     temp.field = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
@@ -183,7 +183,7 @@ export class AnalysisController {
     vm.addMeasureOption(measure);
 
     const name = 'option' + (vm.$scope.gridOptions[measure.uid].columnDefs.length - 1);
-    _.each(vm.$scope.gridOptions[measure.uid].data, function(row){
+    _.forEach(vm.$scope.gridOptions[measure.uid].data, (row) => {
       row[name] = row.option;
     });
   }
@@ -209,9 +209,9 @@ export class AnalysisController {
       //const name = 'option' + (i);
       const name = 'option';
 
-      let columnOptions = [];
+      const columnOptions = [];
 
-      _.each(vm.$scope.gridOptions[measure.uid].data, function(row){
+      _.forEach(vm.$scope.gridOptions[measure.uid].data, (row) => {
         vm.$log.debug('row: ', row);
         vm.$log.debug('row[name]: ', row[name]);
         vm.$log.debug('row.option: ', row.option);
