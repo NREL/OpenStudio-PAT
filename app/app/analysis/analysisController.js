@@ -31,6 +31,8 @@ export class AnalysisController {
     vm.$scope.epMeasures = [];
     vm.$scope.repMeasures = [];
 
+    vm.$scope.selectedAll = false;
+
     vm.setMeasureTypes();
 
     vm.$scope.gridOptions = [];
@@ -60,7 +62,7 @@ export class AnalysisController {
         enableCellEditOnFocus: true,
         columnDefs: [{
           name: 'displayName',
-          displayName: 'Name of Option',
+          displayName: 'Argument Name',
           enableHiding: false,
           width: 200,
           minWidth: 100
@@ -224,6 +226,21 @@ export class AnalysisController {
 
     vm.$log.debug('measure.options: ', measure.options);
 
+  }
+
+  checkAll(measure) {
+    const vm = this;
+    vm.$log.debug('In checkAll in analysis');
+
+    if (vm.$scope.selectedAll === false) {
+      vm.$scope.selectedAll = true;
+    } else {
+      vm.$scope.selectedAll = false;
+    }
+
+    _.forEach(vm.$scope.gridOptions[measure.uid].data, (row) => {
+      row.variable = vm.$scope.selectedAll ? true :false;
+    });
   }
 
   setSeed() {
