@@ -40,6 +40,7 @@ export class AnalysisController {
 
     vm.initMeasureOptions();
     vm.setGridOptions();
+    vm.setDefaultArguments();
   }
 
   initMeasureOptions() {
@@ -123,6 +124,26 @@ export class AnalysisController {
     });
   }
 
+  setDefaultArguments() {
+    const vm = this;
+    vm.$log.debug('In setDefaultArguments in analysis');
+
+    _.forEach(vm.$scope.measures, (measure) => {
+      vm.$log.debug('measure: ', measure);
+      _.forEach(measure.arguments, (argument) => {
+        if(!('option' in argument)) {
+          if((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.defaultValue))) {
+            vm.$log.debug('argument.defaultValue: ', argument.defaultValue);
+            argument.option = Number(argument.defaultValue);
+          }
+          else {
+            argument.option = argument.defaultValue;
+          }
+        }
+      });
+    });
+  }
+
   setMeasureTypes() {
     const vm = this;
     vm.$scope.osMeasures = [];
@@ -149,7 +170,6 @@ export class AnalysisController {
       vm.setGridOptions();
       vm.$log.debug('measures: ', vm.$scope.measures);
     });
-
   }
 
   removeMeasure(measure) {
@@ -163,7 +183,6 @@ export class AnalysisController {
 
     vm.setMeasureTypes();
     vm.setGridOptions();
-
   }
 
   addMeasureOption(measure) {
@@ -221,11 +240,8 @@ export class AnalysisController {
       });
 
       measure.options.push(columnOptions);
-
     }
-
     vm.$log.debug('measure.options: ', measure.options);
-
   }
 
   checkAll(measure) {
