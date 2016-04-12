@@ -129,11 +129,9 @@ export class AnalysisController {
     vm.$log.debug('In setDefaultArguments in analysis');
 
     _.forEach(vm.$scope.measures, (measure) => {
-      vm.$log.debug('measure: ', measure);
       _.forEach(measure.arguments, (argument) => {
         if(!('option' in argument)) {
           if((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.defaultValue))) {
-            vm.$log.debug('argument.defaultValue: ', argument.defaultValue);
             argument.option = Number(argument.defaultValue);
           }
           else {
