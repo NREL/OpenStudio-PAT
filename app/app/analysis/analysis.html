@@ -62,6 +62,7 @@
               <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)">2X Duplicate Option</button>
               <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">2X Duplicate Measure & Option</button>
               <button type="button" class="btn btn-success" ng-click="analysis.saveMeasureOption(measure)">Save Measure Option</button>
+              <p>Check All <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)" /></p>
             </div>
             <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
             </uib-accordion-group>
@@ -97,6 +98,7 @@
                 <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)">2X Duplicate Option</button>
                 <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">2X Duplicate Measure & Option</button>
                 <button type="button" class="btn btn-success" ng-click="analysis.saveMeasureOption(measure)">Save Measure Option</button>
+                <p>Check All <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)" /></p>
               </div>
               <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
             </uib-accordion-group>
@@ -132,6 +134,7 @@
                 <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)">2X Duplicate Option</button>
                 <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">2X Duplicate Measure & Option</button>
                 <button type="button" class="btn btn-success" ng-click="analysis.saveMeasureOption(measure)">Save Measure Option</button>
+                <p>Check All <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)" /></p>
               </div>
               <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
             </uib-accordion-group>

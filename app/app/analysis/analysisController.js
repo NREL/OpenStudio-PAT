@@ -31,6 +31,8 @@ export class AnalysisController {
     vm.$scope.epMeasures = [];
     vm.$scope.repMeasures = [];
 
+    vm.$scope.selectedAll = false;
+
     vm.setMeasureTypes();
 
     vm.$scope.gridOptions = [];
@@ -38,12 +40,13 @@ export class AnalysisController {
 
     vm.initMeasureOptions();
     vm.setGridOptions();
+    vm.setDefaultArguments();
   }
 
   initMeasureOptions() {
     const vm = this;
 
-    _.each(vm.$scope.measures, function(measure){
+    _.forEach(vm.$scope.measures, (measure) => {
       measure.options = [];
     });
   }
@@ -60,7 +63,7 @@ export class AnalysisController {
         enableCellEditOnFocus: true,
         columnDefs: [{
           name: 'displayName',
-          displayName: 'Name of Option',
+          displayName: 'Argument Name',
           enableHiding: false,
           width: 200,
           minWidth: 100
@@ -121,6 +124,24 @@ export class AnalysisController {
     });
   }
 
+  setDefaultArguments() {
+    const vm = this;
+    vm.$log.debug('In setDefaultArguments in analysis');
+
+    _.forEach(vm.$scope.measures, (measure) => {
+      _.forEach(measure.arguments, (argument) => {
+        if(!('option' in argument)) {
+          if((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.defaultValue))) {
+            argument.option = Number(argument.defaultValue);
+          }
+          else {
+            argument.option = argument.defaultValue;
+          }
+        }
+      });
+    });
+  }
+
   setMeasureTypes() {
     const vm = this;
     vm.$scope.osMeasures = [];
@@ -147,7 +168,6 @@ export class AnalysisController {
       vm.setGridOptions();
       vm.$log.debug('measures: ', vm.$scope.measures);
     });
-
   }
 
   removeMeasure(measure) {
@@ -161,14 +181,13 @@ export class AnalysisController {
 
     vm.setMeasureTypes();
     vm.setGridOptions();
-
   }
 
   addMeasureOption(measure) {
     const vm = this;
     vm.$log.debug('In addMeasureOption in analysis');
 
-    let temp = angular.copy(vm.$scope.gridOptions[measure.uid].columnDefs[3]);
+    const temp = angular.copy(vm.$scope.gridOptions[measure.uid].columnDefs[3]);
     temp.name = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
     temp.displayName = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
     temp.field = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
@@ -183,7 +202,7 @@ export class AnalysisController {
     vm.addMeasureOption(measure);
 
     const name = 'option' + (vm.$scope.gridOptions[measure.uid].columnDefs.length - 1);
-    _.each(vm.$scope.gridOptions[measure.uid].data, function(row){
+    _.forEach(vm.$scope.gridOptions[measure.uid].data, (row) => {
       row[name] = row.option;
     });
   }
@@ -209,9 +228,9 @@ export class AnalysisController {
       //const name = 'option' + (i);
       const name = 'option';
 
-      let columnOptions = [];
+      const columnOptions = [];
 
-      _.each(vm.$scope.gridOptions[measure.uid].data, function(row){
+      _.forEach(vm.$scope.gridOptions[measure.uid].data, (row) => {
         vm.$log.debug('row: ', row);
         vm.$log.debug('row[name]: ', row[name]);
         vm.$log.debug('row.option: ', row.option);
@@ -219,11 +238,23 @@ export class AnalysisController {
       });
 
       measure.options.push(columnOptions);
+    }
+    vm.$log.debug('measure.options: ', measure.options);
+  }
 
+  checkAll(measure) {
+    const vm = this;
+    vm.$log.debug('In checkAll in analysis');
+
+    if (vm.$scope.selectedAll === false) {
+      vm.$scope.selectedAll = true;
+    } else {
+      vm.$scope.selectedAll = false;
     }
 
-    vm.$log.debug('measure.options: ', measure.options);
-
+    _.forEach(vm.$scope.gridOptions[measure.uid].data, (row) => {
+      row.variable = vm.$scope.selectedAll ? true :false;
+    });
   }
 
   setSeed() {
