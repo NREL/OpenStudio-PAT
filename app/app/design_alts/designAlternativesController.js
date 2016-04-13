@@ -22,6 +22,8 @@ export class DesignAlternativesController {
     vm.defaultSeed = vm.Project.getDefaultSeed();
     vm.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
 
+    vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
+
     vm.$scope.alternatives = [];
     vm.$scope.gridOptions = [];
     vm.setGridOptions();
