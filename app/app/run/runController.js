@@ -11,6 +11,8 @@ export class RunController {
     vm.runTypes = vm.Project.getRunTypes();
     vm.$scope.runType = vm.Project.getRunType();
 
+    vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
+
   }
 
   setRunType() {
