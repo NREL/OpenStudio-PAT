@@ -13,5 +13,28 @@
         </div>
       </div>
     </div>
+
+    <div ng-show="runType == 'Run on Cloud'" class="row pad-bot-20">
+      <div class="col-md-8">
+        CLOUD SETTINGS GO HERE
+      </div>
+    </div>
+
+    <div ng-show="runType == 'Run Locally'" class="row pad-bot-20">
+      <div class="col-md-12">
+        <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()">Run Entire Workflow</button>
+        <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()">Cancel Run</button>
+        <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runSelected()">Run Selected</button>
+        <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runUpdated()">Run Updated Design Alternatives Only</button>
+        <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runEnergyPlus()">Run up to EnergyPlus</button>
+        <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runReportingMeasures()">Run Reporting Measures</button>
+      </div>
+    </div>
+
+    <div class="row pad-bot-20">
+      <div class="col-md-5">
+        <uib-progressbar class="progress-striped active" type="success" value="progress_amt">{{progress_amt}}</uib-progressbar>
+      </div>
+    </div>
   </div>
 </div>

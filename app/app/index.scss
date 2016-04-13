@@ -384,6 +384,12 @@ h5.measure-type {
   bottom: 0;
 }
 
+.btn-grayed {
+  color: #fff;
+  background-color: #333;
+  border-color: #4cae4c;
+}
+
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject
  *  all your sass files automatically
