@@ -28,8 +28,6 @@ export class DesignAlternativesController {
     vm.$scope.gridOptions = [];
     vm.setGridOptions();
 
-    // start with drag functionality disabled
-    vm.$scope.dragDisabled = true;
 
   }
 
@@ -145,51 +143,49 @@ export class DesignAlternativesController {
       enableSelectAll: false,
       excessRows: 10,
       multiSelect: false,
-      //rowTemplate: '<div grid="grid" class="ui-grid-draggable-row" draggable="true"><div ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell" ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader, \'custom\': true }" ui-grid-cell></div></div>',
-      rowTemplate: '<div ng-repeat="(colRenderIndex, col) in colContainer.renderedColumns track by col.colDef.name" class="ui-grid-cell ui-grid-draggable-row" draggable="true" ng-class="{ \'ui-grid-row-header-cell\': col.isRowHeader, \'custom\': true }" ui-grid-cell></div>',
       columnDefs: [{
         name: 'delete',
         displayName:'',
         enableCellEdit: false,
         cellClass: 'icon-cell',
         cellTemplate: '../app/design_alts/deleteButtonTemplate.html',
-        cellEditableCondition: false,
-        width:'5%',
+        width:'3%',
         minWidth:'50'
+      }, {
+        name: 'reorder',
+        displayName: '',
+        enableCellEdit: false,
+        cellClass: 'icon-cell',
+        cellTemplate: '../app/design_alts/reorderButtonTemplate.html',
+        width:'3%',
+        minWidth: '50'
       }, {
         name: 'name',
         displayName: 'Name',
-        minWidth:'50',
-        cellEditableCondition: false
+        minWidth:'150'
       }, {
         name: 'seed_model',
         displayName: 'Seed Model',
         editableCellTemplate: 'ui-grid/dropdownEditor',
         editDropdownIdLabel: 'name',
         editDropdownValueLabel: 'name',
-        minWidth:'50',
-        editDropdownOptionsArray: vm.seedsDropdownArr,
-        cellEditableCondition: vm.$scope.dragDisabled
-      }, {
+        minWidth:'100',
+        editDropdownOptionsArray: vm.seedsDropdownArr
+     }, {
         name: 'weather_file',
         displayName: 'Location or Weather File',
         editableCellTemplate: 'ui-grid/dropdownEditor',
         editDropdownIdLabel: 'name',
         editDropdownValueLabel: 'name',
-        minWidth:'50',
-        editDropdownOptionsArray: vm.weatherFilesDropdownArr,
-        cellEditableCondition: vm.$scope.dragDisabled
+        minWidth:'100',
+        editDropdownOptionsArray: vm.weatherFilesDropdownArr
       }, {
         name: 'description',
         displayName: 'Description',
-        minWidth:'50',
-        cellEditableCondition: vm.$scope.dragDisabled
+        minWidth:'100'
       }],
       onRegisterApi: function (gridApi) {
         vm.$scope.gridApi = gridApi;
-        vm.$log.debug('dragDisabled: ', vm.$scope.dragDisabled);
-        vm.$log.debug('options: ', vm.$scope.gridOptions);
-        gridApi.dragndrop.setDragDisabled(vm.$scope.dragDisabled);
         gridApi.selection.on.rowSelectionChanged(null, row => {
           if (row.isSelected) {
             vm.selected = row.entity;
@@ -208,7 +204,7 @@ export class DesignAlternativesController {
     _.forEach(vm.measures, (measure) => {
       const optionsArr = vm.setOptionsArray(measure);
       vm.$log.debug(optionsArr);
-      vm.$scope.gridOptions.columnDefs.push({name: measure.name, display_name: measure.display_name, minWidth:'50',cellEditableCondition: vm.$scope.dragDisabled, editableCellTemplate: 'ui-grid/dropdownEditor', editDropdownIdLabel: 'name', editDropdownValueLabel: 'name',
+      vm.$scope.gridOptions.columnDefs.push({name: measure.name, display_name: measure.display_name, minWidth:'100', editableCellTemplate: 'ui-grid/dropdownEditor', editDropdownIdLabel: 'name', editDropdownValueLabel: 'name',
         editDropdownOptionsArray: optionsArr});
     });
   }
@@ -230,6 +226,26 @@ export class DesignAlternativesController {
     const index = vm.$scope.alternatives.indexOf(alternative);
     vm.$scope.alternatives.splice(index, 1);
 
+  }
+
+  moveUp(alternative) {
+    const vm = this;
+    const index = vm.$scope.alternatives.indexOf(alternative);
+    if (index > 0){
+      const temp = angular.copy(vm.$scope.alternatives[index-1]);
+      vm.$scope.alternatives[index-1] = alternative;
+      vm.$scope.alternatives[index] = temp;
+    }
+  }
+
+  moveDown(alternative) {
+    const vm = this;
+    const index = vm.$scope.alternatives.indexOf(alternative);
+    if ((index + 1) != vm.$scope.alternatives.length){
+      const temp = angular.copy(vm.$scope.alternatives[index+1]);
+      vm.$scope.alternatives[index+1] = alternative;
+      vm.$scope.alternatives[index] = temp;
+    }
   }
 
   // create an alternative for each measure option
