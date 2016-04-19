@@ -58,11 +58,14 @@ export class ModalBclController {
     vm.getBCLMeasures();
     vm.resetFilters();
 
-    // temporary workaround until project measures service / JSON is implemented
-    // adds additional info
-    //vm.projectMeasures = vm.libMeasures.project;
-
     vm.$log.debug('DISPLAY MEASURES', vm.$scope.displayMeasures);
+
+    // TEMP: save one display measure to file
+    vm.temp_path = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/measure_hash.json'));
+    vm.temp = angular.copy(JSON.stringify(vm.$scope.displayMeasures[0]));
+    vm.$log.debug('STRING: ', vm.temp);
+    //vm.jetpack.write(vm.temp_path.path(), vm.temp, {atomic: true});
+    //vm.jetpack.write(vm.temp_path.path(), JSON.stringify());
 
     // Library grid
     vm.libraryGridOptions = {

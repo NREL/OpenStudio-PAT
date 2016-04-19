@@ -27,6 +27,32 @@ export class RunController {
   runEntireWorkflow() {
     const vm = this;
     vm.toggleButtons();
+
+    // 1: make/get OSA
+    // 2: make/get other files?
+    // 3: start server (local or remote)
+    // 4: hit serverAPI to start run
+    // 5: until complete, hit serverAPI for updates (errors, warnings, reports?)
+    // 6: toggle button back to 'run' when done
+
+
+  }
+
+  runCloud() {
+    const vm = this;
+    vm.toggleButtons();
+    // temp: save PAT format
+    // export OSA
+  }
+
+  exportPAT() {
+    const vm = this;
+
+  }
+
+  exportOSA() {
+    const vm = this;
+
   }
 
   runSelected() {

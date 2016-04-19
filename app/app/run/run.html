@@ -16,18 +16,29 @@
 
     <div ng-show="runType == 'Run on Cloud'" class="row pad-bot-20">
       <div class="col-md-8">
-        CLOUD SETTINGS GO HERE
+        <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runCloud()">Run Entire Workflow</button>
+        <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()">Cancel Run</button>
       </div>
     </div>
+
+    <div class="row pad-bot-20">
+      <div class="col-md-12">
+        TEMPORARY SECTION: &nbsp;&nbsp;
+        <button type="button" class="btn btn-info" ng-click="run.exportOSA()">Export to OSA</button>
+        <button type="button" class="btn btn-info" ng-click="run.exportPAT()">Export to PAT</button>
+      </div>
+    </div>
+
 
     <div ng-show="runType == 'Run Locally'" class="row pad-bot-20">
       <div class="col-md-12">
         <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()">Run Entire Workflow</button>
         <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()">Cancel Run</button>
-        <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runSelected()">Run Selected</button>
+       <!-- <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runSelected()">Run Selected</button>
         <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runUpdated()">Run Updated Design Alternatives Only</button>
         <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runEnergyPlus()">Run up to EnergyPlus</button>
         <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runReportingMeasures()">Run Reporting Measures</button>
+        -->
       </div>
     </div>
 

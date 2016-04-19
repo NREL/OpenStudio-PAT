@@ -162,4 +162,15 @@ export class Project {
     return vm.weatherFilesDropdownArr;
   }
 
+  // export variables to PAT.json
+  exportPAT() {
+
+
+  }
+
+  // import PAT.json file into variables (for existing projects)
+  importPAT() {
+
+  }
+
 }

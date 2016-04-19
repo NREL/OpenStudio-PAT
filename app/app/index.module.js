@@ -6,6 +6,7 @@ import { routerConfig } from './index.route';
 import { runBlock } from './index.run';
 import { BCL } from '../app/bcl/bclService';
 import { Project } from '../app/project/projectService';
+import { OsServer } from '../app/project/osServerService';
 import { ModalBclController } from '../app/bcl/modalBclController';
 import { NavController } from '../app/nav/navController';
 import { AnalysisController } from '../app/analysis/analysisController';
@@ -28,4 +29,5 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ReportsController', ReportsController)
   .controller('ServerController', ServerController)
   .service('Project', Project)
+  .service('OsServer', OsServer)
   .service('BCL', BCL);
