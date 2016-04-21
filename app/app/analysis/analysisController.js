@@ -188,8 +188,12 @@ export class AnalysisController {
     vm.$log.debug('In addMeasureOption in analysis');
 
     const temp = angular.copy(vm.$scope.gridOptions[measure.uid].columnDefs[3]);
-    temp.name = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
-    temp.displayName = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
+
+    // Note: Subtract 2 to create the correct auto-generated name
+    temp.name = 'Option ' + (vm.$scope.gridOptions[measure.uid].columnDefs.length - 2);
+    temp.displayName = 'Option ' + (vm.$scope.gridOptions[measure.uid].columnDefs.length - 2);
+
+    // Note: Use caution if changing the field's name: ensure data copying still works when using addMeasureOption.
     temp.field = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
 
     vm.$scope.gridOptions[measure.uid].columnDefs.push(temp);
@@ -201,6 +205,8 @@ export class AnalysisController {
 
     vm.addMeasureOption(measure);
 
+    // TODO note: For now, we grabbing the original, first option column.
+    // TODO       Eventually we will need to use the user-selected option column.
     const name = 'option' + (vm.$scope.gridOptions[measure.uid].columnDefs.length - 1);
     _.forEach(vm.$scope.gridOptions[measure.uid].data, (row) => {
       row[name] = row.option;
