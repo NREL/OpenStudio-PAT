@@ -33,6 +33,51 @@ export class AnalysisController {
 
     vm.$scope.selectedAll = false;
 
+    vm.samplingMethods = [{
+      name: 'Nondominated Sorting Genetic Algorithm 2',
+      shortName: 'NSGA2'
+    }, {
+      name: 'Strength Pareto Evolutionary Algorithm 2',
+      shortName: 'SPEA2'
+    }, {
+      name: 'Particle Swarm',
+      shortName: 'PSO'
+    }, {
+      name: 'R-GENetic Optimization Using Derivatives',
+      shortName: 'RGENOUD'
+    }, {
+      name: 'Optim',
+      shortName: 'L-BFGS-B'
+    }, {
+      name: 'Latin Hypercube Sampling',
+      shortName: 'LHS'
+    }, {
+      name: 'Morris Method',
+      shortName: 'Morris'
+    }, {
+      name: 'DesignOfExperiements',
+      shortName: 'DOE'
+    }, {
+      name: 'PreFlight',
+      shortName: 'PreFlight'
+    }, {
+      name: 'SingleRun',
+      shortName: 'SingleRun'
+    }, {
+      name: 'RepeatRun',
+      shortName: 'RepeatRun'
+    }, {
+      name: 'BaselinePerturbation',
+      shortName: 'BaselinePerturbation'
+    }];
+
+    vm.samplingMethod = {
+      name: 'Nondominated Sorting Genetic Algorithm 2',
+      shortName: 'NSGA2'
+    };
+
+    vm.$scope.selectedSamplingMethod = vm.getSamplingMethod();
+
     vm.setMeasureTypes();
 
     vm.$scope.gridOptions = [];
@@ -276,6 +321,21 @@ export class AnalysisController {
   setType() {
     const vm = this;
     vm.Project.setAnalysisType(vm.$scope.selectedAnalysisType);
+  }
+
+  setSamplingMethod(method) {
+    const vm = this;
+    vm.samplingMethod = method;
+  }
+
+  getSamplingMethod(){
+    const vm = this;
+    return vm.samplingMethod;
+  }
+
+  getSamplingMethods(){
+    const vm = this;
+    return vm.samplingMethods;
   }
 
 }
