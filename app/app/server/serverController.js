@@ -1,10 +1,17 @@
 export class ServerController {
 
-  constructor() {
+  constructor($log, OsServer, $sce) {
     'ngInject';
 
     const vm = this;
-    vm.test = 'Server Controller';
+    vm.OsServer = OsServer;
+    vm.$log = $log;
+    vm.$sce = $sce;
+
+    vm.serverStatus = vm.OsServer.getServerStatus();
+    vm.serverType = vm.OsServer.getServerType();
+    vm.serverURL = vm.OsServer.getServerURL();
+    vm.safeURL = vm.$sce.trustAsResourceUrl(vm.serverURL);
 
   }
 

@@ -3,8 +3,21 @@
     <div ng-include="'app/nav/nav.html'"></div>
   </div>
   <div class="main">
-    <p>
-      {{ server.test }}
-    </p>
+    <div class="row">
+      <div class="col-md-1">
+        <h4>Server</h4>
+      </div>
+    </div>
+    <div class="row">
+      <!-- todo: remove this -->
+      <div class="col-md-4">Status: {{server.serverStatus}}</div>
+      <div class="col-md-4">Type: {{server.serverType}}</div>
+      <div class="col-md-4">URL: {{server.serverURL}}</div>
+    </div>
+    <div ng-show="server.serverStatus =='started'" class="row">
+      <div class="col-md-12">
+      <iframe ng-src="{{server.safeURL}}" class="server-frame"></iframe>
+      </div>
+    </div>
   </div>
 </div>

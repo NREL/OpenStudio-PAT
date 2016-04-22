@@ -38,7 +38,7 @@ export class ModalBclController {
     vm.selected = null;
     vm.keyword = '';
 
-    // TODO: fix dirs (get from Electron settings)
+    // TODO: fix dirs (get from Project Service)
     vm.myMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
     vm.localDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
     vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/measures'));

@@ -9,8 +9,16 @@ export class Project {
     vm.$log = $log;
     vm.jetpack = jetpack;
 
+
+    // TODO: get some of these from electron settings?
     vm.seedDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/seeds'));
     vm.weatherDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/weather'));
+    vm.myMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    vm.localDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
+    vm.projectMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/measures'));
+    vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
+    vm.mongoDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/data/db'));
+    vm.railsDir = jetpack.cwd('Users/kflemin/repos/OpenStudio-server/server');
 
     vm.seeds = [];
     vm.weatherFiles = [];
@@ -33,13 +41,43 @@ export class Project {
     vm.reportTypes = ['Calibration Report', 'Radiance Report', 'Parallel Coordinates', 'Radar Chart'];
 
     vm.runTypes = vm.getRunTypes();
-    vm.runType = vm.runTypes[0];
+    vm.runType = vm.runTypes[0].name;
 
+  }
+
+  getProjectDir() {
+    const vm = this;
+    return vm.projectDir;
+  }
+
+  getProjectMeasuresDir() {
+    const vm = this;
+    return vm.projectMeasuresDir;
+  }
+
+  getLocalBCLDir() {
+    const vm = this;
+    return vm.localDir;
+  }
+
+  getMeasureDir() {
+    const vm = this;
+    return vm.myMeasuresDir;
+  }
+
+  getMongoDir() {
+    const vm = this;
+    return vm.mongoDir;
+  }
+
+  getRailsDir() {
+    const vm = this;
+    return vm.railsDir;
   }
 
   getRunTypes() {
     const vm = this;
-    return ['Run Locally', 'Run on Cloud'];
+    return [{displayName: 'Run Locally', name: 'local'}, {displayName:'Run on Cloud', name: 'remote'}];
   }
 
   getRunType() {

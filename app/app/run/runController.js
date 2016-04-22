@@ -1,18 +1,23 @@
 export class RunController {
 
-  constructor($log, Project, $scope) {
+  constructor($log, Project, OsServer, $scope) {
     'ngInject';
 
     const vm = this;
     vm.$log = $log;
     vm.$scope = $scope;
     vm.Project = Project;
-    vm.runTypes = ['Run Locally', 'Run on Cloud'];
-    vm.runTypes = vm.Project.getRunTypes();
+    vm.OsServer = OsServer;
 
+    vm.runTypes = vm.Project.getRunTypes();
     vm.$scope.runType = vm.Project.getRunType();
+
+    vm.$scope.selectedRunType = _.find(vm.runTypes, {name: vm.$scope.runType});
+    vm.$log.debug("RUN TYPE: ", vm.$scope.runType);  // this should be the name, not displayName
+
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.disabledButtons = false;
+    vm.$scope.progressMessage = '';
 
     // TODO: refresh this
     vm.$scope.progress_amt = 66;
@@ -21,7 +26,9 @@ export class RunController {
 
   setRunType() {
     const vm = this;
-    vm.Project.setRunType(vm.runType);
+    vm.Project.setRunType(vm.$scope.selectedRunType.name);
+    vm.$log.debug('RUN TYPE CHANGE: ', vm.$scope.selectedRunType.name);
+    vm.$scope.runType = vm.Project.getRunType();
   }
 
   runEntireWorkflow() {
@@ -30,19 +37,31 @@ export class RunController {
 
     // 1: make/get OSA
     // 2: make/get other files?
-    // 3: start server (local or remote)
-    // 4: hit serverAPI to start run
-    // 5: until complete, hit serverAPI for updates (errors, warnings, reports?)
-    // 6: toggle button back to 'run' when done
+
+    // 3: (if needed) start server (local or remote)
+    vm.status = vm.OsServer.getServerStatus();
+    if (vm.status != 'started'){
+      vm.$scope.progressMessage = 'Starting server';
+      // todo: .then() here?
+      response = vm.OsServer.startServer(vm.$scope.selectedRunType);
+      if (response) {
+        // 4: hit serverAPI to start run
+        // vm.$scope.progressMessage = 'Start run';
+
+        // 5: until complete, hit serverAPI for updates (errors, warnings, reports?)
+
+        // 6: toggle button back to 'run' when done
+
+      } else {
+        // ERROR
+        //TODO: display error message somewhere (toaster?)
+        vm.toggleButtons();
+      }
+
+    }
 
 
-  }
 
-  runCloud() {
-    const vm = this;
-    vm.toggleButtons();
-    // temp: save PAT format
-    // export OSA
   }
 
   exportPAT() {

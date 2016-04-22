@@ -29,11 +29,15 @@ select {
     height: 100vh;
     position: fixed;
   }
+  .server-frame {
+    height: 100vh;
+    width: 100%;
+  }
 }
 
 .main {
   background: white;
-  padding: 10px 20px 10px 55px;
+  padding: 0px 10px 5px 45px;
   width:100%;
 }
 
@@ -119,9 +123,16 @@ select {
 .pad-bot-20 {
   padding-bottom: 20px;
 }
+.pad-bot-10 {
+  padding-bottom: 10px;
+}
 
 .pad-top-20 {
   padding-top: 20px;
+}
+
+.pad-top-5 {
+  padding-top: 5px;
 }
 
 .margin-top-20 {
@@ -313,7 +324,7 @@ select {
 
 .gray-top {
   background-color:#D4D4D4;
-  padding:20px;
+  padding:5px;
   margin-bottom:20px;
 }
 
@@ -368,6 +379,7 @@ h5.measure-type {
   background-color: #333;
   border-color: #4cae4c;
 }
+
 
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject

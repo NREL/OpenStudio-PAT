@@ -4,20 +4,13 @@
   </div>
   <div class="main">
     <div class="row">
-      <div class="col-md-1 pad-bot-20">
-        <h4 class="pull-right">Run</h4>
+      <div class="col-md-1 pad-bot-10">
+        <h4>Run</h4>
       </div>
-      <div class="col-md-3 pad-bot-20">
+      <div class="col-md-5 pad-bot-20 pad-top-5">
         <div class="input-group">
-          <select class="form-control" ng-options="type as type for type in run.runTypes" ng-model="runType" ng-change="run.setRunType()"></select>
+          <select class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-change="run.setRunType()"></select>
         </div>
-      </div>
-    </div>
-
-    <div ng-show="runType == 'Run on Cloud'" class="row pad-bot-20">
-      <div class="col-md-8">
-        <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runCloud()">Run Entire Workflow</button>
-        <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()">Cancel Run</button>
       </div>
     </div>
 
@@ -29,16 +22,22 @@
       </div>
     </div>
 
+    <div ng-show="runType == 'remote'" class="row pad-bot-20">
+      <div class="col-md-8">
+        <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()">Run Entire Workflow</button>
+        <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()">Cancel Run</button>
+      </div>
+    </div>
 
-    <div ng-show="runType == 'Run Locally'" class="row pad-bot-20">
+    <div ng-show="runType == 'local'" class="row pad-bot-20">
       <div class="col-md-12">
         <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()">Run Entire Workflow</button>
         <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()">Cancel Run</button>
-       <!-- <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runSelected()">Run Selected</button>
-        <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runUpdated()">Run Updated Design Alternatives Only</button>
-        <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runEnergyPlus()">Run up to EnergyPlus</button>
-        <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runReportingMeasures()">Run Reporting Measures</button>
-        -->
+        <!-- <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runSelected()">Run Selected</button>
+          <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runUpdated()">Run Updated Design Alternatives Only</button>
+          <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runEnergyPlus()">Run up to EnergyPlus</button>
+          <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runReportingMeasures()">Run Reporting Measures</button>
+          -->
       </div>
     </div>
 
