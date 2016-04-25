@@ -70,6 +70,7 @@ export class RunController {
 
   exportPAT() {
     const vm = this;
+    vm.Project.exportPAT();
 
   }
 

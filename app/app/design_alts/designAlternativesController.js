@@ -28,6 +28,13 @@ export class DesignAlternativesController {
     vm.$scope.gridOptions = [];
     vm.setGridOptions();
 
+    // SAVE
+    vm.$scope.$on("$destroy", function handler() {
+
+      console.log("SAVING!");
+      vm.Project.setDesignAlternatives(vm.$scope.alternatives);
+    });
+
 
   }
 

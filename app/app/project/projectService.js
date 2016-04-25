@@ -9,15 +9,18 @@ export class Project {
     vm.$log = $log;
     vm.jetpack = jetpack;
 
+    vm.projectName = '';
+    // TODO: grab from PAT Electron settings. For now, default to 'the_project'
+    vm.setProjectName('the_project');
 
     // TODO: get some of these from electron settings?
-    vm.seedDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/seeds'));
-    vm.weatherDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/weather'));
+    vm.seedDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/seeds'));
+    vm.weatherDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/weather'));
     vm.myMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
     vm.localDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
-    vm.projectMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/measures'));
-    vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project'));
-    vm.mongoDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/data/db'));
+    vm.projectMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/measures'));
+    vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName));
+    vm.mongoDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/data/db'));
     vm.railsDir = jetpack.cwd('Users/kflemin/repos/OpenStudio-server/server');
 
     vm.seeds = [];
@@ -43,6 +46,30 @@ export class Project {
     vm.runTypes = vm.getRunTypes();
     vm.runType = vm.runTypes[0].name;
 
+    // TODO: save measure
+    vm.measures = [];
+    vm.designAlternatives = [];
+
+  }
+
+  getProjectName() {
+    const vm = this;
+    return vm.projectName;
+  }
+
+  setProjectName(name) {
+    const vm = this;
+    vm.projectName = name;
+  }
+
+  setDesignAlternatives(alts) {
+    const vm = this;
+    vm.designAlternatives = alts;
+  }
+
+  getDesignAlternatives(){
+    const vm = this;
+    return vm.designAlternatives;
   }
 
   getProjectDir() {
@@ -202,9 +229,25 @@ export class Project {
 
   // export variables to PAT.json
   exportPAT() {
+    const vm = this;
+    // general
+    vm.pat = {};
+    vm.pat.projectName = vm.projectName;
+    vm.pat.seed = vm.defaultSeed;
+    vm.pat.weather_file = vm.defaultWeatherFile;
+    vm.pat.analysis_type = vm.analysisType;
+    vm.pat.run_type = vm.runType;
+
+    // measures and options
 
 
+    // design alternatives
+    vm.pat.design_alternatives = vm.designAlternatives;
+
+    vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
+    vm.$log.debug('Project exported to pat.json');
   }
+
 
   // import PAT.json file into variables (for existing projects)
   importPAT() {
