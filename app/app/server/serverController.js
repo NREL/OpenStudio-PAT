@@ -13,6 +13,9 @@ export class ServerController {
     vm.serverURL = vm.OsServer.getServerURL();
     vm.safeURL = vm.$sce.trustAsResourceUrl(vm.serverURL);
 
+    // TODO: fake it for now
+    vm.serverStatus = 'started';
+
   }
 
 }

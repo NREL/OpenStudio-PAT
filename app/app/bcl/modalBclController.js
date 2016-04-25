@@ -61,10 +61,10 @@ export class ModalBclController {
     vm.$log.debug('DISPLAY MEASURES', vm.$scope.displayMeasures);
 
     // TEMP: save one display measure to file
-    vm.temp_path = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/measure_hash.json'));
-    const measureContent = vm.$scope.displayMeasures[0];
-    vm.$log.debug('MEASURE: ', measureContent);
-    vm.jetpack.write(vm.temp_path.path(), measureContent);
+    //vm.temp_path = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/measure_hash.json'));
+    //const measureContent = vm.$scope.displayMeasures[0];
+    //vm.$log.debug('MEASURE: ', measureContent);
+    //vm.jetpack.write(vm.temp_path.path(), measureContent);
 
     // Library grid
     vm.libraryGridOptions = {

@@ -20,7 +20,7 @@ export class RunController {
     vm.$scope.progressMessage = '';
 
     // TODO: refresh this
-    vm.$scope.progress_amt = 66;
+    vm.$scope.progressAmount = 0;
 
   }
 
@@ -41,10 +41,13 @@ export class RunController {
     // 3: (if needed) start server (local or remote)
     vm.status = vm.OsServer.getServerStatus();
     if (vm.status != 'started'){
+      vm.$scope.progressAmount = '15';
       vm.$scope.progressMessage = 'Starting server';
       // todo: .then() here?
-      response = vm.OsServer.startServer(vm.$scope.selectedRunType);
-      if (response) {
+      vm.response = vm.OsServer.startServer(vm.$scope.selectedRunType);
+
+      if (vm.response) {
+        vm.$scope.progressMessage = 'Server started';
         // 4: hit serverAPI to start run
         // vm.$scope.progressMessage = 'Start run';
 
@@ -53,6 +56,7 @@ export class RunController {
         // 6: toggle button back to 'run' when done
 
       } else {
+        vm.$scope.progressMessage = 'Server Error';
         // ERROR
         //TODO: display error message somewhere (toaster?)
         vm.toggleButtons();
@@ -103,6 +107,8 @@ export class RunController {
   cancelRun() {
     const vm = this;
     vm.toggleButtons();
+    vm.$scope.progressMessage = '';
+    vm.$scope.progressAmount = 0;
 
   }
 

@@ -54,13 +54,18 @@ export class OsServer {
   startServer(type='local', options={}) {
     const vm = this;
     if (type == 'local')
-      response = vm.remoteServer(options);
+      vm.response = vm.remoteServer(options);
     else
-      response = vm.localServer(options);
+      vm.response = vm.localServer(options);
 
-    return response
+    return vm.response;
 
   }
+
+  // only manual runs work now locally.
+  // must send ['batch_datapoints', 'batch_run_local'] as the 'analysis_type' to the CLI
+  // example .json and .zip in the project dir is a manual analysis.
+  // to run: pat_meta_cli run_analysis PATH_TO_PROJECT_JSON SERVER_URL -a ANALYSIS_TYPE_ARRAY
 
   // example OSA: https://github.com/NREL/OpenStudio-analysis-gem/blob/develop/spec/files/analysis/examples/medium_office_example.json
 
@@ -103,14 +108,14 @@ export class OsServer {
           const obj = jetpack.read(projectDir.path('local_configuration.json'), 'json');
           vm.setServerURL(obj['server_url']);
           vm.$log.debug('SERVER URL: ', vm.serverURL);
-          return true
+          return true;
 
         } else {
           // TODO: cleanup?
           if (error !== null) {
             console.log(`exec error: ${error}`);
           }
-          return false
+          return false;
         }
 
       });
