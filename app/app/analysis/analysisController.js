@@ -232,7 +232,7 @@ export class AnalysisController {
     // TODO: implement this
   }
 
-  // TODO: EVAN: you don't need this method
+  // TODO: do we need this method?
   saveMeasureOption(measure) {
     const vm = this;
     vm.$log.debug('In saveMeasureOption in analysis');

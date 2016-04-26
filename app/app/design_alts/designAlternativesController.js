@@ -200,7 +200,7 @@ export class DesignAlternativesController {
           }
         });
         gridApi.cellNav.on.navigate(null, (newRowCol) => {
-          vm.gridApi.selection.selectRow(newRowCol.row.entity);
+          vm.$scope.gridApi.selection.selectRow(newRowCol.row.entity);
         });
       }
     };
@@ -284,7 +284,6 @@ export class DesignAlternativesController {
   setNewAlternativeDefaults() {
     const vm = this;
     const newAlt = {};
-    console.log("alts: ", vm.$scope.alternatives);
     newAlt.name = vm.uniqueName(vm.$scope.alternatives, _.template('Alternative <%= num %>'));
     newAlt.seedModel = vm.defaultSeed;
     newAlt.weatherFile = vm.defaultWeatherFile;
@@ -303,8 +302,6 @@ export class DesignAlternativesController {
 
   uniqueName(data, template, num) {
     const vm = this;
-    console.log("data: ", data);
-    console.log("template: ", template);
     if (num === undefined) num = data.length + 1;
     while (!vm.checkUnique(data, template({num: num}))) num++;
     return template({num: num});

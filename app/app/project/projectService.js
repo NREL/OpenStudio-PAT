@@ -43,53 +43,18 @@ export class Project {
     vm.reportType = 'Calibration Report';
     vm.reportTypes = ['Calibration Report', 'Radiance Report', 'Parallel Coordinates', 'Radar Chart'];
 
-    vm.samplingMethods = [{
-      name: 'Nondominated Sorting Genetic Algorithm 2',
-      shortName: 'NSGA2'
-    }, {
-      name: 'Strength Pareto Evolutionary Algorithm 2',
-      shortName: 'SPEA2'
-    }, {
-      name: 'Particle Swarm',
-      shortName: 'PSO'
-    }, {
-      name: 'R-GENetic Optimization Using Derivatives',
-      shortName: 'RGENOUD'
-    }, {
-      name: 'Optim',
-      shortName: 'L-BFGS-B'
-    }, {
-      name: 'Latin Hypercube Sampling',
-      shortName: 'LHS'
-    }, {
-      name: 'Morris Method',
-      shortName: 'Morris'
-    }, {
-      name: 'DesignOfExperiements',
-      shortName: 'DOE'
-    }, {
-      name: 'PreFlight',
-      shortName: 'PreFlight'
-    }, {
-      name: 'SingleRun',
-      shortName: 'SingleRun'
-    }, {
-      name: 'RepeatRun',
-      shortName: 'RepeatRun'
-    }, {
-      name: 'BaselinePerturbation',
-      shortName: 'BaselinePerturbation'
-    }];
+    vm.samplingMethods = vm.setSamplingMethods();
 
     vm.samplingMethod = '';
 
     vm.runTypes = vm.getRunTypes();
-    vm.runType = vm.runTypes[0].name;
+    vm.runType = vm.runTypes[0];
 
     // TODO: load measures from PAT.json & project dir the first time around
     vm.measures = [];
     vm.designAlternatives = [];
 
+    // do this last...it will overwrite defaults
     vm.initializeProject();
 
   }
@@ -110,11 +75,11 @@ export class Project {
       }
 
       vm.projectName = vm.pat.projectName;
-      vm.defaultSeed = vm.pat.seed;
-      vm.defaultWeatherFile = vm.pat.weatherFile;
-      vm.analysisType = vm.pat.analysis_type;
-      vm.runType = vm.pat.runType;
-      vm.samplingMethod = vm.pat.samplingMethod;
+      vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
+      vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
+      vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
+      vm.runType = vm.pat.runType ? vm.pat.runType : vm.runType;
+      vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
     }
   }
 
@@ -260,6 +225,47 @@ export class Project {
   getSamplingMethods() {
     const vm = this;
     return vm.samplingMethods;
+  }
+
+  setSamplingMethods() {
+
+    return [{
+      name: 'Nondominated Sorting Genetic Algorithm 2',
+      shortName: 'NSGA2'
+    }, {
+      name: 'Strength Pareto Evolutionary Algorithm 2',
+      shortName: 'SPEA2'
+    }, {
+      name: 'Particle Swarm',
+      shortName: 'PSO'
+    }, {
+      name: 'R-GENetic Optimization Using Derivatives',
+      shortName: 'RGENOUD'
+    }, {
+      name: 'Optim',
+      shortName: 'L-BFGS-B'
+    }, {
+      name: 'Latin Hypercube Sampling',
+      shortName: 'LHS'
+    }, {
+      name: 'Morris Method',
+      shortName: 'Morris'
+    }, {
+      name: 'DesignOfExperiements',
+      shortName: 'DOE'
+    }, {
+      name: 'PreFlight',
+      shortName: 'PreFlight'
+    }, {
+      name: 'SingleRun',
+      shortName: 'SingleRun'
+    }, {
+      name: 'RepeatRun',
+      shortName: 'RepeatRun'
+    }, {
+      name: 'BaselinePerturbation',
+      shortName: 'BaselinePerturbation'
+    }];
   }
 
   getAnalysisTypes() {

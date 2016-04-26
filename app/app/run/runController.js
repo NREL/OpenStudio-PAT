@@ -10,10 +10,7 @@ export class RunController {
     vm.OsServer = OsServer;
 
     vm.runTypes = vm.Project.getRunTypes();
-    vm.$scope.runType = vm.Project.getRunType();
-
-    vm.$scope.selectedRunType = _.find(vm.runTypes, {name: vm.$scope.runType});
-    vm.$log.debug('RUN TYPE: ', vm.$scope.runType);  // this should be the name, not displayName
+    vm.$scope.selectedRunType = vm.Project.getRunType();
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.disabledButtons = false;
@@ -26,9 +23,8 @@ export class RunController {
 
   setRunType() {
     const vm = this;
-    vm.Project.setRunType(vm.$scope.selectedRunType.name);
-    vm.$log.debug('RUN TYPE CHANGE: ', vm.$scope.selectedRunType.name);
-    vm.$scope.runType = vm.Project.getRunType();
+    vm.Project.setRunType(vm.$scope.selectedRunType);
+    vm.$log.debug('RUN TYPE CHANGE: ', vm.$scope.selectedRunType);
   }
 
   runEntireWorkflow() {
