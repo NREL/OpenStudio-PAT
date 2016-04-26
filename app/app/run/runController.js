@@ -24,7 +24,6 @@ export class RunController {
   setRunType() {
     const vm = this;
     vm.Project.setRunType(vm.$scope.selectedRunType);
-    vm.$log.debug('RUN TYPE CHANGE: ', vm.$scope.selectedRunType);
   }
 
   runEntireWorkflow() {

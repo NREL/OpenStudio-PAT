@@ -22,14 +22,14 @@
       </div>
     </div>
 
-    <div ng-show="runType == 'remote'" class="row pad-bot-20">
+    <div ng-show="selectedRunType.name == 'remote'" class="row pad-bot-20">
       <div class="col-md-8">
         <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()">Run Entire Workflow</button>
         <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()">Cancel Run</button>
       </div>
     </div>
 
-    <div ng-show="runType == 'local'" class="row pad-bot-20">
+    <div ng-show="selectedRunType.name == 'local'" class="row pad-bot-20">
       <div class="col-md-12">
         <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()">Run Entire Workflow</button>
         <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()">Cancel Run</button>
