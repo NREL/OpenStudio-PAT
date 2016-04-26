@@ -5,7 +5,7 @@ import { parseString } from 'xml2js';
 import * as AdmZip from 'adm-zip';
 
 export class BCL {
-  constructor($q, $http, $uibModal, $log) {
+  constructor($q, $http, $uibModal, $log, Project) {
     'ngInject';
 
     const vm = this;
@@ -14,15 +14,15 @@ export class BCL {
     vm.$uibModal = $uibModal;
     vm.$q = $q;
     vm.$log = $log;
+    vm.Project = Project;
     vm.jetpack = jetpack;
     vm.AdmZip = AdmZip;
     vm.bclMeasures = [];
     vm.bclUrl = 'https://bcl.nrel.gov/api/';
 
-    // TODO: fix dirs (get from Electron settings)
-    vm.myMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
-    vm.localDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
-    vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/measures'));
+    vm.myMeasuresDir = vm.Project.getMeasureDir();
+    vm.localDir = vm.Project.getLocalBCLDir();
+    vm.projectDir = vm.Project.getProjectMeasuresDir();
 
     // assign measures by type
     vm.libMeasures = {

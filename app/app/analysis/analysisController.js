@@ -25,58 +25,26 @@ export class AnalysisController {
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
-    vm.$scope.measures = vm.BCL.getProjectMeasures();
+    vm.$scope.measures = vm.Project.getMeasuresAndOptions();
 
     vm.$scope.osMeasures = [];
     vm.$scope.epMeasures = [];
     vm.$scope.repMeasures = [];
 
+    // SAVE
+    vm.$scope.$on("$destroy", function handler() {
+      console.log("SAVING measures to ProjectService");
+      // TODO: options from table are not being saved properly
+      vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+    });
+
+    // TODO EVAN:  load columnDefs of already existing options (loaded from the measures variable)
+    // TODO EVAN:  clean up optionIDs  (right now it's option, option4, option5, ...)
+
     vm.$scope.selectedAll = false;
 
-    vm.samplingMethods = [{
-      name: 'Nondominated Sorting Genetic Algorithm 2',
-      shortName: 'NSGA2'
-    }, {
-      name: 'Strength Pareto Evolutionary Algorithm 2',
-      shortName: 'SPEA2'
-    }, {
-      name: 'Particle Swarm',
-      shortName: 'PSO'
-    }, {
-      name: 'R-GENetic Optimization Using Derivatives',
-      shortName: 'RGENOUD'
-    }, {
-      name: 'Optim',
-      shortName: 'L-BFGS-B'
-    }, {
-      name: 'Latin Hypercube Sampling',
-      shortName: 'LHS'
-    }, {
-      name: 'Morris Method',
-      shortName: 'Morris'
-    }, {
-      name: 'DesignOfExperiements',
-      shortName: 'DOE'
-    }, {
-      name: 'PreFlight',
-      shortName: 'PreFlight'
-    }, {
-      name: 'SingleRun',
-      shortName: 'SingleRun'
-    }, {
-      name: 'RepeatRun',
-      shortName: 'RepeatRun'
-    }, {
-      name: 'BaselinePerturbation',
-      shortName: 'BaselinePerturbation'
-    }];
-
-    vm.samplingMethod = {
-      name: 'Nondominated Sorting Genetic Algorithm 2',
-      shortName: 'NSGA2'
-    };
-
-    vm.$scope.selectedSamplingMethod = vm.getSamplingMethod();
+    vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
+    vm.samplingMethods = vm.Project.getSamplingMethods();
 
     vm.setMeasureTypes();
 
@@ -263,6 +231,7 @@ export class AnalysisController {
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
   }
 
+  // TODO: EVAN: you don't need this method
   saveMeasureOption(measure) {
     const vm = this;
     vm.$log.debug('In saveMeasureOption in analysis');
@@ -323,19 +292,10 @@ export class AnalysisController {
     vm.Project.setAnalysisType(vm.$scope.selectedAnalysisType);
   }
 
-  setSamplingMethod(method) {
+  setSamplingMethod() {
     const vm = this;
-    vm.samplingMethod = method;
+    vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
   }
 
-  getSamplingMethod(){
-    const vm = this;
-    return vm.samplingMethod;
-  }
-
-  getSamplingMethods(){
-    const vm = this;
-    return vm.samplingMethods;
-  }
 
 }

@@ -4,7 +4,7 @@ import * as os from 'os';
 
 export class ModalBclController {
 
-  constructor($log, $uibModalInstance, $scope, BCL, params) {
+  constructor($log, $uibModalInstance, $scope, BCL, params, Project) {
     'ngInject';
 
     const vm = this;
@@ -12,6 +12,7 @@ export class ModalBclController {
     vm.$log = $log;
     vm.$scope = $scope;
     vm.BCL = BCL;
+    vm.Project = Project;
     vm.jetpack = jetpack;
     vm.params = params;
 
@@ -38,10 +39,9 @@ export class ModalBclController {
     vm.selected = null;
     vm.keyword = '';
 
-    // TODO: fix dirs (get from Project Service)
-    vm.myMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
-    vm.localDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
-    vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/the_project/measures'));
+    vm.myMeasuresDir = vm.Project.getMeasureDir();
+    vm.localDir = vm.Project.getLocalBCLDir();
+    vm.projectDir = vm.Project.getProjectMeasuresDir();
 
     vm.$scope.categories = [];
     vm.getBCLCategories();
@@ -424,13 +424,10 @@ export class ModalBclController {
 
   ok() {
     const vm = this;
+    // save measures to project (reconcile) before closing
+    vm.$log.debug('Updating Project Measures in Project Service');
+    vm.Project.updateProjectMeasures(vm.libMeasures.project);
     vm.$uibModalInstance.close();
-  }
-
-  cancel() {
-    const vm = this;
-
-    vm.$uibModalInstance.dismiss('cancel');
   }
 
   search() {

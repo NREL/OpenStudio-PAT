@@ -43,12 +43,116 @@ export class Project {
     vm.reportType = 'Calibration Report';
     vm.reportTypes = ['Calibration Report', 'Radiance Report', 'Parallel Coordinates', 'Radar Chart'];
 
+    vm.samplingMethods = [{
+      name: 'Nondominated Sorting Genetic Algorithm 2',
+      shortName: 'NSGA2'
+    }, {
+      name: 'Strength Pareto Evolutionary Algorithm 2',
+      shortName: 'SPEA2'
+    }, {
+      name: 'Particle Swarm',
+      shortName: 'PSO'
+    }, {
+      name: 'R-GENetic Optimization Using Derivatives',
+      shortName: 'RGENOUD'
+    }, {
+      name: 'Optim',
+      shortName: 'L-BFGS-B'
+    }, {
+      name: 'Latin Hypercube Sampling',
+      shortName: 'LHS'
+    }, {
+      name: 'Morris Method',
+      shortName: 'Morris'
+    }, {
+      name: 'DesignOfExperiements',
+      shortName: 'DOE'
+    }, {
+      name: 'PreFlight',
+      shortName: 'PreFlight'
+    }, {
+      name: 'SingleRun',
+      shortName: 'SingleRun'
+    }, {
+      name: 'RepeatRun',
+      shortName: 'RepeatRun'
+    }, {
+      name: 'BaselinePerturbation',
+      shortName: 'BaselinePerturbation'
+    }];
+
+    vm.samplingMethod = '';
+
     vm.runTypes = vm.getRunTypes();
     vm.runType = vm.runTypes[0].name;
 
-    // TODO: save measure
+    // TODO: load measures from PAT.json & project dir the first time around
     vm.measures = [];
     vm.designAlternatives = [];
+
+    vm.initializeProject();
+
+  }
+
+  // import from pat.json
+  initializeProject() {
+    const vm = this;
+    if (vm.jetpack.exists(vm.projectDir.path('pat.json'))) {
+      vm.pat = vm.jetpack.read(vm.projectDir.path('pat.json'), 'json');
+
+      vm.measures = vm.pat.measures;
+      vm.designAlternatives = vm.pat.design_alternatives;
+
+      vm.projectName = vm.pat.projectName;
+      vm.defaultSeed = vm.pat.seed;
+      vm.defaultWeatherFile = vm.pat.weather_file;
+      vm.analysisType = vm.pat.analysis_type;
+      vm.runType = vm.pat.run_type;
+      vm.samplingMethod = vm.pat.samplingMethod;
+    }
+  }
+
+  // export variables to pat.json
+  exportPAT() {
+    const vm = this;
+    // general
+    vm.pat = {};
+    vm.pat.projectName = vm.projectName;
+    vm.pat.seed = vm.defaultSeed;
+    vm.pat.weather_file = vm.defaultWeatherFile;
+    vm.pat.analysis_type = vm.analysisType;
+    vm.pat.run_type = vm.runType;
+    vm.pat.samplingMethod = vm.samplingMethod;
+
+    // measures and options
+    vm.pat.measures = vm.measures;
+
+    // design alternatives
+    vm.pat.design_alternatives = vm.designAlternatives;
+
+    vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
+    vm.$log.debug('Project exported to pat.json');
+  }
+
+  // reconcile measures and save
+  updateProjectMeasures(updatedMeasures) {
+
+    const vm = this;
+    let newMeasures = [];
+
+    _.forEach(updatedMeasures, (measure) => {
+      let match = _.find(vm.measures, {uid: measure.uid});
+      if (angular.isDefined(match)){
+        // if there's a match, merge (update)
+        angular.merge(match, measure);
+        newMeasures.push(match);
+      } else {
+        // otherwise add
+        newMeasures.push(measure);
+      }
+    });
+
+    vm.setMeasuresAndOptions(newMeasures);
 
   }
 
@@ -70,6 +174,16 @@ export class Project {
   getDesignAlternatives(){
     const vm = this;
     return vm.designAlternatives;
+  }
+
+  setMeasuresAndOptions(measures) {
+    const vm = this;
+    vm.measures = measures;
+  }
+
+  getMeasuresAndOptions() {
+    const vm = this;
+    return vm.measures;
   }
 
   getProjectDir() {
@@ -125,6 +239,21 @@ export class Project {
   getAnalysisType(){
     const vm = this;
     return vm.analysisType;
+  }
+
+  setSamplingMethod(method) {
+    const vm = this;
+    vm.samplingMethod = method;
+  }
+
+  getSamplingMethod() {
+    const vm = this;
+    return vm.samplingMethod;
+  }
+
+  getSamplingMethods(){
+    const vm = this;
+    return vm.samplingMethods;
   }
 
   getAnalysisTypes(){
@@ -225,33 +354,6 @@ export class Project {
   getWeatherFilesDropdownArr() {
     const vm = this;
     return vm.weatherFilesDropdownArr;
-  }
-
-  // export variables to PAT.json
-  exportPAT() {
-    const vm = this;
-    // general
-    vm.pat = {};
-    vm.pat.projectName = vm.projectName;
-    vm.pat.seed = vm.defaultSeed;
-    vm.pat.weather_file = vm.defaultWeatherFile;
-    vm.pat.analysis_type = vm.analysisType;
-    vm.pat.run_type = vm.runType;
-
-    // measures and options
-
-
-    // design alternatives
-    vm.pat.design_alternatives = vm.designAlternatives;
-
-    vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
-    vm.$log.debug('Project exported to pat.json');
-  }
-
-
-  // import PAT.json file into variables (for existing projects)
-  importPAT() {
-
   }
 
 }

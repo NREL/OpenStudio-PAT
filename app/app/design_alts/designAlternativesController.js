@@ -24,17 +24,15 @@ export class DesignAlternativesController {
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
-    vm.$scope.alternatives = [];
+    vm.$scope.alternatives = vm.Project.getDesignAlternatives();
     vm.$scope.gridOptions = [];
     vm.setGridOptions();
 
     // SAVE
     vm.$scope.$on("$destroy", function handler() {
-
-      console.log("SAVING!");
+      console.log("SAVING design alternatives to ProjectService");
       vm.Project.setDesignAlternatives(vm.$scope.alternatives);
     });
-
 
   }
 

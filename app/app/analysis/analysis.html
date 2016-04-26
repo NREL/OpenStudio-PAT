@@ -17,10 +17,12 @@
       </div>
       <div class="row">
         <div class="col-md-4 pad-bot-20">
-          <label class="medium-label">Sampling Method</label>
-          <div class="input-group">
-            <select class="form-control inline form-control-smaller-width" ng-options="method.name for method in analysis.samplingMethods track by method.shortName" ng-model="selectedSamplingMethod" ng-change="analysis.setSamplingMethod()"></select>
-            <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
+          <div ng-show="selectedAnalysisType=='Algorithmic'">
+            <label class="medium-label">Sampling Method</label>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width" ng-options="method.name for method in analysis.samplingMethods track by method.shortName" ng-model="selectedSamplingMethod" ng-change="analysis.setSamplingMethod()"></select>
+              <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
+            </div>
           </div>
         </div>
         <div class="col-md-3 pad-bot-20">
