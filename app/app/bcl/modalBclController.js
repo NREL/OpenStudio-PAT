@@ -1,6 +1,4 @@
 import * as jetpack from 'fs-jetpack';
-import * as path from 'path';
-import * as os from 'os';
 
 export class ModalBclController {
 
@@ -262,7 +260,7 @@ export class ModalBclController {
   // filter measure by BCL categories
   resetCategoryFilters(level = null, namesArr = []) {
     const vm = this;
-    let catsArr = [];
+    const catsArr = [];
 
     vm.$log.debug('level: ', level, ' namesArr: ', namesArr);
 
@@ -282,7 +280,7 @@ export class ModalBclController {
         });
       } else if (level == 2) {
         _.forEach(vm.$scope.categories, (cat1) => {
-          if (cat1.name == namesArr[0]){
+          if (cat1.name == namesArr[0]) {
             _.forEach(cat1.children, (cat2) => {
               if (cat2.name == namesArr[1]) {
                 _.forEach(cat2.children, (cat3) => {
@@ -298,11 +296,11 @@ export class ModalBclController {
         });
       } else if (level == 3) {
         _.forEach(vm.$scope.categories, (cat1) => {
-          if (cat1.name == namesArr[0]){
+          if (cat1.name == namesArr[0]) {
             _.forEach(cat1.children, (cat2) => {
               if (cat2.name == namesArr[1]) {
                 _.forEach(cat2.children, (cat3) => {
-                  if (cat3.name == namesArr[2]){
+                  if (cat3.name == namesArr[2]) {
                     if (cat3.checked == false) {
                       cat2.checked = cat3.checked;
                       cat1.checked = cat3.checked;

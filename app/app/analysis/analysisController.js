@@ -32,8 +32,8 @@ export class AnalysisController {
     vm.$scope.repMeasures = [];
 
     // SAVE
-    vm.$scope.$on("$destroy", function handler() {
-      console.log("SAVING measures to ProjectService");
+    vm.$scope.$on('$destroy', function handler() {
+      console.log('SAVING measures to ProjectService');
       // TODO: options from table are not being saved properly
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
     });
@@ -143,8 +143,8 @@ export class AnalysisController {
 
     _.forEach(vm.$scope.measures, (measure) => {
       _.forEach(measure.arguments, (argument) => {
-        if(!('option' in argument)) {
-          if((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.defaultValue))) {
+        if (!('option' in argument)) {
+          if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.defaultValue))) {
             argument.option = Number(argument.defaultValue);
           }
           else {
@@ -174,7 +174,7 @@ export class AnalysisController {
   addMeasure(type) {
     const vm = this;
     const types = [type];
-    vm.BCL.openBCLModal(types, [], false).then( () => {
+    vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
       vm.$scope.measures = vm.BCL.getProjectMeasures();
       vm.setMeasureTypes();
@@ -189,7 +189,7 @@ export class AnalysisController {
     // TODO: fix so BCL modal doesn't restore deleted panels
     _.remove(vm.$scope.measures, {uid: measure.uid});
 
-    const measurePanel = angular.element(vm.$document[0].querySelector('div[id="'+measure.uid+'"]'));
+    const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.uid + '"]'));
     measurePanel.remove();
 
     vm.setMeasureTypes();
@@ -229,6 +229,7 @@ export class AnalysisController {
   duplicateMeasureAndOption(measure) {
     const vm = this;
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
+    // TODO: implement this
   }
 
   // TODO: EVAN: you don't need this method
@@ -241,8 +242,7 @@ export class AnalysisController {
 
     vm.$log.debug('numColumns: ', numColumns);
 
-    for(let i=0; i<numColumns-firstOptionColumnIndex; i++)
-    {
+    for (let i = 0; i < numColumns - firstOptionColumnIndex; i++) {
       vm.$log.debug('inside loop');
 
       //const name = 'option' + (i);
@@ -273,7 +273,7 @@ export class AnalysisController {
     }
 
     _.forEach(vm.$scope.gridOptions[measure.uid].data, (row) => {
-      row.variable = vm.$scope.selectedAll ? true :false;
+      row.variable = vm.$scope.selectedAll ? true : false;
     });
   }
 

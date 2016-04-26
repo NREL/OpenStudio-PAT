@@ -101,13 +101,19 @@ export class Project {
       vm.pat = vm.jetpack.read(vm.projectDir.path('pat.json'), 'json');
 
       vm.measures = vm.pat.measures;
-      vm.designAlternatives = vm.pat.design_alternatives;
+      if (!angular.isDefined(vm.measures)) {
+        vm.measures = [];
+      }
+      vm.designAlternatives = vm.pat.designAlternatives;
+      if (!angular.isDefined(vm.designAlternatives)) {
+        vm.designAlternatives = [];
+      }
 
       vm.projectName = vm.pat.projectName;
       vm.defaultSeed = vm.pat.seed;
-      vm.defaultWeatherFile = vm.pat.weather_file;
+      vm.defaultWeatherFile = vm.pat.weatherFile;
       vm.analysisType = vm.pat.analysis_type;
-      vm.runType = vm.pat.run_type;
+      vm.runType = vm.pat.runType;
       vm.samplingMethod = vm.pat.samplingMethod;
     }
   }
@@ -119,16 +125,16 @@ export class Project {
     vm.pat = {};
     vm.pat.projectName = vm.projectName;
     vm.pat.seed = vm.defaultSeed;
-    vm.pat.weather_file = vm.defaultWeatherFile;
+    vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType;
-    vm.pat.run_type = vm.runType;
+    vm.pat.runType = vm.runType;
     vm.pat.samplingMethod = vm.samplingMethod;
 
     // measures and options
     vm.pat.measures = vm.measures;
 
     // design alternatives
-    vm.pat.design_alternatives = vm.designAlternatives;
+    vm.pat.designAlternatives = vm.designAlternatives;
 
     vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
     vm.$log.debug('Project exported to pat.json');
@@ -138,11 +144,11 @@ export class Project {
   updateProjectMeasures(updatedMeasures) {
 
     const vm = this;
-    let newMeasures = [];
+    const newMeasures = [];
 
     _.forEach(updatedMeasures, (measure) => {
-      let match = _.find(vm.measures, {uid: measure.uid});
-      if (angular.isDefined(match)){
+      const match = _.find(vm.measures, {uid: measure.uid});
+      if (angular.isDefined(match)) {
         // if there's a match, merge (update)
         angular.merge(match, measure);
         newMeasures.push(match);
@@ -171,7 +177,7 @@ export class Project {
     vm.designAlternatives = alts;
   }
 
-  getDesignAlternatives(){
+  getDesignAlternatives() {
     const vm = this;
     return vm.designAlternatives;
   }
@@ -217,8 +223,8 @@ export class Project {
   }
 
   getRunTypes() {
-    const vm = this;
-    return [{displayName: 'Run Locally', name: 'local'}, {displayName:'Run on Cloud', name: 'remote'}];
+
+    return [{displayName: 'Run Locally', name: 'local'}, {displayName: 'Run on Cloud', name: 'remote'}];
   }
 
   getRunType() {
@@ -236,7 +242,7 @@ export class Project {
     vm.analysisType = name;
   }
 
-  getAnalysisType(){
+  getAnalysisType() {
     const vm = this;
     return vm.analysisType;
   }
@@ -251,12 +257,12 @@ export class Project {
     return vm.samplingMethod;
   }
 
-  getSamplingMethods(){
+  getSamplingMethods() {
     const vm = this;
     return vm.samplingMethods;
   }
 
-  getAnalysisTypes(){
+  getAnalysisTypes() {
     const vm = this;
     return vm.analysisTypes;
   }
@@ -266,12 +272,12 @@ export class Project {
     vm.reportType = name;
   }
 
-  getReportType(){
+  getReportType() {
     const vm = this;
     return vm.reportType;
   }
 
-  getReportTypes(){
+  getReportTypes() {
     const vm = this;
     return vm.reportTypes;
   }
@@ -280,6 +286,7 @@ export class Project {
     const vm = this;
     vm.defaultSeed = name;
   }
+
   getDefaultSeed() {
     const vm = this;
     return vm.defaultSeed;

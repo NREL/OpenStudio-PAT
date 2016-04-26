@@ -13,7 +13,7 @@ export class RunController {
     vm.$scope.runType = vm.Project.getRunType();
 
     vm.$scope.selectedRunType = _.find(vm.runTypes, {name: vm.$scope.runType});
-    vm.$log.debug("RUN TYPE: ", vm.$scope.runType);  // this should be the name, not displayName
+    vm.$log.debug('RUN TYPE: ', vm.$scope.runType);  // this should be the name, not displayName
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.disabledButtons = false;
@@ -40,7 +40,7 @@ export class RunController {
 
     // 3: (if needed) start server (local or remote)
     vm.status = vm.OsServer.getServerStatus();
-    if (vm.status != 'started'){
+    if (vm.status != 'started') {
       vm.$scope.progressAmount = '15';
       vm.$scope.progressMessage = 'Starting server';
       // todo: .then() here?
@@ -61,11 +61,7 @@ export class RunController {
         //TODO: display error message somewhere (toaster?)
         vm.toggleButtons();
       }
-
     }
-
-
-
   }
 
   exportPAT() {
@@ -76,7 +72,7 @@ export class RunController {
 
   exportOSA() {
     const vm = this;
-
+    // TODO: implement
   }
 
   runSelected() {

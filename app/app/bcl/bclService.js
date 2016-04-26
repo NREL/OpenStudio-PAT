@@ -1,6 +1,4 @@
 import * as jetpack from 'fs-jetpack';
-import * as path from 'path';
-import * as os from 'os';
 import { parseString } from 'xml2js';
 import * as AdmZip from 'adm-zip';
 
@@ -40,7 +38,7 @@ export class BCL {
   }
 
   // TODO: these may need refactor after JSON is implemented
-  setProjectMeasures(measures){
+  setProjectMeasures(measures) {
     const vm = this;
     vm.libMeasures.project = measures;
     //vm.projectMeasures = vm.libMeasures.project;
@@ -399,7 +397,7 @@ export class BCL {
       }
     });
 
-    modalInstance.result.then( () => {
+    modalInstance.result.then(() => {
       deferred.resolve();
     }, () => {
       // Modal canceled

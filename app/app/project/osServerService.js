@@ -1,6 +1,4 @@
 import * as jetpack from 'fs-jetpack';
-import * as os from 'os';
-import * as path from 'path';
 
 export class OsServer {
   constructor($log, Project) {
@@ -51,7 +49,7 @@ export class OsServer {
   }
 
   // start server (remote or local)
-  startServer(type='local', options={}) {
+  startServer(type = 'local', options = {}) {
     const vm = this;
     if (type == 'local')
       vm.response = vm.remoteServer(options);
@@ -69,7 +67,7 @@ export class OsServer {
 
   // example OSA: https://github.com/NREL/OpenStudio-analysis-gem/blob/develop/spec/files/analysis/examples/medium_office_example.json
 
-  remoteServer(options={}) {
+  remoteServer(options = {}) {
     const vm = this;
 
     // TODO: any other options need to be passed in (aws_config.yml, server options?)
@@ -80,7 +78,7 @@ export class OsServer {
 
   }
 
-  localServer(options={}) {
+  localServer(options = {}) {
     // ruby pat_meta_cli start_local PROJECT_DIR, MONGO_DIR, SERVER_DIR
     // returns rails URL (local)
     // assume PAT project folder has a 'logs' and a 'data/db' folder for this to work
@@ -93,7 +91,7 @@ export class OsServer {
     vm.jetpack.remove(projectDir.path('local_configuration.receipt'));
 
     // run META CLI will return status code: 0 = success, 1 = failure
-    let child = vm.exec('cd /Users/kflemin/repos/pat_meta_cli/bin && ruby openstudio_meta start_local /Users/kflemin/OpenStudio/PAT/the_project /Users/kflemin/OpenStudio/PAT/the_project/data/db /Users/kflemin/repos/OpenStudio-server/server',
+    const child = vm.exec('cd /Users/kflemin/repos/pat_meta_cli/bin && ruby openstudio_meta start_local /Users/kflemin/OpenStudio/PAT/the_project /Users/kflemin/OpenStudio/PAT/the_project/data/db /Users/kflemin/repos/OpenStudio-server/server',
       (error, stdout, stderr) => {
         console.log('THE PROCESS TERMINATED!');
         console.log('EXIT CODE: ', child.exitCode);
@@ -106,7 +104,7 @@ export class OsServer {
           vm.setServerStatus('started');
           // get url from local_configuration.json
           const obj = jetpack.read(projectDir.path('local_configuration.json'), 'json');
-          vm.setServerURL(obj['server_url']);
+          vm.setServerURL(obj.server_url);
           vm.$log.debug('SERVER URL: ', vm.serverURL);
           return true;
 
@@ -121,7 +119,6 @@ export class OsServer {
       });
 
 
-
     //let child = vm.exec('sleep 5 && echo \'hello\'',
     //  (error, stdout, stderr) => {
     //    console.log(`stdout: ${stdout}`);
@@ -132,7 +129,6 @@ export class OsServer {
     //    }
     //  }
     //);
-
 
 
   }
