@@ -38,7 +38,6 @@ export class AnalysisController {
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
     });
 
-    // TODO EVAN:  load columnDefs of already existing options (loaded from the measures variable)
     // TODO EVAN:  clean up optionIDs  (right now it's option, option4, option5, ...)
 
     vm.$scope.selectedAll = false;
@@ -54,6 +53,12 @@ export class AnalysisController {
     vm.initMeasureOptions();
     vm.setGridOptions();
     vm.setDefaultArguments();
+
+    _.forEach(vm.$scope.measures, (measure) => {
+      vm.loadMeaaureOptions(measure);
+    });
+
+
   }
 
   initMeasureOptions() {
@@ -230,6 +235,36 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
     // TODO: implement this
+  }
+
+  // TODO EVAN:  load columnDefs of already existing options (loaded from the measures variable)
+  loadMeaaureOptions(measure) {
+    const vm = this;
+    vm.$log.debug('In loadMeaaureOptions in analysis');
+
+    let numCols = vm.$scope.gridOptions[measure.uid].columnDefs.length;
+    vm.$log.debug('numColumns: ', numCols);
+
+    let maxKeys = 0;
+    _.forEach(measure.arguments, (argument) => {
+      let numKeys = _.keys(argument).length;
+      if (numKeys > maxKeys) {
+        maxKeys = numKeys;
+      }
+    });
+    vm.$log.debug('maxKeys: ', maxKeys);
+
+    const firstOptionColumnIndex = 10;
+
+    for (let i = 0; i < maxKeys - firstOptionColumnIndex; i++) {
+      const temp = angular.copy(vm.$scope.gridOptions[measure.uid].columnDefs[3]);
+
+      // Note: Use caution if changing the field's name: ensure data copying still works when using addMeasureOption.
+      temp.field = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
+
+      vm.$scope.gridOptions[measure.uid].columnDefs.push(temp);
+    }
+
   }
 
   // TODO: do we need this method?
