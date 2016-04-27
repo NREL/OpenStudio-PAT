@@ -242,9 +242,6 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In loadMeaaureOptions in analysis');
 
-    let numCols = vm.$scope.gridOptions[measure.uid].columnDefs.length;
-    vm.$log.debug('numColumns: ', numCols);
-
     let maxKeys = 0;
     _.forEach(measure.arguments, (argument) => {
       let numKeys = _.keys(argument).length;
@@ -253,11 +250,19 @@ export class AnalysisController {
       }
     });
     vm.$log.debug('maxKeys: ', maxKeys);
+    if (maxKeys > 0) {
+      vm.$log.debug('measure.arguments: ', measure.arguments);
+    }
 
-    const firstOptionColumnIndex = 10;
+    const numUnneededArguments = 10; // TODO this is a complete swag, and only sort of works
+    // TODO need to be able to find 'option' in keys like 'option4', etc
 
-    for (let i = 0; i < maxKeys - firstOptionColumnIndex; i++) {
+    for (let i = 0; i < maxKeys - numUnneededArguments; i++) {
       const temp = angular.copy(vm.$scope.gridOptions[measure.uid].columnDefs[3]);
+
+      // Note: Subtract 2 to create the correct auto-generated name
+      temp.name = 'Option ' + (vm.$scope.gridOptions[measure.uid].columnDefs.length - 2);
+      temp.displayName = 'Option ' + (vm.$scope.gridOptions[measure.uid].columnDefs.length - 2);
 
       // Note: Use caution if changing the field's name: ensure data copying still works when using addMeasureOption.
       temp.field = 'option' + vm.$scope.gridOptions[measure.uid].columnDefs.length;
