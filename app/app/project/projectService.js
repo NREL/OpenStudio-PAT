@@ -91,7 +91,7 @@ export class Project {
     vm.pat.projectName = vm.projectName;
     vm.pat.seed = vm.defaultSeed;
     vm.pat.weatherFile = vm.defaultWeatherFile;
-    vm.pat.analysis_type = vm.analysisType;
+    vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
     vm.pat.runType = vm.runType;
     vm.pat.samplingMethod = vm.samplingMethod;
 

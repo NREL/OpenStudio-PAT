@@ -14,7 +14,7 @@ export class DesignAlternativesController {
 
     // get seed and weather defaults and dropdown options
     vm.seedsDropdownArr = vm.Project.getSeedsDropdownArr();
-    vm.weatherFilesDropdownArr= vm.Project.getWeatherFilesDropdownArr();
+    vm.weatherFilesDropdownArr = vm.Project.getWeatherFilesDropdownArr();
     vm.defaultSeed = vm.Project.getDefaultSeed();
     vm.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
 
@@ -28,7 +28,7 @@ export class DesignAlternativesController {
     vm.generateFakeOptions();
 
     // SAVE
-    vm.$scope.$on('$destroy', function handler() {
+    vm.$scope.$on('$destroy', () => {
       console.log('SAVING design alternatives to ProjectService');
       vm.Project.setDesignAlternatives(vm.$scope.alternatives);
     });
@@ -128,7 +128,7 @@ export class DesignAlternativesController {
 
   setOptionsArray(measure) {
     const options = _.map(measure.options, 'name');
-    const optionsArr = [{id:'none', name: 'None'}];
+    const optionsArr = [{id: 'none', name: 'None'}];
     _.forEach(options, (option) => {
       optionsArr.push({id: option, name: option});
     });
@@ -150,44 +150,44 @@ export class DesignAlternativesController {
       multiSelect: false,
       columnDefs: [{
         name: 'delete',
-        displayName:'',
+        displayName: '',
         enableCellEdit: false,
         cellClass: 'icon-cell',
         cellTemplate: '../app/design_alts/deleteButtonTemplate.html',
-        width:'3%',
-        minWidth:'50'
+        width: '3%',
+        minWidth: '50'
       }, {
         name: 'reorder',
         displayName: '',
         enableCellEdit: false,
         cellClass: 'icon-cell',
         cellTemplate: '../app/design_alts/reorderButtonTemplate.html',
-        width:'3%',
+        width: '3%',
         minWidth: '50'
       }, {
         name: 'name',
         displayName: 'Name',
-        minWidth:'150'
+        minWidth: '150'
       }, {
         name: 'seedModel',
         displayName: 'Seed Model',
         editableCellTemplate: 'ui-grid/dropdownEditor',
         editDropdownIdLabel: 'name',
         editDropdownValueLabel: 'name',
-        minWidth:'100',
+        minWidth: '100',
         editDropdownOptionsArray: vm.seedsDropdownArr
-     }, {
+      }, {
         name: 'weatherFile',
         displayName: 'Location or Weather File',
         editableCellTemplate: 'ui-grid/dropdownEditor',
         editDropdownIdLabel: 'name',
         editDropdownValueLabel: 'name',
-        minWidth:'100',
+        minWidth: '100',
         editDropdownOptionsArray: vm.weatherFilesDropdownArr
       }, {
         name: 'description',
         displayName: 'Description',
-        minWidth:'100'
+        minWidth: '100'
       }],
       onRegisterApi: function (gridApi) {
         vm.$scope.gridApi = gridApi;
@@ -209,8 +209,15 @@ export class DesignAlternativesController {
     _.forEach(vm.measures, (measure) => {
       const optionsArr = vm.setOptionsArray(measure);
       vm.$log.debug(optionsArr);
-      vm.$scope.gridOptions.columnDefs.push({name: measure.name, displayName: measure.displayName, minWidth:'100', editableCellTemplate: 'ui-grid/dropdownEditor', editDropdownIdLabel: 'name', editDropdownValueLabel: 'name',
-        editDropdownOptionsArray: optionsArr});
+      vm.$scope.gridOptions.columnDefs.push({
+        name: measure.name,
+        displayName: measure.displayName,
+        minWidth: '100',
+        editableCellTemplate: 'ui-grid/dropdownEditor',
+        editDropdownIdLabel: 'name',
+        editDropdownValueLabel: 'name',
+        editDropdownOptionsArray: optionsArr
+      });
     });
   }
 
@@ -236,9 +243,9 @@ export class DesignAlternativesController {
   moveUp(alternative) {
     const vm = this;
     const index = vm.$scope.alternatives.indexOf(alternative);
-    if (index > 0){
-      const temp = angular.copy(vm.$scope.alternatives[index-1]);
-      vm.$scope.alternatives[index-1] = alternative;
+    if (index > 0) {
+      const temp = angular.copy(vm.$scope.alternatives[index - 1]);
+      vm.$scope.alternatives[index - 1] = alternative;
       vm.$scope.alternatives[index] = temp;
     }
   }
@@ -246,9 +253,9 @@ export class DesignAlternativesController {
   moveDown(alternative) {
     const vm = this;
     const index = vm.$scope.alternatives.indexOf(alternative);
-    if ((index + 1) != vm.$scope.alternatives.length){
-      const temp = angular.copy(vm.$scope.alternatives[index+1]);
-      vm.$scope.alternatives[index+1] = alternative;
+    if ((index + 1) != vm.$scope.alternatives.length) {
+      const temp = angular.copy(vm.$scope.alternatives[index + 1]);
+      vm.$scope.alternatives[index + 1] = alternative;
       vm.$scope.alternatives[index] = temp;
     }
   }
@@ -260,7 +267,7 @@ export class DesignAlternativesController {
       _.forEach(measure.options, (option) => {
         const newAlt = vm.setNewAlternativeDefaults();
         _.forEach(vm.measures, (m) => {
-          if (m.name == measure.name){
+          if (m.name == measure.name) {
             newAlt[m.name] = option.name;
           } else {
             newAlt[m.name] = 'None';
@@ -294,10 +301,10 @@ export class DesignAlternativesController {
 
   // functions for default alternative names
   checkUnique(data, name, rowIndex) {
-    let unique = _.isEmpty(_.filter(data, function (row, index) {
+    const matches = _.filter(data, (row, index) => {
       return rowIndex != index && row.name == name;
-    }));
-    return unique;
+    });
+    return _.isEmpty(matches);
   }
 
   uniqueName(data, template, num) {

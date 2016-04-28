@@ -32,7 +32,7 @@ export class AnalysisController {
     vm.$scope.repMeasures = [];
 
     // SAVE
-    vm.$scope.$on('$destroy', function handler() {
+    vm.$scope.$on('$destroy', () => {
       console.log('SAVING measures to ProjectService');
       // TODO: options from table are not being saved properly
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
@@ -240,11 +240,11 @@ export class AnalysisController {
   // TODO EVAN:  load columnDefs of already existing options (loaded from the measures variable)
   loadMeaaureOptions(measure) {
     const vm = this;
-    vm.$log.debug('In loadMeaaureOptions in analysis');
+    vm.$log.debug('In loadMeasureOptions in analysis');
 
     let maxKeys = 0;
     _.forEach(measure.arguments, (argument) => {
-      let numKeys = _.keys(argument).length;
+      const numKeys = _.keys(argument).length;
       if (numKeys > maxKeys) {
         maxKeys = numKeys;
       }
