@@ -7,7 +7,6 @@ var conf = require('./conf');
 var $ = require('gulp-load-plugins')();
 
 var wiredep = require('wiredep').stream;
-var _ = require('lodash');
 
 gulp.task('styles', function () {
   return buildStyles();

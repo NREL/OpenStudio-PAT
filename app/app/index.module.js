@@ -4,6 +4,7 @@ import * as contextMenu from '../electron/context_menu'; // eslint-disable-line 
 import { config } from './index.config';
 import { routerConfig } from './index.route';
 import { runBlock } from './index.run';
+import { DependencyManager } from '../app/dependency_manager/dependencyManagerService';
 import { BCL } from '../app/bcl/bclService';
 import { Project } from '../app/project/projectService';
 import { OsServer } from '../app/project/osServerService';
@@ -28,6 +29,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('RunController', RunController)
   .controller('ReportsController', ReportsController)
   .controller('ServerController', ServerController)
-  .service('Project', Project)
+  .service('BCL', BCL)
+  .service('DependencyManager', DependencyManager)
   .service('OsServer', OsServer)
-  .service('BCL', BCL);
+  .service('Project', Project);
