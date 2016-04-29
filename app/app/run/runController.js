@@ -33,7 +33,7 @@ export class RunController {
     // 1: make/get OSA
     // 2: make/get other files?
 
-    // 3: (if needed) start server (local or remote)
+    // 3: (if needed) hit PAT CLI to start server (local or remote)
     vm.status = vm.OsServer.getServerStatus();
     if (vm.status != 'started') {
       vm.$scope.progressAmount = '15';
@@ -43,12 +43,24 @@ export class RunController {
 
       if (vm.response) {
         vm.$scope.progressMessage = 'Server started';
-        // 4: hit serverAPI to start run
-        // vm.$scope.progressMessage = 'Start run';
 
-        // 5: until complete, hit serverAPI for updates (errors, warnings, reports?)
-
-        // 6: toggle button back to 'run' when done
+        //// 4: hit PAT CLI to start run
+        //vm.$scope.progressMessage = 'Starting analysis run';
+        //vm.run_status = vm.OsServer.runAnalysis();
+        //if (vm.run_status) {
+        //  vm.$scope.progressMessage = 'Analysis started'
+        //
+        //  // 5: until complete, hit serverAPI for updates (errors, warnings, status)
+        //  // vm.analysis_status = vm.OsServer.getAnalysisStatus();
+        //
+        //  // 6: toggle button back to 'run' when done
+        //}
+        //else {
+        //  // analysis not started
+        //  vm.$scope.progressMessage = 'Analysis not started - Error';
+        //  // TODO: display error message
+        //  vm.toggleButtons();
+        //}
 
       } else {
         vm.$scope.progressMessage = 'Server Error';

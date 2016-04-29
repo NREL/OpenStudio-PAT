@@ -1,11 +1,13 @@
 import * as jetpack from 'fs-jetpack';
 
 export class OsServer {
-  constructor($log, Project) {
+  constructor($q, $http, $log, Project) {
     'ngInject';
     const vm = this;
     vm.Project = Project;
     vm.$log = $log;
+    vm.$q = $q;
+    vm.$http = $http;
     vm.jetpack = jetpack;
 
     // to run meta_cli
@@ -14,6 +16,7 @@ export class OsServer {
     vm.serverStatus = 'stopped';
     vm.serverType = 'local';
     vm.serverURL = 'http://localhost:8080';
+    vm.analysisID = null;
 
   }
 
@@ -45,7 +48,16 @@ export class OsServer {
   setServerType(type) {
     const vm = this;
     vm.serverType = type;
+  }
 
+  setAnalysisID(id) {
+    const vm = this;
+    vm.analysisID = id;
+  }
+
+  getAnalysisID() {
+    const vm = this;
+    return vm.analysisID;
   }
 
   // start server (remote or local)
@@ -130,6 +142,58 @@ export class OsServer {
     //  }
     //);
 
+  }
+
+  runAnalysis() {
+    const vm = this;
+
+    // run META CLI will return status code: 0 = success, 1 = failure
+    // TODO: catch what analysis type it is
+    const child = vm.exec('cd /Users/kflemin/repos/pat_meta_cli/bin && ruby openstudio_meta run_analysis /Users/kflemin/OpenStudio/PAT/the_project/the_project.json ' + vm.serverURL + ' -a batch_datapoints',
+      (error, stdout, stderr) => {
+        console.log('THE PROCESS TERMINATED!');
+        console.log('EXIT CODE: ', child.exitCode);
+        console.log('child: ', child);
+        console.log(`stdout: ${stdout}`);
+        console.log(`stderr: ${stderr}`);
+
+        if (child.exitCode == 0) {
+          // SUCCESS
+          // TODO: grab analysis_id which should be returned somewhere and store in variable
+          //TODO: vm.setAnalysisID(id);
+
+          vm.$log.debug('Analysis Started');
+          return true;
+
+        } else {
+          // TODO: cleanup?
+          if (error !== null) {
+            console.log(`exec error: ${error}`);
+          }
+          return false;
+        }
+      });
+
+    // TODO: return success/fail
+
+  }
+
+  getAnalysisStatus() {
+
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    const url = vm.serverURL + 'analyses/' + vm.analysisID + '/status.json';
+    vm.$http.get(url).then(response => {
+      // send json to run controller
+      deferred.resolve(response);
+
+    }, response => {
+      vm.$log.debug('ERROR getting status for analysis ', vm.analysisID);
+      deferred.reject(response);
+    });
+
+    return deferred.promise;
 
   }
 
