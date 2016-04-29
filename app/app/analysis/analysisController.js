@@ -327,36 +327,36 @@ export class AnalysisController {
       const options = [];
 
       for (let i = firstOptionColumnIndex; i < numColumns; i++) {
-        const the_option = {};
+        const theOption = {};
         // option name and ID
-        the_option.id = vm.gridApis[measure.uid].grid.columns[i].field;
+        theOption.id = vm.gridApis[measure.uid].grid.columns[i].field;
         // TODO: the name will eventually be from the first row, for now set same as ID
-        the_option.name = vm.gridApis[measure.uid].grid.columns[i].name;
+        theOption.name = vm.gridApis[measure.uid].grid.columns[i].name;
 
         // set argument values
-        the_option.arguments = [];
+        theOption.arguments = [];
         _.forEach(vm.gridApis[measure.uid].grid.rows, (row) => {
           // TODO: when rows for name and descriptions are added, refactor this a bit
 
           // get the row's value for key corresponding to the col's name
           // add to arguments array
           const arg = {};
-          if (the_option.id in row.entity){
+          if (theOption.id in row.entity){
             arg.name = row.entity.name;
-            arg.value = row.entity[the_option.id];
-            the_option.arguments.push(arg);
+            arg.value = row.entity[theOption.id];
+            theOption.arguments.push(arg);
           } else {
             // check if argument is required
-            vm.$log.debug(the_option.id, ' is not a key in row: ', row.entity);
-            const argument_def = _.find(measure.arguments, {name: row.entity.name});
-            if (argument_def.required) {
+            //vm.$log.debug(theOption.id, ' is not a key in row: ', row.entity);
+            const argumentDef = _.find(measure.arguments, {name: row.entity.name});
+            if (argumentDef.required) {
               // TODO: throw an error here: need a value for this argument in this option
-              vm.$log.debug('ARG: ', row.entity.name, ' value left blank in option: ', the_option.name);
+              vm.$log.debug('ARG: ', row.entity.name, ' value left blank in option: ', theOption.name);
             }
           }
 
         });
-        options.push(the_option);
+        options.push(theOption);
       }
       // save to measure
       measure.options = options;
