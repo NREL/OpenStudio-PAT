@@ -1,7 +1,15 @@
 /*global bootlint*/
 
-export function runBlock($window, DependencyManager) {
+export function runBlock($window, DependencyManager, Project) {
   'ngInject';
+
+  $window.onbeforeunload = e => {
+    // Save project automatically on exit
+    Project.exportPAT();
+
+    // Prevent exit
+    //e.returnValue = false;
+  };
 
   $window.lint = function () {
     const s = document.createElement('script');

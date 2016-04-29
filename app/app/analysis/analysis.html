@@ -23,6 +23,25 @@
               <select class="form-control inline form-control-smaller-width" ng-options="method.name for method in analysis.samplingMethods track by method.shortName" ng-model="selectedSamplingMethod" ng-change="analysis.setSamplingMethod()"></select>
               <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
             </div>
+
+            <label class="medium-label">Selected Distributions</label>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width" ng-options="distribution for distribution in analysis.selectedDistributions" ng-model="selectedDistribution" ng-change="analysis.setSelectedDistribution()"></select>
+              <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
+            </div>
+
+            <label class="medium-label">Selected Arguments</label>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width" ng-options="argument for argument in analysis.selectedArguments" ng-model="selectedArgument" ng-change="analysis.setSelectedArgument()"></select>
+              <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
+            </div>
+
+            <label class="medium-label">Variable Settings</label>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width" ng-options="variable for variable in analysis.variableSettings" ng-model="selectedVariableSetting" ng-change="analysis.setVariableSetting()"></select>
+              <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
+            </div>
+
           </div>
         </div>
         <div class="col-md-3 pad-bot-20">

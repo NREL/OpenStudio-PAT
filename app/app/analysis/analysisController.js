@@ -47,6 +47,15 @@ export class AnalysisController {
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
 
+    vm.$scope.selectedVariableSetting = vm.Project.getVariableSetting();
+    vm.variableSettings = vm.Project.getVariableSettings();
+
+    vm.$scope.selectedArgument = vm.Project.getSelectedArgument();
+    vm.selectedArguments = vm.Project.getSelectedArguments();
+
+    vm.$scope.selectedDistribution = vm.Project.getSelectedDistribution();
+    vm.selectedDistributions = vm.Project.getSelectedDistributions();
+
     vm.setMeasureTypes();
 
     vm.$scope.gridOptions = [];
@@ -388,7 +397,30 @@ export class AnalysisController {
   setSamplingMethod() {
     const vm = this;
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
+
+    vm.$log.debug('In setSamplingMethod in analysis');
+    vm.setVariableSetting();
+    vm.setSelectedArgument();
+    vm.setSelectedDistribution();
   }
 
+  setVariableSetting() {
+    const vm = this;
+    vm.$log.debug('In setVariableSettings in analysis');
+    vm.Project.setVariableSetting(vm.$scope.selectedVariableSetting);
+  }
+
+  setSelectedArgument() {
+    const vm = this;
+    vm.$log.debug('In setArguments in analysis');
+    vm.Project.setSelectedArgument(vm.$scope.selectedArgument);
+  }
+
+  setSelectedDistribution() {
+    const vm = this;
+    vm.$log.debug('In setDistribution in analysis');
+   vm.Project.setSelectedDistribution(vm.$scope.selectedDistribution);
+  }
 
 }
+

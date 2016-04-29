@@ -50,6 +50,15 @@ export class Project {
     vm.runTypes = vm.getRunTypes();
     vm.runType = vm.runTypes[0];
 
+    vm.selectedDistributions = vm.getSelectedDistributions();
+    vm.selectedDistribution = vm.selectedDistributions[0];
+
+    vm.selectedArguments = vm.getSelectedArguments();
+    vm.selectedArgument = vm.selectedArguments[0];
+
+    vm.variableSettings = vm.getVariableSettings();
+    vm.variableSetting = vm.variableSettings[0];
+
     // TODO: load measures from PAT.json & project dir the first time around
     vm.measures = [];
     vm.designAlternatives = [];
@@ -80,6 +89,9 @@ export class Project {
       vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
       vm.runType = vm.pat.runType ? vm.pat.runType : vm.runType;
       vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
+      vm.selectedDistribution = vm.pat.selectedDistribution ? vm.pat.selectedDistribution : vm.selectedDistribution;
+      vm.selectedArgument = vm.pat.selectedArgument ? vm.pat.selectedArgument : vm.selectedArgument;
+      vm.variableSetting = vm.pat.variableSetting ? vm.pat.variableSetting : vm.variableSetting;
     }
   }
 
@@ -94,6 +106,9 @@ export class Project {
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
     vm.pat.runType = vm.runType;
     vm.pat.samplingMethod = vm.samplingMethod;
+    vm.pat.selectedDistribution = vm.selectedDistribution;
+    vm.pat.selectedArgument = vm.selectedArgument;
+    vm.pat.variableSetting = vm.variableSetting;
 
     // measures and options
     vm.pat.measures = vm.measures;
@@ -266,6 +281,66 @@ export class Project {
       name: 'BaselinePerturbation',
       shortName: 'BaselinePerturbation'
     }];
+  }
+
+  getVariableSetting() {
+    const vm = this;
+    return vm.variableSetting;
+  }
+
+  setVariableSetting(setting) {
+    const vm = this;
+    vm.variableSetting = setting;
+  }
+
+  getVariableSettings() {
+    const vm = this;
+    return ['Static', 'Discrete', 'Continuous', 'Pivot'];
+  }
+
+  setVariableSettings() {
+    const vm = this;
+    return 'test';
+  }
+
+  getSelectedArgument() {
+    const vm = this;
+    return vm.selectedArgument;
+  }
+
+  setSelectedArgument(argument) {
+    const vm = this;
+    vm.selectedArgument = argument;
+  }
+
+  getSelectedArguments() {
+    const vm = this;
+    return ['Double', 'Choice', 'String'];
+  }
+
+  setSelectedArguments() {
+    const vm = this;
+    return 'test';
+  }
+
+  getSelectedDistribution() {
+    const vm = this;
+    return vm.selectedDistribution;
+  }
+
+  setSelectedDistribution(distribution) {
+    const vm = this;
+    vm.selectedDistribution = distribution;
+  }
+
+  getSelectedDistributions() {
+    const vm = this;
+    return ['Normal', 'Uniform', 'Triangle'];
+  }
+
+  setSelectedDistributions() {
+    const vm = this;
+    return 'test';
   }
 
   getAnalysisTypes() {
