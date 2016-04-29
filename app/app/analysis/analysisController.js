@@ -1,6 +1,7 @@
 import * as jetpack from 'fs-jetpack';
 import * as os from 'os';
 import * as path from 'path';
+import { dialog } from 'remote';
 
 export class AnalysisController {
 
@@ -14,6 +15,7 @@ export class AnalysisController {
     vm.$document = $document;
     vm.BCL = BCL;
     vm.Project = Project;
+    vm.dialog = dialog;
 
     vm.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
 
@@ -68,7 +70,6 @@ export class AnalysisController {
     _.forEach(vm.$scope.measures, (measure) => {
       vm.loadMeasureOptions(measure);
     });
-
 
   }
 
@@ -132,7 +133,7 @@ export class AnalysisController {
           '<input ng-if=\"row.entity.type==\'Int\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
           '<input ng-if=\"row.entity.type==\'Double\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
           '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-          ' </form></div>',
+          '</form></div>',
           enableHiding: false,
           width: 200,
           minWidth: 100,
@@ -368,11 +369,7 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In checkAll in analysis');
 
-    if (vm.$scope.selectedAll === false) {
-      vm.$scope.selectedAll = true;
-    } else {
-      vm.$scope.selectedAll = false;
-    }
+    vm.$scope.selectedAll = vm.$scope.selectedAll === false;
 
     _.forEach(vm.$scope.gridOptions[measure.uid].data, (row) => {
       row.variable = vm.$scope.selectedAll ? true : false;
@@ -419,8 +416,46 @@ export class AnalysisController {
   setSelectedDistribution() {
     const vm = this;
     vm.$log.debug('In setDistribution in analysis');
-   vm.Project.setSelectedDistribution(vm.$scope.selectedDistribution);
+    vm.Project.setSelectedDistribution(vm.$scope.selectedDistribution);
   }
 
+  selectSeedModel() {
+    const vm = this;
+
+    // TODO: set defaultPath
+    const result = vm.dialog.showOpenDialog({
+      title: 'Select Seed Model',
+      filters: [
+        {name: 'OpenStudio Models', extensions: ['osm']}
+      ],
+      properties: ['openFile']
+    });
+
+    if (!_.isEmpty(result)) {
+      // TODO: do something with the result
+      const seedModelPath = result[0];
+      vm.$log.debug('Seed Model:', seedModelPath);
+    }
+  }
+
+  selectWeatherFile() {
+    const vm = this;
+
+    // TODO: set defaultPath
+    const result = vm.dialog.showOpenDialog({
+      title: 'Select Weather File',
+      filters: [
+        {name: 'Weather Files', extensions: ['epw']}
+      ],
+      properties: ['openFile']
+    });
+
+    if (!_.isEmpty(result)) {
+      // TODO: do something with the result
+      const weatherFilePath = result[0];
+      vm.$log.debug('Weather File:', weatherFilePath);
+    }
+
+  }
 }
 
