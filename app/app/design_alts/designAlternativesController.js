@@ -24,105 +24,13 @@ export class DesignAlternativesController {
     vm.$scope.gridOptions = [];
     vm.setGridOptions();
 
-    // TODO: temporary until options come in from analysis controller
-    //vm.generateFakeOptions();
-
     // SAVE
     vm.$scope.$on('$destroy', () => {
       console.log('SAVING design alternatives to ProjectService');
       vm.Project.setDesignAlternatives(vm.$scope.alternatives);
+      // TODO: temporary, just to generate pat.json for inspection
+      vm.Project.exportPAT();
     });
-
-  }
-
-  // TODO: don't do this anymore once analysis controller is saving correctly
-  generateFakeOptions() {
-    const vm = this;
-
-    const $option1 = {
-      name: 'Option1',
-      arguments: [
-        {
-          name: 'space_name',
-          value: 'Space1'
-        }, {
-          name: 'v1',
-          value: '1'
-        }, {
-          name: 'v2',
-          value: '2'
-        }, {
-          name: 'v3',
-          value: '3'
-        }, {
-          name: 'v4',
-          value: '4'
-        }, {
-          name: 'v5',
-          value: '5'
-        }
-      ]
-    };
-
-    const $option2 = {
-      name: 'Option2',
-      arguments: [
-        {
-          name: 'space_name',
-          value: 'Space2'
-        }, {
-          name: 'v1',
-          value: '10'
-        }, {
-          name: 'v2',
-          value: '20'
-        }, {
-          name: 'v3',
-          value: '30'
-        }, {
-          name: 'v4',
-          value: '40'
-        }, {
-          name: 'v5',
-          value: '50'
-        }
-      ]
-    };
-
-    const $option3 = {
-      name: 'Option3',
-      arguments: [
-        {
-          name: 'space_name',
-          value: 'Space3'
-        }, {
-          name: 'v1',
-          value: '100'
-        }, {
-          name: 'v2',
-          value: '200'
-        }, {
-          name: 'v3',
-          value: '300'
-        }, {
-          name: 'v4',
-          value: '400'
-        }, {
-          name: 'v5',
-          value: '500'
-        }
-      ]
-    };
-
-    _.forEach(vm.measures, (measure) => {
-
-      if (measure.name == 'EPMeasure' || measure.name == 'OpenStudioMeasure') {
-        measure.options = [$option1, $option2, $option3];
-      }
-
-    });
-
-    vm.$log.debug('DA measures: ', vm.measures);
 
   }
 

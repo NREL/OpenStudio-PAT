@@ -95,6 +95,55 @@ export class Project {
     }
   }
 
+  // TODO: need to be able to do this just by looking at the ugly hash inside measure arguments
+  savePrettyOptions() {
+    const vm = this;
+
+    vm.$log.debug('Saving all measure option hashes');
+
+    _.forEach(vm.measures, (measure) => {
+
+      const options = [];
+
+      // first find out how many options there are
+      for (let i = 1; i <= measure.number_of_options; i++) {
+
+        const theOption = {};
+        // option name and ID
+        theOption.id = 'option_' + i;
+        // TODO: the name will eventually be from the first row of data, for now set same as ID
+        theOption.name = theOption.id;
+
+        // set argument values
+        theOption.arguments = [];
+        _.forEach(measure.arguments, (argument) => {
+          // TODO: when rows for name and descriptions are added, refactor this a bit
+
+          // get the row's value for key corresponding to the col's name
+          // add to arguments array
+          const theArg = {};
+          if (theOption.id in argument) {
+            theArg.name = argument.name;
+            theArg.value = argument[theOption.id];
+            theOption.arguments.push(theArg);
+          } else {
+            // check if argument is required
+            if (argument.required) {
+              // TODO: throw an error here: need a value for this argument in this option
+              vm.$log.debug('ARG: ', argument.name, ' value left blank in option: ', theOption.name);
+            }
+          }
+
+        });
+        options.push(theOption);
+      }
+      // save to measure
+      measure.options = options;
+
+    });
+
+  }
+
   // export variables to pat.json
   exportPAT() {
     const vm = this;

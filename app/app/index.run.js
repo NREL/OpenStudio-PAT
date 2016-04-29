@@ -4,6 +4,9 @@ export function runBlock($window, DependencyManager, Project) {
   'ngInject';
 
   $window.onbeforeunload = e => {
+    // just in case we are closing from the analysis tab, save pretty options first
+    Project.savePrettyOptions();
+
     // Save project automatically on exit
     Project.exportPAT();
 
