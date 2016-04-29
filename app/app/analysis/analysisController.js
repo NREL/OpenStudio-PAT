@@ -26,6 +26,7 @@ export class AnalysisController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+    vm.gridApis = [];
 
     vm.$scope.osMeasures = [];
     vm.$scope.epMeasures = [];
@@ -35,6 +36,7 @@ export class AnalysisController {
     vm.$scope.$on('$destroy', () => {
       console.log('SAVING measures to ProjectService');
       // TODO: options from table are not being saved properly
+      vm.saveMeasureOptions();
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
     });
 
@@ -55,7 +57,7 @@ export class AnalysisController {
     vm.setDefaultArguments();
 
     _.forEach(vm.$scope.measures, (measure) => {
-      vm.loadMeaaureOptions(measure);
+      vm.loadMeasureOptions(measure);
     });
 
 
@@ -129,9 +131,9 @@ export class AnalysisController {
         }],
 
         onRegisterApi: function (gridApi) {
-          vm.gridApi = gridApi;
+          vm.gridApis[measure.uid] = gridApi;
           const cellTemplate = 'ui-grid/selectionRowHeader';   // you could use your own template here
-          vm.gridApi.core.addRowHeaderColumn({
+          vm.gridApis[measure.uid].core.addRowHeaderColumn({
             name: 'rowHeaderCol',
             displayName: '',
             width: 50,
@@ -237,8 +239,8 @@ export class AnalysisController {
     // TODO: implement this
   }
 
-  // TODO EVAN:  load columnDefs of already existing options (loaded from the measures variable)
-  loadMeaaureOptions(measure) {
+  // TODO: should we use the pretty measure.options hash created on save to load measure options?  Or this method?
+  loadMeasureOptions(measure) {
     const vm = this;
     vm.$log.debug('In loadMeasureOptions in analysis');
 
@@ -272,7 +274,7 @@ export class AnalysisController {
 
   }
 
-  // TODO: do we need this method?
+  // TODO: remove this!
   saveMeasureOption(measure) {
     const vm = this;
     vm.$log.debug('In saveMeasureOption in analysis');
@@ -300,6 +302,57 @@ export class AnalysisController {
       measure.options.push(columnOptions);
     }
     vm.$log.debug('measure.options: ', measure.options);
+  }
+
+  // saves measure options in nicer structure for json export
+  saveMeasureOptions() {
+    const vm = this;
+    vm.$log.debug('Saving all measure option hashes');
+
+    _.forEach(vm.$scope.measures, (measure) => {
+
+      // first option is at col id = 4 when using gridApi to access.  (col id = 3 when going through gridOptions)
+      const firstOptionColumnIndex = 4;
+      const numColumns = vm.gridApis[measure.uid].grid.columns.length;
+
+      const options = [];
+
+      for (let i = firstOptionColumnIndex; i < numColumns; i++) {
+        const the_option = {};
+        // option name and ID
+        the_option.id = vm.gridApis[measure.uid].grid.columns[i].field;
+        // TODO: the name will eventually be from the first row, for now set same as ID
+        the_option.name = vm.gridApis[measure.uid].grid.columns[i].name;
+
+        // set argument values
+        the_option.arguments = [];
+        _.forEach(vm.gridApis[measure.uid].grid.rows, (row) => {
+          // TODO: when rows for name and descriptions are added, refactor this a bit
+
+          // get the row's value for key corresponding to the col's name
+          // add to arguments array
+          const arg = {};
+          if (the_option.id in row.entity){
+            arg.name = row.entity.name;
+            arg.value = row.entity[the_option.id];
+            the_option.arguments.push(arg);
+          } else {
+            // check if argument is required
+            vm.$log.debug(the_option.id, ' is not a key in row: ', row.entity);
+            const argument_def = _.find(measure.arguments, {name: row.entity.name});
+            if (argument_def.required) {
+              // TODO: throw an error here: need a value for this argument in this option
+              vm.$log.debug('ARG: ', row.entity.name, ' value left blank in option: ', the_option.name);
+            }
+          }
+
+        });
+        options.push(the_option);
+      }
+      // save to measure
+      measure.options = options;
+
+    });
   }
 
   checkAll(measure) {

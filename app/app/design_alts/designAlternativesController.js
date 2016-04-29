@@ -25,7 +25,7 @@ export class DesignAlternativesController {
     vm.setGridOptions();
 
     // TODO: temporary until options come in from analysis controller
-    vm.generateFakeOptions();
+    //vm.generateFakeOptions();
 
     // SAVE
     vm.$scope.$on('$destroy', () => {
