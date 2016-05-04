@@ -66,6 +66,10 @@ export class Project {
     // do this last...it will overwrite defaults
     vm.initializeProject();
 
+    // json objects
+    vm.pat = {};
+    vm.osa = {};
+
   }
 
   // import from pat.json
@@ -142,6 +146,199 @@ export class Project {
 
     });
 
+  }
+
+  // export OSA
+  exportOSA() {
+    const vm = this;
+    // check what kind of analysis it is
+    if (vm.analysisType == 'Manual'){
+      vm.exportManual();
+    } else {
+      vm.exportAlgorithmic();
+    }
+
+    // write to file
+    vm.jetpack.write(vm.projectDir.path('osa.json'), vm.osa);
+    vm.$log.debug('Project OSA file exported to osa.json');
+
+  }
+
+  exportManual() {
+    const vm = this;
+
+    vm.osa = {};
+    vm.osa.analysis = {};
+    vm.osa.analysis.display_name = vm.projectName;
+    vm.osa.analysis.name = vm.projectName;
+    vm.osa.seed = {};
+    vm.osa.seed.file_type = 'OSM';
+    vm.osa.seed.path = './seed/' + vm.defaultSeed;
+    vm.osa.weather_file = {};
+    vm.osa.weather_file.file_type = 'EPW';
+    vm.osa.weather_file.path = './weather/' + vm.defaultWeatherFile;
+    vm.osa.file_format_version = 1;
+
+    // empty for manual
+    vm.osa.analysis.output_variables = [];
+
+    vm.osa.analysis.problem = {};
+    vm.osa.analysis.problem.analysis_type = 'batch_datapoints';
+    // empty for manual
+    vm.osa.analysis.problem.algorithm = {objective_functions: []};
+    vm.osa.analysis.problem.workflow = [];
+    let measure_count = 0;
+    _.forEach(vm.measures, (measure) => {
+
+      const m = {};
+      m.name = measure.name;
+      m.display_name = measure.displayName;
+      m.measure_type = measure.type; // TODO: check this
+      m.measure_definition_class_name = measure.className;
+      m.measure_definition_directory = './measures/' + measure.name;
+      m.measure_definition_directory_local = vm.projectMeasuresDir.path() + '/' + measure.name;
+      m.measure_definition_display_name = measure.displayName;
+      m.measure_definition_name = measure.name;
+      m.measure_definition_name_xml = null;
+      m.measure_definition_uuid = measure.uid;
+      m.measure_definition_version_uuid = measure.versionId;
+      m.arguments = [];
+
+      _.forEach(measure.arguments, (arg) => {
+        const argument = {};
+        argument.display_name = arg.displayName;
+        argument.display_name_short = arg.shortName;
+        argument.name = arg.name;
+        argument.value_type = _.toLower(arg.type);
+        argument.default_value = arg.defaultValue;
+        argument.value = arg.defaultValue; //TODO: check if this is right
+        m.arguments.push(argument);
+      });
+      let var_count = 0;
+      m.variables = [];
+      // TODO: fill out variables. variables also have workflow indexes
+
+      // go through alternatives, see if each has an option selected
+      const vars = [];
+      _.forEach(vm.designAlternatives, (da) => {
+        if (da[measure.name] == 'None') {
+          vars.push(true);
+        } else {
+          vars.push(false);
+        }
+      });
+
+      // need a __SKIP__ argument
+      if (_.includes(vars, true)) {
+        const v = {};
+        v.argument = {};
+        // TODO: check this
+        v.argument.display_name = '__SKIP__';
+        v.argument.display_name_short = '__SKIP__';
+        v.argument.name = '__SKIP__';
+        v.argument.value_type = 'bool';  // TODO: or choice?  is there a 'choice' here?
+        v.argument.default_value = false;
+        v.argument.value = false;
+
+        v.display_name = '__SKIP__';
+        v.display_name_short = '__SKIP__';
+        v.variable_type = 'variable';
+        v.units = null;
+        v.minimum = false;
+        v.maximum = true;
+        v.relation_to_output = null;
+        v.static_value = false;
+        v.uuid = ''; // TODO: what is this?
+        v.version_uuid = ''; // TODO: what is this?
+        v.variable = true;
+        v.uncertainty_description = {};
+        v.uncertainty_description.type = 'discrete';
+        v.uncertainty_description.attributes = [];
+
+        const valArr = [];
+        _.forEach(vars, (skip) => {
+          valArr.push({value: skip, weight: 0});
+        });
+        // fix weights (set 1st one to 1)
+        valArr[0].weight = 1;
+
+        v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
+        v.uncertainty_description.attributes.push({name: 'lower_bounds', value: false});
+        v.uncertainty_description.attributes.push({name: 'upper_bounds', value: false});
+        v.uncertainty_description.attributes.push({name: 'mode', value: false});
+        v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
+        v.uncertainty_description.attributes.push({name: 'stddev', value: null});
+
+        v.workflow_index = var_count;
+        var_count += 1;
+
+        m.variables.push(v);
+      }
+
+      // other arguments
+      _.forEach(measure.arguments, (arg) => {
+
+        // see what arg is set to in each design alternative
+        const valArr = [];
+        _.forEach(vm.designAlternatives, (da) => {
+          if (da[measure.name] == 'None') {
+            valArr.push({value: 'None', weight: 0}); // TODO: does this matter?
+          } else {
+            const option_id = da[measure.name];
+            valArr.push({value: arg[option_id], weight: 0});
+          }
+        });
+        // fix weights (set 1st one to 1)
+        valArr[0].weight = 1;
+
+        const v = {};
+        v.argument = {};
+        v.argument.display_name = arg.displayName;
+        v.argument.display_name_short = arg.shortName;
+        v.argument.name = arg.name;
+        v.argument.value_type = _.toLower(arg.type); // TODO: is there a 'choice' here?
+        v.argument.default_value = arg.default_value;
+        v.argument.value = arg.default_value;  // TODO: check this
+
+        v.display_name = arg.displayName;  // TODO: same as arg?
+        v.display_name_short = arg.shortName;
+        v.variable_type = 'variable';
+        v.units = arg.units;
+        v.minimum = arg.minimum;
+        v.maximum = arg.maximum;
+        v.relation_to_output = null;
+        v.static_value = false;
+        v.uuid = ''; // TODO: what is this?
+        v.version_uuid = ''; // TODO: what is this?
+        v.variable = true;
+        v.uncertainty_description = {};
+        v.uncertainty_description.type = 'discrete';
+        v.uncertainty_description.attributes = [];
+
+        v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
+        // TODO: what to set these values to?  (in case no default value?)
+        v.uncertainty_description.attributes.push({name: 'lower_bounds', value: valArr[0].value});
+        v.uncertainty_description.attributes.push({name: 'upper_bounds', value: valArr[0].value});
+        v.uncertainty_description.attributes.push({name: 'mode', value: valArr[0].value});
+        v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
+        v.uncertainty_description.attributes.push({name: 'stddev', value: null});
+
+        v.workflow_index = var_count;
+        var_count += 1;
+
+        m.variables.push(v);
+
+      });
+
+      m.workflow_index = measure_count;
+      measure_count += 1;
+
+      vm.osa.analysis.problem.workflow.push(m);
+    });
+  }
+
+  exportAlgorithmic() {
+    // TODO
   }
 
   // export variables to pat.json

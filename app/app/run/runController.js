@@ -79,7 +79,7 @@ export class RunController {
 
   exportOSA() {
     const vm = this;
-    // TODO: implement
+    vm.Project.exportOSA();
   }
 
   runSelected() {
