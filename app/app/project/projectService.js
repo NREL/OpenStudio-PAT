@@ -488,6 +488,216 @@ export class Project {
     return vm.samplingMethods;
   }
 
+
+  getAnalysisTypeHash() {
+    return [{
+      analysisType: 'batch_run',
+      variables: []
+    }, {
+      analysisType: 'morris',
+      variables: [{
+        name: 'r',
+        description: 'integer giving the number of repetitions of the design',
+        value: 10
+      }, {
+        name: 'levels',
+        description: '',
+        value: 10
+      }, {
+        name: 'grid_jump',
+        description: '',
+        value: 1
+      }, {
+        name: 'type',
+        description: 'oat',
+        value: 'oat'
+      }]
+    }, {
+      analysisType: 'lhs',
+      variables: [{
+        name: 'Sample Method',
+        description: 'individual_variables / all_variables',
+        value: 'individual_variables'
+      }, {
+        name: 'Number of Samples',
+        description: 'positive integer (if individual, total simulations is this times each variable)',
+        value: 30
+      }]
+    }, {
+      analysisType: 'optim',
+      variables: [{
+        name: 'epsilonGradient',
+        description: 'epsilon in gradient calculation',
+        value: 0.01
+      }, {
+        name: 'pgtol',
+        description: 'tolerance on the projected gradient',
+        value: 0.01
+      }, {
+        name: 'factr',
+        description: 'Tolerance on delta_F',
+        value: 45036000000000
+      }, {
+        name: 'maxit',
+        description: 'Maximum number of iterations',
+        value: 100
+      }, {
+        name: 'normType',
+        description: '',
+        value: 'minkowski'
+      }, {
+        name: 'pPower',
+        description: 'Lp norm power',
+        value: 2
+      }, {
+        name: 'Exit On Guideline14',
+        description: '0 false / 1 true (for use with calibration report)',
+        value: 0
+      }]
+    }, {
+      analysisType: 'rgenoud',
+      variables: [{
+        name: 'popSize',
+        description: 'Size of initial population',
+        value: 30
+      }, {
+        name: 'Generations',
+        description: 'Number of generations',
+        value: 5
+      }, {
+        name: 'waitGenerations',
+        description: 'If no improvement in waitGenerations of generations, then exit',
+        value: 2
+      }, {
+        name: 'bfgsburnin',
+        description: 'The number of generations which are run before the BFGS is ﬁrst used',
+        value: 2
+      }, {
+        name: 'gradientcheck',
+        description: '0 false / 1 true',
+        value: 1
+      }, {
+        name: 'solutionTolerance',
+        description: '',
+        value: 0.01
+      }, {
+        name: 'epsilonGradient',
+        description: 'epsilon in gradient calculation',
+        value: 0.01
+      }, {
+        name: 'pgtol',
+        description: 'tolerance on the projected gradient',
+        value: 0.01
+      }, {
+        name: 'factr',
+        description: 'Tolerance on delta_F',
+        value: 45036000000000
+      }, {
+        name: 'maxit',
+        description: 'Maximum number of iterations',
+        value: 100
+      }, {
+        name: 'normType',
+        description: '',
+        value: 'minkowski'
+      }, {
+        name: 'pPower',
+        description: 'Lp norm power',
+        value: 2
+      }, {
+        name: 'Exit On Guideline14',
+        description: '0 false / 1 true (for use with calibration report)',
+        value: 0
+      }, {
+        name: 'balance',
+        description: '0 false / 1 true (load balancing)',
+        value: 1
+      }]
+    }, {
+      analysisType: 'nsga_nrel',
+      variables: [{
+        name: 'Number of Samples',
+        description: 'Size of initial population',
+        value: 30
+      }, {
+        name: 'Generations',
+        description: 'Number of generations',
+        value: 30
+      }, {
+        name: 'cprob',
+        description: 'Crossover probability [0,1]',
+        value: 0.85
+      }, {
+        name: 'XoverDistIdx',
+        description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
+        value: 5
+      }, {
+        name: 'MuDistIdx',
+        description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
+        value: 5
+      }, {
+        name: 'mprob',
+        description: 'Mutation probability [0,1]',
+        value: 0.8
+      }, {
+        name: 'toursize',
+        description: 'Tournament Size',
+        value: 2
+      }, {
+        name: 'normType',
+        description: '',
+        value: 'minkowski'
+      }, {
+        name: 'pPower',
+        description: 'Lp norm power',
+        value: 2
+      }, {
+        name: 'Exit On Guideline14',
+        description: '0 false / 1 true (for use with calibration report)',
+        value: 0
+      }]
+    }, {
+      analysisType: 'preflight',
+      variables: []
+    }, {
+      analysisType: 'doe',
+      variables: [{
+        name: 'Experiment Type',
+        description: 'full_factorial',
+        value: 'full_factorial'
+      }, {
+        name: 'Number of Samples',
+        description: 'positive integer (this discretizes a continuous variable)',
+        value: 2
+      }]
+    }, {
+      analysisType: 'single_run',
+      variables: [{
+        name: '',
+        description: '',
+        value: ''
+      }]
+    }, {
+      analysisType: 'repeat_run',
+      variables: [{
+        name: 'Number of Runs',
+        description: 'positive integer (if individual, total simulations is this times each variable)',
+        value: 30
+      }]
+    }, {
+      analysisType: 'baseline_perturbation',
+      variables: [{
+        name: 'in_measure_combinations',
+        description: '(TRUE/FALSE) Run full factorial search over in-measure variable combinations',
+        value: 'TRUE'
+      }, {
+        name: 'include_baseline_in_combinations',
+        description: '(TRUE/FALSE) If in_measure_combinations are TRUE, sets if static values be included in combinations',
+        value: 'TRUE'
+      }]
+    }];
+  }
+
   setSamplingMethods() {
 
     return [{
