@@ -56,20 +56,6 @@ export class AnalysisController {
     vm.$scope.selectedDistribution = vm.Project.getSelectedDistribution();
     vm.selectedDistributions = vm.Project.getSelectedDistributions();
 
-    vm.$scope.variableSettings = [{
-      ID: 1,
-      type: 'Static'
-    }, {
-      ID: 2,
-      type: 'Discrete'
-    }, {
-      ID: 3,
-      type: 'Continuous'
-    }, {
-      ID: 4,
-      type: 'Pivot'
-    }];
-
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
     vm.initializeGrids();
@@ -207,7 +193,34 @@ export class AnalysisController {
           editType: 'dropdown',
           enableCellEdit: true,
           editableCellTemplate: 'ui-grid/dropdownEditor',
-          editDropdownOptionsArray: vm.$scope.variableSettings,
+          editDropdownOptionsFunction: function(rowEntity, colDef) {
+            if (vm.$scope.selectedSamplingMethod.name === 'Latin Hypercube Sampling' || vm.$scope.selectedSamplingMethod.name === 'DesignOfExperiements') {
+              return [{
+                ID: 1,
+                type: 'Static'
+              }, {
+                ID: 2,
+                type: 'Discrete'
+              }, {
+                ID: 3,
+                type: 'Continuous'
+              }, {
+                ID: 4,
+                type: 'Pivot'
+              }];
+            } else {
+              return [{
+                ID: 1,
+                type: 'Static'
+              }, {
+                ID: 2,
+                type: 'Discrete'
+              }, {
+                ID: 3,
+                type: 'Continuous'
+              }];
+            }
+          },
           editDropdownIdLabel: 'type',
           editDropdownValueLabel: 'type'
         }],
