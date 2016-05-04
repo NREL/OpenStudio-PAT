@@ -56,7 +56,19 @@ export class AnalysisController {
     vm.$scope.selectedDistribution = vm.Project.getSelectedDistribution();
     vm.selectedDistributions = vm.Project.getSelectedDistributions();
 
-
+    vm.$scope.variableSettings = [{
+      ID: 1,
+      type: 'Static'
+    }, {
+      ID: 2,
+      type: 'Discrete'
+    }, {
+      ID: 3,
+      type: 'Continuous'
+    }, {
+      ID: 4,
+      type: 'Pivot'
+    }];
 
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
@@ -66,10 +78,16 @@ export class AnalysisController {
 
   initializeGrids(){
     const vm = this;
+    vm.$log.debug('In initializeGrids in analysis');
     vm.setMeasureTypes();
-    vm.setGridOptions();
-    // load saved measure options
-    vm.loadMeasureOptions();
+    if (vm.$scope.selectedAnalysisType === 'Manual') {
+      vm.setGridOptions();
+      // load saved measure options
+      vm.loadMeasureOptions();
+    }
+    else {
+      vm.setAlgorithmicGridOptions();
+    }
   }
 
   getDefaultOptionColDef() {
@@ -145,6 +163,56 @@ export class AnalysisController {
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.uid] = gridApi;
 
+        }
+      };
+    });
+  }
+
+  setAlgorithmicGridOptions() {
+    const vm = this;
+
+    _.forEach(vm.$scope.measures, (measure) => {
+
+      // set number of options in measure
+      if (!('number_of_options' in measure)) {
+        measure.number_of_options = 0;
+      }
+
+      vm.$scope.gridOptions[measure.uid] = {
+        data: measure.arguments,
+        enableSorting: false,
+        autoResize: true,
+        enableRowSelection: false,
+        enableSelectAll: false,
+        enableColumnMenus: false,
+        enableRowHeaderSelection: false,
+        enableCellEditOnFocus: true,
+        enableHiding: false,
+        columnDefs: [{
+          name: 'displayName',
+          displayName: 'Argument Name',
+          enableCellEdit: false,
+          width: 200,
+          minWidth: 100
+        }, {
+          name: 'name',
+          displayName: 'Short Name',
+          width: 200,
+          minWidth: 100
+        }, {
+          name: 'variableSettings',
+          displayName: 'Variable Settings',
+          width: 200,
+          minWidth: 100,
+          editType: 'dropdown',
+          enableCellEdit: true,
+          editableCellTemplate: 'ui-grid/dropdownEditor',
+          editDropdownOptionsArray: vm.$scope.variableSettings,
+          editDropdownIdLabel: 'type',
+          editDropdownValueLabel: 'type'
+        }],
+        onRegisterApi: function (gridApi) {
+          vm.gridApis[measure.uid] = gridApi;
         }
       };
     });
@@ -289,32 +357,30 @@ export class AnalysisController {
 
   setType() {
     const vm = this;
+    vm.$log.debug('In setType in analysis');
     vm.Project.setAnalysisType(vm.$scope.selectedAnalysisType);
+    vm.initializeGrids();
   }
 
-  setSamplingMethod() {
+  setSamplingMethod() { // TODO delete function?
     const vm = this;
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
-
     vm.$log.debug('In setSamplingMethod in analysis');
-    vm.setVariableSetting();
-    vm.setSelectedArgument();
-    vm.setSelectedDistribution();
   }
 
-  setVariableSetting() {
+  setVariableSetting() { // TODO delete function?
     const vm = this;
     vm.$log.debug('In setVariableSettings in analysis');
     vm.Project.setVariableSetting(vm.$scope.selectedVariableSetting);
   }
 
-  setSelectedArgument() {
+  setSelectedArgument() { // TODO delete function?
     const vm = this;
     vm.$log.debug('In setArguments in analysis');
     vm.Project.setSelectedArgument(vm.$scope.selectedArgument);
   }
 
-  setSelectedDistribution() {
+  setSelectedDistribution() { // TODO delete function?
     const vm = this;
     vm.$log.debug('In setDistribution in analysis');
     vm.Project.setSelectedDistribution(vm.$scope.selectedDistribution);
