@@ -34,6 +34,8 @@ export class AnalysisController {
     vm.$scope.epMeasures = [];
     vm.$scope.repMeasures = [];
 
+    vm.$scope.algorithmSettings = [];
+
     // SAVE
     vm.$scope.$on('$destroy', () => {
       console.log('SAVING measures to ProjectService');
@@ -47,6 +49,9 @@ export class AnalysisController {
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
 
+    vm.algorithmOptions = vm.Project.getAlgorithmOptions();
+    vm.$scope.selectedAlgorithmOptions = vm.setSelectedAlgorithmOptions(vm.$scope.selectedSamplingMethod);
+
     vm.$scope.selectedVariableSetting = vm.Project.getVariableSetting();
     vm.variableSettings = vm.Project.getVariableSettings();
 
@@ -59,10 +64,9 @@ export class AnalysisController {
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
     vm.initializeGrids();
-
   }
 
-  initializeGrids(){
+  initializeGrids() {
     const vm = this;
     vm.$log.debug('In initializeGrids in analysis');
     vm.setMeasureTypes();
@@ -193,7 +197,7 @@ export class AnalysisController {
           editType: 'dropdown',
           enableCellEdit: true,
           editableCellTemplate: 'ui-grid/dropdownEditor',
-          editDropdownOptionsFunction: function(rowEntity, colDef) {
+          editDropdownOptionsFunction: function (rowEntity, colDef) {
             if (vm.$scope.selectedSamplingMethod.name === 'Latin Hypercube Sampling' || vm.$scope.selectedSamplingMethod.name === 'DesignOfExperiements') {
               return [{
                 ID: 1,
@@ -229,6 +233,11 @@ export class AnalysisController {
         }
       };
     });
+  }
+
+  setSelectedAlgorithmOptions(algorithm) {
+    const vm = this;
+    return vm.algorithmOptions[algorithm.shortName];
   }
 
   setMeasureTypes() {
@@ -375,10 +384,10 @@ export class AnalysisController {
     vm.initializeGrids();
   }
 
-  setSamplingMethod() { // TODO delete function?
+  setSamplingMethod() {
     const vm = this;
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
-    vm.$log.debug('In setSamplingMethod in analysis');
+    vm.$scope.selectedAlgorithmOptions = vm.setSelectedAlgorithmOptions(vm.$scope.selectedSamplingMethod);
   }
 
   setVariableSetting() { // TODO delete function?
@@ -437,5 +446,6 @@ export class AnalysisController {
     }
 
   }
+
 }
 

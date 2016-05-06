@@ -1,5 +1,31 @@
 <div class="row">
   <div class="col-md-6">
+    <uib-accordion close-others="false">
+      <uib-accordion-group class="algorithm-custom" is-open="settings.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': settings.open, 'glyphicon-chevron-right': !settings.open}"></i>
+          Algorithm Setting
+        </uib-accordion-heading>
+
+        <div ng-repeat="option in selectedAlgorithmOptions">
+          <div class="row">
+            <div class="col-md-10">
+
+              <label for="{{option.name}}">{{option.name}}</label>
+              <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.value}}">
+
+            </div>
+          </div>
+        </div>
+
+
+      </uib-accordion-group>
+    </uib-accordion>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
     <h5 class="inline measure-type">OpenStudio Measures</h5>
     <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
     <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ModelMeasure')">+ Add Measure</button>
