@@ -52,15 +52,6 @@ export class AnalysisController {
     vm.algorithmOptions = vm.Project.getAlgorithmOptions();
     vm.$scope.selectedAlgorithmOptions = vm.setSelectedAlgorithmOptions(vm.$scope.selectedSamplingMethod);
 
-    vm.$scope.selectedVariableSetting = vm.Project.getVariableSetting();
-    vm.variableSettings = vm.Project.getVariableSettings();
-
-    vm.$scope.selectedArgument = vm.Project.getSelectedArgument();
-    vm.selectedArguments = vm.Project.getSelectedArguments();
-
-    vm.$scope.selectedDistribution = vm.Project.getSelectedDistribution();
-    vm.selectedDistributions = vm.Project.getSelectedDistributions();
-
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
     vm.initializeGrids();
@@ -388,24 +379,6 @@ export class AnalysisController {
     const vm = this;
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.$scope.selectedAlgorithmOptions = vm.setSelectedAlgorithmOptions(vm.$scope.selectedSamplingMethod);
-  }
-
-  setVariableSetting() { // TODO delete function?
-    const vm = this;
-    vm.$log.debug('In setVariableSettings in analysis');
-    vm.Project.setVariableSetting(vm.$scope.selectedVariableSetting);
-  }
-
-  setSelectedArgument() { // TODO delete function?
-    const vm = this;
-    vm.$log.debug('In setArguments in analysis');
-    vm.Project.setSelectedArgument(vm.$scope.selectedArgument);
-  }
-
-  setSelectedDistribution() { // TODO delete function?
-    const vm = this;
-    vm.$log.debug('In setDistribution in analysis');
-    vm.Project.setSelectedDistribution(vm.$scope.selectedDistribution);
   }
 
   selectSeedModel() {
