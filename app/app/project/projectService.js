@@ -51,9 +51,9 @@ export class Project {
     vm.runType = vm.runTypes[0];
 
     vm.algorithmOptions = vm.setAlgorithmOptions();
-    vm.$log.debug('alg options: ', vm.algorithmOptions);
 
-    // TODO: load measures from PAT.json & project dir the first time around
+    vm.algorithmSettings = [];
+
     vm.measures = [];
     vm.designAlternatives = [];
 
@@ -87,6 +87,10 @@ export class Project {
       vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
       vm.runType = vm.pat.runType ? vm.pat.runType : vm.runType;
       vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
+      vm.$log.debug('in initializeProject in Project');
+      vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
+      vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
+      vm.algorithmSettings = vm.pat.algorithmSettings ? vm.pat.algorithmSettings : vm.algorithmSettings;
     }
   }
 
@@ -343,6 +347,7 @@ export class Project {
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
     vm.pat.runType = vm.runType;
     vm.pat.samplingMethod = vm.samplingMethod;
+    vm.pat.algorithmSettings = vm.algorithmSettings;
 
     // measures and options
     vm.pat.measures = vm.measures;
@@ -484,227 +489,271 @@ export class Project {
     at.Morris = [{
       name: 'r',
       description: 'integer giving the number of repetitions of the design',
-      value: 10
+      defaultValue: 10
     }, {
       name: 'levels',
       description: '',
-      value: 10
+      defaultValue: 10
     }, {
       name: 'grid_jump',
       description: '',
-      value: 1
+      defaultValue: 1
     }, {
       name: 'type',
       description: 'oat',
-      value: 'oat'
+      defaultValue: 'oat'
     }];
     at.LHS = [{
       name: 'Sample Method',
       description: 'individual_variables / all_variables',
-      value: 'individual_variables'
+      defaultValue: 'individual_variables'
     }, {
       name: 'Number of Samples',
       description: 'positive integer (if individual, total simulations is this times each variable)',
-      value: 30
+      defaultValue: 30
     }];
     at.Optim = [{
       name: 'epsilonGradient',
       description: 'epsilon in gradient calculation',
-      value: 0.01
+      defaultValue: 0.01
     }, {
       name: 'pgtol',
       description: 'tolerance on the projected gradient',
-      value: 0.01
+      defaultValue: 0.01
     }, {
       name: 'factr',
       description: 'Tolerance on delta_F',
-      value: 45036000000000
+      defaultValue: 45036000000000
     }, {
       name: 'maxit',
       description: 'Maximum number of iterations',
-      value: 100
+      defaultValue: 100
     }, {
       name: 'normType',
       description: '',
-      value: 'minkowski'
+      defaultValue: 'minkowski'
     }, {
       name: 'pPower',
       description: 'Lp norm power',
-      value: 2
+      defaultValue: 2
     }, {
       name: 'Exit On Guideline14',
       description: '0 false / 1 true (for use with calibration report)',
-      value: 0
+      defaultValue: 0
     }];
     at.RGENOUD = [{
       name: 'popSize',
       description: 'Size of initial population',
-      value: 30
+      defaultValue: 30
     }, {
       name: 'Generations',
       description: 'Number of generations',
-      value: 5
+      defaultValue: 5
     }, {
       name: 'waitGenerations',
       description: 'If no improvement in waitGenerations of generations, then exit',
-      value: 2
+      defaultValue: 2
     }, {
       name: 'bfgsburnin',
       description: 'The number of generations which are run before the BFGS is ﬁrst used',
-      value: 2
+      defaultValue: 2
     }, {
       name: 'gradientcheck',
       description: '0 false / 1 true',
-      value: 1
+      defaultValue: 1
     }, {
       name: 'solutionTolerance',
       description: '',
-      value: 0.01
+      defaultValue: 0.01
     }, {
       name: 'epsilonGradient',
       description: 'epsilon in gradient calculation',
-      value: 0.01
+      defaultValue: 0.01
     }, {
       name: 'pgtol',
       description: 'tolerance on the projected gradient',
-      value: 0.01
+      defaultValue: 0.01
     }, {
       name: 'factr',
       description: 'Tolerance on delta_F',
-      value: 45036000000000
+      defaultValue: 45036000000000
     }, {
       name: 'maxit',
       description: 'Maximum number of iterations',
-      value: 100
+      defaultValue: 100
     }, {
       name: 'normType',
       description: '',
-      value: 'minkowski'
+      defaultValue: 'minkowski'
     }, {
       name: 'pPower',
       description: 'Lp norm power',
-      value: 2
+      defaultValue: 2
     }, {
       name: 'Exit On Guideline14',
       description: '0 false / 1 true (for use with calibration report)',
-      value: 0
+      defaultValue: 0
     }, {
       name: 'balance',
       description: '0 false / 1 true (load balancing)',
-      value: 1
+      defaultValue: 1
     }];
       at.NSGA2 = [{
       name: 'Number of Samples',
       description: 'Size of initial population',
-      value: 30
+      defaultValue: 30
     }, {
       name: 'Generations',
       description: 'Number of generations',
-      value: 30
+      defaultValue: 30
     }, {
       name: 'cprob',
       description: 'Crossover probability [0,1]',
-      value: 0.85
+      defaultValue: 0.85
     }, {
       name: 'XoverDistIdx',
       description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
-      value: 5
+      defaultValue: 5
     }, {
       name: 'MuDistIdx',
       description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
-      value: 5
+      defaultValue: 5
     }, {
       name: 'mprob',
       description: 'Mutation probability [0,1]',
-      value: 0.8
+      defaultValue: 0.8
     }, {
       name: 'toursize',
       description: 'Tournament Size',
-      value: 2
+      defaultValue: 2
     }, {
       name: 'normType',
       description: '',
-      value: 'minkowski'
+      defaultValue: 'minkowski'
     }, {
       name: 'pPower',
       description: 'Lp norm power',
-      value: 2
+      defaultValue: 2
     }, {
       name: 'Exit On Guideline14',
       description: '0 false / 1 true (for use with calibration report)',
-      value: 0
+      defaultValue: 0
     }];
     at.SPEA2 = [{
       name: 'Number of Samples',
       description: 'Size of initial population',
-      value: 30
+      defaultValue: 30
     }, {
       name: 'Generations',
       description: 'Number of generations',
-      value: 30
+      defaultValue: 30
     }, {
       name: 'cprob',
       description: 'Crossover probability [0,1]',
-      value: 0.85
+      defaultValue: 0.85
     }, {
       name: 'XoverDistIdx',
       description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
-      value: 5
+      defaultValue: 5
     }, {
       name: 'MuDistIdx',
       description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
-      value: 5
+      defaultValue: 5
     }, {
       name: 'mprob',
       description: 'Mutation probability [0,1]',
-      value: 0.8
+      defaultValue: 0.8
     }, {
       name: 'toursize',
       description: 'Tournament Size',
-      value: 2
+      defaultValue: 2
     }, {
       name: 'normType',
       description: '',
-      value: 'minkowski'
+      defaultValue: 'minkowski'
     }, {
       name: 'pPower',
       description: 'Lp norm power',
-      value: 2
+      defaultValue: 2
     }, {
       name: 'Exit On Guideline14',
       description: '0 false / 1 true (for use with calibration report)',
-      value: 0
+      defaultValue: 0
     }];
     at.PreFlight = [];
     at.DOE = [{
       name: 'Experiment Type',
       description: 'full_factorial',
-      value: 'full_factorial'
+      defaultValue: 'full_factorial'
     }, {
       name: 'Number of Samples',
       description: 'positive integer (this discretizes a continuous variable)',
-      value: 2
+      defaultValue: 2
     }];
     at.SingleRun = [{
       name: '',
       description: '',
-      value: ''
+      defaultValue: ''
     }];
     at.RepeatRun = [{
       name: 'Number of Runs',
       description: 'positive integer (if individual, total simulations is this times each variable)',
-      value: 30
+      defaultValue: 30
     }];
     at.PSO = [{
       name: 'in_measure_combinations',
       description: '(TRUE/FALSE) Run full factorial search over in-measure variable combinations',
-      value: 'TRUE'
+      defaultValue: 'TRUE'
     }, {
       name: 'include_baseline_in_combinations',
       description: '(TRUE/FALSE) If in_measure_combinations are TRUE, sets if static values be included in combinations',
-      value: 'TRUE'
+      defaultValue: 'TRUE'
     }];
     return at;
+  }
+
+  // this will return all settings that have been set regardless of sampling method (not useful)
+  getAlgorithmSettings() {
+    const vm = this;
+    return vm.algorithmSettings;
+  }
+
+  getAlgorithmSettingsForMethod(samplingMethod) {
+    const vm = this;
+    vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
+
+    let settings = [];
+    _.forEach(vm.algorithmOptions[vm.samplingMethod.shortName], object => {
+      settings.push(object);
+    })
+
+    return settings;
+
+  }
+
+  setAlgorithmSettings(algorithm) {
+    const vm = this;
+    vm.$log.debug('In setAlgorithmSettings in Project');
+
+    _.forEach(vm.algorithmOptions[algorithm.shortName], (object) => {
+      let flag = 0;
+      _.forEach(vm.algorithmSettings, (setting) => {
+        if (object.name === setting.name) {
+          setting.description = object.description;
+          setting.defaultValue = object.defaultValue;
+          if (!setting['value']) {
+            setting.value = object.value;
+          }
+          flag = 1;
+        }
+      });
+      if (!flag) {
+        object.value = object.defaultValue;
+        vm.algorithmSettings.push(object);
+      }
+    });
+
+    vm.algorithmSettings = vm.algorithmOptions[algorithm.shortName];
   }
 
   getAlgorithmOptions() {

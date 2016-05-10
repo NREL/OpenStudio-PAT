@@ -34,8 +34,6 @@ export class AnalysisController {
     vm.$scope.epMeasures = [];
     vm.$scope.repMeasures = [];
 
-    vm.$scope.algorithmSettings = [];
-
     // SAVE
     vm.$scope.$on('$destroy', () => {
       console.log('SAVING measures to ProjectService');
@@ -49,8 +47,7 @@ export class AnalysisController {
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
 
-    vm.algorithmOptions = vm.Project.getAlgorithmOptions();
-    vm.$scope.selectedAlgorithmOptions = vm.setSelectedAlgorithmOptions(vm.$scope.selectedSamplingMethod);
+    vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
 
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
@@ -226,11 +223,6 @@ export class AnalysisController {
     });
   }
 
-  setSelectedAlgorithmOptions(algorithm) {
-    const vm = this;
-    return vm.algorithmOptions[algorithm.shortName];
-  }
-
   setMeasureTypes() {
     const vm = this;
     vm.$scope.osMeasures = [];
@@ -377,8 +369,11 @@ export class AnalysisController {
 
   setSamplingMethod() {
     const vm = this;
+    vm.$log.debug('In setSamplingMethod in analysis');
+
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
-    vm.$scope.selectedAlgorithmOptions = vm.setSelectedAlgorithmOptions(vm.$scope.selectedSamplingMethod);
+    vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
+    vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
   }
 
   selectSeedModel() {
