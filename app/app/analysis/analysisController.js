@@ -282,6 +282,16 @@ export class AnalysisController {
     return opt;
   }
 
+  deleteSelectedOption(measure) {
+    const vm = this;
+    vm.$log.debug('In deleteSelectedOption in analysis');
+
+    if (measure.number_of_options > 0) {
+      measure.number_of_options -= 1;
+      vm.$scope.gridOptions[measure.uid].columnDefs.splice(vm.$scope.gridOptions[measure.uid].columnDefs.length-1, 1);
+    }
+  }
+
   addDefaultArguments(measure, option) {
     _.forEach(measure.arguments, (argument) => {
       if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.defaultValue))) {

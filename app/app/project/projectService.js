@@ -725,7 +725,7 @@ export class Project {
     let settings = [];
     _.forEach(vm.algorithmOptions[vm.samplingMethod.shortName], object => {
       settings.push(object);
-    })
+    });
 
     return settings;
 
