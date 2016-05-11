@@ -20,7 +20,8 @@ var buildStyles = function () {
   var injectFiles = gulp.src([
     path.join(conf.paths.src, '/app/**/*.scss'),
     path.join('!' + conf.paths.src, '/app/bootstrap.scss'),
-    path.join('!' + conf.paths.src, '/app/index.scss')
+    path.join('!' + conf.paths.src, '/app/index.scss'),
+    path.join('!' + conf.paths.src, '/app/styles/**/*')
   ], {read: false});
 
   var injectOptions = {
@@ -48,7 +49,10 @@ var buildStyles = function () {
     .pipe($.sourcemaps.init())
     .pipe($.inject(injectFiles, injectOptions))
     .pipe($.sass(sassOptions)).on('error', conf.errorHandler('Sass'))
-    //.pipe($.autoprefixer()).on('error', conf.errorHandler('Autoprefixer'))
+    .pipe($.autoprefixer({
+      browsers: ['last 2 Chrome versions'],
+      cascade: false
+    })).on('error', conf.errorHandler('Autoprefixer'))
     .pipe($.sourcemaps.write())
     .pipe(indexFilter.restore)
     .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app/')));
