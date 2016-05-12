@@ -274,9 +274,13 @@ export class AnalysisController {
     opt.field = 'option_' + measure.number_of_options;
 
     // add default arguments to opt
-    vm.addDefaultArguments(measure, opt);
-    // TODO:  eventually check if variable is checked.
-    // TODO: If not, and option isn't the 1st one, copy what's in option_1 to the new option.
+    vm.addDefaultArguments(measure, opt);.
+
+    _.forEach (measure.arguments, (argument) => {
+      if (!argument['variable'] || !argument.variable) {
+        argument[opt.field] = argument['option_1'];
+      }
+    });
 
     vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
     return opt;
