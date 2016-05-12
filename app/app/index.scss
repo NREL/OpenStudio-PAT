@@ -51,8 +51,8 @@ select {
 
 .main {
   background: white;
-  padding: 10px 20px 10px 55px;
-  width:100%;
+  padding: 10px 15px 10px 50px;
+  width: 100%;
 }
 
 .nav {
@@ -131,12 +131,13 @@ select {
 }
 
 .full-width {
-  width:100%;
+  width: 100%;
 }
 
 .pad-bot-20 {
   padding-bottom: 20px;
 }
+
 .pad-bot-10 {
   padding-bottom: 10px;
 }
@@ -150,15 +151,15 @@ select {
 }
 
 .margin-top-20 {
-  margin-top:20px;
+  margin-top: 20px;
 }
 
 .margin-left-5 {
-  margin-left:5px;
+  margin-left: 5px;
 }
 
 .margin-right-5 {
-  margin-right:5px;
+  margin-right: 5px;
 }
 
 .search-img {
@@ -251,7 +252,6 @@ select {
   height: 250px;
 }
 
-
 /* TODO: Something is wrong, fix this later */
 .input-group > select + .input-group-btn > button {
   height: 34px;
@@ -281,15 +281,15 @@ select {
 }
 
 .gray-button {
-  color:#D6D6D6;
+  color: #D6D6D6;
 }
 
 .black-button {
-  color:#000000;
+  color: #000000;
 }
 
 .black-badge {
-  background-color:#000000;
+  background-color: #000000;
 }
 
 .library-grid-button {
@@ -308,13 +308,12 @@ select {
 }
 */
 
-
 /* ANALYSIS page */
 
 .analysis-custom {
 
   .panel {
-    border:0px;
+    border: 0px;
     /* border-radius: 0px; */
     /* -webkit-box-shadow: 0 0px 0px rgba(0, 0, 0, 0.0); */
     /* box-shadow: 0 0px 0px rgba(0, 0, 0, 0.0); */
@@ -322,56 +321,56 @@ select {
   }
 
   a:hover, a:focus {
-    text-decoration:none;
+    text-decoration: none;
   }
 
   .panel-default > .panel-heading {
-    background-color:#95A5A6;
-    color:#ffffff;
-    border-color:#ffffff;
+    background-color: #95A5A6;
+    color: #ffffff;
+    border-color: #ffffff;
   }
 }
 
 .button-div {
-  padding-bottom:10px;
+  padding-bottom: 10px;
 }
 
 .gray-top {
-  background-color:#D4D4D4;
-  padding:5px;
-  margin-bottom:20px;
+  background-color: #D4D4D4;
+  padding: 5px;
+  margin-bottom: 20px;
 }
 
 .big-label {
-  font-size:2em;
-  display:inline;
-  padding-right:20px;
+  font-size: 2em;
+  display: inline;
+  padding-right: 20px;
 }
 
 .medium-label {
-  font-size:1.4em;
+  font-size: 1.4em;
 }
 
 .form-control-smaller-width {
-  width:50%;
+  width: 50%;
 }
 
 .badge-info {
-  background-color:#6ACBE5;
-  display:inline;
+  background-color: #6ACBE5;
+  display: inline;
 }
 
 .input-group-addon {
-  background-color:transparent;
+  background-color: transparent;
   border: 0px;
 }
 
 .inline {
-  display:inline;
+  display: inline;
 }
 
 h5.measure-type {
-  font-size:1.5em;
+  font-size: 1.5em;
   line-height: 1.33;
   margin: 0;
 }
@@ -385,7 +384,7 @@ h5.measure-type {
 }
 
 .outputs-manual {
-  font-size:1.5em;
+  font-size: 1.5em;
 }
 
 .btn-grayed {
@@ -393,7 +392,6 @@ h5.measure-type {
   background-color: #333;
   border-color: #4cae4c;
 }
-
 
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject

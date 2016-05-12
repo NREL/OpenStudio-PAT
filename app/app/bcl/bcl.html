@@ -101,9 +101,9 @@
               <tr ng-repeat="file in modal.selected.files">
                 <td>
                   <strong>{{file.filename}}</strong>
-                  <span ng-if="file.version.softwareProgram != null"><br/><em>{{file.version.softwareProgram}} {{file.version.identifier}}</em></span>
-                  <span ng-if="file.version.minCompatible != null"><br/><em>Min Compatible Version: {{file.version.minCompatible}}</em></span>
-                  <span ng-if="file.version.maxCompatible != null"><br/><em>Max Compatible Version: {{file.version.maxCompatible}}</em></span>
+                  <span ng-if="file.version.softwareProgram != null"><br><em>{{file.version.softwareProgram}} {{file.version.identifier}}</em></span>
+                  <span ng-if="file.version.minCompatible != null"><br><em>Min Compatible Version: {{file.version.minCompatible}}</em></span>
+                  <span ng-if="file.version.maxCompatible != null"><br><em>Max Compatible Version: {{file.version.maxCompatible}}</em></span>
                 </td>
               </tr>
             </table>

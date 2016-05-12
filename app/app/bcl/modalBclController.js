@@ -84,7 +84,7 @@ export class ModalBclController {
         enableCellEdit: false,
         cellClass: 'icon-cell',
         width: '15%',
-        cellTemplate: '<img ng-src="assets/images/{{grid.getCellValue(row, col)}}_icon.png" alt="{{grid.getCellValue(row, col)}}" />'
+        cellTemplate: '<img ng-src="assets/images/{{grid.getCellValue(row, col)}}_icon.png" alt="{{grid.getCellValue(row, col)}}">'
       }, {
         name: 'author',
         enableCellEdit: false,
