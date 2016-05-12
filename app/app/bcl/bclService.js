@@ -7,7 +7,6 @@ export class BCL {
     'ngInject';
 
     const vm = this;
-    vm.service = {};
     vm.$http = $http;
     vm.$uibModal = $uibModal;
     vm.$q = $q;

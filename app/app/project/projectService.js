@@ -788,7 +788,7 @@ export class Project {
       name: 'Morris Method',
       shortName: 'Morris'
     }, {
-      name: 'DesignOfExperiements',
+      name: 'DesignOfExperiments',
       shortName: 'DOE'
     }, {
       name: 'PreFlight',

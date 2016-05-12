@@ -1,12 +1,9 @@
 <div class="library-grid-button">
-  <span ng-if="row.entity.location == 'my'" class="glyphicon glyphicon-pencil library-grid-button"
-          aria-hidden="true" aria-label="Edit" ng-click="grid.appScope.modal.editMeasure(row.entity);  $event.stopPropagation();">
+  <span ng-if="row.entity.location == 'my'" class="glyphicon glyphicon-pencil library-grid-button" aria-hidden="true" aria-label="Edit" ng-click="grid.appScope.modal.editMeasure(row.entity); $event.stopPropagation();">
   </span>
   <span>
-    <img ng-if="row.entity.location != 'bcl'" ng-src="assets/images/2x-enabled.png" alt="Copy and Edit" ng-click="grid.appScope.modal.copyAndEditMeasure(row.entity); $event.stopPropagation();"/>
+    <img ng-if="row.entity.location != 'bcl'" ng-src="assets/images/2x-enabled.png" alt="Copy and Edit" ng-click="grid.appScope.modal.copyAndEditMeasure(row.entity); $event.stopPropagation();">
   </span>
-  <span ng-if="row.entity.location == 'bcl'" class="glyphicon glyphicon-download library-grid-button" aria-hidden="true"
-            aria-label="Download Measure from BCL" ng-click="grid.appScope.modal.download(row.entity);  $event.stopPropagation();">
+  <span ng-if="row.entity.location == 'bcl'" class="glyphicon glyphicon-download library-grid-button" aria-hidden="true" aria-label="Download Measure from BCL" ng-click="grid.appScope.modal.download(row.entity); $event.stopPropagation();">
   </span>
 </div>
-

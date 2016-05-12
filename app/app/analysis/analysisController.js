@@ -86,13 +86,7 @@ export class AnalysisController {
       },
       //cellTemplate: '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />' +
       //'<div ng-if=\"!row.entity.type==\'Boolean\'\" class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>',
-      editableCellTemplate: '<div><form name=\"inputForm\">' +
-      '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
-      '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />' +
-      '<input ng-if=\"row.entity.type==\'Int\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-      '<input ng-if=\"row.entity.type==\'Double\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-      '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-      '</form></div>',
+      editableCellTemplate: 'app/analysis/optionInputTemplate.html',
       width: 200,
       minWidth: 100,
       enableCellEdit: true
@@ -186,7 +180,7 @@ export class AnalysisController {
           enableCellEdit: true,
           editableCellTemplate: 'ui-grid/dropdownEditor',
           editDropdownOptionsFunction: function (rowEntity, colDef) {
-            if (vm.$scope.selectedSamplingMethod.name === 'Latin Hypercube Sampling' || vm.$scope.selectedSamplingMethod.name === 'DesignOfExperiements') {
+            if (vm.$scope.selectedSamplingMethod.name === 'Latin Hypercube Sampling' || vm.$scope.selectedSamplingMethod.name === 'DesignOfExperiments') {
               return [{
                 ID: 1,
                 type: 'Static'

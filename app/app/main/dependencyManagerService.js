@@ -9,7 +9,6 @@ export class DependencyManager {
     'ngInject';
 
     const vm = this;
-    vm.service = {};
     vm.$http = $http;
     vm.$q = $q;
     vm.$log = $log;
@@ -112,8 +111,15 @@ export class DependencyManager {
       const tempDir = jetpack.cwd(app.getPath('temp'));
       if (tempDir.exists(filename)) tempDir.remove(filename);
       https.get(`${vm.manifest.endpoint}${filename}`, res => {
+        const contentLength = parseInt(res.headers['content-length']);
+        let bytesReceived = 0;
+        console.debug('Content Length:', contentLength);
         console.time(`${_.startCase(downloadManifest.type)} downloaded`);
-        res.on('data', d => tempDir.append(filename, d));
+        res.on('data', d => {
+          bytesReceived += d.length;
+          console.debug(`Downloading ${_.startCase(downloadManifest.type)} (${Math.floor(bytesReceived / contentLength * 100)}%)`);
+          tempDir.append(filename, d);
+        });
         res.on('end', () => {
           console.timeEnd(`${_.startCase(downloadManifest.type)} downloaded`);
           const actualMD5 = jetpack.inspect(tempDir.path(filename), {checksum: 'md5'}).md5;

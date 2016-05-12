@@ -1,9 +1,5 @@
 @import "styles/fonts.scss";
 
-* {
-  user-select: none;
-}
-
 @media (max-width: 1200px) {
   html, body {
     font-size: 0.8em;
@@ -14,6 +10,16 @@ body {
   display: flex;
   min-height: 100vh;
   flex-direction: column;
+}
+
+/* disallow text selection */
+* {
+  user-select: none;
+}
+
+/* hide button border */
+*:focus {
+  outline: none !important;
 }
 
 /* placeholder hyperlinks */
