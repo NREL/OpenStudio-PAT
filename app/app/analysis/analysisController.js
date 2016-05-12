@@ -92,7 +92,7 @@ export class AnalysisController {
       '<input ng-if=\"row.entity.type==\'Int\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
       '<input ng-if=\"row.entity.type==\'Double\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
       '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-      ' </form></div>',
+      '</form></div>',
       width: 200,
       minWidth: 100,
       enableCellEdit: true
@@ -105,8 +105,9 @@ export class AnalysisController {
     _.forEach(vm.$scope.measures, (measure) => {
 
       // set number of options in measure
-      if (!('number_of_options' in measure)) {
-        measure.number_of_options = 0;
+
+      if (!_.has(measure, 'numberOfOptions')) {
+        measure.numberOfOptions = 0;
       }
 
       vm.$scope.gridOptions[measure.uid] = {
@@ -140,7 +141,6 @@ export class AnalysisController {
         }],
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.uid] = gridApi;
-
         }
       };
     });
@@ -152,8 +152,8 @@ export class AnalysisController {
     _.forEach(vm.$scope.measures, (measure) => {
 
       // set number of options in measure
-      if (!('number_of_options' in measure)) {
-        measure.number_of_options = 0;
+      if ((!_.has(measure, 'numberOfOptions'))) {
+        measure.numberOfOptions = 0;
       }
 
       vm.$scope.gridOptions[measure.uid] = {
@@ -266,19 +266,19 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In addMeasureOption in analysis');
 
-    measure.number_of_options += 1;
+    measure.numberOfOptions++;
 
     // start from first option
     const opt = vm.getDefaultOptionColDef();
-    opt.displayName = 'Option ' + measure.number_of_options;
-    opt.field = 'option_' + measure.number_of_options;
+    opt.displayName = 'Option ' + measure.numberOfOptions;
+    opt.field = 'option_' + measure.numberOfOptions;
 
     // add default arguments to opt
-    vm.addDefaultArguments(measure, opt);.
+    vm.addDefaultArguments(measure, opt);
 
-    _.forEach (measure.arguments, (argument) => {
-      if (!argument['variable'] || !argument.variable) {
-        argument[opt.field] = argument['option_1'];
+    _.forEach(measure.arguments, argument => {
+      if (!argument.variable) {
+        argument[opt.field] = argument.option_1;
       }
     });
 
@@ -290,9 +290,9 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In deleteSelectedOption in analysis');
 
-    if (measure.number_of_options > 0) {
-      measure.number_of_options -= 1;
-      vm.$scope.gridOptions[measure.uid].columnDefs.splice(vm.$scope.gridOptions[measure.uid].columnDefs.length-1, 1);
+    if (measure.numberOfOptions > 0) {
+      measure.numberOfOptions -= 1;
+      vm.$scope.gridOptions[measure.uid].columnDefs.splice(vm.$scope.gridOptions[measure.uid].columnDefs.length - 1, 1);
     }
   }
 
@@ -317,7 +317,7 @@ export class AnalysisController {
 
     // copy from 1st option
     _.forEach(measure.arguments, (arg) => {
-      arg[opt.field] = arg['option_1'];
+      arg[opt.field] = arg.option_1;
     });
   }
 
@@ -340,17 +340,15 @@ export class AnalysisController {
 
   loadOption(measure, option) {
     const vm = this;
-    let id = 1;
-    var n = option.id.lastIndexOf('_');
-    if (n != -1) {
-      id = option.id.substring(n + 1);
+    const re = /^option_(\d+)$/;
+    if (re.test(option.id)) {
+      const opt = vm.getDefaultOptionColDef();
+      opt.displayName = _.startCase(option.id);
+      opt.field = option.id;
+      vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
     } else {
-      // TODO: error in option id (expecting format option_<ID>)
+      vm.$log.error('option id does not match expected format (option_<ID>)');
     }
-    const opt = vm.getDefaultOptionColDef();
-    opt.displayName = 'Option ' + id;
-    opt.field = 'option_' + id;
-    vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
   }
 
   checkAll(measure) {
@@ -359,9 +357,7 @@ export class AnalysisController {
 
     vm.$scope.selectedAll = vm.$scope.selectedAll === false;
 
-    _.forEach(vm.$scope.gridOptions[measure.uid].data, (row) => {
-      row.variable = vm.$scope.selectedAll ? true : false;
-    });
+    _.forEach(vm.$scope.gridOptions[measure.uid].data, row => row.variable = !!vm.$scope.selectedAll);
   }
 
   setSeed() {

@@ -722,7 +722,7 @@ export class Project {
     const vm = this;
     vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
 
-    let settings = [];
+    const settings = [];
     _.forEach(vm.algorithmOptions[vm.samplingMethod.shortName], object => {
       settings.push(object);
     });
@@ -741,7 +741,7 @@ export class Project {
         if (object.name === setting.name) {
           setting.description = object.description;
           setting.defaultValue = object.defaultValue;
-          if (!setting['value']) {
+          if (!setting.value) {
             setting.value = object.value;
           }
           flag = 1;
