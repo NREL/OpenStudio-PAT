@@ -1,23 +1,53 @@
 @import "styles/fonts.scss";
 
+$footer-height: 25px;
+
 @media (max-width: 1200px) {
-  html, body {
+  body {
     font-size: 0.8em;
   }
 }
 
 body {
-  overflow-y: scroll;
+  height: calc(100vh - #{$footer-height});
+  overflow: hidden;
+  > nav {
+    background: #3f3f3f;
+    border-right: 1px solid #000;
+    height: calc(100vh - #{$footer-height});
+    overflow-y: auto;
+    padding: 15px 0;
+    position: fixed;
+    width: 40px;
+  }
+  > main {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 10px 10px 10px 50px;
+  }
+  > footer {
+    background-color: #e8e8e8;
+    border-top: 1px solid #919191;
+    bottom: 0;
+    font-size: 14px;
+    line-height: 1.8em;
+    height: $footer-height;
+    padding: 0 8px;
+    position: fixed;
+    width: 100%;
+    z-index: 1060;
+  }
 }
 
 ::-webkit-scrollbar {
-  width: 6px;
   height: 6px;
+  width: 6px;
 }
 
 ::-webkit-scrollbar-button {
-  width: 0;
   height: 0;
+  width: 0;
 }
 
 ::-webkit-scrollbar-thumb {
@@ -60,33 +90,9 @@ select {
   cursor: pointer;
 }
 
-.container-flex {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
-  overflow-y: scroll;
-  > .nav {
-    height: 100vh;
-    position: fixed;
-  }
-  .server-frame {
-    height: 100vh;
-    width: 100%;
-  }
-}
-
-.main {
-  background: white;
-  padding: 10px 15px 10px 50px;
+.server-frame {
+  height: 100vh;
   width: 100%;
-}
-
-.nav {
-  background: #3f3f3f;
-  border-right: 1px solid #000;
-  flex-direction: column;
-  padding: 15px 0;
-  width: 40px;
 }
 
 /* make sidebar nav vertical */
@@ -286,7 +292,11 @@ select {
 // Increase modal size
 .wide-modal .modal-dialog {
   min-width: 500px;
-  width: calc(100% - 100px);
+  width: calc(100vw - 100px);
+  .modal-body {
+    max-height: calc(100vh - 191px - #{$footer-height});
+    overflow-y: auto;
+  }
 }
 
 .icon-cell {
@@ -417,6 +427,19 @@ h5.measure-type {
   color: #fff;
   background-color: #333;
   border-color: #4cae4c;
+}
+
+.glyphicon-spin {
+  animation: spin 1000ms infinite linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
 }
 
 /**
