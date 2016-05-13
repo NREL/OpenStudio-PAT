@@ -21,13 +21,11 @@
     <!-- endinject -->
     <!-- endbuild -->
   </head>
-  <body>
-    <div class="container-flex">
-      <div class="nav">
-        <div ng-include="'app/nav/nav.html'"></div>
-      </div>
-      <div class="main" ui-view></div>
+  <body class="container-flex">
+    <div class="nav">
+      <div ng-include="'app/nav/nav.html'"></div>
     </div>
+    <div class="main" ui-view></div>
 
     <!-- build:js(src) scripts/vendor.js -->
     <!-- bower:js -->
