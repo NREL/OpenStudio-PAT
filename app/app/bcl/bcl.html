@@ -11,7 +11,7 @@
           <input type="text" name="search" id="search" ng-model="modal.keyword" class="form-control" placeholder="Search">
           <span class="input-group-btn">
             <button class="btn btn-default" type="button" ng-click="modal.search()">
-              <span class="glyphicon glyphicon-search" style="padding-bottom:6px;"  aria-hidden="true" aria-label="Search">
+              <span class="glyphicon glyphicon-search" aria-hidden="true" aria-label="Search">
               </span>
             </button>
           </span>
@@ -59,7 +59,8 @@
                         <label><input type="checkbox" ng-model="cat2.checked" ng-click="modal.resetFilters(2, [cat1.name, cat2.name]);">{{cat2.name}}</label>
                         <div ng-show="cat1.children" class="indent-twice">
                           <div ng-repeat="cat3 in cat2.children">
-                            <div class="checkbox bcl-cb"><label><input type="checkbox" ng-model="cat3.checked" ng-click="modal.resetFilters(3, [cat1.name, cat2.name, cat3.name]);">{{cat3.name}}</label>
+                            <div class="checkbox bcl-cb">
+                              <label><input type="checkbox" ng-model="cat3.checked" ng-click="modal.resetFilters(3, [cat1.name, cat2.name, cat3.name]);">{{cat3.name}}</label>
                             </div>
                           </div>
                         </div>
@@ -110,8 +111,6 @@
           </div>
         </div>
       </aside>
-
-      <h3></h3>
     </div>
   </div>
 </div>

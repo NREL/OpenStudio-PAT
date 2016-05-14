@@ -16,7 +16,8 @@ import { Project } from '../app/project/projectService';
 import { ReportsController } from '../app/reports/reportsController';
 import { RunController } from '../app/run/runController';
 import { ServerController } from '../app/server/serverController';
-import { StatusBar } from '../app/main/statusBarService';
+import { StatusBar } from '../app/status_bar/statusBarService';
+import { StatusBarController } from '../app/status_bar/statusBarController';
 
 angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'pascalprecht.translate', 'ui.router', 'ui.router.stateHelper', 'ui.bootstrap', 'toastr', 'ui.grid', 'ui.grid.autoResize', 'ui.grid.cellNav', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ui.grid.selection', 'ui.grid.pinning'])
   .config(config)
@@ -30,6 +31,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('RunController', RunController)
   .controller('ReportsController', ReportsController)
   .controller('ServerController', ServerController)
+  .controller('StatusBarController', StatusBarController)
   .service('BCL', BCL)
   .service('DependencyManager', DependencyManager)
   .service('OsServer', OsServer)

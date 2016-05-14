@@ -1,5 +1,6 @@
 @import "styles/fonts.scss";
 
+$nav-width: 40px;
 $footer-height: 25px;
 
 @media (max-width: 1200px) {
@@ -14,23 +15,23 @@ body {
   > nav {
     background: #3f3f3f;
     border-right: 1px solid #000;
+    box-sizing: content-box;
     height: calc(100vh - #{$footer-height});
-    overflow-y: auto;
-    padding: 15px 0;
     position: fixed;
-    width: 40px;
+    width: $nav-width;
   }
   > main {
     height: 100%;
+    margin-left: $nav-width + 1px;
     overflow-x: hidden;
     overflow-y: scroll;
-    padding: 10px 10px 10px 50px;
+    padding: 10px;
   }
   > footer {
     background-color: #e8e8e8;
     border-top: 1px solid #919191;
     bottom: 0;
-    font-size: 14px;
+    font-size: 13px;
     line-height: 1.8em;
     height: $footer-height;
     padding: 0 8px;
@@ -40,7 +41,12 @@ body {
   }
 }
 
-::-webkit-scrollbar {
+#status {
+  left: 30px;
+  position: absolute;
+}
+
+/*::-webkit-scrollbar {
   height: 6px;
   width: 6px;
 }
@@ -65,6 +71,28 @@ body {
 
 ::-webkit-scrollbar-track, ::-webkit-scrollbar-track:hover, ::-webkit-scrollbar-track:active, ::-webkit-scrollbar-corner {
   background: transparent;
+}*/
+
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 7px;
+  border: 4px solid rgba(0, 0, 0, 0);
+  box-shadow: inset -1px -1px 0 rgba(0, 0, 0, 0.05), inset 1px 1px 0 rgba(0, 0, 0, 0.05);
+  height: 6px;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-corner {
+  background-color: transparent;
 }
 
 /* disallow text selection */
@@ -96,36 +124,39 @@ select {
 }
 
 /* make sidebar nav vertical */
-.sidebar-nav .navbar {
-  border: 0;
-  margin: 0;
-}
+.sidebar-nav {
+  padding: 15px 0;
 
-.sidebar-nav .navbar .navbar-collapse {
-  padding: 0;
-  max-height: none;
-  background-color: #000;
-  border: 0;
-}
+  .navbar {
+    border: 0;
+    margin: 0;
 
-.sidebar-nav .navbar ul {
-  float: none;
-  background-color: #000;
-}
+    .navbar-collapse {
+      padding: 0;
+      max-height: none;
+      background-color: #000;
+      border: 0;
+    }
 
-.sidebar-nav .navbar ul:not {
-  display: block;
-}
+    ul {
+      float: none;
+      background-color: #000;
+      &::not {
+        display: block;
+      }
+    }
 
-.sidebar-nav .navbar li {
-  float: none;
-  display: block;
-}
+    li {
+      float: none;
+      display: block;
 
-.sidebar-nav .navbar li a {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #fff;
+      a {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #fff;
+      }
+    }
+  }
 }
 
 .nav .nav-pills ul {

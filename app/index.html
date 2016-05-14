@@ -22,11 +22,9 @@
     <!-- endbuild -->
   </head>
   <body>
-    <nav class="nav">
-      <div ng-include="'app/nav/nav.html'"></div>
-    </nav>
+    <nav ng-include="'app/nav/nav.html'"></nav>
     <main ui-view></main>
-    <footer></footer>
+    <footer ng-include="'app/status_bar/statusBar.html'"></footer>
 
     <!-- build:js(src) scripts/vendor.js -->
     <!-- bower:js -->
