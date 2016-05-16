@@ -11,7 +11,7 @@
           <input type="text" name="search" id="search" ng-model="modal.keyword" class="form-control" placeholder="Search">
           <span class="input-group-btn">
             <button class="btn btn-default" type="button" ng-click="modal.search()">
-              <span class="glyphicon glyphicon-search" style="padding-bottom:6px;"  aria-hidden="true" aria-label="Search">
+              <span class="glyphicon glyphicon-search" aria-hidden="true" aria-label="Search">
               </span>
             </button>
           </span>
@@ -59,7 +59,8 @@
                         <label><input type="checkbox" ng-model="cat2.checked" ng-click="modal.resetFilters(2, [cat1.name, cat2.name]);">{{cat2.name}}</label>
                         <div ng-show="cat1.children" class="indent-twice">
                           <div ng-repeat="cat3 in cat2.children">
-                            <div class="checkbox bcl-cb"><label><input type="checkbox" ng-model="cat3.checked" ng-click="modal.resetFilters(3, [cat1.name, cat2.name, cat3.name]);">{{cat3.name}}</label>
+                            <div class="checkbox bcl-cb">
+                              <label><input type="checkbox" ng-model="cat3.checked" ng-click="modal.resetFilters(3, [cat1.name, cat2.name, cat3.name]);">{{cat3.name}}</label>
                             </div>
                           </div>
                         </div>
@@ -79,7 +80,7 @@
     </div>
 
     <div class="col-xs-4">
-      <div ng-show="modal.selected" class="lib-details">
+      <aside ng-show="modal.selected" class="lib-details">
 
         <div class="row">
           <div class="col-xs-12">
@@ -101,17 +102,15 @@
               <tr ng-repeat="file in modal.selected.files">
                 <td>
                   <strong>{{file.filename}}</strong>
-                  <span ng-if="file.version.softwareProgram != null"><br/><em>{{file.version.softwareProgram}} {{file.version.identifier}}</em></span>
-                  <span ng-if="file.version.minCompatible != null"><br/><em>Min Compatible Version: {{file.version.minCompatible}}</em></span>
-                  <span ng-if="file.version.maxCompatible != null"><br/><em>Max Compatible Version: {{file.version.maxCompatible}}</em></span>
+                  <span ng-if="file.version.softwareProgram != null"><br><em>{{file.version.softwareProgram}} {{file.version.identifier}}</em></span>
+                  <span ng-if="file.version.minCompatible != null"><br><em>Min Compatible Version: {{file.version.minCompatible}}</em></span>
+                  <span ng-if="file.version.maxCompatible != null"><br><em>Max Compatible Version: {{file.version.maxCompatible}}</em></span>
                 </td>
               </tr>
             </table>
           </div>
         </div>
-      </div>
-
-      <h3></h3>
+      </aside>
     </div>
   </div>
 </div>

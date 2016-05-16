@@ -50,16 +50,10 @@ export class Project {
     vm.runTypes = vm.getRunTypes();
     vm.runType = vm.runTypes[0];
 
-    vm.selectedDistributions = vm.getSelectedDistributions();
-    vm.selectedDistribution = vm.selectedDistributions[0];
+    vm.algorithmOptions = vm.setAlgorithmOptions();
 
-    vm.selectedArguments = vm.getSelectedArguments();
-    vm.selectedArgument = vm.selectedArguments[0];
+    vm.algorithmSettings = [];
 
-    vm.variableSettings = vm.getVariableSettings();
-    vm.variableSetting = vm.variableSettings[0];
-
-    // TODO: load measures from PAT.json & project dir the first time around
     vm.measures = [];
     vm.designAlternatives = [];
 
@@ -93,9 +87,10 @@ export class Project {
       vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
       vm.runType = vm.pat.runType ? vm.pat.runType : vm.runType;
       vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
-      vm.selectedDistribution = vm.pat.selectedDistribution ? vm.pat.selectedDistribution : vm.selectedDistribution;
-      vm.selectedArgument = vm.pat.selectedArgument ? vm.pat.selectedArgument : vm.selectedArgument;
-      vm.variableSetting = vm.pat.variableSetting ? vm.pat.variableSetting : vm.variableSetting;
+      vm.$log.debug('in initializeProject in Project');
+      vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
+      vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
+      vm.algorithmSettings = vm.pat.algorithmSettings ? vm.pat.algorithmSettings : vm.algorithmSettings;
     }
   }
 
@@ -345,9 +340,7 @@ export class Project {
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
     vm.pat.runType = vm.runType;
     vm.pat.samplingMethod = vm.samplingMethod;
-    vm.pat.selectedDistribution = vm.selectedDistribution;
-    vm.pat.selectedArgument = vm.selectedArgument;
-    vm.pat.variableSetting = vm.variableSetting;
+    vm.pat.algorithmSettings = vm.algorithmSettings;
 
     // measures and options
     vm.pat.measures = vm.measures;
@@ -481,9 +474,292 @@ export class Project {
     return vm.samplingMethods;
   }
 
+
+  setAlgorithmOptions() {
+    const at = {};
+
+    at.BatchRun = [];
+    at.Morris = [{
+      name: 'r',
+      description: 'integer giving the number of repetitions of the design',
+      defaultValue: 10
+    }, {
+      name: 'levels',
+      description: '',
+      defaultValue: 10
+    }, {
+      name: 'grid_jump',
+      description: '',
+      defaultValue: 1
+    }, {
+      name: 'type',
+      description: 'oat',
+      defaultValue: 'oat'
+    }];
+    at.LHS = [{
+      name: 'Sample Method',
+      description: 'individual_variables / all_variables',
+      defaultValue: 'individual_variables'
+    }, {
+      name: 'Number of Samples',
+      description: 'positive integer (if individual, total simulations is this times each variable)',
+      defaultValue: 30
+    }];
+    at.Optim = [{
+      name: 'epsilonGradient',
+      description: 'epsilon in gradient calculation',
+      defaultValue: 0.01
+    }, {
+      name: 'pgtol',
+      description: 'tolerance on the projected gradient',
+      defaultValue: 0.01
+    }, {
+      name: 'factr',
+      description: 'Tolerance on delta_F',
+      defaultValue: 45036000000000
+    }, {
+      name: 'maxit',
+      description: 'Maximum number of iterations',
+      defaultValue: 100
+    }, {
+      name: 'normType',
+      description: '',
+      defaultValue: 'minkowski'
+    }, {
+      name: 'pPower',
+      description: 'Lp norm power',
+      defaultValue: 2
+    }, {
+      name: 'Exit On Guideline14',
+      description: '0 false / 1 true (for use with calibration report)',
+      defaultValue: 0
+    }];
+    at.RGENOUD = [{
+      name: 'popSize',
+      description: 'Size of initial population',
+      defaultValue: 30
+    }, {
+      name: 'Generations',
+      description: 'Number of generations',
+      defaultValue: 5
+    }, {
+      name: 'waitGenerations',
+      description: 'If no improvement in waitGenerations of generations, then exit',
+      defaultValue: 2
+    }, {
+      name: 'bfgsburnin',
+      description: 'The number of generations which are run before the BFGS is ﬁrst used',
+      defaultValue: 2
+    }, {
+      name: 'gradientcheck',
+      description: '0 false / 1 true',
+      defaultValue: 1
+    }, {
+      name: 'solutionTolerance',
+      description: '',
+      defaultValue: 0.01
+    }, {
+      name: 'epsilonGradient',
+      description: 'epsilon in gradient calculation',
+      defaultValue: 0.01
+    }, {
+      name: 'pgtol',
+      description: 'tolerance on the projected gradient',
+      defaultValue: 0.01
+    }, {
+      name: 'factr',
+      description: 'Tolerance on delta_F',
+      defaultValue: 45036000000000
+    }, {
+      name: 'maxit',
+      description: 'Maximum number of iterations',
+      defaultValue: 100
+    }, {
+      name: 'normType',
+      description: '',
+      defaultValue: 'minkowski'
+    }, {
+      name: 'pPower',
+      description: 'Lp norm power',
+      defaultValue: 2
+    }, {
+      name: 'Exit On Guideline14',
+      description: '0 false / 1 true (for use with calibration report)',
+      defaultValue: 0
+    }, {
+      name: 'balance',
+      description: '0 false / 1 true (load balancing)',
+      defaultValue: 1
+    }];
+      at.NSGA2 = [{
+      name: 'Number of Samples',
+      description: 'Size of initial population',
+      defaultValue: 30
+    }, {
+      name: 'Generations',
+      description: 'Number of generations',
+      defaultValue: 30
+    }, {
+      name: 'cprob',
+      description: 'Crossover probability [0,1]',
+      defaultValue: 0.85
+    }, {
+      name: 'XoverDistIdx',
+      description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5
+    }, {
+      name: 'MuDistIdx',
+      description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5
+    }, {
+      name: 'mprob',
+      description: 'Mutation probability [0,1]',
+      defaultValue: 0.8
+    }, {
+      name: 'toursize',
+      description: 'Tournament Size',
+      defaultValue: 2
+    }, {
+      name: 'normType',
+      description: '',
+      defaultValue: 'minkowski'
+    }, {
+      name: 'pPower',
+      description: 'Lp norm power',
+      defaultValue: 2
+    }, {
+      name: 'Exit On Guideline14',
+      description: '0 false / 1 true (for use with calibration report)',
+      defaultValue: 0
+    }];
+    at.SPEA2 = [{
+      name: 'Number of Samples',
+      description: 'Size of initial population',
+      defaultValue: 30
+    }, {
+      name: 'Generations',
+      description: 'Number of generations',
+      defaultValue: 30
+    }, {
+      name: 'cprob',
+      description: 'Crossover probability [0,1]',
+      defaultValue: 0.85
+    }, {
+      name: 'XoverDistIdx',
+      description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5
+    }, {
+      name: 'MuDistIdx',
+      description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5
+    }, {
+      name: 'mprob',
+      description: 'Mutation probability [0,1]',
+      defaultValue: 0.8
+    }, {
+      name: 'toursize',
+      description: 'Tournament Size',
+      defaultValue: 2
+    }, {
+      name: 'normType',
+      description: '',
+      defaultValue: 'minkowski'
+    }, {
+      name: 'pPower',
+      description: 'Lp norm power',
+      defaultValue: 2
+    }, {
+      name: 'Exit On Guideline14',
+      description: '0 false / 1 true (for use with calibration report)',
+      defaultValue: 0
+    }];
+    at.PreFlight = [];
+    at.DOE = [{
+      name: 'Experiment Type',
+      description: 'full_factorial',
+      defaultValue: 'full_factorial'
+    }, {
+      name: 'Number of Samples',
+      description: 'positive integer (this discretizes a continuous variable)',
+      defaultValue: 2
+    }];
+    at.SingleRun = [{
+      name: '',
+      description: '',
+      defaultValue: ''
+    }];
+    at.RepeatRun = [{
+      name: 'Number of Runs',
+      description: 'positive integer (if individual, total simulations is this times each variable)',
+      defaultValue: 30
+    }];
+    at.PSO = [{
+      name: 'in_measure_combinations',
+      description: '(TRUE/FALSE) Run full factorial search over in-measure variable combinations',
+      defaultValue: 'TRUE'
+    }, {
+      name: 'include_baseline_in_combinations',
+      description: '(TRUE/FALSE) If in_measure_combinations are TRUE, sets if static values be included in combinations',
+      defaultValue: 'TRUE'
+    }];
+    return at;
+  }
+
+  // this will return all settings that have been set regardless of sampling method (not useful)
+  getAlgorithmSettings() {
+    const vm = this;
+    return vm.algorithmSettings;
+  }
+
+  getAlgorithmSettingsForMethod(samplingMethod) {
+    const vm = this;
+    vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
+
+    const settings = [];
+    _.forEach(vm.algorithmOptions[vm.samplingMethod.shortName], object => {
+      settings.push(object);
+    });
+
+    return settings;
+
+  }
+
+  setAlgorithmSettings(algorithm) {
+    const vm = this;
+    vm.$log.debug('In setAlgorithmSettings in Project');
+
+    _.forEach(vm.algorithmOptions[algorithm.shortName], (object) => {
+      let flag = 0;
+      _.forEach(vm.algorithmSettings, (setting) => {
+        if (object.name === setting.name) {
+          setting.description = object.description;
+          setting.defaultValue = object.defaultValue;
+          if (!setting.value) {
+            setting.value = object.value;
+          }
+          flag = 1;
+        }
+      });
+      if (!flag) {
+        object.value = object.defaultValue;
+        vm.algorithmSettings.push(object);
+      }
+    });
+
+    vm.algorithmSettings = vm.algorithmOptions[algorithm.shortName];
+  }
+
+  getAlgorithmOptions() {
+    const vm = this;
+    return vm.algorithmOptions;
+  }
+
   setSamplingMethods() {
 
     return [{
+      name: 'BatchRun',
+      shortName: 'BatchRun'
+    }, {
       name: 'Nondominated Sorting Genetic Algorithm 2',
       shortName: 'NSGA2'
     }, {
@@ -497,7 +773,7 @@ export class Project {
       shortName: 'RGENOUD'
     }, {
       name: 'Optim',
-      shortName: 'L-BFGS-B'
+      shortName: 'Optim'
     }, {
       name: 'Latin Hypercube Sampling',
       shortName: 'LHS'
@@ -505,7 +781,7 @@ export class Project {
       name: 'Morris Method',
       shortName: 'Morris'
     }, {
-      name: 'DesignOfExperiements',
+      name: 'DesignOfExperiments',
       shortName: 'DOE'
     }, {
       name: 'PreFlight',
@@ -520,66 +796,6 @@ export class Project {
       name: 'BaselinePerturbation',
       shortName: 'BaselinePerturbation'
     }];
-  }
-
-  getVariableSetting() {
-    const vm = this;
-    return vm.variableSetting;
-  }
-
-  setVariableSetting(setting) {
-    const vm = this;
-    vm.variableSetting = setting;
-  }
-
-  getVariableSettings() {
-    const vm = this;
-    return ['Static', 'Discrete', 'Continuous', 'Pivot'];
-  }
-
-  setVariableSettings() {
-    const vm = this;
-    return 'test';
-  }
-
-  getSelectedArgument() {
-    const vm = this;
-    return vm.selectedArgument;
-  }
-
-  setSelectedArgument(argument) {
-    const vm = this;
-    vm.selectedArgument = argument;
-  }
-
-  getSelectedArguments() {
-    const vm = this;
-    return ['Double', 'Choice', 'String'];
-  }
-
-  setSelectedArguments() {
-    const vm = this;
-    return 'test';
-  }
-
-  getSelectedDistribution() {
-    const vm = this;
-    return vm.selectedDistribution;
-  }
-
-  setSelectedDistribution(distribution) {
-    const vm = this;
-    vm.selectedDistribution = distribution;
-  }
-
-  getSelectedDistributions() {
-    const vm = this;
-    return ['Normal', 'Uniform', 'Triangle'];
-  }
-
-  setSelectedDistributions() {
-    const vm = this;
-    return 'test';
   }
 
   getAnalysisTypes() {

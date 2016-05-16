@@ -1,8 +1,34 @@
 <div class="row">
   <div class="col-md-6">
+    <uib-accordion close-others="false">
+      <uib-accordion-group class="algorithm-custom" is-open="settings.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': settings.open, 'glyphicon-chevron-right': !settings.open}"></i>
+          Algorithm Setting
+        </uib-accordion-heading>
+
+        <div ng-repeat="option in algorithmSettings">
+          <div class="row">
+            <div class="col-md-10">
+
+              <label for="{{option.name}}">{{option.name}}</label>
+              <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}" ng-model="option.value">
+
+            </div>
+          </div>
+        </div>
+
+
+      </uib-accordion-group>
+    </uib-accordion>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-md-6">
     <h5 class="inline measure-type">OpenStudio Measures</h5>
     <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ModelMeasure')">+ Add Measure</button>
+    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ModelMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Measure</button>
   </div>
   <div class="col-md-6">
     <button type="button" class="btn btn-primary" ng-click="analysis.checkUpdates()"><span class="glyphicon glyphicon-repeat">&nbsp;</span>Check for Updates</button>
@@ -16,55 +42,53 @@
           <uib-accordion-heading>
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
             {{measure.name}}
-              <span class="pull-right">
-                <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
-                  <span class="glyphicon glyphicon-remove"></span>
-                </span>
+            <span class="pull-right">
+              <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
+                <span class="glyphicon glyphicon-remove"></span>
               </span>
+            </span>
           </uib-accordion-heading>
-          ALGORITHMIC FIELDS
-          <!--<div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>-->
+          <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
         </uib-accordion-group>
       </uib-accordion>
     </div>
   </div>
 </div>
-<hr class="black-line" />
+<hr class="black-line">
 <div class="row">
   <div class="col-md-12">
     <h5 class="inline measure-type">EnergyPlus Measures</h5>
     <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('EnergyPlusMeasure')">+ Add Measure</button>
+    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('EnergyPlusMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Measure</button>
   </div>
 </div>
 <div class="analysis-custom">
   <div class="panel panel-default full-width margin-top-20">
     <div class="analysis-custom panel-body">
       <uib-accordion close-others="false">
-        <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.uid}}"  is-open="measure.open">
+        <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
           <uib-accordion-heading>
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
             {{measure.name}}
-                <span class="pull-right">
-                  <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
-                    <span class="glyphicon glyphicon-remove"></span>
-                  </span>
-                </span>
+            <span class="pull-right">
+              <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
+                <span class="glyphicon glyphicon-remove"></span>
+              </span>
+            </span>
           </uib-accordion-heading>
-          ALGORITHMIC FIELDS
-         <!-- <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>-->
+          <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
         </uib-accordion-group>
       </uib-accordion>
     </div>
   </div>
 </div>
 
-<hr class="black-line" />
+<hr class="black-line">
 <div class="row">
   <div class="col-md-12">
     <h5 class="inline measure-type">Reporting Measures</h5>
     <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ReportingMeasure')">+ Add Measure</button>
+    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ReportingMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Measure</button>
   </div>
 </div>
 <div class="analysis-custom">
@@ -75,14 +99,13 @@
           <uib-accordion-heading>
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
             {{measure.name}}
-                <span class="pull-right">
-                  <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
-                    <span class="glyphicon glyphicon-remove"></span>
-                  </span>
-                </span>
+            <span class="pull-right">
+              <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
+                <span class="glyphicon glyphicon-remove"></span>
+              </span>
+            </span>
           </uib-accordion-heading>
-          ALGORITHMIC FIELDS
-          <!--<div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>-->
+          <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
         </uib-accordion-group>
       </uib-accordion>
     </div>

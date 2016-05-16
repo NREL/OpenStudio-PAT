@@ -1,74 +1,47 @@
-<div class="container-flex">
-  <div class="nav">
-    <div ng-include="'app/nav/nav.html'"></div>
-  </div>
-  <div class="main">
-    <div class="gray-top">
-      <div class="row">
-        <div class="col-md-1 pad-bot-10">
-          <h4>Analysis</h4>
-        </div>
-        <div class="col-md-5 pad-bot-20 pad-top-5">
-          <div class="input-group">
-            <select class="form-control inline form-control-smaller-width" ng-options="type as type for type in analysis.analysisTypes" ng-model="selectedAnalysisType" ng-change="analysis.setType()"></select>
-            <span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>
-          </div>
-        </div>
+<div class="gray-top">
+  <div class="row">
+    <div class="col-md-1 pad-bot-10">
+      <h4>Analysis</h4>
+    </div>
+    <div class="col-md-5 pad-bot-20 pad-top-5">
+      <div class="input-group">
+        <select class="form-control inline form-control-smaller-width" ng-options="type as type for type in analysis.analysisTypes" ng-model="selectedAnalysisType" ng-change="analysis.setType()"></select>
+        <span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>
       </div>
-      <div class="row">
-        <div class="col-md-4 pad-bot-20">
-          <div ng-show="selectedAnalysisType=='Algorithmic'">
-            <label class="medium-label">Sampling Method</label>
-            <div class="input-group">
-              <select class="form-control inline form-control-smaller-width" ng-options="method.name for method in analysis.samplingMethods track by method.shortName" ng-model="selectedSamplingMethod" ng-change="analysis.setSamplingMethod()"></select>
-              <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
-            </div>
-
-            <label class="medium-label">Selected Distributions</label>
-            <div class="input-group">
-              <select class="form-control inline form-control-smaller-width" ng-options="distribution for distribution in analysis.selectedDistributions" ng-model="selectedDistribution" ng-change="analysis.setSelectedDistribution()"></select>
-              <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
-            </div>
-
-            <label class="medium-label">Selected Arguments</label>
-            <div class="input-group">
-              <select class="form-control inline form-control-smaller-width" ng-options="argument for argument in analysis.selectedArguments" ng-model="selectedArgument" ng-change="analysis.setSelectedArgument()"></select>
-              <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
-            </div>
-
-            <label class="medium-label">Variable Settings</label>
-            <div class="input-group">
-              <select class="form-control inline form-control-smaller-width" ng-options="variable for variable in analysis.variableSettings" ng-model="selectedVariableSetting" ng-change="analysis.setVariableSetting()"></select>
-              <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
-            </div>
-
-          </div>
-        </div>
-        <div class="col-md-3 pad-bot-20">
-          <label class="medium-label">Default Seed Model</label>
-          <div class="input-group">
-            <select class="form-control" ng-options="seed as seed for seed in analysis.seeds" ng-model="defaultSeed" ng-change="analysis.setSeed()"></select>
-            <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
-            <span class="input-group-btn">
-              <button class="btn btn-default" type="button" ng-click="analysis.selectSeedModel()"><span class="glyphicon glyphicon-folder-open"></span></button>
-            </span>
-          </div>
-        </div>
-        <div class="col-md-3 pad-bot-20">
-          <label class="medium-label">Default Weather File</label>
-          <div class="input-group">
-            <select class="form-control" ng-options="file as file for file in analysis.weatherFiles" ng-model="defaultWeatherFile" ng-change="analysis.setWeatherFile()"></select>
-            <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
-            <span class="input-group-btn">
-              <button class="btn btn-default" type="button" ng-click="analysis.selectWeatherFile()"><span class="glyphicon glyphicon-folder-open"></span></button>
-            </span>
-          </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-md-4 pad-bot-20">
+      <div ng-show="selectedAnalysisType=='Algorithmic'">
+        <label class="medium-label">Sampling Method</label>
+        <div class="input-group">
+          <select class="form-control inline form-control-smaller-width" ng-options="method.name for method in analysis.samplingMethods track by method.shortName" ng-model="selectedSamplingMethod" ng-change="analysis.setSamplingMethod()"></select>
+          <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
         </div>
       </div>
     </div>
-
-    <div ng-if="selectedAnalysisType=='Manual'" ng-include="'app/analysis/analysis_manual.html'"></div>
-    <div ng-if="selectedAnalysisType=='Algorithmic'" ng-include="'app/analysis/analysis_algorithmic.html'"></div>
-
+    <div class="col-md-3 pad-bot-20">
+      <label class="medium-label">Default Seed Model</label>
+      <div class="input-group">
+        <select class="form-control" ng-options="seed as seed for seed in analysis.seeds" ng-model="defaultSeed" ng-change="analysis.setSeed()"></select>
+        <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button" ng-click="analysis.selectSeedModel()"><span class="glyphicon glyphicon-folder-open"></span></button>
+        </span>
+      </div>
+    </div>
+    <div class="col-md-3 pad-bot-20">
+      <label class="medium-label">Default Weather File</label>
+      <div class="input-group">
+        <select class="form-control" ng-options="file as file for file in analysis.weatherFiles" ng-model="defaultWeatherFile" ng-change="analysis.setWeatherFile()"></select>
+        <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button" ng-click="analysis.selectWeatherFile()"><span class="glyphicon glyphicon-folder-open"></span></button>
+        </span>
+      </div>
+    </div>
   </div>
 </div>
+
+<div ng-if="selectedAnalysisType=='Manual'" ng-include="'app/analysis/analysis_manual.html'"></div>
+<div ng-if="selectedAnalysisType=='Algorithmic'" ng-include="'app/analysis/analysis_algorithmic.html'"></div>

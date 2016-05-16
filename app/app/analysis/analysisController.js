@@ -47,29 +47,25 @@ export class AnalysisController {
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
 
-    vm.$scope.selectedVariableSetting = vm.Project.getVariableSetting();
-    vm.variableSettings = vm.Project.getVariableSettings();
-
-    vm.$scope.selectedArgument = vm.Project.getSelectedArgument();
-    vm.selectedArguments = vm.Project.getSelectedArguments();
-
-    vm.$scope.selectedDistribution = vm.Project.getSelectedDistribution();
-    vm.selectedDistributions = vm.Project.getSelectedDistributions();
-
-
+    vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
 
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
     vm.initializeGrids();
-
   }
 
-  initializeGrids(){
+  initializeGrids() {
     const vm = this;
+    vm.$log.debug('In initializeGrids in analysis');
     vm.setMeasureTypes();
-    vm.setGridOptions();
-    // load saved measure options
-    vm.loadMeasureOptions();
+    if (vm.$scope.selectedAnalysisType === 'Manual') {
+      vm.setGridOptions();
+      // load saved measure options
+      vm.loadMeasureOptions();
+    }
+    else {
+      vm.setAlgorithmicGridOptions();
+    }
   }
 
   getDefaultOptionColDef() {
@@ -88,15 +84,9 @@ export class AnalysisController {
           return vm.choices;
         }
       },
-      //cellTemplate: '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />' +
+      //cellTemplate: '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\">' +
       //'<div ng-if=\"!row.entity.type==\'Boolean\'\" class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>',
-      editableCellTemplate: '<div><form name=\"inputForm\">' +
-      '<select ng-if=\"row.entity.type==\'Choice\'\" ng-class=\"\'colt\' + col.uid\" ui-grid-edit-dropdown ng-model=\"MODEL_COL_FIELD\" ng-options=\"field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray\"></select>' +
-      '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />' +
-      '<input ng-if=\"row.entity.type==\'Int\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-      '<input ng-if=\"row.entity.type==\'Double\'\" type=\"number\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-      '<input ng-if=\"row.entity.type==\'String\'\" type=\"text\" ng-class=\"\'colt\' + col.uid\" ui-grid-editor ng-model=\"MODEL_COL_FIELD\" />' +
-      ' </form></div>',
+      editableCellTemplate: 'app/analysis/optionInputTemplate.html',
       width: 200,
       minWidth: 100,
       enableCellEdit: true
@@ -109,8 +99,9 @@ export class AnalysisController {
     _.forEach(vm.$scope.measures, (measure) => {
 
       // set number of options in measure
-      if (!('number_of_options' in measure)) {
-        measure.number_of_options = 0;
+
+      if (!_.has(measure, 'numberOfOptions')) {
+        measure.numberOfOptions = 0;
       }
 
       vm.$scope.gridOptions[measure.uid] = {
@@ -140,11 +131,87 @@ export class AnalysisController {
           width: 200,
           minWidth: 100,
           type: 'boolean',
-          cellTemplate: '<input type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\" />'
+          cellTemplate: '<input type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\">'
         }],
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.uid] = gridApi;
+        }
+      };
+    });
+  }
 
+  setAlgorithmicGridOptions() {
+    const vm = this;
+
+    _.forEach(vm.$scope.measures, (measure) => {
+
+      // set number of options in measure
+      if ((!_.has(measure, 'numberOfOptions'))) {
+        measure.numberOfOptions = 0;
+      }
+
+      vm.$scope.gridOptions[measure.uid] = {
+        data: measure.arguments,
+        enableSorting: false,
+        autoResize: true,
+        enableRowSelection: false,
+        enableSelectAll: false,
+        enableColumnMenus: false,
+        enableRowHeaderSelection: false,
+        enableCellEditOnFocus: true,
+        enableHiding: false,
+        columnDefs: [{
+          name: 'displayName',
+          displayName: 'Argument Name',
+          enableCellEdit: false,
+          width: 200,
+          minWidth: 100
+        }, {
+          name: 'name',
+          displayName: 'Short Name',
+          width: 200,
+          minWidth: 100
+        }, {
+          name: 'variableSettings',
+          displayName: 'Variable Settings',
+          width: 200,
+          minWidth: 100,
+          editType: 'dropdown',
+          enableCellEdit: true,
+          editableCellTemplate: 'ui-grid/dropdownEditor',
+          editDropdownOptionsFunction: function (rowEntity, colDef) {
+            if (vm.$scope.selectedSamplingMethod.name === 'Latin Hypercube Sampling' || vm.$scope.selectedSamplingMethod.name === 'DesignOfExperiments') {
+              return [{
+                ID: 1,
+                type: 'Static'
+              }, {
+                ID: 2,
+                type: 'Discrete'
+              }, {
+                ID: 3,
+                type: 'Continuous'
+              }, {
+                ID: 4,
+                type: 'Pivot'
+              }];
+            } else {
+              return [{
+                ID: 1,
+                type: 'Static'
+              }, {
+                ID: 2,
+                type: 'Discrete'
+              }, {
+                ID: 3,
+                type: 'Continuous'
+              }];
+            }
+          },
+          editDropdownIdLabel: 'type',
+          editDropdownValueLabel: 'type'
+        }],
+        onRegisterApi: function (gridApi) {
+          vm.gridApis[measure.uid] = gridApi;
         }
       };
     });
@@ -193,20 +260,34 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In addMeasureOption in analysis');
 
-    measure.number_of_options += 1;
+    measure.numberOfOptions++;
 
     // start from first option
     const opt = vm.getDefaultOptionColDef();
-    opt.displayName = 'Option ' + measure.number_of_options;
-    opt.field = 'option_' + measure.number_of_options;
+    opt.displayName = 'Option ' + measure.numberOfOptions;
+    opt.field = 'option_' + measure.numberOfOptions;
 
     // add default arguments to opt
     vm.addDefaultArguments(measure, opt);
-    // TODO:  eventually check if variable is checked.
-    // TODO: If not, and option isn't the 1st one, copy what's in option_1 to the new option.
+
+    _.forEach(measure.arguments, argument => {
+      if (!argument.variable) {
+        argument[opt.field] = argument.option_1;
+      }
+    });
 
     vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
     return opt;
+  }
+
+  deleteSelectedOption(measure) {
+    const vm = this;
+    vm.$log.debug('In deleteSelectedOption in analysis');
+
+    if (measure.numberOfOptions > 0) {
+      measure.numberOfOptions -= 1;
+      vm.$scope.gridOptions[measure.uid].columnDefs.splice(vm.$scope.gridOptions[measure.uid].columnDefs.length - 1, 1);
+    }
   }
 
   addDefaultArguments(measure, option) {
@@ -230,7 +311,7 @@ export class AnalysisController {
 
     // copy from 1st option
     _.forEach(measure.arguments, (arg) => {
-      arg[opt.field] = arg['option_1'];
+      arg[opt.field] = arg.option_1;
     });
   }
 
@@ -253,17 +334,15 @@ export class AnalysisController {
 
   loadOption(measure, option) {
     const vm = this;
-    let id = 1;
-    var n = option.id.lastIndexOf('_');
-    if (n != -1) {
-      id = option.id.substring(n + 1);
+    const re = /^option_(\d+)$/;
+    if (re.test(option.id)) {
+      const opt = vm.getDefaultOptionColDef();
+      opt.displayName = _.startCase(option.id);
+      opt.field = option.id;
+      vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
     } else {
-      // TODO: error in option id (expecting format option_<ID>)
+      vm.$log.error('option id does not match expected format (option_<ID>)');
     }
-    const opt = vm.getDefaultOptionColDef();
-    opt.displayName = 'Option ' + id;
-    opt.field = 'option_' + id;
-    vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
   }
 
   checkAll(measure) {
@@ -272,9 +351,7 @@ export class AnalysisController {
 
     vm.$scope.selectedAll = vm.$scope.selectedAll === false;
 
-    _.forEach(vm.$scope.gridOptions[measure.uid].data, (row) => {
-      row.variable = vm.$scope.selectedAll ? true : false;
-    });
+    _.forEach(vm.$scope.gridOptions[measure.uid].data, row => row.variable = !!vm.$scope.selectedAll);
   }
 
   setSeed() {
@@ -289,35 +366,18 @@ export class AnalysisController {
 
   setType() {
     const vm = this;
+    vm.$log.debug('In setType in analysis');
     vm.Project.setAnalysisType(vm.$scope.selectedAnalysisType);
+    vm.initializeGrids();
   }
 
   setSamplingMethod() {
     const vm = this;
-    vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
-
     vm.$log.debug('In setSamplingMethod in analysis');
-    vm.setVariableSetting();
-    vm.setSelectedArgument();
-    vm.setSelectedDistribution();
-  }
 
-  setVariableSetting() {
-    const vm = this;
-    vm.$log.debug('In setVariableSettings in analysis');
-    vm.Project.setVariableSetting(vm.$scope.selectedVariableSetting);
-  }
-
-  setSelectedArgument() {
-    const vm = this;
-    vm.$log.debug('In setArguments in analysis');
-    vm.Project.setSelectedArgument(vm.$scope.selectedArgument);
-  }
-
-  setSelectedDistribution() {
-    const vm = this;
-    vm.$log.debug('In setDistribution in analysis');
-    vm.Project.setSelectedDistribution(vm.$scope.selectedDistribution);
+    vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
+    vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
+    vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
   }
 
   selectSeedModel() {
@@ -358,5 +418,6 @@ export class AnalysisController {
     }
 
   }
+
 }
 

@@ -61,7 +61,7 @@ export class DesignAlternativesController {
         displayName: '',
         enableCellEdit: false,
         cellClass: 'icon-cell',
-        cellTemplate: '../app/design_alts/deleteButtonTemplate.html',
+        cellTemplate: 'app/design_alts/deleteButtonTemplate.html',
         width: '3%',
         minWidth: '50'
       }, {
@@ -69,7 +69,7 @@ export class DesignAlternativesController {
         displayName: '',
         enableCellEdit: false,
         cellClass: 'icon-cell',
-        cellTemplate: '../app/design_alts/reorderButtonTemplate.html',
+        cellTemplate: 'app/design_alts/reorderButtonTemplate.html',
         width: '3%',
         minWidth: '50'
       }, {

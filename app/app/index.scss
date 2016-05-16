@@ -1,13 +1,108 @@
+@import "styles/fonts.scss";
+
+$nav-width: 40px;
+$footer-height: 25px;
+
 @media (max-width: 1200px) {
-  html, body {
+  body {
     font-size: 0.8em;
   }
 }
 
 body {
-  display: flex;
-  min-height: 100vh;
-  flex-direction: column;
+  height: calc(100vh - #{$footer-height});
+  overflow: hidden;
+  > nav {
+    background: #3f3f3f;
+    border-right: 1px solid #000;
+    box-sizing: content-box;
+    height: calc(100vh - #{$footer-height});
+    position: fixed;
+    width: $nav-width;
+  }
+  > main {
+    height: 100%;
+    margin-left: $nav-width + 1px;
+    overflow-x: hidden;
+    overflow-y: scroll;
+    padding: 10px;
+  }
+  > footer {
+    background-color: #e8e8e8;
+    border-top: 1px solid #919191;
+    bottom: 0;
+    font-size: 13px;
+    line-height: 1.8em;
+    height: $footer-height;
+    padding: 0 8px;
+    position: fixed;
+    width: 100%;
+    z-index: 1060;
+  }
+}
+
+#status {
+  left: 30px;
+  position: absolute;
+}
+
+/*::-webkit-scrollbar {
+  height: 6px;
+  width: 6px;
+}
+
+::-webkit-scrollbar-button {
+  height: 0;
+  width: 0;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #a3a3a3;
+  border: 0;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #949494;
+}
+
+::-webkit-scrollbar-thumb:active {
+  background: #41779e;
+}
+
+::-webkit-scrollbar-track, ::-webkit-scrollbar-track:hover, ::-webkit-scrollbar-track:active, ::-webkit-scrollbar-corner {
+  background: transparent;
+}*/
+
+::-webkit-scrollbar {
+  width: 14px;
+  height: 14px;
+}
+
+::-webkit-scrollbar-thumb {
+  background-clip: padding-box;
+  background-color: rgba(0, 0, 0, 0.15);
+  border-radius: 7px;
+  border: 4px solid rgba(0, 0, 0, 0);
+  box-shadow: inset -1px -1px 0 rgba(0, 0, 0, 0.05), inset 1px 1px 0 rgba(0, 0, 0, 0.05);
+  height: 6px;
+}
+
+::-webkit-scrollbar-button {
+  display: none;
+}
+
+::-webkit-scrollbar-corner {
+  background-color: transparent;
+}
+
+/* disallow text selection */
+* {
+  user-select: none;
+}
+
+/* hide button border */
+*:focus {
+  outline: none !important;
 }
 
 /* placeholder hyperlinks */
@@ -23,65 +118,45 @@ select {
   cursor: pointer;
 }
 
-.container-flex {
-  display: flex;
-  height: 100%;
-  align-items: stretch;
-  > .nav {
-    height: 100vh;
-    position: fixed;
-  }
-  .server-frame {
-    height: 100vh;
-    width: 100%;
-  }
-}
-
-.main {
-  background: white;
-  padding: 0px 10px 5px 45px;
-  width:100%;
-}
-
-.nav {
-  background: #3f3f3f;
-  border-right: 1px solid #000;
-  flex-direction: column;
-  padding: 15px 0;
-  width: 40px;
+.server-frame {
+  height: 100vh;
+  width: 100%;
 }
 
 /* make sidebar nav vertical */
-.sidebar-nav .navbar {
-  border: 0;
-  margin: 0;
-}
+.sidebar-nav {
+  padding: 15px 0;
 
-.sidebar-nav .navbar .navbar-collapse {
-  padding: 0;
-  max-height: none;
-  background-color: #000;
-  border: 0;
-}
+  .navbar {
+    border: 0;
+    margin: 0;
 
-.sidebar-nav .navbar ul {
-  float: none;
-  background-color: #000;
-}
+    .navbar-collapse {
+      padding: 0;
+      max-height: none;
+      background-color: #000;
+      border: 0;
+    }
 
-.sidebar-nav .navbar ul:not {
-  display: block;
-}
+    ul {
+      float: none;
+      background-color: #000;
+      &::not {
+        display: block;
+      }
+    }
 
-.sidebar-nav .navbar li {
-  float: none;
-  display: block;
-}
+    li {
+      float: none;
+      display: block;
 
-.sidebar-nav .navbar li a {
-  padding-top: 12px;
-  padding-bottom: 12px;
-  border-bottom: 1px solid #fff;
+      a {
+        padding-top: 12px;
+        padding-bottom: 12px;
+        border-bottom: 1px solid #fff;
+      }
+    }
+  }
 }
 
 .nav .nav-pills ul {
@@ -119,12 +194,13 @@ select {
 }
 
 .full-width {
-  width:100%;
+  width: 100%;
 }
 
 .pad-bot-20 {
   padding-bottom: 20px;
 }
+
 .pad-bot-10 {
   padding-bottom: 10px;
 }
@@ -138,15 +214,15 @@ select {
 }
 
 .margin-top-20 {
-  margin-top:20px;
+  margin-top: 20px;
 }
 
 .margin-left-5 {
-  margin-left:5px;
+  margin-left: 5px;
 }
 
 .margin-right-5 {
-  margin-right:5px;
+  margin-right: 5px;
 }
 
 .search-img {
@@ -239,7 +315,6 @@ select {
   height: 250px;
 }
 
-
 /* TODO: Something is wrong, fix this later */
 .input-group > select + .input-group-btn > button {
   height: 34px;
@@ -248,12 +323,16 @@ select {
 // Increase modal size
 .wide-modal .modal-dialog {
   min-width: 500px;
-  width: calc(100% - 100px);
+  width: calc(100vw - 100px);
+  .modal-body {
+    max-height: calc(100vh - 191px - #{$footer-height});
+    overflow-y: auto;
+  }
 }
 
 .icon-cell {
   text-align: center;
-  padding: 3px 0px;
+  padding: 3px 0;
 }
 
 .icon-edit-cell {
@@ -269,15 +348,15 @@ select {
 }
 
 .gray-button {
-  color:#D6D6D6;
+  color: #D6D6D6;
 }
 
 .black-button {
-  color:#000000;
+  color: #000000;
 }
 
 .black-badge {
-  background-color:#000000;
+  background-color: #000000;
 }
 
 .library-grid-button {
@@ -296,70 +375,69 @@ select {
 }
 */
 
-
 /* ANALYSIS page */
 
 .analysis-custom {
 
   .panel {
-    border:0px;
-    /* border-radius: 0px; */
-    /* -webkit-box-shadow: 0 0px 0px rgba(0, 0, 0, 0.0); */
-    /* box-shadow: 0 0px 0px rgba(0, 0, 0, 0.0); */
+    border: 0;
+    /* border-radius: 0; */
+    /* -webkit-box-shadow: 0 0 0 rgba(0, 0, 0, 0.0); */
+    /* box-shadow: 0 0 0 rgba(0, 0, 0, 0.0); */
 
   }
 
   a:hover, a:focus {
-    text-decoration:none;
+    text-decoration: none;
   }
 
   .panel-default > .panel-heading {
-    background-color:#95A5A6;
-    color:#ffffff;
-    border-color:#ffffff;
+    background-color: #95A5A6;
+    color: #ffffff;
+    border-color: #ffffff;
   }
 }
 
 .button-div {
-  padding-bottom:10px;
+  padding-bottom: 10px;
 }
 
 .gray-top {
-  background-color:#D4D4D4;
-  padding:5px;
-  margin-bottom:20px;
+  background-color: #D4D4D4;
+  padding: 5px;
+  margin-bottom: 20px;
 }
 
 .big-label {
-  font-size:2em;
-  display:inline;
-  padding-right:20px;
+  font-size: 2em;
+  display: inline;
+  padding-right: 20px;
 }
 
 .medium-label {
-  font-size:1.4em;
+  font-size: 1.4em;
 }
 
 .form-control-smaller-width {
-  width:50%;
+  width: 50%;
 }
 
 .badge-info {
-  background-color:#6ACBE5;
-  display:inline;
+  background-color: #6ACBE5;
+  display: inline;
 }
 
 .input-group-addon {
-  background-color:transparent;
-  border: 0px;
+  background-color: transparent;
+  border: 0;
 }
 
 .inline {
-  display:inline;
+  display: inline;
 }
 
 h5.measure-type {
-  font-size:1.5em;
+  font-size: 1.5em;
   line-height: 1.33;
   margin: 0;
 }
@@ -373,7 +451,7 @@ h5.measure-type {
 }
 
 .outputs-manual {
-  font-size:1.5em;
+  font-size: 1.5em;
 }
 
 .btn-grayed {
@@ -382,6 +460,18 @@ h5.measure-type {
   border-color: #4cae4c;
 }
 
+.glyphicon-spin {
+  animation: spin 1000ms infinite linear;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(359deg);
+  }
+}
 
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject
