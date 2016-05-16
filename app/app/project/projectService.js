@@ -193,7 +193,7 @@ export class Project {
       const m = {};
       m.name = measure.name;
       m.display_name = measure.displayName;
-      m.measure_type = measure.type; // TODO: check this
+      m.measure_type = measure.type; // TODO: convert this.  options are:  Ruby (same as OpenStudioMeasure), EnergyPlus, and Reporting
       m.measure_definition_class_name = measure.className;
       m.measure_definition_directory = './measures/' + measure.name;
       m.measure_definition_directory_local = vm.projectMeasuresDir.path() + '/' + measure.name;
@@ -202,21 +202,21 @@ export class Project {
       m.measure_definition_name_xml = null;
       m.measure_definition_uuid = measure.uid;
       m.measure_definition_version_uuid = measure.versionId;
-      m.arguments = [];
 
+      m.arguments = [];
+        // TODO: this portion only has arguments that don't have the variable box checked
       _.forEach(measure.arguments, (arg) => {
         const argument = {};
         argument.display_name = arg.displayName;
         argument.display_name_short = arg.shortName;
         argument.name = arg.name;
-        argument.value_type = _.toLower(arg.type);
+        argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
         argument.default_value = arg.defaultValue;
-        argument.value = arg.defaultValue; //TODO: check if this is right
+        argument.value = arg.defaultValue; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
         m.arguments.push(argument);
       });
       let var_count = 0;
       m.variables = [];
-      // TODO: fill out variables. variables also have workflow indexes
 
       // go through alternatives, see if each has an option selected
       const vars = [];
@@ -232,11 +232,10 @@ export class Project {
       if (_.includes(vars, true)) {
         const v = {};
         v.argument = {};
-        // TODO: check this
         v.argument.display_name = '__SKIP__';
         v.argument.display_name_short = '__SKIP__';
         v.argument.name = '__SKIP__';
-        v.argument.value_type = 'bool';  // TODO: or choice?  is there a 'choice' here?
+        v.argument.value_type = 'bool';
         v.argument.default_value = false;
         v.argument.value = false;
 
@@ -248,8 +247,6 @@ export class Project {
         v.maximum = true;
         v.relation_to_output = null;
         v.static_value = false;
-        v.uuid = ''; // TODO: what is this?
-        v.version_uuid = ''; // TODO: what is this?
         v.variable = true;
         v.uncertainty_description = {};
         v.uncertainty_description.type = 'discrete';
@@ -292,34 +289,30 @@ export class Project {
         valArr[0].weight = 1;
 
         const v = {};
+        // TODO: only arguments that are variables go here
         v.argument = {};
         v.argument.display_name = arg.displayName;
         v.argument.display_name_short = arg.shortName;
         v.argument.name = arg.name;
-        v.argument.value_type = _.toLower(arg.type); // TODO: is there a 'choice' here?
-        v.argument.default_value = arg.default_value;
-        v.argument.value = arg.default_value;  // TODO: check this
+        v.argument.value_type = _.toLower(arg.type); // TODO: see above
 
-        v.display_name = arg.displayName;  // TODO: same as arg?
-        v.display_name_short = arg.shortName;
-        v.variable_type = 'variable';
+        v.display_name = arg.displayName;  // same as arg
+        v.display_name_short = arg.shortName; // entered in PAT
+        v.variable_type = 'variable'; //this is always 'variable'
         v.units = arg.units;
-        v.minimum = arg.minimum;
-        v.maximum = arg.maximum;
+        v.minimum = arg.minimum;  // TODO: must be alphabetically ordered if string, otherwise standard order (pick from option values mean must be btw min and max, and max > min)
+        v.maximum = arg.maximum;  // TODO: must be alphabetically ordered
         v.relation_to_output = null;
-        v.static_value = false;
-        v.uuid = ''; // TODO: what is this?
-        v.version_uuid = ''; // TODO: what is this?
-        v.variable = true;
+        v.static_value = false; // TODO: do this: 1st option value
+        v.variable = true; // this is always true
         v.uncertainty_description = {};
-        v.uncertainty_description.type = 'discrete';
+        v.uncertainty_description.type = 'discrete'; //options are triangle, uniform, discrete, and normal.  use "discrete" always for manual
         v.uncertainty_description.attributes = [];
 
         v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
-        // TODO: what to set these values to?  (in case no default value?)
-        v.uncertainty_description.attributes.push({name: 'lower_bounds', value: valArr[0].value});
-        v.uncertainty_description.attributes.push({name: 'upper_bounds', value: valArr[0].value});
-        v.uncertainty_description.attributes.push({name: 'mode', value: valArr[0].value});
+        v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.minimum});  // minimum
+        v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.maximum});  // maximum
+        v.uncertainty_description.attributes.push({name: 'mode', value: valArr[0].value}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
         v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
         v.uncertainty_description.attributes.push({name: 'stddev', value: null});
 
