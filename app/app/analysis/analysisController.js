@@ -17,11 +17,11 @@ export class AnalysisController {
     vm.Project = Project;
     vm.dialog = dialog;
 
-    vm.srcDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    vm.projectDir = vm.Project.getProjectDir();
 
     vm.analysisTypes = vm.Project.getAnalysisTypes();
-    vm.seeds = vm.Project.getSeeds();
-    vm.weatherFiles = vm.Project.getWeatherFiles();
+    vm.$scope.seeds = vm.Project.getSeeds();
+    vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
 
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
@@ -393,9 +393,18 @@ export class AnalysisController {
     });
 
     if (!_.isEmpty(result)) {
-      // TODO: do something with the result
+      // copy and select the file
       const seedModelPath = result[0];
       vm.$log.debug('Seed Model:', seedModelPath);
+      const seedModelFilename = seedModelPath.replace(/^.*[\\\/]/, '');
+      // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
+      vm.jetpack.copy(seedModelPath, vm.projectDir.path('seeds/' + seedModelFilename) );
+      vm.$log.debug('Seed Model name: ', seedModelFilename);
+      // update seeds
+      vm.Project.setSeeds();
+      vm.$scope.seeds = vm.Project.getSeeds();
+      vm.$scope.defaultSeed = seedModelFilename;
+
     }
   }
 
@@ -412,9 +421,19 @@ export class AnalysisController {
     });
 
     if (!_.isEmpty(result)) {
-      // TODO: do something with the result
+      // copy and select the file
       const weatherFilePath = result[0];
       vm.$log.debug('Weather File:', weatherFilePath);
+      const weatherFilename = weatherFilePath.replace(/^.*[\\\/]/, '');
+      // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
+      vm.jetpack.copy(weatherFilePath, vm.projectDir.path('weather/' + weatherFilename) );
+      vm.$log.debug('Weather file name: ', weatherFilename);
+      // update seeds
+      vm.Project.setWeatherFiles();
+      vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
+      vm.$scope.defaultWeatherFile = weatherFilename;
+
+
     }
 
   }

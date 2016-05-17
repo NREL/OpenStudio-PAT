@@ -23,7 +23,7 @@
     <div class="col-md-3 pad-bot-20">
       <label class="medium-label">Default Seed Model</label>
       <div class="input-group">
-        <select class="form-control" ng-options="seed as seed for seed in analysis.seeds" ng-model="defaultSeed" ng-change="analysis.setSeed()"></select>
+        <select class="form-control" ng-options="seed as seed for seed in seeds" ng-model="defaultSeed" ng-change="analysis.setSeed()"></select>
         <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
         <span class="input-group-btn">
           <button class="btn btn-default" type="button" ng-click="analysis.selectSeedModel()"><span class="glyphicon glyphicon-folder-open"></span></button>
@@ -33,7 +33,7 @@
     <div class="col-md-3 pad-bot-20">
       <label class="medium-label">Default Weather File</label>
       <div class="input-group">
-        <select class="form-control" ng-options="file as file for file in analysis.weatherFiles" ng-model="defaultWeatherFile" ng-change="analysis.setWeatherFile()"></select>
+        <select class="form-control" ng-options="file as file for file in weatherFiles" ng-model="defaultWeatherFile" ng-change="analysis.setWeatherFile()"></select>
         <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
         <span class="input-group-btn">
           <button class="btn btn-default" type="button" ng-click="analysis.selectWeatherFile()"><span class="glyphicon glyphicon-folder-open"></span></button>
