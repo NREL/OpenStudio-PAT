@@ -105,18 +105,21 @@ export class Project {
       const options = [];
 
       // first find out how many options there are
-      for (let i = 1; i <= measure.number_of_options; i++) {
+      for (let i = 1; i <= measure.numberOfOptions; i++) {
 
         const theOption = {};
         // option name and ID
         theOption.id = 'option_' + i;
-        // TODO: the name will eventually be from the first row of data, for now set same as ID
-        theOption.name = theOption.id;
 
         // set argument values
         theOption.arguments = [];
         _.forEach(measure.arguments, (argument) => {
-          // TODO: when rows for name and descriptions are added, refactor this a bit
+
+          if (argument.specialRowId == 'optionName') {
+            theOption.name = argument[theOption.id];
+          } else if (argument.specialRowId == 'optionDescription') {
+            theOption.description = argument[theOption.id];
+          }
 
           // get the row's value for key corresponding to the col's name
           // add to arguments array

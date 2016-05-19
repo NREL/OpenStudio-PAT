@@ -104,6 +104,25 @@ export class AnalysisController {
         measure.numberOfOptions = 0;
       }
 
+      let addRows = true;
+      if (measure.arguments.length > 0) {
+        _.forEach(measure.arguments, (argument) => {
+          if (_.has(argument, 'specialRowId')) {
+            addRows = false;
+          }
+        });
+      }
+      else {
+        addRows = false;
+      }
+
+      if (addRows) {
+        const row0 = {specialRowId: 'optionDelete'};
+        const row1 = {specialRowId: 'optionName', type: 'String'};
+        const row2 = {specialRowId: 'optionDescription', type: 'String'};
+        measure.arguments.splice(0,0,row0,row1,row2);
+      }
+
       vm.$scope.gridOptions[measure.uid] = {
         data: measure.arguments,
         enableSorting: false,
@@ -121,8 +140,9 @@ export class AnalysisController {
           width: 200,
           minWidth: 100
         }, {
-          name: 'name',
+          name: 'shortName',
           displayName: 'Short Name',
+          cellEditableCondition: function( $scope ) { return angular.isDefined($scope.row.entity.displayName); },
           width: 200,
           minWidth: 100
         }, {
@@ -131,7 +151,7 @@ export class AnalysisController {
           width: 200,
           minWidth: 100,
           type: 'boolean',
-          cellTemplate: '<input type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\">'
+          cellTemplate: '<input ng-if=\"row.entity.displayName.length > 0\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\">'
         }],
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.uid] = gridApi;
@@ -271,7 +291,13 @@ export class AnalysisController {
     vm.addDefaultArguments(measure, opt);
 
     _.forEach(measure.arguments, argument => {
-      if (!argument.variable) {
+      if (argument.specialRowId === 'optionName') {
+        argument[opt.field] = opt.displayName + ' Name';
+      }
+      else if (argument.specialRowId === 'optionDescription') {
+        argument[opt.field] = opt.displayName + ' Description';
+      }
+      else if (!argument.variable) {
         argument[opt.field] = argument.option_1;
       }
     });
