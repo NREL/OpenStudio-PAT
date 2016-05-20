@@ -84,6 +84,7 @@ export class AnalysisController {
           return vm.choices;
         }
       },
+      cellTemplate: 'app/analysis/deleteButtonTemplate.html',
       //cellTemplate: '<input ng-if=\"row.entity.type==\'Boolean\'\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\">' +
       //'<div ng-if=\"!row.entity.type==\'Boolean\'\" class="ngCellText" ng-class="col.colIndex()"><span ng-cell-text>{{row.getProperty(col.field)}}</span></div>',
       editableCellTemplate: 'app/analysis/optionInputTemplate.html',
@@ -285,7 +286,7 @@ export class AnalysisController {
     // start from first option
     const opt = vm.getDefaultOptionColDef();
     opt.displayName = 'Option ' + measure.numberOfOptions;
-    opt.field = 'option_' + measure.numberOfOptions;
+    opt.field = 'option_' + measure.numberOfOptions + '_' + measure.uid;
 
     // add default arguments to opt
     vm.addDefaultArguments(measure, opt);
@@ -314,6 +315,17 @@ export class AnalysisController {
       measure.numberOfOptions -= 1;
       vm.$scope.gridOptions[measure.uid].columnDefs.splice(vm.$scope.gridOptions[measure.uid].columnDefs.length - 1, 1);
     }
+  }
+
+
+  deleteOption(col){
+    const vm = this;
+
+    const optionCount = Number(col.field.split('_')[1]);
+    const columnIdxToDelete = optionCount + 2; // 3 columns are present before any option columns
+    const measureUID = col.field.split('_')[2];
+
+    vm.$scope.gridOptions[measureUID].columnDefs.splice(columnIdxToDelete, 1);
   }
 
   addDefaultArguments(measure, option) {
