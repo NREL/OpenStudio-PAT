@@ -68,44 +68,55 @@ export class ModalBclController {
     vm.libraryGridOptions = {
       columnDefs: [{
         name: 'displayName',
-        displayName: 'Name',
+        displayName: 'bcl.columns.name',
         enableCellEdit: false,
+        headerCellFilter: 'translate',
         width: '35%'
       }, {
         name: 'location',
         displayName: '',
         enableCellEdit: false,
         cellClass: 'location-cell',
-        cellTemplate: '../app/bcl/locationTemplate.html',
+        cellTemplate: '<span>{{row.entity.location == "my" ? "My" : "BCL"}}</span>',
         width: '11%'
       }, {
         name: 'type',
-        enableSorting: false,
+        displayName: 'bcl.columns.type',
+        cellTemplate: '<img ng-src="assets/images/{{grid.getCellValue(row, col)}}_icon.png" alt="{{grid.getCellValue(row, col)}}">',
         enableCellEdit: false,
+        enableSorting: false,
         cellClass: 'icon-cell',
+        headerCellFilter: 'translate',
         width: '15%',
-        cellTemplate: '<img ng-src="assets/images/{{grid.getCellValue(row, col)}}_icon.png" alt="{{grid.getCellValue(row, col)}}">'
       }, {
         name: 'author',
+        displayName: 'bcl.columns.author',
         enableCellEdit: false,
+        headerCellFilter: 'translate',
         visible: false
       }, {
         name: 'date',
-        enableCellEdit: false,
-        type: 'date',
+        displayName: 'bcl.columns.date',
         cellFilter: 'date:"dd/MM/yyyy"',
+        enableCellEdit: false,
+        headerCellFilter: 'translate',
+        type: 'date',
         width: '15%'
       }, {
         name: 'status',
-        enableCellEdit: false,
+        displayName: 'bcl.columns.status',
         cellClass: 'dropdown-button',
         cellTemplate: '../app/bcl/tempEditButtonTemplate.html',
+        enableCellEdit: false,
+        headerCellFilter: 'translate',
         width: '15%'
       }, {
         name: 'add',
-        enableCellEdit: false,
+        displayName: 'bcl.columns.add',
         cellClass: 'icon-cell',
         cellTemplate: '../app/bcl/addButtonTemplate.html',
+        enableCellEdit: false,
+        headerCellFilter: 'translate',
         width: '10%'
       }],
       data: 'displayMeasures',
@@ -126,7 +137,7 @@ export class ModalBclController {
             vm.selected = null;
           }
         });
-        gridApi.cellNav.on.navigate(null, (newRowCol) => {
+        gridApi.cellNav.on.navigate(null, newRowCol => {
           vm.gridApi.selection.selectRow(newRowCol.row.entity);
         });
       }

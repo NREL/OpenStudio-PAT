@@ -121,7 +121,7 @@ export class AnalysisController {
         const row0 = {specialRowId: 'optionDelete'};
         const row1 = {specialRowId: 'optionName', type: 'String'};
         const row2 = {specialRowId: 'optionDescription', type: 'String'};
-        measure.arguments.splice(0,0,row0,row1,row2);
+        measure.arguments.splice(0, 0, row0, row1, row2);
       }
 
       vm.$scope.gridOptions[measure.uid] = {
@@ -136,23 +136,28 @@ export class AnalysisController {
         enableHiding: false,
         columnDefs: [{
           name: 'displayName',
-          displayName: 'Argument Name',
+          displayName: 'analysis.columns.argumentName',
           enableCellEdit: false,
+          headerCellFilter: 'translate',
           width: 200,
           minWidth: 100
         }, {
           name: 'shortName',
-          displayName: 'Short Name',
-          cellEditableCondition: function( $scope ) { return angular.isDefined($scope.row.entity.displayName); },
+          displayName: 'analysis.columns.shortName',
+          cellEditableCondition: $scope => {
+            return angular.isDefined($scope.row.entity.displayName);
+          },
+          headerCellFilter: 'translate',
           width: 200,
           minWidth: 100
         }, {
           name: 'variable',
-          displayName: 'Variable',
-          width: 200,
+          displayName: 'analysis.columns.variable',
+          cellTemplate: '<input ng-if="row.entity.displayName.length" type="checkbox" ng-class="\'colt\' + col.uid" ui-grid-checkbox ng-model="MODEL_COL_FIELD">',
+          headerCellFilter: 'translate',
           minWidth: 100,
           type: 'boolean',
-          cellTemplate: '<input ng-if=\"row.entity.displayName.length > 0\" type=\"checkbox\" ng-class=\"\'colt\' + col.uid\" ui-grid-checkbox ng-model=\"MODEL_COL_FIELD\">'
+          width: 200
         }],
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.uid] = gridApi;
@@ -183,25 +188,28 @@ export class AnalysisController {
         enableHiding: false,
         columnDefs: [{
           name: 'displayName',
-          displayName: 'Argument Name',
+          displayName: 'analysis.columns.argumentName',
           enableCellEdit: false,
-          width: 200,
-          minWidth: 100
+          headerCellFilter: 'translate',
+          minWidth: 100,
+          width: 200
         }, {
           name: 'name',
-          displayName: 'Short Name',
-          width: 200,
-          minWidth: 100
+          displayName: 'analysis.columns.shortName',
+          headerCellFilter: 'translate',
+          minWidth: 100,
+          width: 200
         }, {
           name: 'variableSettings',
-          displayName: 'Variable Settings',
-          width: 200,
-          minWidth: 100,
+          displayName: 'analysis.columns.variableSettings',
           editType: 'dropdown',
           enableCellEdit: true,
+          headerCellFilter: 'translate',
+          minWidth: 100,
+          width: 200,
           editableCellTemplate: 'ui-grid/dropdownEditor',
           editDropdownOptionsFunction: function (rowEntity, colDef) {
-            if (vm.$scope.selectedSamplingMethod.name === 'Latin Hypercube Sampling' || vm.$scope.selectedSamplingMethod.name === 'DesignOfExperiments') {
+            if (_.includes(['LHS', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
               return [{
                 ID: 1,
                 type: 'Static'
@@ -318,7 +326,7 @@ export class AnalysisController {
   }
 
 
-  deleteOption(col){
+  deleteOption(col) {
     const vm = this;
 
     const optionCount = Number(col.field.split('_')[1]);
@@ -436,7 +444,7 @@ export class AnalysisController {
       vm.$log.debug('Seed Model:', seedModelPath);
       const seedModelFilename = seedModelPath.replace(/^.*[\\\/]/, '');
       // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
-      vm.jetpack.copy(seedModelPath, vm.projectDir.path('seeds/' + seedModelFilename) );
+      vm.jetpack.copy(seedModelPath, vm.projectDir.path('seeds/' + seedModelFilename));
       vm.$log.debug('Seed Model name: ', seedModelFilename);
       // update seeds
       vm.Project.setSeeds();
@@ -464,7 +472,7 @@ export class AnalysisController {
       vm.$log.debug('Weather File:', weatherFilePath);
       const weatherFilename = weatherFilePath.replace(/^.*[\\\/]/, '');
       // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
-      vm.jetpack.copy(weatherFilePath, vm.projectDir.path('weather/' + weatherFilename) );
+      vm.jetpack.copy(weatherFilePath, vm.projectDir.path('weather/' + weatherFilename));
       vm.$log.debug('Weather file name: ', weatherFilename);
       // update seeds
       vm.Project.setWeatherFiles();

@@ -31,8 +31,7 @@ gulp.task('partials', function () {
 gulp.task('inject', ['partials', 'scripts', 'styles'], function () {
   var injectAppStyles = gulp.src([
     path.join(conf.paths.tmp, '/serve/app/**/*.css'),
-    path.join('!' + conf.paths.tmp, '/serve/app/**/bootstrap.css'),
-    path.join('!' + conf.paths.tmp, '/serve/app/vendor.css')
+    path.join('!' + conf.paths.tmp, '/serve/app/**/bootstrap.css')
   ], {read: false});
   var injectBootstrapStyles = gulp.src([path.join(conf.paths.tmp, '/serve/app/**/bootstrap.css')], {read: false});
   var injectScripts = gulp.src([path.join(conf.paths.tmp, '/serve/app/**/*.module.js')], {read: false});

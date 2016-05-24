@@ -1,26 +1,30 @@
 <div class="container-fluid">
   <div class="row pad-bot-20">
-    <div class="col-md-6"><h4>Design Alternatives <span class="badge badge-info margin-left-5">&nbsp;?&nbsp;</span></h4></div>
+    <div class="col-md-6"><h4><translate>designAlts.title</translate> <span class="badge badge-info margin-left-5">&nbsp;?&nbsp;</span></h4></div>
   </div>
 </div>
 
-<div ng-if="selectedAnalysisType == 'Manual'" class="container-fluid">
-  <div class="row pad-bot-20">
-    <div class="col-md-12">
-      <button type="button" class="btn btn-success" ng-click="da.addAlternative()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Alternative</button>
-      <button type="button" class="btn btn-success" ng-click="da.createAlternatives()">
-        <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Create One Design Alternative with Each Measure Option
-      </button>
-      <button type="button" class="btn btn-success" ng-click="da.duplicateAlternative()"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Duplicate Alternative</button>
+<ng-switch on="selectedAnalysisType">
+  <div ng-switch-when="Manual" class="container-fluid">
+    <div class="row pad-bot-20">
+      <div class="col-md-12">
+        <button type="button" class="btn btn-success" ng-click="da.addAlternative()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+          <translate>designAlts.addAlternative</translate>
+        </button>
+        <button type="button" class="btn btn-success" ng-click="da.createAlternatives()">
+          <span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <translate>designAlts.createOneDesignAlternative</translate>
+        </button>
+        <button type="button" class="btn btn-success" ng-click="da.duplicateAlternative()"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>designAlts.duplicateAlternative</translate></button>
+      </div>
     </div>
+    <div ui-grid="gridOptions" ui-grid-edit ui-grid-selection ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns class="grid"></div>
   </div>
-  <div ui-grid="gridOptions" ui-grid-edit ui-grid-selection ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns class="grid"></div>
-</div>
 
-<div ng-if="selectedAnalysisType == 'Algorithmic'">
-  <div class="row pad-bot-20">
-    <div class="col-md-12">
-      <p>There are no design alternatives to set for an Algorithmic Analysis.</p>
+  <div ng-switch-when="Algorithmic">
+    <div class="row pad-bot-20">
+      <div class="col-md-12">
+        <p translate>designAlts.noAlternativesInAlgorithmic</p>
+      </div>
     </div>
   </div>
-</div>
+</ng-switch>

@@ -59,43 +59,47 @@ export class DesignAlternativesController {
       columnDefs: [{
         name: 'delete',
         displayName: '',
-        enableCellEdit: false,
         cellClass: 'icon-cell',
         cellTemplate: 'app/design_alts/deleteButtonTemplate.html',
-        width: '3%',
-        minWidth: '50'
+        enableCellEdit: false,
+        minWidth: 50,
+        width: '3%'
       }, {
         name: 'reorder',
         displayName: '',
-        enableCellEdit: false,
         cellClass: 'icon-cell',
         cellTemplate: 'app/design_alts/reorderButtonTemplate.html',
-        width: '3%',
-        minWidth: '50'
+        enableCellEdit: false,
+        minWidth: 50,
+        width: '3%'
       }, {
         name: 'name',
-        displayName: 'Name',
-        minWidth: '150'
+        displayName: 'designAlts.columns.name',
+        headerCellFilter: 'translate',
+        minWidth: 150
       }, {
         name: 'seedModel',
-        displayName: 'Seed Model',
+        displayName: 'designAlts.columns.seedModel',
         editableCellTemplate: 'ui-grid/dropdownEditor',
         editDropdownIdLabel: 'name',
+        editDropdownOptionsArray: vm.seedsDropdownArr,
         editDropdownValueLabel: 'name',
-        minWidth: '100',
-        editDropdownOptionsArray: vm.seedsDropdownArr
+        headerCellFilter: 'translate',
+        minWidth: 100
       }, {
         name: 'weatherFile',
-        displayName: 'Location or Weather File',
+        displayName: 'designAlts.columns.locationOrWeatherFile',
         editableCellTemplate: 'ui-grid/dropdownEditor',
         editDropdownIdLabel: 'name',
+        editDropdownOptionsArray: vm.weatherFilesDropdownArr,
         editDropdownValueLabel: 'name',
-        minWidth: '100',
-        editDropdownOptionsArray: vm.weatherFilesDropdownArr
+        headerCellFilter: 'translate',
+        minWidth: 100
       }, {
         name: 'description',
-        displayName: 'Description',
-        minWidth: '100'
+        displayName: 'designAlts.columns.description',
+        headerCellFilter: 'translate',
+        minWidth: 100
       }],
       onRegisterApi: function (gridApi) {
         vm.$scope.gridApi = gridApi;
@@ -120,7 +124,7 @@ export class DesignAlternativesController {
       vm.$scope.gridOptions.columnDefs.push({
         name: measure.name,
         displayName: measure.displayName,
-        minWidth: '100',
+        minWidth: 100,
         editableCellTemplate: 'ui-grid/dropdownEditor',
         editDropdownIdLabel: 'name',
         editDropdownValueLabel: 'name',

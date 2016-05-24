@@ -1,5 +1,5 @@
 <div class="modal-header">
-  <h3 class="modal-title">Building Component Library</h3>
+  <h3 class="modal-title" translate>bcl.title</h3>
 </div>
 <div class="modal-body">
 
@@ -8,7 +8,7 @@
 
       <form ng-submit="submit()" name="form" novalidate>
         <div class="input-group">
-          <input type="text" name="search" id="search" ng-model="modal.keyword" class="form-control" placeholder="Search">
+          <input type="text" name="search" id="search" ng-model="modal.keyword" class="form-control" ng-attr-placeholder="{{'bcl.search' | translate}}">
           <span class="input-group-btn">
             <button class="btn btn-default" type="button" ng-click="modal.search()">
               <span class="glyphicon glyphicon-search" aria-hidden="true" aria-label="Search">
@@ -20,29 +20,26 @@
         <div class="panel panel-default">
           <div class="panel-heading">
             <div class="filter-img"><span class="glyphicon glyphicon-filter" aria-hidden="true"></span></div>
-            Filters
+            <translate>bcl.filters.title</translate>
           </div>
           <div class="panel-body">
-            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.project" ng-change="modal.resetFilters()">My Project</label></div>
-            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.my" ng-change="modal.resetFilters()"> Measure Directory</label></div>
-            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.local" ng-change="modal.resetFilters()"> Local</label></div>
-            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.bcl" ng-change="modal.resetFilters()"> BCL (Online)</label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.project" ng-change="modal.resetFilters()"><translate>bcl.filters.myProject</translate></label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.my" ng-change="modal.resetFilters()"><translate>bcl.filters.measureDirectory</translate></label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.local" ng-change="modal.resetFilters()"><translate>bcl.filters.local</translate></label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.filters.bcl" ng-change="modal.resetFilters()"><translate>bcl.filters.bclOnline</translate></label></div>
           </div>
         </div>
-        <div class="pad-top-20"></div>
         <div class="panel panel-default">
-          <div class="panel-heading">
-            Type
-          </div>
+          <div class="panel-heading" translate>bcl.type.title</div>
           <div class="panel-body">
-            <div class="checkbox"><label><input type="checkbox" ng-model="modal.types.ModelMeasure" ng-change="modal.resetFilters()">OpenStudio</label></div>
-            <div class="checkbox"><label><input type="checkbox" ng-model="modal.types.EnergyPlusMeasure" ng-change="modal.resetFilters()">EnergyPlus</label></div>
-            <div class="checkbox"><label><input type="checkbox" ng-model="modal.types.ReportingMeasure" ng-change="modal.resetFilters()">Reporting</label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.types.ModelMeasure" ng-change="modal.resetFilters()"><translate>bcl.type.openstudio</translate></label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.types.EnergyPlusMeasure" ng-change="modal.resetFilters()"><translate>bcl.type.energyplus</translate></label></div>
+            <div class="checkbox"><label><input type="checkbox" ng-model="modal.types.ReportingMeasure" ng-change="modal.resetFilters()"><translate>bcl.type.reporting</translate></label></div>
           </div>
         </div>
 
         <div class="panel panel-default">
-          <div class="panel-heading">Category</div>
+          <div class="panel-heading" translate>bcl.category.title</div>
           <div class="bcl-custom">
             <div class="bcl-custom panel-body">
               <uib-accordion close-others="false">
@@ -50,17 +47,17 @@
                   <uib-accordion-heading>
                     <i class="pull-left glyphicon pad-right-5" ng-class="{'glyphicon-chevron-down': cat1.open, 'glyphicon-chevron-right': !cat1.open}"></i>
                     <div class="checkbox bcl-cb">
-                      <label><input type="checkbox" ng-model="cat1.checked" ng-click="$event.stopPropagation(); modal.resetFilters(1, [cat1.name]);">{{cat1.name}}</label>
+                      <label><input type="checkbox" ng-model="cat1.checked" ng-click="$event.stopPropagation(); modal.resetFilters(1, [cat1.name]);"><translate>{{'bcl.category.' + cat1.name}}</translate></label>
                     </div>
                   </uib-accordion-heading>
                   <div ng-show="cat1.children" class="indent-once">
                     <div ng-repeat="cat2 in cat1.children">
                       <div class="checkbox bcl-cb">
-                        <label><input type="checkbox" ng-model="cat2.checked" ng-click="modal.resetFilters(2, [cat1.name, cat2.name]);">{{cat2.name}}</label>
+                        <label><input type="checkbox" ng-model="cat2.checked" ng-click="modal.resetFilters(2, [cat1.name, cat2.name]);"><translate>{{'bcl.category.' + cat2.name}}</translate></label>
                         <div ng-show="cat1.children" class="indent-twice">
                           <div ng-repeat="cat3 in cat2.children">
                             <div class="checkbox bcl-cb">
-                              <label><input type="checkbox" ng-model="cat3.checked" ng-click="modal.resetFilters(3, [cat1.name, cat2.name, cat3.name]);">{{cat3.name}}</label>
+                              <label><input type="checkbox" ng-model="cat3.checked" ng-click="modal.resetFilters(3, [cat1.name, cat2.name, cat3.name]);"><translate>{{'bcl.category.' + cat3.name}}</translate></label>
                             </div>
                           </div>
                         </div>
@@ -84,27 +81,27 @@
 
         <div class="row">
           <div class="col-xs-12">
-            <h4>Description</h4>
+            <h4 translate>bcl.aside.description</h4>
             <p class="bcl-p">{{modal.selected.description}}</p>
-            <h4>Modeler Description</h4>
+            <h4 translate>bcl.aside.modelerDescription</h4>
             <p class="bcl-p">{{modal.selected.modelerDescription}}</p>
-            <h4>Tags</h4>
+            <h4 translate>bcl.aside.tags</h4>
             <p class="bcl-p">{{modal.selected.tags}}</p>
-            <h4>Attributes</h4>
+            <h4 translate>bcl.aside.attributes</h4>
             <table class="table table-striped">
               <tr ng-repeat="attr in modal.selected.attributes">
                 <th>{{attr.name}}</th>
                 <td>{{attr.value}}</td>
               </tr>
             </table>
-            <h4>Files</h4>
+            <h4 translate>bcl.aside.files</h4>
             <table class="table table-striped">
               <tr ng-repeat="file in modal.selected.files">
                 <td>
                   <strong>{{file.filename}}</strong>
                   <span ng-if="file.version.softwareProgram != null"><br><em>{{file.version.softwareProgram}} {{file.version.identifier}}</em></span>
-                  <span ng-if="file.version.minCompatible != null"><br><em>Min Compatible Version: {{file.version.minCompatible}}</em></span>
-                  <span ng-if="file.version.maxCompatible != null"><br><em>Max Compatible Version: {{file.version.maxCompatible}}</em></span>
+                  <span ng-if="file.version.minCompatible != null"><br><em><translate>bcl.aside.minCompatibleVersion</translate>: {{file.version.minCompatible}}</em></span>
+                  <span ng-if="file.version.maxCompatible != null"><br><em><translate>bcl.aside.maxCompatibleVersion</translate>: {{file.version.maxCompatible}}</em></span>
                 </td>
               </tr>
             </table>
@@ -116,5 +113,5 @@
 </div>
 
 <div class="modal-footer">
-  <button type="button" class="btn btn-primary" ng-click="modal.ok()">OK</button>
+  <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
 </div>

@@ -5,16 +5,18 @@ import * as https from 'https';
 import * as os from 'os';
 
 export class DependencyManager {
-  constructor($q, $http, $log, StatusBar) {
+  constructor($q, $http, $log, $translate, StatusBar) {
     'ngInject';
 
     const vm = this;
     vm.$http = $http;
     vm.$q = $q;
     vm.$log = $log;
+    vm.$translate = $translate;
     vm.jetpack = jetpack;
     vm.AdmZip = AdmZip;
     vm.StatusBar = StatusBar;
+    vm.translations = {};
 
     vm.manifest = {
       endpoint: 'https://openstudio-resources.s3.amazonaws.com/pat-dependencies/',
@@ -57,6 +59,11 @@ export class DependencyManager {
       rubyPath += '.exe';
       mongoPath += '.exe';
     }
+
+    vm.$translate(['statusBar.Downloading', 'statusBar.Extracting']).then(translations => {
+      vm.translations.Downloading = translations['statusBar.Downloading'];
+      vm.translations.Extracting = translations['statusBar.Extracting'];
+    });
 
     function downloadRuby() {
       if (!src.exists(rubyPath)) {
@@ -169,7 +176,7 @@ export class DependencyManager {
         console.time(`${_.startCase(downloadManifest.type)} downloaded`);
         res.on('data', d => {
           bytesReceived += d.length;
-          vm.StatusBar.set(`Downloading ${_.startCase(downloadManifest.type)} (${_.floor(bytesReceived / contentLength * 100)}%)`, true);
+          vm.StatusBar.set(`${vm.translations.Downloading} ${_.startCase(downloadManifest.type)} (${_.floor(bytesReceived / contentLength * 100)}%)`, true);
           write(filename, d);
         });
         res.on('end', () => {
@@ -179,7 +186,7 @@ export class DependencyManager {
             const zip = new AdmZip(tempDir.path(filename));
             const dest = jetpack.dir(`${app.getPath('userData')}/${downloadManifest.type}`, {empty: true});
 
-            vm.StatusBar.set(`Extracting ${_.startCase(downloadManifest.type)}`, true);
+            vm.StatusBar.set(`${vm.translations.Extracting} ${_.startCase(downloadManifest.type)}`, true);
             console.time(`${_.startCase(downloadManifest.type)} extracted`);
             _.defer(() => {
               zip.extractAllTo(dest.path(), true);
