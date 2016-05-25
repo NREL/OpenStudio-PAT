@@ -1,6 +1,6 @@
 /*global bootlint*/
 
-export function runBlock($window, DependencyManager, Project) {
+export function runBlock($window, DependencyManager, Project, OsServer) {
   'ngInject';
 
   $window.onbeforeunload = e => {
@@ -9,6 +9,12 @@ export function runBlock($window, DependencyManager, Project) {
 
     // Save project automatically on exit
     Project.exportPAT();
+
+    // Stop server
+    // THE CLI doesn't work to stop the server yet
+    //OsServer.stopServer().then(response => {
+      // server is stopped
+    // });
 
     // Prevent exit
     //e.returnValue = false;

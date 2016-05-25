@@ -13,9 +13,12 @@ export class OsServer {
     // to run meta_cli
     vm.exec = require('child_process').exec;
 
-    vm.serverStatus = 'stopped';
-    vm.serverType = 'local';
-    vm.serverURL = 'http://localhost:8080';
+    vm.serverStatus = 'stopped';  // started, stopped, error?
+
+    vm.serverURL = 'http://192.168.99.100:8080';  // TODO: for now, use docker default URL
+    vm.CLIpath = '/Users/kflemin/repos/pat_meta_cli/bin'; // TODO: fix this
+    vm.OsServerPath = '/Users/kflemin/repos/OpenStudio-server-PAT';
+    vm.projectDir = vm.Project.getProjectDir();
     vm.analysisID = null;
 
   }
@@ -61,120 +64,182 @@ export class OsServer {
   }
 
   // start server (remote or local)
-  startServer(type = 'local', options = {}) {
+  startServer() {
     const vm = this;
-    if (type == 'local')
-      vm.response = vm.remoteServer(options);
-    else
-      vm.response = vm.localServer(options);
+    const deferred = vm.$q.defer();
 
-    return vm.response;
+    const serverType = vm.Project.getRunType();
+    vm.$log.debug("SERVER TYPE: ", serverType);
 
+    // TODO: maybe ping server to make sure it is really started?
+    if (vm.serverStatus != 'started'){
+      if (serverType.name == 'local') {
+        vm.localServer().then(response => {
+          vm.serverStatus = 'started';
+          deferred.resolve(response);
+
+        }, response => {
+          vm.$log.debug('ERROR in start local server');
+          deferred.reject(response);
+        });
+      }
+      else {
+        vm.remoteServer().then(response => {
+          vm.serverStatus = 'started';
+          deferred.resolve(response);
+        }, response => {
+          vm.$log.debug('ERROR in start remote server');
+          deferred.reject(response);
+        });
+      }
+    } else {
+      deferred.resolve();
+    }
+
+    return deferred.promise;
   }
 
   // only manual runs work now locally.
-  // must send ['batch_datapoints', 'batch_run_local'] as the 'analysis_type' to the CLI
+  // must send '-a batch_datapoints' as the 'analysis_type' to the CLI
   // example .json and .zip in the project dir is a manual analysis.
   // to run: pat_meta_cli run_analysis PATH_TO_PROJECT_JSON SERVER_URL -a ANALYSIS_TYPE_ARRAY
 
   // example OSA: https://github.com/NREL/OpenStudio-analysis-gem/blob/develop/spec/files/analysis/examples/medium_office_example.json
 
-  remoteServer(options = {}) {
+  remoteServer() {
+    // TODO: this doesn't work yet
     const vm = this;
+    const deferred = vm.$q.defer();
 
-    // TODO: any other options need to be passed in (aws_config.yml, server options?)
-    // ruby openstudio_meta start_remote -t nrel24a spec/schema/aws_yml/ex.yml spec/server_options/ex.json'
-    // https://github.com/NREL/OpenStudio-cli/tree/develop/spec/schema/aws_yml
-    // get back rails URL (remote)
-    // https://github.com/NREL/OpenStudio-analysis-gem/blob/develop/lib/openstudio/analysis/server_api.rb
+    deferred.resolve();
+    return deferred.promise;
 
   }
 
-  localServer(options = {}) {
-    // ruby pat_meta_cli start_local PROJECT_DIR, MONGO_DIR, SERVER_DIR
-    // returns rails URL (local)
-    // assume PAT project folder has a 'logs' and a 'data/db' folder for this to work
+  localServer() {
+    // using the dockerize branch of pat_meta_cli repo to start server in a docker at url 192.168.99.100
+    // openstudio-server branch: dockerize-multi-queue
+    // this is a work-around, works on mac, but will only start 1 server (with mongo /data/db NOT in project dir)
+    // will write rails URL to local_configuration.json (check this file to know if started)
+    // command: ruby openstudio_meta start_local ~/OpenStudio/PAT/the_project/  ~/repos/OpenStudio-server-PAT/server  --debug
+
     const vm = this;
-    vm.setServerStatus('initializing');
-    vm.$log.debug('SERVER STATUS: ', vm.serverStatus);
-    const projectDir = vm.Project.getProjectDir();
+    const deferred = vm.$q.defer();
 
     // delete local_configuration.receipt
-    vm.jetpack.remove(projectDir.path('local_configuration.receipt'));
+    vm.jetpack.remove(vm.projectDir.path('local_configuration.receipt'));
 
     // run META CLI will return status code: 0 = success, 1 = failure
-    const child = vm.exec('cd /Users/kflemin/repos/pat_meta_cli/bin && ruby openstudio_meta start_local /Users/kflemin/OpenStudio/PAT/the_project /Users/kflemin/OpenStudio/PAT/the_project/data/db /Users/kflemin/repos/OpenStudio-server/server',
+    // TODO: add a timeout here in case this takes too long
+    const command = 'cd ' + vm.CLIpath + ' && ruby openstudio_meta start_local ' + vm.projectDir.path() + ' ' + vm.OsServerPath;
+    vm.$log.debug('Start Local command: ', command);
+    const child = vm.exec(command,
       (error, stdout, stderr) => {
-        console.log('THE PROCESS TERMINATED!');
-        console.log('EXIT CODE: ', child.exitCode);
-        console.log('child: ', child);
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
+        vm.$log.debug('THE PROCESS TERMINATED!');
+        vm.$log.debug('EXIT CODE: ', child.exitCode);
+        vm.$log.debug('child: ', child);
+        vm.$log.debug('stdout: ', stdout);
+        vm.$log.debug('stderr: ', stderr);
 
         if (child.exitCode == 0) {
           // SUCCESS
-          vm.setServerStatus('started');
           // get url from local_configuration.json
-          const obj = jetpack.read(projectDir.path('local_configuration.json'), 'json');
+          const obj = jetpack.read(vm.projectDir.path('local_configuration.json'), 'json');
           vm.setServerURL(obj.server_url);
           vm.$log.debug('SERVER URL: ', vm.serverURL);
-          return true;
+          deferred.resolve(child);
 
         } else {
           // TODO: cleanup?
           if (error !== null) {
-            console.log(`exec error: ${error}`);
+            console.log('exec error:',  error);
           }
-          return false;
+          deferred.reject(error);
         }
-
       });
 
-
-    //let child = vm.exec('sleep 5 && echo \'hello\'',
-    //  (error, stdout, stderr) => {
-    //    console.log(`stdout: ${stdout}`);
-    //    console.log(`stderr: ${stderr}`);
-    //    console.log('child: ', child);
-    //    if (error !== null) {
-    //      console.log(`exec error: ${error}`);
-    //    }
-    //  }
-    //);
-
+    return deferred.promise;
   }
 
   runAnalysis() {
     const vm = this;
+    const deferred = vm.$q.defer();
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: catch what analysis type it is
-    const child = vm.exec('cd /Users/kflemin/repos/pat_meta_cli/bin && ruby openstudio_meta run_analysis /Users/kflemin/OpenStudio/PAT/the_project/the_project.json ' + vm.serverURL + ' -a batch_datapoints',
+    const command = 'cd ' + vm.CLIpath + ' && ruby openstudio_meta run_analysis ' +  vm.projectDir.path() + '/' + vm.Project.getProjectName() + '.json ' + vm.serverURL + ' -a batch_datapoints';
+   vm.$log.debug('Run command: ', command);
+    const child = vm.exec(command,
       (error, stdout, stderr) => {
         console.log('THE PROCESS TERMINATED!');
         console.log('EXIT CODE: ', child.exitCode);
         console.log('child: ', child);
-        console.log(`stdout: ${stdout}`);
-        console.log(`stderr: ${stderr}`);
+        console.log('stdout: ', stdout);
+        console.log('stderr: ', stderr);
 
         if (child.exitCode == 0) {
           // SUCCESS
-          // TODO: grab analysis_id which should be returned somewhere and store in variable
-          //TODO: vm.setAnalysisID(id);
-
           vm.$log.debug('Analysis Started');
-          return true;
+          const analysis_arr = stdout.toString().split("request to run analysis ");
+          const analysis_id = _.last(analysis_arr);
+          vm.$log.debug('ANALYSIS ID: ', analysis_id);
+          deferred.resolve(analysis_id);
+          vm.setAnalysisID(analysis_id);
 
         } else {
           // TODO: cleanup?
           if (error !== null) {
-            console.log(`exec error: ${error}`);
+            console.log('exec error: ', error);
           }
-          return false;
+          deferred.reject(error);
         }
       });
 
-    // TODO: return success/fail
+    return deferred.promise;
+
+  }
+
+  stopServer() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const serverType = vm.Project.getRunType();
+
+    if (vm.serverStatus != 'stopped'){
+
+      if (serverType.name == 'local') {
+
+        const command = 'cd ' + vm.CLIpath + ' && ruby openstudio_meta stop_local ' + vm.projectDir.path();
+        vm.$log.debug('Stop Local command: ', command);
+        const child = vm.exec(command,
+          (error, stdout, stderr) => {
+            console.log('THE PROCESS TERMINATED');
+            console.log('EXIT CODE: ', child.exitCode);
+            console.log('child: ', child);
+            console.log('stdout: ', stdout);
+            console.log('stderr: ', stderr);
+
+            if (child.exitCode == 0) {
+              // SUCCESS
+              vm.$log.debug('Server Stopped');
+              deferred.resolve(child);
+
+            } else {
+              // TODO: cleanup?
+              if (error !== null) {
+                console.log('exec error: ', error);
+              }
+              deferred.reject(error);
+            }
+          });
+        } else {
+        // TODO: stop remote server here
+      }
+    } else {
+      // Server already stopped
+      deferred.resolve();
+    }
+
+    return deferred.promise;
 
   }
 
@@ -183,9 +248,11 @@ export class OsServer {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    const url = vm.serverURL + 'analyses/' + vm.analysisID + '/status.json';
+    const url = vm.serverURL + '/analyses/' + vm.analysisID + '/status.json';
+    vm.$log.debug("Analysis Status URL: ", url);
     vm.$http.get(url).then(response => {
       // send json to run controller
+      vm.$log.debug("status JSON response: ", response);
       deferred.resolve(response);
 
     }, response => {
