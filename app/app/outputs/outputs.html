@@ -1,12 +1,12 @@
 <div class="row pad-bot-20">
-  <div class="col-md-6"><h4>Outputs <span class="badge badge-info margin-left-5">&nbsp;?&nbsp;</span></h4></div>
+  <div class="col-md-6"><h4><translate>outputs.title</translate> <span class="badge badge-info margin-left-5">&nbsp;?&nbsp;</span></h4></div>
 </div>
 <div class="row pad-bot-20">
-  <div class="col-md-12">
-    <div ng-if="selectedAnalysisType == 'Manual'">
-      <div class="outputs-manual">There are no outputs to set in Manual mode.</div>
+  <div class="col-md-12" ng-switch="selectedAnalysisType">
+    <div ng-switch-when="Manual">
+      <div class="outputs-manual" translate>outputs.noOutputsInManual</div>
     </div>
-    <div ng-if="!selectedAnalysisType == 'Manual'">
+    <div ng-switch-when="Algorithmic">
 
     </div>
   </div>

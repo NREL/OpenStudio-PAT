@@ -41,9 +41,21 @@ export class Project {
     vm.analysisTypes = ['Manual', 'Algorithmic'];
 
     vm.reportType = 'Calibration Report';
-    vm.reportTypes = ['Calibration Report', 'Radiance Report', 'Parallel Coordinates', 'Radar Chart'];
+    vm.reportTypes = [{
+      id: 'Calibration Report',
+      name: 'reports.type.calibrationReport'
+    }, {
+      id: 'Radiance Report',
+      name: 'reports.type.radianceReport'
+    }, {
+      id: 'Parallel Coordinates',
+      name: 'reports.type.parallelCoordinates'
+    }, {
+      id: 'Radar Chart',
+      name: 'reports.type.radarChart'
+    }];
 
-    vm.samplingMethods = vm.setSamplingMethods();
+    vm.samplingMethods = Project.setSamplingMethods();
 
     vm.samplingMethod = '';
 
@@ -105,18 +117,21 @@ export class Project {
       const options = [];
 
       // first find out how many options there are
-      for (let i = 1; i <= measure.number_of_options; i++) {
+      for (let i = 1; i <= measure.numberOfOptions; i++) {
 
         const theOption = {};
         // option name and ID
         theOption.id = 'option_' + i;
-        // TODO: the name will eventually be from the first row of data, for now set same as ID
-        theOption.name = theOption.id;
 
         // set argument values
         theOption.arguments = [];
         _.forEach(measure.arguments, (argument) => {
-          // TODO: when rows for name and descriptions are added, refactor this a bit
+
+          if (argument.specialRowId == 'optionName') {
+            theOption.name = argument[theOption.id];
+          } else if (argument.specialRowId == 'optionDescription') {
+            theOption.description = argument[theOption.id];
+          }
 
           // get the row's value for key corresponding to the col's name
           // add to arguments array
@@ -147,7 +162,7 @@ export class Project {
   exportOSA() {
     const vm = this;
     // check what kind of analysis it is
-    if (vm.analysisType == 'Manual'){
+    if (vm.analysisType == 'Manual') {
       vm.exportManual();
     } else {
       vm.exportAlgorithmic();
@@ -199,11 +214,11 @@ export class Project {
       m.measure_definition_version_uuid = measure.versionId;
 
       m.arguments = [];
-        // TODO: this portion only has arguments that don't have the variable box checked
+      // TODO: this portion only has arguments that don't have the variable box checked
       _.forEach(measure.arguments, (arg) => {
         const argument = {};
         argument.display_name = arg.displayName;
-        argument.display_name_short = arg.shortName;
+        argument.display_name_short = arg.id;
         argument.name = arg.name;
         argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
         argument.default_value = arg.defaultValue;
@@ -225,27 +240,29 @@ export class Project {
 
       // need a __SKIP__ argument
       if (_.includes(vars, true)) {
-        const v = {};
-        v.argument = {};
-        v.argument.display_name = '__SKIP__';
-        v.argument.display_name_short = '__SKIP__';
-        v.argument.name = '__SKIP__';
-        v.argument.value_type = 'bool';
-        v.argument.default_value = false;
-        v.argument.value = false;
-
-        v.display_name = '__SKIP__';
-        v.display_name_short = '__SKIP__';
-        v.variable_type = 'variable';
-        v.units = null;
-        v.minimum = false;
-        v.maximum = true;
-        v.relation_to_output = null;
-        v.static_value = false;
-        v.variable = true;
-        v.uncertainty_description = {};
-        v.uncertainty_description.type = 'discrete';
-        v.uncertainty_description.attributes = [];
+        const v = {
+          argument: {
+            display_name: '__SKIP__',
+            display_name_short: '__SKIP__',
+            name: '__SKIP__',
+            value_type: 'bool',
+            default_value: false,
+            value: false
+          },
+          display_name: '__SKIP__',
+          display_name_short: '__SKIP__',
+          variable_type: 'variable',
+          units: null,
+          minimum: false,
+          maximum: true,
+          relation_to_output: null,
+          static_value: false,
+          variable: true,
+          uncertainty_description: {
+            attributes: [],
+            type: 'discrete'
+          }
+        };
 
         const valArr = [];
         _.forEach(vars, (skip) => {
@@ -287,12 +304,12 @@ export class Project {
         // TODO: only arguments that are variables go here
         v.argument = {};
         v.argument.display_name = arg.displayName;
-        v.argument.display_name_short = arg.shortName;
+        v.argument.display_name_short = arg.id;
         v.argument.name = arg.name;
         v.argument.value_type = _.toLower(arg.type); // TODO: see above
 
         v.display_name = arg.displayName;  // same as arg
-        v.display_name_short = arg.shortName; // entered in PAT
+        v.display_name_short = arg.id; // entered in PAT
         v.variable_type = 'variable'; //this is always 'variable'
         v.units = arg.units;
         v.minimum = arg.minimum;  // TODO: must be alphabetically ordered if string, otherwise standard order (pick from option values mean must be btw min and max, and max > min)
@@ -591,7 +608,7 @@ export class Project {
       description: '0 false / 1 true (load balancing)',
       defaultValue: 1
     }];
-      at.NSGA2 = [{
+    at.NSGA2 = [{
       name: 'Number of Samples',
       description: 'Size of initial population',
       defaultValue: 30
@@ -716,7 +733,7 @@ export class Project {
     vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
 
     const settings = [];
-    _.forEach(vm.algorithmOptions[vm.samplingMethod.shortName], object => {
+    _.forEach(vm.algorithmOptions[vm.samplingMethod.id], object => {
       settings.push(object);
     });
 
@@ -728,7 +745,7 @@ export class Project {
     const vm = this;
     vm.$log.debug('In setAlgorithmSettings in Project');
 
-    _.forEach(vm.algorithmOptions[algorithm.shortName], (object) => {
+    _.forEach(vm.algorithmOptions[algorithm.id], (object) => {
       let flag = 0;
       _.forEach(vm.algorithmSettings, (setting) => {
         if (object.name === setting.name) {
@@ -746,7 +763,7 @@ export class Project {
       }
     });
 
-    vm.algorithmSettings = vm.algorithmOptions[algorithm.shortName];
+    vm.algorithmSettings = vm.algorithmOptions[algorithm.id];
   }
 
   getAlgorithmOptions() {
@@ -754,47 +771,47 @@ export class Project {
     return vm.algorithmOptions;
   }
 
-  setSamplingMethods() {
+  static setSamplingMethods() {
 
     return [{
-      name: 'BatchRun',
-      shortName: 'BatchRun'
+      id: 'BatchRun',
+      name: 'analysis.type.batchRun'
     }, {
-      name: 'Nondominated Sorting Genetic Algorithm 2',
-      shortName: 'NSGA2'
+      id: 'NSGA2',
+      name: 'analysis.type.nsga2'
     }, {
-      name: 'Strength Pareto Evolutionary Algorithm 2',
-      shortName: 'SPEA2'
+      id: 'SPEA2',
+      name: 'analysis.type.spea2'
     }, {
-      name: 'Particle Swarm',
-      shortName: 'PSO'
+      id: 'PSO',
+      name: 'analysis.type.pso'
     }, {
-      name: 'R-GENetic Optimization Using Derivatives',
-      shortName: 'RGENOUD'
+      id: 'RGENOUD',
+      name: 'analysis.type.rgenoud'
     }, {
-      name: 'Optim',
-      shortName: 'Optim'
+      id: 'Optim',
+      name: 'analysis.type.optim'
     }, {
-      name: 'Latin Hypercube Sampling',
-      shortName: 'LHS'
+      id: 'LHS',
+      name: 'analysis.type.lhs'
     }, {
-      name: 'Morris Method',
-      shortName: 'Morris'
+      id: 'Morris',
+      name: 'analysis.type.morris'
     }, {
-      name: 'DesignOfExperiments',
-      shortName: 'DOE'
+      id: 'DOE',
+      name: 'analysis.type.doe'
     }, {
-      name: 'PreFlight',
-      shortName: 'PreFlight'
+      id: 'PreFlight',
+      name: 'analysis.type.preFlight'
     }, {
-      name: 'SingleRun',
-      shortName: 'SingleRun'
+      id: 'SingleRun',
+      name: 'analysis.type.singleRun'
     }, {
-      name: 'RepeatRun',
-      shortName: 'RepeatRun'
+      id: 'RepeatRun',
+      name: 'analysis.type.repeatRun'
     }, {
-      name: 'BaselinePerturbation',
-      shortName: 'BaselinePerturbation'
+      id: 'BaselinePerturbation',
+      name: 'analysis.type.baselinePerturbation'
     }];
   }
 

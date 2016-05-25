@@ -186,7 +186,7 @@ select {
       background-color: #F6921E;
     }
   }
-  li.active > a, li.active > a:hover, .nav-pills > li.active > a:focus {
+  > li.active > a, > li.active > a:hover, > li.active > a:focus {
     color: darkslategray;
     background-color: #F6921E;
     border-bottom: 2px solid #000;

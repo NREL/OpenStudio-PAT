@@ -1,15 +1,17 @@
 <div class="row pad-bot-20">
-  <div class="col-md-6"><h4>Project Measures and Options <span class="badge badge-info margin-left-5">&nbsp;?&nbsp;</span></h4></div>
+  <div class="col-md-6"><h4><translate>analysis.manual.projectMeasuresAndOptions</translate> <span class="badge badge-info margin-left-5">&nbsp;?&nbsp;</span></h4></div>
   <div class="col-md-2 col-md-offset-2">
-    <button type="button" class="btn btn-primary" ng-click="analysis.checkUpdates()"><span class="glyphicon glyphicon-repeat">&nbsp;</span>Check for Updates</button>
+    <button type="button" class="btn btn-primary" ng-click="analysis.checkUpdates()"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> <translate>analysis.checkForUpdates</translate>
+    </button>
   </div>
 </div>
 
 <div class="row">
   <div class="col-md-12">
-    <h5 class="inline measure-type">OpenStudio Measures</h5>
+    <h5 class="inline measure-type" translate>analysis.openstudioMeasures</h5>
     <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ModelMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Measure</button>
+    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ModelMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+      <translate>analysis.addMeasure</translate></button>
   </div>
 </div>
 <div class="analysis-custom">
@@ -21,19 +23,22 @@
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
             {{measure.name}}
             <span class="pull-right">
-              <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
+              <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation(); analysis.removeMeasure(measure);">
                 <span class="glyphicon glyphicon-remove"></span>
               </span>
             </span>
           </uib-accordion-heading>
           <div class="button-div">
-            <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Measure Option</button>
-            <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Duplicate Option</button>
-            <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Duplicate Measure &amp; Option</button>
-            <button type="button" class="btn btn-success" ng-click="analysis.deleteSelectedOption(measure)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete Last Option</button>
-            <p>Check All <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
+            <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <translate>analysis.addMeasureOption</translate></button>
+            <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateOption</translate></button>
+            <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
+              <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
+            </button>
+            <button type="button" class="btn btn-success" ng-click="analysis.deleteSelectedOption(measure)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> <translate>analysis.deleteLastOption</translate>
+            </button>
+            <p><translate>analysis.checkAll</translate> <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
           </div>
-          <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
+          <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
         </uib-accordion-group>
       </uib-accordion>
     </div>
@@ -43,9 +48,10 @@
 <hr class="black-line">
 <div class="row">
   <div class="col-md-12">
-    <h5 class="inline measure-type">EnergyPlus Measures</h5>
+    <h5 class="inline measure-type" translate>analysis.energyplusMeasures</h5>
     <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('EnergyPlusMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Measure</button>
+    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('EnergyPlusMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+      <translate>analysis.addMeasure</translate></button>
   </div>
 </div>
 <div class="analysis-custom">
@@ -63,12 +69,17 @@
             </span>
           </uib-accordion-heading>
           <div class="button-div">
-            <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Measure Option</button>
-            <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Duplicate Option</button>
-            <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Duplicate Measure &amp; Option</button>
-            <button type="button" class="btn btn-success" ng-click="analysis.deleteSelectedOption(measure)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete Last Option</button>
+            <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              <translate>analysis.addMeasureOption</translate></button>
+            <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
+              <translate>analysis.duplicateOption</translate></button>
+            <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
+              <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
+            </button>
+            <button type="button" class="btn btn-success" ng-click="analysis.deleteSelectedOption(measure)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+              <translate>analysis.deleteLastOption</translate></button>
 
-            <p>Check All <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
+            <p><translate>analysis.checkAll</translate> <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
           </div>
           <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
         </uib-accordion-group>
@@ -80,9 +91,10 @@
 <hr class="black-line">
 <div class="row">
   <div class="col-md-12">
-    <h5 class="inline measure-type">Reporting Measures</h5>
+    <h5 class="inline measure-type" translate>analysis.reportingMeasures</h5>
     <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ReportingMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Measure</button>
+    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ReportingMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+      <translate>analysis.addMeasure</translate></button>
   </div>
 </div>
 <div class="analysis-custom">
@@ -100,11 +112,17 @@
             </span>
           </uib-accordion-heading>
           <div class="button-div">
-            <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> Add Measure Option</button>
-            <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Duplicate Option</button>
-            <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> Duplicate Measure &amp; Option</button>
-            <button type="button" class="btn btn-success" ng-click="analysis.deleteSelectedOption(measure)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span> Delete Last Option</button>
-            <p>Check All <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
+            <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+              <translate>analysis.addMeasureOption</translate></button>
+            <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
+              <translate>analysis.duplicateOption</translate></button>
+            <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
+              <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
+            </button>
+            <button type="button" class="btn btn-success" ng-click="analysis.deleteSelectedOption(measure)"><span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+              <translate>analysis.deleteLastOption</translate>
+            </button>
+            <p><translate>analysis.checkAll</translate> <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
           </div>
           <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
         </uib-accordion-group>
