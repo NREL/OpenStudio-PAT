@@ -87,7 +87,7 @@ export class ModalBclController {
         enableSorting: false,
         cellClass: 'icon-cell',
         headerCellFilter: 'translate',
-        width: '15%',
+        width: '15%'
       }, {
         name: 'author',
         displayName: 'bcl.columns.author',

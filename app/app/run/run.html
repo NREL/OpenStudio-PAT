@@ -9,12 +9,12 @@
   </div>
 </div>
 
-<div class="row pad-bot-20">
+<!--<div class="row pad-bot-20">
   <div class="col-md-12">
     TEMPORARY SECTION: &nbsp;&nbsp;
     <button type="button" class="btn btn-info" ng-click="run.exportOSA()" translate>run.exportToOSA</button>
   </div>
-</div>
+</div>-->
 
 <div ng-show="selectedRunType.name == 'remote'" class="row pad-bot-20">
   <div class="col-md-8">
@@ -45,5 +45,22 @@
   <div class="col-md-5">
     <p>Analysis ID is: {{analysisID}}</p>
     <p>Analysis Status is: {{analysisStatus}}</p>
+  </div>
+</div>
+<div ng-if="serverStatus == 'started'"><button type="button" class="btn btn-primary" ng-click="run.viewServer()">View Server</button></div>
+
+<div ng-if="datapoints.length > 0">
+  <div class="panel panel-default full-width margin-top-20">
+    <div class="panel-body">
+      <uib-accordion close-others="false">
+        <uib-accordion-group ng-repeat="datapoint in datapoints" id="{{datapoint.id}}" is-open="datapoint.open">
+          <uib-accordion-heading>
+            <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
+            {{datapoint.id}} - status: {{datapoint.status}}
+          </uib-accordion-heading>
+           <p>Datapoint Details Placeholder</p>
+        </uib-accordion-group>
+      </uib-accordion>
+    </div>
   </div>
 </div>
