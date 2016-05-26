@@ -14,7 +14,7 @@ export default {
     defaultSeedModel: 'Default Seed Model',
     defaultWeatherFile: 'Default Weather File',
     deleteLastOption: 'Delete Last Option',
-    duplicateMeasureAndOption: 'Duplicate Measure &amp; Option',
+    duplicateMeasureAndOption: 'Duplicate Measure & Option',
     duplicateOption: 'Duplicate Option',
     energyplusMeasures: 'EnergyPlus Measures',
     openstudioMeasures: 'OpenStudio Measures',
