@@ -294,7 +294,8 @@ export class AnalysisController {
     // start from first option
     const opt = vm.getDefaultOptionColDef();
     opt.displayName = 'Option ' + measure.numberOfOptions;
-    opt.field = 'option_' + measure.numberOfOptions + '_' + measure.uid;
+    //opt.field = 'option_' + measure.numberOfOptions + '_' + measure.uid; // TODO fix this
+    opt.field = 'option_' + measure.numberOfOptions;
 
     // add default arguments to opt
     vm.addDefaultArguments(measure, opt);
