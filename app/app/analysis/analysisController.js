@@ -37,9 +37,11 @@ export class AnalysisController {
     // SAVE
     vm.$scope.$on('$destroy', () => {
       console.log('SAVING measures to ProjectService');
-      // vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+      vm.Project.setMeasuresAndOptions(vm.$scope.measures);
       // save measure options in nicer structure for json export
+      // TODO: this isn't saving quite correctly (options don't load back?)
       vm.Project.savePrettyOptions();
+      vm.Project.exportPAT();
     });
 
     vm.$scope.selectedAll = false;
@@ -278,6 +280,7 @@ export class AnalysisController {
     // line below also removes it from bclService 'getProjectMeasures', but not from disk
     // TODO: fix so BCL modal doesn't restore deleted panels
     _.remove(vm.$scope.measures, {uid: measure.uid});
+    vm.Project.setMeasuresAndOptions(vm.$scope.measures);
 
     const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.uid + '"]'));
     measurePanel.remove();

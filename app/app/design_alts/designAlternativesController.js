@@ -11,6 +11,7 @@ export class DesignAlternativesController {
 
     vm.selected = null;
     vm.measures = vm.Project.getMeasuresAndOptions();
+    vm.$log.debug('RETRIEVED MEASURES: ', vm.measures);
 
     // get seed and weather defaults and dropdown options
     vm.seedsDropdownArr = vm.Project.getSeedsDropdownArr();

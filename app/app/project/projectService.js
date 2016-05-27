@@ -147,7 +147,6 @@ export class Project {
               vm.$log.debug('ARG: ', argument.name, ' value left blank in option: ', theOption.name);
             }
           }
-
         });
         options.push(theOption);
       }
