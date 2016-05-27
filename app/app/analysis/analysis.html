@@ -15,7 +15,7 @@
       <div ng-show="selectedAnalysisType == 'Algorithmic'">
         <label class="medium-label" translate>analysis.samplingMethod</label>
         <div class="input-group">
-          <select class="form-control inline form-control-smaller-width" ng-options="method.name | translate for method in analysis.samplingMethods track by method.shortName" ng-model="selectedSamplingMethod" ng-change="analysis.setSamplingMethod()"></select>
+          <select class="form-control inline form-control-smaller-width" ng-options="method.name | translate for method in analysis.samplingMethods track by method.id" ng-model="selectedSamplingMethod" ng-change="analysis.setSamplingMethod()"></select>
           <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
         </div>
       </div>

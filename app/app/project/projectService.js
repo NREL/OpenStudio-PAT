@@ -57,7 +57,7 @@ export class Project {
 
     vm.samplingMethods = Project.setSamplingMethods();
 
-    vm.samplingMethod = '';
+    vm.samplingMethod = vm.samplingMethods.length > 0 ? vm.samplingMethods[0] : null;
 
     vm.runTypes = vm.getRunTypes();
     vm.runType = vm.runTypes[0];
@@ -743,7 +743,6 @@ export class Project {
   setAlgorithmSettings(algorithm) {
     const vm = this;
     vm.$log.debug('In setAlgorithmSettings in Project');
-
     _.forEach(vm.algorithmOptions[algorithm.id], (object) => {
       let flag = 0;
       _.forEach(vm.algorithmSettings, (setting) => {

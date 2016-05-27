@@ -424,10 +424,10 @@ export class AnalysisController {
   setSamplingMethod() {
     const vm = this;
     vm.$log.debug('In setSamplingMethod in analysis');
-
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
+
   }
 
   selectSeedModel() {
