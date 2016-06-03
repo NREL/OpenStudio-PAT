@@ -297,8 +297,8 @@ export class AnalysisController {
     // start from first option
     const opt = vm.getDefaultOptionColDef();
     opt.displayName = 'Option ' + measure.numberOfOptions;
-    //opt.field = 'option_' + measure.numberOfOptions + '_' + measure.uid; // TODO fix this
     opt.field = 'option_' + measure.numberOfOptions;
+    opt.measureUID = measure.uid;
 
     // add default arguments to opt
     vm.addDefaultArguments(measure, opt);
@@ -329,15 +329,40 @@ export class AnalysisController {
     }
   }
 
-
   deleteOption(col) {
     const vm = this;
 
-    const optionCount = Number(col.field.split('_')[1]);
-    const columnIdxToDelete = optionCount + 2; // 3 columns are present before any option columns
-    const measureUID = col.field.split('_')[2];
+    vm.$log.debug('col: ', col);
 
-    vm.$scope.gridOptions[measureUID].columnDefs.splice(columnIdxToDelete, 1);
+
+    vm.$log.debug('In deleteOption in analysis');
+    const optionCount = Number(col.field.split('_')[1]);
+    vm.$log.debug('optionCount: ', optionCount);
+    const measureUID = col.colDef.measureUID;
+    vm.$log.debug('measureUID: ', measureUID);
+
+    let columnIndex = 0;
+    _.forEach((vm.$scope.gridOptions[measureUID]).columnDefs, (columnDef) => {
+      if (_.has(columnDef, 'field')) {
+        const optionCount2 = Number(columnDef.field.split('_')[1]);
+        vm.$log.debug('columnDef.field: ', columnDef.field);
+        if (optionCount === optionCount2) {
+          vm.$log.debug('SUCCESS');
+          vm.$log.debug('columnIndex: ', columnIndex);
+          vm.$scope.gridOptions[measureUID].columnDefs.splice(columnIndex, 1);
+        }
+      }
+      columnIndex++;
+    });
+    _.forEach(vm.$scope.measures, (measure) => {
+      if (measure.uid == measureUID){
+        _.forEach(measure.arguments, (argument) => {
+          delete argument[col.field];
+        });
+        // decrement options count
+        measure.numberOfOptions = measure.numberOfOptions - 1;
+      }
+    });
   }
 
   addDefaultArguments(measure, option) {

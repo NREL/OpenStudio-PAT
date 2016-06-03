@@ -117,43 +117,53 @@ export class Project {
       const options = [];
 
       // first find out how many options there are
-      for (let i = 1; i <= measure.numberOfOptions; i++) {
+     const keys = Object.keys(measure.arguments[0]);
+     const optionKeys = _.filter(keys, function(k) {
+        return k.indexOf('option_') !== -1;
+     });
+     vm.$log.debug("option keys: ", optionKeys);
+
+      _.forEach(optionKeys,(key) => {
 
         const theOption = {};
         // option name and ID
-        theOption.id = 'option_' + i;
+        theOption.id = key;
 
         // set argument values
         theOption.arguments = [];
         _.forEach(measure.arguments, (argument) => {
-
+          const theArg = {};
           if (argument.specialRowId == 'optionName') {
-            theOption.name = argument[theOption.id];
+            theOption.name = argument[key];
           } else if (argument.specialRowId == 'optionDescription') {
-            theOption.description = argument[theOption.id];
+            theOption.description = argument[key];
           }
 
           // get the row's value for key corresponding to the col's name
           // add to arguments array
-          const theArg = {};
-          if (theOption.id in argument) {
-            theArg.name = argument.name;
-            theArg.value = argument[theOption.id];
-            theOption.arguments.push(theArg);
-          } else {
-            // check if argument is required
-            if (argument.required) {
-              // TODO: throw an error here: need a value for this argument in this option
-              vm.$log.debug('ARG: ', argument.name, ' value left blank in option: ', theOption.name);
+          else if (!('specialRowId' in argument)) {
+            if (key in argument) {
+              theArg.name = argument.name;
+              theArg.value = argument[key];
+              theOption.arguments.push(theArg);
+            } else {
+              // check if argument is required
+              if (argument.required) {
+                // TODO: throw an error here: need a value for this argument in this option
+                vm.$log.debug('ARG: ', argument.name, ' value left blank in option: ', theOption.name);
+              }
             }
           }
+
         });
         options.push(theOption);
-      }
+      });
       // save to measure
       measure.options = options;
 
     });
+
+    vm.$log.debug('Measures with pretty options: ', vm.measures);
 
   }
 
