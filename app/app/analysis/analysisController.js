@@ -285,6 +285,10 @@ export class AnalysisController {
     const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.uid + '"]'));
     measurePanel.remove();
 
+    if (!vm.jetpack.remove(vm.projectDir.path('measures/' + measure.name))) {
+      vm.jetpack.remove(vm.projectDir.path('measures/' + measure.className));
+    }
+
     vm.initializeGrids();
   }
 
