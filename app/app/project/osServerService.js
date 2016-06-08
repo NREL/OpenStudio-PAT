@@ -14,13 +14,18 @@ export class OsServer {
     vm.exec = require('child_process').exec;
 
     vm.serverStatus = 'stopped';  // started, stopped, error?
+    vm.analysisStatus = '';
+    vm.progressAmount = 0;
+    vm.progressMessage = '';
+    vm.isDone = true;
+    vm.datapoints = [];
+    vm.disabledButtons = false;
 
     vm.serverURL = 'http://192.168.99.100:8080';  // TODO: for now, use docker default URL
-    vm.CLIpath = '/Users/kflemin/repos/pat_meta_cli/bin'; // TODO: fix this
-    vm.OsServerPath = '/Users/kflemin/repos/OpenStudio-server-PAT';
+    vm.CLIpath = '/Users/kflemin/repos/pat_meta_cli/bin'; // TODO: Evan fix this
+    vm.OsServerPath = '/Users/kflemin/repos/OpenStudio-server-PAT'; // TODO: Evan fix this
     vm.projectDir = vm.Project.getProjectDir();
     vm.analysisID = null;
-
   }
 
   getServerURL() {
@@ -41,6 +46,66 @@ export class OsServer {
   setServerStatus(status) {
     const vm = this;
     vm.serverStatus = status;
+  }
+
+  getAnalysisStat() {
+    const vm = this;
+    return vm.analysisStatus;
+  }
+
+  setAnalysisStat(analysisStatus) {
+    const vm = this;
+    vm.analysisStatus = analysisStatus;
+  }
+
+  getProgressAmount() {
+    const vm = this;
+    return vm.progressAmount;
+  }
+
+  setProgressAmount(progressAmount) {
+    const vm = this;
+    vm.progressAmount = progressAmount;
+  }
+
+  getProgressMessage() {
+    const vm = this;
+    return vm.progressMessage;
+  }
+
+  setProgressMessage(progressMessage) {
+    const vm = this;
+    vm.progressMessage = progressMessage;
+  }
+
+  getIsDone() {
+    const vm = this;
+    return vm.isDone;
+  }
+
+  setIsDone(isDone) {
+    const vm = this;
+    vm.isDone = isDone;
+  }
+
+  getDatapointsIsDone() {
+    const vm = this;
+    return vm.datapoints;
+  }
+
+  setDatapoints(datapoints) {
+    const vm = this;
+    vm.datapoints = datapoints;
+  }
+
+  getDisabledButtons() {
+    const vm = this;
+    return vm.disabledButtons;
+  }
+
+  setDisabledButtons(isDisabled) {
+    const vm = this;
+    vm.disabledButtons = isDisabled;
   }
 
   getServerType() {

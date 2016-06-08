@@ -13,18 +13,18 @@ export class RunController {
     vm.runTypes = vm.Project.getRunTypes();
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.OsServer.getAnalysisID();
-    vm.$scope.analysisStatus = '';
+    vm.$scope.analysisStatus =  vm.OsServer.getAnalysisStat();
     vm.$scope.serverStatus = vm.OsServer.getServerStatus();
     vm.$log.debug('SERVER STATUS: ', vm.$scope.serverStatus);
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
-    vm.$scope.disabledButtons = false;
-    vm.$scope.progressMessage = '';
+    vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
+    vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
-    vm.$scope.datapoints = [];
+    vm.$scope.datapoints = vm.OsServer.getDatapoints();
 
     // TODO: refresh this
-    vm.$scope.progressAmount = 0;
+    vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
 
   }
 
@@ -48,23 +48,38 @@ export class RunController {
     vm.$scope.analysisStatus = '';
 
     // 3: hit PAT CLI to start server (local or remote)
-    vm.$scope.progressAmount = '15';
-    vm.$scope.progressMessage = 'Starting server';
+    vm.OsServer.setProgressAmount('15');
+    vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+
+    vm.OsServer.setProgressMessage('Starting server');
+    vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
     vm.OsServer.startServer().then(response => {
       vm.$log.debug("Start Server response: ", response);
-      vm.$scope.progressMessage = 'Server started';
+
+      vm.OsServer.setProgressMessage('Server started');
+      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+
       vm.$scope.serverStatus = vm.OsServer.getServerStatus();
       vm.$log.debug("Server Status: ", vm.$scope.serverStatus);
 
       // 4: hit PAT CLI to start run
       // TODO: for now, use an already-created OSA
-      vm.$scope.progressMessage = 'Starting analysis run';
-      vm.$scope.progressAmount = 30;
+      vm.OsServer.setProgressMessage('Starting analysis run');
+      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+
+      vm.OsServer.setProgressAmount(30);
+      vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+
       vm.OsServer.runAnalysis().then(response => {
         vm.$log.debug('Run Analysis response: ', response);
-        vm.$scope.progressMessage = 'Analysis started';
-        vm.$scope.progressAmount = 45;
+
+        vm.OsServer.setProgressMessage('Analysis started');
+        vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+
+        vm.OsServer.setProgressAmount(45);
+        vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+
         vm.$scope.analysisID = vm.OsServer.getAnalysisID();
 
         // 5: until complete, hit serverAPI for updates (errors, warnings, status)
@@ -77,17 +92,22 @@ export class RunController {
             //vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
 
             // workaround until the item below is fixed
-            vm.isDone = true;
+            vm.OsServer.setIsDone(true);
+            vm.isDone = vm.OsServer.getIsDone();
+
             vm.$scope.datapoints = response.data.analysis.data_points;
+
             vm.$log.debug("DATAPOINTS: ", vm.$scope.datapoints);
             _.forEach(response.data.analysis.data_points, dp => {
               if (dp.status != 'completed') {
-                vm.isDone = false;
+             vm.OsServer.setIsDone(false);
+            vm.isDone = vm.OsServer.getIsDone();
               }
             });
 
             if (vm.isDone) {
-              vm.$scope.analysisStatus = 'completed';
+              vm.OsServer.setAnalysisStatus('completed');
+              vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
               // cancel loop
               vm.stopAnalysisStatus();
             }
@@ -102,28 +122,23 @@ export class RunController {
             vm.$log.debug('analysis status retrieval error: ', response);
           });
 
-
         }, 20000);  // once per 20 seconds
-
-
 
       }, response => {
         // analysis not started
-        vm.$scope.progressMessage = 'Analysis Error';
+        vm.OsServer.setProgressMessage('Analysis Error');
+        vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
         vm.$log.debug("ANALYSIS NOT STARTED, ERROR: ", response);
         // TODO: show status as 'ERROR'
         vm.toggleButtons();
-
       });
 
     }, response => {
-
-      vm.$scope.progressMessage = 'Server Error';
+      vm.OsServer.setProgressMessage('Server Error');
+      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
       vm.$log.debug("SERVER NOT STARTED, ERROR: ", response);
       // TODO: show status as 'ERROR'
       vm.toggleButtons();
-
-
     });
   }
 
@@ -135,9 +150,14 @@ export class RunController {
     }
     // toggle button back to 'run' when done
     // TODO: show status as 'COMPLETED' (once it actually is)
-    vm.$scope.progressMessage = 'Analysis complete';
-    vm.$scope.progressAmount = 100;
-    vm.$scope.disabledButtons = false;
+    vm.OsServer.setProgressMessage('Analysis complete');
+    vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+
+    vm.OsServer.setProgressAmount(100);
+    vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+
+    vm.OsServer.setDisabledButtons(false);
+    vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
   }
 
   exportPAT() {
