@@ -298,10 +298,29 @@ export class AnalysisController {
 
     measure.numberOfOptions++;
 
+
+    const keys = Object.keys(measure.arguments[0]);
+    vm.$log.debug("keys: ", keys);
+
+    const optionKeys = _.filter(keys, function(k) {
+      return k.indexOf('option_') !== -1;
+    });
+    vm.$log.debug("option keys: ", optionKeys);
+
+    let max = 0;
+    _.forEach(optionKeys,(key) => {
+      vm.$log.debug("key: ", key);
+      const num = Number(key.split('_')[1]);
+      if (num > max) {
+        max = num;
+      }
+    });
+    vm.$log.debug('max: ', max);
+
     // start from first option
     const opt = vm.getDefaultOptionColDef();
-    opt.displayName = 'Option ' + measure.numberOfOptions;
-    opt.field = 'option_' + measure.numberOfOptions;
+    opt.displayName = 'Option ' + Number(max + 1);
+    opt.field = 'option_' + Number(max + 1);
     opt.measureUID = measure.uid;
 
     // add default arguments to opt
@@ -337,7 +356,6 @@ export class AnalysisController {
     const vm = this;
 
     vm.$log.debug('col: ', col);
-
 
     vm.$log.debug('In deleteOption in analysis');
     const optionCount = Number(col.field.split('_')[1]);
@@ -413,6 +431,9 @@ export class AnalysisController {
 
   loadOption(measure, option) {
     const vm = this;
+    vm.$log.debug('In loadOption in analysis');
+    vm.$log.debug('measure: ', measure);
+    vm.$log.debug('option: ', option);
     const re = /^option_(\d+)$/;
     if (re.test(option.id)) {
       const opt = vm.getDefaultOptionColDef();
