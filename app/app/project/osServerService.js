@@ -22,8 +22,8 @@ export class OsServer {
     vm.disabledButtons = false;
 
     vm.serverURL = 'http://192.168.99.100:8080';  // TODO: for now, use docker default URL
-    vm.CLIpath = '/Users/kflemin/repos/pat_meta_cli/bin'; // TODO: Evan fix this
-    vm.OsServerPath = '/Users/kflemin/repos/OpenStudio-server-PAT'; // TODO: Evan fix this
+    vm.CLIpath = '/Users/kflemin/repos/pat_meta_cli/bin'; // TODO: fix this
+    vm.OsServerPath = '/Users/kflemin/repos/OpenStudio-server-PAT'; // TODO: fix this
     vm.projectDir = vm.Project.getProjectDir();
     vm.analysisID = null;
   }

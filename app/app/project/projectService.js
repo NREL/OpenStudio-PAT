@@ -21,7 +21,7 @@ export class Project {
     vm.projectMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/measures'));
     vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName));
     vm.mongoDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/data/db'));
-    vm.railsDir = jetpack.cwd('Users/kflemin/repos/OpenStudio-server/server');
+    vm.railsDir = jetpack.cwd('Users/kflemin/repos/OpenStudio-server/server'); // TODO: fix this
 
     vm.seeds = [];
     vm.weatherFiles = [];
@@ -214,6 +214,7 @@ export class Project {
       m.display_name = measure.displayName;
       m.measure_type = measure.type; // TODO: convert this.  options are:  Ruby (same as OpenStudioMeasure), EnergyPlus, and Reporting
       m.measure_definition_class_name = measure.className;
+      //m.measure_definition_measureUID = measure.colDef.measureUID; // TODO: fix this
       m.measure_definition_directory = './measures/' + measure.name;
       m.measure_definition_directory_local = vm.projectMeasuresDir.path() + '/' + measure.name;
       m.measure_definition_display_name = measure.displayName;
