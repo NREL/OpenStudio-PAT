@@ -88,7 +88,7 @@ export class OsServer {
     vm.isDone = isDone;
   }
 
-  getDatapointsIsDone() {
+  getDatapoints() {
     const vm = this;
     return vm.datapoints;
   }
