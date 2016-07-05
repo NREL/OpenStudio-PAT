@@ -41,12 +41,22 @@ export class DependencyManager {
         name: 'mongodb-3.2.5',
         platform: 'darwin',
         arch: 'x64'
-      }, {
+      }],
+      openstudioServer: [{
         name: 'openstudio-server',
         platform: 'win32',
         arch: 'ia32'
       }, {
         name: 'openstudio-server',
+        platform: 'darwin',
+        arch: 'x64'
+      }],
+      openstudioCLI: [{
+        name: 'OpenStudio2-1.12.0.58d7efc146',
+        platform: 'win32',
+        arch: 'ia32'
+      }, {
+        name: 'OpenStudio2-1.12.0.58d7efc146',
         platform: 'darwin',
         arch: 'x64'
       }]
