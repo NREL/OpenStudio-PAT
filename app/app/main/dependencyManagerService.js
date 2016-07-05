@@ -41,6 +41,14 @@ export class DependencyManager {
         name: 'mongodb-3.2.5',
         platform: 'darwin',
         arch: 'x64'
+      }, {
+        name: 'openstudio-server',
+        platform: 'win32',
+        arch: 'ia32'
+      }, {
+        name: 'openstudio-server',
+        platform: 'darwin',
+        arch: 'x64'
       }]
     };
   }
