@@ -73,9 +73,14 @@ export class DependencyManager {
     // Check for Ruby
     let rubyPath = 'ruby/bin/ruby';
     let mongoPath = 'mongo/bin/mongod';
+    let openstudioServerPath = 'openstudioServer/bin/openstudioServer';
+    let openstudioCLIPath = 'openstudioCLI/bin/openstudioCLI';
+
     if (platform == 'win32') {
       rubyPath += '.exe';
       mongoPath += '.exe';
+      openstudioServerPath += '.exe';
+      openstudioCLIPath += '.exe';
     }
 
     vm.$translate(['statusBar.Downloading', 'statusBar.Extracting']).then(translations => {
@@ -111,8 +116,38 @@ export class DependencyManager {
       return vm.$q.resolve();
     }
 
+    function downloadOpenstudioServer() {
+      if (!src.exists(openstudioServerPath)) {
+        vm.$log.debug('OpenstudioServer not found, downloading');
+        const openstudioServerManifest = _.find(vm.manifest.openstudioServer, {platform: platform, arch: arch});
+        if (_.isEmpty(openstudioServerManifest)) {
+          const errorMsg = `No openstudioServer download found for platform ${platform}`;
+          vm.$log.error(errorMsg);
+          return vm.$q.reject(errorMsg);
+        }
+        return vm._downloadDependency(_.assign({}, openstudioServerManifest, {type: 'openstudioServer'}));
+      }
+      return vm.$q.resolve();
+    }
+
+    function downloadOpenstudioCLI() {
+      if (!src.exists(openstudioCLIPath)) {
+        vm.$log.debug('OpenstudioCLI not found, downloading');
+        const openstudioCLIManifest = _.find(vm.manifest.openstudioCLI, {platform: platform, arch: arch});
+        if (_.isEmpty(openstudioCLIManifest)) {
+          const errorMsg = `No openstudioCLI download found for platform ${platform}`;
+          vm.$log.error(errorMsg);
+          return vm.$q.reject(errorMsg);
+        }
+        return vm._downloadDependency(_.assign({}, openstudioCLIManifest, {type: 'openstudioCLI'}));
+      }
+      return vm.$q.resolve();
+    }
+
     downloadRuby()
       .then(downloadMongo, downloadMongo)
+      .then(downloadOpenstudioServer, downloadOpenstudioServer)
+      .then(downloadOpenstudioCLI, downloadOpenstudioCLI)
       .finally(() => {
         vm.StatusBar.clear();
       });
