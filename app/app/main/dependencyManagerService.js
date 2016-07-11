@@ -45,7 +45,7 @@ export class DependencyManager {
       openstudioServer: [{
         name: 'openstudio-server',
         platform: 'win32',
-        arch: 'ia32'
+        arch: 'x64'
       }, {
         name: 'openstudio-server',
         platform: 'darwin',
@@ -54,7 +54,7 @@ export class DependencyManager {
       openstudioCLI: [{
         name: 'OpenStudio2-1.12.0.58d7efc146',
         platform: 'win32',
-        arch: 'ia32'
+        arch: 'x64'
       }, {
         name: 'OpenStudio2-1.12.0.58d7efc146',
         platform: 'darwin',
@@ -220,6 +220,7 @@ export class DependencyManager {
     let append = '';
     if (_.isMatch(downloadManifest, {type: 'mongo', platform: 'win32', arch: 'x64'})) append = `-${downloadManifest.arch}`;
     const filename = `${downloadManifest.name}-${downloadManifest.platform}${append}.zip`;
+    vm.$log.debug('filename:', filename);
     vm._getOnlineChecksum(filename).then(expectedMD5 => {
       if (tempDir.exists(filename)) tempDir.remove(filename);
       https.get(`${vm.manifest.endpoint}${filename}`, res => {
