@@ -1,4 +1,5 @@
 import * as jetpack from 'fs-jetpack';
+import { app } from 'remote';
 
 export class OsServer {
   constructor($q, $http, $log, Project) {
@@ -22,8 +23,13 @@ export class OsServer {
     vm.disabledButtons = false;
 
     vm.serverURL = 'http://192.168.99.100:8080';  // TODO: for now, use docker default URL
-    vm.CLIpath = '/Users/kflemin/repos/pat_meta_cli/bin'; // TODO: fix this
-    vm.OsServerPath = '/Users/kflemin/repos/OpenStudio-server-PAT'; // TODO: fix this
+    const src = jetpack.cwd(app.getPath('userData'));
+    vm.$log.debug('src.path(): ', src.path());
+    vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/OpenStudio-1.12.0.58d7efc146-Win64/bin'));
+    vm.$log.debug('vm.CLIpath.path(): ', vm.CLIpath.path());
+    vm.OsServerPath = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
+    vm.$log.debug('vm.OsServerPath.path(): ', vm.OsServerPath.path());
+
     vm.projectDir = vm.Project.getProjectDir();
     vm.analysisID = null;
   }

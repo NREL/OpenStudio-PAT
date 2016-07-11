@@ -243,6 +243,7 @@ export class DependencyManager {
             vm.StatusBar.set(`${vm.translations.Extracting} ${_.startCase(downloadManifest.type)}`, true);
             console.time(`${_.startCase(downloadManifest.type)} extracted`);
             _.defer(() => {
+              vm.$log.debug('dest.path():', dest.path());
               zip.extractAllTo(dest.path(), true);
               console.timeEnd(`${_.startCase(downloadManifest.type)} extracted`);
               tempDir.remove(filename);

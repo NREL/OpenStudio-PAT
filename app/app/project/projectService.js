@@ -1,6 +1,7 @@
 import * as jetpack from 'fs-jetpack';
 import * as os from 'os';
 import * as path from 'path';
+import { app } from 'remote';
 
 export class Project {
   constructor($log) {
@@ -21,7 +22,10 @@ export class Project {
     vm.projectMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/measures'));
     vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName));
     vm.mongoDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/data/db'));
-    vm.railsDir = jetpack.cwd('Users/kflemin/repos/OpenStudio-server/server'); // TODO: fix this
+    const src = jetpack.cwd(app.getPath('userData'));
+    vm.$log.debug('src.path(): ', src.path());
+    vm.railsDir = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
+    vm.$log.debug('vm.railsDir.path(): ', vm.railsDir.path());
 
     vm.seeds = [];
     vm.weatherFiles = [];
