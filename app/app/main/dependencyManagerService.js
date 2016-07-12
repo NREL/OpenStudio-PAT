@@ -66,6 +66,7 @@ export class DependencyManager {
   checkDependencies() {
     const vm = this;
     const src = jetpack.cwd(app.getPath('userData'));
+    vm.$log.debug('src:', src.path());
 
     const platform = os.platform();
     const arch = os.arch();
@@ -73,13 +74,12 @@ export class DependencyManager {
     // Check for Ruby
     let rubyPath = 'ruby/bin/ruby';
     let mongoPath = 'mongo/bin/mongod';
-    let openstudioServerPath = 'openstudioServer/bin/openstudioServer';
-    let openstudioCLIPath = 'openstudioCLI/bin/openstudioCLI';
+    let openstudioServerPath = 'openstudioServer/bin/openstudio_meta';
+    let openstudioCLIPath = 'openstudioCLI/bin/openstudio';
 
     if (platform == 'win32') {
       rubyPath += '.exe';
       mongoPath += '.exe';
-      openstudioServerPath += '.exe';
       openstudioCLIPath += '.exe';
     }
 

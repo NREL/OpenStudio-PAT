@@ -1,5 +1,6 @@
 import * as jetpack from 'fs-jetpack';
 import { app } from 'remote';
+import * as path from 'path';
 
 export class OsServer {
   constructor($q, $http, $log, Project) {
@@ -25,11 +26,13 @@ export class OsServer {
     vm.serverURL = 'http://192.168.99.100:8080';  // TODO: for now, use docker default URL
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
-    vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/OpenStudio-1.12.0.58d7efc146-Win64/bin'));
+    vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/bin'));
     vm.$log.debug('vm.CLIpath.path(): ', vm.CLIpath.path());
-    vm.OsServerPath = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
-    vm.$log.debug('vm.OsServerPath.path(): ', vm.OsServerPath.path());
+    vm.OsMetaPath = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/bin/openstudio_meta'));
+    vm.$log.debug('vm.OsMetaPath.path(): ', vm.OsMetaPath.path());
 
+    vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby.exe'));
+    vm.mongoBinDir = jetpack.cwd(path.resolve(src.path() + '/mongo/bin'));
     vm.projectDir = vm.Project.getProjectDir();
     vm.analysisID = null;
   }
@@ -202,7 +205,7 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: add a timeout here in case this takes too long
-    const command = 'cd ' + vm.CLIpath + ' && ruby openstudio_meta start_local ' + vm.projectDir.path() + ' ' + vm.OsServerPath;
+    const command =  '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\" ' + ' start_local --debug ' +  '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path()  + '\" \"' + vm.rubyBinDir.path() + '\" --verbose';
     vm.$log.debug('Start Local command: ', command);
     const child = vm.exec(command,
       (error, stdout, stderr) => {
