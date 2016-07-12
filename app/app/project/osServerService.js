@@ -27,10 +27,7 @@ export class OsServer {
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
     vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/bin'));
-    vm.$log.debug('vm.CLIpath.path(): ', vm.CLIpath.path());
     vm.OsMetaPath = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/bin/openstudio_meta'));
-    vm.$log.debug('vm.OsMetaPath.path(): ', vm.OsMetaPath.path());
-
     vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby.exe'));
     vm.mongoBinDir = jetpack.cwd(path.resolve(src.path() + '/mongo/bin'));
     vm.projectDir = vm.Project.getProjectDir();

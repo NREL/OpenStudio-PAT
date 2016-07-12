@@ -15,17 +15,17 @@ export class Project {
     vm.setProjectName('the_project');
 
     // TODO: get some of these from electron settings?
-    vm.seedDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/seeds'));
-    vm.weatherDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/weather'));
-    vm.myMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/Measures'));
-    vm.localDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
-    vm.projectMeasuresDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/measures'));
-    vm.projectDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName));
-    vm.mongoDir = jetpack.cwd(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/data/db'));
+    vm.seedDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/seeds'));
+    vm.weatherDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/weather'));
+    vm.myMeasuresDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    vm.localDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
+    vm.projectMeasuresDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/measures'));
+    vm.projectDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName));
+    vm.mongoDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/data/db'));
+    vm.logsDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/logs'));
+
     const src = jetpack.cwd(app.getPath('userData'));
-    vm.$log.debug('src.path(): ', src.path());
-    vm.railsDir = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
-    vm.$log.debug('vm.railsDir.path(): ', vm.railsDir.path());
+    vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
 
     vm.seeds = [];
     vm.weatherFiles = [];
