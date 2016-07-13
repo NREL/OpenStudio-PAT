@@ -1,6 +1,10 @@
 /*global bootlint*/
 
-export function runBlock($window, DependencyManager, Project, OsServer) {
+import env from '../electron/env';
+const {remote} = require('electron');
+const {app, Menu, shell} = remote;
+
+export function runBlock($window, $document, $translate, DependencyManager, Project, BCL, OsServer) {
   'ngInject';
 
   $window.onbeforeunload = e => {
@@ -13,120 +17,37 @@ export function runBlock($window, DependencyManager, Project, OsServer) {
     // Stop server
     // THE CLI doesn't work to stop the server yet
     //OsServer.stopServer().then(response => {
-      // server is stopped
-    // });
+    //  server is stopped
+    //});
 
     // Prevent exit
     //e.returnValue = false;
   };
 
-  $window.lint = function () {
-    const s = document.createElement('script');
+  $window.lint = () => {
+    const s = $document[0].createElement('script');
     s.src = 'https://maxcdn.bootstrapcdn.com/bootlint/latest/bootlint.min.js';
-    s.onload = function () {
-      bootlint.showLintReportForCurrentDocument([]);
-    };
-    document.body.appendChild(s);
+    s.onload = () => bootlint.showLintReportForCurrentDocument([]);
+    $document[0].body.appendChild(s);
   };
 
   DependencyManager.checkDependencies();
-}
 
-// File Menu Attempt
-
-
-/*
-import { remote } from 'electron';
-import env from '../electron/env';
-
-const app = remote.app,
-  Menu = remote.Menu,
-  shell = remote.shell;
-
-const menu = [];
-
-export function runBlock($rootScope, $state, BCL) {
-  'ngInject';
-
-  $rootScope.remote = require('remote');
-
-  $rootScope.remote.getCurrentWindow().removeAllListeners();
-
-  /!*var Menu = $rootScope.remote.require('menu');
-  var App = $rootScope.remote.require('app');
-
-  var menu = new Menu();
-  var tpl = [
-    {
-      label: 'Actions',
-      submenu: [
-        {
-          label: 'GoPage',
-          click: function() {
-
-            $state.go('samepage');
-
-          }
-        },
-        {
-          label: 'Quit',
-          click: function() { App.quit(); },
-          accelerator: 'Command+Q'
-        }
-      ]
-    }
-
-  ];
-  menu = Menu.buildFromTemplate( tpl );
-  Menu.setApplicationMenu(menu);*!/
+  const initialLanguage = $translate.use();
+  const setLanguage = language => {
+    console.log(language);
+    $translate.use(language);
+  };
 
   const fileMenu = {
     label: 'File',
     submenu: [{
       label: 'Quit',
       accelerator: 'Ctrl+Q',
-      click: () => {
-        app.quit();
-      }
+      click: () => app.quit()
     }]
   };
-
-  const macFileMenu = {
-    label: 'Electron',
-    submenu: [{
-      label: 'About Electron',
-      role: 'about'
-    }, {
-      type: 'separator'
-    }, {
-      label: 'Services',
-      role: 'services',
-      submenu: []
-    }, {
-      type: 'separator'
-    }, {
-      label: 'Hide Electron',
-      accelerator: 'Command+H',
-      role: 'hide'
-    }, {
-      label: 'Hide Others',
-      accelerator: 'Command+Alt+H',
-      role: 'hideothers'
-    }, {
-      label: 'Show All',
-      role: 'unhide'
-    }, {
-      type: 'separator'
-    }, {
-      label: 'Quit',
-      accelerator: 'Command+Q',
-      click: () => {
-        app.quit();
-      }
-    }]
-  };
-
-  const editMenu = {
+  const template = [{
     label: 'Edit',
     submenu: [{
       label: 'Undo',
@@ -155,81 +76,126 @@ export function runBlock($rootScope, $state, BCL) {
       accelerator: 'CmdOrCtrl+A',
       role: 'selectall'
     }]
-  };
-
-  const helpMenu = {
-    label: 'Help',
-    role: 'help',
+  }, {
+    label: 'View',
     submenu: [{
-      label: 'About ParametricAnalysisTool',
-      role: 'about'
-    }, {
-      label: 'Search Issues',
-      click: () => {
-        shell.openExternal('https://github.com/NREL/OpenStudio-PAT/issues');
-      }
-    }]
-  };
-
-  const devMenu = {
-    label: 'Development',
-    submenu: [{
-      label: 'Open BCL',
-      click: () => {
-        BCL.openBCLModal();
-      }
+      label: 'Language',
+      submenu: [{
+        label: 'English',
+        type: 'radio',
+        checked: initialLanguage == 'en',
+        click() {
+          setLanguage('en');
+        }
+      }, {
+        label: 'French',
+        type: 'radio',
+        checked: initialLanguage == 'fr',
+        click() {
+          setLanguage('fr');
+        }
+      }]
     }, {
       label: 'Reload',
       accelerator: 'CmdOrCtrl+R',
-      click: (item, focusedWindow) => {
-        if (focusedWindow)
-          focusedWindow.reload();
+      click(item, focusedWindow) {
+        if (focusedWindow) focusedWindow.reload();
       }
     }, {
       label: 'Toggle Full Screen',
-      accelerator: (() => {
-        if (process.platform == 'darwin') return 'Ctrl+Command+F';
-        return 'F11';
-      })(),
-      click: (item, focusedWindow) => {
+      accelerator: process.platform === 'darwin' ? 'Ctrl+Command+F' : 'F11',
+      click(item, focusedWindow) {
         if (focusedWindow) focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
       }
     }, {
       label: 'Toggle Developer Tools',
-      accelerator: (() => {
-        if (process.platform == 'darwin')
-          return 'Alt+Command+I';
-        else
-          return 'Ctrl+Shift+I';
-      })(),
-      click: (item, focusedWindow) => {
-        if (focusedWindow) focusedWindow.toggleDevTools();
+      accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
+      click(item, focusedWindow) {
+        if (focusedWindow) focusedWindow.webContents.toggleDevTools();
       }
     }]
-  };
+  }, {
+    label: 'Window',
+    role: 'window',
+    submenu: [{
+      label: 'Minimize',
+      accelerator: 'CmdOrCtrl+M',
+      role: 'minimize'
+    }, {
+      label: 'Close',
+      accelerator: 'CmdOrCtrl+W',
+      role: 'close'
+    }, {
+      label: 'Open BCL',
+      click() {
+        BCL.openBCLModal().then(() => {
+          // Do something
+        });
+      }
+    }]
+  }, {
+    label: 'Help',
+    role: 'help',
+    submenu: [{
+      label: 'Learn More',
+      click() {
+        shell.openExternal('https://www.openstudio.net/');
+      }
+    }, {
+      label: 'Search Issues',
+      click() {
+        shell.openExternal('https://github.com/NREL/OpenStudio-PAT/issues');
+      }
+    }]
+  }];
 
-  if (process.platform == 'darwin') {
-    menu.push(macFileMenu);
-    menu.push(editMenu);
-    menu.push(helpMenu);
-
-    menu[menu.length - 1].submenu.push({
+  if (process.platform === 'darwin') {
+    const name = app.getName();
+    template.unshift({
+      label: name,
+      submenu: [{
+        label: 'About ' + name,
+        role: 'about'
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Services',
+        role: 'services',
+        submenu: []
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Hide ' + name,
+        accelerator: 'Command+H',
+        role: 'hide'
+      }, {
+        label: 'Hide Others',
+        accelerator: 'Command+Alt+H',
+        role: 'hideothers'
+      }, {
+        label: 'Show All',
+        role: 'unhide'
+      }, {
+        type: 'separator'
+      }, {
+        label: 'Quit',
+        accelerator: 'Command+Q',
+        click() {
+          app.quit();
+        }
+      }]
+    });
+    // Window menu.
+    template[3].submenu.push({
       type: 'separator'
     }, {
       label: 'Bring All to Front',
       role: 'front'
     });
   } else {
-    menu.push(fileMenu);
-    menu.push(editMenu);
-    menu.push(helpMenu);
+    template.unshift(fileMenu);
   }
 
-  if (env.name !== 'production') {
-    menu.push(devMenu);
-  }
-
-  Menu.setApplicationMenu(Menu.buildFromTemplate(menu));
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
 }
-
-*/

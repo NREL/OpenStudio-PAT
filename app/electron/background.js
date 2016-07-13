@@ -4,7 +4,6 @@
 // window from here.
 
 import { app, BrowserWindow } from 'electron';
-import menu from './menu';
 import windowStateKeeper from './window_state';
 import env from './env';
 
@@ -27,8 +26,6 @@ app.on('ready', () => {
   });
 
   if (mainWindowState.isMaximized) mainWindow.maximize();
-
-  menu.setMenu();
 
   if (env.name === 'test') {
     mainWindow.loadURL('file://' + __dirname + '/spec.html');
