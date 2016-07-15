@@ -299,16 +299,16 @@ export class AnalysisController {
 
 
     const keys = Object.keys(measure.arguments[0]);
-    vm.$log.debug("keys: ", keys);
+    vm.$log.debug('keys: ', keys);
 
     const optionKeys = _.filter(keys, function(k) {
       return k.indexOf('option_') !== -1;
     });
-    vm.$log.debug("option keys: ", optionKeys);
+    vm.$log.debug('option keys: ', optionKeys);
 
     let max = 0;
-    _.forEach(optionKeys,(key) => {
-      vm.$log.debug("key: ", key);
+    _.forEach(optionKeys, (key) => {
+      vm.$log.debug('key: ', key);
       const num = Number(key.split('_')[1]);
       if (num > max) {
         max = num;

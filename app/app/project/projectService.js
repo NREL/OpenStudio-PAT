@@ -126,9 +126,9 @@ export class Project {
      const optionKeys = _.filter(keys, function(k) {
         return k.indexOf('option_') !== -1;
      });
-     vm.$log.debug("option keys: ", optionKeys);
+     vm.$log.debug('option keys: ', optionKeys);
 
-      _.forEach(optionKeys,(key) => {
+      _.forEach(optionKeys, (key) => {
 
         const theOption = {};
         // option name and ID

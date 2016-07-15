@@ -13,7 +13,7 @@ export class RunController {
     vm.runTypes = vm.Project.getRunTypes();
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.OsServer.getAnalysisID();
-    vm.$scope.analysisStatus =  vm.OsServer.getAnalysisStat();
+    vm.$scope.analysisStatus = vm.OsServer.getAnalysisStat();
     vm.$scope.serverStatus = vm.OsServer.getServerStatus();
     vm.$log.debug('SERVER STATUS: ', vm.$scope.serverStatus);
 
@@ -55,13 +55,13 @@ export class RunController {
     vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
     vm.OsServer.startServer().then(response => {
-      vm.$log.debug("Start Server response: ", response);
+      vm.$log.debug('Start Server response: ', response);
 
       vm.OsServer.setProgressMessage('Server started');
       vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
       vm.$scope.serverStatus = vm.OsServer.getServerStatus();
-      vm.$log.debug("Server Status: ", vm.$scope.serverStatus);
+      vm.$log.debug('Server Status: ', vm.$scope.serverStatus);
 
       // 4: hit PAT CLI to start run
       // TODO: for now, use an already-created OSA
@@ -97,7 +97,7 @@ export class RunController {
 
             vm.$scope.datapoints = response.data.analysis.data_points;
 
-            vm.$log.debug("DATAPOINTS: ", vm.$scope.datapoints);
+            vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
             _.forEach(response.data.analysis.data_points, dp => {
               if (dp.status != 'completed') {
              vm.OsServer.setIsDone(false);
@@ -128,7 +128,7 @@ export class RunController {
         // analysis not started
         vm.OsServer.setProgressMessage('Analysis Error');
         vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
-        vm.$log.debug("ANALYSIS NOT STARTED, ERROR: ", response);
+        vm.$log.debug('ANALYSIS NOT STARTED, ERROR: ', response);
         // TODO: show status as 'ERROR'
         vm.toggleButtons();
       });
@@ -136,7 +136,7 @@ export class RunController {
     }, response => {
       vm.OsServer.setProgressMessage('Server Error');
       vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
-      vm.$log.debug("SERVER NOT STARTED, ERROR: ", response);
+      vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
       // TODO: show status as 'ERROR'
       vm.toggleButtons();
     });

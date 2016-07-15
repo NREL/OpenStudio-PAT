@@ -141,7 +141,7 @@ export class OsServer {
     const deferred = vm.$q.defer();
 
     const serverType = vm.Project.getRunType();
-    vm.$log.debug("SERVER TYPE: ", serverType);
+    vm.$log.debug('SERVER TYPE: ', serverType);
 
     // TODO: maybe ping server to make sure it is really started?
     if (vm.serverStatus != 'started'){
@@ -203,7 +203,7 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: add a timeout here in case this takes too long
-    const command =  '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\" ' + ' start_local --debug ' +  '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path()  + '\" \"' + vm.rubyBinDir.path() + '\" --verbose';
+    const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\" ' + ' start_local --debug ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\" --verbose';
     vm.$log.debug('Start Local command: ', command);
     const child = vm.exec(command,
       (error, stdout, stderr) => {
@@ -224,7 +224,7 @@ export class OsServer {
         } else {
           // TODO: cleanup?
           if (error !== null) {
-            console.log('exec error:',  error);
+            console.log('exec error:', error);
           }
           deferred.reject(error);
         }
@@ -239,7 +239,7 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: catch what analysis type it is
-    const command = 'cd ' + vm.CLIpath + ' && ruby openstudio_meta run_analysis ' +  vm.projectDir.path() + '/' + vm.Project.getProjectName() + '.json ' + vm.serverURL + ' -a batch_datapoints';
+    const command = 'cd ' + vm.CLIpath + ' && ruby openstudio_meta run_analysis ' + vm.projectDir.path() + '/' + vm.Project.getProjectName() + '.json ' + vm.serverURL + ' -a batch_datapoints';
    vm.$log.debug('Run command: ', command);
     const child = vm.exec(command,
       (error, stdout, stderr) => {
@@ -252,7 +252,7 @@ export class OsServer {
         if (child.exitCode == 0) {
           // SUCCESS
           vm.$log.debug('Analysis Started');
-          const analysis_arr = stdout.toString().split("request to run analysis ");
+          const analysis_arr = stdout.toString().split('request to run analysis ');
           const analysis_id = _.last(analysis_arr);
           vm.$log.debug('ANALYSIS ID: ', analysis_id);
           deferred.resolve(analysis_id);
@@ -321,10 +321,10 @@ export class OsServer {
     const deferred = vm.$q.defer();
 
     const url = vm.serverURL + '/analyses/' + vm.analysisID + '/status.json';
-    vm.$log.debug("Analysis Status URL: ", url);
+    vm.$log.debug('Analysis Status URL: ', url);
     vm.$http.get(url).then(response => {
       // send json to run controller
-      vm.$log.debug("status JSON response: ", response);
+      vm.$log.debug('status JSON response: ', response);
       deferred.resolve(response);
 
     }, response => {
