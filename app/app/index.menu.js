@@ -1,4 +1,5 @@
-import { app, Menu, shell } from 'remote';
+import {remote} from 'electron';
+const {app, Menu, shell} = remote;
 import env from '../electron/env';
 
 const menu = [];
@@ -7,7 +8,7 @@ const fileMenu = {
   label: 'File',
   submenu: [{
     label: 'Quit',
-    accelerator: 'Ctrl+Q',
+    accelerator: 'CmdOrCtrl+Q',
     click: () => {
       app.quit();
     }
@@ -101,7 +102,7 @@ const devMenu = {
     accelerator: 'CmdOrCtrl+R',
     click: (item, focusedWindow) => {
       if (focusedWindow)
-        focusedWindow.reload();
+        focusedWindow.webContents.reloadIgnoringCache();
     }
   }, {
     label: 'Toggle Full Screen',
@@ -113,13 +114,8 @@ const devMenu = {
       if (focusedWindow) focusedWindow.setFullScreen(!focusedWindow.isFullScreen());
     }
   }, {
-    label: 'Toggle Developer Tools',
-    accelerator: (() => {
-      if (process.platform == 'darwin')
-        return 'Alt+Command+I';
-      else
-        return 'Ctrl+Shift+I';
-    })(),
+    label: 'Toggle DevTools',
+    accelerator: 'Alt+CmdOrCtrl+I',
     click: (item, focusedWindow) => {
       if (focusedWindow) focusedWindow.toggleDevTools();
     }

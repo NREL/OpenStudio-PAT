@@ -1,6 +1,7 @@
-import * as jetpack from 'fs-jetpack';
-import { app } from 'remote';
-import * as path from 'path';
+import jetpack from 'fs-jetpack';
+import {remote} from 'electron';
+const {app} = remote;
+import path from 'path';
 
 export class OsServer {
   constructor($q, $http, $log, Project) {

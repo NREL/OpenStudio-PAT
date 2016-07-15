@@ -1,7 +1,8 @@
-import * as jetpack from 'fs-jetpack';
-import * as os from 'os';
-import * as path from 'path';
-import { app } from 'remote';
+import jetpack from 'fs-jetpack';
+import os from 'os';
+import path from 'path';
+import {remote} from 'electron';
+const {app} = remote;
 
 export class Project {
   constructor($log) {

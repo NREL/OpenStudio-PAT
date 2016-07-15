@@ -1,8 +1,9 @@
-import { app } from 'remote';
-import * as jetpack from 'fs-jetpack';
-import * as AdmZip from 'adm-zip';
-import * as https from 'https';
-import * as os from 'os';
+import {remote} from 'electron';
+const {app} = remote;
+import jetpack from 'fs-jetpack';
+import AdmZip from 'adm-zip';
+import https from 'https';
+import os from 'os';
 
 export class DependencyManager {
   constructor($q, $http, $log, $translate, StatusBar) {

@@ -1,7 +1,7 @@
 /*global bootlint*/
 
 import env from '../electron/env';
-const {remote} = require('electron');
+import {remote} from 'electron';
 const {app, Menu, shell} = remote;
 
 export function runBlock($window, $document, $translate, DependencyManager, Project, BCL, OsServer) {

@@ -1,4 +1,4 @@
-import * as jetpack from 'fs-jetpack';
+import jetpack from 'fs-jetpack';
 
 export class ModalBclController {
 
@@ -106,7 +106,7 @@ export class ModalBclController {
         name: 'status',
         displayName: 'bcl.columns.status',
         cellClass: 'dropdown-button',
-        cellTemplate: '../app/bcl/tempEditButtonTemplate.html',
+        cellTemplate: 'app/bcl/tempEditButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
         width: '15%'
@@ -114,7 +114,7 @@ export class ModalBclController {
         name: 'add',
         displayName: 'bcl.columns.add',
         cellClass: 'icon-cell',
-        cellTemplate: '../app/bcl/addButtonTemplate.html',
+        cellTemplate: 'app/bcl/addButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
         width: '10%'

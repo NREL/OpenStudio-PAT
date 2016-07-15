@@ -1,6 +1,6 @@
-import * as jetpack from 'fs-jetpack';
+import jetpack from 'fs-jetpack';
 import { parseString } from 'xml2js';
-import * as AdmZip from 'adm-zip';
+import AdmZip from 'adm-zip';
 
 export class BCL {
   constructor($q, $http, $uibModal, $log, Project) {

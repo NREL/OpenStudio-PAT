@@ -1,7 +1,6 @@
-import * as jetpack from 'fs-jetpack';
-import * as os from 'os';
-import * as path from 'path';
-import { dialog } from 'remote';
+import jetpack from 'fs-jetpack';
+import {remote} from 'electron';
+const {dialog} = remote;
 
 export class AnalysisController {
 
