@@ -94,11 +94,11 @@ gulp.task('build', ['html', 'fonts', 'nodeModules', 'other'], function () {
   switch (utils.getEnvName()) {
     case 'development':
       manifest.name += '-dev';
-      manifest.productName += ' Dev';
+      manifest.productName += 'Dev';
       break;
     case 'test':
       manifest.name += '-test';
-      manifest.productName += ' Test';
+      manifest.productName += 'Test';
       break;
   }
 
