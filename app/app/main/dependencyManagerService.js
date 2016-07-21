@@ -60,6 +60,15 @@ export class DependencyManager {
         name: 'OpenStudio2-1.12.0.58d7efc146',
         platform: 'darwin',
         arch: 'x64'
+      }],
+      openstudio: [{
+        name: 'OpenStudio-1.12.0.58d7efc146',
+        platform: 'win32',
+        arch: 'x64'
+      }, {
+        name: 'OpenStudio-1.12.0.58d7efc146',
+        platform: 'darwin',
+        arch: 'x64'
       }]
     };
   }
@@ -77,6 +86,7 @@ export class DependencyManager {
     let mongoPath = 'mongo/bin/mongod';
     let openstudioServerPath = 'openstudioServer/bin/openstudio_meta';
     let openstudioCLIPath = 'openstudioCLI/bin/openstudio';
+    let openstudioPath = 'openstudio/';
 
     if (platform == 'win32') {
       rubyPath += '.exe';
@@ -145,10 +155,25 @@ export class DependencyManager {
       return vm.$q.resolve();
     }
 
+    function downloadOpenstudio() {
+      if (!src.exists(openstudioPath)) {
+        vm.$log.debug('Openstudio not found, downloading');
+        const openstudioManifest = _.find(vm.manifest.openstudio, {platform: platform, arch: arch});
+        if (_.isEmpty(openstudioManifest)) {
+          const errorMsg = `No openstudio download found for platform ${platform}`;
+          vm.$log.error(errorMsg);
+          return vm.$q.reject(errorMsg);
+        }
+        return vm._downloadDependency(_.assign({}, openstudioManifest, {type: 'openstudio'}));
+      }
+      return vm.$q.resolve();
+    }
+
     downloadRuby()
       .then(downloadMongo, downloadMongo)
       .then(downloadOpenstudioServer, downloadOpenstudioServer)
       .then(downloadOpenstudioCLI, downloadOpenstudioCLI)
+      .then(downloadOpenstudio, downloadOpenstudio)
       .finally(() => {
         vm.StatusBar.clear();
       });
