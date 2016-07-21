@@ -40,6 +40,7 @@ export class RunController {
 
   runEntireWorkflow() {
     const vm = this;
+    vm.$log.debug('***** In runController::runEntireWorkflow() *****');
     vm.toggleButtons();
 
     // 1: make/get OSA
@@ -54,7 +55,9 @@ export class RunController {
     vm.OsServer.setProgressMessage('Starting server');
     vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
+    vm.$log.debug('***** In runController::runEntireWorkflow() ready to start server *****');
     vm.OsServer.startServer().then(response => {
+      vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
       vm.$log.debug('Start Server response: ', response);
 
       vm.OsServer.setProgressMessage('Server started');
@@ -71,7 +74,9 @@ export class RunController {
       vm.OsServer.setProgressAmount(30);
       vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
 
+      vm.$log.debug('***** In runController::runEntireWorkflow() ready to run analysis *****');
       vm.OsServer.runAnalysis().then(response => {
+        vm.$log.debug('***** In runController::runEntireWorkflow() analysis running *****');
         vm.$log.debug('Run Analysis response: ', response);
 
         vm.OsServer.setProgressMessage('Analysis started');
@@ -144,6 +149,7 @@ export class RunController {
 
   stopAnalysisStatus() {
     const vm = this;
+    vm.$log.debug('***** In runController::stopAnalysisStatus() *****');
     if (angular.isDefined(vm.getStatus)){
       vm.$interval.cancel(vm.getStatus);
       vm.getStatus = undefined;

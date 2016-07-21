@@ -24,13 +24,15 @@ export class OsServer {
     vm.datapoints = [];
     vm.disabledButtons = false;
 
-    vm.serverURL = 'http://192.168.99.100:8080';  // TODO: for now, use docker default URL
+    //vm.serverURL = 'http://192.168.99.100:8080';  // TODO: for now, use docker default URL
+    vm.serverURL = 'http://localhost:8080';
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
     vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/bin'));
     vm.OsMetaPath = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/bin/openstudio_meta'));
     vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby.exe'));
     vm.mongoBinDir = jetpack.cwd(path.resolve(src.path() + '/mongo/bin'));
+    vm.openstudioDir = jetpack.cwd(path.resolve(src.path() + '/openstudio/'));
     vm.projectDir = vm.Project.getProjectDir();
     vm.analysisID = null;
   }
@@ -138,6 +140,7 @@ export class OsServer {
   // start server (remote or local)
   startServer() {
     const vm = this;
+    vm.$log.debug('***** In osServerService::startServer() *****');
     const deferred = vm.$q.defer();
 
     const serverType = vm.Project.getRunType();
@@ -196,6 +199,8 @@ export class OsServer {
     // command: ruby openstudio_meta start_local ~/OpenStudio/PAT/the_project/  ~/repos/OpenStudio-server-PAT/server  --debug
 
     const vm = this;
+    vm.$log.debug('***** In osServerService::localServer() *****');
+    // See "https://github.com/NREL/OpenStudio-server/tree/dockerize-osw/server/spec/files/batch_datapoints" for test files
     const deferred = vm.$q.defer();
 
     // delete local_configuration.receipt
@@ -203,7 +208,7 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: add a timeout here in case this takes too long
-    const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\" ' + ' start_local --debug ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\" --verbose';
+    const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --debug ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\" --verbose';
     vm.$log.debug('Start Local command: ', command);
     const child = vm.exec(command,
       (error, stdout, stderr) => {
@@ -235,12 +240,13 @@ export class OsServer {
 
   runAnalysis() {
     const vm = this;
+    vm.$log.debug('***** In osServerService::runAnalysis() *****');
     const deferred = vm.$q.defer();
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: catch what analysis type it is
-    const command = 'cd ' + vm.CLIpath + ' && ruby openstudio_meta run_analysis ' + vm.projectDir.path() + '/' + vm.Project.getProjectName() + '.json ' + vm.serverURL + ' -a batch_datapoints';
-   vm.$log.debug('Run command: ', command);
+    const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' run_analysis ' + '\"' + vm.projectDir.path() + '\\' + vm.Project.getProjectName() + '.json\" ' + vm.serverURL  + ' -a batch_datapoints';
+    vm.$log.debug('Run command: ', command);
     const child = vm.exec(command,
       (error, stdout, stderr) => {
         console.log('THE PROCESS TERMINATED!');
