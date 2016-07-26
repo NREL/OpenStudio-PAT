@@ -245,7 +245,8 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: catch what analysis type it is
-    const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' run_analysis ' + '\"' + vm.projectDir.path() + '\\' + vm.Project.getProjectName() + '.json\" ' + vm.serverURL  + ' -a batch_datapoints';
+    const command = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis "${vm.projectDir.path()}\\${vm.Project.getProjectName()}.json" "${vm.serverURL}" -a batch_datapoints`;
+    //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' run_analysis ' + '\"' + vm.projectDir.path() + '\\' + vm.Project.getProjectName() + '.json\" ' + vm.serverURL  + ' -a batch_datapoints';
     vm.$log.debug('Run command: ', command);
     const child = vm.exec(command,
       (error, stdout, stderr) => {
