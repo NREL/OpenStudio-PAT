@@ -24,8 +24,8 @@ export class OsServer {
     vm.datapoints = [];
     vm.disabledButtons = false;
 
-    //vm.serverURL = 'http://192.168.99.100:8080';  // TODO: for now, use docker default URL
-    vm.serverURL = 'http://localhost:8080';
+    //vm.serverURL = 'http://localhost:8080';
+    vm.serverURL = 'http://bball-130553.nrel.gov:8080'; // TODO: using Brian's machine
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
     vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/bin'));
