@@ -183,8 +183,9 @@ export class Project {
     }
 
     // write to file
-    vm.jetpack.write(vm.projectDir.path('osa.json'), vm.osa);
-    vm.$log.debug('Project OSA file exported to osa.json');
+    let filename = vm.projectName + '.json';
+    vm.jetpack.write(vm.projectDir.path(filename), vm.osa);
+    vm.$log.debug('Project OSA file exported to ' + filename);
 
   }
 
