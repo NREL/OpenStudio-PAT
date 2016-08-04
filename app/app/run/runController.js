@@ -111,7 +111,7 @@ export class RunController {
             });
 
             if (vm.isDone) {
-              vm.OsServer.setAnalysisStatus('completed');
+              //vm.OsServer.setAnalysisStatus('completed'); TODO: Is this needed? No such function currently
               vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
               // cancel loop
               vm.stopAnalysisStatus();
