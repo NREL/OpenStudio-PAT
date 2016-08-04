@@ -65,12 +65,12 @@ export class AnalysisController {
     vm.$scope.gridOptions = [];
     vm.initializeGrids();
 
-    vm.startMeasureManager();
+    //vm.startMeasureManager();
 
-    setTimeout(function (){
-      console.log(' calling computeArguments');
-      vm.computeArguments();
-    }, 5000);
+    //setTimeout(function (){
+    //  console.log(' calling computeArguments');
+    //  vm.computeArguments();
+    //}, 5000);
 
     //setTimeout(function (){
     //  console.log('killing cli');
