@@ -24,8 +24,9 @@ export class OsServer {
     vm.datapoints = [];
     vm.disabledButtons = false;
 
-    //vm.serverURL = 'http://localhost:8080';
-    vm.serverURL = 'http://bball-130553.nrel.gov:8080'; // TODO: using Brian's machine
+    vm.localServerURL = 'http://localhost:8080';
+    vm.cloudServerURL = 'http://bball-130553.nrel.gov:8080'; // TODO: using Brian's machine
+    vm.serverURL = vm.localServerURL;
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
     vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/bin'));
@@ -145,6 +146,13 @@ export class OsServer {
 
     const serverType = vm.Project.getRunType();
     vm.$log.debug('SERVER TYPE: ', serverType);
+    vm.$log.debug('SERVER STATUS: ', vm.serverStatus);
+
+    if (serverType.name == 'local') {
+      vm.setServerURL(vm.localServerURL);
+    } else {
+      vm.setServerURL(vm.cloudServerURL);
+    }
 
     // TODO: maybe ping server to make sure it is really started?
     if (vm.serverStatus != 'started'){
@@ -152,7 +160,6 @@ export class OsServer {
         vm.localServer().then(response => {
           vm.serverStatus = 'started';
           deferred.resolve(response);
-
         }, response => {
           vm.$log.debug('ERROR in start local server');
           deferred.reject(response);

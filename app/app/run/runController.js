@@ -56,9 +56,9 @@ export class RunController {
     vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
     vm.$log.debug('***** In runController::runEntireWorkflow() ready to start server *****');
-    //vm.OsServer.startServer().then(response => { // TODO: To start local server, uncomment this part 1 of 3
+    vm.OsServer.startServer().then(response => { // TODO: To start local server, uncomment this part 1 of 3
       vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
-      //vm.$log.debug('Start Server response: ', response); // TODO: To start local server, uncomment this part 2 of 3
+      vm.$log.debug('Start Server response: ', response); // TODO: To start local server, uncomment this part 2 of 3
 
       vm.OsServer.setProgressMessage('Server started');
       vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
@@ -138,13 +138,13 @@ export class RunController {
         vm.toggleButtons();
       });
 
-    //}, response => { // TODO: To start local server, uncomment this part 3 of 3
-    //  vm.OsServer.setProgressMessage('Server Error');
-    //  vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
-    //  vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
-    //  // TODO: show status as 'ERROR'
-    //  vm.toggleButtons();
-    //});
+    }, response => { // TODO: To start local server, uncomment this part 3 of 3
+      vm.OsServer.setProgressMessage('Server Error');
+      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+      vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
+      // TODO: show status as 'ERROR'
+      vm.toggleButtons();
+    });
   }
 
   stopAnalysisStatus() {
