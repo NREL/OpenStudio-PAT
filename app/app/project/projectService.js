@@ -2,6 +2,8 @@ import jetpack from 'fs-jetpack';
 import os from 'os';
 import path from 'path';
 import {remote} from 'electron';
+import AdmZip from 'adm-zip';
+
 const {app} = remote;
 
 export class Project {
@@ -81,6 +83,7 @@ export class Project {
     vm.pat = {};
     vm.osa = {};
 
+    vm.AdmZip = AdmZip;
   }
 
   // import from pat.json
@@ -187,6 +190,13 @@ export class Project {
     vm.jetpack.write(vm.projectDir.path(filename), vm.osa);
     vm.$log.debug('Project OSA file exported to ' + filename);
 
+    // create archives
+    var zip = new vm.AdmZip();
+    zip.addLocalFolder(vm.projectMeasuresDir.path() + '/', './measures2');
+    //zip.addLocalFile(vm.projectMeasuresDir.path() + '/', './measures'); NOT COMPLETE
+    zip.addLocalFile(vm.seedDir.path() + '/myModel.osm', './seed');
+    zip.addLocalFile(vm.weatherDir.path() + '/poopyWeather.epw', './weather');
+    zip.writeZip('C:/Temp/files.zip');
   }
 
   exportManual() {
