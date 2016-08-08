@@ -2,7 +2,8 @@ import jetpack from 'fs-jetpack';
 import os from 'os';
 import path from 'path';
 import {remote} from 'electron';
-import AdmZip from 'adm-zip';
+import jsZip from 'jszip';
+import fs from 'fs';
 
 const {app} = remote;
 
@@ -12,6 +13,8 @@ export class Project {
     const vm = this;
     vm.$log = $log;
     vm.jetpack = jetpack;
+    vm.fs = fs;
+    vm.jsZip = jsZip;
 
     vm.projectName = '';
     // TODO: grab from PAT Electron settings. For now, default to 'the_project'
@@ -83,7 +86,6 @@ export class Project {
     vm.pat = {};
     vm.osa = {};
 
-    vm.AdmZip = AdmZip;
   }
 
   // import from pat.json
@@ -191,12 +193,49 @@ export class Project {
     vm.$log.debug('Project OSA file exported to ' + filename);
 
     // create archives
-    var zip = new vm.AdmZip();
-    zip.addLocalFolder(vm.projectMeasuresDir.path() + '/', './measures2');
-    //zip.addLocalFile(vm.projectMeasuresDir.path() + '/', './measures'); NOT COMPLETE
-    zip.addLocalFile(vm.seedDir.path() + '/myModel.osm', './seed');
-    zip.addLocalFile(vm.weatherDir.path() + '/poopyWeather.epw', './weather');
-    zip.writeZip('C:/Temp/files.zip');
+    var zip = new vm.jsZip();
+    filename = vm.projectDir.path() + '\\' +  vm.projectName + '.zip';
+    vm.$log.debug('Zip name: ' + filename);
+
+    const run = false;
+    if (run){
+      vm.$log.debug('vm.projectMeasuresDir.path(): ' + vm.projectMeasuresDir.path());
+
+      var filenames = fs.readdirSync(vm.projectMeasuresDir.path());
+      filenames.forEach(function (name) {
+        vm.$log.debug('name: ' + name);
+        if (name === "." || name === "..") {
+          return;
+        }
+        vm.$log.debug('vm.projectMeasuresDir.path() + "/" + name: ' + vm.projectMeasuresDir.path() + "/" + name);
+        if (fs.lstatSync(vm.projectMeasuresDir.path() + '/' + name).isDirectory()) {
+          vm.$log.debug('measures: ', vm.projectMeasuresDir.path() + '/' + name + '/' + 'measure.xml');
+          //zip.addLocalFile(vm.projectMeasuresDir.path() + '\\' + name + '\\' + 'measure.xml', './measures/' + name);
+          //zip.addLocalFile(vm.projectMeasuresDir.path() + '\\' + name + '\\' + 'measure.rb', './measures/' + name);
+        }
+      });
+
+      //zip.addLocalFile(vm.seedDir.path() + '/myModel.osm', './seed2');
+      //zip.addLocalFile(vm.seedDir.path() + '\\' + vm.getDefaultSeed(), './seed');
+      //zip.addLocalFile(vm.weatherDir.path() + '\\' + vm.getDefaultWeatherFile(), './weather');
+    } else {
+
+      //zip.addLocalFolder(vm.projectMeasuresDir.path() + '/', './measures2');
+      //zip.addLocalFile(vm.projectMeasuresDir.path() + '/', './measures'); NOT COMPLETE
+      //zip.addLocalFile('C:\\Users\\eweaver\\OpenStudio\\PAT\\the_project\\seeds\\myModel.osm');
+      //zip.addLocalFile("C:/Users/eweaver/OpenStudio/PAT/the_project/seeds/myModel.osm");
+    }
+    var stream = fs.createReadStream('C:/Users/eweaver/OpenStudio/PAT/the_project/seeds/doc.txt');
+    zip.file('doc.txt', stream);
+    vm.$log.debug('writing zip');
+    zip.generateNodeStream({type: 'nodebuffer', streamFiles: true})
+      .pipe(fs.createWriteStream('deleteme.zip')).on('finish', function () {
+      // JSZip generates a readable stream with a "end" event,
+      // but is piped here in a writable stream which emits a "finish" event.
+      console.log("deleteme.zip written.");
+    }).on('error', function () {
+      console.log('on no!');
+    });
   }
 
   exportManual() {
