@@ -193,8 +193,7 @@ export class Project {
     vm.$log.debug('Project OSA file exported to ' + filename);
 
     // create archives
-    var zip = new vm.jsZip();
-    filename = vm.projectDir.path() + '\\' +  vm.projectName + '.zip';
+    filename = vm.projectDir.path() + '\\' + vm.projectName + '.zip';
     vm.$log.debug('Zip name: ' + filename);
 
     const run = false;
@@ -225,17 +224,16 @@ export class Project {
       //zip.addLocalFile('C:\\Users\\eweaver\\OpenStudio\\PAT\\the_project\\seeds\\myModel.osm');
       //zip.addLocalFile("C:/Users/eweaver/OpenStudio/PAT/the_project/seeds/myModel.osm");
     }
-    var stream = fs.createReadStream('C:/Users/eweaver/OpenStudio/PAT/the_project/seeds/doc.txt');
-    zip.file('doc.txt', stream);
-    vm.$log.debug('writing zip');
-    zip.generateNodeStream({type: 'nodebuffer', streamFiles: true})
-      .pipe(fs.createWriteStream('deleteme.zip')).on('finish', function () {
-      // JSZip generates a readable stream with a "end" event,
-      // but is piped here in a writable stream which emits a "finish" event.
-      console.log("deleteme.zip written.");
-    }).on('error', function () {
-      console.log('on no!');
-    });
+
+    const zip = new vm.jsZip();
+    const file = 'doc.txt';
+    const fileContents = jetpack.read(`C:/Users/eweaver/OpenStudio/PAT/the_project/seeds/${file}`);
+    zip.file(file, fileContents);
+    zip.generateNodeStream({compression: 'DEFLATE', type: 'nodebuffer', streamFiles: true})
+      .pipe(jetpack.createWriteStream('out.zip'))
+      .on('finish', () => {
+        console.log('zip written successfully');
+      });
   }
 
   exportManual() {
