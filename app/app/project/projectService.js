@@ -127,11 +127,11 @@ export class Project {
       const options = [];
 
       // first find out how many options there are
-     const keys = Object.keys(measure.arguments[0]);
-     const optionKeys = _.filter(keys, function(k) {
+      const keys = Object.keys(measure.arguments[0]);
+      const optionKeys = _.filter(keys, function (k) {
         return k.indexOf('option_') !== -1;
-     });
-     vm.$log.debug('option keys: ', optionKeys);
+      });
+      vm.$log.debug('option keys: ', optionKeys);
 
       _.forEach(optionKeys, (key) => {
 
@@ -193,47 +193,37 @@ export class Project {
     vm.$log.debug('Project OSA file exported to ' + filename);
 
     // create archives
+    const zip = new vm.jsZip();
+
+    let fileContents = jetpack.read(vm.seedDir.path() + '\\' + vm.defaultSeed);
+    zip.file('\\seeds\\' + vm.defaultSeed, fileContents);
+
+    fileContents = jetpack.read(vm.weatherDir.path() + '\\' + vm.defaultWeatherFile);
+    zip.file('\\weather\\' + vm.defaultWeatherFile, fileContents);
+
+    var filenames = fs.readdirSync(vm.projectMeasuresDir.path());
+    filenames.forEach(function (name) {
+      vm.$log.debug('name: ' + name);
+      if (name === "." || name === "..") {
+        return;
+      }
+      if (fs.lstatSync(vm.projectMeasuresDir.path() + '/' + name).isDirectory()) {
+        fileContents = jetpack.read(vm.projectMeasuresDir.path() + '\\' + name + '\\' + 'measure.rb');
+        zip.file('\\measures\\' + name + '\\' + 'measure.rb', fileContents);
+
+        fileContents = jetpack.read(vm.projectMeasuresDir.path() + '\\' + name + '\\' + 'measure.xml');
+        zip.file('\\measures\\' + name + '\\' + 'measure.xml', fileContents);
+      }
+    });
+
     filename = vm.projectDir.path() + '\\' + vm.projectName + '.zip';
     vm.$log.debug('Zip name: ' + filename);
-
-    const run = false;
-    if (run){
-      vm.$log.debug('vm.projectMeasuresDir.path(): ' + vm.projectMeasuresDir.path());
-
-      var filenames = fs.readdirSync(vm.projectMeasuresDir.path());
-      filenames.forEach(function (name) {
-        vm.$log.debug('name: ' + name);
-        if (name === "." || name === "..") {
-          return;
-        }
-        vm.$log.debug('vm.projectMeasuresDir.path() + "/" + name: ' + vm.projectMeasuresDir.path() + "/" + name);
-        if (fs.lstatSync(vm.projectMeasuresDir.path() + '/' + name).isDirectory()) {
-          vm.$log.debug('measures: ', vm.projectMeasuresDir.path() + '/' + name + '/' + 'measure.xml');
-          //zip.addLocalFile(vm.projectMeasuresDir.path() + '\\' + name + '\\' + 'measure.xml', './measures/' + name);
-          //zip.addLocalFile(vm.projectMeasuresDir.path() + '\\' + name + '\\' + 'measure.rb', './measures/' + name);
-        }
-      });
-
-      //zip.addLocalFile(vm.seedDir.path() + '/myModel.osm', './seed2');
-      //zip.addLocalFile(vm.seedDir.path() + '\\' + vm.getDefaultSeed(), './seed');
-      //zip.addLocalFile(vm.weatherDir.path() + '\\' + vm.getDefaultWeatherFile(), './weather');
-    } else {
-
-      //zip.addLocalFolder(vm.projectMeasuresDir.path() + '/', './measures2');
-      //zip.addLocalFile(vm.projectMeasuresDir.path() + '/', './measures'); NOT COMPLETE
-      //zip.addLocalFile('C:\\Users\\eweaver\\OpenStudio\\PAT\\the_project\\seeds\\myModel.osm');
-      //zip.addLocalFile("C:/Users/eweaver/OpenStudio/PAT/the_project/seeds/myModel.osm");
-    }
-
-    const zip = new vm.jsZip();
-    const file = 'doc.txt';
-    const fileContents = jetpack.read(`C:/Users/eweaver/OpenStudio/PAT/the_project/seeds/${file}`);
-    zip.file(file, fileContents);
     zip.generateNodeStream({compression: 'DEFLATE', type: 'nodebuffer', streamFiles: true})
-      .pipe(jetpack.createWriteStream('out.zip'))
+      .pipe(jetpack.createWriteStream(filename))
       .on('finish', () => {
         console.log('zip written successfully');
       });
+
   }
 
   exportManual() {
