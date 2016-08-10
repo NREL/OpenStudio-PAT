@@ -6,11 +6,13 @@ import path from 'path';
 
 export class AnalysisController {
 
-  constructor($log, BCL, Project, $scope, $document) {
+  constructor($log, $q, BCL, Project, $scope, $document, $uibModal) {
     'ngInject';
 
     const vm = this;
     vm.$log = $log;
+    vm.$q = $q;
+    vm.$uibModal = $uibModal;
     vm.jetpack = jetpack;
     vm.$scope = $scope;
     vm.$document = $document;
@@ -490,8 +492,35 @@ export class AnalysisController {
 
   duplicateMeasureAndOption(measure) {
     const vm = this;
+    const deferred = vm.$q.defer();
+
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
-    // TODO: implement this
+
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalDuplicateMeasureController',
+      controllerAs: 'modal',
+      templateUrl: 'app/analysis/duplicate_measure.html',
+      windowClass: 'wide-modal',
+      resolve: {
+        measure: function() {
+          return measure;
+        }
+      }
+    });
+
+    modalInstance.result.then(() => {
+      // reset data
+      vm.$scope.measures = vm.BCL.getProjectMeasures();
+      vm.initializeGrids();
+      vm.$log.debug('measures: ', vm.$scope.measures);
+      deferred.resolve();
+    }, () => {
+      // Modal canceled
+      deferred.reject();
+    });
+
+    return deferred.promise;
   }
 
   loadMeasureOptions() {

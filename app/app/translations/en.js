@@ -16,6 +16,9 @@ export default {
     deleteLastOption: 'Delete Last Option',
     duplicateMeasureAndOption: 'Duplicate Measure & Option',
     duplicateOption: 'Duplicate Option',
+    duplicateMeasureEdit: {
+      title: 'Duplicate Measure'
+    },
     energyplusMeasures: 'EnergyPlus Measures',
     openstudioMeasures: 'OpenStudio Measures',
     reportingMeasures: 'Reporting Measures',

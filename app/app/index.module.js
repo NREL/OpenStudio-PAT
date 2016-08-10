@@ -9,6 +9,7 @@ import { BCL } from '../app/bcl/bclService';
 import { DependencyManager } from '../app/main/dependencyManagerService';
 import { DesignAlternativesController } from '../app/design_alts/designAlternativesController';
 import { ModalBclController } from '../app/bcl/modalBclController';
+import { ModalDuplicateMeasureController } from '../app/analysis/modalDuplicateMeasureController';
 import { NavController } from '../app/nav/navController';
 import { OsServer } from '../app/project/osServerService';
 import { OutputsController } from '../app/outputs/outputsController';
@@ -25,6 +26,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .run(runBlock)
   .controller('NavController', NavController)
   .controller('ModalBclController', ModalBclController)
+  .controller('ModalDuplicateMeasureController', ModalDuplicateMeasureController)
   .controller('AnalysisController', AnalysisController)
   .controller('DesignAlternativesController', DesignAlternativesController)
   .controller('OutputsController', OutputsController)
