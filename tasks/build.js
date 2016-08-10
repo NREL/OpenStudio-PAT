@@ -7,7 +7,7 @@ var conf = require('./conf');
 var utils = require('./utils');
 
 var $ = require('gulp-load-plugins')({
-  pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del']
+  pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del', 'lazypipe']
 });
 
 gulp.task('background', ['scripts'], function () {
@@ -22,16 +22,14 @@ gulp.task('html', ['background', 'inject', 'partials'], function () {
   var cssFilter = $.filter('**/*.css', {restore: true});
 
   return gulp.src(path.join(conf.paths.tmp, '/serve/*.html'))
-    .pipe($.useref())
+    .pipe($.useref({}, $.lazypipe().pipe($.sourcemaps.init, {loadMaps: true})))
     .pipe(jsFilter)
-    .pipe($.sourcemaps.init())
     .pipe($.ngAnnotate())
     .pipe($.rev())
     .pipe($.uglify({preserveComments: $.uglifySaveLicense})).on('error', conf.errorHandler('Uglify'))
     .pipe($.sourcemaps.write('maps'))
     .pipe(jsFilter.restore)
     .pipe(cssFilter)
-    .pipe($.sourcemaps.init())
     .pipe($.replace('../../bower_components/bootstrap-sass/assets/fonts/bootstrap/', '../fonts/'))
     .pipe($.replace(/url\('ui-grid.(.+?)'\)/g, 'url(\'../fonts/ui-grid.$1\')'))
     .pipe($.rev())
