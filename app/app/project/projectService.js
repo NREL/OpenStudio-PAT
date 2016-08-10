@@ -4,6 +4,7 @@ import path from 'path';
 import {remote} from 'electron';
 import jsZip from 'jszip';
 import fs from 'fs';
+import http from 'http';
 
 const {app} = remote;
 
@@ -85,7 +86,6 @@ export class Project {
     // json objects
     vm.pat = {};
     vm.osa = {};
-
   }
 
   // import from pat.json
@@ -177,6 +177,67 @@ export class Project {
 
   }
 
+  computeAllArguments() {
+    const vm = this;
+
+    var filenames = fs.readdirSync(vm.projectMeasuresDir.path());
+    filenames.forEach(function (name) {
+      vm.$log.debug('name: ' + name);
+      if (name === "." || name === "..") {
+        return;
+      }
+      if (fs.lstatSync(vm.projectMeasuresDir.path() + '/' + name).isDirectory()) {
+        vm.computeArguments(name);
+      }
+    });
+  }
+
+  computeArguments(measureDirName) {
+    const vm = this;
+
+    let measurePath = vm.projectMeasuresDir.path() + '\\' + measureDirName + '\\';
+    let seedPath = vm.seedDir.path() + '\\' + vm.defaultSeed;
+
+    vm.$log.debug('measurePath: ' + measurePath);
+    vm.$log.debug('seedPath: ' + seedPath);
+
+    const postData = JSON.stringify({
+      measure_dir: measurePath,
+      osm_path: seedPath
+    });
+
+    var options = {
+      hostname: 'localhost',
+      port: 1234,
+      path: '/compute_arguments',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    var req = http.request(options, (res) => {
+      vm.$log.debug(`STATUS: ${res.statusCode}`);
+      vm.$log.debug(`HEADERS: ${JSON.stringify(res.headers)}`);
+      res.setEncoding('utf8');
+      res.on('data', (chunk) => {
+        console.log(`BODY: ${chunk}`);
+      });
+      res.on('end', () => {
+        console.log('No more data in response.');
+      });
+    });
+
+    req.on('error', (e) => {
+      console.log(`problem with request: ${e.message}`);
+    });
+
+    // write data to request body
+    req.write(postData);
+    req.end();
+  }
+
   // export OSA
   exportOSA() {
     const vm = this;
@@ -196,10 +257,10 @@ export class Project {
     const zip = new vm.jsZip();
 
     let fileContents = jetpack.read(vm.seedDir.path() + '\\' + vm.defaultSeed);
-    zip.file('\\seeds\\' + vm.defaultSeed, fileContents);
+    zip.file('.\\seeds\\' + vm.defaultSeed, fileContents);
 
     fileContents = jetpack.read(vm.weatherDir.path() + '\\' + vm.defaultWeatherFile);
-    zip.file('\\weather\\' + vm.defaultWeatherFile, fileContents);
+    zip.file('.\\weather\\' + vm.defaultWeatherFile, fileContents);
 
     var filenames = fs.readdirSync(vm.projectMeasuresDir.path());
     filenames.forEach(function (name) {
@@ -209,10 +270,10 @@ export class Project {
       }
       if (fs.lstatSync(vm.projectMeasuresDir.path() + '/' + name).isDirectory()) {
         fileContents = jetpack.read(vm.projectMeasuresDir.path() + '\\' + name + '\\' + 'measure.rb');
-        zip.file('\\measures\\' + name + '\\' + 'measure.rb', fileContents);
+        zip.file('.\\measures\\' + name + '\\' + 'measure.rb', fileContents);
 
         fileContents = jetpack.read(vm.projectMeasuresDir.path() + '\\' + name + '\\' + 'measure.xml');
-        zip.file('\\measures\\' + name + '\\' + 'measure.xml', fileContents);
+        zip.file('.\\measures\\' + name + '\\' + 'measure.xml', fileContents);
       }
     });
 
