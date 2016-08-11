@@ -4,7 +4,7 @@ import env from '../electron/env';
 import {remote} from 'electron';
 const {app, Menu, shell} = remote;
 
-export function runBlock($window, $document, $translate, DependencyManager, Project, BCL, OsServer) {
+export function runBlock($window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer) {
   'ngInject';
 
   $window.onbeforeunload = e => {
@@ -22,6 +22,7 @@ export function runBlock($window, $document, $translate, DependencyManager, Proj
 
     // Prevent exit
     //e.returnValue = false;
+    MeasureManager.stopMeasureManager();
   };
 
   $window.lint = () => {
@@ -32,6 +33,8 @@ export function runBlock($window, $document, $translate, DependencyManager, Proj
   };
 
   DependencyManager.checkDependencies();
+
+  MeasureManager.startMeasureManager();
 
   const initialLanguage = $translate.use();
   const setLanguage = language => {

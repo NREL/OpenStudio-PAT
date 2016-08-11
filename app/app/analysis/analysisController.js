@@ -30,15 +30,6 @@ export class AnalysisController {
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
-    // to run cli
-    vm.exec = require('child_process').exec;
-
-    const src = jetpack.cwd(app.getPath('userData'));
-    vm.$log.debug('src.path(): ', src.path());
-
-    vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/bin'));
-    vm.$log.debug('CLIpath: ', vm.CLIpath.path());
-
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
     vm.$log.debug('PROJECT MEASURES RETRIEVED: ', vm.$scope.measures);
 
@@ -66,8 +57,6 @@ export class AnalysisController {
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
     vm.initializeGrids();
-
-    //vm.startMeasureManager();
 
     //setTimeout(function (){
     //  console.log(' calling computeArguments');
@@ -297,37 +286,6 @@ export class AnalysisController {
       vm.initializeGrids();
       vm.$log.debug('measures: ', vm.$scope.measures);
     });
-  }
-
-  startMeasureManager() {
-    const vm = this;
-    const command = `"${vm.CLIpath.path()}\\openstudio.exe" measure -s`;
-    vm.$log.debug('Start Measure Manager Server: ', command);
-    vm.cli = vm.exec(command, (error, stdout, stderr) => {
-      console.log('THE PROCESS TERMINATED!');
-      console.log('EXIT CODE: ', vm.cli.exitCode);
-      console.log('child: ', vm.cli);
-      console.log('stdout: ', stdout);
-      console.log('stderr: ', stderr);
-
-      if (vm.cli.exitCode == 0) {
-        // SUCCESS
-        vm.$log.debug('Started');
-      } else {
-        // TODO: cleanup?
-        vm.$log.debug('Oops!');
-        if (error !== null) {
-          console.log('exec error: ', error);
-        }
-      }
-    });
-  }
-
-  stopMeasureManager() {
-    const vm = this;
-    console.log('vm.cli: ', vm.cli);
-    vm.cli.kill('SIGINT');
-    console.log('vm.cli: ', vm.cli);
   }
 
   computeArguments() {

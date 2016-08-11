@@ -8,6 +8,7 @@ import { AnalysisController } from '../app/analysis/analysisController';
 import { BCL } from '../app/bcl/bclService';
 import { DependencyManager } from '../app/main/dependencyManagerService';
 import { DesignAlternativesController } from '../app/design_alts/designAlternativesController';
+import { MeasureManager } from '../app/main/measureManagerService';
 import { ModalBclController } from '../app/bcl/modalBclController';
 import { ModalDuplicateMeasureController } from '../app/analysis/modalDuplicateMeasureController';
 import { NavController } from '../app/nav/navController';
@@ -35,6 +36,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ServerController', ServerController)
   .controller('StatusBarController', StatusBarController)
   .service('BCL', BCL)
+  .service('MeasureManager', MeasureManager)
   .service('DependencyManager', DependencyManager)
   .service('OsServer', OsServer)
   .service('Project', Project)
