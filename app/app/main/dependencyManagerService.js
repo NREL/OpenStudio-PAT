@@ -262,7 +262,7 @@ export class DependencyManager {
         res.on('end', () => {
           console.timeEnd(`${_.startCase(downloadManifest.type)} downloaded`);
           const actualMD5 = jetpack.inspect(tempDir.path(filename), {checksum: 'md5'}).md5;
-          if (expectedMD5 === actualMD5) {
+          if (expectedMD5.trim() === actualMD5.trim()) {
             const zip = new AdmZip(tempDir.path(filename));
             const dest = jetpack.dir(`${app.getPath('userData')}/${downloadManifest.type}`, {empty: true});
 
