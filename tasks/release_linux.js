@@ -61,7 +61,7 @@ var finalize = function () {
 };
 
 var renameApp = function () {
-  return readyAppDir.renameAsync("electron", manifest.name);
+  return readyAppDir.renameAsync('electron', manifest.name);
 };
 
 var packToDebFile = function () {
