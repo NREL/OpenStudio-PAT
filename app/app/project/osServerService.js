@@ -155,7 +155,7 @@ export class OsServer {
     }
 
     // TODO: maybe ping server to make sure it is really started?
-    if (vm.serverStatus != 'started'){
+    if (vm.serverStatus != 'started') {
       if (serverType.name == 'local') {
         vm.localServer().then(response => {
           vm.serverStatus = 'started';
@@ -215,25 +215,30 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: add a timeout here in case this takes too long
-    const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --debug ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\" --verbose';
+    //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --debug ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\" --verbose';
+    const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\"';
     vm.$log.debug('Start Local command: ', command);
     const child = vm.exec(command,
       (error, stdout, stderr) => {
-        vm.$log.debug('THE PROCESS TERMINATED!');
-        vm.$log.debug('EXIT CODE: ', child.exitCode);
+        vm.$log.debug('exit code: ', child.exitCode);
         vm.$log.debug('child: ', child);
         vm.$log.debug('stdout: ', stdout);
         vm.$log.debug('stderr: ', stderr);
 
         if (child.exitCode == 0) {
           // SUCCESS
+          vm.$log.debug('SERVER SUCCESS');
           // get url from local_configuration.json
           const obj = jetpack.read(vm.projectDir.path('local_configuration.json'), 'json');
-          vm.setServerURL(obj.server_url);
+          if (obj) {
+            vm.setServerURL(obj.server_url);
+          } else {
+            vm.$log.debug('local_configuration.json obj undefined');
+          }
           vm.$log.debug('SERVER URL: ', vm.serverURL);
           deferred.resolve(child);
-
         } else {
+          vm.$log.debug('SERVER ERROR');
           // TODO: cleanup?
           if (error !== null) {
             console.log('exec error:', error);
@@ -257,8 +262,7 @@ export class OsServer {
     vm.$log.debug('Run command: ', command);
     const child = vm.exec(command,
       (error, stdout, stderr) => {
-        console.log('THE PROCESS TERMINATED!');
-        console.log('EXIT CODE: ', child.exitCode);
+        console.log('exit code: ', child.exitCode);
         console.log('child: ', child);
         console.log('stdout: ', stdout);
         console.log('stderr: ', stderr);
@@ -290,7 +294,7 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType();
 
-    if (vm.serverStatus != 'stopped'){
+    if (vm.serverStatus != 'stopped') {
 
       if (serverType.name == 'local') {
 
@@ -317,7 +321,7 @@ export class OsServer {
               deferred.reject(error);
             }
           });
-        } else {
+      } else {
         // TODO: stop remote server here
       }
     } else {
