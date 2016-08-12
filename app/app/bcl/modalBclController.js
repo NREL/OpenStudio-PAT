@@ -2,17 +2,20 @@ import jetpack from 'fs-jetpack';
 
 export class ModalBclController {
 
-  constructor($log, $uibModalInstance, $scope, BCL, params, Project) {
+  constructor($log, $q, $uibModalInstance, $uibModal, $scope, BCL, params, Project, MeasureManager) {
     'ngInject';
 
     const vm = this;
     vm.$uibModalInstance = $uibModalInstance;
     vm.$log = $log;
+    vm.$q = $q;
+    vm.$uibModal = $uibModal;
     vm.$scope = $scope;
     vm.BCL = BCL;
     vm.Project = Project;
     vm.jetpack = jetpack;
     vm.params = params;
+    vm.MeasureManager = MeasureManager;
 
     vm.checkForUpdates = vm.params.update;
     // TODO: do the check for updates
@@ -426,9 +429,42 @@ export class ModalBclController {
   }
 
   // copy from local and edit
-  copyAndEditMeasure() {
+  copyAndEditMeasure(measure) {
     const vm = this;
     vm.$log.debug('in COPY AND EDIT function');
+    const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalDuplicateMeasureController',
+      controllerAs: 'modal',
+      templateUrl: 'app/bcl/duplicate_measure.html',
+      windowClass: 'modal',
+      resolve: {
+        measure: function() {
+          return measure;
+        }
+      }
+    });
+
+    modalInstance.result.then((params) => {
+      vm.MeasureManager.duplicateMeasure(params).then( () => {
+        // success
+        vm.$log.debug('Measure Manager duplicateMeasure succedded');
+        vm.getLocalMeasures();
+        vm.setDisplayMeasures();
+        deferred.resolve();
+      }, () => {
+        // failure
+        vm.$log.debug('Measure Manager duplicateMeasure failed');
+        deferred.reject();
+      } );
+    }, () => {
+      // Modal canceled
+      vm.$log.debug('DuplicateMeasure Modal was canceled');
+      deferred.reject();
+    });
+
+    return deferred.promise;
   }
 
   ok() {

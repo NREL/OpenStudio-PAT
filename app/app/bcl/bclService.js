@@ -88,6 +88,9 @@ export class BCL {
 
       const xml = path.read(measurePath);
       let measure = vm.parseMeasure(xml);
+      measure.measureDir = path.path(measurePath,'..');
+      //measure.measureDir = path.path(measurePath.path('..'));
+      vm.$log.debug(`measure.measureDir: ${measure.measureDir}`);
       measure = vm.prepareMeasure(measure, type);
       measures.push(measure);
 
@@ -405,5 +408,4 @@ export class BCL {
     return deferred.promise;
 
   }
-
 }

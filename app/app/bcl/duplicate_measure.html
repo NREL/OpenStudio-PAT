@@ -1,0 +1,22 @@
+<div class="modal-header">
+  <h3 class="modal-title" translate>bcl.duplicateMeasure.title</h3>
+</div>
+
+<div class="modal-body">
+  <div class="row pad-bot-20">
+    <div class="col-md-12">
+      <label class="full-width"><translate>bcl.duplicateMeasure.name</translate></label>
+      <input class="full-width" type="text" ng-model="modal.newName">
+      <label class="full-width"><translate>bcl.duplicateMeasure.displayName</translate></label>
+      <input class="full-width" type="text" ng-model="modal.newDisplayName">
+      <label class="full-width"><translate>bcl.duplicateMeasure.description</translate></label>
+      <textarea class="full-width" ng-model="modal.newDescription"></textarea>
+      <label class="full-width"><translate>bcl.duplicateMeasure.modelerDescription</translate></label>
+      <textarea class="full-width" ng-model="modal.newModelerDescription"></textarea>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
+</div>

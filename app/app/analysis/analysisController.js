@@ -453,32 +453,6 @@ export class AnalysisController {
     const deferred = vm.$q.defer();
 
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
-
-    const modalInstance = vm.$uibModal.open({
-      backdrop: 'static',
-      controller: 'ModalDuplicateMeasureController',
-      controllerAs: 'modal',
-      templateUrl: 'app/analysis/duplicate_measure.html',
-      windowClass: 'wide-modal',
-      resolve: {
-        measure: function() {
-          return measure;
-        }
-      }
-    });
-
-    modalInstance.result.then(() => {
-      // reset data
-      vm.$scope.measures = vm.BCL.getProjectMeasures();
-      vm.initializeGrids();
-      vm.$log.debug('measures: ', vm.$scope.measures);
-      deferred.resolve();
-    }, () => {
-      // Modal canceled
-      deferred.reject();
-    });
-
-    return deferred.promise;
   }
 
   loadMeasureOptions() {

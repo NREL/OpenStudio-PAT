@@ -16,9 +16,6 @@ export default {
     deleteLastOption: 'Delete Last Option',
     duplicateMeasureAndOption: 'Duplicate Measure & Option',
     duplicateOption: 'Duplicate Option',
-    duplicateMeasureEdit: {
-      title: 'Duplicate Measure'
-    },
     energyplusMeasures: 'EnergyPlus Measures',
     openstudioMeasures: 'OpenStudio Measures',
     reportingMeasures: 'Reporting Measures',
@@ -126,6 +123,13 @@ export default {
       energyplus: 'EnergyPlus',
       openstudio: 'OpenStudio',
       reporting: 'Reporting'
+    },
+    duplicateMeasure: {
+      title: 'Duplicate Measure',
+      name: 'Name',
+      displayName: 'Display Name',
+      description: 'Description',
+      modelerDescription: 'Modeler Description'
     }
   },
   designAlts: {

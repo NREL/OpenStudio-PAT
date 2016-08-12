@@ -10,7 +10,7 @@ import { DependencyManager } from '../app/main/dependencyManagerService';
 import { DesignAlternativesController } from '../app/design_alts/designAlternativesController';
 import { MeasureManager } from '../app/main/measureManagerService';
 import { ModalBclController } from '../app/bcl/modalBclController';
-import { ModalDuplicateMeasureController } from '../app/analysis/modalDuplicateMeasureController';
+import { ModalDuplicateMeasureController } from '../app/bcl/modalDuplicateMeasureController';
 import { NavController } from '../app/nav/navController';
 import { OsServer } from '../app/project/osServerService';
 import { OutputsController } from '../app/outputs/outputsController';
