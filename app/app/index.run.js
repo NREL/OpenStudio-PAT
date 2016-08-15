@@ -1,6 +1,5 @@
 /*global bootlint*/
 
-import env from '../electron/env';
 import {remote} from 'electron';
 const {app, Menu, shell} = remote;
 

@@ -15,8 +15,7 @@ var eslint = function (fix) {
   fix = !!fix;
   return gulp.src([
       path.join(conf.paths.src, '**/*.js'),
-      '!' + path.join(conf.paths.src, 'node_modules/**'),
-      '!' + path.join(conf.paths.src, 'electron/jasmine/**')
+      '!' + path.join(conf.paths.src, 'node_modules/**')
     ], {base: '.'})
     .pipe($.eslint({fix: fix}))
     .pipe($.eslint.format())
@@ -38,7 +37,7 @@ var bundle = function (src, dest) {
 
   rollup.rollup({
     entry: src,
-    external: ['adm-zip', 'electron', 'fs', 'fs-jetpack', 'https', 'jszip', 'os', 'path', 'remote', 'xml2js'],
+    external: ['adm-zip', 'electron', 'fs', 'fs-jetpack', 'http', 'https', 'jszip', 'os', 'path', 'remote', 'xml2js'],
     plugins: [
       babel({exclude: 'node_modules/**'})
     ]
@@ -75,7 +74,7 @@ var bundle = function (src, dest) {
 
 var compileScripts = function () {
   var promises = [
-    bundle(path.join(conf.paths.src, '/electron/background.js'), path.join(conf.paths.tmp, 'serve/app/background.js')),
+    bundle(path.join(conf.paths.src, '/background.js'), path.join(conf.paths.tmp, 'serve/app/background.js')),
     bundle(path.join(conf.paths.src, '/app/index.module.js'), path.join(conf.paths.tmp, 'serve/app/index.module.js'))
   ];
 

@@ -4,7 +4,7 @@
 // window from here.
 
 import { app, BrowserWindow } from 'electron';
-import createWindow from './window';
+import createWindow from './electron/window';
 import env from './env';
 
 app.on('ready', () => {
@@ -19,7 +19,7 @@ app.on('ready', () => {
 
   if (env.name === 'test') {
     mainWindow.loadURL('file://' + __dirname + '/spec.html');
-  } else if (env.name === 'pat-dev') {
+  } else if (env.name === 'development') {
     mainWindow.loadURL('http://localhost:3000/index.html');
   } else {
     mainWindow.loadURL('file://' + __dirname + '/index.html');
@@ -30,6 +30,4 @@ app.on('ready', () => {
   }
 });
 
-app.on('window-all-closed', () => {
-  app.quit();
-});
+app.on('window-all-closed', app.quit);

@@ -57,16 +57,6 @@ export class AnalysisController {
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
     vm.initializeGrids();
-
-    //setTimeout(function (){
-    //  console.log(' calling computeArguments');
-    //  vm.computeArguments();
-    //}, 5000);
-
-    //setTimeout(function (){
-    //  console.log('killing cli');
-    //  vm.stopMeasureManager();
-    //}, 5000);
   }
 
   initializeGrids() {
@@ -285,29 +275,6 @@ export class AnalysisController {
       vm.$scope.measures = vm.BCL.getProjectMeasures();
       vm.initializeGrids();
       vm.$log.debug('measures: ', vm.$scope.measures);
-    });
-  }
-
-  computeArguments() {
-    const vm = this;
-    const command = `-t`;
-    vm.$log.debug('Compute Arguments: ', command);
-    vm.cli = vm.exec(command, (error, stdout, stderr) => {
-      console.log('THE PROCESS TERMINATED!');
-      console.log('EXIT CODE: ', vm.cli.exitCode);
-      console.log('child: ', vm.cli);
-      console.log('stdout: ', stdout);
-      console.log('stderr: ', stderr);
-
-      if (vm.cli.exitCode == 0) {
-        // SUCCESS
-        vm.$log.debug('success');
-      } else {
-        vm.$log.debug('Oops!');
-        if (error !== null) {
-          console.log('exec error: ', error);
-        }
-      }
     });
   }
 
