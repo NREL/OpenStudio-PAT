@@ -396,7 +396,12 @@ export class Project {
           valArr.push({value: skip, weight: 0});
         });
         // fix weights (set 1st one to 1)
-        valArr[0].weight = 1;
+        if (valArr.length > 0) {
+          vm.$log.debug('Setting weight');
+          valArr[0].weight = 1;
+        } else {
+          vm.$log.debug('Skipping weight');
+        }
 
         v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
         v.uncertainty_description.attributes.push({name: 'lower_bounds', value: false});
@@ -425,7 +430,12 @@ export class Project {
           }
         });
         // fix weights (set 1st one to 1)
-        valArr[0].weight = 1;
+        if (valArr.length > 0) {
+          vm.$log.debug('Setting Weight');
+          valArr[0].weight = 1;
+        } else {
+          vm.$log.debug('Skipping Weight');
+        }
 
         const v = {};
         // TODO: only arguments that are variables go here
@@ -451,7 +461,12 @@ export class Project {
         v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
         v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.minimum});  // minimum
         v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.maximum});  // maximum
-        v.uncertainty_description.attributes.push({name: 'mode', value: valArr[0].value}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
+        if (valArr.length > 0) {
+          vm.$log.debug('Setting attribute');
+          v.uncertainty_description.attributes.push({name: 'mode', value: valArr[0].value}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
+        } else {
+          vm.$log.debug('Skipping attribute');
+        }
         v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
         v.uncertainty_description.attributes.push({name: 'stddev', value: null});
 
