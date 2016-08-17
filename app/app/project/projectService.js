@@ -86,6 +86,8 @@ export class Project {
     // json objects
     vm.pat = {};
     vm.osa = {};
+
+    //vm.computeAllArguments();
   }
 
   // import from pat.json
@@ -241,6 +243,8 @@ export class Project {
   // export OSA
   exportOSA() {
     const vm = this;
+    vm.$log.debug('In Project::exportOSA');
+
     // check what kind of analysis it is
     if (vm.analysisType == 'Manual') {
       vm.exportManual();
@@ -289,6 +293,7 @@ export class Project {
 
   exportManual() {
     const vm = this;
+    vm.$log.debug('In Project::exportManual');
 
     vm.osa = {};
     vm.osa.analysis = {};
@@ -316,7 +321,15 @@ export class Project {
       const m = {};
       m.name = measure.name;
       m.display_name = measure.displayName;
-      m.measure_type = measure.type; // TODO: convert this.  options are:  Ruby (same as OpenStudioMeasure), EnergyPlus, and Reporting
+      if (measure.type === 'ModelMeasure') {
+        m.measure_type = 'RubyMeasure';
+      } else if (measure.type === 'EnergyPlusMeasure') {
+        m.measure_type = 'EnergyPlusMeasure';
+      } else if (measure.type === 'RubyMeasure') {
+        m.measure_type = 'RubyMeasure';
+      } else {
+        m.measure_type = 'unknown';
+      }
       m.measure_definition_class_name = measure.className;
       //m.measure_definition_measureUID = measure.colDef.measureUID; // TODO: fix this
       m.measure_definition_directory = './measures/' + measure.name;
@@ -457,6 +470,8 @@ export class Project {
   }
 
   exportAlgorithmic() {
+    const vm = this;
+    vm.$log.debug('In Project::exportManual');
     // TODO
   }
 
