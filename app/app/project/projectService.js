@@ -299,13 +299,6 @@ export class Project {
     vm.osa.analysis = {};
     vm.osa.analysis.display_name = vm.projectName;
     vm.osa.analysis.name = vm.projectName;
-    vm.osa.seed = {};
-    vm.osa.seed.file_type = 'OSM';
-    vm.osa.seed.path = './seed/' + vm.defaultSeed;
-    vm.osa.weather_file = {};
-    vm.osa.weather_file.file_type = 'EPW';
-    vm.osa.weather_file.path = './weather/' + vm.defaultWeatherFile;
-    vm.osa.file_format_version = 1;
 
     // empty for manual
     vm.osa.analysis.output_variables = [];
@@ -470,6 +463,14 @@ export class Project {
 
       vm.osa.analysis.problem.workflow.push(m);
     });
+
+    vm.osa.analysis.seed = {};
+    vm.osa.analysis.seed.file_type = 'OSM';
+    vm.osa.analysis.seed.path = './seed/' + vm.defaultSeed;
+    vm.osa.analysis.weather_file = {};
+    vm.osa.analysis.weather_file.file_type = 'EPW';
+    vm.osa.analysis.weather_file.path = './weather/' + vm.defaultWeatherFile;
+    vm.osa.analysis.file_format_version = 1;
   }
 
   exportAlgorithmic() {
