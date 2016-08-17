@@ -337,16 +337,20 @@ export class Project {
       m.arguments = [];
       // TODO: this portion only has arguments that don't have the variable box checked
       vm.$log.debug('Project::exportManual measure.arguments.length: ', measure.arguments.length);
+      //vm.$log.debug('Project::exportManual measure.arguments: ', measure.arguments);
       _.forEach(measure.arguments, (arg) => {
-        const argument = {};
-        argument.display_name = arg.displayName;
-        argument.display_name_short = arg.id;
-        argument.name = arg.name;
-        argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
-        argument.default_value = arg.defaultValue;
-        argument.value = arg.defaultValue; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
-        m.arguments.push(argument);
+        if ((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) {
+          //vm.$log.debug('Project::exportManual arg: ', arg);
+          const argument = {};
+          argument.display_name = arg.displayName;
+          argument.display_name_short = arg.id;
+          argument.name = arg.name;
+          argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
+          argument.default_value = arg.defaultValue;
+          argument.value = arg.defaultValue; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
+            m.arguments.push(argument);
       });
+
       let var_count = 0;
       m.variables = [];
 
@@ -388,7 +392,7 @@ export class Project {
 
         const valArr = [];
         _.forEach(vars, (skip) => {
-          valArr.push({value: skip, weight: 1/valArr.length});
+          valArr.push({value: skip, weight: 1 / valArr.length});
         });
 
         v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
@@ -406,56 +410,57 @@ export class Project {
 
       // other arguments
       _.forEach(measure.arguments, (arg) => {
+        if ((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) {
+          //vm.$log.debug('Project::exportManual arg: ', arg);
+          // see what arg is set to in each design alternative
+          const valArr = [];
+          _.forEach(vm.designAlternatives, (da) => {
+            if (da[measure.name] == 'None') {
+              valArr.push({value: 'None', weight: 1 / vm.designAlternatives.length}); // TODO: does this matter?
+            } else {
+              const option_id = da[measure.name];
+              valArr.push({value: arg[option_id], weight: 1 / vm.designAlternatives.length});
+            }
+          });
 
-        // see what arg is set to in each design alternative
-        const valArr = [];
-        _.forEach(vm.designAlternatives, (da) => {
-          if (da[measure.name] == 'None') {
-            valArr.push({value: 'None', weight: 1/vm.designAlternatives.length}); // TODO: does this matter?
+          const v = {};
+          // TODO: only arguments that are variables go here
+          v.argument = {};
+          v.argument.display_name = arg.displayName;
+          v.argument.display_name_short = arg.id;
+          v.argument.name = arg.name;
+          v.argument.value_type = _.toLower(arg.type); // TODO: see above
+
+          v.display_name = arg.displayName;  // same as arg
+          v.display_name_short = arg.id; // entered in PAT
+          v.variable_type = 'variable'; //this is always 'variable'
+          v.units = arg.units;
+          v.minimum = arg.minimum;  // TODO: must be alphabetically ordered if string, otherwise standard order (pick from option values mean must be btw min and max, and max > min)
+          v.maximum = arg.maximum;  // TODO: must be alphabetically ordered
+          v.relation_to_output = null;
+          v.static_value = false; // TODO: do this: 1st option value
+          v.variable = true; // this is always true
+          v.uncertainty_description = {};
+          v.uncertainty_description.type = 'discrete'; //options are triangle, uniform, discrete, and normal.  use "discrete" always for manual
+          v.uncertainty_description.attributes = [];
+
+          v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
+          v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.minimum});  // minimum
+          v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.maximum});  // maximum
+          if (valArr.length > 0) {
+            vm.$log.debug('Setting attribute');
+            v.uncertainty_description.attributes.push({name: 'mode', value: valArr[0].value}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
           } else {
-            const option_id = da[measure.name];
-            valArr.push({value: arg[option_id], weight: 1/vm.designAlternatives.length});
+            vm.$log.debug('Skipping attribute');
           }
-        });
+          v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
+          v.uncertainty_description.attributes.push({name: 'stddev', value: null});
 
-        const v = {};
-        // TODO: only arguments that are variables go here
-        v.argument = {};
-        v.argument.display_name = arg.displayName;
-        v.argument.display_name_short = arg.id;
-        v.argument.name = arg.name;
-        v.argument.value_type = _.toLower(arg.type); // TODO: see above
+          v.workflow_index = var_count;
+          var_count += 1;
 
-        v.display_name = arg.displayName;  // same as arg
-        v.display_name_short = arg.id; // entered in PAT
-        v.variable_type = 'variable'; //this is always 'variable'
-        v.units = arg.units;
-        v.minimum = arg.minimum;  // TODO: must be alphabetically ordered if string, otherwise standard order (pick from option values mean must be btw min and max, and max > min)
-        v.maximum = arg.maximum;  // TODO: must be alphabetically ordered
-        v.relation_to_output = null;
-        v.static_value = false; // TODO: do this: 1st option value
-        v.variable = true; // this is always true
-        v.uncertainty_description = {};
-        v.uncertainty_description.type = 'discrete'; //options are triangle, uniform, discrete, and normal.  use "discrete" always for manual
-        v.uncertainty_description.attributes = [];
-
-        v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
-        v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.minimum});  // minimum
-        v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.maximum});  // maximum
-        if (valArr.length > 0) {
-          vm.$log.debug('Setting attribute');
-          v.uncertainty_description.attributes.push({name: 'mode', value: valArr[0].value}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
-        } else {
-          vm.$log.debug('Skipping attribute');
+          m.variables.push(v);
         }
-        v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
-        v.uncertainty_description.attributes.push({name: 'stddev', value: null});
-
-        v.workflow_index = var_count;
-        var_count += 1;
-
-        m.variables.push(v);
-
       });
 
       m.workflow_index = measure_count;
