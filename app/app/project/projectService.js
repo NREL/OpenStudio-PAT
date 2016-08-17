@@ -316,6 +316,7 @@ export class Project {
     vm.osa.analysis.problem.algorithm = {objective_functions: []};
     vm.osa.analysis.problem.workflow = [];
     let measure_count = 0;
+    vm.$log.debug('Project::exportManual vm.measures.length: ', vm.measures.length);
     _.forEach(vm.measures, (measure) => {
 
       const m = {};
@@ -342,6 +343,7 @@ export class Project {
 
       m.arguments = [];
       // TODO: this portion only has arguments that don't have the variable box checked
+      vm.$log.debug('Project::exportManual measure.arguments.length: ', measure.arguments.length);
       _.forEach(measure.arguments, (arg) => {
         const argument = {};
         argument.display_name = arg.displayName;
@@ -393,15 +395,8 @@ export class Project {
 
         const valArr = [];
         _.forEach(vars, (skip) => {
-          valArr.push({value: skip, weight: 0});
+          valArr.push({value: skip, weight: 1/valArr.length});
         });
-        // fix weights (set 1st one to 1)
-        if (valArr.length > 0) {
-          vm.$log.debug('Setting weight');
-          valArr[0].weight = 1;
-        } else {
-          vm.$log.debug('Skipping weight');
-        }
 
         v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
         v.uncertainty_description.attributes.push({name: 'lower_bounds', value: false});
@@ -423,19 +418,12 @@ export class Project {
         const valArr = [];
         _.forEach(vm.designAlternatives, (da) => {
           if (da[measure.name] == 'None') {
-            valArr.push({value: 'None', weight: 0}); // TODO: does this matter?
+            valArr.push({value: 'None', weight: 1/vm.designAlternatives.length}); // TODO: does this matter?
           } else {
             const option_id = da[measure.name];
-            valArr.push({value: arg[option_id], weight: 0});
+            valArr.push({value: arg[option_id], weight: 1/vm.designAlternatives.length});
           }
         });
-        // fix weights (set 1st one to 1)
-        if (valArr.length > 0) {
-          vm.$log.debug('Setting Weight');
-          valArr[0].weight = 1;
-        } else {
-          vm.$log.debug('Skipping Weight');
-        }
 
         const v = {};
         // TODO: only arguments that are variables go here
