@@ -297,6 +297,7 @@ export class Project {
 
     vm.osa = {};
     vm.osa.analysis = {};
+    vm.osa.analysis.uuid = "";
     vm.osa.analysis.display_name = vm.projectName;
     vm.osa.analysis.name = vm.projectName;
 
@@ -304,7 +305,8 @@ export class Project {
     vm.osa.analysis.output_variables = [];
 
     vm.osa.analysis.problem = {};
-    vm.osa.analysis.problem.analysis_type = 'batch_datapoints';
+    //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO Evan which is correct?
+    vm.osa.analysis.problem.analysis_type = null;
     // empty for manual
     vm.osa.analysis.problem.algorithm = {objective_functions: []};
     vm.osa.analysis.problem.workflow = [];
@@ -339,16 +341,32 @@ export class Project {
       vm.$log.debug('Project::exportManual measure.arguments.length: ', measure.arguments.length);
       //vm.$log.debug('Project::exportManual measure.arguments: ', measure.arguments);
       _.forEach(measure.arguments, (arg) => {
-        if ((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) {
-          //vm.$log.debug('Project::exportManual arg: ', arg);
+        if (((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) && (arg.variable === false)) {
+          vm.$log.debug('Project::exportManual arg: ', arg);
+          vm.$log.debug('Project::exportManual arg.variable: ', arg.variable);
           const argument = {};
           argument.display_name = arg.displayName;
-          argument.display_name_short = arg.id;
+          //argument.display_name_short = arg.id; TODO
+          argument.display_name_short = arg.displayName;
           argument.name = arg.name;
           argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
           argument.default_value = arg.defaultValue;
           argument.value = arg.defaultValue; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
+          // Make sure that argument is "complete"
+          if (((typeof argument.display_name !== 'undefined' && argument.display_name.length) ||
+            (typeof argument.display_name_short !== 'undefined' && argument.display_name_short.length) ||
+            (typeof argument.name !== 'undefined' && argument.name.length)) &&
+            typeof argument.value_type !== 'undefined' && argument.value_type.length &&
+            typeof argument.default_value !== 'undefined' && argument.default_value.length &&
+            typeof argument.value !== 'undefined' && argument.value.length) {
+            vm.$log.debug('Pushing to m.arguments');
+            vm.$log.debug('argument: ', argument);
+            var_count += 1;
             m.arguments.push(argument);
+          } else {
+            vm.$log.debug('Not pushing to m.arguments');
+          }
+        }
       });
 
       let var_count = 0;
@@ -398,7 +416,7 @@ export class Project {
         v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
         v.uncertainty_description.attributes.push({name: 'lower_bounds', value: false});
         v.uncertainty_description.attributes.push({name: 'upper_bounds', value: false});
-        v.uncertainty_description.attributes.push({name: 'mode', value: false});
+        v.uncertainty_description.attributes.push({name: 'modes', value: false});
         v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
         v.uncertainty_description.attributes.push({name: 'stddev', value: null});
 
@@ -410,7 +428,7 @@ export class Project {
 
       // other arguments
       _.forEach(measure.arguments, (arg) => {
-        if ((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) {
+        if (((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) && (arg.variable === true)) {
           //vm.$log.debug('Project::exportManual arg: ', arg);
           // see what arg is set to in each design alternative
           const valArr = [];
@@ -424,15 +442,18 @@ export class Project {
           });
 
           const v = {};
-          // TODO: only arguments that are variables go here
           v.argument = {};
           v.argument.display_name = arg.displayName;
-          v.argument.display_name_short = arg.id;
+          //v.argument.display_name_short = arg.id; TODO
+          v.argument.display_name_short = arg.displayName;
           v.argument.name = arg.name;
           v.argument.value_type = _.toLower(arg.type); // TODO: see above
+          v.argument.default_value = arg.defaultValue;
+          v.argument.value = _.toString(arg.option_1);
 
           v.display_name = arg.displayName;  // same as arg
-          v.display_name_short = arg.id; // entered in PAT
+          //v.display_name_short = arg.id; // entered in PAT TODO
+          v.display_name_short = arg.displayName;
           v.variable_type = 'variable'; //this is always 'variable'
           v.units = arg.units;
           v.minimum = arg.minimum;  // TODO: must be alphabetically ordered if string, otherwise standard order (pick from option values mean must be btw min and max, and max > min)
