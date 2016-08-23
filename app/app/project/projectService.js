@@ -310,10 +310,11 @@ export class Project {
     // empty for manual
     vm.osa.analysis.problem.algorithm = {objective_functions: []};
     vm.osa.analysis.problem.workflow = [];
-    let measure_count = 0;
-    vm.$log.debug('Project::exportManual vm.measures.length: ', vm.measures.length);
-    _.forEach(vm.measures, (measure) => {
 
+    vm.savePrettyOptions(); // TODO: this is temporary. remove when options are already showing up in arg?
+
+    let measure_count = 0;
+    _.forEach(vm.measures, (measure) => {
       const m = {};
       m.name = measure.name;
       m.display_name = measure.displayName;
@@ -336,14 +337,16 @@ export class Project {
       m.measure_definition_uuid = measure.uid;
       m.measure_definition_version_uuid = measure.versionId;
 
+      // first find out how many options there are
+      const keys = Object.keys(measure.arguments[0]);
+      const optionKeys = _.filter(keys, function (k) {
+        return k.indexOf('option_') !== -1;
+      });
+
       m.arguments = [];
-      // TODO: this portion only has arguments that don't have the variable box checked
-      vm.$log.debug('Project::exportManual measure.arguments.length: ', measure.arguments.length);
-      //vm.$log.debug('Project::exportManual measure.arguments: ', measure.arguments);
+      // This portion only has arguments that don't have the variable box checked
       _.forEach(measure.arguments, (arg) => {
-        if (((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) && (arg.variable === false)) {
-          vm.$log.debug('Project::exportManual arg: ', arg);
-          vm.$log.debug('Project::exportManual arg.variable: ', arg.variable);
+        if (((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) && (typeof arg.variable === 'undefined' || arg.variable === false)) {
           const argument = {};
           argument.display_name = arg.displayName;
           //argument.display_name_short = arg.id; TODO
@@ -359,12 +362,10 @@ export class Project {
             typeof argument.value_type !== 'undefined' && argument.value_type.length &&
             typeof argument.default_value !== 'undefined' && argument.default_value.length &&
             typeof argument.value !== 'undefined' && argument.value.length) {
-            vm.$log.debug('Pushing to m.arguments');
-            vm.$log.debug('argument: ', argument);
             var_count += 1;
             m.arguments.push(argument);
           } else {
-            vm.$log.debug('Not pushing to m.arguments');
+            vm.$log.debug('Not pushing partial arg to m.arguments');
           }
         }
       });
@@ -383,6 +384,8 @@ export class Project {
       });
 
       // need a __SKIP__ argument
+      // TODO: verify that this is still valid syntax-wise
+      // TODO: Should this not appear up here anymore? (b/c it's a variable?)
       if (_.includes(vars, true)) {
         const v = {
           argument: {
@@ -410,7 +413,7 @@ export class Project {
 
         const valArr = [];
         _.forEach(vars, (skip) => {
-          valArr.push({value: skip, weight: 1 / valArr.length});
+          valArr.push({value: skip, weight: 1 / vars.length});
         });
 
         v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
@@ -426,20 +429,61 @@ export class Project {
         m.variables.push(v);
       }
 
-      // other arguments
+      // Variable arguments
       _.forEach(measure.arguments, (arg) => {
         if (((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) && (arg.variable === true)) {
-          //vm.$log.debug('Project::exportManual arg: ', arg);
+          vm.$log.debug('Project::exportManual arg: ', arg);
           // see what arg is set to in each design alternative
           const valArr = [];
+          let option_id;
           _.forEach(vm.designAlternatives, (da) => {
+              vm.$log.debug('Project::exportManual da: ', da);
             if (da[measure.name] == 'None') {
-              valArr.push({value: 'None', weight: 1 / vm.designAlternatives.length}); // TODO: does this matter?
+                vm.$log.debug('value: None');
+              // TODO: Review what value to assign when no option is selected for that design alternative.
+              // TODO: Does it matter what we put here?  'None' is put there for now, if doesn't work, try value of the same type.
+              valArr.push({value: 'None', weight: 1 / vm.designAlternatives.length});
             } else {
-              const option_id = da[measure.name];
+              const option_name = da[measure.name];
+              vm.$log.debug('arg: ', arg);
+              vm.$log.debug('option_name: ', option_name);
+              vm.$log.debug('MEASURE', measure);
+              // retrieve the option ID from the option_name in measure.options
+              _.forEach(measure.options, (option) => {
+                if (option.name == option_name){
+                  option_id = option.id;
+                }
+              });
+              vm.$log.debug('arg[option_id]: ', arg[option_id]);
               valArr.push({value: arg[option_id], weight: 1 / vm.designAlternatives.length});
             }
           });
+
+          const values = _.values(_.pick(arg,optionKeys));
+
+
+          const min = _.min( values ),
+            max = _.max( values );
+
+          const mode = function mode(ar) {
+            var numMapping = {};
+            var greatestFreq = 0;
+            var mode = 0;
+            ar.forEach(function findMode(number) {
+              numMapping[number] = (numMapping[number] || 0) + 1;
+
+              if (greatestFreq < numMapping[number]) {
+                greatestFreq = numMapping[number];
+                mode = number;
+              }
+            });
+            return +mode;
+          };
+
+          arg.units = '';
+          arg.minimum = min; // TODO is this meta data or calculated form options? Is it same as lower_bound below?
+          arg.maximum = max; // TODO is this meta data or calculated form options? Is it same as upper_bound below?
+          arg.mode = mode(values);
 
           const v = {};
           v.argument = {};
@@ -459,7 +503,10 @@ export class Project {
           v.minimum = arg.minimum;  // TODO: must be alphabetically ordered if string, otherwise standard order (pick from option values mean must be btw min and max, and max > min)
           v.maximum = arg.maximum;  // TODO: must be alphabetically ordered
           v.relation_to_output = null;
-          v.static_value = false; // TODO: do this: 1st option value
+          //v.static_value = false; // TODO: verify that this should always be 1
+          v.static_value = 1;
+          v.uuid = '';
+          v.version_uuid = '';
           v.variable = true; // this is always true
           v.uncertainty_description = {};
           v.uncertainty_description.type = 'discrete'; //options are triangle, uniform, discrete, and normal.  use "discrete" always for manual
@@ -470,7 +517,7 @@ export class Project {
           v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.maximum});  // maximum
           if (valArr.length > 0) {
             vm.$log.debug('Setting attribute');
-            v.uncertainty_description.attributes.push({name: 'mode', value: valArr[0].value}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
+            v.uncertainty_description.attributes.push({name: 'modes', value: arg.mode}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
           } else {
             vm.$log.debug('Skipping attribute');
           }
