@@ -86,8 +86,6 @@ export class Project {
     // json objects
     vm.pat = {};
     vm.osa = {};
-
-    //vm.computeAllArguments();
   }
 
   // import from pat.json
@@ -100,6 +98,7 @@ export class Project {
       if (!angular.isDefined(vm.measures)) {
         vm.measures = [];
       }
+      vm.computeAllArguments();
       vm.designAlternatives = vm.pat.designAlternatives;
       if (!angular.isDefined(vm.designAlternatives)) {
         vm.designAlternatives = [];
