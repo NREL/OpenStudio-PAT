@@ -10,6 +10,7 @@ export class AnalysisController {
     'ngInject';
 
     const vm = this;
+    vm.Project = Project;
     vm.$log = $log;
     vm.$q = $q;
     vm.$uibModal = $uibModal;
@@ -17,7 +18,6 @@ export class AnalysisController {
     vm.$scope = $scope;
     vm.$document = $document;
     vm.BCL = BCL;
-    vm.Project = Project;
     vm.dialog = dialog;
 
     vm.projectDir = vm.Project.getProjectDir();
@@ -31,21 +31,11 @@ export class AnalysisController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
-    vm.$log.debug('PROJECT MEASURES RETRIEVED: ', vm.$scope.measures);
+    vm.$log.debug('ANALYSIS MEASURES RETRIEVED: ', vm.$scope.measures);
 
     vm.$scope.osMeasures = [];
     vm.$scope.epMeasures = [];
     vm.$scope.repMeasures = [];
-
-    // SAVE
-    vm.$scope.$on('$destroy', () => {
-      console.log('SAVING measures to ProjectService');
-      vm.Project.setMeasuresAndOptions(vm.$scope.measures);
-      // save measure options in nicer structure for json export
-      // TODO: this isn't saving quite correctly (options don't load back?)
-      vm.Project.savePrettyOptions();
-      vm.Project.exportPAT();
-    });
 
     vm.$scope.selectedAll = false;
 
@@ -272,9 +262,8 @@ export class AnalysisController {
     const types = [type];
     vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
-      vm.$scope.measures = vm.BCL.getProjectMeasures();
+      vm.$scope.measures = vm.Project.getMeasuresAndOptions();
       vm.initializeGrids();
-      vm.$log.debug('measures: ', vm.$scope.measures);
     });
   }
 
@@ -283,7 +272,7 @@ export class AnalysisController {
     // line below also removes it from bclService 'getProjectMeasures', but not from disk
     // TODO: fix so BCL modal doesn't restore deleted panels
     _.remove(vm.$scope.measures, {uid: measure.uid});
-    vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+    //vm.Project.setMeasuresAndOptions(vm.$scope.measures);
 
     const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.uid + '"]'));
     measurePanel.remove();
@@ -297,28 +286,27 @@ export class AnalysisController {
 
   addMeasureOption(measure) {
     const vm = this;
-    vm.$log.debug('In addMeasureOption in analysis');
+    //vm.$log.debug('In addMeasureOption in analysis');
 
     measure.numberOfOptions++;
 
-
     const keys = Object.keys(measure.arguments[0]);
-    vm.$log.debug('keys: ', keys);
+    //vm.$log.debug('keys: ', keys);
 
     const optionKeys = _.filter(keys, function (k) {
       return k.indexOf('option_') !== -1;
     });
-    vm.$log.debug('option keys: ', optionKeys);
+    //vm.$log.debug('option keys: ', optionKeys);
 
     let max = 0;
     _.forEach(optionKeys, (key) => {
-      vm.$log.debug('key: ', key);
+      //vm.$log.debug('key: ', key);
       const num = Number(key.split('_')[1]);
       if (num > max) {
         max = num;
       }
     });
-    vm.$log.debug('max: ', max);
+    //vm.$log.debug('max: ', max);
 
     // start from first option
     const opt = vm.getDefaultOptionColDef();
@@ -330,7 +318,10 @@ export class AnalysisController {
     vm.addDefaultArguments(measure, opt);
 
     _.forEach(measure.arguments, argument => {
-      if (argument.specialRowId === 'optionName') {
+      if (argument.specialRowId === 'optionDelete') {
+         argument[opt.field] = opt.field;
+      }
+      else if (argument.specialRowId === 'optionName') {
         argument[opt.field] = opt.displayName + ' Name';
       }
       else if (argument.specialRowId === 'optionDescription') {
@@ -435,9 +426,9 @@ export class AnalysisController {
 
   loadOption(measure, option) {
     const vm = this;
-    vm.$log.debug('In loadOption in analysis');
-    vm.$log.debug('measure: ', measure);
-    vm.$log.debug('option: ', option);
+    //vm.$log.debug('In loadOption in analysis');
+    //vm.$log.debug('measure: ', measure);
+    //vm.$log.debug('option: ', option);
     const re = /^option_(\d+)$/;
     if (re.test(option.id)) {
       const opt = vm.getDefaultOptionColDef();

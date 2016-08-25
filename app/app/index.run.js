@@ -3,12 +3,10 @@
 import {remote} from 'electron';
 const {app, Menu, shell} = remote;
 
-export function runBlock($window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer) {
+export function runBlock($rootScope, $state, $window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer) {
   'ngInject';
 
   $window.onbeforeunload = e => {
-    // just in case we are closing from the analysis tab, save pretty options first
-    Project.savePrettyOptions();
 
     // Save project automatically on exit
     Project.exportPAT();
@@ -30,6 +28,13 @@ export function runBlock($window, $document, $translate, MeasureManager, Depende
     s.onload = () => bootlint.showLintReportForCurrentDocument([]);
     $document[0].body.appendChild(s);
   };
+
+  // Save pretty options when leaving analysis state (needed for PAT.json and for DesignAlternatives tab)
+  $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+    if (fromState.name == 'analysis') {
+      Project.savePrettyOptions();
+    }
+  });
 
   DependencyManager.checkDependencies();
 

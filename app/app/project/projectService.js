@@ -91,10 +91,14 @@ export class Project {
   }
 
   // import from pat.json
+  // TODO: add check to ensure that the measures really are in the PAT project folder and haven't been deleted
+  // TODO: if measure is in pat dir but not in json, ignore
+  // TODO: if measure is in pat dir, not in json, and user tries to add it, overwrite existing measure in dir? (currently it doesn't overwrite)
   initializeProject() {
     const vm = this;
     if (vm.jetpack.exists(vm.projectDir.path('pat.json'))) {
       vm.pat = vm.jetpack.read(vm.projectDir.path('pat.json'), 'json');
+      //vm.$log.debug('PAT JSON: ', vm.pat);
 
       vm.measures = vm.pat.measures;
       if (!angular.isDefined(vm.measures)) {
@@ -111,29 +115,26 @@ export class Project {
       vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
       vm.runType = vm.pat.runType ? vm.pat.runType : vm.runType;
       vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
-      vm.$log.debug('in initializeProject in Project');
       vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
       vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
       vm.algorithmSettings = vm.pat.algorithmSettings ? vm.pat.algorithmSettings : vm.algorithmSettings;
+
     }
   }
 
-  // TODO: need to be able to do this just by looking at the ugly hash inside measure arguments
   savePrettyOptions() {
     const vm = this;
-
-    vm.$log.debug('Saving all measure option hashes');
+    vm.$log.debug('Parse arguments and save Options hash to each measure');
 
     _.forEach(vm.measures, (measure) => {
 
       const options = [];
 
-      // first find out how many options there are
+      // first find out how many options there are (from the optionDelete special argument)
       const keys = Object.keys(measure.arguments[0]);
       const optionKeys = _.filter(keys, function (k) {
         return k.indexOf('option_') !== -1;
       });
-      vm.$log.debug('option keys: ', optionKeys);
 
       _.forEach(optionKeys, (key) => {
 
@@ -310,8 +311,6 @@ export class Project {
     // empty for manual
     vm.osa.analysis.problem.algorithm = {objective_functions: []};
     vm.osa.analysis.problem.workflow = [];
-
-    vm.savePrettyOptions(); // TODO: this is temporary. remove when options are already showing up in arg?
 
     let measure_count = 0;
     _.forEach(vm.measures, (measure) => {
@@ -548,13 +547,15 @@ export class Project {
 
   exportAlgorithmic() {
     const vm = this;
-    vm.$log.debug('In Project::exportManual');
+    vm.$log.debug('In Project::exportAlgorithmic');
     // TODO
   }
 
   // export variables to pat.json
   exportPAT() {
     const vm = this;
+    vm.savePrettyOptions();  // must do this first in case we are closing the app on the analysis tab
+
     // general
     vm.pat = {};
     vm.pat.projectName = vm.projectName;
@@ -624,6 +625,7 @@ export class Project {
 
   getMeasuresAndOptions() {
     const vm = this;
+    //vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
     return vm.measures;
   }
 
@@ -696,7 +698,6 @@ export class Project {
     const vm = this;
     return vm.samplingMethods;
   }
-
 
   setAlgorithmOptions() {
     const at = {};

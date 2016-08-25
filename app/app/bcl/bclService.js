@@ -31,27 +31,22 @@ export class BCL {
 
     // initialize measures
     vm.getLocalMeasures();
-    vm.$log.debug('PROJECT measures: ', vm.libMeasures.project);
+    // initialize Project measures (with arguments and options) from Project service
+    vm.libMeasures.project = vm.Project.getMeasuresAndOptions();
+    vm.$log.debug('BCL SERVICE MEASURES RETRIEVED: ', vm.libMeasures.project);
     vm.getBCLMeasures();
-
   }
 
-  // TODO: these may need refactor after JSON is implemented
-  setProjectMeasures(measures) {
-    const vm = this;
-    vm.libMeasures.project = measures;
-    //vm.projectMeasures = vm.libMeasures.project;
-  }
+  // TODO: is this one needed?  Shouldn't we go through the Project service instead?
+  //setProjectMeasures(measures) {
+  //  const vm = this;
+  //  vm.libMeasures.project = measures;
+  //}
 
+  // TODO: is this needed?
   getProjectMeasures() {
     const vm = this;
-    if (vm.libMeasures.project.length > 0) {
-      return vm.libMeasures.project;
-    }
-    else {
-      vm.libMeasures.project = vm.getMeasuresByType(vm.projectDir, 'project');
-      return vm.libMeasures.project;
-    }
+    return vm.libMeasures.project;
   }
 
   addProjectMeasure(measure) {
@@ -72,11 +67,10 @@ export class BCL {
     // assign measures by type
     vm.libMeasures.my = vm.getMeasuresByType(vm.myMeasuresDir, 'my');
     vm.libMeasures.local = vm.getMeasuresByType(vm.localDir, 'local');
-    vm.libMeasures.project = vm.getMeasuresByType(vm.projectDir, 'project');
-
   }
 
-  // retrieve measures by type
+
+  // retrieve measures by type (local, my)
   getMeasuresByType(path, type) {
     const vm = this;
     let measurePaths = [];
@@ -90,7 +84,7 @@ export class BCL {
       let measure = vm.parseMeasure(xml);
       measure.measureDir = path.path(measurePath,'..');
       //measure.measureDir = path.path(measurePath.path('..'));
-      vm.$log.debug(`measure.measureDir: ${measure.measureDir}`);
+      //vm.$log.debug(`measure.measureDir: ${measure.measureDir}`);
       measure = vm.prepareMeasure(measure, type);
       measures.push(measure);
 

@@ -11,7 +11,7 @@ export class DesignAlternativesController {
 
     vm.selected = null;
     vm.measures = vm.Project.getMeasuresAndOptions();
-    vm.$log.debug('RETRIEVED MEASURES: ', vm.measures);
+    vm.$log.debug('DA MEASURE RETRIEVED: ', vm.measures);
 
     // get seed and weather defaults and dropdown options
     vm.seedsDropdownArr = vm.Project.getSeedsDropdownArr();
@@ -24,14 +24,6 @@ export class DesignAlternativesController {
     vm.$scope.alternatives = vm.Project.getDesignAlternatives();
     vm.$scope.gridOptions = [];
     vm.setGridOptions();
-
-    // SAVE
-    vm.$scope.$on('$destroy', () => {
-      console.log('SAVING design alternatives to ProjectService');
-      vm.Project.setDesignAlternatives(vm.$scope.alternatives);
-      // TODO: temporary, just to generate pat.json for inspection
-      vm.Project.exportPAT();
-    });
 
   }
 

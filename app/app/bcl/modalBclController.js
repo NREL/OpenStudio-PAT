@@ -54,7 +54,7 @@ export class ModalBclController {
     vm.libMeasures = vm.BCL.getMeasures();
 
 
-    // load measures and apply filters
+    // reload measures (in case of changes on disk/BCL) and apply filters
     vm.getLocalMeasures();
     vm.getBCLMeasures();
     vm.resetFilters();
@@ -168,6 +168,7 @@ export class ModalBclController {
     }
   }
 
+  // TODO: what about project measures? do they need to be updated somehow?
   getLocalMeasures() {
     const vm = this;
     const measures = vm.BCL.getLocalMeasures();
@@ -387,11 +388,8 @@ export class ModalBclController {
   addToProject(measure) {
     const vm = this;
 
-    // add to array(s)
-    //vm.projectMeasures.push(measure);
-    vm.libMeasures.project.push(measure);
     // I think this is unnecessary (adds it twice?)
-    //vm.BCL.addProjectMeasure(measure);
+    vm.BCL.addProjectMeasure(measure);
     vm.$log.debug('Project MEASURES IN bclService: ', vm.BCL.getProjectMeasures());
 
     // copy on disk
