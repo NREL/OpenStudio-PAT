@@ -267,6 +267,16 @@ export class AnalysisController {
     });
   }
 
+  checkUpdates() {
+    const vm = this;
+    const types = ['ModelMeasure','EnergyPlusMeasure','ReportingMeasure'];
+    vm.BCL.openBCLModal(types, [], false).then(() => {
+      // reset data
+      vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+      vm.initializeGrids();
+    });
+  }
+
   removeMeasure(measure) {
     const vm = this;
     // line below also removes it from bclService 'getProjectMeasures', but not from disk
