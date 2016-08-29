@@ -203,8 +203,8 @@ export class Project {
   computeArguments(measureDirName) {
     const vm = this;
 
-    let measurePath = vm.projectMeasuresDir.path() + '\\' + measureDirName + '\\';
-    let seedPath = vm.seedDir.path() + '\\' + vm.defaultSeed;
+    let measurePath = vm.projectMeasuresDir.path() + '/' + measureDirName + '/';
+    let seedPath = vm.seedDir.path() + '/' + vm.defaultSeed;
 
     vm.$log.debug('measurePath: ' + measurePath);
     vm.$log.debug('seedPath: ' + seedPath);
@@ -266,11 +266,11 @@ export class Project {
     // create archives
     const zip = new vm.jsZip();
 
-    let fileContents = jetpack.read(vm.seedDir.path() + '\\' + vm.defaultSeed);
-    zip.file('.\\seeds\\' + vm.defaultSeed, fileContents);
+    let fileContents = jetpack.read(vm.seedDir.path() + '/' + vm.defaultSeed);
+    zip.file('./seeds/' + vm.defaultSeed, fileContents);
 
-    fileContents = jetpack.read(vm.weatherDir.path() + '\\' + vm.defaultWeatherFile);
-    zip.file('.\\weather\\' + vm.defaultWeatherFile, fileContents);
+    fileContents = jetpack.read(vm.weatherDir.path() + '/' + vm.defaultWeatherFile);
+    zip.file('./weather/' + vm.defaultWeatherFile, fileContents);
 
     var filenames = fs.readdirSync(vm.projectMeasuresDir.path());
     filenames.forEach(function (name) {
@@ -279,15 +279,15 @@ export class Project {
         return;
       }
       if (fs.lstatSync(vm.projectMeasuresDir.path() + '/' + name).isDirectory()) {
-        fileContents = jetpack.read(vm.projectMeasuresDir.path() + '\\' + name + '\\' + 'measure.rb');
-        zip.file('.\\measures\\' + name + '\\' + 'measure.rb', fileContents);
+        fileContents = jetpack.read(vm.projectMeasuresDir.path() + '/' + name + '/' + 'measure.rb');
+        zip.file('./measures/' + name + '/' + 'measure.rb', fileContents);
 
-        fileContents = jetpack.read(vm.projectMeasuresDir.path() + '\\' + name + '\\' + 'measure.xml');
-        zip.file('.\\measures\\' + name + '\\' + 'measure.xml', fileContents);
+        fileContents = jetpack.read(vm.projectMeasuresDir.path() + '/' + name + '/' + 'measure.xml');
+        zip.file('./measures/' + name + '/' + 'measure.xml', fileContents);
       }
     });
 
-    filename = vm.projectDir.path() + '\\' + vm.projectName + '.zip';
+    filename = vm.projectDir.path() + '/' + vm.projectName + '.zip';
     vm.$log.debug('Zip name: ' + filename);
     zip.generateNodeStream({compression: 'DEFLATE', type: 'nodebuffer', streamFiles: true})
       .pipe(jetpack.createWriteStream(filename))
