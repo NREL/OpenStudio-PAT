@@ -21,9 +21,10 @@ export class ModalDuplicateMeasureController {
     const vm = this;
     vm.$log.debug('Duplicate Measure measure: ',vm.measure);
     const oldMeasureDir = vm.measure.measureDir;
+    // store duplicated measures in 'Measures' folder (not LocalBCL)
     const params = {
       old_measure_dir: vm.measure.measureDir,
-      measure_dir: vm.jetpack.cwd(oldMeasureDir).path('..',_.snakeCase(vm.newName)),
+      measure_dir: vm.jetpack.cwd(oldMeasureDir).path('..', '..', 'Measures', _.snakeCase(vm.newName)),
       name: vm.newName,
       class_name: _.capitalize(_.camelCase(vm.newName)),
       taxonomy_tag: vm.measure.tags,

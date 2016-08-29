@@ -46,8 +46,8 @@ export class MeasureManager {
   }
 
   // This function make a copy of a measure on the file system.
-  // Probably in my measures, or local bcl
-  // parms should look like this
+  // Copy should be in 'my measures' (actual folder name: 'Measures')
+  // params should look like this
   // params {
   //   old_measure_dir:
   //   measure_dir:
