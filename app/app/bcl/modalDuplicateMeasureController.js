@@ -39,4 +39,9 @@ export class ModalDuplicateMeasureController {
     //} );
   }
 
+  cancel() {
+    const vm = this;
+    vm.$uibModalInstance.dismiss('cancel');
+  }
+
 }

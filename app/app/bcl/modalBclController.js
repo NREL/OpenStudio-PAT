@@ -375,26 +375,24 @@ export class ModalBclController {
     const vm = this;
     const measure = _.find(vm.$scope.displayMeasures, {uid: rowEntity.uid});
 
-    vm.$log.debug(measure);
-    measure.addedToProject = true;
-
-    // TODO: Call service to add to project?
+    vm.$log.debug('Adding the following measure to project: ', measure);
     vm.addToProject(measure);
-
+    measure.addedToProject = true;
   }
 
-  // TODO: this will be in a service?
   addToProject(measure) {
     const vm = this;
 
-    // I think this is unnecessary (adds it twice?)
-    vm.BCL.addProjectMeasure(measure);
-    vm.$log.debug('Project MEASURES IN bclService: ', vm.BCL.getProjectMeasures());
+    // I think this is unnecessary (just add to local scope variable?)
+    // vm.BCL.addProjectMeasure(measure);
+    // vm.$log.debug('Project MEASURES IN bclService: ', vm.BCL.getProjectMeasures());
 
     // copy on disk
     const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;
     src.copy(measure.name, vm.projectDir.path(measure.name));
 
+    // add to project measures
+    vm.libMeasures.project.push(measure);
   }
 
   // download from BCL (via service)
@@ -447,7 +445,7 @@ export class ModalBclController {
         // success
         vm.$log.debug('Measure Manager duplicateMeasure succeeded');
         vm.getLocalMeasures();
-        vm.setDisplayMeasures();
+        vm.resetFilters();
         deferred.resolve();
       }, () => {
         // failure
