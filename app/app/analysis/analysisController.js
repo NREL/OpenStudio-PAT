@@ -298,10 +298,12 @@ export class AnalysisController {
     const vm = this;
     //vm.$log.debug('In addMeasureOption in analysis');
 
-    measure.numberOfOptions++;
+    if (measure.arguments.length === 0 ) return; // Nothing to see here
 
     const keys = Object.keys(measure.arguments[0]);
-    //vm.$log.debug('keys: ', keys);
+    vm.$log.debug('keys: ', keys);
+
+    measure.numberOfOptions++;
 
     const optionKeys = _.filter(keys, function (k) {
       return k.indexOf('option_') !== -1;
