@@ -25,7 +25,7 @@ export class RunController {
 
     // TODO: refresh this
     vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
-    
+
   }
 
   setRunType() {

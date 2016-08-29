@@ -69,7 +69,6 @@ export class BCL {
     vm.libMeasures.local = vm.getMeasuresByType(vm.localDir, 'local');
   }
 
-
   // retrieve measures by type (local, my)
   getMeasuresByType(path, type) {
     const vm = this;
@@ -247,7 +246,7 @@ export class BCL {
       versionModified: _.result(input, 'measure.version_modified'),
       xmlChecksum: _.result(input, 'measure.xml_checksum'),
       className: _.result(input, 'measure.class_name'),
-      displayName: _.result(input, 'measure.display_name'),
+      displayName: (input.measure.display_name && input.measure.display_name != '') ? input.measure.display_name : input.measure.name,
       shortName: _.result(input, 'measure.short_name'),
       description: _.result(input, 'measure.description'),
       modelerDescription: _.result(input, 'measure.modeler_description'),

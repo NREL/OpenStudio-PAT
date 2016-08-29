@@ -20,6 +20,13 @@ export class ModalBclController {
     vm.checkForUpdates = vm.params.update;
     // TODO: do the check for updates
 
+    vm.selected = null;
+    vm.keyword = '';
+
+    vm.myMeasuresDir = vm.Project.getMeasureDir();
+    vm.localDir = vm.Project.getLocalBCLDir();
+    vm.projectDir = vm.Project.getProjectMeasuresDir();
+
     vm.filters = {
       my: true,
       local: true,
@@ -33,26 +40,18 @@ export class ModalBclController {
       ReportingMeasure: true
     };
 
+    vm.$scope.categories = [];
+    vm.getBCLCategories();
+
     // set filters and types with incoming params
     vm.setTypes();
     vm.setFilters();
-
-    vm.selected = null;
-    vm.keyword = '';
-
-    vm.myMeasuresDir = vm.Project.getMeasureDir();
-    vm.localDir = vm.Project.getLocalBCLDir();
-    vm.projectDir = vm.Project.getProjectMeasuresDir();
-
-    vm.$scope.categories = [];
-    vm.getBCLCategories();
 
     // get measures array for Library display
     vm.$scope.displayMeasures = [];
 
     // get all measures
     vm.libMeasures = vm.BCL.getMeasures();
-
 
     // reload measures (in case of changes on disk/BCL) and apply filters
     vm.getLocalMeasures();
@@ -155,7 +154,6 @@ export class ModalBclController {
         vm.filters[key] = !!_.includes(vm.params.filters, key);
       });
     }
-
   }
 
   // set types from parameters (if array isn't empty)
@@ -190,6 +188,8 @@ export class ModalBclController {
   // get measures for display based on filter values
   setDisplayMeasures() {
     const vm = this;
+    vm.$log.debug('in setDisplayMeasures');
+    vm.$log.debug('FILTERS: ', vm.filters);
     const measures = [];
     vm.$log.debug('libMeasures: ', vm.libMeasures);
     // add checked
@@ -369,7 +369,6 @@ export class ModalBclController {
 
   }
 
-
   // add measure to project
   addMeasure(rowEntity) {
 
@@ -402,10 +401,9 @@ export class ModalBclController {
   download(measure) {
     const vm = this;
     vm.BCL.downloadMeasure(measure).then(newMeasure => {
-
-      // TODO: possible refactor.  add to measures and recalculate display, or pull from service first?
+      vm.$log.debug('DOWNLOADED MEASURE: ', newMeasure);
       vm.libMeasures.local.push(newMeasure);
-      vm.$scope.displayMeasures = vm.setDisplayMeasures();
+      vm.resetFilters();
       // select newly added row
       vm.selectARow(measure.uid);
 
@@ -447,7 +445,7 @@ export class ModalBclController {
     modalInstance.result.then((params) => {
       vm.MeasureManager.duplicateMeasure(params).then( () => {
         // success
-        vm.$log.debug('Measure Manager duplicateMeasure succedded');
+        vm.$log.debug('Measure Manager duplicateMeasure succeeded');
         vm.getLocalMeasures();
         vm.setDisplayMeasures();
         deferred.resolve();
