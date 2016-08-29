@@ -49,7 +49,8 @@ export class Project {
     vm.setWeatherFilesDropdownOptions();
 
     vm.analysisType = 'Manual';
-    vm.analysisTypes = ['Manual', 'Algorithmic'];
+    //vm.analysisTypes = ['Manual', 'Algorithmic']; // TODO implement this after initial release
+    vm.analysisTypes = ['Manual'];
 
     vm.reportType = 'Calibration Report';
     vm.reportTypes = [{
