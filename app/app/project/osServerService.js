@@ -31,10 +31,17 @@ export class OsServer {
     vm.$log.debug('src.path(): ', src.path());
     vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/bin'));
     vm.OsMetaPath = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/bin/openstudio_meta'));
-    vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby.exe'));
     vm.mongoBinDir = jetpack.cwd(path.resolve(src.path() + '/mongo/bin'));
     vm.openstudioDir = jetpack.cwd(path.resolve(src.path() + '/openstudio/'));
     vm.projectDir = vm.Project.getProjectDir();
+
+    // Depends on system type (windows vs mac)
+    vm.systemType = vm.Project.getSystemType();
+    if (vm.systemType == 'Windows')
+      vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby.exe'));
+    else
+      vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby'));
+
     vm.analysisID = null;
   }
 
