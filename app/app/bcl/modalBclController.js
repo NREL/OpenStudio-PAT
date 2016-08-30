@@ -1,8 +1,11 @@
 import jetpack from 'fs-jetpack';
+//const {shell} = require('electron');
+import {remote} from 'electron';
+const {shell} = remote;
 
 export class ModalBclController {
 
-  constructor($log, $q, $uibModalInstance, $uibModal, $scope, BCL, params, Project, MeasureManager) {
+  constructor($log, $q, $uibModalInstance, $uibModal, $scope, toastr, BCL, params, Project, MeasureManager) {
     'ngInject';
 
     const vm = this;
@@ -13,7 +16,9 @@ export class ModalBclController {
     vm.$scope = $scope;
     vm.BCL = BCL;
     vm.Project = Project;
+    vm.toastr = toastr;
     vm.jetpack = jetpack;
+    vm.shell = shell;
     vm.params = params;
     vm.MeasureManager = MeasureManager;
 
@@ -417,9 +422,17 @@ export class ModalBclController {
   }
 
   // edit My measure
-  editMeasure() {
+  editMeasure(measure) {
     const vm = this;
     vm.$log.debug('in EDIT MEASURE function');
+    console.log(measure.measureDir + '/measure.rb');
+    // show toastr for 2 seconds then open file
+    const msg = 'Measure \'' + measure.name + '\' will open in a text editor for editing.';
+    vm.toastr.info(msg, { timeOut: 2000, onHidden: function() {
+      vm.$log.debug('Opening measure file');
+      vm.shell.openItem(measure.measureDir + '/measure.rb');
+    }});
+
   }
 
   // copy from local and edit
