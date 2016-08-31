@@ -464,6 +464,8 @@ export class AnalysisController {
   setSeed() {
     const vm = this;
     vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
+    vm.$log.debug('In Analysis::setSeed');
+    vm.Project.computeAllArguments();
   }
 
   setWeatherFile() {
@@ -484,7 +486,6 @@ export class AnalysisController {
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
-
   }
 
   selectSeedModel() {
@@ -511,7 +512,6 @@ export class AnalysisController {
       vm.Project.setSeeds();
       vm.$scope.seeds = vm.Project.getSeeds();
       vm.$scope.defaultSeed = seedModelFilename;
-
     }
   }
 
@@ -539,10 +539,7 @@ export class AnalysisController {
       vm.Project.setWeatherFiles();
       vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
       vm.$scope.defaultWeatherFile = weatherFilename;
-
-
     }
-
   }
 
 }

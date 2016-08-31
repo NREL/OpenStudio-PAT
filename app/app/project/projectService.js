@@ -251,10 +251,10 @@ export class Project {
     req.end();
   }
 
-  updateAllMeasures(measureDirName) {
+  updateAllMeasures() {
     const vm = this;
 
-    let measurePath = vm.projectMeasuresDir.path() + '/' + measureDirName + '/';
+    let measurePath = vm.projectMeasuresDir.path() + '/';
 
     vm.$log.debug('measurePath: ' + measurePath);
 
