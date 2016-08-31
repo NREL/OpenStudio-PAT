@@ -259,8 +259,7 @@ export class Project {
     vm.$log.debug('measurePath: ' + measurePath);
 
     const postData = JSON.stringify({
-      measure_dir: measurePath,
-      osm_path: seedPath
+      measure_dir: measurePath
     });
 
     var options = {
