@@ -228,12 +228,14 @@ export class Project {
 
     // The response is will consist of JSON with measure data, including model-specific arguments.
     // These arguments should be displayed in the analysis tab's measure tables.
+    let body = ''; // TODO use body for analysis tab measure tables
     var req = http.request(options, (res) => {
       vm.$log.debug(`STATUS: ${res.statusCode}`);
       vm.$log.debug(`HEADERS: ${JSON.stringify(res.headers)}`);
       res.setEncoding('utf8');
       res.on('data', (chunk) => {
-        console.log(`BODY: ${chunk}`);
+        body += chunk;
+        //console.log(`BODY: ${chunk}`);
       });
       res.on('end', () => {
         console.log('No more data in response.');
@@ -248,15 +250,6 @@ export class Project {
     req.write(postData);
     req.end();
   }
-
-  //https.get(`${vm.manifest.endpoint}${filename}.md5`, res => {
-  //let body = '';
-  //res.on('data', d => body += d);
-  //res.on('end', () => deferred.resolve(body));
-  //}).on('error', e => {
-  //vm.$log.error('Failed to fetch md5:', e);
-  //deferred.reject(e);
-  //});
 
   updateAllMeasures(measureDirName) {
     const vm = this;
@@ -282,12 +275,14 @@ export class Project {
     };
 
     // The response is will consist of the measures which were found to have been updated
+    let body = ''; // TODO use body for library dialog's updated measures note
     var req = http.request(options, res => {
       vm.$log.debug(`STATUS: ${ res.statusCode }`);
       vm.$log.debug(`HEADERS: ${ JSON.stringify(res.headers) }`);
       res.setEncoding('utf8');
       res.on('data', chunk => {
-        console.log(`BODY: ${ chunk }`);
+        body += chunk;
+        //console.log(`BODY: ${chunk}`);
       });
       res.on('end', () => {
         console.log('No more data in response.');
