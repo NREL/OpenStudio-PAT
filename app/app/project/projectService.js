@@ -226,12 +226,68 @@ export class Project {
       }
     };
 
+    // The response is will consist of JSON with measure data, including model-specific arguments.
+    // These arguments should be displayed in the analysis tab's measure tables.
     var req = http.request(options, (res) => {
       vm.$log.debug(`STATUS: ${res.statusCode}`);
       vm.$log.debug(`HEADERS: ${JSON.stringify(res.headers)}`);
       res.setEncoding('utf8');
       res.on('data', (chunk) => {
         console.log(`BODY: ${chunk}`);
+      });
+      res.on('end', () => {
+        console.log('No more data in response.');
+      });
+    });
+
+    req.on('error', (e) => {
+      console.log(`problem with request: ${e.message}`);
+    });
+
+    // write data to request body
+    req.write(postData);
+    req.end();
+  }
+
+  //https.get(`${vm.manifest.endpoint}${filename}.md5`, res => {
+  //let body = '';
+  //res.on('data', d => body += d);
+  //res.on('end', () => deferred.resolve(body));
+  //}).on('error', e => {
+  //vm.$log.error('Failed to fetch md5:', e);
+  //deferred.reject(e);
+  //});
+
+  updateAllMeasures(measureDirName) {
+    const vm = this;
+
+    let measurePath = vm.projectMeasuresDir.path() + '/' + measureDirName + '/';
+
+    vm.$log.debug('measurePath: ' + measurePath);
+
+    const postData = JSON.stringify({
+      measure_dir: measurePath,
+      osm_path: seedPath
+    });
+
+    var options = {
+      hostname: 'localhost',
+      port: 1234,
+      path: '/update_measures',
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(postData)
+      }
+    };
+
+    // The response is will consist of the measures which were found to have been updated
+    var req = http.request(options, res => {
+      vm.$log.debug(`STATUS: ${ res.statusCode }`);
+      vm.$log.debug(`HEADERS: ${ JSON.stringify(res.headers) }`);
+      res.setEncoding('utf8');
+      res.on('data', chunk => {
+        console.log(`BODY: ${ chunk }`);
       });
       res.on('end', () => {
         console.log('No more data in response.');
@@ -442,9 +498,9 @@ export class Project {
           const valArr = [];
           let option_id;
           _.forEach(vm.designAlternatives, (da) => {
-              vm.$log.debug('Project::exportManual da: ', da);
+            vm.$log.debug('Project::exportManual da: ', da);
             if (da[measure.name] == 'None') {
-                vm.$log.debug('value: None');
+              vm.$log.debug('value: None');
               // TODO: Review what value to assign when no option is selected for that design alternative.
               // TODO: Does it matter what we put here?  'None' is put there for now, if doesn't work, try value of the same type.
               valArr.push({value: 'None', weight: 1 / vm.designAlternatives.length});
@@ -455,7 +511,7 @@ export class Project {
               vm.$log.debug('MEASURE', measure);
               // retrieve the option ID from the option_name in measure.options
               _.forEach(measure.options, (option) => {
-                if (option.name == option_name){
+                if (option.name == option_name) {
                   option_id = option.id;
                 }
               });
@@ -464,11 +520,11 @@ export class Project {
             }
           });
 
-          const values = _.values(_.pick(arg,optionKeys));
+          const values = _.values(_.pick(arg, optionKeys));
 
 
-          const min = _.min( values ),
-            max = _.max( values );
+          const min = _.min(values),
+            max = _.max(values);
 
           const mode = function mode(ar) {
             var numMapping = {};
