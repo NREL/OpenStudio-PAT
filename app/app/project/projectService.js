@@ -85,7 +85,7 @@ export class Project {
     vm.designAlternatives = [];
 
     // set platform
-    const platform = os.platform();
+    //const platform = os.platform();
 
     // do this last...it will overwrite defaults
     vm.initializeProject();
@@ -189,10 +189,10 @@ export class Project {
   computeAllArguments() {
     const vm = this;
 
-    var filenames = fs.readdirSync(vm.projectMeasuresDir.path());
+    const filenames = fs.readdirSync(vm.projectMeasuresDir.path());
     filenames.forEach(function (name) {
       vm.$log.debug('name: ' + name);
-      if (name === "." || name === "..") {
+      if (name === '.' || name === '..') {
         return;
       }
       if (fs.lstatSync(vm.projectMeasuresDir.path() + '/' + name).isDirectory()) {
@@ -204,8 +204,8 @@ export class Project {
   computeArguments(measureDirName) {
     const vm = this;
 
-    let measurePath = vm.projectMeasuresDir.path() + '/' + measureDirName + '/';
-    let seedPath = vm.seedDir.path() + '/' + vm.defaultSeed;
+    const measurePath = vm.projectMeasuresDir.path() + '/' + measureDirName + '/';
+    const seedPath = vm.seedDir.path() + '/' + vm.defaultSeed;
 
     vm.$log.debug('measurePath: ' + measurePath);
     vm.$log.debug('seedPath: ' + seedPath);
@@ -215,7 +215,7 @@ export class Project {
       osm_path: seedPath
     });
 
-    var options = {
+    const options = {
       hostname: 'localhost',
       port: 1234,
       path: '/compute_arguments',
@@ -229,7 +229,7 @@ export class Project {
     // The response is will consist of JSON with measure data, including model-specific arguments.
     // These arguments should be displayed in the analysis tab's measure tables.
     let body = ''; // TODO use body for analysis tab measure tables
-    var req = http.request(options, (res) => {
+    const req = http.request(options, (res) => {
       vm.$log.debug(`STATUS: ${res.statusCode}`);
       vm.$log.debug(`HEADERS: ${JSON.stringify(res.headers)}`);
       res.setEncoding('utf8');
@@ -249,12 +249,12 @@ export class Project {
     // write data to request body
     req.write(postData);
     req.end();
+
+    return body;
   }
 
-  updateAllMeasures() {
+  updateAllMeasures(measurePath) {
     const vm = this;
-
-    let measurePath = vm.projectMeasuresDir.path() + '/';
 
     vm.$log.debug('measurePath: ' + measurePath);
 
@@ -262,7 +262,7 @@ export class Project {
       measure_dir: measurePath
     });
 
-    var options = {
+    const options = {
       hostname: 'localhost',
       port: 1234,
       path: '/update_measures',
@@ -275,7 +275,7 @@ export class Project {
 
     // The response is will consist of the measures which were found to have been updated
     let body = ''; // TODO use body for library dialog's updated measures note
-    var req = http.request(options, res => {
+    const req = http.request(options, res => {
       vm.$log.debug(`STATUS: ${ res.statusCode }`);
       vm.$log.debug(`HEADERS: ${ JSON.stringify(res.headers) }`);
       res.setEncoding('utf8');
@@ -295,6 +295,8 @@ export class Project {
     // write data to request body
     req.write(postData);
     req.end();
+
+    return body;
   }
 
   // export OSA
@@ -323,10 +325,10 @@ export class Project {
     fileContents = jetpack.read(vm.weatherDir.path() + '/' + vm.defaultWeatherFile);
     zip.file('./weather/' + vm.defaultWeatherFile, fileContents);
 
-    var filenames = fs.readdirSync(vm.projectMeasuresDir.path());
+    const filenames = fs.readdirSync(vm.projectMeasuresDir.path());
     filenames.forEach(function (name) {
       vm.$log.debug('name: ' + name);
-      if (name === "." || name === "..") {
+      if (name === '.' || name === '..') {
         return;
       }
       if (fs.lstatSync(vm.projectMeasuresDir.path() + '/' + name).isDirectory()) {
@@ -354,7 +356,7 @@ export class Project {
 
     vm.osa = {};
     vm.osa.analysis = {};
-    vm.osa.analysis.uuid = "";
+    vm.osa.analysis.uuid = '';
     vm.osa.analysis.display_name = vm.projectName;
     vm.osa.analysis.name = vm.projectName;
 
@@ -991,7 +993,7 @@ export class Project {
     return vm.algorithmSettings;
   }
 
-  getAlgorithmSettingsForMethod(samplingMethod) {
+  getAlgorithmSettingsForMethod() {
     const vm = this;
     vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
 
