@@ -267,6 +267,16 @@ export class AnalysisController {
     });
   }
 
+  checkUpdates() {
+    const vm = this;
+    const types = ['ModelMeasure','EnergyPlusMeasure','ReportingMeasure'];
+    vm.BCL.openBCLModal(types, [], false).then(() => {
+      // reset data
+      vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+      vm.initializeGrids();
+    });
+  }
+
   removeMeasure(measure) {
     const vm = this;
     // line below also removes it from bclService 'getProjectMeasures', but not from disk
@@ -288,10 +298,12 @@ export class AnalysisController {
     const vm = this;
     //vm.$log.debug('In addMeasureOption in analysis');
 
-    measure.numberOfOptions++;
+    if (measure.arguments.length === 0 ) return; // Nothing to see here
 
     const keys = Object.keys(measure.arguments[0]);
-    //vm.$log.debug('keys: ', keys);
+    vm.$log.debug('keys: ', keys);
+
+    measure.numberOfOptions++;
 
     const optionKeys = _.filter(keys, function (k) {
       return k.indexOf('option_') !== -1;
@@ -452,6 +464,8 @@ export class AnalysisController {
   setSeed() {
     const vm = this;
     vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
+    vm.$log.debug('In Analysis::setSeed');
+    vm.Project.computeAllArguments();
   }
 
   setWeatherFile() {
@@ -472,7 +486,6 @@ export class AnalysisController {
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
-
   }
 
   selectSeedModel() {
@@ -499,7 +512,6 @@ export class AnalysisController {
       vm.Project.setSeeds();
       vm.$scope.seeds = vm.Project.getSeeds();
       vm.$scope.defaultSeed = seedModelFilename;
-
     }
   }
 
@@ -527,10 +539,7 @@ export class AnalysisController {
       vm.Project.setWeatherFiles();
       vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
       vm.$scope.defaultWeatherFile = weatherFilename;
-
-
     }
-
   }
 
 }

@@ -7,18 +7,7 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
   'ngInject';
 
   $window.onbeforeunload = e => {
-
-    // Save project automatically on exit
     Project.exportPAT();
-
-    // Stop server
-    // THE CLI doesn't work to stop the server yet
-    //OsServer.stopServer().then(response => {
-    //  server is stopped
-    //});
-
-    // Prevent exit
-    //e.returnValue = false;
     MeasureManager.stopMeasureManager();
   };
 
@@ -36,9 +25,9 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
     }
   });
 
-  DependencyManager.checkDependencies();
-
-  MeasureManager.startMeasureManager();
+  DependencyManager.checkDependencies()
+    .then(_.bind(MeasureManager.startMeasureManager, MeasureManager), _.bind(MeasureManager.startMeasureManager, MeasureManager))
+    .finally(Project.computeAllArguments);
 
   const initialLanguage = $translate.use();
   const setLanguage = language => {

@@ -214,12 +214,15 @@ export class DependencyManager {
       return vm.$q.resolve();
     }
 
+    const deferred = vm.$q.defer();
+
     downloadRuby()
       .then(downloadMongo, downloadMongo)
       .then(downloadOpenstudioServer, downloadOpenstudioServer)
       .then(downloadOpenstudioCLI, downloadOpenstudioCLI)
       .then(downloadOpenstudio, downloadOpenstudio)
       .finally(() => {
+        deferred.resolve();
         vm.StatusBar.clear();
       });
 
@@ -237,6 +240,7 @@ export class DependencyManager {
     //    vm.StatusBar.clear();
     //});
 
+    return deferred.promise;
   }
 
   _getOnlineChecksum(filename) {
