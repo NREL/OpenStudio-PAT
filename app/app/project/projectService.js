@@ -21,6 +21,9 @@ export class Project {
     // TODO: grab from PAT Electron settings. For now, default to 'the_project'
     vm.setProjectName('the_project');
 
+    // ignore camelcase for this file
+    /* eslint camelcase: 0 */
+
     // TODO: get some of these from electron settings?
     vm.seedDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/seeds'));
     vm.weatherDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/weather'));

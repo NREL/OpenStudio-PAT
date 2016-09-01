@@ -65,11 +65,11 @@ export class MeasureManager {
 
     vm.$http.post(vm.url + '/duplicate_measure', params)
       .success( (data, status, headers, config) => {
-        vm.$log.debug(`Measure Manager reply ${data}`);
+        vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve();
       })
       .error( (data, status, header, config) => {
-        vm.$log.debug(`Measure Manager error ${data}`);
+        vm.$log.debug('Measure Manager error: ', data);
         deferred.reject();
       });
 

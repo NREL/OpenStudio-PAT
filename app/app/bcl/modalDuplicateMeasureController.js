@@ -26,6 +26,7 @@ export class ModalDuplicateMeasureController {
       old_measure_dir: vm.measure.measureDir,
       measure_dir: vm.jetpack.cwd(oldMeasureDir).path('..', '..', 'Measures', _.snakeCase(vm.newName)),
       name: vm.newName,
+      display_name: vm.newDisplayName,
       class_name: _.capitalize(_.camelCase(vm.newName)),
       taxonomy_tag: vm.measure.tags,
       measure_type: vm.measure.type,
