@@ -428,7 +428,7 @@ export class ModalBclController {
     console.log(measure.measureDir + '/measure.rb');
     // show toastr for 2 seconds then open file
     const msg = 'Measure \'' + measure.name + '\' will open in a text editor for editing.';
-    vm.toastr.info(msg, { timeOut: 2000, onHidden: function() {
+    vm.toastr.info(msg, { timeOut: 3000, onHidden: function() {
       vm.$log.debug('Opening measure file');
       vm.shell.openItem(measure.measureDir + '/measure.rb');
     }});

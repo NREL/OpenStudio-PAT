@@ -2,6 +2,7 @@ import jetpack from 'fs-jetpack';
 import {remote} from 'electron';
 const {app} = remote;
 import path from 'path';
+import os from 'os';
 
 export class OsServer {
   constructor($q, $http, $log, Project) {
@@ -36,8 +37,8 @@ export class OsServer {
     vm.projectDir = vm.Project.getProjectDir();
 
     // Depends on system type (windows vs mac)
-    vm.systemType = vm.Project.getSystemType();
-    if (vm.systemType == 'Windows')
+    const platform = os.platform();
+    if (platform == 'win32')
       vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby.exe'));
     else
       vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby'));

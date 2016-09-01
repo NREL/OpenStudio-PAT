@@ -18,6 +18,8 @@ export class DependencyManager {
     vm.AdmZip = AdmZip;
     vm.StatusBar = StatusBar;
     vm.translations = {};
+    vm.exec = require('child_process').exec;
+    vm.platform = os.platform();
 
     // 2MB buffer
     vm.bufferSize = 2 * 0x100000;
@@ -26,6 +28,7 @@ export class DependencyManager {
     vm.bytesReceived = 0;
 
     vm.tempDir = jetpack.cwd(app.getPath('temp'));
+    vm.$log.debug('TEMPDIR HERE: ', app.getPath('temp'));
     vm.src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src:', vm.src.path());
 
@@ -277,17 +280,34 @@ export class DependencyManager {
           console.timeEnd(`${_.startCase(type)} downloaded`);
           const actualMD5 = jetpack.inspect(vm.tempDir.path(filename), {checksum: 'md5'}).md5;
           if (expectedMD5.trim() === actualMD5.trim() || !useMD5) {
-            const zip = new AdmZip(vm.tempDir.path(filename));
+            let zip;
+            if (vm.platform != 'darwin')
+              zip = new AdmZip(vm.tempDir.path(filename));
+
             const dest = jetpack.dir(`${app.getPath('userData')}/${type}`, {empty: true});
 
             vm.StatusBar.set(`${vm.translations.Extracting} ${_.startCase(type)}`, true);
             console.time(`${_.startCase(type)} extracted`);
             _.defer(() => {
-              vm.$log.debug('dest.path():', dest.path());
-              zip.extractAllTo(dest.path(), true);
-              console.timeEnd(`${_.startCase(type)} extracted`);
-              vm.tempDir.remove(filename);
-              deferred.resolve();
+              if (vm.platform == 'darwin') {
+                const command = 'unzip "' + vm.tempDir.path(filename) + '" -d "' + dest.path() + '"';
+                console.log('UNZIP COMMAND: ', command);
+                const child = vm.exec(command,
+                  (error, stdout, stderr) => {
+                    vm.$log.debug('exit code: ', child.exitCode);
+                    vm.$log.debug('child: ', child);
+                    console.timeEnd(`${_.startCase(type)} extracted`);
+                    vm.tempDir.remove(filename);
+                    deferred.resolve();
+                  });
+              } else {
+                zip.extractAllTo(dest.path(), true);
+                console.timeEnd(`${_.startCase(type)} extracted`);
+                vm.tempDir.remove(filename);
+                deferred.resolve();
+              }
+
+
             });
           } else {
             console.groupCollapsed('Failed download: MD5 mismatch');

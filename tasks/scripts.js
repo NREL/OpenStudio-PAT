@@ -67,6 +67,7 @@ var bundle = function (src, dest) {
     deferred.resolve();
   }).catch(function (err) {
     console.error('Build: Error during rollup', err.stack);
+    deferred.reject();
   });
 
   return deferred.promise;
