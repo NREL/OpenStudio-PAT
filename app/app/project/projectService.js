@@ -82,10 +82,7 @@ export class Project {
     vm.designAlternatives = [];
 
     // set platform
-    if (navigator.platform.includes('Win'))
-      vm.systemType = 'Windows';
-    else
-      vm.systemType = 'Mac';
+    const platform = os.platform();
 
     // do this last...it will overwrite defaults
     vm.initializeProject();
@@ -612,11 +609,6 @@ export class Project {
   setProjectName(name) {
     const vm = this;
     vm.projectName = name;
-  }
-
-  getSystemType() {
-    const vm = this;
-    return vm.systemType;
   }
 
   setDesignAlternatives(alts) {
