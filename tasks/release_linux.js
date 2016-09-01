@@ -112,7 +112,7 @@ module.exports = function () {
     .then(packageBuiltApp)
     .then(finalize)
     .then(renameApp)
-    .then(packToDebFile)
-    .then(cleanClutter)
+    //.then(packToDebFile)
+    //.then(cleanClutter)
     .catch(console.error);
 };

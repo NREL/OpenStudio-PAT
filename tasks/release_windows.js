@@ -125,7 +125,7 @@ module.exports = function () {
     .then(packageBuiltApp)
     .then(finalize)
     .then(renameApp)
-    .then(createInstaller)
-    .then(cleanClutter)
+    //.then(createInstaller)
+    //.then(cleanClutter)
     .catch(console.error);
 };

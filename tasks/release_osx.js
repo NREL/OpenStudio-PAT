@@ -141,7 +141,7 @@ module.exports = function () {
     .then(finalize)
     .then(renameApp)
     .then(signApp)
-    .then(packToDmgFile)
-    .then(cleanClutter)
+    //.then(packToDmgFile)
+    //.then(cleanClutter)
     .catch(console.error);
 };
