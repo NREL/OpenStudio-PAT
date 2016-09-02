@@ -1,0 +1,14 @@
+<div ng-if="row.entity.status == 'update' && row.entity.addedToProject && row.entity.location != 'bcl'">
+  <!-- My Measure update, measure added to project: display button to update project -->
+   <span class="glyphicon glyphicon-refresh library-grid-button blue-button" aria-hidden="true" aria-label="Update Measure" ng-click="grid.appScope.modal.updateMyMeasure(row.entity); $event.stopPropagation();">
+   </span>
+</div>
+
+<div ng-if="row.entity.status == 'update' && row.entity.location == 'bcl' && row.entity.addedToProject">
+  <!-- BCL update on localBCL measure added to project:  display button to update LocalBCL only, or update both local and project -->
+</div>
+
+<div ng-if="row.entity.status == 'update' && row.entity.location == 'bcl' && !row.entity.addedToProject">
+  <!-- BCL update on localBCL measure NOT added to project: display button to update localBCL only-->
+</div>
+

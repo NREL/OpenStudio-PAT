@@ -51,7 +51,7 @@ export class MeasureManager {
   // params {
   //   old_measure_dir:
   //   measure_dir:
-  //   name:
+  //   display_name:
   //   class_name:
   //   taxonomy_tag:
   //   measure_type:
@@ -63,16 +63,42 @@ export class MeasureManager {
     const vm = this;
     const deferred = vm.$q.defer();
 
+    vm.$log.debug("params one more time: ", params);
     vm.$http.post(vm.url + '/duplicate_measure', params)
       .success( (data, status, headers, config) => {
         vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve();
       })
-      .error( (data, status, header, config) => {
-        vm.$log.debug('Measure Manager error: ', data);
+      .error( (data, status, headers, config) => {
+        vm.$log.debug('Measure Manager DuplicateMeasure error: ', data);
         deferred.reject();
       });
 
     return deferred.promise;
+  }
+
+  // Update Measures
+  // This function updates measures at specified path
+  // Expects a measurePath
+  updateMeasures(measurePath) {
+
+    const vm = this;
+    const params = { measures_dir: measurePath };
+
+    const deferred = vm.$q.defer();
+
+    vm.$http.post(vm.url + '/update_measures', params)
+      .success( (data, status, headers, config) => {
+        vm.$log.debug('Success!, status: ', status);
+        vm.$log.debug('Measure Manager reply: ', data);
+        deferred.resolve(data);
+      })
+    .error ((data, status, headers, config) => {
+      vm.$log.debug('Measure Manager UpdateMeasures error: ', data);
+      deferred.reject([]);
+    });
+
+    return deferred.promise;
+
   }
 }

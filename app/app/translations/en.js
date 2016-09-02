@@ -105,7 +105,8 @@ export default {
       add: 'Add',
       date: 'Date',
       name: 'Name',
-      status: 'Status',
+      edit: 'Edit',
+      status: 'Update',
       type: 'Type'
     },
     edit: 'Edit',

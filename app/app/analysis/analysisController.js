@@ -261,8 +261,8 @@ export class AnalysisController {
     const vm = this;
     const types = [type];
     // Update measures in MyMeasures
-    const measurePath = vm.myMeasuresDir.path() + '/';
-    const updatedMeasures = vm.Project.updateAllMeasures(measurePath); // TODO we can let users know of any updated measures
+    //const measurePath = vm.myMeasuresDir.path() + '/';
+    //const updatedMeasures = vm.Project.updateAllMeasures(measurePath); // TODO we can let users know of any updated measures
     vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
@@ -274,8 +274,8 @@ export class AnalysisController {
     const vm = this;
     const types = ['ModelMeasure','EnergyPlusMeasure','ReportingMeasure'];
     // Update measures in MyMeasures
-    const measurePath = vm.myMeasuresDir.path() + '/';
-    const updatedMeasures = vm.Project.updateAllMeasures(measurePath); // TODO we can let users know of any updated measures
+    //const measurePath = vm.myMeasuresDir.path() + '/';
+    //const updatedMeasures = vm.Project.updateAllMeasures(measurePath); // TODO we can let users know of any updated measures
     vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();

@@ -253,51 +253,51 @@ export class Project {
     return body;
   }
 
-  updateAllMeasures(measurePath) {
-    const vm = this;
-
-    vm.$log.debug('measurePath: ' + measurePath);
-
-    const postData = JSON.stringify({
-      measure_dir: measurePath
-    });
-
-    const options = {
-      hostname: 'localhost',
-      port: 1234,
-      path: '/update_measures',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(postData)
-      }
-    };
-
-    // The response is will consist of the measures which were found to have been updated
-    let body = ''; // TODO use body for library dialog's updated measures note
-    const req = http.request(options, res => {
-      vm.$log.debug(`STATUS: ${ res.statusCode }`);
-      vm.$log.debug(`HEADERS: ${ JSON.stringify(res.headers) }`);
-      res.setEncoding('utf8');
-      res.on('data', chunk => {
-        body += chunk;
-        //console.log(`BODY: ${chunk}`);
-      });
-      res.on('end', () => {
-        console.log('No more data in response.');
-      });
-    });
-
-    req.on('error', (e) => {
-      console.log(`problem with request: ${e.message}`);
-    });
-
-    // write data to request body
-    req.write(postData);
-    req.end();
-
-    return body;
-  }
+  //updateAllMeasures(measurePath) {
+  //  const vm = this;
+  //
+  //  vm.$log.debug('measurePath: ', measurePath);
+  //
+  //  const postData = JSON.stringify({
+  //    measure_dir: measurePath
+  //  });
+  //
+  //  const options = {
+  //    hostname: 'localhost',
+  //    port: 1234,
+  //    path: '/update_measures',
+  //    method: 'POST',
+  //    headers: {
+  //      'Content-Type': 'application/x-www-form-urlencoded',
+  //      'Content-Length': Buffer.byteLength(postData)
+  //    }
+  //  };
+  //
+  //  // The response will consist of the measures which were found to have been updated
+  //  let body = ''; // TODO use body for library dialog's updated measures note
+  //  const req = http.request(options, res => {
+  //    vm.$log.debug(`STATUS: ${ res.statusCode }`);
+  //    vm.$log.debug(`HEADERS: ${ JSON.stringify(res.headers) }`);
+  //    res.setEncoding('utf8');
+  //    res.on('data', chunk => {
+  //      body += chunk;
+  //      //console.log(`BODY: ${chunk}`);
+  //    });
+  //    res.on('end', () => {
+  //      console.log('No more data in response.');
+  //    });
+  //  });
+  //
+  //  req.on('error', (e) => {
+  //    console.log(`problem with request: ${e.message}`);
+  //  });
+  //
+  //  // write data to request body
+  //  req.write(postData);
+  //  req.end();
+  //
+  //  return body;
+  //}
 
   // export OSA
   exportOSA() {

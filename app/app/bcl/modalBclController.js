@@ -22,8 +22,9 @@ export class ModalBclController {
     vm.params = params;
     vm.MeasureManager = MeasureManager;
 
-    vm.checkForUpdates = vm.params.update;
-    // TODO: do the check for updates
+    //vm.checkForUpdates = vm.params.update;
+    // TODO: always check for updates locally
+    // TODO: check for BCL updates when PAT launches  (in BCL service then)
 
     vm.selected = null;
     vm.keyword = '';
@@ -55,12 +56,17 @@ export class ModalBclController {
     // get measures array for Library display
     vm.$scope.displayMeasures = [];
 
-    // get all measures
+    // get all measures (this also checks for updates)
     vm.libMeasures = vm.BCL.getMeasures();
 
-    // reload measures (in case of changes on disk/BCL) and apply filters
-    vm.getLocalMeasures();
+    // reload local and my measures
+    // TODO: might not need this one?
+    //vm.getLocalMeasures();
+
+    // reload BCL measures
     vm.getBCLMeasures();
+
+    // apply filters
     vm.resetFilters();
 
     vm.$log.debug('DISPLAY MEASURES', vm.$scope.displayMeasures);
@@ -85,7 +91,7 @@ export class ModalBclController {
         enableCellEdit: false,
         cellClass: 'location-cell',
         cellTemplate: '<span>{{row.entity.location == "my" ? "My" : "BCL"}}</span>',
-        width: '11%'
+        width: '10%'
       }, {
         name: 'type',
         displayName: 'bcl.columns.type',
@@ -108,15 +114,23 @@ export class ModalBclController {
         enableCellEdit: false,
         headerCellFilter: 'translate',
         type: 'date',
-        width: '15%'
+        width: '10%'
       }, {
-        name: 'status',
-        displayName: 'bcl.columns.status',
+        name: 'edit',
+        displayName: 'bcl.columns.edit',
         cellClass: 'dropdown-button',
         cellTemplate: 'app/bcl/tempEditButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
         width: '15%'
+      }, {
+        name: 'status',
+        displayName: 'bcl.columns.status',
+        cellClass: 'icon-button',
+        cellTemplate: 'app/bcl/updateButtonTemplate.html',
+        enableCellEdit: false,
+        headerCellFilter: 'translate',
+        width: '10%'
       }, {
         name: 'add',
         displayName: 'bcl.columns.add',
@@ -170,6 +184,14 @@ export class ModalBclController {
       });
     }
   }
+
+
+
+  // TODO:  function to updateProjectMeasure from MyMeasures (when mymeasures has an update
+  // updateProjectMeasure() {
+
+
+  //}
 
   // TODO: what about project measures? do they need to be updated somehow?
   getLocalMeasures() {
@@ -394,7 +416,11 @@ export class ModalBclController {
 
     // copy on disk
     const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;
-    src.copy(measure.name, vm.projectDir.path(measure.name));
+    const dirNames =_.split(measure.measure_dir, '/');
+    vm.$log.debug('DIR NAMES: ', dirNames);
+    const dirName =  _.last(dirNames);
+    vm.$log.debug("DIR NAME: ", dirName);
+    src.copy(dirName, vm.projectDir.path(dirName));
 
     // add to project measures
     vm.libMeasures.project.push(measure);
@@ -432,7 +458,13 @@ export class ModalBclController {
       vm.$log.debug('Opening measure file');
       vm.shell.openItem(measure.measureDir + '/measure.rb');
     }});
+  }
 
+  // update My measure
+  updateMyMeasure(measure) {
+    const vm = this;
+    vm.$log.debug('in UPDATE MY MEASURE function');
+    // TODO
   }
 
   // copy from local and edit

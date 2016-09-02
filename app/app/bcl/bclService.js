@@ -3,7 +3,7 @@ import { parseString } from 'xml2js';
 import AdmZip from 'adm-zip';
 
 export class BCL {
-  constructor($q, $http, $uibModal, $log, Project) {
+  constructor($q, $http, $uibModal, $log, Project, MeasureManager) {
     'ngInject';
 
     const vm = this;
@@ -12,6 +12,7 @@ export class BCL {
     vm.$q = $q;
     vm.$log = $log;
     vm.Project = Project;
+    vm.MeasureManager = MeasureManager;
     vm.jetpack = jetpack;
     vm.AdmZip = AdmZip;
     vm.bclMeasures = [];
@@ -29,19 +30,22 @@ export class BCL {
       project: []
     };
 
-    // initialize measures
-    vm.getLocalMeasures();
+
     // initialize Project measures (with arguments and options) from Project service
     vm.libMeasures.project = vm.Project.getMeasuresAndOptions();
     vm.$log.debug('BCL SERVICE MEASURES RETRIEVED: ', vm.libMeasures.project);
-    vm.getBCLMeasures();
-  }
 
-  // TODO: is this one needed?  Shouldn't we go through the Project service instead?
-  //setProjectMeasures(measures) {
-  //  const vm = this;
-  //  vm.libMeasures.project = measures;
-  //}
+    // initialize measures
+   // vm.getLocalMeasures();  // TODO: might just need to check for updates instead (once local and my update checks are implemented)
+
+    vm.getBCLMeasures();
+
+    vm.checkForUpdates();
+    vm.checkForUpdatesLocalBcl();
+
+    //TODO: CHECK FOR UPDATES (BCL - only when loading PAT)
+
+  }
 
   // TODO: is this needed?
   getProjectMeasures() {
@@ -57,10 +61,84 @@ export class BCL {
   // returns libMeasures variable
   getMeasures() {
     const vm = this;
+    vm.checkForUpdates();
+    vm.checkForUpdatesLocalBcl();
     return vm.libMeasures;
   }
 
+  // check for updates in MyMeasures via MeasureManager
+  checkForUpdates() {
+    const vm = this;
+    // the path doesn't work if the trailing slash isn't there!
+    vm.MeasureManager.updateMeasures(vm.myMeasuresDir.path() + '/').then(updatedMeasures => {
+      //vm.$log.debug('****UPDATED MEASURES: ', updatedMeasures);
+
+      // update MyMeasure Directory and rerun prepare measure
+      _.forEach(updatedMeasures, (measure) => {
+        measure = vm.prepareMeasure(measure, 'my');
+
+        // is measure added to project?
+        const project_match = _.find(vm.libMeasures.project, {uid: measure.uid});
+        if (angular.isDefined(project_match)) {
+          // compare version_id and date:
+          // TODO: also compare date (match.versionModified > measure.versionModified)
+          if (project_match.version_id != measure.version_id) {
+            // set status flag
+            measure.status = 'update';
+          } else {
+            measure.status = '';
+          }
+        }
+
+        // update myMeasures
+        const my_match = _.find(vm.libMeasures.my, {uid: measure.uid});
+        if (angular.isDefined(my_match)){
+          // merge (overwrite 'libMeasures.my')
+          angular.merge(my_match, measure);
+        } else {
+          // add
+          vm.libMeasures.my.push(measure);
+        }
+
+      });
+
+      vm.$log.debug('NEW MY MEASURES DIR: ', vm.libMeasures.my);
+    });
+  }
+
+  // Load / check for updates in local BCL folder
+  checkForUpdatesLocalBcl(){
+    const vm = this;
+    // the path doesn't work if the trailing slash isn't there!
+    vm.MeasureManager.updateMeasures(vm.localDir.path() + '/').then(updatedMeasures => {
+      // update LocalBCL Directory and rerun prepare measure
+      _.forEach(updatedMeasures, (measure) => {
+        measure = vm.prepareMeasure(measure, 'local');
+
+        // is measure added to project?
+        const project_match = _.find(vm.libMeasures.project, {uid: measure.uid});
+        if (angular.isDefined(project_match)) {
+         // TODO: do this
+        }
+
+        // update localBCL
+        const local_match = _.find(vm.libMeasures.local, {uid: measure.uid});
+        if (angular.isDefined(local_match)){
+          // merge (overwrite 'libMeasures.local')
+          angular.merge(local_match, measure);
+        } else {
+          // add
+          vm.libMeasures.local.push(measure);
+        }
+
+      });
+
+      vm.$log.debug('NEW LOCAL BCL MEASURES DIR: ', vm.libMeasures.local);
+    });
+  }
+
   // get local measures
+  // TODO: deprecate
   getLocalMeasures() {
     const vm = this;
 
@@ -70,6 +148,7 @@ export class BCL {
   }
 
   // retrieve measures by type (local, my)
+  // TODO: deprecate this once checkForUpdates works
   getMeasuresByType(path, type) {
     const vm = this;
     let measurePaths = [];
@@ -108,10 +187,10 @@ export class BCL {
       });
     } else {
       // bclMeasures array is already loaded
+      vm.$log.debug('BCL measures: ', vm.libMeasures.bcl);
       deferred.resolve(vm.libMeasures.bcl);
     }
     return deferred.promise;
-
   }
 
   // "private" function.
@@ -158,6 +237,7 @@ export class BCL {
 
   }
 
+  // TODO: deprecate this when checkForUpdates works
   parseMeasure(input) {
     const vm = this;
 
@@ -243,6 +323,7 @@ export class BCL {
       name: _.result(input, 'measure.name'),
       uid: input.measure.uid ? _.result(input, 'measure.uid') : _.result(input, 'measure.uuid'),
       versionId: input.measure.version_id ? _.result(input, 'measure.version_id') : _.result(input, 'measure.vuuid'),
+      version_id: input.measure.version_id ? _.result(input, 'measure.version_id') : _.result(input, 'measure.vuuid'),
       versionModified: _.result(input, 'measure.version_modified'),
       xmlChecksum: _.result(input, 'measure.xml_checksum'),
       className: _.result(input, 'measure.class_name'),
@@ -270,10 +351,16 @@ export class BCL {
   prepareMeasure(measure, type) {
     const vm = this;
     // add fields for display
+    measure.edit = '';
     measure.status = '';
     // TODO: if type shows up as 'Project', means there's an error? (measure is missing from local or my measures dirs)
     measure.location = (type == 'project') ? vm.findMeasureOrigin(measure.uid) : type;
     measure.add = '';
+
+    // Temporary
+    // TODO: reconcile names returned from measuremanager and names we were already using
+    measure.displayName = measure.display_name;
+    measure.measureDir = measure.measure_dir;
 
     // measure accordion
     measure.open = false;
