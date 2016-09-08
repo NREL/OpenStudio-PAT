@@ -11,12 +11,21 @@ export class ReportsController {
 
     vm.reportTypes = vm.Project.getReportTypes();
     vm.$scope.selectedReportType = vm.Project.getReportType();
+    vm.openWebViewDevTools(); // Uncomment this line to debug project reports
 
   }
 
   setType() {
     const vm = this;
     vm.Project.setReportType(vm.$scope.selectedReportType);
+  }
+
+  openWebViewDevTools() {
+    var wv = document.getElementById("wv");
+    wv.addEventListener('dom-ready', function () {
+      console.log("Opening the dev tools for the webview.");
+      wv.openDevTools();
+    });
   }
 
 }

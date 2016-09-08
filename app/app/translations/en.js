@@ -157,7 +157,7 @@ export default {
       parallelCoordinates: 'Parallel Coordinates',
       radarChart: 'Radar Chart',
       radianceReport: 'Radiance Report',
-      EDAPTReport: 'EDAPT Report'
+      edaptExport: 'EDAPT Export'
     }
   },
   run: {

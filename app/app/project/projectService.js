@@ -69,8 +69,8 @@ export class Project {
       id: 'Radar Chart',
       name: 'reports.type.radarChart'
     }, {
-      id: 'EDAPT Chart',
-      name: 'reports.type.EDAPTReport'
+      id: 'EDAPT Export',
+      name: 'reports.type.edaptExport'
     }];
 
     vm.samplingMethods = Project.setSamplingMethods();
