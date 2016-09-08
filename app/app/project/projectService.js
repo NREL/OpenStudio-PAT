@@ -374,7 +374,7 @@ export class Project {
     _.forEach(vm.measures, (measure) => {
       const m = {};
       m.name = measure.name;
-      m.display_name = measure.displayName;
+      m.display_name = measure.display_name;
       if (measure.type === 'ModelMeasure') {
         m.measure_type = 'RubyMeasure';
       } else if (measure.type === 'EnergyPlusMeasure') {
@@ -388,11 +388,11 @@ export class Project {
       //m.measure_definition_measureUID = measure.colDef.measureUID; // TODO: fix this
       m.measure_definition_directory = './measures/' + measure.name;
       m.measure_definition_directory_local = vm.projectMeasuresDir.path() + '/' + measure.name;
-      m.measure_definition_display_name = measure.displayName;
+      m.measure_definition_display_name = measure.display_name;
       m.measure_definition_name = measure.name;
       m.measure_definition_name_xml = null;
       m.measure_definition_uuid = measure.uid;
-      m.measure_definition_version_uuid = measure.versionId;
+      m.measure_definition_version_uuid = measure.version_id;
 
       // first find out how many options there are
       const keys = Object.keys(measure.arguments[0]);
@@ -407,11 +407,11 @@ export class Project {
           const argument = {};
           argument.display_name = arg.displayName;
           //argument.display_name_short = arg.id; TODO
-          argument.display_name_short = arg.displayName;
+          argument.display_name_short = arg.display_name;
           argument.name = arg.name;
           argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
-          argument.default_value = arg.defaultValue;
-          argument.value = arg.defaultValue; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
+          argument.default_value = arg.default_value;
+          argument.value = arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
           // Make sure that argument is "complete"
           if (((typeof argument.display_name !== 'undefined' && argument.display_name.length) ||
             (typeof argument.display_name_short !== 'undefined' && argument.display_name_short.length) ||
@@ -544,17 +544,17 @@ export class Project {
 
           const v = {};
           v.argument = {};
-          v.argument.display_name = arg.displayName;
+          v.argument.display_name = arg.display_name;
           //v.argument.display_name_short = arg.id; TODO
-          v.argument.display_name_short = arg.displayName;
+          v.argument.display_name_short = arg.display_name;
           v.argument.name = arg.name;
           v.argument.value_type = _.toLower(arg.type); // TODO: see above
-          v.argument.default_value = arg.defaultValue;
+          v.argument.default_value = arg.default_value;
           v.argument.value = _.toString(arg.option_1);
 
-          v.display_name = arg.displayName;  // same as arg
+          v.display_name = arg.display_name;  // same as arg
           //v.display_name_short = arg.id; // entered in PAT TODO
-          v.display_name_short = arg.displayName;
+          v.display_name_short = arg.display_name;
           v.variable_type = 'variable'; //this is always 'variable'
           v.units = arg.units;
           v.minimum = arg.minimum;  // TODO: must be alphabetically ordered if string, otherwise standard order (pick from option values mean must be btw min and max, and max > min)

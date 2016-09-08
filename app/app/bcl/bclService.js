@@ -43,7 +43,7 @@ export class BCL {
     vm.checkForUpdates();
     vm.checkForUpdatesLocalBcl();
 
-    //TODO: CHECK FOR UPDATES (BCL - only when loading PAT)
+    // TODO: CHECK FOR UPDATES (BCL - only when loading PAT)
 
   }
 
@@ -81,7 +81,7 @@ export class BCL {
         const project_match = _.find(vm.libMeasures.project, {uid: measure.uid});
         if (angular.isDefined(project_match)) {
           // compare version_id and date:
-          // TODO: also compare date (match.versionModified > measure.versionModified)
+          // TODO: also compare date (match.version_modified > measure.version_modified)
           if (project_match.version_id != measure.version_id) {
             // set status flag
             measure.status = 'update';
@@ -109,6 +109,7 @@ export class BCL {
   // Load / check for updates in local BCL folder
   checkForUpdatesLocalBcl(){
     const vm = this;
+    const deferred = vm.$q.defer();
     // the path doesn't work if the trailing slash isn't there!
     vm.MeasureManager.updateMeasures(vm.localDir.path() + '/').then(updatedMeasures => {
       // update LocalBCL Directory and rerun prepare measure
@@ -132,9 +133,12 @@ export class BCL {
         }
 
       });
+      deferred.resolve(vm.libMeasures.local);
 
       vm.$log.debug('NEW LOCAL BCL MEASURES DIR: ', vm.libMeasures.local);
+
     });
+    return deferred.promise;
   }
 
   // get local measures
@@ -237,7 +241,7 @@ export class BCL {
 
   }
 
-  // TODO: deprecate this when checkForUpdates works
+  // For online BCL only
   parseMeasure(input) {
     const vm = this;
 
@@ -261,22 +265,22 @@ export class BCL {
       _.forEach(choices, (choice, i) => {
         choices[i] = {
           value: _.result(choice, 'value'),
-          displayName: _.result(choice, 'display_name')
+          display_name: _.result(choice, 'display_name')
         };
       });
 
       measureArguments[i] = {
         name: argument.name,
-        displayName: argument.display_name ? argument.display_name : argument.name,
-        shortName: _.result(argument, 'short_name'),
+        display_name: argument.display_name ? argument.display_name : argument.name,
+        short_name: _.result(argument, 'short_name'),
         description: _.result(argument, 'description'),
         type: argument.type,
         required: argument.required,
-        modelDependent: _.result(argument, 'model_dependent', 'false'),
-        defaultValue: _.result(argument, 'default_value'),
+        model_dependent: _.result(argument, 'model_dependent', 'false'),
+        default_value: _.result(argument, 'default_value'),
         choices: choices,
-        minValue: _.result(argument, 'min_value'),
-        maxValue: _.result(argument, 'max_value')
+        min_value: _.result(argument, 'min_value'),
+        max_value: _.result(argument, 'max_value')
       };
     });
 
@@ -304,33 +308,34 @@ export class BCL {
     _.forEach(files, (file, i) => {
 
       const version = {
-        softwareProgram: _.result(file, 'version.software_program', null),
+        software_program: _.result(file, 'version.software_program', null),
         identifier: _.result(file, 'version.identifier', null),
-        minCompatible: _.result(file, 'version.min_compatible', null),
-        maxCompatible: _.result(file, 'version.max_compatible', null)
+        min_compatible: _.result(file, 'version.min_compatible', null),
+        max_compatible: _.result(file, 'version.max_compatible', null)
       };
 
       files[i] = {
         filename: file.filename,
         filetype: file.filetype,
-        usageType: _.result(file, 'usage_type', null),
+        usage_type: _.result(file, 'usage_type', null),
         checksum: file.checksum,
         version: version
       };
     });
     measure = {
-      schemaVersion: _.result(input, 'measure.schema_version'),
+      schema_version: _.result(input, 'measure.schema_version'),
       name: _.result(input, 'measure.name'),
       uid: input.measure.uid ? _.result(input, 'measure.uid') : _.result(input, 'measure.uuid'),
-      versionId: input.measure.version_id ? _.result(input, 'measure.version_id') : _.result(input, 'measure.vuuid'),
+      //versiond: input.measure.version_id ? _.result(input, 'measure.version_id') : _.result(input, 'measure.vuuid'),
       version_id: input.measure.version_id ? _.result(input, 'measure.version_id') : _.result(input, 'measure.vuuid'),
-      versionModified: _.result(input, 'measure.version_modified'),
-      xmlChecksum: _.result(input, 'measure.xml_checksum'),
-      className: _.result(input, 'measure.class_name'),
-      displayName: (input.measure.display_name && input.measure.display_name != '') ? input.measure.display_name : input.measure.name,
-      shortName: _.result(input, 'measure.short_name'),
+      version_modified: _.result(input, 'measure.version_modified'),
+      xml_checksum: _.result(input, 'measure.xml_checksum'),
+      class_name: _.result(input, 'measure.class_name'),
+      //displayName: (input.measure.display_name && input.measure.display_name != '') ? input.measure.display_name : input.measure.name,
+      display_name: (input.measure.display_name && input.measure.display_name != '') ? input.measure.display_name : input.measure.name,
+      short_name: _.result(input, 'measure.short_name'),
       description: _.result(input, 'measure.description'),
-      modelerDescription: _.result(input, 'measure.modeler_description'),
+      modeler_description: _.result(input, 'measure.modeler_description'),
       arguments: measureArguments,
       provenances: provenances,
       tags: _.result(input, 'measure.tags.tag', ''),
@@ -339,7 +344,9 @@ export class BCL {
     };
 
     // for old measures
-    if (measure.displayName == undefined) measure.displayName = measure.name;
+    // TODO: reconcile names returned from measure manager and names we were already using
+    if (measure.display_name == undefined) measure.display_name = measure.name;
+    //if (measure.displayName == undefined) measure.displayName = measure.name;
 
     // fix tags
     measure.tags = _.join(_.split(measure.tags, '.'), ' -> ');
@@ -358,18 +365,19 @@ export class BCL {
     measure.add = '';
 
     // Temporary
-    // TODO: reconcile names returned from measuremanager and names we were already using
-    measure.displayName = measure.display_name;
-    measure.measureDir = measure.measure_dir;
+    // TODO: reconcile names returned from measure manager and names we were already using (ex: measure_dir vs measureDir)
+    //measure.displayName = measure.display_name;
+
+    //measure.measureDir = measure.measure_dir;
 
     // measure accordion
     measure.open = false;
     // is measure added to project?
     measure.addedToProject = (type == 'project' || _.find(vm.libMeasures.project, {uid: measure.uid}));
 
-    if (measure.versionModified) {
+    if (measure.version_modified) {
       // assuming yyyy-mm-dd
-      measure.date = new Date(measure.versionModified.substring(0, 4), measure.versionModified.substring(5, 7), measure.versionModified.substring(8, 10));
+      measure.date = new Date(measure.version_modified.substring(0, 4), measure.version_modified.substring(5, 7), measure.version_modified.substring(8, 10));
 
     } else {
       measure.date = '';
@@ -380,6 +388,10 @@ export class BCL {
     } else {
       measure.author = '';
     }
+
+    // fix tags to be a string (measure manager returns it as an array)
+    if (_.isArray(measure.tags))
+      measure.tags = measure.tags[0];
 
     _.forEach(measure.attributes, attr => {
       if (attr.name == 'Measure Type') {
@@ -417,22 +429,11 @@ export class BCL {
       // extract to location (and overwrite)
       zip.extractAllTo(vm.localDir.path() + '/', true);
 
-      const newPath = vm.localDir.path() + '/' + vm.measure.name + '/measure.xml';
-      vm.$log.debug(newPath);
+      // TODO: instead of checkForUpdates, use computeArguments and add to localMeasures array
+      vm.checkForUpdatesLocalBcl().then(localMeasures => {
+        deferred.resolve(localMeasures);
+      });
 
-      // parse new measure and add to local measures
-      let newMeasure = {};
-      if (vm.jetpack.exists(newPath)) {
-        const xml = vm.jetpack.read(newPath);
-        newMeasure = vm.parseMeasure(xml);
-        newMeasure = vm.prepareMeasure(newMeasure, 'local');
-        vm.libMeasures.local.push(newMeasure);
-        deferred.resolve(newMeasure);
-      }
-      else {
-        vm.$log.debug.error('The Measure directory (%s) does not exist', newPath);
-        deferred.reject();
-      }
     }, response => {
       vm.$log.debug('ERROR downloading BCL measure');
       deferred.reject(response);

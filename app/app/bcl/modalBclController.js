@@ -24,7 +24,7 @@ export class ModalBclController {
 
     //vm.checkForUpdates = vm.params.update;
     // TODO: always check for updates locally
-    // TODO: check for BCL updates when PAT launches  (in BCL service then)
+    // TODO: check for BCL updates when PAT launches  (in BCL service)
 
     vm.selected = null;
     vm.keyword = '';
@@ -57,7 +57,7 @@ export class ModalBclController {
     vm.$scope.displayMeasures = [];
 
     // get all measures (this also checks for updates)
-    vm.libMeasures = vm.BCL.getMeasures();
+    vm.$scope.libMeasures = vm.BCL.getMeasures();
 
     // reload local and my measures
     // TODO: might not need this one?
@@ -80,7 +80,7 @@ export class ModalBclController {
     // Library grid
     vm.libraryGridOptions = {
       columnDefs: [{
-        name: 'displayName',
+        name: 'display_name',
         displayName: 'bcl.columns.name',
         enableCellEdit: false,
         headerCellFilter: 'translate',
@@ -91,7 +91,7 @@ export class ModalBclController {
         enableCellEdit: false,
         cellClass: 'location-cell',
         cellTemplate: '<span>{{row.entity.location == "my" ? "My" : "BCL"}}</span>',
-        width: '10%'
+        width: '9%'
       }, {
         name: 'type',
         displayName: 'bcl.columns.type',
@@ -100,7 +100,7 @@ export class ModalBclController {
         enableSorting: false,
         cellClass: 'icon-cell',
         headerCellFilter: 'translate',
-        width: '15%'
+        width: '14%'
       }, {
         name: 'author',
         displayName: 'bcl.columns.author',
@@ -122,7 +122,7 @@ export class ModalBclController {
         cellTemplate: 'app/bcl/tempEditButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
-        width: '15%'
+        width: '14%'
       }, {
         name: 'status',
         displayName: 'bcl.columns.status',
@@ -200,15 +200,15 @@ export class ModalBclController {
 
     // set all measure keys
     _.forEach(measures, (val, key) => {
-      vm.libMeasures[key] = val;
+      vm.$scope.libMeasures[key] = val;
     });
   }
 
   getBCLMeasures() {
     const vm = this;
     vm.BCL.getBCLMeasures().then(response => {
-      vm.libMeasures.bcl = response;
-      vm.$log.debug('ALL MEASURES: ', vm.libMeasures);
+      vm.$scope.libMeasures.bcl = response;
+      vm.$log.debug('ALL MEASURES: ', vm.$scope.libMeasures);
     });
   }
 
@@ -218,11 +218,11 @@ export class ModalBclController {
     vm.$log.debug('in setDisplayMeasures');
     vm.$log.debug('FILTERS: ', vm.filters);
     const measures = [];
-    vm.$log.debug('libMeasures: ', vm.libMeasures);
+    vm.$log.debug('libMeasures: ', vm.$scope.libMeasures);
     // add checked
     _.forEach(vm.filters, (val, key) => {
       if (val) {
-        _.forEach(vm.libMeasures[key], m => {
+        _.forEach(vm.$scope.libMeasures[key], m => {
           // add if not found
           if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
         });
@@ -423,16 +423,20 @@ export class ModalBclController {
     src.copy(dirName, vm.projectDir.path(dirName));
 
     // add to project measures
-    vm.libMeasures.project.push(measure);
+    vm.$scope.libMeasures.project.push(measure);
   }
 
   // download from BCL (via service)
   download(measure) {
     const vm = this;
     vm.BCL.downloadMeasure(measure).then(newMeasure => {
-      vm.$log.debug('DOWNLOADED MEASURE: ', newMeasure);
-      vm.libMeasures.local.push(newMeasure);
+      //vm.$log.debug('DOWNLOADED MEASURE: ', newMeasure);
+      //vm.$scope.libMeasures.local.push(newMeasure);
+      vm.$log.debug("HI Local Measures: ", vm.$scope.libMeasures);
+      vm.setDisplayMeasures();
       vm.resetFilters();
+      // refresh grid?
+      //vm.gridApi.core.refresh();
       // select newly added row
       vm.selectARow(measure.uid);
 
@@ -451,7 +455,7 @@ export class ModalBclController {
   editMeasure(measure) {
     const vm = this;
     vm.$log.debug('in EDIT MEASURE function');
-    console.log(measure.measureDir + '/measure.rb');
+    console.log(measure.measure_dir + '/measure.rb');
     // show toastr for 2 seconds then open file
     const msg = 'Measure \'' + measure.name + '\' will open in a text editor for editing.';
     vm.toastr.info(msg, { timeOut: 3000, onHidden: function() {
@@ -510,7 +514,7 @@ export class ModalBclController {
     const vm = this;
     // save measures to project (reconcile) before closing
     vm.$log.debug('Updating Project Measures in Project Service');
-    vm.Project.updateProjectMeasures(vm.libMeasures.project);
+    vm.Project.updateProjectMeasures(vm.$scope.libMeasures.project);
     vm.$uibModalInstance.close();
   }
 
