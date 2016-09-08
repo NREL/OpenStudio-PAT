@@ -1,8 +1,6 @@
 import jetpack from 'fs-jetpack';
 import {remote} from 'electron';
 const {dialog} = remote;
-const {app} = remote;
-import path from 'path';
 
 export class AnalysisController {
 
@@ -269,7 +267,7 @@ export class AnalysisController {
 
   checkUpdates() {
     const vm = this;
-    const types = ['ModelMeasure','EnergyPlusMeasure','ReportingMeasure'];
+    const types = ['ModelMeasure', 'EnergyPlusMeasure', 'ReportingMeasure'];
     vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
@@ -418,9 +416,8 @@ export class AnalysisController {
     });
   }
 
-  duplicateMeasureAndOption(measure) {
+  duplicateMeasureAndOption() {
     const vm = this;
-    const deferred = vm.$q.defer();
 
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
   }
