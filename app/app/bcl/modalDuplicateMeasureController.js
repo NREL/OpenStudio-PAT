@@ -2,7 +2,7 @@ import jetpack from 'fs-jetpack';
 
 export class ModalDuplicateMeasureController {
 
-  constructor($log, $uibModalInstance, measure, Project) {
+  constructor($log, $uibModalInstance, measure) {
     'ngInject';
 
     const vm = this;
@@ -33,7 +33,7 @@ export class ModalDuplicateMeasureController {
       force_reload: 0
     };
 
-    vm.$log.debug('Duplicate Measure params: ',params);
+    vm.$log.debug('Duplicate Measure params: ', params);
     vm.$uibModalInstance.close(params);
   }
 

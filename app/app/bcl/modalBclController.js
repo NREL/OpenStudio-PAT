@@ -418,8 +418,8 @@ export class ModalBclController {
     const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;
     const dirNames =_.split(measure.measure_dir, '/');
     vm.$log.debug('DIR NAMES: ', dirNames);
-    const dirName =  _.last(dirNames);
-    vm.$log.debug("DIR NAME: ", dirName);
+    const dirName = _.last(dirNames);
+    vm.$log.debug('DIR NAME: ', dirName);
     src.copy(dirName, vm.projectDir.path(dirName));
 
     // add to project measures
@@ -465,7 +465,7 @@ export class ModalBclController {
   }
 
   // update My measure
-  updateMyMeasure(measure) {
+  updateMyMeasure() {
     const vm = this;
     vm.$log.debug('in UPDATE MY MEASURE function');
     // TODO

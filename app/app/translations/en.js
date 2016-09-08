@@ -156,7 +156,8 @@ export default {
       calibrationReport: 'Calibration Report',
       parallelCoordinates: 'Parallel Coordinates',
       radarChart: 'Radar Chart',
-      radianceReport: 'Radiance Report'
+      radianceReport: 'Radiance Report',
+      EDAPTReport: 'EDAPT Report'
     }
   },
   run: {
