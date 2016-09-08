@@ -63,7 +63,7 @@ export class MeasureManager {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    vm.$log.debug("params one more time: ", params);
+    vm.$log.debug('params one more time: ', params);
     vm.$http.post(vm.url + '/duplicate_measure', params)
       .success( (data, status, headers, config) => {
         vm.$log.debug('Measure Manager reply: ', data);
