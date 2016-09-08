@@ -81,6 +81,12 @@ export class Project {
 
     vm.algorithmSettings = [];
 
+    vm.rubyMD5 = '';
+    vm.mongoMD5 = '';
+    vm.openstudioServerMD5 = '';
+    vm.openstudioCLIMD5 = '';
+    vm.openstudioMD5 = '';
+
     vm.measures = [];
     vm.designAlternatives = [];
 
@@ -124,7 +130,11 @@ export class Project {
       vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
       vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
       vm.algorithmSettings = vm.pat.algorithmSettings ? vm.pat.algorithmSettings : vm.algorithmSettings;
-
+      vm.rubyMD5 = vm.pat.rubyMD5 ? vm.pat.rubyMD5 : vm.rubyMD5;
+      vm.mongoMD5 = vm.pat.mongoMD5 ? vm.pat.mongoMD5 : vm.mongoMD5;
+      vm.openstudioServerMD5 = vm.pat.openstudioServerMD5 ? vm.pat.openstudioServerMD5 : vm.openstudioServerMD5;
+      vm.openstudioCLIMD5 = vm.pat.openstudioCLIMD5 ? vm.pat.openstudioCLIMD5 : vm.openstudioCLIMD5;
+      vm.openstudioMD5 = vm.pat.openstudioMD5 ? vm.pat.openstudioMD5 : vm.openstudioMD5;
     }
   }
 
@@ -623,6 +633,11 @@ export class Project {
     vm.pat.runType = vm.runType;
     vm.pat.samplingMethod = vm.samplingMethod;
     vm.pat.algorithmSettings = vm.algorithmSettings;
+    vm.pat.rubyMD5 = vm.rubyMD5;
+    vm.pat.mongoMD5 = vm.mongoMD5;
+    vm.pat.openstudioServerMD5 = vm.openstudioServerMD5;
+    vm.pat.openstudioCLIMD5 = vm.openstudioCLIMD5;
+    vm.pat.openstudioMD5 = vm.openstudioMD5;
 
     // measures and options
     vm.pat.measures = vm.measures;
@@ -985,6 +1000,56 @@ export class Project {
       defaultValue: 'TRUE'
     }];
     return at;
+  }
+
+  getRubyMD5() {
+    const vm = this;
+    return vm.rubyMD5;
+  }
+
+  setRubyMD5(md5) {
+    const vm = this;
+    vm.rubyMD5 = md5;
+  }
+
+  getMongoMD5() {
+    const vm = this;
+    return vm.mongoMD5;
+  }
+
+  setMongoMD5(md5) {
+    const vm = this;
+    vm.mongoMD5 = md5;
+  }
+
+  getOpenstudioServerMD5() {
+    const vm = this;
+    return vm.openstudioServerMD5;
+  }
+
+  setOpenstudioServerMD5(md5) {
+    const vm = this;
+    vm.openstudioServerMD5 = md5;
+  }
+
+  getOpenstudioCLIMD5() {
+    const vm = this;
+    return vm.openstudioCLIMD5;
+  }
+
+  setOpenstudioCLIMD5(md5) {
+    const vm = this;
+    vm.openstudioCLIMD5 = md5;
+  }
+
+  getOpenstudioMD5() {
+    const vm = this;
+    return vm.openstudioMD5;
+  }
+
+  setOpenstudioMD5(md5) {
+    const vm = this;
+    vm.openstudioMD5 = md5;
   }
 
   // this will return all settings that have been set regardless of sampling method (not useful)

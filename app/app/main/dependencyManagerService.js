@@ -4,9 +4,10 @@ import jetpack from 'fs-jetpack';
 import AdmZip from 'adm-zip';
 import https from 'https';
 import os from 'os';
+import path from 'path';
 
 export class DependencyManager {
-  constructor($q, $http, $log, $translate, StatusBar) {
+  constructor($q, $http, $log, $translate, StatusBar, Project) {
     'ngInject';
 
     const vm = this;
@@ -17,9 +18,15 @@ export class DependencyManager {
     vm.jetpack = jetpack;
     vm.AdmZip = AdmZip;
     vm.StatusBar = StatusBar;
+    vm.Project = Project;
     vm.translations = {};
     vm.exec = require('child_process').exec;
     vm.platform = os.platform();
+    vm.rubyMD5 = vm.Project.getRubyMD5();
+    vm.mongoMD5 = vm.Project.getMongoMD5();
+    vm.openstudioServerMD5 = vm.Project.getOpenstudioServerMD5();
+    vm.openstudioCLIMD5 = vm.Project.getOpenstudioCLIMD5();
+    vm.openstudioMD5 = vm.Project.getOpenstudioMD5();
 
     // 2MB buffer
     vm.bufferSize = 2 * 0x100000;
@@ -129,9 +136,9 @@ export class DependencyManager {
     // Check for Ruby
     let rubyPath = 'ruby/bin/ruby';
     let mongoPath = 'mongo/bin/mongod';
-    let openstudioServerPath = 'openstudioServer/bin/openstudio_meta';
+    const openstudioServerPath = 'openstudioServer/bin/openstudio_meta';
     let openstudioCLIPath = 'openstudioCLI/bin/openstudio';
-    let openstudioPath = 'openstudio/';
+    const openstudioPath = 'openstudio/';
 
     if (platform == 'win32') {
       rubyPath += '.exe';
@@ -145,71 +152,171 @@ export class DependencyManager {
     });
 
     function downloadRuby() {
+      let downloadDependency = false;
+      const dependencyManifest = _.find(vm.manifest.ruby, {platform: platform});
+      const manifestEmpty = _.isEmpty(dependencyManifest);
+
       if (!vm.src.exists(rubyPath)) {
+        downloadDependency = true;
         vm.$log.debug('Ruby not found, downloading');
-        const rubyManifest = _.find(vm.manifest.ruby, {platform: platform});
-        if (_.isEmpty(rubyManifest)) {
+      } else if (!manifestEmpty) {
+        const filename = vm._dependencyFilename(dependencyManifest);
+        vm._getOnlineChecksum(filename).then(expectedMD5 => {
+          if (expectedMD5.trim() !== vm.rubyMD5.trim()) {
+            vm.rubyMD5 = expectedMD5.trim();
+            vm.Project.setRubyMD5(vm.rubyMD5);
+            downloadDependency = true;
+            vm.$log.debug('Ruby not up to date, updating');
+            const rubyDir = jetpack.dir(path.resolve(vm.src.path() + '/ruby'));
+            vm.$log.debug('rubyDir: ', rubyDir.path());
+            jetpack.remove(rubyDir.path());
+          }
+        });
+      }
+
+      if (downloadDependency){
+        if (manifestEmpty) {
           const errorMsg = `No ruby download found for platform ${platform}`;
           vm.$log.error(errorMsg);
           return vm.$q.reject(errorMsg);
         }
-        return vm._downloadDependency(_.assign({}, rubyManifest, {type: 'ruby'}));
+        return vm._downloadDependency(_.assign({}, dependencyManifest, {type: 'ruby'}));
       }
       return vm.$q.resolve();
     }
 
     function downloadMongo() {
+      let downloadDependency = false;
+      const dependencyManifest = _.find(vm.manifest.mongo, {platform: platform, arch: arch});
+      const manifestEmpty = _.isEmpty(dependencyManifest);
+
       if (!vm.src.exists(mongoPath)) {
+        downloadDependency = true;
         vm.$log.debug('Mongo not found, downloading');
-        const mongoManifest = _.find(vm.manifest.mongo, {platform: platform, arch: arch});
-        if (_.isEmpty(mongoManifest)) {
+      } else if (!manifestEmpty) {
+        const filename = vm._dependencyFilename(dependencyManifest);
+        vm._getOnlineChecksum(filename).then(expectedMD5 => {
+          if (expectedMD5.trim() !== vm.mongoMD5.trim()) {
+            vm.mongoMD5 = expectedMD5.trim();
+            vm.Project.setMongoMD5(vm.mongoMD5);
+            downloadDependency = true;
+            vm.$log.debug('Mongo not up to date, updating');
+            const mongoDir = jetpack.dir(path.resolve(vm.src.path() + '/mongo'));
+            vm.$log.debug('mongoDir: ', mongoDir.path());
+            jetpack.remove(mongoDir.path());
+          }
+        });
+      }
+
+      if (downloadDependency){
+        if (manifestEmpty) {
           const errorMsg = `No mongo download found for platform ${platform}`;
           vm.$log.error(errorMsg);
           return vm.$q.reject(errorMsg);
         }
-        return vm._downloadDependency(_.assign({}, mongoManifest, {type: 'mongo'}));
+        return vm._downloadDependency(_.assign({}, dependencyManifest, {type: 'mongo'}));
       }
       return vm.$q.resolve();
     }
 
     function downloadOpenstudioServer() {
+      let downloadDependency = false;
+      const dependencyManifest = _.find(vm.manifest.openstudioServer, {platform: platform, arch: arch});
+      const manifestEmpty = _.isEmpty(dependencyManifest);
+
       if (!vm.src.exists(openstudioServerPath)) {
+        downloadDependency = true;
         vm.$log.debug('OpenstudioServer not found, downloading');
-        const openstudioServerManifest = _.find(vm.manifest.openstudioServer, {platform: platform, arch: arch});
-        if (_.isEmpty(openstudioServerManifest)) {
+      } else if (!manifestEmpty) {
+        const filename = vm._dependencyFilename(dependencyManifest);
+        vm._getOnlineChecksum(filename).then(expectedMD5 => {
+          if (expectedMD5.trim() !== vm.openstudioServerMD5.trim()) {
+            vm.openstudioServerMD5 = expectedMD5.trim();
+            vm.Project.setOpenstudioServerMD5(vm.openstudioServerMD5);
+            downloadDependency = true;
+            vm.$log.debug('OpenstudioServer not up to date, updating');
+            const openstudioServerDir = jetpack.dir(path.resolve(vm.src.path() + '/openstudioServer'));
+            vm.$log.debug('openstudioServerDir: ', openstudioServerDir.path());
+            jetpack.remove(openstudioServerDir.path());
+          }
+        });
+      }
+
+      if (downloadDependency){
+        if (manifestEmpty) {
           const errorMsg = `No openstudioServer download found for platform ${platform}`;
           vm.$log.error(errorMsg);
           return vm.$q.reject(errorMsg);
         }
-        return vm._downloadDependency(_.assign({}, openstudioServerManifest, {type: 'openstudioServer'}));
+        return vm._downloadDependency(_.assign({}, dependencyManifest, {type: 'openstudioServer'}));
       }
       return vm.$q.resolve();
     }
 
     function downloadOpenstudioCLI() {
+      let downloadDependency = false;
+      const dependencyManifest = _.find(vm.manifest.openstudioCLI, {platform: platform, arch: arch});
+      const manifestEmpty = _.isEmpty(dependencyManifest);
+
       if (!vm.src.exists(openstudioCLIPath)) {
+        downloadDependency = true;
         vm.$log.debug('OpenstudioCLI not found, downloading');
-        const openstudioCLIManifest = _.find(vm.manifest.openstudioCLI, {platform: platform, arch: arch});
-        if (_.isEmpty(openstudioCLIManifest)) {
-          const errorMsg = `No openstudioCLI download found for platform ${platform}`;
+      } else if (!manifestEmpty) {
+        const filename = vm._dependencyFilename(dependencyManifest);
+        vm._getOnlineChecksum(filename).then(expectedMD5 => {
+          if (expectedMD5.trim() !== vm.openstudioCLIMD5.trim()) {
+            vm.openstudioCLIMD5 = expectedMD5.trim();
+            vm.Project.setOpenstudioCLIMD5(vm.openstudioCLIMD5);
+            downloadDependency = true;
+            vm.$log.debug('OpenstudioCLI not up to date, updating');
+            const openstudioCLIDir = jetpack.dir(path.resolve(vm.src.path() + '/openstudioCLI'));
+            vm.$log.debug('openstudioCLIDir: ', openstudioCLIDir.path());
+            jetpack.remove(openstudioCLIDir.path());
+          }
+        });
+      }
+
+      if (downloadDependency){
+        if (manifestEmpty) {
+          const errorMsg = `No OpenstudioCLI download found for platform ${platform}`;
           vm.$log.error(errorMsg);
           return vm.$q.reject(errorMsg);
         }
-        return vm._downloadDependency(_.assign({}, openstudioCLIManifest, {type: 'openstudioCLI'}));
+        return vm._downloadDependency(_.assign({}, dependencyManifest, {type: 'openstudioCLI'}));
       }
       return vm.$q.resolve();
     }
 
     function downloadOpenstudio() {
+      let downloadDependency = false;
+      const dependencyManifest = _.find(vm.manifest.openstudio, {platform: platform, arch: arch});
+      const manifestEmpty = _.isEmpty(dependencyManifest);
+
       if (!vm.src.exists(openstudioPath)) {
+        downloadDependency = true;
         vm.$log.debug('Openstudio not found, downloading');
-        const openstudioManifest = _.find(vm.manifest.openstudio, {platform: platform, arch: arch});
-        if (_.isEmpty(openstudioManifest)) {
-          const errorMsg = `No openstudio download found for platform ${platform}`;
+      } else if (!manifestEmpty) {
+        const filename = vm._dependencyFilename(dependencyManifest);
+        vm._getOnlineChecksum(filename).then(expectedMD5 => {
+          if (expectedMD5.trim() !== vm.openstudioMD5.trim()) {
+            vm.openstudioMD5 = expectedMD5.trim();
+            vm.Project.setOpenstudioMD5(vm.openstudioMD5);
+            downloadDependency = true;
+            vm.$log.debug('Openstudio not up to date, updating');
+            const openstudioDir = jetpack.dir(path.resolve(vm.src.path() + '/openstudio'));
+            vm.$log.debug('openstudioDir: ', openstudioDir.path());
+            jetpack.remove(openstudioDir.path());
+          }
+        });
+      }
+
+      if (downloadDependency){
+        if (manifestEmpty) {
+          const errorMsg = `No Openstudio download found for platform ${platform}`;
           vm.$log.error(errorMsg);
           return vm.$q.reject(errorMsg);
         }
-        return vm._downloadDependency(_.assign({}, openstudioManifest, {type: 'openstudio'}));
+        return vm._downloadDependency(_.assign({}, dependencyManifest, {type: 'openstudio'}));
       }
       return vm.$q.resolve();
     }
@@ -328,6 +435,14 @@ export class DependencyManager {
     const vm = this;
     const deferred = vm.$q.defer();
 
+    vm.downloadZip(vm.manifest.endpoint, vm._dependencyFilename(downloadManifest), downloadManifest.type, true).then(deferred.resolve, deferred.reject);
+
+    return deferred.promise;
+  }
+
+  _dependencyFilename(downloadManifest) {
+    const vm = this;
+
     let append = '';
     if (_.isMatch(downloadManifest, {
         type: 'mongo',
@@ -338,9 +453,7 @@ export class DependencyManager {
     const filename = `${downloadManifest.name}-${downloadManifest.platform}${append}.zip`;
     vm.$log.debug('filename:', filename);
 
-    vm.downloadZip(vm.manifest.endpoint, filename, downloadManifest.type, true).then(deferred.resolve, deferred.reject);
-
-    return deferred.promise;
+    return filename;
   }
 
 }
