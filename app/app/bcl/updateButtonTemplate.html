@@ -1,6 +1,6 @@
 <div ng-if="row.entity.status == 'update' && row.entity.addedToProject && row.entity.location != 'bcl'">
   <!-- My Measure update, measure added to project: display button to update project -->
-   <span class="glyphicon glyphicon-refresh library-grid-button blue-button" aria-hidden="true" aria-label="Update Measure" ng-click="grid.appScope.modal.updateMyMeasure(row.entity); $event.stopPropagation();">
+   <span class="glyphicon glyphicon-refresh library-grid-button blue-button" aria-hidden="true" aria-label="Update Measure" ng-click="grid.appScope.modal.updateProjectMeasure(row.entity); $event.stopPropagation();">
    </span>
 </div>
 

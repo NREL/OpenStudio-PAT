@@ -30,33 +30,29 @@ export class BCL {
       project: []
     };
 
-
     // initialize Project measures (with arguments and options) from Project service
     vm.libMeasures.project = vm.Project.getMeasuresAndOptions();
     vm.$log.debug('BCL SERVICE MEASURES RETRIEVED: ', vm.libMeasures.project);
-
-    // initialize measures
-   // vm.getLocalMeasures();  // TODO: might just need to check for updates instead (once local and my update checks are implemented)
 
     vm.getBCLMeasures();
 
     vm.checkForUpdates();
     vm.checkForUpdatesLocalBcl();
 
-    // TODO: CHECK FOR UPDATES (BCL - only when loading PAT)
+    // TODO: CHECK FOR UPDATES ONLINE BCL
 
   }
 
   // TODO: is this needed?
-  getProjectMeasures() {
-    const vm = this;
-    return vm.libMeasures.project;
-  }
+  // getProjectMeasures() {
+  //   const vm = this;
+  //   return vm.libMeasures.project;
+  // }
 
-  addProjectMeasure(measure) {
-    const vm = this;
-    vm.libMeasures.project.push(measure);
-  }
+  // addProjectMeasure(measure) {
+  //   const vm = this;
+  //   vm.libMeasures.project.push(measure);
+  // }
 
   // returns libMeasures variable
   getMeasures() {
@@ -69,9 +65,10 @@ export class BCL {
   // check for updates in MyMeasures via MeasureManager
   checkForUpdates() {
     const vm = this;
+    const deferred = vm.$q.defer();
+
     // the path doesn't work if the trailing slash isn't there!
     vm.MeasureManager.updateMeasures(vm.myMeasuresDir.path() + '/').then(updatedMeasures => {
-      //vm.$log.debug('****UPDATED MEASURES: ', updatedMeasures);
 
       // update MyMeasure Directory and rerun prepare measure
       _.forEach(updatedMeasures, (measure) => {
@@ -79,8 +76,14 @@ export class BCL {
 
         // is measure added to project?
         const project_match = _.find(vm.libMeasures.project, {uid: measure.uid});
+
         if (angular.isDefined(project_match)) {
           // compare version_id and date:
+
+          vm.$log.debug('project match: ', project_match);
+          vm.$log.debug('measure: ', measure);
+          vm.$log.debug('version_ids: ', project_match.version_id, measure.version_id);
+
           // TODO: also compare date (match.version_modified > measure.version_modified)
           if (project_match.version_id != measure.version_id) {
             // set status flag
@@ -102,8 +105,11 @@ export class BCL {
 
       });
 
+      deferred.resolve(vm.libMeasures.my);
+
       vm.$log.debug('NEW MY MEASURES DIR: ', vm.libMeasures.my);
     });
+    return deferred.promise;
   }
 
   // Load / check for updates in local BCL folder
@@ -429,10 +435,19 @@ export class BCL {
       // extract to location (and overwrite)
       zip.extractAllTo(vm.localDir.path() + '/', true);
 
-      // TODO: instead of checkForUpdates, use computeArguments and add to localMeasures array
-      vm.checkForUpdatesLocalBcl().then(localMeasures => {
-        deferred.resolve(localMeasures);
+      // use computeArguments to add to localMeasures array
+      vm.MeasureManager.computeArguments(vm.localDir.path(measure.display_name)).then( (newMeasure) => {
+        vm.libMeasures.local.push(newMeasure);
+        deferred.resolve(newMeasure);
+      }, () => {
+        // failure
+        //vm.$log.debug('Measure Manager computeArguments failed');
+        deferred.reject();
       });
+
+        // vm.checkForUpdatesLocalBcl().then(localMeasures => {
+      //   deferred.resolve(localMeasures);
+      // });
 
     }, response => {
       vm.$log.debug('ERROR downloading BCL measure');

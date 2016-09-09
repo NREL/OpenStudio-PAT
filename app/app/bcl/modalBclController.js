@@ -22,10 +22,6 @@ export class ModalBclController {
     vm.params = params;
     vm.MeasureManager = MeasureManager;
 
-    //vm.checkForUpdates = vm.params.update;
-    // TODO: always check for updates locally
-    // TODO: check for BCL updates when PAT launches  (in BCL service)
-
     vm.selected = null;
     vm.keyword = '';
 
@@ -57,13 +53,11 @@ export class ModalBclController {
     vm.$scope.displayMeasures = [];
 
     // get all measures (this also checks for updates)
-    vm.$scope.libMeasures = vm.BCL.getMeasures();
-
-    // reload local and my measures
-    // TODO: might not need this one?
-    //vm.getLocalMeasures();
+    // this always check for updates locally (populates the table)
+    vm.libMeasures = vm.BCL.getMeasures();
 
     // reload BCL measures
+    // TODO: check for BCL updates once when PAT launches  (in BCL service)
     vm.getBCLMeasures();
 
     // apply filters
@@ -185,30 +179,11 @@ export class ModalBclController {
     }
   }
 
-
-
-  // TODO:  function to updateProjectMeasure from MyMeasures (when mymeasures has an update
-  // updateProjectMeasure() {
-
-
-  //}
-
-  // TODO: what about project measures? do they need to be updated somehow?
-  getLocalMeasures() {
-    const vm = this;
-    const measures = vm.BCL.getLocalMeasures();
-
-    // set all measure keys
-    _.forEach(measures, (val, key) => {
-      vm.$scope.libMeasures[key] = val;
-    });
-  }
-
   getBCLMeasures() {
     const vm = this;
     vm.BCL.getBCLMeasures().then(response => {
-      vm.$scope.libMeasures.bcl = response;
-      vm.$log.debug('ALL MEASURES: ', vm.$scope.libMeasures);
+      vm.libMeasures.bcl = response;
+      //vm.$log.debug('ALL MEASURES: ', vm.libMeasures);
     });
   }
 
@@ -218,18 +193,16 @@ export class ModalBclController {
     vm.$log.debug('in setDisplayMeasures');
     vm.$log.debug('FILTERS: ', vm.filters);
     const measures = [];
-    vm.$log.debug('libMeasures: ', vm.$scope.libMeasures);
+    vm.$log.debug('libMeasures: ', vm.libMeasures);
     // add checked
     _.forEach(vm.filters, (val, key) => {
       if (val) {
-        _.forEach(vm.$scope.libMeasures[key], m => {
+        _.forEach(vm.libMeasures[key], m => {
           // add if not found
           if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
         });
       }
     });
-
-    // TODO: then check for updates on local measures
 
     vm.$scope.displayMeasures = measures;
     return measures;
@@ -403,43 +376,37 @@ export class ModalBclController {
     const measure = _.find(vm.$scope.displayMeasures, {uid: rowEntity.uid});
 
     vm.$log.debug('Adding the following measure to project: ', measure);
-    vm.addToProject(measure);
     measure.addedToProject = true;
+    vm.addToProject(measure);
   }
 
   addToProject(measure) {
     const vm = this;
 
-    // I think this is unnecessary (just add to local scope variable?)
-    // vm.BCL.addProjectMeasure(measure);
-    // vm.$log.debug('Project MEASURES IN bclService: ', vm.BCL.getProjectMeasures());
-
     // copy on disk
     const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;
     const dirNames =_.split(measure.measure_dir, '/');
-    vm.$log.debug('DIR NAMES: ', dirNames);
+    //vm.$log.debug('DIR NAMES: ', dirNames);
     const dirName = _.last(dirNames);
-    vm.$log.debug('DIR NAME: ', dirName);
+    //vm.$log.debug('DIR NAME: ', dirName);
     src.copy(dirName, vm.projectDir.path(dirName));
 
     // add to project measures
-    vm.$scope.libMeasures.project.push(measure);
+    const project_measure = angular.copy(measure);
+    project_measure.measure_dir = vm.projectDir.path(dirName);
+
+    vm.libMeasures.project.push(project_measure);
   }
 
   // download from BCL (via service)
   download(measure) {
     const vm = this;
     vm.BCL.downloadMeasure(measure).then(newMeasure => {
-      //vm.$log.debug('DOWNLOADED MEASURE: ', newMeasure);
-      //vm.$scope.libMeasures.local.push(newMeasure);
-      vm.$log.debug("HI Local Measures: ", vm.$scope.libMeasures);
+      //vm.$log.debug("Local Measures: ", vm.libMeasures);
       vm.setDisplayMeasures();
       vm.resetFilters();
-      // refresh grid?
-      //vm.gridApi.core.refresh();
       // select newly added row
       vm.selectARow(measure.uid);
-
     });
   }
 
@@ -459,19 +426,45 @@ export class ModalBclController {
     // show toastr for 2 seconds then open file
     const msg = 'Measure \'' + measure.name + '\' will open in a text editor for editing.';
     vm.toastr.info(msg, { timeOut: 3000, onHidden: function() {
-      vm.$log.debug('Opening measure file');
-      vm.shell.openItem(measure.measureDir + '/measure.rb');
+      //vm.$log.debug('Opening measure file');
+      vm.shell.openItem(measure.measure_dir + '/measure.rb');
     }});
   }
 
-  // update My measure
-  updateMyMeasure() {
+  // update Project measure
+  updateProjectMeasure(measure) {
     const vm = this;
+    const deferred = vm.$q.defer();
     vm.$log.debug('in UPDATE MY MEASURE function');
-    // TODO
+
+    // copy on disk
+    const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;
+    const dirNames =_.split(measure.measure_dir, '/');
+    const dirName = _.last(dirNames);
+    src.copy(dirName, vm.projectDir.path(dirName), {overwrite: true});
+
+    // retrieve newly copied measure data
+    vm.MeasureManager.computeArguments(vm.projectDir.path(dirName)).then( (newMeasure) => {
+      // success
+      vm.$log.debug('New computed measure: ', newMeasure);
+      // update (replace) project measure in array
+      const index = _.indexOf(vm.libMeasures.project, _.find(vm.libMeasures.project, {uid: measure.uid}));
+      vm.libMeasures.project.splice(index, 1, newMeasure);
+
+      // unset 'update' status on original measure
+      measure.status = '';
+
+      deferred.resolve();
+    }, () => {
+      // failure
+      //vm.$log.debug('Measure Manager computeArguments failed');
+      deferred.reject();
+    });
+
+    return deferred.promise;
   }
 
-  // copy from local and edit
+  // copy from local and edit (2X)
   copyAndEditMeasure(measure) {
     const vm = this;
     vm.$log.debug('in COPY AND EDIT function');
@@ -512,14 +505,14 @@ export class ModalBclController {
 
   ok() {
     const vm = this;
-    // save measures to project (reconcile) before closing
+    // save measures to project service (reconcile) before closing
     vm.$log.debug('Updating Project Measures in Project Service');
-    vm.Project.updateProjectMeasures(vm.$scope.libMeasures.project);
+    vm.Project.updateProjectMeasures(vm.libMeasures.project);
     vm.$uibModalInstance.close();
   }
 
   search() {
-    // first just search by keyword and display results
+    // TODO
   }
 
 }
