@@ -196,7 +196,7 @@ export class Project {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.$log.debug('in Project computeAllMeasureArguments()');
-
+    const osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
 
     _.forEach(vm.measures, (measure) => {
       vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {

@@ -466,7 +466,7 @@ export class ModalBclController {
 
     // set seed path
     const defaultSeed = vm.Project.getDefaultSeed();
-    osmPath = (defaultSeed == null) ? null : vm.seedDir.path(defaultSeed);
+    const osmPath = (defaultSeed == null) ? null : vm.seedDir.path(defaultSeed);
 
     vm.MeasureManager.computeArguments(vm.projectDir.path(dirName), osmPath).then((newMeasure) => {
       // success
