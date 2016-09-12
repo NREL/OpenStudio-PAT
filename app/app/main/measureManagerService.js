@@ -90,7 +90,7 @@ export class MeasureManager {
     vm.$http.post(vm.url + '/update_measures', params)
       .success( (data, status, headers, config) => {
         vm.$log.debug('updateMeasures Success!, status: ', status);
-        vm.$log.debug('Measure Manager reply: ', data);
+        // vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
     .error ((data, status, headers, config) => {
@@ -103,18 +103,20 @@ export class MeasureManager {
 
   // Compute Arguments
   // This function computes arguments and returns all metadata for a single measure
-  // Expects a measurePath, and osmPath if evaluating against a specific model
-  computeArguments(measurePath, osmPath) {
+  // Expects a measurePath.  and osmPath if evaluating against a specific model
+  computeArguments(measurePath, osmPath=null) {
     const vm = this;
 
-    const params = _.isUndefined(osmPath) ? {measure_dir: measurePath} : {measure_dir: measurePath, osm_path: osmPath };
+    osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(defaultSeed);
 
+    const params = (osmPath == null) ? {measure_dir: measurePath} : {measure_dir: measurePath, osm_path: osmPath };
+    vm.$log.debug('computeArguments params', params);
     const deferred = vm.$q.defer();
 
     vm.$http.post(vm.url + '/compute_arguments', params)
       .success( (data, status, headers, config) => {
         vm.$log.debug('computeArguments Success!, status: ', status);
-        vm.$log.debug('Measure Manager reply: ', data);
+        // vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
       .error ((data, status, headers, config) => {

@@ -113,7 +113,7 @@ export class Project {
       if (!angular.isDefined(vm.measures)) {
         vm.measures = [];
       }
-      vm.computeAllArguments();
+
       vm.designAlternatives = vm.pat.designAlternatives;
       if (!angular.isDefined(vm.designAlternatives)) {
         vm.designAlternatives = [];
@@ -190,118 +190,28 @@ export class Project {
 
   }
 
-  computeAllArguments() {
+  // computes all project measure arguments with selected seed
+  // uses empty seed model otherwise
+  computeAllMeasureArguments() {
     const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('in Project computeAllMeasureArguments()');
 
-    const filenames = fs.readdirSync(vm.projectMeasuresDir.path());
-    filenames.forEach(function (name) {
-      vm.$log.debug('name: ' + name);
-      if (name === '.' || name === '..') {
-        return;
-      }
-      if (fs.lstatSync(vm.projectMeasuresDir.path() + '/' + name).isDirectory()) {
-        vm.MeasureManager.computeArguments(name);
-      }
+
+    _.forEach(vm.measures, (measure) => {
+      vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
+        // merge with existing project measure
+        vm.$log.debug('New computed measure: ', newMeasure);
+        // merge project measure in array to preserve prepareMeasure arguments and already-set arguments
+        _.merge(measure, newMeasure);
+
+      });
     });
+
+    deferred.resolve();
+    return deferred.promise;
+
   }
-
-  // computeArguments(measureDirName) {
-  //   const vm = this;
-  //
-  //   const measurePath = vm.projectMeasuresDir.path() + '/' + measureDirName + '/';
-  //   const seedPath = vm.seedDir.path() + '/' + vm.defaultSeed;
-  //
-  //   vm.$log.debug('measurePath: ' + measurePath);
-  //   vm.$log.debug('seedPath: ' + seedPath);
-  //
-  //   const postData = JSON.stringify({
-  //     measure_dir: measurePath,
-  //     osm_path: seedPath
-  //   });
-  //
-  //   const options = {
-  //     hostname: 'localhost',
-  //     port: 1234,
-  //     path: '/compute_arguments',
-  //     method: 'POST',
-  //     headers: {
-  //       'Content-Type': 'application/x-www-form-urlencoded',
-  //       'Content-Length': Buffer.byteLength(postData)
-  //     }
-  //   };
-  //
-  //   // The response is will consist of JSON with measure data, including model-specific arguments.
-  //   // These arguments should be displayed in the analysis tab's measure tables.
-  //   let body = ''; // TODO use body for analysis tab measure tables
-  //   const req = http.request(options, (res) => {
-  //     vm.$log.debug(`STATUS: ${res.statusCode}`);
-  //     vm.$log.debug(`HEADERS: ${JSON.stringify(res.headers)}`);
-  //     res.setEncoding('utf8');
-  //     res.on('data', (chunk) => {
-  //       body += chunk;
-  //       //console.log(`BODY: ${chunk}`);
-  //     });
-  //     res.on('end', () => {
-  //       console.log('No more data in response.');
-  //     });
-  //   });
-  //
-  //   req.on('error', (e) => {
-  //     console.log(`problem with request: ${e.message}`);
-  //   });
-  //
-  //   // write data to request body
-  //   req.write(postData);
-  //   req.end();
-  //
-  //   return body;
-  // }
-
-  //updateAllMeasures(measurePath) {
-  //  const vm = this;
-  //
-  //  vm.$log.debug('measurePath: ', measurePath);
-  //
-  //  const postData = JSON.stringify({
-  //    measure_dir: measurePath
-  //  });
-  //
-  //  const options = {
-  //    hostname: 'localhost',
-  //    port: 1234,
-  //    path: '/update_measures',
-  //    method: 'POST',
-  //    headers: {
-  //      'Content-Type': 'application/x-www-form-urlencoded',
-  //      'Content-Length': Buffer.byteLength(postData)
-  //    }
-  //  };
-  //
-  //  // The response will consist of the measures which were found to have been updated
-  //  let body = ''; // TODO use body for library dialog's updated measures note
-  //  const req = http.request(options, res => {
-  //    vm.$log.debug(`STATUS: ${ res.statusCode }`);
-  //    vm.$log.debug(`HEADERS: ${ JSON.stringify(res.headers) }`);
-  //    res.setEncoding('utf8');
-  //    res.on('data', chunk => {
-  //      body += chunk;
-  //      //console.log(`BODY: ${chunk}`);
-  //    });
-  //    res.on('end', () => {
-  //      console.log('No more data in response.');
-  //    });
-  //  });
-  //
-  //  req.on('error', (e) => {
-  //    console.log(`problem with request: ${e.message}`);
-  //  });
-  //
-  //  // write data to request body
-  //  req.write(postData);
-  //  req.end();
-  //
-  //  return body;
-  //}
 
   // export OSA
   exportOSA() {
@@ -642,13 +552,13 @@ export class Project {
   updateProjectMeasures(updatedMeasures) {
 
     const vm = this;
-
     const newMeasures = [];
+
     _.forEach(updatedMeasures, (measure) => {
       const match = _.find(vm.measures, {uid: measure.uid});
       if (angular.isDefined(match)) {
         // if there's a match, merge (update)
-        angular.merge(match, measure);
+        _.merge(match, measure);
         newMeasures.push(match);
       } else {
         // otherwise add
@@ -682,12 +592,13 @@ export class Project {
 
   setMeasuresAndOptions(measures) {
     const vm = this;
+    vm.savePrettyOptions();
     vm.measures = measures;
   }
 
   getMeasuresAndOptions() {
     const vm = this;
-    //vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
+    vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
     return vm.measures;
   }
 

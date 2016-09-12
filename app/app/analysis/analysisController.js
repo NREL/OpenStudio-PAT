@@ -29,6 +29,7 @@ export class AnalysisController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+    vm.$log.debug("****ANALYSIS TAB****");
     vm.$log.debug('ANALYSIS MEASURES RETRIEVED: ', vm.$scope.measures);
 
     vm.$scope.osMeasures = [];
@@ -64,7 +65,7 @@ export class AnalysisController {
   getDefaultOptionColDef() {
     const vm = this;
     return {
-      displayName: 'Option 1',
+      display_name: 'Option 1',
       field: 'option_1',
       editDropdownOptionsFunction: function (rowEntity) {
         if (rowEntity.type === 'Choice') {
@@ -258,6 +259,8 @@ export class AnalysisController {
   addMeasure(type) {
     const vm = this;
     const types = [type];
+    // save pretty options (will be needed to load back)
+    vm.Project.savePrettyOptions();
     vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
@@ -316,7 +319,7 @@ export class AnalysisController {
         max = num;
       }
     });
-    //vm.$log.debug('max: ', max);
+    vm.$log.debug('max: ', max);
 
     // start from first option
     const opt = vm.getDefaultOptionColDef();
@@ -426,7 +429,7 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In loadMeasureOptions in analysis');
     _.forEach(vm.$scope.measures, (measure) => {
-
+        vm.$log.debug('measure: ', measure);
       _.forEach(measure.options, (option) => {
         vm.loadOption(measure, option);
       });
@@ -462,7 +465,8 @@ export class AnalysisController {
     const vm = this;
     vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
     vm.$log.debug('In Analysis::setSeed');
-    vm.Project.computeAllArguments();
+    // recompute model-dependent measure arguments when resetting seed
+    vm.Project.computeAllMeasureArguments();
   }
 
   setWeatherFile() {
