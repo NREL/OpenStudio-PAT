@@ -460,28 +460,42 @@ export class ModalBclController {
     src.copy(dirName, vm.projectDir.path(dirName), {overwrite: true});
 
     // retrieve newly copied measure data (with calculated arguments)
-    vm.$log.debug('DirName: ', dirName);
-    vm.$log.debug('src path: ', src.path());
-    vm.$log.debug("ProjectDir path: ", vm.projectDir.path());
 
     // set seed path
     const defaultSeed = vm.Project.getDefaultSeed();
-    const osmPath = (defaultSeed == null) ? null : vm.seedDir.path(defaultSeed);
+    const seedDir = vm.Project.getSeedDir();
+    const osmPath = (defaultSeed == null) ? null : seedDir.path(defaultSeed);
 
     vm.MeasureManager.computeArguments(vm.projectDir.path(dirName), osmPath).then((newMeasure) => {
       // success
       vm.$log.debug('New computed measure: ', newMeasure);
       // merge project measure in array to preserve prepareMeasure arguments and already-set arguments
       const project_measure = _.find(vm.projectMeasures, {uid: measure.uid});
-      _.merge(project_measure, newMeasure);
-
-      //const index = _.indexOf(vm.projectMeasures, _.find(vm.projectMeasures, {uid: measure.uid}));
-      //vm.projectMeasures.splice(index, 1, newMeasure);
+      // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
+      _.forEachRight(project_measure.arguments, (arg, index) => {
+        if (typeof arg.specialRowId === 'undefined') {
+          const match = _.find(measure.arguments, {name: arg.name});
+          if (_.isUndefined(match)) {
+            project_measure.arguments.splice(index, 1);
+          }
+        }
+      });
+      // then add/merge (at argument level)
+      _.forEach(newMeasure.arguments, (arg) => {
+        const match = _.find(project_measure.arguments, {name: arg.name});
+        if (_.isUndefined(match)) {
+          project_measure.arguments.push(arg);
+        } else {
+          _.merge(match, arg);
+        }
+      });
 
       // unset 'update' status on original measure
       measure.status = '';
-
+      const msg = 'Measure \'' + newMeasure.display_name + '\' was successfully updated in your project.';
+      vm.toastr.success(msg);
       deferred.resolve();
+
     }, () => {
       // failure
       //vm.$log.debug('Measure Manager computeArguments failed');
@@ -536,10 +550,9 @@ export class ModalBclController {
 
   ok() {
     const vm = this;
-    // save measures to project service (reconcile) before closing
-    // vm.$log.debug('Updating Project Measures in Project Service');
+    // save pretty options in case changes were made to project measures
+    vm.Project.savePrettyOptions();
     vm.$log.debug('Project Measures: ', vm.projectMeasures);
-    // vm.Project.updateProjectMeasures(vm.projectMeasures);
     vm.$uibModalInstance.close();
   }
 

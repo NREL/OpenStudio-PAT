@@ -19,7 +19,7 @@ export function config($logProvider, $translateProvider, toastrConfig) {
   toastrConfig.allowHtml = true;
   toastrConfig.timeOut = 3000;
   toastrConfig.positionClass = 'toast-top-right';
-  toastrConfig.preventDuplicates = true;
+  toastrConfig.preventDuplicates = false; // need duplicates on BCL library view
   toastrConfig.progressBar = true;
 
 }

@@ -622,6 +622,16 @@ export class Project {
     return vm.myMeasuresDir;
   }
 
+  getSeedDir() {
+    const vm = this;
+    return vm.seedDir;
+  }
+
+  getWeatherDir() {
+    const vm = this;
+    return vm.weatherDir;
+  }
+
   getMongoDir() {
     const vm = this;
     return vm.mongoDir;
