@@ -83,7 +83,10 @@ export class MeasureManager {
   updateMeasures(measurePath) {
 
     const vm = this;
-    const params = { measures_dir: measurePath };
+    // fix path for windows
+    const newMeasurePath = measurePath.replace(/\\/g,"/"); // Evan: how to normalize the path
+    const params = { measures_dir: newMeasurePath };
+    vm.$log.debug('PARAMS: ', params);
 
     const deferred = vm.$q.defer();
 
