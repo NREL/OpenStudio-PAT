@@ -132,7 +132,7 @@ export class ModalBclController {
       }, {
         name: 'status',
         displayName: 'bcl.columns.status',
-        cellClass: 'icon-button',
+        cellClass: 'icon-cell',
         cellTemplate: 'app/bcl/updateButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
