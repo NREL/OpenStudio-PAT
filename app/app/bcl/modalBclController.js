@@ -204,8 +204,24 @@ export class ModalBclController {
     vm.$log.debug('in setDisplayMeasures');
     vm.$log.debug('FILTERS: ', vm.filters);
     const measures = [];
-    //vm.$log.debug('libMeasures: ', vm.libMeasures);
-    // add checked
+
+    // special case: show only project measures
+    if (vm.filters.project) {
+      // go through my and local and add only 'addedToProject'
+      _.forEach(vm.libMeasures.my, m => {
+        if (m.addedToProject) {
+          // add if not found
+          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+        }
+      })
+      _.forEach(vm.libMeasures.local, m => {
+        if (m.addedToProject) {
+          // add if not found
+          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+        }
+      })
+    }
+    // add other checked
     _.forEach(vm.filters, (val, key) => {
       if (val) {
         vm.$log.debug('key: ', key);
@@ -216,8 +232,6 @@ export class ModalBclController {
         });
       }
     });
-
-    // TODO: PROJECT MEASURES?
 
     vm.$scope.displayMeasures = measures;
     return measures;
