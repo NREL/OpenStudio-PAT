@@ -510,10 +510,15 @@ export class ModalBclController {
     });
 
     modalInstance.result.then((params) => {
-      vm.MeasureManager.duplicateMeasure(params).then( () => {
+      vm.MeasureManager.duplicateMeasure(params).then( (newMeasure) => {
         // success
         vm.$log.debug('Measure Manager duplicateMeasure succeeded');
+        // add and prepare new measure
+        newMeasure = vm.BCL.prepareMeasure(newMeasure, 'my');
+        vm.libMeasures.my.push(newMeasure);
         vm.resetFilters();
+        // select newly added row
+        vm.selectARow(newMeasure.uid);
         deferred.resolve();
       }, () => {
         // failure

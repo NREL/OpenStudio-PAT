@@ -67,7 +67,7 @@ export class MeasureManager {
     vm.$http.post(vm.url + '/duplicate_measure', params)
       .success( (data, status, headers, config) => {
         vm.$log.debug('Measure Manager reply: ', data);
-        deferred.resolve();
+        deferred.resolve(data);
       })
       .error( (data, status, headers, config) => {
         vm.$log.debug('Measure Manager DuplicateMeasure error: ', data);
