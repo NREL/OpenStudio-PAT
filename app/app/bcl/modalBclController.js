@@ -513,7 +513,6 @@ export class ModalBclController {
       vm.MeasureManager.duplicateMeasure(params).then( () => {
         // success
         vm.$log.debug('Measure Manager duplicateMeasure succeeded');
-        vm.getLocalMeasures();
         vm.resetFilters();
         deferred.resolve();
       }, () => {
