@@ -202,11 +202,32 @@ export class Project {
       vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
         // merge with existing project measure
         vm.$log.debug('New computed measure: ', newMeasure);
-        // merge project measure in array to preserve prepareMeasure arguments and already-set arguments
-        _.merge(measure, newMeasure);
+
+        // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
+        _.forEachRight(measure.arguments, (arg, index) => {
+          if (_.isUndefined(arg.specialRowId)) {
+            const match = _.find(measure.arguments, {name: arg.name});
+            if (_.isUndefined(match)) {
+              measure.arguments.splice(index, 1);
+            }
+          }
+        });
+        // then add/merge (at argument level)
+        _.forEach(newMeasure.arguments, (arg) => {
+          const match = _.find(measure.arguments, {name: arg.name});
+          if (_.isUndefined(match)) {
+            measure.arguments.push(arg);
+          } else {
+            _.merge(match, arg);
+          }
+        });
 
       });
+
     });
+
+    // recalculate pretty options
+    vm.savePrettyOptions();
 
     deferred.resolve();
     return deferred.promise;
@@ -317,7 +338,10 @@ export class Project {
       m.arguments = [];
       // This portion only has arguments that don't have the variable box checked
       _.forEach(measure.arguments, (arg) => {
-        if (((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) && (typeof arg.variable === 'undefined' || arg.variable === false)) {
+        if (
+             (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) &&
+             (_.isUndefined(arg.variable) || arg.variable === false)
+           ) {
           const argument = {};
           argument.display_name = arg.displayName;
           //argument.display_name_short = arg.id; TODO
@@ -327,12 +351,12 @@ export class Project {
           argument.default_value = arg.default_value;
           argument.value = arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
           // Make sure that argument is "complete"
-          if (((typeof argument.display_name !== 'undefined' && argument.display_name.length) ||
-            (typeof argument.display_name_short !== 'undefined' && argument.display_name_short.length) ||
-            (typeof argument.name !== 'undefined' && argument.name.length)) &&
-            typeof argument.value_type !== 'undefined' && argument.value_type.length &&
-            typeof argument.default_value !== 'undefined' && argument.default_value.length &&
-            typeof argument.value !== 'undefined' && argument.value.length) {
+          if (((angular.isDefined(argument.display_name) && argument.display_name.length) ||
+            (angular.isDefined(argument.display_name_short) && argument.display_name_short.length) ||
+            (angular.isDefined(argument.name) && argument.name.length)) &&
+            angular.isDefined(argument.value_type) && argument.value_type.length &&
+            angular.isDefined(argument.default_value) && argument.default_value.length &&
+            angular.isDefined(argument.value) && argument.value.length) {
             var_count += 1;
             m.arguments.push(argument);
           } else {
@@ -402,7 +426,7 @@ export class Project {
 
       // Variable arguments
       _.forEach(measure.arguments, (arg) => {
-        if (((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) && (arg.variable === true)) {
+        if (((_.isUndefined(arg.specialRowId)) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) && (arg.variable === true)) {
           vm.$log.debug('Project::exportManual arg: ', arg);
           // see what arg is set to in each design alternative
           const valArr = [];
