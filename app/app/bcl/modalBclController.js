@@ -42,8 +42,8 @@ export class ModalBclController {
       ReportingMeasure: true
     };
 
-    vm.$scope.categories = [];
-    vm.getBCLCategories();
+    // get BCL categories
+    vm.$scope.categories = vm.BCL.getBCLCategories();
 
     // set filters and types with incoming params
     vm.setTypes();
@@ -213,13 +213,13 @@ export class ModalBclController {
           // add if not found
           if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
         }
-      })
+      });
       _.forEach(vm.libMeasures.local, m => {
         if (m.addedToProject) {
           // add if not found
           if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
         }
-      })
+      });
     }
     // add other checked
     _.forEach(vm.filters, (val, key) => {
@@ -235,42 +235,6 @@ export class ModalBclController {
 
     vm.$scope.displayMeasures = measures;
     return measures;
-  }
-
-  // TODO: move most of this processing to BCL service
-  getBCLCategories() {
-    const vm = this;
-
-    vm.BCL.getCategories().then(response => {
-
-      if (response.data.term) {
-        const categories = [];
-        // 3 possible levels of nesting
-        _.forEach(response.data.term, term => {
-          const cat1 = _.pick(term, ['name', 'tid']);
-          cat1.checked = false;
-          const cat1Terms = [];
-          _.forEach(term.term, term2 => {
-            const cat2 = _.pick(term2, ['name', 'tid']);
-            cat2.checked = false;
-            const cat2Terms = [];
-            _.forEach(term2.term, term3 => {
-              const cat3 = _.pick(term3, ['name', 'tid']);
-              cat3.checked = false;
-              cat2Terms.push(cat3);
-            });
-            cat2.children = cat2Terms;
-            cat1Terms.push(cat2);
-          });
-          cat1.children = cat1Terms;
-          categories.push(cat1);
-        });
-
-        vm.$log.debug('Categories: ', categories);
-        vm.$scope.categories = categories;
-
-      }
-    });
   }
 
   // process measures filter changes

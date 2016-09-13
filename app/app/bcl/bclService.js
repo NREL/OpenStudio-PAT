@@ -29,6 +29,11 @@ export class BCL {
       bcl: []
     };
 
+    vm.BCLCategories = [];
+    vm.getCategories().then((categories) => {
+      vm.BCLCategories = categories;
+    });
+
     // initialize Project measures (with arguments and options) from Project service
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
     vm.$log.debug('BCL SERVICE Project MEASURES RETRIEVED: ', vm.projectMeasures);
@@ -457,9 +462,51 @@ export class BCL {
   // TODO: SHOULD PROBABLY MOVE THAT TO MAIN ROUTING WITH PROMISES (LIKE CONSTRUCTIONS IN CBECC-COM)
   getCategories() {
     const vm = this;
-    //return vm.$http.get('http://bcl7.development.nrel.gov/api/taxonomy/measure.json');
-    return vm.$http.get(vm.bclUrl + 'taxonomy/measure.json');
+    const deferred = vm.$q.defer();
+    const categories = [];
+    vm.$http.get(vm.bclUrl + 'taxonomy/measure.json').then(response => {
+      if (response.data.term) {
+        // 3 possible levels of nesting
+        _.forEach(response.data.term, term => {
+          const cat1 = _.pick(term, ['name', 'tid']);
+          cat1.checked = false;
+          const cat1Terms = [];
+          _.forEach(term.term, term2 => {
+            const cat2 = _.pick(term2, ['name', 'tid']);
+            cat2.checked = false;
+            const cat2Terms = [];
+            _.forEach(term2.term, term3 => {
+              const cat3 = _.pick(term3, ['name', 'tid']);
+              cat3.checked = false;
+              cat2Terms.push(cat3);
+            });
+            cat2.children = cat2Terms;
+            cat1Terms.push(cat2);
+          });
+          cat1.children = cat1Terms;
+          categories.push(cat1);
+        });
+
+        vm.$log.debug('Categories: ', categories);
+
+      }
+
+      deferred.resolve(categories);
+
+    }, response => {
+      vm.$log.debug('ERROR retrieving BCL categories');
+      deferred.reject(response);
+    });
+
+    return deferred.promise;
+
   }
+
+  getBCLCategories() {
+    const vm = this;
+    return vm.BCLCategories;
+  }
+
 
   // OPEN BCL LIBRARY MODAL
   // TODO: update is not necessary: we always check for updates
