@@ -279,7 +279,7 @@ export class DependencyManager {
         res.on('end', () => {
           console.timeEnd(`${_.startCase(type)} downloaded`);
           const actualMD5 = jetpack.inspect(vm.tempDir.path(filename), {checksum: 'md5'}).md5;
-          if (expectedMD5.trim() === actualMD5.trim() || !useMD5) {
+          if (expectedMD5.trim() == actualMD5.trim() || !useMD5) {
             let zip;
             if (vm.platform != 'darwin')
               zip = new AdmZip(vm.tempDir.path(filename));
