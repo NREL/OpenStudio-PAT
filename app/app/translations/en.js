@@ -131,6 +131,18 @@ export default {
       displayName: 'Display Name',
       description: 'Description',
       modelerDescription: 'Modeler Description'
+    },
+    updateMeasure: {
+      title: 'Update Measure',
+      name: 'Name',
+      displayName: 'Display Name',
+      updateProjectMeasure: 'A local update is available for this measure.  Apply update to your Project?',
+      updateLocalFromBCL: 'An update for this local measure is available from the BCL. Update Local BCL measure?',
+      updateLocalAndProject: 'An update for this local measure is available from the BCL.  Update Local BCL and Apply to your Project?',
+      updateProjectButton: 'Update Project',
+      updateLocalLibButton: 'Update Local Library',
+      updateLocalLibOnlyButton: 'Update Local Library Only',
+      updateBothButton: 'Update Local Library and Project'
     }
   },
   designAlts: {

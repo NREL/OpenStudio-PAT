@@ -11,6 +11,7 @@ import { DesignAlternativesController } from '../app/design_alts/designAlternati
 import { MeasureManager } from '../app/main/measureManagerService';
 import { ModalBclController } from '../app/bcl/modalBclController';
 import { ModalDuplicateMeasureController } from '../app/bcl/modalDuplicateMeasureController';
+import { ModalUpdateMeasureController } from '../app/bcl/modalUpdateMeasureController';
 import { NavController } from '../app/nav/navController';
 import { OsServer } from '../app/project/osServerService';
 import { OutputsController } from '../app/outputs/outputsController';
@@ -28,6 +29,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('NavController', NavController)
   .controller('ModalBclController', ModalBclController)
   .controller('ModalDuplicateMeasureController', ModalDuplicateMeasureController)
+  .controller('ModalUpdateMeasureController', ModalUpdateMeasureController)
   .controller('AnalysisController', AnalysisController)
   .controller('DesignAlternativesController', DesignAlternativesController)
   .controller('OutputsController', OutputsController)

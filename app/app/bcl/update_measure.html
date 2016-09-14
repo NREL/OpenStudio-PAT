@@ -1,0 +1,39 @@
+<div class="modal-header">
+  <h3 class="modal-title" translate>bcl.updateMeasure.title</h3>
+</div>
+
+<div class="modal-body">
+  <div class="row pad-bot-20">
+    <div class="col-md-12">
+      <div ng-if="modal.measure.status == 'update' && modal.measure.addedToProject && modal.measure.location != 'bcl'">
+        <!-- "My measure", updateProjectMeasure only -->
+        <p class="update-modal" translate>bcl.updateMeasure.updateProjectMeasure</p>
+      </div>
+      <div ng-if="modal.measure.status == 'update' && modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.bcl_update">
+        <!-- BCL update on localBCL measure added to project:  display button to update LocalBCL only, or update both local and project -->
+        <translate>bcl.updateMeasure.updateLocalAndProject</translate>
+      </div>
+
+      <div ng-if="vmeasure.status == 'update' && modal.measure.addedToProject && modal.measure.location != 'bcl' && !modal.measure.bcl_update">
+        <!-- BCL update already applied to localBCL dir, but not applied to project: display button to update project -->
+        <translate>bcl.updateMeasure.updateProjectMeasure</translate>
+      </div>
+
+      <div ng-if="modal.measure.status == 'update' && !modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.bcl_update">
+        <!-- BCL update on localBCL measure NOT added to project: display button to update localBCL only-->
+        <translate>bcl.updateMeasure.updateLocalFromBCL</translate>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" ng-if="modal.measure.status == 'update' && modal.measure.location != 'bcl' && !modal.measure.bcl_update && modal.measure.addedToProject" ng-click="modal.updateProject()" translate>bcl.updateMeasure.updateProjectButton</button>
+  <button type="button" class="btn btn-primary" ng-if="modal.measure.status == 'update' && !modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.bcl_update" ng-click="modal.updateLocalLib()" translate>bcl.updateMeasure.UpdateLocalLibButton</button>
+
+  <button type="button" class="btn btn-primary" ng-if="modal.measure.status == 'update' && modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.bcl_update" ng-click="modal.updateLocalLib()" translate>bcl.updateMeasure.updateLocalLibOnlyButton</button>
+  <button type="button" class="btn btn-primary" ng-if="modal.measure.status == 'update' && modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.bcl_update" ng-click="modal.updateLocalLibAndProject()" translate>bcl.updateMeasure.UpdateBothButton</button>
+
+
+  <button type="button" class="btn btn-warning" ng-click="modal.cancel()">Cancel</button>
+</div>

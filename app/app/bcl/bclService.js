@@ -34,16 +34,21 @@ export class BCL {
       vm.BCLCategories = categories;
     });
 
+    vm.onlineBCLcheck = false;
+
     // initialize Project measures (with arguments and options) from Project service
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
     vm.$log.debug('BCL SERVICE Project MEASURES RETRIEVED: ', vm.projectMeasures);
 
-    vm.getBCLMeasures();
+    vm.getBCLMeasures().then( () => {
 
-    vm.checkForUpdates();
-    vm.checkForUpdatesLocalBcl();
+      // check for updates against localBCL
+      vm.checkForUpdatesLocalBcl();
 
-    // TODO: CHECK FOR UPDATES ONLINE BCL
+    });
+
+    // this will be done each time modal is opened.  not needed here
+    // vm.checkForUpdates();
 
   }
 
@@ -129,58 +134,42 @@ export class BCL {
       _.forEach(updatedMeasures, (measure) => {
         measure = vm.prepareMeasure(measure, 'local');
 
+        // measure update from BCL?
+        if (!vm.onlineBCLcheck){
+          const bcl_match = _.find(vm.libMeasures.bcl, {uid: measure.uid});
+          if (angular.isDefined(bcl_match) && (bcl_match.version_id != measure.version_id)){
+            // TODO: also compare date (match.version_modified > measure.version_modified)
+            // bcl update
+            measure.bcl_update = true;
+          } else {
+            measure.bcl_update = false;
+          }
+        }
+
         // is measure added to project?
         const project_match = _.find(vm.projectMeasures, {uid: measure.uid});
-        if (angular.isDefined(project_match)) {
-         // TODO: do this
+        // update from local to project or from bcl to local to project
+        if (angular.isDefined(project_match) || measure.bcl_update) {
+          // TODO: also compare date (match.version_modified > measure.version_modified)
+          measure.status = 'update';
+        } else {
+          measure.status = '';
         }
 
        newMeasures.push(measure);
 
       });
-      // overwrite myMeasures (to delete removed measures)
+      // overwrite local Measures (to delete removed measures)
       vm.libMeasures.local = newMeasures;
       deferred.resolve();
-
       vm.$log.debug('NEW LOCAL BCL MEASURES DIR: ', vm.libMeasures.local);
 
     });
+
+    // set flag to true
+    vm.onlineBCLcheck = true;
     return deferred.promise;
   }
-
-  // // get local measures
-  // // TODO: deprecate
-  // getLocalMeasures() {
-  //   const vm = this;
-  //
-  //   // assign measures by type
-  //   vm.libMeasures.my = vm.getMeasuresByType(vm.myMeasuresDir, 'my');
-  //   vm.libMeasures.local = vm.getMeasuresByType(vm.localDir, 'local');
-  // }
-
-  // retrieve measures by type (local, my)
-  // TODO: deprecate this once checkForUpdates works
-  // getMeasuresByType(path, type) {
-  //   const vm = this;
-  //   let measurePaths = [];
-  //   const measures = [];
-  //   if (vm.jetpack.exists(path.cwd())) measurePaths = path.find('.', {matching: '*/measure.xml'}, 'relativePath');
-  //   else vm.$log.error('The (%s) Measures directory (%s) does not exist', type, path.cwd());
-  //
-  //   _.forEach(measurePaths, measurePath => {
-  //
-  //     const xml = path.read(measurePath);
-  //     let measure = vm.parseMeasure(xml);
-  //     measure.measureDir = path.path(measurePath, '..');
-  //     //measure.measureDir = path.path(measurePath.path('..'));
-  //     //vm.$log.debug(`measure.measureDir: ${measure.measureDir}`);
-  //     measure = vm.prepareMeasure(measure, type);
-  //     measures.push(measure);
-  //
-  //   });
-  //
-  //   return measures;
-  // }
 
   // retrieve online BCL measures (or what's already been retrieved)
   getBCLMeasures(force = false) {
@@ -365,6 +354,7 @@ export class BCL {
     // add fields for display
     measure.edit = '';
     measure.status = '';
+    measure.bcl_update = false;
     // TODO: if type shows up as 'Project', means there's an error? (measure is missing from local or my measures dirs)
     measure.location = (type == 'project') ? vm.findMeasureOrigin(measure.uid) : type;
     measure.add = '';
@@ -428,12 +418,23 @@ export class BCL {
       const buf = new Buffer(new Uint8Array(response.data));
       const zip = new vm.AdmZip(buf);
       // extract to location (and overwrite)
+      // TODO: verify that this does in fact overwrite and not error out
       zip.extractAllTo(vm.localDir.path() + '/', true);
 
       // use computeArguments to add to localMeasures array
       vm.MeasureManager.computeArguments(vm.localDir.path(measure.display_name)).then( (newMeasure) => {
          newMeasure = vm.prepareMeasure(newMeasure, 'local');
-        vm.libMeasures.local.push(newMeasure);
+
+         // add or merge
+        const lib_match = _.find(vm.libMeasures.local, {uid: newMeasure.uid});
+        if (lib_match) {
+          // TODO: verify this
+          _.merge(lib_match, newMeasure);
+          lib_match.bcl_update = false;
+        } else {
+          vm.libMeasures.local.push(newMeasure);
+        }
+
         deferred.resolve(newMeasure);
       }, () => {
         // failure

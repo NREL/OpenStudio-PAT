@@ -394,6 +394,7 @@ export class ModalBclController {
   // download from BCL (via service)
   download(measure) {
     const vm = this;
+    const deferred = vm.$q.defer();
     vm.BCL.downloadMeasure(measure).then(newMeasure => {
       vm.$log.debug('In modal download()');
       vm.$log.debug("Local Measures: ", vm.libMeasures.local);
@@ -401,7 +402,12 @@ export class ModalBclController {
       vm.resetFilters();
       // select newly added row
       vm.selectARow(measure.uid);
+      deferred.resolve();
+    }, () => {
+      deferred.reject();
     });
+
+    return deferred.promise;
   }
 
   // select row in table based on UID
@@ -425,11 +431,38 @@ export class ModalBclController {
     }});
   }
 
+  // update LocalBCL measure from Online BCL
+  updateLocalBCLMeasure(measure, updateProject=false) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('in UPDATE LOCAL BCL MEASURE function');
+
+    // download from BCL & prepare (overwrite files on disk)
+    vm.download(measure).then(() => {
+
+      // unset 'bcl update' status on original measure
+      measure.bcl_update = false;
+      const msg = 'Measure \'' + measure.display_name + '\' was successfully updated in your local BCL.';
+      vm.toastr.success(msg);
+
+      if (updateProject) {
+        vm.updateProjectMeasure(measure).then( () => {
+          deferred.resolve();
+        });
+      } else {
+        deferred.resolve();
+      }
+
+    });
+
+    return deferred.promise;
+  }
+
   // update Project measure
   updateProjectMeasure(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('in UPDATE MY MEASURE function');
+    vm.$log.debug('in UPDATE PROJECT MEASURE function');
 
     // copy on disk
     const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;
@@ -451,7 +484,7 @@ export class ModalBclController {
       const project_measure = _.find(vm.projectMeasures, {uid: measure.uid});
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
       _.forEachRight(project_measure.arguments, (arg, index) => {
-        if (typeof arg.specialRowId === 'undefined') {
+        if (_.isUndefined(arg.specialRowId)) {
           const match = _.find(measure.arguments, {name: arg.name});
           if (_.isUndefined(match)) {
             project_measure.arguments.splice(index, 1);
@@ -470,7 +503,14 @@ export class ModalBclController {
 
       // unset 'update' status on original measure
       measure.status = '';
-      const msg = 'Measure \'' + newMeasure.display_name + '\' was successfully updated in your project.';
+
+      // remove arguments from measure and merge rest with project_measure
+      // arguments are too complicated to merge in as is
+      let measure_copy = angular.copy(measure);
+      _.assignIn(project_measure, measure_copy);
+
+      const msg = 'Measure \'' + measure.display_name + '\' was successfully updated in your project.';
+      vm.$log.debug("updated project measure: ", project_measure);
       vm.toastr.success(msg);
       deferred.resolve();
 
@@ -481,6 +521,42 @@ export class ModalBclController {
     });
 
     return deferred.promise;
+  }
+
+  // update button
+  updateAMeasure(measure) {
+    const vm = this;
+    vm.$log.debug('in Update A Measure function');
+    const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalUpdateMeasureController',
+      controllerAs: 'modal',
+      templateUrl: 'app/bcl/update_measure.html',
+      windowClass: 'modal',
+      resolve: {
+        measure: function() {
+          return measure;
+        }
+      }
+    });
+
+    modalInstance.result.then((action) => {
+      if (action == 'updateProject') {
+        vm.updateProjectMeasure(measure);
+
+      } else if (action == 'updateLocalLib') {
+        vm.updateLocalBCLMeasure(measure);
+
+      } else if (action == 'updateLocalLibAndProject') {
+        vm.updateLocalBCLMeasure(measure, true);
+
+      } else {
+        vm.$log.debug('Invalid action in modal');
+      }
+
+    });
+
   }
 
   // copy from local and edit (2X)
