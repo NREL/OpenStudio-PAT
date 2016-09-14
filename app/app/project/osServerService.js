@@ -336,11 +336,12 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType();
 
-    if (vm.serverStatus != 'stopped') {
+    //if ( vm.serverStatus ==  vm.serverStatus ) { TODO serverStatus is not being set to running, even when it is running
+    if ( vm.serverStatus ==  vm.serverStatus ) {
 
       if (serverType.name == 'local') {
 
-        const command = 'cd ' + vm.CLIpath + ' && ruby openstudio_meta stop_local ' + vm.projectDir.path();
+        const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local --debug ' + '\"' + vm.projectDir.path()  + '\" --verbose';
         vm.$log.debug('Stop Local command: ', command);
         const child = vm.exec(command,
           (error, stdout, stderr) => {

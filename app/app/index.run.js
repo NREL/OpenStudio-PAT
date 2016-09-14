@@ -9,6 +9,12 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
   $window.onbeforeunload = e => {
     Project.exportPAT();
     MeasureManager.stopMeasureManager();
+    OsServer.stopServer().then(response => {
+      //  server is stopped
+    });
+
+    // Prevent exit
+    //e.returnValue = false;
   };
 
   $window.lint = () => {
