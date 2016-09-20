@@ -354,14 +354,28 @@ export class DependencyManager {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    https.get(`${vm.manifest.endpoint}${filename}.md5`, res => {
-      let body = '';
-      res.on('data', d => body += d);
-      res.on('end', () => deferred.resolve(body));
-    }).on('error', e => {
-      vm.$log.error('Failed to fetch md5:', e);
-      deferred.reject(e);
-    });
+    let fileFound = false;
+    vm.$log.debug('Trying to read file ', filename);
+    const file = jetpack.read(filename);
+    vm.$log.debug('file: ', file);
+    if (typeof file !== 'undefined' ) {
+      fileFound = true;
+      vm.$log.debug(filename, ' found');
+    } else {
+      vm.$log.debug(filename, ' not found');
+      deferred.reject();
+    }
+
+    if( fileFound ) {
+      https.get(`${vm.manifest.endpoint}${filename}.md5`, res => {
+        let body = '';
+        res.on('data', d => body += d);
+        res.on('end', () => deferred.resolve(body));
+      }).on('error', e => {
+        vm.$log.error('Failed to fetch md5:', e);
+        deferred.reject(e);
+      });
+    }
 
     return deferred.promise;
   }
