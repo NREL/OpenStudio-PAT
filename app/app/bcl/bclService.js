@@ -43,6 +43,7 @@ export class BCL {
     vm.getBCLMeasures().then( () => {
 
       // check for updates against localBCL
+      // TODO: wait until measureManager is up and running before doing this
       vm.checkForUpdatesLocalBcl();
 
     });
@@ -55,20 +56,12 @@ export class BCL {
   // returns libMeasures variable (and check for Updates too)
   getMeasures() {
     const vm = this;
-    // const deferred = vm.$q.defer();
-    // vm.checkForUpdates().then(() => {
-    //   vm.checkForUpdatesLocalBcl().then(() => {
-    //     deferred.resolve(vm.libMeasures);
-    //   });
-    // });
-    // return deferred.promise;
 
     const promise1 = vm.checkForUpdates();
     const promise2 = vm.checkForUpdatesLocalBcl();
 
     return vm.$q.all([promise1, promise2]).then(() => {
 
-      vm.$log.debug('HEY!!', vm.libMeasures);
       return vm.libMeasures;
     });
    }
@@ -127,6 +120,7 @@ export class BCL {
   checkForUpdatesLocalBcl(){
     const vm = this;
     const deferred = vm.$q.defer();
+    vm.$log.debug("in BCLService checkForUpdatesLocalBcl   method");
     // the path doesn't work if the trailing slash isn't there!
     vm.MeasureManager.updateMeasures(vm.localDir.path() + '/').then(updatedMeasures => {
       const newMeasures = [];
@@ -175,10 +169,12 @@ export class BCL {
   getBCLMeasures(force = false) {
     const vm = this;
     const deferred = vm.$q.defer();
+    vm.$log.debug('in BCLService geBCLMeasures function');
 
     if (force || _.isEmpty(vm.libMeasures.bcl)) {
       vm.libMeasures.bcl = [];
       vm.loadOnlineBCLMeasures().then(measures => {
+        vm.$log.debug('loaded online BCL measures');
         vm.libMeasures.bcl = measures;
         deferred.resolve(measures);
       }, response => {

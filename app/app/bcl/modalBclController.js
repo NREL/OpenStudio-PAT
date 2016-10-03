@@ -479,7 +479,7 @@ export class ModalBclController {
 
     vm.MeasureManager.computeArguments(vm.projectDir.path(dirName), osmPath).then((newMeasure) => {
       // success
-      vm.$log.debug('New computed measure: ', newMeasure);
+      // vm.$log.debug('New computed measure: ', newMeasure);
       // merge project measure in array to preserve prepareMeasure arguments and already-set arguments
       const project_measure = _.find(vm.projectMeasures, {uid: measure.uid});
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
@@ -488,6 +488,7 @@ export class ModalBclController {
           const match = _.find(measure.arguments, {name: arg.name});
           if (_.isUndefined(match)) {
             project_measure.arguments.splice(index, 1);
+            // vm.$log.debug('removing argument: ', arg.name);
           }
         }
       });
@@ -495,21 +496,25 @@ export class ModalBclController {
       _.forEach(newMeasure.arguments, (arg) => {
         const match = _.find(project_measure.arguments, {name: arg.name});
         if (_.isUndefined(match)) {
+          // vm.$log.debug('adding argument: ', arg.name);
           project_measure.arguments.push(arg);
         } else {
+          // vm.$log.debug('merging argument: ', arg.name);
           _.merge(match, arg);
+          // vm.$log.debug('merged match: ', match);
         }
       });
 
       // unset 'update' status on original measure
       measure.status = '';
 
-      // remove arguments from measure and merge rest with project_measure
-      // arguments are too complicated to merge in as is
+      // remove arguments and merge rest with project_measure
       let measure_copy = angular.copy(measure);
+      delete measure_copy.arguments;
+      delete measure_copy.open;
       _.assignIn(project_measure, measure_copy);
 
-      const msg = 'Measure \'' + measure.display_name + '\' was successfully updated in your project.';
+      const msg = 'Measure \'' + project_measure.display_name + '\' was successfully updated in your project.';
       vm.$log.debug("updated project measure: ", project_measure);
       vm.toastr.success(msg);
       deferred.resolve();
