@@ -7,7 +7,7 @@ import os from 'os';
 import path from 'path';
 
 export class DependencyManager {
-  constructor($q, $http, $log, $translate, StatusBar, Project) {
+  constructor($q, $http, $log, $translate, $uibModal, StatusBar, Project) {
     'ngInject';
 
     const vm = this;
@@ -27,6 +27,9 @@ export class DependencyManager {
     vm.openstudioServerMD5 = vm.Project.getOpenstudioServerMD5();
     vm.openstudioCLIMD5 = vm.Project.getOpenstudioCLIMD5();
     vm.openstudioMD5 = vm.Project.getOpenstudioMD5();
+    vm.$q = $q;
+    vm.$uibModal = $uibModal;
+    //vm.$uibModalInstance = $uibModalInstance;
 
     // 2MB buffer
     vm.bufferSize = 2 * 0x100000;
@@ -129,6 +132,9 @@ export class DependencyManager {
 
   checkDependencies() {
     const vm = this;
+
+    // Open modal dialog to "disable app during downloads, and inform user of any issues
+    vm.openDependencyModal();
 
     const platform = os.platform();
     const arch = os.arch();
@@ -468,6 +474,37 @@ export class DependencyManager {
     vm.$log.debug('filename:', filename);
 
     return filename;
+  }
+
+  openDependencyModal(types = [], filters = [], update = false) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      //controller: 'ModalBclController',
+      controller: 'ModalDependencyController',
+      controllerAs: 'modal',
+      //templateUrl: 'app/bcl/bcl.html',
+      templateUrl: 'app/main/dependency.html',
+      windowClass: 'wide-modal',
+      resolve: {
+        params: function () {
+          return {
+            update: update,
+            filters: filters,
+            types: types
+          };
+        }
+      }
+    });
+
+    modalInstance.result.then(() => {
+      deferred.resolve();
+    }, () => {
+      // Modal canceled
+      deferred.reject();
+    });
+    return deferred.promise;
   }
 
 }

@@ -1,4 +1,7 @@
 export default {
+  dependency: {
+    title: 'PAT Dependency Download Status'
+  },
   analysis: {
     title: 'Analysis',
     addMeasure: 'Add Measure',
