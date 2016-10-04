@@ -11,7 +11,7 @@ export class MeasureManager {
     vm.$q = $q;
 
     let exeExt = '';
-    if( process.platform == 'win32' ) {
+    if (process.platform == 'win32') {
       exeExt = '.exe';
     }
 
@@ -65,11 +65,11 @@ export class MeasureManager {
 
     vm.$log.debug('params one more time: ', params);
     vm.$http.post(vm.url + '/duplicate_measure', params)
-      .success( (data, status, headers, config) => {
+      .success((data, status, headers, config) => {
         vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
-      .error( (data, status, headers, config) => {
+      .error((data, status, headers, config) => {
         vm.$log.debug('Measure Manager DuplicateMeasure error: ', data);
         deferred.reject();
       });
@@ -84,22 +84,22 @@ export class MeasureManager {
 
     const vm = this;
     // fix path for windows
-    const newMeasurePath = measurePath.replace(/\\/g,"/"); // Evan: how to normalize the path
-    const params = { measures_dir: newMeasurePath };
+    const newMeasurePath = measurePath.replace(/\\/g, '/'); // Evan: how to normalize the path
+    const params = {measures_dir: newMeasurePath};
     vm.$log.debug('PARAMS: ', params);
 
     const deferred = vm.$q.defer();
 
     vm.$http.post(vm.url + '/update_measures', params)
-      .success( (data, status, headers, config) => {
+      .success((data, status, headers, config) => {
         vm.$log.debug('updateMeasures Success!, status: ', status);
         // vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
-    .error ((data, status, headers, config) => {
-      vm.$log.debug('Measure Manager UpdateMeasures error: ', data);
-      deferred.reject([]);
-    });
+      .error((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager UpdateMeasures error: ', data);
+        deferred.reject([]);
+      });
 
     return deferred.promise;
   }
@@ -107,23 +107,23 @@ export class MeasureManager {
   // Compute Arguments
   // This function computes arguments and returns all metadata for a single measure
   // Expects a measurePath.  and osmPath if evaluating against a specific model
-  computeArguments(measurePath, osmPath=null) {
+  computeArguments(measurePath, osmPath = null) {
     const vm = this;
 
     // TODO: is there a situation where we want to use an empty model even though we have a seed model defined?
     osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
 
-    const params = (osmPath == null) ? {measure_dir: measurePath} : {measure_dir: measurePath, osm_path: osmPath };
+    const params = (osmPath == null) ? {measure_dir: measurePath} : {measure_dir: measurePath, osm_path: osmPath};
     vm.$log.debug('computeArguments params', params);
     const deferred = vm.$q.defer();
 
     vm.$http.post(vm.url + '/compute_arguments', params)
-      .success( (data, status, headers, config) => {
+      .success((data, status, headers, config) => {
         vm.$log.debug('computeArguments Success!, status: ', status);
         // vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
-      .error ((data, status, headers, config) => {
+      .error((data, status, headers, config) => {
         vm.$log.debug('Measure Manager ComputeArguments error: ', data);
         deferred.reject([]);
       });

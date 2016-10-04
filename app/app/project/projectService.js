@@ -4,7 +4,7 @@ import path from 'path';
 import {remote} from 'electron';
 import jsZip from 'jszip';
 import fs from 'fs';
-import http from 'http';
+//import http from 'http';
 
 const {app} = remote;
 

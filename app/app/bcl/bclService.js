@@ -40,7 +40,7 @@ export class BCL {
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
     vm.$log.debug('BCL SERVICE Project MEASURES RETRIEVED: ', vm.projectMeasures);
 
-    vm.getBCLMeasures().then( () => {
+    vm.getBCLMeasures().then(() => {
 
       // check for updates against localBCL
       // TODO: wait until measureManager is up and running before doing this
@@ -64,7 +64,7 @@ export class BCL {
 
       return vm.libMeasures;
     });
-   }
+  }
 
   // returns libMeasures variable without checking updates
   getMeasuresNoUpdates() {
@@ -76,7 +76,7 @@ export class BCL {
   checkForUpdates() {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug("in BCLService checkForUpdates method");
+    vm.$log.debug('in BCLService checkForUpdates method');
 
     // the path doesn't work if the trailing slash isn't there!
     vm.MeasureManager.updateMeasures(vm.myMeasuresDir.path() + '/').then(updatedMeasures => {
@@ -117,10 +117,10 @@ export class BCL {
   }
 
   // Load / check for updates in local BCL folder
-  checkForUpdatesLocalBcl(){
+  checkForUpdatesLocalBcl() {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug("in BCLService checkForUpdatesLocalBcl   method");
+    vm.$log.debug('in BCLService checkForUpdatesLocalBcl   method');
     // the path doesn't work if the trailing slash isn't there!
     vm.MeasureManager.updateMeasures(vm.localDir.path() + '/').then(updatedMeasures => {
       const newMeasures = [];
@@ -129,9 +129,9 @@ export class BCL {
         measure = vm.prepareMeasure(measure, 'local');
 
         // measure update from BCL?
-        if (!vm.onlineBCLcheck){
+        if (!vm.onlineBCLcheck) {
           const bcl_match = _.find(vm.libMeasures.bcl, {uid: measure.uid});
-          if (angular.isDefined(bcl_match) && (bcl_match.version_id != measure.version_id)){
+          if (angular.isDefined(bcl_match) && (bcl_match.version_id != measure.version_id)) {
             // TODO: also compare date (match.version_modified > measure.version_modified)
             // bcl update
             measure.bcl_update = true;
@@ -150,7 +150,7 @@ export class BCL {
           measure.status = '';
         }
 
-       newMeasures.push(measure);
+        newMeasures.push(measure);
 
       });
       // overwrite local Measures (to delete removed measures)
@@ -418,10 +418,10 @@ export class BCL {
       zip.extractAllTo(vm.localDir.path() + '/', true);
 
       // use computeArguments to add to localMeasures array
-      vm.MeasureManager.computeArguments(vm.localDir.path(measure.display_name)).then( (newMeasure) => {
-         newMeasure = vm.prepareMeasure(newMeasure, 'local');
+      vm.MeasureManager.computeArguments(vm.localDir.path(measure.display_name)).then((newMeasure) => {
+        newMeasure = vm.prepareMeasure(newMeasure, 'local');
 
-         // add or merge
+        // add or merge
         const lib_match = _.find(vm.libMeasures.local, {uid: newMeasure.uid});
         if (lib_match) {
           // TODO: verify this

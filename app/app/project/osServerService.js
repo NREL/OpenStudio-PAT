@@ -165,7 +165,7 @@ export class OsServer {
     function sleep(milliseconds) {
       const start = new Date().getTime();
       for (let i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds){
+        if ((new Date().getTime() - start) > milliseconds) {
           break;
         }
       }
@@ -189,7 +189,7 @@ export class OsServer {
           vm.$log.debug('try to read file');
           const file = jetpack.read(vm.projectDir.path('local_configuration.receipt'));
           vm.$log.debug('file: ', file);
-          if (typeof file !== 'undefined' ) {
+          if (typeof file !== 'undefined') {
             vm.$log.debug('local_configuration.receipt found');
             noFileYet = false;
             vm.$log.debug('noFileYet: ', noFileYet);
@@ -337,11 +337,11 @@ export class OsServer {
     const serverType = vm.Project.getRunType();
 
     //if ( vm.serverStatus ==  vm.serverStatus ) { TODO serverStatus is not being set to running, even when it is running
-    if ( vm.serverStatus ==  vm.serverStatus ) {
+    if (vm.serverStatus == vm.serverStatus) {
 
       if (serverType.name == 'local') {
 
-        const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local --debug ' + '\"' + vm.projectDir.path()  + '\" --verbose';
+        const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local --debug ' + '\"' + vm.projectDir.path() + '\" --verbose';
         vm.$log.debug('Stop Local command: ', command);
         const child = vm.exec(command,
           (error, stdout, stderr) => {
