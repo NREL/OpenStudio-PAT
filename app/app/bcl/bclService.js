@@ -41,13 +41,7 @@ export class BCL {
     vm.$log.debug('BCL SERVICE Project MEASURES RETRIEVED: ', vm.projectMeasures);
 
     vm.getBCLMeasures().then( () => {
-
-      // check for updates against localBCL (after measureManager is running)
-      vm.MeasureManager.isReady().then( () => {
-        vm.$log.debug('MEASURE MANAGER IS READY PROMISE RESOLVED! Checking for Updates...');
-        vm.checkForUpdatesLocalBcl();
-      });
-
+      vm.checkForUpdatesLocalBcl();
     });
 
     // this will be done each time modal is opened.  not needed here
@@ -80,42 +74,46 @@ export class BCL {
     const deferred = vm.$q.defer();
     vm.$log.debug("in BCLService checkForUpdates method");
 
-    // the path doesn't work if the trailing slash isn't there!
-    vm.MeasureManager.updateMeasures(vm.myMeasuresDir.path() + '/').then(updatedMeasures => {
-      const newMeasures = [];
-      // update MyMeasure Directory and rerun prepare measure
-      _.forEach(updatedMeasures, (measure) => {
-        measure = vm.prepareMeasure(measure, 'my');
+    vm.MeasureManager.isReady().then( () => {
+      vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates...');
+      // the path doesn't work if the trailing slash isn't there!
+      vm.MeasureManager.updateMeasures(vm.myMeasuresDir.path() + '/').then(updatedMeasures => {
+        const newMeasures = [];
+        // update MyMeasure Directory and rerun prepare measure
+        _.forEach(updatedMeasures, (measure) => {
+          measure = vm.prepareMeasure(measure, 'my');
 
-        // is measure added to project?
-        const project_match = _.find(vm.projectMeasures, {uid: measure.uid});
+          // is measure added to project?
+          const project_match = _.find(vm.projectMeasures, {uid: measure.uid});
 
-        if (angular.isDefined(project_match)) {
-          // compare version_id and date:
+          if (angular.isDefined(project_match)) {
+            // compare version_id and date:
 
-          // vm.$log.debug('project match: ', project_match);
-          // vm.$log.debug('measure: ', measure);
-          // vm.$log.debug('version_ids: ', project_match.version_id, measure.version_id);
+            // vm.$log.debug('project match: ', project_match);
+            // vm.$log.debug('measure: ', measure);
+            // vm.$log.debug('version_ids: ', project_match.version_id, measure.version_id);
 
-          // TODO: also compare date (match.version_modified > measure.version_modified)
-          if (project_match.version_id != measure.version_id) {
-            // set status flag
-            measure.status = 'update';
-          } else {
-            measure.status = '';
+            // TODO: also compare date (match.version_modified > measure.version_modified)
+            if (project_match.version_id != measure.version_id) {
+              // set status flag
+              measure.status = 'update';
+            } else {
+              measure.status = '';
+            }
           }
-        }
 
-        newMeasures.push(measure);
+          newMeasures.push(measure);
 
+        });
+        // overwrite myMeasures (to delete removed measures)
+        vm.libMeasures.my = newMeasures;
+        deferred.resolve();
+
+        vm.$log.debug('NEW MY MEASURES DIR: ', vm.libMeasures.my);
       });
-      // overwrite myMeasures (to delete removed measures)
-      vm.libMeasures.my = newMeasures;
-      deferred.resolve();
-
-      vm.$log.debug('NEW MY MEASURES DIR: ', vm.libMeasures.my);
     });
     return deferred.promise;
+
   }
 
   // Load / check for updates in local BCL folder
@@ -123,47 +121,50 @@ export class BCL {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.$log.debug("in BCLService checkForUpdatesLocalBcl   method");
-    // the path doesn't work if the trailing slash isn't there!
-    vm.MeasureManager.updateMeasures(vm.localDir.path() + '/').then(updatedMeasures => {
-      const newMeasures = [];
-      // update LocalBCL Directory and rerun prepare measure
-      _.forEach(updatedMeasures, (measure) => {
-        measure = vm.prepareMeasure(measure, 'local');
+    vm.MeasureManager.isReady().then( () => {
+      vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates LocalBCL...');
+      // the path doesn't work if the trailing slash isn't there!
+      vm.MeasureManager.updateMeasures(vm.localDir.path() + '/').then(updatedMeasures => {
+        const newMeasures = [];
+        // update LocalBCL Directory and rerun prepare measure
+        _.forEach(updatedMeasures, (measure) => {
+          measure = vm.prepareMeasure(measure, 'local');
 
-        // measure update from BCL?
-        if (!vm.onlineBCLcheck){
-          const bcl_match = _.find(vm.libMeasures.bcl, {uid: measure.uid});
-          if (angular.isDefined(bcl_match) && (bcl_match.version_id != measure.version_id)){
-            // TODO: also compare date (match.version_modified > measure.version_modified)
-            // bcl update
-            measure.bcl_update = true;
-          } else {
-            measure.bcl_update = false;
+          // measure update from BCL?
+          if (!vm.onlineBCLcheck) {
+            const bcl_match = _.find(vm.libMeasures.bcl, {uid: measure.uid});
+            if (angular.isDefined(bcl_match) && (bcl_match.version_id != measure.version_id)) {
+              // TODO: also compare date (match.version_modified > measure.version_modified)
+              // bcl update
+              measure.bcl_update = true;
+            } else {
+              measure.bcl_update = false;
+            }
           }
-        }
 
-        // is measure added to project?
-        const project_match = _.find(vm.projectMeasures, {uid: measure.uid});
-        // update from local to project or from bcl to local to project
-        if (angular.isDefined(project_match) || measure.bcl_update) {
-          // TODO: also compare date (match.version_modified > measure.version_modified)
-          measure.status = 'update';
-        } else {
-          measure.status = '';
-        }
+          // is measure added to project?
+          const project_match = _.find(vm.projectMeasures, {uid: measure.uid});
+          // update from local to project or from bcl to local to project
+          if (angular.isDefined(project_match) || measure.bcl_update) {
+            // TODO: also compare date (match.version_modified > measure.version_modified)
+            measure.status = 'update';
+          } else {
+            measure.status = '';
+          }
 
-       newMeasures.push(measure);
+          newMeasures.push(measure);
+
+        });
+        // overwrite local Measures (to delete removed measures)
+        vm.libMeasures.local = newMeasures;
+        deferred.resolve();
+        vm.$log.debug('NEW LOCAL BCL MEASURES DIR: ', vm.libMeasures.local);
 
       });
-      // overwrite local Measures (to delete removed measures)
-      vm.libMeasures.local = newMeasures;
-      deferred.resolve();
-      vm.$log.debug('NEW LOCAL BCL MEASURES DIR: ', vm.libMeasures.local);
 
+      // set flag to true
+      vm.onlineBCLcheck = true;
     });
-
-    // set flag to true
-    vm.onlineBCLcheck = true;
     return deferred.promise;
   }
 
