@@ -42,9 +42,11 @@ export class BCL {
 
     vm.getBCLMeasures().then( () => {
 
-      // check for updates against localBCL
-      // TODO: wait until measureManager is up and running before doing this
-      vm.checkForUpdatesLocalBcl();
+      // check for updates against localBCL (after measureManager is running)
+      vm.MeasureManager.isReady().then( () => {
+        vm.$log.debug('MEASURE MANAGER IS READY PROMISE RESOLVED! Checking for Updates...');
+        vm.checkForUpdatesLocalBcl();
+      });
 
     });
 
