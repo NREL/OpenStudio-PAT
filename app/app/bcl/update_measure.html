@@ -5,7 +5,7 @@
 <div class="modal-body">
   <div class="row pad-bot-20">
     <div class="col-md-12">
-      <div ng-if="modal.measure.status == 'update' && modal.measure.addedToProject && modal.measure.location != 'bcl'">
+      <div ng-if="modal.measure.status == 'update' && modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.location != 'my' && !modal.measure.bcl_update">
         <!-- "My measure", updateProjectMeasure only -->
         <p class="update-modal" translate>bcl.updateMeasure.updateProjectMeasure</p>
       </div>
@@ -29,10 +29,10 @@
 
 <div class="modal-footer">
   <button type="button" class="btn btn-primary" ng-if="modal.measure.status == 'update' && modal.measure.location != 'bcl' && !modal.measure.bcl_update && modal.measure.addedToProject" ng-click="modal.updateProject()" translate>bcl.updateMeasure.updateProjectButton</button>
-  <button type="button" class="btn btn-primary" ng-if="modal.measure.status == 'update' && !modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.bcl_update" ng-click="modal.updateLocalLib()" translate>bcl.updateMeasure.UpdateLocalLibButton</button>
+  <button type="button" class="btn btn-primary" ng-if="modal.measure.status == 'update' && !modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.bcl_update" ng-click="modal.updateLocalLib()" translate>bcl.updateMeasure.updateLocalLibButton</button>
 
   <button type="button" class="btn btn-primary" ng-if="modal.measure.status == 'update' && modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.bcl_update" ng-click="modal.updateLocalLib()" translate>bcl.updateMeasure.updateLocalLibOnlyButton</button>
-  <button type="button" class="btn btn-primary" ng-if="modal.measure.status == 'update' && modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.bcl_update" ng-click="modal.updateLocalLibAndProject()" translate>bcl.updateMeasure.UpdateBothButton</button>
+  <button type="button" class="btn btn-primary" ng-if="modal.measure.status == 'update' && modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.bcl_update" ng-click="modal.updateLocalLibAndProject()" translate>bcl.updateMeasure.updateBothButton</button>
 
 
   <button type="button" class="btn btn-warning" ng-click="modal.cancel()">Cancel</button>

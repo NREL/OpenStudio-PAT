@@ -44,6 +44,11 @@ export class MeasureManager {
         vm.$log.debug('Found WEBrick Start!, resolve promise');
         vm.mmReadyDeferred.resolve();
       }
+      // TODO: THIS IS TEMPORARY:
+      else if (str.indexOf('Error: Address already in use') !== -1) {
+        vm.$log.debug ('WEBrick already running...using tempMeasureManager');
+        vm.mmReadyDeferred.resolve();
+      }
 
     });
     vm.cli.stderr.on('data', (data) => {
@@ -52,6 +57,11 @@ export class MeasureManager {
       const str = data.toString();
       if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
         vm.$log.debug('Found WEBrick Start!, resolve promise');
+        vm.mmReadyDeferred.resolve();
+      }
+      // TODO: THIS IS TEMPORARY:
+      else if (str.indexOf('Error: Address already in use') !== -1) {
+        vm.$log.debug ('WEBrick already running...using tempMeasureManager');
         vm.mmReadyDeferred.resolve();
       }
     });
