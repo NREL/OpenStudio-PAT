@@ -5,9 +5,9 @@ import AdmZip from 'adm-zip';
 import https from 'https';
 import os from 'os';
 import path from 'path';
+import url from 'url';
 
 export class DependencyManager {
-  //constructor($q, $http, $log, $translate, $uibModal, $uibModalInstance, StatusBar, Project) {
   constructor($q, $http, $log, $translate, $uibModal, StatusBar, Project) {
     'ngInject';
 
@@ -31,7 +31,6 @@ export class DependencyManager {
     vm.$q = $q;
     vm.$uibModal = $uibModal;
     vm.downloadStatus = 'N/A';
-    //vm.$uibModalInstance = $uibModalInstance;
 
     // 2MB buffer
     vm.bufferSize = 2 * 0x100000;
@@ -220,7 +219,7 @@ export class DependencyManager {
             vm.$log.debug('mongoDir: ', mongoDir.path());
             vm.downloadStatus += 'mongoDir: ';
             vm.downloadStatus += mongoDir.path();
-            jetpack.remove(mongoDir.path());
+            //jetpack.remove(mongoDir.path());
           }
         });
       }
@@ -259,7 +258,7 @@ export class DependencyManager {
             vm.$log.debug('openstudioServerDir: ', openstudioServerDir.path());
             vm.downloadStatus += 'openstudioServerDir: ';
             vm.downloadStatus += openstudioServerDir.path();
-            jetpack.remove(openstudioServerDir.path());
+            //jetpack.remove(openstudioServerDir.path());
           }
         });
       }
@@ -298,7 +297,7 @@ export class DependencyManager {
             vm.$log.debug('openstudioCLIDir: ', openstudioCLIDir.path());
             vm.downloadStatus += 'openstudioCLIDir: ';
             vm.downloadStatus += openstudioCLIDir.path();
-            jetpack.remove(openstudioCLIDir.path());
+            //jetpack.remove(openstudioCLIDir.path());
           }
         });
       }
@@ -337,7 +336,7 @@ export class DependencyManager {
             vm.$log.debug('openstudioDir: ', openstudioDir.path());
             vm.downloadStatus += 'openstudioDir: ';
             vm.downloadStatus += openstudioDir.path();
-            jetpack.remove(openstudioDir.path());
+            //jetpack.remove(openstudioDir.path());
           }
         });
       }
@@ -378,54 +377,43 @@ export class DependencyManager {
       return vm.downloadZip(dataPath, dataFilename, 'dataLocalDir');
     }
 
-    //downloadData(dataPath, dataFilename, dataLocalDir)
-    //  .finally(() => {
-    //    vm.StatusBar.clear();
-    //});
-
-    // Close dialog
-    //vm.$uibModalInstance.close();
-
     return deferred.promise;
+  }
+
+  _urlExists(Url, callback) {
+    const vm = this;
+    var options = {
+      method: 'HEAD',
+      host: url.parse(Url).host,
+      path: url.parse(Url).pathname
+    };
+    const req = https.request(options, r => callback(r.statusCode == 200));
+    req.end();
   }
 
   _getOnlineChecksum(filename) {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    let fileFound = false;
-    vm.$log.debug('Trying to read file ', filename);
-    vm.downloadStatus = 'Trying to read file ';
-    vm.downloadStatus += filename;
-    const file = jetpack.read(filename);
-    vm.$log.debug('File: ', file);
-    vm.downloadStatus += '. File: ';
-    vm.downloadStatus += file;
-    vm.downloadStatus += '. ';
-    if (typeof file !== 'undefined') {
-      fileFound = true;
-      vm.$log.debug(filename, ' found.');
-      vm.downloadStatus += filename;
-      vm.downloadStatus += ' found.';
-    } else {
-      vm.$log.debug(filename, ' not found.');
-      vm.downloadStatus += filename;
-      vm.downloadStatus += ' not found.';
-      deferred.reject();
-    }
-
-    if (fileFound) {
-      https.get(`${vm.manifest.endpoint}${filename}.md5`, res => {
-        let body = '';
-        res.on('data', d => body += d);
-        res.on('end', () => deferred.resolve(body));
-      }).on('error', e => {
-        vm.$log.error('Failed to fetch md5:', e);
-        vm.downloadStatus += ' Failed to fetch md5: ';
-        vm.downloadStatus += e;
-        deferred.reject(e);
-      });
-    }
+    let urlExists = vm._urlExists(`${vm.manifest.endpoint}${filename}.md5`, exists => {
+      if (exists) {
+        vm.$log.debug(filename, 'found.');
+        vm.downloadStatus = filename;
+        vm.downloadStatus += ' found.';
+        https.get(`${vm.manifest.endpoint}${filename}.md5`, res => {
+          let body = '';
+          res.on('data', d => body += d);
+          res.on('end', () => deferred.resolve(body));
+        }).on('error', e => {
+          vm.$log.error('Failed to fetch md5:', e);
+          vm.downloadStatus += ' Failed to fetch md5: ';
+          vm.downloadStatus += e;
+          deferred.reject(e);
+        });
+      } else {
+        deferred.reject('File not found');
+      }
+    });
 
     return deferred.promise;
   }
@@ -482,7 +470,6 @@ export class DependencyManager {
                 deferred.resolve();
               }
 
-
             });
           } else {
             console.groupCollapsed('Failed download: MD5 mismatch');
@@ -532,22 +519,15 @@ export class DependencyManager {
 
   openDependencyModal() {
     const vm = this;
-    const deferred = vm.$q.defer();
-    const modalInstance = vm.$uibModal.open({
+    vm.$uibModal.open({
       backdrop: 'static',
       controller: 'ModalDependencyController',
       controllerAs: 'modal',
+      size: 'lg',
       templateUrl: 'app/main/dependency.html',
       windowClass: 'wide-modal'
     });
 
-    modalInstance.result.then(() => {
-      deferred.resolve();
-    }, () => {
-      // Modal canceled
-      deferred.reject();
-    });
-    return deferred.promise;
   }
 
 }
