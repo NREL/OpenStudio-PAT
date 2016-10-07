@@ -219,7 +219,7 @@ export class DependencyManager {
             vm.$log.debug('mongoDir: ', mongoDir.path());
             vm.downloadStatus += 'mongoDir: ';
             vm.downloadStatus += mongoDir.path();
-            //jetpack.remove(mongoDir.path());
+            jetpack.remove(mongoDir.path());
           }
         });
       }
@@ -258,7 +258,7 @@ export class DependencyManager {
             vm.$log.debug('openstudioServerDir: ', openstudioServerDir.path());
             vm.downloadStatus += 'openstudioServerDir: ';
             vm.downloadStatus += openstudioServerDir.path();
-            //jetpack.remove(openstudioServerDir.path());
+            jetpack.remove(openstudioServerDir.path());
           }
         });
       }
@@ -297,7 +297,7 @@ export class DependencyManager {
             vm.$log.debug('openstudioCLIDir: ', openstudioCLIDir.path());
             vm.downloadStatus += 'openstudioCLIDir: ';
             vm.downloadStatus += openstudioCLIDir.path();
-            //jetpack.remove(openstudioCLIDir.path());
+            jetpack.remove(openstudioCLIDir.path());
           }
         });
       }
@@ -336,7 +336,7 @@ export class DependencyManager {
             vm.$log.debug('openstudioDir: ', openstudioDir.path());
             vm.downloadStatus += 'openstudioDir: ';
             vm.downloadStatus += openstudioDir.path();
-            //jetpack.remove(openstudioDir.path());
+            jetpack.remove(openstudioDir.path());
           }
         });
       }
