@@ -84,9 +84,9 @@ export class BCL {
           measure = vm.prepareMeasure(measure, 'my');
 
           // is measure added to project?
-          const project_match = _.find(vm.projectMeasures, {uid: measure.uid});
+          const projectMatch = _.find(vm.projectMeasures, {uid: measure.uid});
 
-          if (angular.isDefined(project_match)) {
+          if (angular.isDefined(projectMatch)) {
             // compare version_id and date:
 
             // vm.$log.debug('project match: ', project_match);
@@ -94,7 +94,7 @@ export class BCL {
             // vm.$log.debug('version_ids: ', project_match.version_id, measure.version_id);
 
             // TODO: also compare date (match.version_modified > measure.version_modified)
-            if (project_match.version_id != measure.version_id) {
+            if (projectMatch.version_id != measure.version_id) {
               // set status flag
               measure.status = 'update';
             } else {
@@ -133,26 +133,36 @@ export class BCL {
           measure = vm.prepareMeasure(measure, 'local');
 
           // measure update from BCL?
-          const bcl_match = _.find(vm.libMeasures.bcl, {uid: measure.uid});
-          vm.$log.debug("BCL MATCH: ", bcl_match);
-          if (angular.isDefined(bcl_match) && (bcl_match.version_id != measure.version_id)) {
-            // TODO: also compare date (match.version_modified > measure.version_modified)
-            // bcl update
-            measure.bcl_update = true;
-          } else {
-            measure.bcl_update = false;
+          const bclMatch = _.find(vm.libMeasures.bcl, {uid: measure.uid});
+          vm.$log.debug("BCL MATCH: ", bclMatch);
+
+          measure.bcl_update = false;
+          if (angular.isDefined(bclMatch)) {
+            // for now compare the 'changed' date from the BCL search API to the version_modified from measureManager updateMeasure
+            const bclChangedDate = new Date(bclMatch.changed);
+            const localVersionModified = new Date(measure.version_modified);
+            if (bclChangedDate > localVersionModified) {
+              // bcl update
+              measure.bcl_update = true;
+            }
           }
-          vm.$log.debug(`BCL update flag for measure: ${measure.name}: ${measure.bcl_update}.  measure version ID: ${measure.version_id}, bcl version ID: ${bcl_match.version_id}`);
 
           // is measure added to project?
           const projectMatch = _.find(vm.projectMeasures, {uid: measure.uid});
+          measure.status = '';
           // update from local to project or from bcl to local to project
-          if (angular.isDefined(projectMatch) || measure.bcl_update) {
-            // TODO: also compare date (match.version_modified > measure.version_modified)
-            measure.status = 'update';
-          } else {
-            measure.status = '';
+          if (angular.isDefined(projectMatch)) {
+            if (measure.bcl_update) {
+              // update options:  online BCL to local BCL only, or to local BCL and project
+              measure.status = 'update';
+            } else if (projectMatch.version_id != measure.version_id){
+              // update options: local BCL to project (no online BCL updates)
+              measure.status = 'update';
+            }
           }
+
+          vm.$log.debug(`BCL update flag for measure: ${measure.name}: ${measure.bcl_update}, BCL changed: ${bclMatch.changed}, local Version Modified: ${measure.version_modified} version ID: ${measure.version_id}, bcl version ID: ${bclMatch.version_id}`);
+          vm.$log.debug(`regular update flag: ${measure.status}, local version_id: ${measure.version_id}, project version_id: ${projectMatch.version_id}`);
 
           // TEMPORARY:  measure manager may change name and display_name and this causes problems. Restore names
           const localMatch = _.find(vm.libMeasures.local, {uid: measure.uid});
@@ -335,6 +345,7 @@ export class BCL {
       version_id: input.measure.version_id ? _.result(input, 'measure.version_id') : _.result(input, 'measure.vuuid'),
       version_modified: _.result(input, 'measure.version_modified'),
       xml_checksum: _.result(input, 'measure.xml_checksum'),
+      changed: _.result(input, 'measure.changed'),
       class_name: _.result(input, 'measure.class_name'),
       //displayName: (input.measure.display_name && input.measure.display_name != '') ? input.measure.display_name : input.measure.name,
       display_name: (input.measure.display_name && input.measure.display_name != '') ? input.measure.display_name : input.measure.name,
