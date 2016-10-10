@@ -77,20 +77,20 @@ export class DependencyManager {
         arch: 'x64'
       }],
       openstudioCLI: [{
-        name: 'OpenStudio2-1.12.0.58d7efc146',
+        name: 'OpenStudio2-1.13.0.fb588cc683',
         platform: 'win32',
         arch: 'x64'
       }, {
-        name: 'OpenStudio2-1.12.0.58d7efc146',
+        name: 'OpenStudio2-1.13.0.fb588cc683',
         platform: 'darwin',
         arch: 'x64'
       }],
       openstudio: [{
-        name: 'OpenStudio-1.12.0.58d7efc146',
+        name: 'OpenStudio-1.13.0.fb588cc683',
         platform: 'win32',
         arch: 'x64'
       }, {
-        name: 'OpenStudio-1.12.0.58d7efc146',
+        name: 'OpenStudio-1.13.0.fb588cc683',
         platform: 'darwin',
         arch: 'x64'
       }]
