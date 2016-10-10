@@ -43,6 +43,21 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
   const fileMenu = {
     label: 'File',
     submenu: [{
+      label: 'New',
+      accelerator: 'Ctrl+N',
+      click: () => Project.newProject()
+    }, {
+      label: 'Open',
+      accelerator: 'Ctrl+O',
+      click: () => Project.openProject()
+    }, {
+      label: 'Save',
+      accelerator: 'Ctrl+S',
+      click: () => Project.saveProject()
+    }, {
+      label: 'Save As',
+      click: () => Project.saveAsProject()
+    }, {
       label: 'Quit',
       accelerator: 'Ctrl+Q',
       click: () => app.quit()
