@@ -51,13 +51,13 @@ export class ModalBclController {
 
     // get project measures
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
-    vm.$log.debug("Project Measures(): ", vm.projectMeasures);
+    vm.$log.debug('Project Measures(): ', vm.projectMeasures);
 
     // get measures array for Library display
     vm.$scope.displayMeasures = [];
 
     // initialize structure of libMeasures
-    vm.libMeasures =  {
+    vm.libMeasures = {
       my: [],
       local: [],
       bcl: []
@@ -67,7 +67,7 @@ export class ModalBclController {
     // TODO: add getBCL measures to this?
     vm.BCL.getMeasures().then((measures) => {
       vm.libMeasures = measures;
-      vm.$log.debug("LibMeasures retrieved from BCL.getMeasures(): ", vm.libMeasures);
+      vm.$log.debug('LibMeasures retrieved from BCL.getMeasures(): ', vm.libMeasures);
       // reload BCL measures
       // TODO: check for BCL updates once when PAT launches  (in BCL service)
       vm.getBCLMeasures();
@@ -377,7 +377,7 @@ export class ModalBclController {
 
     // copy on disk
     const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;
-    const dirNames =_.split(measure.measure_dir, '/');
+    const dirNames = _.split(measure.measure_dir, '/');
     //vm.$log.debug('DIR NAMES: ', dirNames);
     const dirName = _.last(dirNames);
     //vm.$log.debug('DIR NAME: ', dirName);
@@ -397,7 +397,7 @@ export class ModalBclController {
     const deferred = vm.$q.defer();
     vm.BCL.downloadMeasure(measure).then(newMeasure => {
       vm.$log.debug('In modal download()');
-      vm.$log.debug("Local Measures: ", vm.libMeasures.local);
+      vm.$log.debug('Local Measures: ', vm.libMeasures.local);
       vm.$log.debug('new measure: ', newMeasure);
       vm.resetFilters();
       // select newly added row
@@ -425,14 +425,16 @@ export class ModalBclController {
     console.log(measure.measure_dir + '/measure.rb');
     // show toastr for 2 seconds then open file
     const msg = 'Measure \'' + measure.name + '\' will open in a text editor for editing.';
-    vm.toastr.info(msg, { timeOut: 3000, onHidden: function() {
-      //vm.$log.debug('Opening measure file');
-      vm.shell.openItem(measure.measure_dir + '/measure.rb');
-    }});
+    vm.toastr.info(msg, {
+      timeOut: 3000, onHidden: function () {
+        //vm.$log.debug('Opening measure file');
+        vm.shell.openItem(measure.measure_dir + '/measure.rb');
+      }
+    });
   }
 
   // update LocalBCL measure from Online BCL
-  updateLocalBCLMeasure(measure, updateProject=false) {
+  updateLocalBCLMeasure(measure, updateProject = false) {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.$log.debug('in UPDATE LOCAL BCL MEASURE function');
@@ -446,7 +448,7 @@ export class ModalBclController {
       vm.toastr.success(msg);
 
       if (updateProject) {
-        vm.updateProjectMeasure(measure).then( () => {
+        vm.updateProjectMeasure(measure).then(() => {
           deferred.resolve();
         });
       } else {
@@ -466,7 +468,7 @@ export class ModalBclController {
 
     // copy on disk
     const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;
-    const dirNames =_.split(measure.measure_dir, '/');
+    const dirNames = _.split(measure.measure_dir, '/');
     const dirName = _.last(dirNames);
     src.copy(dirName, vm.projectDir.path(dirName), {overwrite: true});
 
@@ -515,7 +517,7 @@ export class ModalBclController {
       _.assignIn(project_measure, measure_copy);
 
       const msg = 'Measure \'' + project_measure.display_name + '\' was successfully updated in your project.';
-      vm.$log.debug("updated project measure: ", project_measure);
+      vm.$log.debug('updated project measure: ', project_measure);
       vm.toastr.success(msg);
       deferred.resolve();
 
@@ -532,7 +534,7 @@ export class ModalBclController {
   updateAMeasure(measure) {
     const vm = this;
     vm.$log.debug('in Update A Measure function');
-    const deferred = vm.$q.defer();
+    //const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
       controller: 'ModalUpdateMeasureController',
@@ -540,7 +542,7 @@ export class ModalBclController {
       templateUrl: 'app/bcl/update_measure.html',
       windowClass: 'modal',
       resolve: {
-        measure: function() {
+        measure: function () {
           return measure;
         }
       }
@@ -576,14 +578,14 @@ export class ModalBclController {
       templateUrl: 'app/bcl/duplicate_measure.html',
       windowClass: 'modal',
       resolve: {
-        measure: function() {
+        measure: function () {
           return measure;
         }
       }
     });
 
     modalInstance.result.then((params) => {
-      vm.MeasureManager.duplicateMeasure(params).then( (newMeasure) => {
+      vm.MeasureManager.duplicateMeasure(params).then((newMeasure) => {
         // success
         vm.$log.debug('Measure Manager duplicateMeasure succeeded');
         // add and prepare new measure
@@ -597,7 +599,7 @@ export class ModalBclController {
         // failure
         vm.$log.debug('Measure Manager duplicateMeasure failed');
         deferred.reject();
-      } );
+      });
     }, () => {
       // Modal canceled
       vm.$log.debug('DuplicateMeasure Modal was canceled');

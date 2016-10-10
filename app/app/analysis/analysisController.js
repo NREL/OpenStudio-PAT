@@ -29,7 +29,7 @@ export class AnalysisController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
-    vm.$log.debug("****ANALYSIS TAB****");
+    vm.$log.debug('****ANALYSIS TAB****');
     vm.$log.debug('ANALYSIS MEASURES RETRIEVED: ', vm.$scope.measures);
 
     vm.$scope.osMeasures = [];
