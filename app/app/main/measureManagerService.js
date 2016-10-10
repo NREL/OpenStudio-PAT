@@ -21,6 +21,15 @@ export class MeasureManager {
     vm.cliPath = vm.cliPath.replace(' ', '\ ');
 
     vm.url = 'http://localhost:1234';
+
+    // measure Manager ready promise
+    vm.mmReadyDeferred = vm.$q.defer();
+
+  }
+
+  isReady() {
+    const vm = this;
+    return vm.mmReadyDeferred.promise;
   }
 
   startMeasureManager() {
@@ -29,9 +38,32 @@ export class MeasureManager {
     vm.cli = vm.spawn(vm.cliPath, ['measure', '-s']);
     vm.cli.stdout.on('data', (data) => {
       vm.$log.debug(`MeasureManager: ${data}`);
+      // check that the mm was started correctly: resolve readyDeferred
+      const str = data.toString();
+      if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
+        vm.$log.debug('Found WEBrick Start!, resolve promise');
+        vm.mmReadyDeferred.resolve();
+      }
+      // TODO: THIS IS TEMPORARY:
+      else if (str.indexOf('Error: Address already in use') !== -1) {
+        vm.$log.debug ('WEBrick already running...using tempMeasureManager');
+        vm.mmReadyDeferred.resolve();
+      }
+
     });
     vm.cli.stderr.on('data', (data) => {
       vm.$log.debug(`MeasureManager: ${data}`);
+      // check that the mm was started correctly: resolve readyDeferred
+      const str = data.toString();
+      if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
+        vm.$log.debug('Found WEBrick Start!, resolve promise');
+        vm.mmReadyDeferred.resolve();
+      }
+      // TODO: THIS IS TEMPORARY:
+      else if (str.indexOf('Error: Address already in use') !== -1) {
+        vm.$log.debug ('WEBrick already running...using tempMeasureManager');
+        vm.mmReadyDeferred.resolve();
+      }
     });
     vm.cli.on('close', (code) => {
       vm.$log.debug(`Measure Manager exited with code ${code}`);
