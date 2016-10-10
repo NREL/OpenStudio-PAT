@@ -95,6 +95,8 @@ export class DependencyManager {
         arch: 'x64'
       }]
     };
+
+    vm.deregisterObserver();
   }
 
   initializeBuffer() {
@@ -156,6 +158,11 @@ export class DependencyManager {
     vm.$translate(['statusBar.Downloading', 'statusBar.Extracting']).then(translations => {
       vm.translations.Downloading = translations['statusBar.Downloading'];
       vm.translations.Extracting = translations['statusBar.Extracting'];
+    });
+
+    vm.$translate(['dependencyManager.Downloading', 'dependencyManager.Extracting']).then(translations => {
+      vm.translations.Downloading = translations['dependencyManager.Downloading'];
+      vm.translations.Extracting = translations['dependencyManager.Extracting'];
     });
 
     function downloadRuby() {
@@ -363,6 +370,7 @@ export class DependencyManager {
       .finally(() => {
         deferred.resolve();
         vm.StatusBar.clear();
+        //vm.clear();
         vm.downloadStatus = 'complete';
       });
 
@@ -433,6 +441,7 @@ export class DependencyManager {
         res.on('data', d => {
           vm.bytesReceived += d.length;
           vm.StatusBar.set(`${vm.translations.Downloading} ${_.startCase(type)} (${_.floor(vm.bytesReceived / vm.contentLength * 100)}%)`, true);
+          vm.set(`${vm.translations.Downloading} ${_.startCase(type)} (${_.floor(vm.bytesReceived / vm.contentLength * 100)}%)`, true);
           vm.write(filename, d);
         });
         res.on('end', () => {
@@ -446,6 +455,7 @@ export class DependencyManager {
             const dest = jetpack.dir(`${app.getPath('userData')}/${type}`, {empty: true});
 
             vm.StatusBar.set(`${vm.translations.Extracting} ${_.startCase(type)}`, true);
+            vm.set(`${vm.translations.Extracting} ${_.startCase(type)}`, true);
             console.time(`${_.startCase(type)} extracted`);
             _.defer(() => {
               if (vm.platform == 'darwin') {
@@ -527,7 +537,29 @@ export class DependencyManager {
       templateUrl: 'app/main/dependency.html',
       windowClass: 'wide-modal'
     });
+  }
 
+  registerObserver(cb) {
+    const vm = this;
+    vm.observerCallback = cb;
+  }
+
+  deregisterObserver() {
+    const vm = this;
+    vm.observerCallback = null;
+  }
+
+  set(downloadStatus) {
+    const vm = this;
+    if (vm.downloadStatus !== downloadStatus) {
+      vm.downloadStatus = downloadStatus;
+      vm.observerCallback(status);
+    }
+  }
+
+  clear() {
+    const vm = this;
+    vm.set('');
   }
 
 }

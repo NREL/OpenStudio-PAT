@@ -185,6 +185,10 @@ export default {
     Downloading: 'Downloading',
     Extracting: 'Extracting'
   },
+  dependencyManager: {
+    Downloading: 'Downloading',
+    Extracting: 'Extracting'
+  },
   Algorithmic: 'Algorithmic',
   Cancel: 'Cancel',
   Manual: 'Manual',
