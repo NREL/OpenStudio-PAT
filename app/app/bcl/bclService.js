@@ -42,6 +42,8 @@ export class BCL {
 
     vm.getBCLMeasures().then( () => {
       vm.checkForUpdatesLocalBcl();
+      vm.$log.debug('BCL SERVICE CONSTRUCTOR.  LIBMEASURES: ', vm.libMeasures);
+
     });
 
     // this will be done each time modal is opened.  not needed here
@@ -161,8 +163,14 @@ export class BCL {
             }
           }
 
-          vm.$log.debug(`BCL update flag for measure: ${measure.name}: ${measure.bcl_update}, BCL changed: ${bclMatch.changed}, local Version Modified: ${measure.version_modified} version ID: ${measure.version_id}, bcl version ID: ${bclMatch.version_id}`);
-          vm.$log.debug(`regular update flag: ${measure.status}, local version_id: ${measure.version_id}, project version_id: ${projectMatch.version_id}`);
+          vm.$log.debug(`BCL update flag for measure: ${measure.name}: ${measure.bcl_update}`);
+          if (angular.isDefined(bclMatch)) {
+            vm.$log.debug(`BCL_changed: ${bclMatch.changed}, local Version Modified: ${measure.version_modified} version ID: ${measure.version_id}, bcl version ID: ${bclMatch.version_id}`);
+          }
+          vm.$log.debug(`regular update flag: ${measure.status}, local version_id: ${measure.version_id}`);
+          if (angular.isDefined(projectMatch)) {
+            vm.$log.debug(`project version_id: ${projectMatch.version_id}`);
+          }
 
           // TEMPORARY:  measure manager may change name and display_name and this causes problems. Restore names
           const localMatch = _.find(vm.libMeasures.local, {uid: measure.uid});

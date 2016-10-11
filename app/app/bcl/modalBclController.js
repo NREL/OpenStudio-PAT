@@ -68,7 +68,7 @@ export class ModalBclController {
     // TODO: add getBCL measures to this?
     vm.BCL.getMeasures().then((measures) => {
       vm.libMeasures = measures;
-      vm.$log.debug('LibMeasures retrieved from BCL.getMeasures(): ', vm.libMeasures);
+      vm.$log.debug('***LibMeasures retrieved from BCL.getMeasures(): ', vm.libMeasures);
       // reload BCL measures
       // TODO: check for BCL updates once when PAT launches  (in BCL service)
       vm.getBCLMeasures();
