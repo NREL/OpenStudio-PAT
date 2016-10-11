@@ -382,16 +382,20 @@ select {
   background-color: #000000;
 }
 
-.library-grid-button {
+.library-grid-button-container {
   font-size: 2em;
-  text-align: center;
-  vertical-align: middle;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height:100%;
 }
 
-.library-grid-button-sm {
+.library-grid-button {
   font-size: 1em;
-  text-align: center;
-  vertical-align: middle;
+}
+
+.library-grid-pencil {
+  padding-right: 6px;
 }
 
 

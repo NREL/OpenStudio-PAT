@@ -1,6 +1,6 @@
-<div class="library-grid-button">
+<div class="library-grid-button-container">
 
-  <span ng-if="row.entity.location == 'my'" class="glyphicon glyphicon-pencil library-grid-pencil" aria-hidden="true" aria-label="Edit" ng-click="grid.appScope.modal.editMeasure(row.entity); $event.stopPropagation();"></span>
-  <span ng-if="row.entity.location != 'bcl'" class="glyphicon glyphicon-duplicate library-grid-button-sm green-button" aria-hidden="true" aria-label="Duplicate" ng-click="grid.appScope.modal.copyAndEditMeasure(row.entity); $event.stopPropagation();"></span>
+  <span ng-if="row.entity.location == 'my'" class="glyphicon glyphicon-pencil library-grid-button library-grid-pencil" aria-hidden="true" aria-label="Edit" ng-click="grid.appScope.modal.editMeasure(row.entity); $event.stopPropagation();"></span>
+  <span ng-if="row.entity.location != 'bcl'" class="glyphicon glyphicon-duplicate library-grid-button green-button" aria-hidden="true" aria-label="Duplicate" ng-click="grid.appScope.modal.copyAndEditMeasure(row.entity); $event.stopPropagation();"></span>
   <span ng-if="row.entity.location == 'bcl'" class="glyphicon glyphicon-download library-grid-button" aria-hidden="true" aria-label="Download Measure from BCL" ng-click="grid.appScope.modal.download(row.entity); $event.stopPropagation();"></span>
 </div>

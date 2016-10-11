@@ -5,11 +5,12 @@ const {shell} = remote;
 
 export class ModalBclController {
 
-  constructor($log, $q, $uibModalInstance, $uibModal, $scope, toastr, BCL, params, Project, MeasureManager) {
+  constructor($log, $q, $uibModalInstance, $uibModal, uiGridConstants, $scope, toastr, BCL, params, Project, MeasureManager) {
     'ngInject';
 
     const vm = this;
     vm.$uibModalInstance = $uibModalInstance;
+    vm.uiGridConstants = uiGridConstants;
     vm.$log = $log;
     vm.$q = $q;
     vm.$uibModal = $uibModal;
@@ -129,7 +130,7 @@ export class ModalBclController {
         cellTemplate: 'app/bcl/editButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
-        width: '14%'
+        width: '13%'
       }, {
         name: 'status',
         displayName: 'bcl.columns.status',
@@ -137,7 +138,7 @@ export class ModalBclController {
         cellTemplate: 'app/bcl/updateButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
-        width: '11%'
+        width: '10%'
       }, {
         name: 'add',
         displayName: 'bcl.columns.add',
@@ -145,7 +146,7 @@ export class ModalBclController {
         cellTemplate: 'app/bcl/addButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
-        width: '10%'
+        width: '9%'
       }],
       data: 'displayMeasures',
       rowHeight: 45,
@@ -154,6 +155,7 @@ export class ModalBclController {
       enableColumnMenus: false,
       enableRowSelection: true,
       enableRowHeaderSelection: false,
+      enableVerticalScrollbar:uiGridConstants.scrollbars.ALWAYS,
       multiSelect: false,
       onRegisterApi: function (gridApi) {
         vm.gridApi = gridApi;
