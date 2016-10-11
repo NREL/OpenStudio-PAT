@@ -107,13 +107,14 @@ export class ModalBclController {
         cellClass: 'icon-cell',
         headerCellFilter: 'translate',
         width: '14%'
-      }, {
+      }, /*{
         name: 'author',
         displayName: 'bcl.columns.author',
         enableCellEdit: false,
         headerCellFilter: 'translate',
         visible: false
-      }, {
+      }, */
+      {
         name: 'date',
         displayName: 'bcl.columns.date',
         cellFilter: 'date:"dd/MM/yyyy"',
@@ -125,7 +126,7 @@ export class ModalBclController {
         name: 'edit',
         displayName: 'bcl.columns.edit',
         cellClass: 'dropdown-button',
-        cellTemplate: 'app/bcl/tempEditButtonTemplate.html',
+        cellTemplate: 'app/bcl/editButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
         width: '14%'
@@ -136,7 +137,7 @@ export class ModalBclController {
         cellTemplate: 'app/bcl/updateButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
-        width: '10%'
+        width: '11%'
       }, {
         name: 'add',
         displayName: 'bcl.columns.add',

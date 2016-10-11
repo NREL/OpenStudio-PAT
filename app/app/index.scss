@@ -351,7 +351,7 @@ select {
 
 .icon-cell {
   text-align: center;
-  padding: 3px 0;
+  padding: 3px 5px;
 }
 
 .icon-edit-cell {
@@ -383,10 +383,17 @@ select {
 }
 
 .library-grid-button {
-  font-size: 25px;
+  font-size: 2em;
   text-align: center;
   vertical-align: middle;
 }
+
+.library-grid-button-sm {
+  font-size: 1em;
+  text-align: center;
+  vertical-align: middle;
+}
+
 
 /*
 .ui-grid-cell.dropdown-button {
