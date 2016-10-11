@@ -3,7 +3,7 @@
 // It doesn't have any windows which you can see on screen, but we can open
 // window from here.
 
-import { app, BrowserWindow } from 'electron';
+import { app } from 'electron';
 import createWindow from './electron/window';
 import env from './env';
 

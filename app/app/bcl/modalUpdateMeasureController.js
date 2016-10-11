@@ -9,8 +9,8 @@ export class ModalUpdateMeasureController {
     vm.$uibModalInstance = $uibModalInstance;
     vm.$log = $log;
     vm.measure = measure;
-    vm.$log.debug("in Modal Update Measure Controller constructor");
-    vm.$log.debug("measure: ", measure);
+    vm.$log.debug('in Modal Update Measure Controller constructor');
+    vm.$log.debug('measure: ', measure);
     vm.jetpack = jetpack;
   }
 

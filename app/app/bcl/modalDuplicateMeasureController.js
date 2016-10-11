@@ -18,7 +18,7 @@ export class ModalDuplicateMeasureController {
 
   ok() {
     const vm = this;
-    vm.$log.debug('Duplicate Measure measure: ',vm.measure);
+    vm.$log.debug('Duplicate Measure measure: ', vm.measure);
     const oldMeasureDir = vm.measure.measure_dir;
     // store duplicated measures in 'Measures' folder (not LocalBCL)
     const params = {

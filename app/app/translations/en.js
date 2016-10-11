@@ -1,4 +1,7 @@
 export default {
+  dependency: {
+    title: 'PAT Dependency Download Status'
+  },
   analysis: {
     title: 'Analysis',
     addMeasure: 'Add Measure',
@@ -179,6 +182,10 @@ export default {
     runEntireWorkflow: 'Run Entire Workflow'
   },
   statusBar: {
+    Downloading: 'Downloading',
+    Extracting: 'Extracting'
+  },
+  dependencyManager: {
     Downloading: 'Downloading',
     Extracting: 'Extracting'
   },

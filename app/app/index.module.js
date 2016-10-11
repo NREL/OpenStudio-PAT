@@ -10,6 +10,7 @@ import { DependencyManager } from '../app/main/dependencyManagerService';
 import { DesignAlternativesController } from '../app/design_alts/designAlternativesController';
 import { MeasureManager } from '../app/main/measureManagerService';
 import { ModalBclController } from '../app/bcl/modalBclController';
+import { ModalDependencyController } from '../app/main/modalDependencyController';
 import { ModalDuplicateMeasureController } from '../app/bcl/modalDuplicateMeasureController';
 import { ModalUpdateMeasureController } from '../app/bcl/modalUpdateMeasureController';
 import { NavController } from '../app/nav/navController';
@@ -28,6 +29,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .run(runBlock)
   .controller('NavController', NavController)
   .controller('ModalBclController', ModalBclController)
+  .controller('ModalDependencyController', ModalDependencyController)
   .controller('ModalDuplicateMeasureController', ModalDuplicateMeasureController)
   .controller('ModalUpdateMeasureController', ModalUpdateMeasureController)
   .controller('AnalysisController', AnalysisController)

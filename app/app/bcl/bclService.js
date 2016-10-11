@@ -60,7 +60,7 @@ export class BCL {
 
       return vm.libMeasures;
     });
-   }
+  }
 
   // returns libMeasures variable without checking updates
   getMeasuresNoUpdates() {
@@ -72,7 +72,7 @@ export class BCL {
   checkForUpdates() {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug("in BCLService checkForUpdates method");
+    vm.$log.debug('in BCLService checkForUpdates method');
 
     vm.MeasureManager.isReady().then( () => {
       vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates...');
@@ -117,7 +117,7 @@ export class BCL {
   }
 
   // Load / check for updates in local BCL folder
-  checkForUpdatesLocalBcl(){
+  checkForUpdatesLocalBcl() {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.$log.debug("in BCLService checkForUpdatesLocalBcl method");
@@ -456,7 +456,7 @@ export class BCL {
 
         vm.$log.debug('new measure after prepare and restore names: ', newMeasure);
 
-         // add or merge
+        // add or merge
         const lib_match = _.find(vm.libMeasures.local, {uid: newMeasure.uid});
         if (lib_match) {
           // TODO: verify this
