@@ -136,6 +136,9 @@ export class DependencyManager {
   checkDependencies() {
     const vm = this;
 
+    // TEMPORARY! (UNCOMMENT TO STOP AUTO DOWNLOADS)
+    // return vm.$q.resolve();
+
     // Open modal dialog to "disable app during downloads, and inform user of any issues
     vm.openDependencyModal();
 
@@ -289,7 +292,7 @@ export class DependencyManager {
 
       if (!vm.src.exists(openstudioCLIPath)) {
         downloadDependency = true;
-        vm.$log.debug('OpenstudioCLI not found, downloading');
+        vm.$log.debug(`OpenstudioCLI not found in: ${vm.src.path(openstudioCLIPath)}, downloading`);
         vm.downloadStatus = 'OpenstudioCLI not found, downloading';
       } else if (!manifestEmpty) {
         const filename = vm._dependencyFilename(dependencyManifest);
@@ -328,7 +331,7 @@ export class DependencyManager {
 
       if (!vm.src.exists(openstudioPath)) {
         downloadDependency = true;
-        vm.$log.debug('Openstudio not found, downloading');
+        vm.$log.debug(`Openstudio not found in ${vm.src.path(openstudioPath)}, downloading`);
         vm.downloadStatus = 'Openstudio not found, downloading';
       } else if (!manifestEmpty) {
         const filename = vm._dependencyFilename(dependencyManifest);
@@ -405,7 +408,7 @@ export class DependencyManager {
 
     let urlExists = vm._urlExists(`${vm.manifest.endpoint}${filename}.md5`, exists => {
       if (exists) {
-        vm.$log.debug(filename, 'found.');
+        vm.$log.debug(filename, 'found online.');
         vm.downloadStatus = filename;
         vm.downloadStatus += ' found.';
         https.get(`${vm.manifest.endpoint}${filename}.md5`, res => {
@@ -419,7 +422,7 @@ export class DependencyManager {
           deferred.reject(e);
         });
       } else {
-        deferred.reject('File not found');
+        deferred.reject('File not found online');
       }
     });
 

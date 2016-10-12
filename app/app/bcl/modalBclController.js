@@ -440,6 +440,7 @@ export class ModalBclController {
   updateLocalBCLMeasure(measure, updateProject = false) {
     const vm = this;
     const deferred = vm.$q.defer();
+    const originalStatus = angular.copy(measure.status);
     vm.$log.debug('in UPDATE LOCAL BCL MEASURE function');
 
     // download from BCL & prepare (overwrite files on disk)
@@ -455,9 +456,10 @@ export class ModalBclController {
           deferred.resolve();
         });
       } else {
+        // restore status (in case didn't update measure in project)
+        measure.status = originalStatus;
         deferred.resolve();
       }
-
     });
 
     return deferred.promise;

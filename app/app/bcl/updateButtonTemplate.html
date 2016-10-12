@@ -1,4 +1,4 @@
-<div ng-if="(row.entity.status == 'update' || row.entity.bcl_update) && row.entity.location != 'bcl' ">
+<div ng-if="(row.entity.status == 'update' || row.entity.bcl_update) && row.entity.location != 'bcl' "  class="library-grid-button-container">
   <!-- open update modal -->
   <span class="glyphicon glyphicon-refresh library-grid-button blue-button" aria-hidden="true" aria-label="Update Measure" ng-click="grid.appScope.modal.updateAMeasure(row.entity); $event.stopPropagation();">
    </span>

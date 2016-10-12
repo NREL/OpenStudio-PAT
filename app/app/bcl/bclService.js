@@ -139,10 +139,12 @@ export class BCL {
           vm.$log.debug("BCL MATCH: ", bclMatch);
 
           measure.bcl_update = false;
+          let bclChangedDate = null;
+          let localVersionModified = null;
           if (angular.isDefined(bclMatch)) {
             // for now compare the 'changed' date from the BCL search API to the version_modified from measureManager updateMeasure
-            const bclChangedDate = new Date(bclMatch.changed);
-            const localVersionModified = new Date(measure.version_modified);
+            bclChangedDate = new Date(bclMatch.changed);
+            localVersionModified = new Date(measure.version_modified + " UTC");  // returned in UTC from measureManager
             if (bclChangedDate > localVersionModified) {
               // bcl update
               measure.bcl_update = true;
@@ -165,19 +167,19 @@ export class BCL {
 
           vm.$log.debug(`BCL update flag for measure: ${measure.name}: ${measure.bcl_update}`);
           if (angular.isDefined(bclMatch)) {
-            vm.$log.debug(`BCL_changed: ${bclMatch.changed}, local Version Modified: ${measure.version_modified} version ID: ${measure.version_id}, bcl version ID: ${bclMatch.version_id}`);
+            vm.$log.debug(`BCL_changed: ${bclMatch.changed}, date: ${bclChangedDate}, local Version Modified: ${measure.version_modified}, date: ${localVersionModified}, version ID: ${measure.version_id}, bcl version ID: ${bclMatch.version_id}`);
           }
           vm.$log.debug(`regular update flag: ${measure.status}, local version_id: ${measure.version_id}`);
           if (angular.isDefined(projectMatch)) {
             vm.$log.debug(`project version_id: ${projectMatch.version_id}`);
           }
 
-          // TEMPORARY:  measure manager may change name and display_name and this causes problems. Restore names
-          const localMatch = _.find(vm.libMeasures.local, {uid: measure.uid});
-          if (angular.isDefined(localMatch)){
-            measure.name = localMatch.name;
-            measure.display_name = localMatch.display_name;
-          }
+          // TEMPORARY:  measure manager may change name and display_name. Restore BCL names
+          // const localMatch = _.find(vm.libMeasures.local, {uid: measure.uid});
+          // if (angular.isDefined(localMatch)){
+          //   measure.name = localMatch.name;
+          //   measure.display_name = localMatch.display_name;
+          // }
 
           newMeasures.push(measure);
 
@@ -436,9 +438,7 @@ export class BCL {
   downloadMeasure(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.measure = measure;
-
-    const url = vm.bclUrl + 'component/download?uids=' + vm.measure.uid;
+    const url = vm.bclUrl + 'component/download?uids=' + measure.uid;
 
     vm.$http.get(url, {responseType: 'arraybuffer'}).then(response => {
       //extract dir and save to disk in local measures directory
@@ -449,27 +449,36 @@ export class BCL {
       // TODO: verify that this does in fact overwrite and not error out
       zip.extractAllTo(vm.localDir.path() + '/', true);
 
-      vm.$log.debug('measure name: ', measure.name);
-      vm.$log.debug('measure display_name: ', measure.display_name);
+      vm.$log.debug('DOWNLOADED measure name: ', measure.name);
+      vm.$log.debug('DOWNLOADED measure display_name: ', measure.display_name);
+      vm.$log.debug('DOWNLOADED measure path: ', vm.localDir.path(measure.display_name));
 
       // use computeArguments to add to localMeasures array
-      vm.$log.debug('new measure before compute args: ', measure);
-      vm.MeasureManager.computeArguments(vm.localDir.path(measure.display_name)).then( (newMeasure) => {
+      // vm.$log.debug('new measure before compute args: ', measure);
+
+      // get path of newly downloaded measure from online BCL name (measureManager may change the name and the path will not be found)
+      let originalName = measure.name;
+      const bclMatch = _.find(vm.libMeasures.bcl, {uid: measure.uid});
+      if (bclMatch) {
+        originalName = bclMatch.name;
+      }
+
+      vm.MeasureManager.computeArguments(vm.localDir.path(originalName)).then( (newMeasure) => {
         vm.$log.debug('new measure after compute args', newMeasure);
         newMeasure = vm.prepareMeasure(newMeasure, 'local');
 
-        // TODO: measureManager recomputes name and display name, restore original names:
-        newMeasure.name = measure.name;
-        newMeasure.display_name = measure.display_name;
+        // measureManager recomputes name and display name, restore BCL original names:
+        // newMeasure.name = measure.name;
+        // newMeasure.display_name = measure.display_name;
 
         vm.$log.debug('new measure after prepare and restore names: ', newMeasure);
 
         // add or merge
-        const lib_match = _.find(vm.libMeasures.local, {uid: newMeasure.uid});
-        if (lib_match) {
+        const libMatch = _.find(vm.libMeasures.local, {uid: newMeasure.uid});
+        if (libMatch) {
           // TODO: verify this
-          _.merge(lib_match, newMeasure);
-          lib_match.bcl_update = false;
+          _.merge(libMatch, newMeasure);
+          libMatch.bcl_update = false;
         } else {
           vm.libMeasures.local.push(newMeasure);
         }
