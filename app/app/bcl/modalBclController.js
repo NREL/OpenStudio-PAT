@@ -477,13 +477,12 @@ export class ModalBclController {
     const dirName = _.last(dirNames);
     src.copy(dirName, vm.projectDir.path(dirName), {overwrite: true});
 
-    // retrieve newly copied measure data (with calculated arguments)
-
     // set seed path
     const defaultSeed = vm.Project.getDefaultSeed();
     const seedDir = vm.Project.getSeedDir();
     const osmPath = (defaultSeed == null) ? null : seedDir.path(defaultSeed);
 
+    // retrieve newly copied measure data (with calculated arguments)
     vm.MeasureManager.computeArguments(vm.projectDir.path(dirName), osmPath).then((newMeasure) => {
       // success
       // vm.$log.debug('New computed measure: ', newMeasure);
