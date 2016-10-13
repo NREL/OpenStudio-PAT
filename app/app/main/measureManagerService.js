@@ -44,7 +44,12 @@ export class MeasureManager {
         vm.$log.debug('Found WEBrick Start!, resolve promise');
         vm.mmReadyDeferred.resolve();
       }
-      // TODO: THIS IS TEMPORARY:
+      // TODO: THIS IS TEMPORARY (windows):
+      else if (str.indexOf('Only one usage of each socket address') !== -1) {
+        vm.$log.debug('WEBrick already running...using tempMeasureManager');
+        vm.mmReadyDeferred.resolve();
+      }
+      // TODO: THIS IS TEMPORARY (mac):
       else if (str.indexOf('Error: Address already in use') !== -1) {
         vm.$log.debug ('WEBrick already running...using tempMeasureManager');
         vm.mmReadyDeferred.resolve();
@@ -59,7 +64,12 @@ export class MeasureManager {
         vm.$log.debug('Found WEBrick Start!, resolve promise');
         vm.mmReadyDeferred.resolve();
       }
-      // TODO: THIS IS TEMPORARY:
+      // TODO: THIS IS TEMPORARY (windows):
+      else if (str.indexOf('Only one usage of each socket address') !== -1) {
+        vm.$log.debug('WEBrick already running...using tempMeasureManager');
+        vm.mmReadyDeferred.resolve();
+      }
+      // TODO: THIS IS TEMPORARY (mac):
       else if (str.indexOf('Error: Address already in use') !== -1) {
         vm.$log.debug ('WEBrick already running...using tempMeasureManager');
         vm.mmReadyDeferred.resolve();

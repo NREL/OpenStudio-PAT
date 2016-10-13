@@ -143,6 +143,10 @@ export class Project {
     }
   }
 
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+  }
+
   savePrettyOptions() {
     const vm = this;
     vm.$log.debug('Parse arguments and save Options hash to each measure');

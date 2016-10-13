@@ -5,11 +5,12 @@ const {shell} = remote;
 
 export class ModalBclController {
 
-  constructor($log, $q, $uibModalInstance, $uibModal, $scope, toastr, BCL, params, Project, MeasureManager) {
+  constructor($log, $q, $uibModalInstance, $uibModal, uiGridConstants, $scope, toastr, BCL, params, Project, MeasureManager) {
     'ngInject';
 
     const vm = this;
     vm.$uibModalInstance = $uibModalInstance;
+    vm.uiGridConstants = uiGridConstants;
     vm.$log = $log;
     vm.$q = $q;
     vm.$uibModal = $uibModal;
@@ -67,7 +68,7 @@ export class ModalBclController {
     // TODO: add getBCL measures to this?
     vm.BCL.getMeasures().then((measures) => {
       vm.libMeasures = measures;
-      vm.$log.debug('LibMeasures retrieved from BCL.getMeasures(): ', vm.libMeasures);
+      vm.$log.debug('***LibMeasures retrieved from BCL.getMeasures(): ', vm.libMeasures);
       // reload BCL measures
       // TODO: check for BCL updates once when PAT launches  (in BCL service)
       vm.getBCLMeasures();
@@ -107,13 +108,14 @@ export class ModalBclController {
         cellClass: 'icon-cell',
         headerCellFilter: 'translate',
         width: '14%'
-      }, {
+      }, /*{
         name: 'author',
         displayName: 'bcl.columns.author',
         enableCellEdit: false,
         headerCellFilter: 'translate',
         visible: false
-      }, {
+      }, */
+      {
         name: 'date',
         displayName: 'bcl.columns.date',
         cellFilter: 'date:"dd/MM/yyyy"',
@@ -125,10 +127,10 @@ export class ModalBclController {
         name: 'edit',
         displayName: 'bcl.columns.edit',
         cellClass: 'dropdown-button',
-        cellTemplate: 'app/bcl/tempEditButtonTemplate.html',
+        cellTemplate: 'app/bcl/editButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
-        width: '14%'
+        width: '13%'
       }, {
         name: 'status',
         displayName: 'bcl.columns.status',
@@ -144,7 +146,7 @@ export class ModalBclController {
         cellTemplate: 'app/bcl/addButtonTemplate.html',
         enableCellEdit: false,
         headerCellFilter: 'translate',
-        width: '10%'
+        width: '9%'
       }],
       data: 'displayMeasures',
       rowHeight: 45,
@@ -153,6 +155,7 @@ export class ModalBclController {
       enableColumnMenus: false,
       enableRowSelection: true,
       enableRowHeaderSelection: false,
+      enableVerticalScrollbar:uiGridConstants.scrollbars.ALWAYS,
       multiSelect: false,
       onRegisterApi: function (gridApi) {
         vm.gridApi = gridApi;
@@ -437,6 +440,7 @@ export class ModalBclController {
   updateLocalBCLMeasure(measure, updateProject = false) {
     const vm = this;
     const deferred = vm.$q.defer();
+    const originalStatus = angular.copy(measure.status);
     vm.$log.debug('in UPDATE LOCAL BCL MEASURE function');
 
     // download from BCL & prepare (overwrite files on disk)
@@ -452,9 +456,10 @@ export class ModalBclController {
           deferred.resolve();
         });
       } else {
+        // restore status (in case didn't update measure in project)
+        measure.status = originalStatus;
         deferred.resolve();
       }
-
     });
 
     return deferred.promise;
@@ -472,13 +477,12 @@ export class ModalBclController {
     const dirName = _.last(dirNames);
     src.copy(dirName, vm.projectDir.path(dirName), {overwrite: true});
 
-    // retrieve newly copied measure data (with calculated arguments)
-
     // set seed path
     const defaultSeed = vm.Project.getDefaultSeed();
     const seedDir = vm.Project.getSeedDir();
     const osmPath = (defaultSeed == null) ? null : seedDir.path(defaultSeed);
 
+    // retrieve newly copied measure data (with calculated arguments)
     vm.MeasureManager.computeArguments(vm.projectDir.path(dirName), osmPath).then((newMeasure) => {
       // success
       // vm.$log.debug('New computed measure: ', newMeasure);

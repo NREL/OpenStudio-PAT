@@ -36,7 +36,7 @@
         <uib-accordion-group ng-repeat="measure in osMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
           <uib-accordion-heading>
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
-            {{measure.name}}
+            {{measure.display_name}}
             <span class="pull-right">
               <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
                 <span class="glyphicon glyphicon-remove"></span>
@@ -64,7 +64,7 @@
         <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
           <uib-accordion-heading>
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
-            {{measure.name}}
+            {{measure.display_name}}
             <span class="pull-right">
               <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation(); analysis.removeMeasure(measure);">
                 <span class="glyphicon glyphicon-remove"></span>
@@ -93,7 +93,7 @@
         <uib-accordion-group ng-repeat="measure in repMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
           <uib-accordion-heading>
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
-            {{measure.name}}
+            {{measure.display_name}}
             <span class="pull-right">
               <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
                 <span class="glyphicon glyphicon-remove"></span>

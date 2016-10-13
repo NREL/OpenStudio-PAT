@@ -5,7 +5,7 @@
 <div class="modal-body">
   <div class="row pad-bot-20">
     <div class="col-md-12">
-      <div ng-if="modal.measure.status == 'update' && modal.measure.addedToProject && modal.measure.location != 'bcl' && modal.measure.location != 'my' && !modal.measure.bcl_update">
+      <div ng-if="modal.measure.status == 'update' && modal.measure.addedToProject && modal.measure.location == 'my' && !modal.measure.bcl_update">
         <!-- "My measure", updateProjectMeasure only -->
         <p class="update-modal" translate>bcl.updateMeasure.updateProjectMeasure</p>
       </div>

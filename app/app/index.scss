@@ -351,7 +351,7 @@ select {
 
 .icon-cell {
   text-align: center;
-  padding: 3px 0;
+  padding: 3px 5px;
 }
 
 .icon-edit-cell {
@@ -382,11 +382,22 @@ select {
   background-color: #000000;
 }
 
-.library-grid-button {
-  font-size: 25px;
-  text-align: center;
-  vertical-align: middle;
+.library-grid-button-container {
+  font-size: 2em;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height:100%;
 }
+
+.library-grid-button {
+  font-size: 1em;
+}
+
+.library-grid-pencil {
+  padding-right: 6px;
+}
+
 
 /*
 .ui-grid-cell.dropdown-button {
