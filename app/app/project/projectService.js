@@ -6,10 +6,10 @@ import jsZip from 'jszip';
 import fs from 'fs';
 //import http from 'http';
 
-const {app} = remote;
+const {app, dialog} = remote;
 
 export class Project {
-  constructor($log, MeasureManager) {
+  constructor($log, $uibModal, MeasureManager) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -17,6 +17,7 @@ export class Project {
     vm.fs = fs;
     vm.jsZip = jsZip;
     vm.MeasureManager = MeasureManager;
+    vm.dialog = dialog;
 
     vm.projectName = '';
     // TODO: grab from PAT Electron settings. For now, default to 'the_project'
@@ -349,9 +350,9 @@ export class Project {
       // This portion only has arguments that don't have the variable box checked
       _.forEach(measure.arguments, (arg) => {
         if (
-             (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) &&
-             (_.isUndefined(arg.variable) || arg.variable === false)
-           ) {
+          (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) &&
+          (_.isUndefined(arg.variable) || arg.variable === false)
+        ) {
           const argument = {};
           argument.display_name = arg.displayName;
           //argument.display_name_short = arg.id; TODO
@@ -1192,6 +1193,96 @@ export class Project {
   getWeatherFilesDropdownArr() {
     const vm = this;
     return vm.weatherFilesDropdownArr;
+  }
+
+  newProject() {
+    const vm = this;
+    vm.$log.debug('newProject');
+    // get new project name
+
+    let windows = true;
+    if (windows) {
+      const result = vm.dialog.showOpenDialog({
+        title: 'New PAT Project',
+        buttonLabel: 'Make Project',
+        properties: ['openDirectory']
+      });
+
+      if (!_.isEmpty(result)) {
+        // copy and select the file
+        const path = result[0];
+        vm.$log.debug('PAT Project path:', path);
+        const foldername = path.replace(/^.*[\\\/]/, '');
+        vm.$log.debug('PAT Project folder name:', foldername);
+
+        let fullFilename = path;
+        fullFilename += '\\pat.json';
+      }
+    } else {
+      const result = vm.dialog.showSaveDialog({
+        title: 'New PAT Project',
+        filters: [
+          {name: 'PAT Project', extensions: ['json']}
+        ],
+        properties: ['createDirectory'] // only implemented on Mac, and only available when saving
+      });
+    }
+
+  }
+
+  openProject() {
+    const vm = this;
+    vm.$log.debug('openProject');
+
+    const result = vm.dialog.showOpenDialog({
+      title: 'Open PAT Project',
+      filters: [
+        {name: 'PAT Project', extensions: ['json']}
+      ],
+      properties: ['openDirectory']
+    });
+
+    if (!_.isEmpty(result)) {
+      // copy and select the file
+      const path = result[0];
+      vm.$log.debug('PAT Project path:', path);
+      const foldername = path.replace(/^.*[\\\/]/, '');
+      vm.$log.debug('PAT Project folder name:', foldername);
+
+      let fullFilename = path;
+      fullFilename += '\\pat.json';
+
+      // foldername must contain "pat.json"
+      let fileExists = false;
+      vm.$log.debug('checking for ', fullFilename);
+      const file = jetpack.read(fullFilename);
+      vm.$log.debug('file: ', file);
+      if (typeof file !== 'undefined') {
+        vm.$log.debug(fullFilename, ' found');
+        fileExists = true;
+      } else {
+        vm.$log.debug(fullFilename, ' not found');
+      }
+
+      if (fileExists) {
+        vm.$log.debug('time to do some work');
+      }
+    }
+  }
+
+  saveProject() {
+    const vm = this;
+    vm.$log.debug('saveProject');
+    // no dialog needed
+    vm.$log.debug('time to do some work');
+  }
+
+  saveAsProject() {
+    const vm = this;
+    vm.$log.debug('saveAsProject');
+    // get new project name
+
+
   }
 
 }
