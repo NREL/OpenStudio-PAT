@@ -149,7 +149,7 @@ export class DependencyManager {
     // return vm.$q.resolve();
 
     // Open modal dialog to "disable app during downloads, and inform user of any issues
-    vm.openDependencyModal();
+    //vm.openDependencyModal(); TODO uncomment this later
 
     const platform = os.platform();
     const arch = os.arch();
