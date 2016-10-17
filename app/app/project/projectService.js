@@ -1276,9 +1276,8 @@ export class Project {
 
   saveProject() {
     const vm = this;
-    vm.$log.debug('saveProject');
-    // no dialog needed
-    vm.$log.debug('time to do some work');
+    vm.$log.debug('saveProject, call project.exportPat');
+    vm.exportPAT();
   }
 
   saveAsProject() {
