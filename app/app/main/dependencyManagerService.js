@@ -6,10 +6,14 @@ import https from 'https';
 import os from 'os';
 import path from 'path';
 import url from 'url';
+const env = jetpack.cwd(app.getAppPath()).read('env.json', 'json');
 
 export class DependencyManager {
+
   constructor($q, $http, $log, $translate, $uibModal, StatusBar, Project) {
     'ngInject';
+
+    console.log(`this is a test : ${env.testing}`);
 
     const vm = this;
     vm.$http = $http;
@@ -40,7 +44,7 @@ export class DependencyManager {
 
     vm.tempDir = jetpack.cwd(app.getPath('temp'));
     vm.$log.debug('TEMPDIR HERE: ', app.getPath('temp'));
-    vm.src = jetpack.cwd(app.getPath('userData'));
+    vm.src = jetpack.cwd(app.getPath('home'));
     vm.$log.debug('src:', vm.src.path());
 
     vm.manifest = {
@@ -99,6 +103,50 @@ export class DependencyManager {
     vm.deregisterObserver();
   }
 
+  // The following are valid names to ask for
+  // "PAT_OS_CLI_PATH" "PAT_OS_BINDING_PATH" "PAT_OS_SERVER_PATH" "PAT_RUBY_PATH" "PAT_MONGO_PATH"
+  getPath(name) {
+    const prefixPath = 'OpenStudio/PAT/';
+
+    let exeExt = '';
+    if( os.platform() == 'win32' ) {
+      exeExt = '.exe';
+    }
+    let bindingExt = '.bundle';
+    if( os.platform() == 'win32' ) {
+      bindingExt = '.so';
+    }
+
+    if( env.name == 'production' ) {
+      // If the environment is "production" then
+      // we should be in a release build, which means 
+      // we should also be in the install tree 
+
+      // Parse a pat_config.json file dropped by the installer
+      // or better yet just assume the os install layout here and 
+      // find stuff based on relative location from the pat exe (aka electron exe).
+    } else if( env[name] ) {
+      // Look in the env.json file 
+      return env[name];
+    } else( process.env[name] ) {
+      // Look for a system environment variable
+      return process.env[name];  
+    } else {
+      // Look in a default location
+      if( name == 'PAT_OS_CLI_PATH' ) {
+        app.getPath('home') + prefixPath + 'OpenStudio/bin/openstudio' + exeExt;
+      } else if( name == 'PAT_OS_BINDING_PATH' ) {
+        app.getPath('home') + prefixPath + 'OpenStudio/Ruby/openstudio' + bindingExt;
+      } else if( name == 'PAT_OS_META_CLI_PATH' ) {
+        app.getPath('home') + prefixPath + 'OpenStudio-server/bin/openstudio_meta';
+      } else if( name == 'PAT_RUBY_PATH' ) {
+        app.getPath('home') + prefixPath + 'ruby/bin/ruby' + exeExt;
+      } else if( name == 'PAT_MONGO_PATH' ) {
+        app.getPath('home') + prefixPath + 'mongo/bin/ruby' + exeExt;
+      }
+    }
+  }
+
   initializeBuffer() {
     const vm = this;
 
@@ -137,26 +185,13 @@ export class DependencyManager {
     const vm = this;
 
     // TEMPORARY! (UNCOMMENT TO STOP AUTO DOWNLOADS)
-    // return vm.$q.resolve();
+    //return vm.$q.resolve();
 
     // Open modal dialog to "disable app during downloads, and inform user of any issues
     vm.openDependencyModal();
 
     const platform = os.platform();
     const arch = os.arch();
-
-    // Check for Ruby
-    let rubyPath = 'ruby/bin/ruby';
-    let mongoPath = 'mongo/bin/mongod';
-    const openstudioServerPath = 'openstudioServer/bin/openstudio_meta';
-    let openstudioCLIPath = 'openstudioCLI/bin/openstudio';
-    const openstudioPath = 'openstudio/';
-
-    if (platform == 'win32') {
-      rubyPath += '.exe';
-      mongoPath += '.exe';
-      openstudioCLIPath += '.exe';
-    }
 
     vm.$translate(['statusBar.Downloading', 'statusBar.Extracting']).then(translations => {
       vm.translations.Downloading = translations['statusBar.Downloading'];
@@ -173,7 +208,7 @@ export class DependencyManager {
       const dependencyManifest = _.find(vm.manifest.ruby, {platform: platform});
       const manifestEmpty = _.isEmpty(dependencyManifest);
 
-      if (!vm.src.exists(rubyPath)) {
+      if (!vm.src.exists(vm.getPath('PAT_RUBY_PATH'))) {
         downloadDependency = true;
         vm.$log.debug('Ruby not found, downloading');
         vm.downloadStatus = 'Ruby not found, downloading';
@@ -212,7 +247,7 @@ export class DependencyManager {
       const dependencyManifest = _.find(vm.manifest.mongo, {platform: platform, arch: arch});
       const manifestEmpty = _.isEmpty(dependencyManifest);
 
-      if (!vm.src.exists(mongoPath)) {
+      if (!vm.src.exists(this.getPath('PAT_MONGO_PATH'))) {
         downloadDependency = true;
         vm.$log.debug('Mongo not found, downloading');
         vm.downloadStatus = 'Mongo not found, downloading';
@@ -251,7 +286,7 @@ export class DependencyManager {
       const dependencyManifest = _.find(vm.manifest.openstudioServer, {platform: platform, arch: arch});
       const manifestEmpty = _.isEmpty(dependencyManifest);
 
-      if (!vm.src.exists(openstudioServerPath)) {
+      if (!vm.src.exists(this.getPath('PAT_OS_META_CLI_PATH'))) {
         downloadDependency = true;
         vm.$log.debug('OpenstudioServer not found, downloading');
         vm.downloadStatus = 'OpenstudioServer not found, downloading';
@@ -285,53 +320,14 @@ export class DependencyManager {
       return vm.$q.resolve();
     }
 
-    function downloadOpenstudioCLI() {
-      let downloadDependency = false;
-      const dependencyManifest = _.find(vm.manifest.openstudioCLI, {platform: platform, arch: arch});
-      const manifestEmpty = _.isEmpty(dependencyManifest);
-
-      if (!vm.src.exists(openstudioCLIPath)) {
-        downloadDependency = true;
-        vm.$log.debug(`OpenstudioCLI not found in: ${vm.src.path(openstudioCLIPath)}, downloading`);
-        vm.downloadStatus = 'OpenstudioCLI not found, downloading';
-      } else if (!manifestEmpty) {
-        const filename = vm._dependencyFilename(dependencyManifest);
-        vm._getOnlineChecksum(filename).then(expectedMD5 => {
-          if (expectedMD5.trim() !== vm.openstudioCLIMD5.trim()) {
-            vm.openstudioCLIMD5 = expectedMD5.trim();
-            vm.Project.setOpenstudioCLIMD5(vm.openstudioCLIMD5);
-            downloadDependency = true;
-            vm.$log.debug('OpenstudioCLI not up to date, updating');
-            vm.downloadStatus = 'OpenstudioCLI not up to date, updating. ';
-            const openstudioCLIDir = jetpack.dir(path.resolve(vm.src.path() + '/openstudioCLI'));
-            vm.$log.debug('openstudioCLIDir: ', openstudioCLIDir.path());
-            vm.downloadStatus += 'openstudioCLIDir: ';
-            vm.downloadStatus += openstudioCLIDir.path();
-            jetpack.remove(openstudioCLIDir.path());
-          }
-        });
-      }
-
-      if (downloadDependency) {
-        if (manifestEmpty) {
-          const errorMsg = `No OpenstudioCLI download found for platform ${platform}`;
-          vm.$log.error(errorMsg);
-          vm.downloadStatus = errorMsg;
-          return vm.$q.reject(errorMsg);
-        }
-        return vm._downloadDependency(_.assign({}, dependencyManifest, {type: 'openstudioCLI'}));
-      }
-      return vm.$q.resolve();
-    }
-
     function downloadOpenstudio() {
       let downloadDependency = false;
       const dependencyManifest = _.find(vm.manifest.openstudio, {platform: platform, arch: arch});
       const manifestEmpty = _.isEmpty(dependencyManifest);
 
-      if (!vm.src.exists(openstudioPath)) {
+      if (!vm.src.exists(vm.getPath('PAT_OS_CLI_PATH'))) {
         downloadDependency = true;
-        vm.$log.debug(`Openstudio not found in ${vm.src.path(openstudioPath)}, downloading`);
+        vm.$log.debug(`Openstudio not found in ${vm.getPath('PAT_OS_CLI_PATH'))}, downloading`);
         vm.downloadStatus = 'Openstudio not found, downloading';
       } else if (!manifestEmpty) {
         const filename = vm._dependencyFilename(dependencyManifest);
@@ -368,7 +364,6 @@ export class DependencyManager {
     downloadRuby()
       .then(downloadMongo, downloadMongo)
       .then(downloadOpenstudioServer, downloadOpenstudioServer)
-      .then(downloadOpenstudioCLI, downloadOpenstudioCLI)
       .then(downloadOpenstudio, downloadOpenstudio)
       .finally(() => {
         deferred.resolve();
@@ -455,7 +450,7 @@ export class DependencyManager {
             if (vm.platform != 'darwin')
               zip = new AdmZip(vm.tempDir.path(filename));
 
-            const dest = jetpack.dir(`${app.getPath('userData')}/${type}`, {empty: true});
+            const dest = jetpack.dir(`${app.getPath('home')}/${type}`, {empty: true});
 
             vm.StatusBar.set(`${vm.translations.Extracting} ${_.startCase(type)}`, true);
             vm.set(`${vm.translations.Extracting} ${_.startCase(type)}`, true);
