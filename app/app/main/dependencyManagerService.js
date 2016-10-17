@@ -67,12 +67,21 @@ export class DependencyManager {
         platform: 'darwin',
         arch: 'x64'
       }],
+      //openstudioServer: [{
+      //  name: 'openstudio-server',
+      //  platform: 'win32',
+      //  arch: 'x64'
+      //}, {
+      //  name: 'openstudio-server',
+      //  platform: 'darwin',
+      //  arch: 'x64'
+      //}],
       openstudioServer: [{
-        name: 'openstudio-server',
+        name: 'openstudio-server-994b4463f3',
         platform: 'win32',
         arch: 'x64'
       }, {
-        name: 'openstudio-server',
+        name: 'openstudio-server-e1b41a4ac4',
         platform: 'darwin',
         arch: 'x64'
       }],
@@ -140,7 +149,7 @@ export class DependencyManager {
     // return vm.$q.resolve();
 
     // Open modal dialog to "disable app during downloads, and inform user of any issues
-    vm.openDependencyModal();
+    //vm.openDependencyModal(); TODO uncomment this later
 
     const platform = os.platform();
     const arch = os.arch();
@@ -507,7 +516,7 @@ export class DependencyManager {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    vm.downloadZip(vm.manifest.endpoint, vm._dependencyFilename(downloadManifest), downloadManifest.type, true).then(deferred.resolve, deferred.reject);
+    //vm.downloadZip(vm.manifest.endpoint, vm._dependencyFilename(downloadManifest), downloadManifest.type, true).then(deferred.resolve, deferred.reject);
 
     return deferred.promise;
   }
