@@ -44,6 +44,15 @@ export class OsServer {
       vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby'));
 
     vm.analysisID = null;
+
+    vm.startServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --mongo-dir=' + '\"' + vm.mongoBinDir.path() + '\" --worker-number=4 --debug \"' + vm.projectDir.path() + '\"';
+    vm.$log.info('start server command: ', vm.startServerCommand);
+
+    vm.runAnalysisCommand = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis --debug "${vm.projectDir.path()}\\${vm.Project.getProjectName()}.json" "${vm.serverURL}" -a batch_datapoints`;
+    vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
+
+    vm.stopServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local ' + '\"' + vm.projectDir.path() + '\"';
+    vm.$log.info('stop server command: ',  vm.stopServerCommand);
   }
 
   getServerURL() {
@@ -257,10 +266,9 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: add a timeout here in case this takes too long
-    //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --debug ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\" --verbose';
-    const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\"';
-    vm.$log.debug('Start Local command: ', command);
-    const child = vm.exec(command,
+    // Old server command
+    //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\"';
+    const child = vm.exec(vm.startServerCommand,
       (error, stdout, stderr) => {
         vm.$log.debug('exit code: ', child.exitCode);
         vm.$log.debug('child: ', child);
@@ -299,10 +307,9 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: catch what analysis type it is
-    const command = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis "${vm.projectDir.path()}\\${vm.Project.getProjectName()}.json" "${vm.serverURL}" -a batch_datapoints`;
-    //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' run_analysis ' + '\"' + vm.projectDir.path() + '\\' + vm.Project.getProjectName() + '.json\" ' + vm.serverURL  + ' -a batch_datapoints';
-    vm.$log.debug('Run command: ', command);
-    const child = vm.exec(command,
+    // Old server command
+    //const command = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis "${vm.projectDir.path()}\\${vm.Project.getProjectName()}.json" "${vm.serverURL}" -a batch_datapoints`;
+    const child = vm.exec( vm.runAnalysisCommand,
       (error, stdout, stderr) => {
         console.log('exit code: ', child.exitCode);
         console.log('child: ', child);
@@ -341,9 +348,9 @@ export class OsServer {
 
       if (serverType.name == 'local') {
 
-        const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local --debug ' + '\"' + vm.projectDir.path() + '\" --verbose';
-        vm.$log.debug('Stop Local command: ', command);
-        const child = vm.exec(command,
+        // Old server command
+        //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local --debug ' + '\"' + vm.projectDir.path() + '\" --verbose';
+        const child = vm.exec( vm.stopServerCommand,
           (error, stdout, stderr) => {
             console.log('THE PROCESS TERMINATED');
             console.log('EXIT CODE: ', child.exitCode);
