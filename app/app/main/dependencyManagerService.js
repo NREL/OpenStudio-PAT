@@ -146,7 +146,7 @@ export class DependencyManager {
     const vm = this;
 
     // TEMPORARY! (UNCOMMENT TO STOP AUTO DOWNLOADS)
-    // return vm.$q.resolve();
+     return vm.$q.resolve();
 
     // Open modal dialog to "disable app during downloads, and inform user of any issues
     //vm.openDependencyModal(); TODO uncomment this later
@@ -184,6 +184,7 @@ export class DependencyManager {
 
       if (!vm.src.exists(rubyPath)) {
         downloadDependency = true;
+        vm.$log.debug('RUBY PATH: ', vm.src.path(rubyPath));
         vm.$log.debug('Ruby not found, downloading');
         vm.downloadStatus = 'Ruby not found, downloading';
       } else if (!manifestEmpty) {
