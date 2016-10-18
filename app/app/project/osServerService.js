@@ -41,11 +41,12 @@ export class OsServer {
     const platform = os.platform();
     if (platform == 'win32')
       vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby.exe'));
-    else
+    else {
       vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby'));
+      // TODO: temporary (for mac: assume that the openstudio ruby bindings are in user's home folder at following path)
+      vm.rubyBinDir = jetpack.cwd(app.getPath('home') + '/tempPAT/ruby/bin/ruby');
+    }
 
-    // TODO: this is temporary (and super hard-coded!)
-    vm.rubyBinDir = jetpack.cwd('/Users/kflemin/tempPAT/ruby/bin/ruby');
 
     vm.analysisID = null;
 
