@@ -184,6 +184,7 @@ export class DependencyManager {
 
       if (!vm.src.exists(rubyPath)) {
         downloadDependency = true;
+        vm.$log.debug('RUBY PATH: ', vm.src.path(rubyPath));
         vm.$log.debug('Ruby not found, downloading');
         vm.downloadStatus = 'Ruby not found, downloading';
       } else if (!manifestEmpty) {
