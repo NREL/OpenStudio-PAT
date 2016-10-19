@@ -27,11 +27,6 @@ export class DependencyManager {
     vm.translations = {};
     vm.exec = require('child_process').exec;
     vm.platform = os.platform();
-    vm.rubyMD5 = vm.Project.getRubyMD5();
-    vm.mongoMD5 = vm.Project.getMongoMD5();
-    vm.openstudioServerMD5 = vm.Project.getOpenstudioServerMD5();
-    vm.openstudioCLIMD5 = vm.Project.getOpenstudioCLIMD5();
-    vm.openstudioMD5 = vm.Project.getOpenstudioMD5();
     vm.$q = $q;
     vm.$uibModal = $uibModal;
     vm.downloadStatus = 'N/A';
@@ -44,59 +39,59 @@ export class DependencyManager {
 
     vm.tempDir = jetpack.cwd(app.getPath('temp'));
     vm.$log.debug('TEMPDIR HERE: ', app.getPath('temp'));
-    vm.src = jetpack.cwd(app.getPath('home'));
+    vm.src = jetpack.cwd(app.getPath('home') + "/OpenStudio/Pat/Support/");
     vm.$log.debug('src:', vm.src.path());
 
     vm.manifest = {
-      endpoint: 'https://openstudio-resources.s3.amazonaws.com/pat-dependencies/',
+      endpoint: 'https://openstudio-resources.s3.amazonaws.com/pat-dependencies2/',
       ruby: [{
         name: 'ruby-2.0.0-p648',
         platform: 'win32',
-        arch: 'ia32'
+        arch: 'ia32',
+        type: 'ruby'
       }, {
         name: 'ruby-2.0.0-p648',
         platform: 'darwin',
-        arch: 'x64'
+        arch: 'x64',
+        type: 'ruby'
       }],
       mongo: [{
         name: 'mongodb-3.2.5',
         platform: 'win32',
-        arch: 'x64'
+        arch: 'x64',
+        type: 'mongo'
       }, {
         name: 'mongodb-3.2.5',
         platform: 'win32',
-        arch: 'ia32'
+        arch: 'ia32',
+        type: 'mongo'
       }, {
         name: 'mongodb-3.2.5',
         platform: 'darwin',
-        arch: 'x64'
+        arch: 'x64',
+        type: 'mongo'
       }],
       openstudioServer: [{
-        name: 'openstudio-server',
+        name: 'OpenStudio-server-f9c68107af',
         platform: 'win32',
-        arch: 'x64'
+        arch: 'x64',
+        type: 'OpenStudio-server'
       }, {
-        name: 'openstudio-server',
+        name: 'OpenStudio-server-f9c68107af',
         platform: 'darwin',
-        arch: 'x64'
-      }],
-      openstudioCLI: [{
-        name: 'OpenStudio2-1.13.0.fb588cc683',
-        platform: 'win32',
-        arch: 'x64'
-      }, {
-        name: 'OpenStudio2-1.13.0.fb588cc683',
-        platform: 'darwin',
-        arch: 'x64'
+        arch: 'x64',
+        type: 'OpenStudio-server'
       }],
       openstudio: [{
         name: 'OpenStudio-1.13.0.fb588cc683',
         platform: 'win32',
-        arch: 'x64'
+        arch: 'x64',
+        type: 'OpenStudio'
       }, {
-        name: 'OpenStudio-1.13.0.fb588cc683',
+        name: 'OpenStudio2-1.13.1.ec682bda8a',
         platform: 'darwin',
-        arch: 'x64'
+        arch: 'x64',
+        type: 'OpenStudio'
       }]
     };
 
@@ -106,7 +101,8 @@ export class DependencyManager {
   // The following are valid names to ask for
   // "PAT_OS_CLI_PATH" "PAT_OS_BINDING_PATH" "PAT_OS_SERVER_PATH" "PAT_RUBY_PATH" "PAT_MONGO_PATH"
   getPath(name) {
-    const prefixPath = 'OpenStudio/PAT/';
+    const vm = this;
+    //const prefixPath = app.getPath('home') + 'OpenStudio/PAT/Support';
 
     let exeExt = '';
     if( os.platform() == 'win32' ) {
@@ -128,21 +124,21 @@ export class DependencyManager {
     } else if( env[name] ) {
       // Look in the env.json file 
       return env[name];
-    } else( process.env[name] ) {
+    } else if( process.env[name] ) {
       // Look for a system environment variable
       return process.env[name];  
     } else {
       // Look in a default location
       if( name == 'PAT_OS_CLI_PATH' ) {
-        app.getPath('home') + prefixPath + 'OpenStudio/bin/openstudio' + exeExt;
+         return vm.src.path('OpenStudio/bin/openstudio' + exeExt);
       } else if( name == 'PAT_OS_BINDING_PATH' ) {
-        app.getPath('home') + prefixPath + 'OpenStudio/Ruby/openstudio' + bindingExt;
+        return vm.src.path('OpenStudio/Ruby/openstudio' + bindingExt);
       } else if( name == 'PAT_OS_META_CLI_PATH' ) {
-        app.getPath('home') + prefixPath + 'OpenStudio-server/bin/openstudio_meta';
+        return vm.src.path('OpenStudio-server/bin/openstudio_meta');
       } else if( name == 'PAT_RUBY_PATH' ) {
-        app.getPath('home') + prefixPath + 'ruby/bin/ruby' + exeExt;
+        return vm.src.path('ruby/bin/ruby' + exeExt);
       } else if( name == 'PAT_MONGO_PATH' ) {
-        app.getPath('home') + prefixPath + 'mongo/bin/ruby' + exeExt;
+        return vm.src.path('mongo/bin/mongod' + exeExt);
       }
     }
   }
@@ -212,22 +208,6 @@ export class DependencyManager {
         downloadDependency = true;
         vm.$log.debug('Ruby not found, downloading');
         vm.downloadStatus = 'Ruby not found, downloading';
-      } else if (!manifestEmpty) {
-        const filename = vm._dependencyFilename(dependencyManifest);
-        vm._getOnlineChecksum(filename).then(expectedMD5 => {
-          if (expectedMD5.trim() !== vm.rubyMD5.trim()) {
-            vm.rubyMD5 = expectedMD5.trim();
-            vm.Project.setRubyMD5(vm.rubyMD5);
-            downloadDependency = true;
-            vm.$log.debug('Ruby not up to date, updating');
-            vm.downloadStatus = 'Ruby not up to date, updating. ';
-            const rubyDir = jetpack.dir(path.resolve(vm.src.path() + '/ruby'));
-            vm.$log.debug('rubyDir: ', rubyDir.path());
-            vm.downloadStatus += 'rubyDir: ';
-            vm.downloadStatus += rubyDir.path();
-            jetpack.remove(rubyDir.path());
-          }
-        });
       }
 
       if (downloadDependency) {
@@ -237,7 +217,7 @@ export class DependencyManager {
           vm.downloadStatus = errorMsg;
           return vm.$q.reject(errorMsg);
         }
-        return vm._downloadDependency(_.assign({}, dependencyManifest, {type: 'ruby'}));
+        return vm._downloadDependency(dependencyManifest);
       }
       return vm.$q.resolve();
     }
@@ -247,26 +227,10 @@ export class DependencyManager {
       const dependencyManifest = _.find(vm.manifest.mongo, {platform: platform, arch: arch});
       const manifestEmpty = _.isEmpty(dependencyManifest);
 
-      if (!vm.src.exists(this.getPath('PAT_MONGO_PATH'))) {
+      if (!vm.src.exists(vm.getPath('PAT_MONGO_PATH'))) {
         downloadDependency = true;
         vm.$log.debug('Mongo not found, downloading');
         vm.downloadStatus = 'Mongo not found, downloading';
-      } else if (!manifestEmpty) {
-        const filename = vm._dependencyFilename(dependencyManifest);
-        vm._getOnlineChecksum(filename).then(expectedMD5 => {
-          if (expectedMD5.trim() !== vm.mongoMD5.trim()) {
-            vm.mongoMD5 = expectedMD5.trim();
-            vm.Project.setMongoMD5(vm.mongoMD5);
-            downloadDependency = true;
-            vm.$log.debug('Mongo not up to date, updating');
-            vm.downloadStatus = 'Mongo not up to date, updating. ';
-            const mongoDir = jetpack.dir(path.resolve(vm.src.path() + '/mongo'));
-            vm.$log.debug('mongoDir: ', mongoDir.path());
-            vm.downloadStatus += 'mongoDir: ';
-            vm.downloadStatus += mongoDir.path();
-            jetpack.remove(mongoDir.path());
-          }
-        });
       }
 
       if (downloadDependency) {
@@ -276,7 +240,7 @@ export class DependencyManager {
           vm.downloadStatus = errorMsg;
           return vm.$q.reject(errorMsg);
         }
-        return vm._downloadDependency(_.assign({}, dependencyManifest, {type: 'mongo'}));
+        return vm._downloadDependency(dependencyManifest);
       }
       return vm.$q.resolve();
     }
@@ -286,26 +250,10 @@ export class DependencyManager {
       const dependencyManifest = _.find(vm.manifest.openstudioServer, {platform: platform, arch: arch});
       const manifestEmpty = _.isEmpty(dependencyManifest);
 
-      if (!vm.src.exists(this.getPath('PAT_OS_META_CLI_PATH'))) {
+      if (!vm.src.exists(vm.getPath('PAT_OS_META_CLI_PATH'))) {
         downloadDependency = true;
         vm.$log.debug('OpenstudioServer not found, downloading');
         vm.downloadStatus = 'OpenstudioServer not found, downloading';
-      } else if (!manifestEmpty) {
-        const filename = vm._dependencyFilename(dependencyManifest);
-        vm._getOnlineChecksum(filename).then(expectedMD5 => {
-          if (expectedMD5.trim() !== vm.openstudioServerMD5.trim()) {
-            vm.openstudioServerMD5 = expectedMD5.trim();
-            vm.Project.setOpenstudioServerMD5(vm.openstudioServerMD5);
-            downloadDependency = true;
-            vm.$log.debug('OpenstudioServer not up to date, updating');
-            vm.downloadStatus = 'OpenstudioServer not up to date, updating. ';
-            const openstudioServerDir = jetpack.dir(path.resolve(vm.src.path() + '/openstudioServer'));
-            vm.$log.debug('openstudioServerDir: ', openstudioServerDir.path());
-            vm.downloadStatus += 'openstudioServerDir: ';
-            vm.downloadStatus += openstudioServerDir.path();
-            jetpack.remove(openstudioServerDir.path());
-          }
-        });
       }
 
       if (downloadDependency) {
@@ -315,7 +263,7 @@ export class DependencyManager {
           vm.downloadStatus = errorMsg;
           return vm.$q.reject(errorMsg);
         }
-        return vm._downloadDependency(_.assign({}, dependencyManifest, {type: 'openstudioServer'}));
+        return vm._downloadDependency(dependencyManifest);
       }
       return vm.$q.resolve();
     }
@@ -327,24 +275,8 @@ export class DependencyManager {
 
       if (!vm.src.exists(vm.getPath('PAT_OS_CLI_PATH'))) {
         downloadDependency = true;
-        vm.$log.debug(`Openstudio not found in ${vm.getPath('PAT_OS_CLI_PATH'))}, downloading`);
+        vm.$log.debug(`Openstudio not found in ${vm.getPath('PAT_OS_CLI_PATH')}, downloading`);
         vm.downloadStatus = 'Openstudio not found, downloading';
-      } else if (!manifestEmpty) {
-        const filename = vm._dependencyFilename(dependencyManifest);
-        vm._getOnlineChecksum(filename).then(expectedMD5 => {
-          if (expectedMD5.trim() !== vm.openstudioMD5.trim()) {
-            vm.openstudioMD5 = expectedMD5.trim();
-            vm.Project.setOpenstudioMD5(vm.openstudioMD5);
-            downloadDependency = true;
-            vm.$log.debug('Openstudio not up to date, updating');
-            vm.downloadStatus = 'Openstudio not up to date, updating. ';
-            const openstudioDir = jetpack.dir(path.resolve(vm.src.path() + '/openstudio'));
-            vm.$log.debug('openstudioDir: ', openstudioDir.path());
-            vm.downloadStatus += 'openstudioDir: ';
-            vm.downloadStatus += openstudioDir.path();
-            jetpack.remove(openstudioDir.path());
-          }
-        });
       }
 
       if (downloadDependency) {
@@ -354,7 +286,7 @@ export class DependencyManager {
           vm.downloadStatus = errorMsg;
           return vm.$q.reject(errorMsg);
         }
-        return vm._downloadDependency(_.assign({}, dependencyManifest, {type: 'openstudio'}));
+        return vm._downloadDependency(dependencyManifest);
       }
       return vm.$q.resolve();
     }
@@ -450,14 +382,14 @@ export class DependencyManager {
             if (vm.platform != 'darwin')
               zip = new AdmZip(vm.tempDir.path(filename));
 
-            const dest = jetpack.dir(`${app.getPath('home')}/${type}`, {empty: true});
+            const dest = jetpack.dir(vm.src.path(type), {empty: true});
 
             vm.StatusBar.set(`${vm.translations.Extracting} ${_.startCase(type)}`, true);
             vm.set(`${vm.translations.Extracting} ${_.startCase(type)}`, true);
             console.time(`${_.startCase(type)} extracted`);
             _.defer(() => {
               if (vm.platform == 'darwin') {
-                const command = 'unzip "' + vm.tempDir.path(filename) + '" -d "' + dest.path() + '"';
+                const command = 'unzip "' + vm.tempDir.path(filename) + '" -d "' + vm.src.path() + '"';
                 console.log('UNZIP COMMAND: ', command);
                 const child = vm.exec(command,
                   (error, stdout, stderr) => {
