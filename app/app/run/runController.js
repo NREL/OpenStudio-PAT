@@ -56,9 +56,9 @@ export class RunController {
     vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
     vm.$log.debug('***** In runController::runEntireWorkflow() ready to start server *****');
-    vm.OsServer.startServer().then(response => { // TODO: To start local server, uncomment this part 1 of 3
+    vm.OsServer.startServer().then(response => {
       vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
-      vm.$log.debug('Start Server response: ', response); // TODO: To start local server, uncomment this part 2 of 3
+      vm.$log.debug('Start Server response: ', response);
 
       vm.OsServer.setProgressMessage('Server started');
       vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
@@ -75,6 +75,7 @@ export class RunController {
       vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
 
       vm.$log.debug('***** In runController::runEntireWorkflow() ready to run analysis *****');
+      // TODO: THIS WILL NEED TO BE MODIFIED FOR WINDOWS HACK
       vm.OsServer.runAnalysis().then(response => {
         vm.$log.debug('***** In runController::runEntireWorkflow() analysis running *****');
         vm.$log.debug('Run Analysis response: ', response);
@@ -138,7 +139,7 @@ export class RunController {
         vm.toggleButtons();
       });
 
-    }, response => { // TODO: To start local server, uncomment this part 3 of 3
+    }, response => {
       vm.OsServer.setProgressMessage('Server Error');
       vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
       vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
