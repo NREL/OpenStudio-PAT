@@ -99,7 +99,7 @@ export class DependencyManager {
   }
 
   // The following are valid names to ask for
-  // "PAT_OS_CLI_PATH" "PAT_OS_BINDING_PATH" "PAT_OS_SERVER_PATH" "PAT_RUBY_PATH" "PAT_MONGO_PATH"
+  // "PAT_OS_CLI_PATH" "PAT_OS_META_CLI_PATH" "PAT_OS_BINDING_PATH" "PAT_RUBY_PATH" "PAT_MONGO_PATH"
   getPath(name) {
     const vm = this;
     //const prefixPath = app.getPath('home') + 'OpenStudio/PAT/Support';

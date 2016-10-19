@@ -5,7 +5,7 @@ import path from 'path';
 import os from 'os';
 
 export class OsServer {
-  constructor($q, $http, $log, Project) {
+  constructor($q, $http, $log, Project, DependencyManager) {
     'ngInject';
     const vm = this;
     vm.Project = Project;
@@ -30,18 +30,16 @@ export class OsServer {
     vm.serverURL = vm.localServerURL;
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
-    vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/bin'));
-    vm.OsMetaPath = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/bin/openstudio_meta'));
-    vm.mongoBinDir = jetpack.cwd(path.resolve(src.path() + '/mongo/bin'));
-    vm.openstudioDir = jetpack.cwd(path.resolve(src.path() + '/openstudio/'));
-    vm.projectDir = vm.Project.getProjectDir();
 
-    // Depends on system type (windows vs mac)
-    const platform = os.platform();
-    if (platform == 'win32')
-      vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby.exe'));
-    else
-      vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby'));
+    vm.cliPath = DependencyManager.getPath("PAT_OS_CLI_PATH");
+    vm.metaCLIPath = DependencyManager.getPath("PAT_OS_META_CLI_PATH");
+    vm.mongoPath = DependencyManager.getPath("PAT_MONGO_PATH");
+    vm.mongoDirPath = path.dirname(vm.mongoPath);
+    vm.openstudioBindingsPath = DependencyManager.getPath("PAT_OS_BINDING_PATH");
+    vm.openstudioBindingsDirPath = path.dirname(vm.openstudioBindingsPath);
+    vm.rubyPath = DependencyManager.getPath("PAT_RUBY_PATH");
+
+    vm.projectDir = vm.Project.getProjectDir();
 
     vm.analysisID = null;
   }
@@ -257,8 +255,7 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: add a timeout here in case this takes too long
-    //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --debug ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\" --verbose';
-    const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\"';
+    const command = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\" start_local --mongo-dir=\"' + vm.mongoDirPath + '\" --ruby-lib-path=\"' + vm.openstudioBindingsDirPath + '\" \"' + vm.projectDir.path() + '\"';
     vm.$log.debug('Start Local command: ', command);
     const child = vm.exec(command,
       (error, stdout, stderr) => {
@@ -299,8 +296,7 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: catch what analysis type it is
-    const command = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis "${vm.projectDir.path()}\\${vm.Project.getProjectName()}.json" "${vm.serverURL}" -a batch_datapoints`;
-    //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' run_analysis ' + '\"' + vm.projectDir.path() + '\\' + vm.Project.getProjectName() + '.json\" ' + vm.serverURL  + ' -a batch_datapoints';
+    const command = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis "${vm.projectDir.path()}\\${vm.Project.getProjectName()}.json" "${vm.serverURL}" -a batch_datapoints`;
     vm.$log.debug('Run command: ', command);
     const child = vm.exec(command,
       (error, stdout, stderr) => {
@@ -340,8 +336,7 @@ export class OsServer {
     if (vm.serverStatus == vm.serverStatus) {
 
       if (serverType.name == 'local') {
-
-        const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local --debug ' + '\"' + vm.projectDir.path() + '\" --verbose';
+        const command = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_local ' + '\"' + vm.projectDir.path() + '\"';
         vm.$log.debug('Stop Local command: ', command);
         const child = vm.exec(command,
           (error, stdout, stderr) => {
