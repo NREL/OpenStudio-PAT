@@ -18,6 +18,7 @@ export class RunController {
     vm.$log.debug('SERVER STATUS: ', vm.$scope.serverStatus);
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
+    vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
     vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
@@ -25,6 +26,11 @@ export class RunController {
 
     // TODO: refresh this
     vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+
+    // DEBUG
+    vm.$log.debug('Run Type: ', vm.$scope.selectedRunType);
+    vm.$log.debug('Analysis Type: ', vm.$scope.selectedAnalysisType);
+    vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod);
 
   }
 
@@ -56,6 +62,7 @@ export class RunController {
     vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
     vm.$log.debug('***** In runController::runEntireWorkflow() ready to start server *****');
+
     vm.OsServer.startServer().then(response => {
       vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
       vm.$log.debug('Start Server response: ', response);
@@ -75,8 +82,17 @@ export class RunController {
       vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
 
       vm.$log.debug('***** In runController::runEntireWorkflow() ready to run analysis *****');
-      // TODO: THIS WILL NEED TO BE MODIFIED FOR WINDOWS HACK
-      vm.OsServer.runAnalysis().then(response => {
+
+      // set analysis type (sampling method).  batch_datapoints is for manual runs only
+      let analysis_param = '';
+      if (vm.$scope.selectedAnalysisType == 'Manual')
+        analysis_param = 'batch_datapoints';
+      else
+        analysis_param = vm.$scope.samplingMethod.id;
+
+      // TODO: NEED TO ADD WINDOWS HACK
+
+      vm.OsServer.runAnalysis(analysis_param).then(response => {
         vm.$log.debug('***** In runController::runEntireWorkflow() analysis running *****');
         vm.$log.debug('Run Analysis response: ', response);
 

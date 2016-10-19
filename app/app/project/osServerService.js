@@ -59,7 +59,7 @@ export class OsServer {
     if (vm.platform == 'win32')
       vm.runAnalysisCommand = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis --debug "${vm.projectDir.path()}\\${vm.Project.getProjectName()}.json" "${vm.serverURL}" -a batch_datapoints`;
     else
-      vm.runAnalysisCommand = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis --debug --verbose --ruby-lib-path="${vm.rubyLibPath.path()}" "${vm.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}" -a batch_datapoints`;
+      vm.runAnalysisCommand = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis --debug --verbose --ruby-lib-path="${vm.rubyLibPath.path()}" "${vm.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
     vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
 
     vm.stopServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local ' + '\"' + vm.projectDir.path() + '\"';
@@ -337,7 +337,7 @@ export class OsServer {
     return deferred.promise;
   }
 
-  runAnalysis() {
+  runAnalysis(analysis_param) {
     const vm = this;
     vm.$log.debug('***** In osServerService::runAnalysis() *****');
     const deferred = vm.$q.defer();
@@ -346,7 +346,9 @@ export class OsServer {
     // TODO: catch what analysis type it is
     // Old server command
     //const command = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis "${vm.projectDir.path()}\\${vm.Project.getProjectName()}.json" "${vm.serverURL}" -a batch_datapoints`;
-    const child = vm.exec( vm.runAnalysisCommand,
+    const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param;
+    vm.$log.debug('FULL run_analysis command: ', full_command);
+    const child = vm.exec( full_command,
       (error, stdout, stderr) => {
         console.log('exit code: ', child.exitCode);
         console.log('child: ', child);
