@@ -319,17 +319,28 @@ export class Project {
     vm.osa.analysis.problem.algorithm = {objective_functions: []};
     vm.osa.analysis.problem.workflow = [];
 
+    // design alternatives array
+    vm.osa.analysis.problem.design_alternatives = [];
+    _.forEach(vm.designAlternatives, (da) => {
+      const da_hash = {};
+      da_hash.name = da.name;
+      da_hash.description = da.description;
+      vm.osa.analysis.problem.design_alternatives.push(da_hash);
+    });
+
     let measure_count = 0;
     _.forEach(vm.measures, (measure) => {
       const m = {};
       m.name = measure.name;
       m.display_name = measure.display_name;
+      // measure types: ModelMeasure, EnergyPlusMeasure, ReportingMeasure
+      // OSA wants: Ruby, EnergyPlus, Reporting
       if (measure.type === 'ModelMeasure') {
-        m.measure_type = 'RubyMeasure';
+        m.measure_type = 'Ruby';
       } else if (measure.type === 'EnergyPlusMeasure') {
-        m.measure_type = 'EnergyPlusMeasure';
-      } else if (measure.type === 'RubyMeasure') {
-        m.measure_type = 'RubyMeasure';
+        m.measure_type = 'EnergyPlus';
+      } else if (measure.type === 'ReportingMeasure') {
+        m.measure_type = 'Reporting';
       } else {
         m.measure_type = 'unknown';
       }
@@ -342,6 +353,12 @@ export class Project {
       m.measure_definition_name_xml = null;
       m.measure_definition_uuid = measure.uid;
       m.measure_definition_version_uuid = measure.version_id;
+
+      // adding these to support EDAPT reporting
+      m.uuid = measure.uid;
+      m.version_uuid = measure.version_id;
+      m.description = measure.description; // TODO: verify this works in JSON (could have line breaks and other special characters)
+      m.taxonomy = measure.tags;
 
       // first find out how many options there are
       const keys = Object.keys(measure.arguments[0]);

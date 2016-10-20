@@ -70,6 +70,15 @@ export class DependencyManager {
         arch: 'x64',
         type: 'mongo'
       }],
+      //openstudioServer: [{
+      //  name: 'openstudio-server',
+      //  platform: 'win32',
+      //  arch: 'x64'
+      //}, {
+      //  name: 'openstudio-server',
+      //  platform: 'darwin',
+      //  arch: 'x64'
+      //}],
       openstudioServer: [{
         name: 'OpenStudio-server-f9c68107af',
         platform: 'win32',
@@ -183,7 +192,7 @@ export class DependencyManager {
     //return vm.$q.resolve();
 
     // Open modal dialog to "disable app during downloads, and inform user of any issues
-    vm.openDependencyModal();
+    //vm.openDependencyModal(); TODO uncomment this later
 
     const platform = os.platform();
     const arch = os.arch();
@@ -203,7 +212,7 @@ export class DependencyManager {
       const dependencyManifest = _.find(vm.manifest.ruby, {platform: platform});
       const manifestEmpty = _.isEmpty(dependencyManifest);
 
-      if (!vm.src.exists(vm.getPath('PAT_RUBY_PATH'))) {
+      if (! jetpack.exists(vm.getPath('PAT_RUBY_PATH')) ) {
         downloadDependency = true;
         vm.$log.debug('Ruby not found, downloading');
         vm.downloadStatus = 'Ruby not found, downloading';
@@ -226,7 +235,7 @@ export class DependencyManager {
       const dependencyManifest = _.find(vm.manifest.mongo, {platform: platform, arch: arch});
       const manifestEmpty = _.isEmpty(dependencyManifest);
 
-      if (!vm.src.exists(vm.getPath('PAT_MONGO_PATH'))) {
+      if (! jetpack.exists(vm.getPath('PAT_MONGO_PATH'))) {
         downloadDependency = true;
         vm.$log.debug('Mongo not found, downloading');
         vm.downloadStatus = 'Mongo not found, downloading';
@@ -249,7 +258,7 @@ export class DependencyManager {
       const dependencyManifest = _.find(vm.manifest.openstudioServer, {platform: platform, arch: arch});
       const manifestEmpty = _.isEmpty(dependencyManifest);
 
-      if (!vm.src.exists(vm.getPath('PAT_OS_META_CLI_PATH'))) {
+      if (! jetpack.exists(vm.getPath('PAT_OS_META_CLI_PATH'))) {
         downloadDependency = true;
         vm.$log.debug('OpenstudioServer not found, downloading');
         vm.downloadStatus = 'OpenstudioServer not found, downloading';
@@ -272,7 +281,7 @@ export class DependencyManager {
       const dependencyManifest = _.find(vm.manifest.openstudio, {platform: platform, arch: arch});
       const manifestEmpty = _.isEmpty(dependencyManifest);
 
-      if (!vm.src.exists(vm.getPath('PAT_OS_CLI_PATH'))) {
+      if (! jetpack.exists(vm.getPath('PAT_OS_CLI_PATH'))) {
         downloadDependency = true;
         vm.$log.debug(`Openstudio not found in ${vm.getPath('PAT_OS_CLI_PATH')}, downloading`);
         vm.downloadStatus = 'Openstudio not found, downloading';
@@ -433,7 +442,7 @@ export class DependencyManager {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    vm.downloadZip(vm.manifest.endpoint, vm._dependencyFilename(downloadManifest), downloadManifest.type, true).then(deferred.resolve, deferred.reject);
+    //vm.downloadZip(vm.manifest.endpoint, vm._dependencyFilename(downloadManifest), downloadManifest.type, true).then(deferred.resolve, deferred.reject);
 
     return deferred.promise;
   }
