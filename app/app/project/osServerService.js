@@ -5,11 +5,12 @@ import path from 'path';
 import os from 'os';
 
 export class OsServer {
-  constructor($q, $http, $log, Project) {
+  constructor($q, $http, $log, $uibModal, Project) {
     'ngInject';
     const vm = this;
     vm.Project = Project;
     vm.$log = $log;
+    vm.$uibModal = $uibModal;
     vm.$q = $q;
     vm.$http = $http;
     vm.jetpack = jetpack;
@@ -86,12 +87,12 @@ export class OsServer {
     vm.serverStatus = status;
   }
 
-  getAnalysisStat() {
+  getAnalysisStatus() {
     const vm = this;
     return vm.analysisStatus;
   }
 
-  setAnalysisStat(analysisStatus) {
+  setAnalysisStatus(analysisStatus) {
     const vm = this;
     vm.analysisStatus = analysisStatus;
   }
@@ -441,7 +442,7 @@ export class OsServer {
     return deferred.promise;
   }
 
-  getAnalysisStatus() {
+  retrieveAnalysisStatus() {
     const vm = this;
     const deferred = vm.$q.defer();
 
@@ -459,5 +460,22 @@ export class OsServer {
 
     return deferred.promise;
   }
+
+  // analysis running dialog
+  showAnalysisRunningDialog() {
+    const vm = this;
+    vm.$log.debug('In showAnalysisRunningDialog function');
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalAnalysisRunningController',
+      controllerAs: 'modal',
+      templateUrl: 'app/run/analysisRunning.html',
+      windowClass: 'modal'
+    });
+
+  }
+
+
+
 
 }

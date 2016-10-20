@@ -179,7 +179,11 @@ export default {
     title: 'Run',
     cancelRun: 'Cancel Run',
     exportToOSA: 'Export to OSA',
-    runEntireWorkflow: 'Run Entire Workflow'
+    runEntireWorkflow: 'Run Entire Workflow',
+    modalAnalysisRunning: {
+      title: 'Analysis is Running',
+      message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'
+    }
   },
   statusBar: {
     Downloading: 'Downloading',
