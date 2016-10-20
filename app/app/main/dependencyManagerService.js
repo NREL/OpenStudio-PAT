@@ -10,7 +10,7 @@ const env = jetpack.cwd(app.getAppPath()).read('env.json', 'json');
 
 export class DependencyManager {
 
-  constructor($q, $http, $log, $translate, $uibModal, StatusBar, Project) {
+  constructor($q, $http, $log, $translate, $uibModal, StatusBar) {
     'ngInject';
 
     console.log(`this is a test : ${env.testing}`);
@@ -23,7 +23,6 @@ export class DependencyManager {
     vm.jetpack = jetpack;
     vm.AdmZip = AdmZip;
     vm.StatusBar = StatusBar;
-    vm.Project = Project;
     vm.translations = {};
     vm.exec = require('child_process').exec;
     vm.platform = os.platform();
