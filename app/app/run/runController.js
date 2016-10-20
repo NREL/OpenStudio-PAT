@@ -20,6 +20,7 @@ export class RunController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
+    vm.$log.debug('DISABLED BUTTONS? ', vm.$scope.disabledButtons);
     vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
     vm.$scope.datapoints = vm.OsServer.getDatapoints();
@@ -216,7 +217,8 @@ export class RunController {
 
   toggleButtons() {
     const vm = this;
-    vm.$scope.disabledButtons = !vm.$scope.disabledButtons;
+   // vm.$scope.disabledButtons = !vm.$scope.disabledButtons;
+    vm.OsServer.setDisabledButtons(!vm.$scope.disabledButtons);
 
   }
 

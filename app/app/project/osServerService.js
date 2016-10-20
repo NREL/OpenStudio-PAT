@@ -23,7 +23,8 @@ export class OsServer {
     vm.progressMessage = '';
     vm.isDone = true;
     vm.datapoints = [];
-    vm.disabledButtons = false;
+
+    vm.disabledButtons = false;  // display run or cancel button
 
     vm.localServerURL = 'http://localhost:8080';
     vm.cloudServerURL = 'http://bball-130553.nrel.gov:8080'; // TODO: using Brian's machine
@@ -216,7 +217,6 @@ export class OsServer {
         });
       }
       else {
-        // TODO: fix this for windows
         vm.remoteServer().then(response => {
           vm.serverStatus = 'started';
           deferred.resolve(response);
@@ -403,8 +403,7 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType();
 
-    //if ( vm.serverStatus ==  vm.serverStatus ) { TODO serverStatus is not being set to running, even when it is running
-    if (vm.serverStatus == vm.serverStatus) {
+    if (vm.serverStatus == 'started') {
 
       if (serverType.name == 'local') {
 
