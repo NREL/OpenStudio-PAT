@@ -31,9 +31,6 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
     }
   });
 
-  DependencyManager.checkDependencies()
-    .then(_.bind(MeasureManager.startMeasureManager, MeasureManager), _.bind(MeasureManager.startMeasureManager, MeasureManager));
-
   const initialLanguage = $translate.use();
   const setLanguage = language => {
     console.log(language);
