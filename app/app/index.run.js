@@ -29,6 +29,12 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
     if (fromState.name == 'analysis') {
       Project.savePrettyOptions();
     }
+    if (fromState.name == 'run' && OsServer.analysisStatus == 'starting') {
+      // warn user that they need to cancel their run before moving from this state
+      event.preventDefault();
+      OsServer.showAnalysisRunningDialog();
+    }
+
   });
 
   DependencyManager.checkDependencies()

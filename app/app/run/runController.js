@@ -13,13 +13,14 @@ export class RunController {
     vm.runTypes = vm.Project.getRunTypes();
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.OsServer.getAnalysisID();
-    vm.$scope.analysisStatus = vm.OsServer.getAnalysisStat();
+    vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
     vm.$scope.serverStatus = vm.OsServer.getServerStatus();
     vm.$log.debug('SERVER STATUS: ', vm.$scope.serverStatus);
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
+    vm.$log.debug('DISABLED BUTTONS? ', vm.$scope.disabledButtons);
     vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
     vm.$scope.datapoints = vm.OsServer.getDatapoints();
@@ -44,6 +45,26 @@ export class RunController {
     require('shell').openExternal(vm.OsServer.getServerURL());
   }
 
+  stopServer() {
+    const vm = this;
+    vm.OsServer.stopServer().then(response => {
+      vm.$log.debug('***** Server Stopped *****');
+
+      vm.OsServer.setProgressAmount(0);
+      vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+
+      vm.OsServer.setProgressMessage('');
+      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+
+      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+
+    }, response => {
+      vm.OsServer.setProgressMessage('Error Stopping Server');
+      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+      vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
+    });
+  }
+
   runEntireWorkflow() {
     const vm = this;
     vm.$log.debug('***** In runController::runEntireWorkflow() *****');
@@ -52,7 +73,8 @@ export class RunController {
     // 1: make/get OSA
     // 2: make/get zip file?
 
-    vm.$scope.analysisStatus = '';
+    vm.OsServer.setAnalysisStatus('starting');
+    vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
     // 3: hit PAT CLI to start server (local or remote)
     vm.OsServer.setProgressAmount('15');
@@ -74,7 +96,6 @@ export class RunController {
       vm.$log.debug('Server Status: ', vm.$scope.serverStatus);
 
       // 4: hit PAT CLI to start run
-      // TODO: for now, use an already-created OSA
       vm.OsServer.setProgressMessage('Starting analysis run');
       vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
@@ -89,8 +110,6 @@ export class RunController {
         analysis_param = 'batch_datapoints';
       else
         analysis_param = vm.$scope.samplingMethod.id;
-
-      // TODO: NEED TO ADD WINDOWS HACK
 
       vm.OsServer.runAnalysis(analysis_param).then(response => {
         vm.$log.debug('***** In runController::runEntireWorkflow() analysis running *****');
@@ -107,7 +126,7 @@ export class RunController {
         // 5: until complete, hit serverAPI for updates (errors, warnings, status)
         vm.getStatus = vm.$interval(function() {
 
-          vm.OsServer.getAnalysisStatus().then( response => {
+          vm.OsServer.retrieveAnalysisStatus().then( response => {
             vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
             vm.$scope.analysisStatus = 'In progress';
             //vm.$scope.analysisStatus = response.data.analysis.status;
@@ -128,7 +147,7 @@ export class RunController {
             });
 
             if (vm.isDone) {
-              //vm.OsServer.setAnalysisStatus('completed'); TODO: Is this needed? No such function currently
+              vm.OsServer.setAnalysisStatus('completed');
               vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
               // cancel loop
               vm.stopAnalysisStatus();
@@ -164,7 +183,7 @@ export class RunController {
     });
   }
 
-  stopAnalysisStatus() {
+  stopAnalysisStatus(status = 'completed') {
     const vm = this;
     vm.$log.debug('***** In runController::stopAnalysisStatus() *****');
     if (angular.isDefined(vm.getStatus)){
@@ -173,7 +192,7 @@ export class RunController {
     }
     // toggle button back to 'run' when done
     // TODO: show status as 'COMPLETED' (once it actually is)
-    vm.OsServer.setProgressMessage('Analysis complete');
+    vm.OsServer.setProgressMessage('Analysis ' + status);
     vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
 
     vm.OsServer.setProgressAmount(100);
@@ -216,15 +235,27 @@ export class RunController {
 
   toggleButtons() {
     const vm = this;
-    vm.$scope.disabledButtons = !vm.$scope.disabledButtons;
-
+    vm.OsServer.setDisabledButtons(!vm.$scope.disabledButtons);
+    vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
   }
 
   cancelRun() {
     const vm = this;
-    vm.toggleButtons();
-    vm.$scope.progressMessage = '';
-    vm.$scope.progressAmount = 0;
+    vm.OsServer.stopAnalysis().then(response => {
+      vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+      vm.toggleButtons();
+      vm.OsServer.setProgressMessage('');
+      vm.$scope.progressMessage =  vm.OsServer.getProgressMessage();
+      vm.OsServer.setProgressAmount(0);
+      vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+
+      vm.stopAnalysisStatus('canceled');
+    }, response => {
+      vm.$log.debug('ERROR attempting to stop analysis / cancel run');
+
+    });
+
+
 
   }
 

@@ -19,6 +19,7 @@ import { OutputsController } from '../app/outputs/outputsController';
 import { Project } from '../app/project/projectService';
 import { ReportsController } from '../app/reports/reportsController';
 import { RunController } from '../app/run/runController';
+import { ModalAnalysisRunningController} from '../app/run/modalAnalysisRunningController';
 import { ServerController } from '../app/server/serverController';
 import { StatusBar } from '../app/status_bar/statusBarService';
 import { StatusBarController } from '../app/status_bar/statusBarController';
@@ -36,6 +37,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('DesignAlternativesController', DesignAlternativesController)
   .controller('OutputsController', OutputsController)
   .controller('RunController', RunController)
+  .controller('ModalAnalysisRunningController', ModalAnalysisRunningController)
   .controller('ReportsController', ReportsController)
   .controller('ServerController', ServerController)
   .controller('StatusBarController', StatusBarController)
