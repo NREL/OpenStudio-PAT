@@ -421,6 +421,7 @@ export class OsServer {
             if (child.exitCode == 0) {
               // SUCCESS
               vm.$log.debug('Server Stopped');
+              vm.setServerStatus('stopped');
               deferred.resolve(child);
 
             } else {
@@ -461,6 +462,30 @@ export class OsServer {
     return deferred.promise;
   }
 
+  stopAnalysis() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const url = vm.serverURL + '/analyses/' + vm.analysisID + '/action.json';
+    const params = {analysis_action: 'stop'};
+
+    if (vm.analysisStatus == 'completed') {
+      vm.$log.debug('Analysis is already completed');
+      deferred.resolve();
+    } else {
+      vm.$http.post(url, params)
+        .success((data, status, headers, config) => {
+          vm.$log.debug('stop analysis Success!, status: ', status);
+          vm.setAnalysisStatus('canceled');
+          deferred.resolve(data);
+        })
+        .error((data, status, headers, config) => {
+          vm.$log.debug('stop analysis error: ', data);
+          deferred.reject([]);
+        });
+    }
+    return deferred.promise;
+  }
+
   // analysis running dialog
   showAnalysisRunningDialog() {
     const vm = this;
@@ -472,10 +497,6 @@ export class OsServer {
       templateUrl: 'app/run/analysisRunning.html',
       windowClass: 'modal'
     });
-
   }
-
-
-
 
 }

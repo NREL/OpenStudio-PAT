@@ -178,6 +178,7 @@ export default {
   run: {
     title: 'Run',
     cancelRun: 'Cancel Run',
+    stopServer: 'Stop Server',
     exportToOSA: 'Export to OSA',
     runEntireWorkflow: 'Run Entire Workflow',
     modalAnalysisRunning: {
