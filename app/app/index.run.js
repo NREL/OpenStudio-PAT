@@ -3,7 +3,7 @@
 import {remote} from 'electron';
 const {app, Menu, shell} = remote;
 
-export function runBlock($rootScope, $state, $window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer) {
+export function runBlock($rootScope, $state, $window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject) {
   'ngInject';
 
   $window.onbeforeunload = e => {
@@ -51,18 +51,18 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
     submenu: [{
       label: 'New',
       accelerator: 'Ctrl+N',
-      click: () => Project.newProject()
+      click: () => SetProject.newProject()
     }, {
       label: 'Open',
       accelerator: 'Ctrl+O',
-      click: () => Project.openProject()
+      click: () => SetProject.openProject()
     }, {
       label: 'Save',
       accelerator: 'Ctrl+S',
-      click: () => Project.saveProject()
+      click: () => SetProject.saveProject()
     }, {
       label: 'Save As',
-      click: () => Project.saveAsProject()
+      click: () => SetProject.saveAsProject()
     }, {
       label: 'Quit',
       accelerator: 'Ctrl+Q',
