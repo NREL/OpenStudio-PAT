@@ -143,7 +143,7 @@ gulp.task('install-deps', function() {
 
   _.forEach(dependencies, (depend) => {
     const fileInfo = _.find(manifest[depend], {platform: platform});
-    const fileName = fileInfo.name + '-' + platform + '.tar.gz';
+    const fileName = fileInfo.name;
 
     progress(request(manifest.endpoint + fileName))
       .on('progress', state => {
