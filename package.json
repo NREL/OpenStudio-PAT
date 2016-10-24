@@ -71,5 +71,8 @@
     "start": "node ./tasks/start",
     "start:dist": "node ./tasks/start --env=production",
     "test": "node ./tasks/start --env=test"
+  },
+  "dependencies": {
+    "merge-stream": "^1.0.0"
   }
 }

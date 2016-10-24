@@ -11,6 +11,8 @@ var utils = require('./utils');
 var _ = require('lodash');
 var os = require('os');
 const decompress = require('gulp-decompress');
+var merge = require('merge-stream');
+
 
 var $ = require('gulp-load-plugins')({
   pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del', 'lazypipe', 'streamify']
@@ -118,41 +120,61 @@ gulp.task('manifest', function() {
   jetpack.copy('manifest.json', path.join(conf.paths.dist, '/manifest.json'), {overwrite: true});
 });
 
-gulp.task('install-deps', function() {
-  var argv = require('yargs').argv;
+// Binary dependency management
 
-  let destination = path.join(conf.paths.dist, '..', 'depend');
-  let dependencies = ['ruby','mongo','openstudioServer','openstudio'];
+var argv = require('yargs').argv;
 
-  if( argv.prefix ) {
-    destination = argv.prefix;
-  }
+let destination = path.join(conf.paths.dist, '..', 'depend');
+let dependencies = ['ruby','mongo','openstudioServer','openstudio'];
 
-  if( argv.exclude ) {
-    const without = argv.exclude.split(',');
-    dependencies = _.difference(dependencies, without);
-  }
+if( argv.prefix ) {
+  destination = argv.prefix;
+}
 
-  const manifest = jetpack.read('manifest.json', 'json');
+if( argv.exclude ) {
+  const without = argv.exclude.split(',');
+  dependencies = _.difference(dependencies, without);
+}
 
-  const platform = os.platform();
-  const arch = os.arch();
+const manifest = jetpack.read('manifest.json', 'json');
+
+const platform = os.platform();
+const arch = os.arch();
+
+gulp.task('download-deps', function() {
 
   // List the dependencies to download here
   // These should correspond to keys in the manifest
 
-  _.forEach(dependencies, (depend) => {
+  var tasks = dependencies.map( depend => {
     const fileInfo = _.find(manifest[depend], {platform: platform});
     const fileName = fileInfo.name;
 
-    progress(request(manifest.endpoint + fileName))
+    return progress(request(manifest.endpoint + fileName))
       .on('progress', state => {
         console.log(`Downloading ${depend}, ${(state.percentage * 100).toFixed(0)}%`)
       })
       .pipe(source(fileName))
-      .pipe($.streamify( decompress() ))
       .pipe(gulp.dest(destination));
   });
+
+  return merge(tasks);
+});
+
+gulp.task('extract-deps',['download-deps'], function() {
+  var tasks = dependencies.map( depend => {
+    const fileInfo = _.find(manifest[depend], {platform: platform});
+    const fileName = fileInfo.name;
+
+    return gulp.src(path.join(destination, fileName))
+      .pipe( decompress() )
+      .pipe(gulp.dest(destination));
+  });
+
+  return merge(tasks);
+})
+
+gulp.task('install-deps',['download-deps','extract-deps'], function() {
 });
 
 
