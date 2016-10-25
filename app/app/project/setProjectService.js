@@ -1,22 +1,21 @@
 import jetpack from 'fs-jetpack';
-import os from 'os';
-import path from 'path';
 import {remote} from 'electron';
 import fs from 'fs';
 
-const {app, dialog} = remote;
+const {dialog} = remote;
 
 export class SetProject {
-  constructor($log, $uibModal, Project, OsServer) {
+  constructor($q, $log, $uibModal, Project, OsServer) {
     'ngInject';
     const vm = this;
+    vm.$q = $q;
     vm.$log = $log;
-    vm.jetpack = jetpack;
+    vm.$uibModal = $uibModal;
     vm.fs = fs;
+    vm.jetpack = jetpack;
     vm.dialog = dialog;
     vm.osServer = OsServer;
     vm.project = Project;
-    vm.$uibModal = $uibModal;
   }
 
   saveProject() {
@@ -30,40 +29,44 @@ export class SetProject {
     vm.$log.debug('saveAsProject');
 
     // pop modal to get new project name
-    vm.openModal();
+    vm.openModal().then(response => {
+      vm.$log.debug('response:', response);
 
-    const projectName = 'test';
+      // pop modal to allow user to navigate to project parent folder
+      const result = vm.dialog.showOpenDialog({
+        title: 'Choose New ParametricAnalysisTool Project Folder',
+        properties: ['openDirectory']
+      });
 
-    // pop modal to allow user to navigate to project parent folder
-    const result = vm.dialog.showOpenDialog({
-      title: 'Choose New ParametricAnalysisTool Project Folder',
-      //buttonLabel: 'Select Folder',
-      properties: ['openDirectory']
+      if (!_.isEmpty(result)) {
+        const path = result[0];
+        vm.$log.debug('PAT Project path:', path);
+
+        let newProjectDir = path;
+        newProjectDir += '\\';
+        newProjectDir += vm.project.getProjectName();
+
+        const oldProjectDir = vm.project.projectDir.path();
+        vm.$log.debug('oldProjectDir:', oldProjectDir);
+        vm.$log.debug('newProjectDir:', newProjectDir);
+
+        // set new project directory
+        vm.project.projectDir = newProjectDir;
+
+        // stop server
+        // TODO!
+
+        // for saveAs: copy old project's folder structure to new location (from, to)
+        jetpack.copy(oldProjectDir, newProjectDir);
+
+        // start server at new location
+        // TODO!
+        //vm.osServer.startServer().then(response => {
+        //  vm.$log.debug('setProjectService::saveAsProject() server started');
+        //  vm.$log.debug('response: ', response);
+        //});
+      }
     });
-
-    if (!_.isEmpty(result)) {
-      const path = result[0];
-      vm.$log.debug('PAT Project path:', path);
-      const foldername = path.replace(/^.*[\\\/]/, '');
-      vm.$log.debug('PAT Project folder name:', foldername);
-
-      let fullFilename = path;
-      fullFilename += '\\pat.json';
-
-      let newProjectDir = path;
-      newProjectDir += '/';
-      newProjectDir += projectName;
-      vm.$log.debug('newProjectDir:', newProjectDir);
-
-      // create directory
-      vm.jetpack.dir(newProjectDir);
-
-      // for saveAs: copy old project's folder structure to new location
-      vm.$log.debug('vm.project.getProjectName():', vm.project.getProjectName());
-      //jetpack.copy(vm.project.getProjectName(), newProjectDir);
-
-      //vm.relaunchUpdatedServer(newProjectDir);
-    }
   }
 
   newProject() {
@@ -131,7 +134,7 @@ export class SetProject {
         if (allOSPs.length > 0) {
           vm.$log.debug('found osp in openProject');
           vm.$log.debug('path: ', path);
-          const result = vm.dialog.showMessageBox({
+          vm.dialog.showMessageBox({
             type: 'info',
             buttons: ['OK'],
             title: 'Open ParametricAnalysisTool Project',
@@ -139,7 +142,7 @@ export class SetProject {
           });
         } else {
           vm.$log.debug('could not find pat.json in openProject');
-          const result = vm.dialog.showMessageBox({
+          vm.dialog.showMessageBox({
             type: 'info',
             buttons: ['OK'],
             title: 'Open ParametricAnalysisTool Project',
@@ -156,12 +159,23 @@ export class SetProject {
 
   openModal() {
     const vm = this;
-    vm.$uibModal.open({
+    const deferred = vm.$q.defer();
+    vm.$log.debug('setProject::openModal');
+
+    const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
       controller: 'ModalProjectNameController',
       controllerAs: 'modal',
       templateUrl: 'app/project/project_name.html'
     });
+
+    modalInstance.result.then(() => {
+      deferred.resolve('resolved');
+    }, () => {
+      // Modal canceled
+      deferred.reject('rejected');
+    });
+    return deferred.promise;
   }
 
   relaunchUpdatedServer(projectDir) {
@@ -169,7 +183,9 @@ export class SetProject {
 
     // Stop server before changing projectDir
     vm.osServer.stopServer().then(response => {
+
       vm.$log.debug('setProjectService::relaunchUpdatedServer() server stopped');
+      vm.$log.debug('response: ', response);
 
       // update osServer's project location
       vm.project.setProjectDir = jetpack.dir(projectDir);
@@ -177,6 +193,7 @@ export class SetProject {
       // start server at new location
       vm.osServer.startServer().then(response => {
         vm.$log.debug('setProjectService::relaunchUpdatedServer() server started');
+        vm.$log.debug('response: ', response);
       });
     });
   }

@@ -4,12 +4,11 @@ import path from 'path';
 import {remote} from 'electron';
 import jsZip from 'jszip';
 import fs from 'fs';
-//import http from 'http';
 
 const {app, dialog} = remote;
 
 export class Project {
-  constructor($log, $uibModal, MeasureManager) {
+  constructor($log, MeasureManager) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -494,23 +493,23 @@ export class Project {
             max = _.max(values);
 
           const mode = function mode(ar) {
-            var numMapping = {};
-            var greatestFreq = 0;
-            var mode = 0;
+            let numMapping = {};
+            let greatestFreq = 0;
+            let currentMode = 0;
             ar.forEach(function findMode(number) {
               numMapping[number] = (numMapping[number] || 0) + 1;
 
               if (greatestFreq < numMapping[number]) {
                 greatestFreq = numMapping[number];
-                mode = number;
+                currentMode = number;
               }
             });
-            return +mode;
+            return +currentMode;
           };
 
           arg.units = '';
-          arg.minimum = min; // TODO is this meta data or calculated form options? Is it same as lower_bound below?
-          arg.maximum = max; // TODO is this meta data or calculated form options? Is it same as upper_bound below?
+          arg.minimum = min; // TODO is this meta data or calculated from options? Is it same as lower_bound below?
+          arg.maximum = max; // TODO is this meta data or calculated from options? Is it same as upper_bound below?
           arg.mode = mode(values);
 
           const v = {};
