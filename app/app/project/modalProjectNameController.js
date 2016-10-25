@@ -4,11 +4,9 @@ export class ModalProjectNameController {
     'ngInject';
 
     const vm = this;
-    //vm.$scope = $scope;
     vm.$log = $log;
+    vm.$scope = $scope;
     vm.$uibModalInstance = $uibModalInstance;
-    //vm.Project = Project;
-    vm.projectName = '';
     vm.project = Project;
 
     //const updateStatus = function (status) {
@@ -19,9 +17,8 @@ export class ModalProjectNameController {
 
   ok() {
     const vm = this;
+    vm.project.setProjectName(vm.$scope.name);
     vm.$uibModalInstance.close();
-    //vm.$log.debug('HELLO!');
-    //vm.project.setProjectName(vm.projectName);
   }
 
   cancel() {

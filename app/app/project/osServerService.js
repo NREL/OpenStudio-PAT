@@ -437,7 +437,7 @@ export class OsServer {
       }
     } else {
       // Server already stopped
-      deferred.resolve();
+      deferred.resolve('Server already stopped');
     }
 
     return deferred.promise;

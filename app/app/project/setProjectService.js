@@ -156,8 +156,6 @@ export class SetProject {
 
   openModal() {
     const vm = this;
-    const deferred = vm.$q.defer();
-
     vm.$uibModal.open({
       backdrop: 'static',
       controller: 'ModalProjectNameController',
@@ -169,11 +167,17 @@ export class SetProject {
   relaunchUpdatedServer(projectDir) {
     const vm = this;
 
-    // update osServer's project location
-    vm.project.setProjectDir = jetpack.dir(projectDir);
+    // Stop server before changing projectDir
+    vm.osServer.stopServer().then(response => {
+      vm.$log.debug('setProjectService::relaunchUpdatedServer() server stopped');
 
-    // stop server at old location, and then start server at new location
-    vm.osServer.stopServer().then(vm.osServer.startServer());
+      // update osServer's project location
+      vm.project.setProjectDir = jetpack.dir(projectDir);
+
+      // start server at new location
+      vm.osServer.startServer().then(response => {
+        vm.$log.debug('setProjectService::relaunchUpdatedServer() server started');
+      });
+    });
   }
-
 }
