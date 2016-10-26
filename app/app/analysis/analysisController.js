@@ -29,6 +29,7 @@ export class AnalysisController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+    vm.$log.debug('****ANALYSIS TAB****');
     vm.$log.debug('ANALYSIS MEASURES RETRIEVED: ', vm.$scope.measures);
 
     vm.$scope.osMeasures = [];
@@ -64,7 +65,7 @@ export class AnalysisController {
   getDefaultOptionColDef() {
     const vm = this;
     return {
-      displayName: 'Option 1',
+      display_name: 'Option 1',
       field: 'option_1',
       editDropdownOptionsFunction: function (rowEntity) {
         if (rowEntity.type === 'Choice') {
@@ -128,17 +129,17 @@ export class AnalysisController {
         enableCellEditOnFocus: true,
         enableHiding: false,
         columnDefs: [{
-          name: 'displayName',
+          name: 'display_name',
           displayName: 'analysis.columns.argumentName',
           enableCellEdit: false,
           headerCellFilter: 'translate',
           width: 200,
           minWidth: 100
         }, {
-          name: 'shortName',
+          name: 'short_name',
           displayName: 'analysis.columns.shortName',
           cellEditableCondition: $scope => {
-            return angular.isDefined($scope.row.entity.displayName);
+            return angular.isDefined($scope.row.entity.display_name);
           },
           headerCellFilter: 'translate',
           width: 200,
@@ -180,7 +181,7 @@ export class AnalysisController {
         enableCellEditOnFocus: true,
         enableHiding: false,
         columnDefs: [{
-          name: 'displayName',
+          name: 'display_name',
           displayName: 'analysis.columns.argumentName',
           enableCellEdit: false,
           headerCellFilter: 'translate',
@@ -258,6 +259,8 @@ export class AnalysisController {
   addMeasure(type) {
     const vm = this;
     const types = [type];
+    // save pretty options (will be needed to load back)
+    vm.Project.savePrettyOptions();
     vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
@@ -286,7 +289,7 @@ export class AnalysisController {
     measurePanel.remove();
 
     if (!vm.jetpack.remove(vm.projectDir.path('measures/' + measure.name))) {
-      vm.jetpack.remove(vm.projectDir.path('measures/' + measure.className));
+      vm.jetpack.remove(vm.projectDir.path('measures/' + measure.class_name));
     }
 
     vm.initializeGrids();
@@ -316,11 +319,11 @@ export class AnalysisController {
         max = num;
       }
     });
-    //vm.$log.debug('max: ', max);
+    vm.$log.debug('max: ', max);
 
     // start from first option
     const opt = vm.getDefaultOptionColDef();
-    opt.displayName = 'Option ' + Number(max + 1);
+    opt.display_name = 'Option ' + Number(max + 1);
     opt.field = 'option_' + Number(max + 1);
     opt.measureUID = measure.uid;
 
@@ -332,10 +335,10 @@ export class AnalysisController {
          argument[opt.field] = opt.field;
       }
       else if (argument.specialRowId === 'optionName') {
-        argument[opt.field] = opt.displayName + ' Name';
+        argument[opt.field] = opt.display_name + ' Name';
       }
       else if (argument.specialRowId === 'optionDescription') {
-        argument[opt.field] = opt.displayName + ' Description';
+        argument[opt.field] = opt.display_name + ' Description';
       }
       else if (!argument.variable) {
         argument[opt.field] = argument.option_1;
@@ -393,11 +396,11 @@ export class AnalysisController {
 
   addDefaultArguments(measure, option) {
     _.forEach(measure.arguments, (argument) => {
-      if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.defaultValue))) {
-        argument[option.field] = Number(argument.defaultValue);
+      if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.default_value))) {
+        argument[option.field] = Number(argument.default_value);
       }
       else {
-        argument[option.field] = argument.defaultValue;
+        argument[option.field] = argument.default_value;
       }
     });
   }
@@ -426,7 +429,7 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In loadMeasureOptions in analysis');
     _.forEach(vm.$scope.measures, (measure) => {
-
+        vm.$log.debug('measure: ', measure);
       _.forEach(measure.options, (option) => {
         vm.loadOption(measure, option);
       });
@@ -441,7 +444,7 @@ export class AnalysisController {
     const re = /^option_(\d+)$/;
     if (re.test(option.id)) {
       const opt = vm.getDefaultOptionColDef();
-      opt.displayName = _.startCase(option.id);
+      opt.display_name = _.startCase(option.id);
       opt.field = option.id;
       vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
     } else {
@@ -462,7 +465,8 @@ export class AnalysisController {
     const vm = this;
     vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
     vm.$log.debug('In Analysis::setSeed');
-    vm.Project.computeAllArguments();
+    // recompute model-dependent measure arguments when resetting seed
+    vm.Project.computeAllMeasureArguments();
   }
 
   setWeatherFile() {

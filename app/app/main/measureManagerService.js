@@ -11,7 +11,7 @@ export class MeasureManager {
     vm.$q = $q;
 
     let exeExt = '';
-    if( process.platform == 'win32' ) {
+    if (process.platform == 'win32') {
       exeExt = '.exe';
     }
 
@@ -21,6 +21,15 @@ export class MeasureManager {
     vm.cliPath = vm.cliPath.replace(' ', '\ ');
 
     vm.url = 'http://localhost:1234';
+
+    // measure Manager ready promise
+    vm.mmReadyDeferred = vm.$q.defer();
+
+  }
+
+  isReady() {
+    const vm = this;
+    return vm.mmReadyDeferred.promise;
   }
 
   startMeasureManager() {
@@ -29,9 +38,42 @@ export class MeasureManager {
     vm.cli = vm.spawn(vm.cliPath, ['measure', '-s']);
     vm.cli.stdout.on('data', (data) => {
       vm.$log.debug(`MeasureManager: ${data}`);
+      // check that the mm was started correctly: resolve readyDeferred
+      const str = data.toString();
+      if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
+        vm.$log.debug('Found WEBrick Start!, resolve promise');
+        vm.mmReadyDeferred.resolve();
+      }
+      // TODO: THIS IS TEMPORARY (windows):
+      else if (str.indexOf('Only one usage of each socket address') !== -1) {
+        vm.$log.debug('WEBrick already running...using tempMeasureManager');
+        vm.mmReadyDeferred.resolve();
+      }
+      // TODO: THIS IS TEMPORARY (mac):
+      else if (str.indexOf('Error: Address already in use') !== -1) {
+        vm.$log.debug ('WEBrick already running...using tempMeasureManager');
+        vm.mmReadyDeferred.resolve();
+      }
+
     });
     vm.cli.stderr.on('data', (data) => {
       vm.$log.debug(`MeasureManager: ${data}`);
+      // check that the mm was started correctly: resolve readyDeferred
+      const str = data.toString();
+      if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
+        vm.$log.debug('Found WEBrick Start!, resolve promise');
+        vm.mmReadyDeferred.resolve();
+      }
+      // TODO: THIS IS TEMPORARY (windows):
+      else if (str.indexOf('Only one usage of each socket address') !== -1) {
+        vm.$log.debug('WEBrick already running...using tempMeasureManager');
+        vm.mmReadyDeferred.resolve();
+      }
+      // TODO: THIS IS TEMPORARY (mac):
+      else if (str.indexOf('Error: Address already in use') !== -1) {
+        vm.$log.debug ('WEBrick already running...using tempMeasureManager');
+        vm.mmReadyDeferred.resolve();
+      }
     });
     vm.cli.on('close', (code) => {
       vm.$log.debug(`Measure Manager exited with code ${code}`);
@@ -65,11 +107,11 @@ export class MeasureManager {
 
     vm.$log.debug('params one more time: ', params);
     vm.$http.post(vm.url + '/duplicate_measure', params)
-      .success( (data, status, headers, config) => {
+      .success((data, status, headers, config) => {
         vm.$log.debug('Measure Manager reply: ', data);
-        deferred.resolve();
+        deferred.resolve(data);
       })
-      .error( (data, status, headers, config) => {
+      .error((data, status, headers, config) => {
         vm.$log.debug('Measure Manager DuplicateMeasure error: ', data);
         deferred.reject();
       });
@@ -83,22 +125,52 @@ export class MeasureManager {
   updateMeasures(measurePath) {
 
     const vm = this;
-    const params = { measures_dir: measurePath };
+    // fix path for windows
+    const newMeasurePath = measurePath.replace(/\\/g, '/'); // Evan: how to normalize the path
+    const params = {measures_dir: newMeasurePath};
+    vm.$log.debug('PARAMS: ', params);
 
     const deferred = vm.$q.defer();
 
     vm.$http.post(vm.url + '/update_measures', params)
-      .success( (data, status, headers, config) => {
-        vm.$log.debug('Success!, status: ', status);
-        vm.$log.debug('Measure Manager reply: ', data);
+      .success((data, status, headers, config) => {
+        vm.$log.debug('updateMeasures Success!, status: ', status);
+        // vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
-    .error ((data, status, headers, config) => {
-      vm.$log.debug('Measure Manager UpdateMeasures error: ', data);
-      deferred.reject([]);
-    });
+      .error((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager UpdateMeasures error: ', data);
+        deferred.reject([]);
+      });
 
     return deferred.promise;
+  }
 
+  // Compute Arguments
+  // This function computes arguments and returns all metadata for a single measure
+  // Expects a measurePath.  and osmPath if evaluating against a specific model
+  computeArguments(measurePath, osmPath = null) {
+    const vm = this;
+
+    // TODO: is there a situation where we want to use an empty model even though we have a seed model defined?
+    osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
+
+    const params = (osmPath == null) ? {measure_dir: measurePath} : {measure_dir: measurePath, osm_path: osmPath};
+    vm.$log.debug('computeArguments params', params);
+    const deferred = vm.$q.defer();
+
+    vm.$http.post(vm.url + '/compute_arguments', params)
+      .success((data, status, headers, config) => {
+        vm.$log.debug('computeArguments Success!, status: ', status);
+        // vm.$log.debug('Measure Manager reply: ', data);
+        deferred.resolve(data);
+      })
+      .error((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager ComputeArguments error: ', data);
+        deferred.reject([]);
+      });
+
+    return deferred.promise;
   }
 }
+

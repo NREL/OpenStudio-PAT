@@ -4,18 +4,19 @@ import path from 'path';
 import {remote} from 'electron';
 import jsZip from 'jszip';
 import fs from 'fs';
-import http from 'http';
+//import http from 'http';
 
 const {app} = remote;
 
 export class Project {
-  constructor($log) {
+  constructor($log, MeasureManager) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
     vm.jetpack = jetpack;
     vm.fs = fs;
     vm.jsZip = jsZip;
+    vm.MeasureManager = MeasureManager;
 
     vm.projectName = '';
     // TODO: grab from PAT Electron settings. For now, default to 'the_project'
@@ -118,7 +119,7 @@ export class Project {
       if (!angular.isDefined(vm.measures)) {
         vm.measures = [];
       }
-      vm.computeAllArguments();
+
       vm.designAlternatives = vm.pat.designAlternatives;
       if (!angular.isDefined(vm.designAlternatives)) {
         vm.designAlternatives = [];
@@ -139,6 +140,11 @@ export class Project {
       vm.openstudioCLIMD5 = vm.pat.openstudioCLIMD5 ? vm.pat.openstudioCLIMD5 : vm.openstudioCLIMD5;
       vm.openstudioMD5 = vm.pat.openstudioMD5 ? vm.pat.openstudioMD5 : vm.openstudioMD5;
     }
+
+  }
+
+  sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
   }
 
   savePrettyOptions() {
@@ -199,118 +205,49 @@ export class Project {
 
   }
 
-  computeAllArguments() {
+  // computes all project measure arguments with selected seed
+  // uses empty seed model otherwise
+  computeAllMeasureArguments() {
     const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('in Project computeAllMeasureArguments()');
+    const osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
 
-    const filenames = fs.readdirSync(vm.projectMeasuresDir.path());
-    filenames.forEach(function (name) {
-      vm.$log.debug('name: ' + name);
-      if (name === '.' || name === '..') {
-        return;
-      }
-      if (fs.lstatSync(vm.projectMeasuresDir.path() + '/' + name).isDirectory()) {
-        vm.computeArguments(name);
-      }
-    });
-  }
+    _.forEach(vm.measures, (measure) => {
+      vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
+        // merge with existing project measure
+        vm.$log.debug('New computed measure: ', newMeasure);
 
-  computeArguments(measureDirName) {
-    const vm = this;
+        // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
+        _.forEachRight(measure.arguments, (arg, index) => {
+          if (_.isUndefined(arg.specialRowId)) {
+            const match = _.find(measure.arguments, {name: arg.name});
+            if (_.isUndefined(match)) {
+              measure.arguments.splice(index, 1);
+            }
+          }
+        });
+        // then add/merge (at argument level)
+        _.forEach(newMeasure.arguments, (arg) => {
+          const match = _.find(measure.arguments, {name: arg.name});
+          if (_.isUndefined(match)) {
+            measure.arguments.push(arg);
+          } else {
+            _.merge(match, arg);
+          }
+        });
 
-    const measurePath = vm.projectMeasuresDir.path() + '/' + measureDirName + '/';
-    const seedPath = vm.seedDir.path() + '/' + vm.defaultSeed;
-
-    vm.$log.debug('measurePath: ' + measurePath);
-    vm.$log.debug('seedPath: ' + seedPath);
-
-    const postData = JSON.stringify({
-      measure_dir: measurePath,
-      osm_path: seedPath
-    });
-
-    const options = {
-      hostname: 'localhost',
-      port: 1234,
-      path: '/compute_arguments',
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/x-www-form-urlencoded',
-        'Content-Length': Buffer.byteLength(postData)
-      }
-    };
-
-    // The response is will consist of JSON with measure data, including model-specific arguments.
-    // These arguments should be displayed in the analysis tab's measure tables.
-    let body = ''; // TODO use body for analysis tab measure tables
-    const req = http.request(options, (res) => {
-      vm.$log.debug(`STATUS: ${res.statusCode}`);
-      vm.$log.debug(`HEADERS: ${JSON.stringify(res.headers)}`);
-      res.setEncoding('utf8');
-      res.on('data', (chunk) => {
-        body += chunk;
-        //console.log(`BODY: ${chunk}`);
       });
-      res.on('end', () => {
-        console.log('No more data in response.');
-      });
+
     });
 
-    req.on('error', (e) => {
-      console.log(`problem with request: ${e.message}`);
-    });
+    // recalculate pretty options
+    vm.savePrettyOptions();
 
-    // write data to request body
-    req.write(postData);
-    req.end();
+    deferred.resolve();
+    return deferred.promise;
 
-    return body;
   }
-
-  //updateAllMeasures(measurePath) {
-  //  const vm = this;
-  //
-  //  vm.$log.debug('measurePath: ', measurePath);
-  //
-  //  const postData = JSON.stringify({
-  //    measure_dir: measurePath
-  //  });
-  //
-  //  const options = {
-  //    hostname: 'localhost',
-  //    port: 1234,
-  //    path: '/update_measures',
-  //    method: 'POST',
-  //    headers: {
-  //      'Content-Type': 'application/x-www-form-urlencoded',
-  //      'Content-Length': Buffer.byteLength(postData)
-  //    }
-  //  };
-  //
-  //  // The response will consist of the measures which were found to have been updated
-  //  let body = ''; // TODO use body for library dialog's updated measures note
-  //  const req = http.request(options, res => {
-  //    vm.$log.debug(`STATUS: ${ res.statusCode }`);
-  //    vm.$log.debug(`HEADERS: ${ JSON.stringify(res.headers) }`);
-  //    res.setEncoding('utf8');
-  //    res.on('data', chunk => {
-  //      body += chunk;
-  //      //console.log(`BODY: ${chunk}`);
-  //    });
-  //    res.on('end', () => {
-  //      console.log('No more data in response.');
-  //    });
-  //  });
-  //
-  //  req.on('error', (e) => {
-  //    console.log(`problem with request: ${e.message}`);
-  //  });
-  //
-  //  // write data to request body
-  //  req.write(postData);
-  //  req.end();
-  //
-  //  return body;
-  //}
 
   // export OSA
   exportOSA() {
@@ -383,17 +320,28 @@ export class Project {
     vm.osa.analysis.problem.algorithm = {objective_functions: []};
     vm.osa.analysis.problem.workflow = [];
 
+    // design alternatives array
+    vm.osa.analysis.problem.design_alternatives = [];
+    _.forEach(vm.designAlternatives, (da) => {
+      const da_hash = {};
+      da_hash.name = da.name;
+      da_hash.description = da.description;
+      vm.osa.analysis.problem.design_alternatives.push(da_hash);
+    });
+
     let measure_count = 0;
     _.forEach(vm.measures, (measure) => {
       const m = {};
       m.name = measure.name;
-      m.display_name = measure.displayName;
+      m.display_name = measure.display_name;
+      // measure types: ModelMeasure, EnergyPlusMeasure, ReportingMeasure
+      // OSA wants: Ruby, EnergyPlus, Reporting
       if (measure.type === 'ModelMeasure') {
-        m.measure_type = 'RubyMeasure';
+        m.measure_type = 'Ruby';
       } else if (measure.type === 'EnergyPlusMeasure') {
-        m.measure_type = 'EnergyPlusMeasure';
-      } else if (measure.type === 'RubyMeasure') {
-        m.measure_type = 'RubyMeasure';
+        m.measure_type = 'EnergyPlus';
+      } else if (measure.type === 'ReportingMeasure') {
+        m.measure_type = 'Reporting';
       } else {
         m.measure_type = 'unknown';
       }
@@ -401,11 +349,17 @@ export class Project {
       //m.measure_definition_measureUID = measure.colDef.measureUID; // TODO: fix this
       m.measure_definition_directory = './measures/' + measure.name;
       m.measure_definition_directory_local = vm.projectMeasuresDir.path() + '/' + measure.name;
-      m.measure_definition_display_name = measure.displayName;
+      m.measure_definition_display_name = measure.display_name;
       m.measure_definition_name = measure.name;
       m.measure_definition_name_xml = null;
       m.measure_definition_uuid = measure.uid;
-      m.measure_definition_version_uuid = measure.versionId;
+      m.measure_definition_version_uuid = measure.version_id;
+
+      // adding these to support EDAPT reporting
+      m.uuid = measure.uid;
+      m.version_uuid = measure.version_id;
+      m.description = measure.description; // TODO: verify this works in JSON (could have line breaks and other special characters)
+      m.taxonomy = measure.tags;
 
       // first find out how many options there are
       const keys = Object.keys(measure.arguments[0]);
@@ -416,22 +370,25 @@ export class Project {
       m.arguments = [];
       // This portion only has arguments that don't have the variable box checked
       _.forEach(measure.arguments, (arg) => {
-        if (((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) && (typeof arg.variable === 'undefined' || arg.variable === false)) {
+        if (
+             (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) &&
+             (_.isUndefined(arg.variable) || arg.variable === false)
+           ) {
           const argument = {};
           argument.display_name = arg.displayName;
           //argument.display_name_short = arg.id; TODO
-          argument.display_name_short = arg.displayName;
+          argument.display_name_short = arg.display_name;
           argument.name = arg.name;
           argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
-          argument.default_value = arg.defaultValue;
-          argument.value = arg.defaultValue; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
+          argument.default_value = arg.default_value;
+          argument.value = arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
           // Make sure that argument is "complete"
-          if (((typeof argument.display_name !== 'undefined' && argument.display_name.length) ||
-            (typeof argument.display_name_short !== 'undefined' && argument.display_name_short.length) ||
-            (typeof argument.name !== 'undefined' && argument.name.length)) &&
-            typeof argument.value_type !== 'undefined' && argument.value_type.length &&
-            typeof argument.default_value !== 'undefined' && argument.default_value.length &&
-            typeof argument.value !== 'undefined' && argument.value.length) {
+          if (((angular.isDefined(argument.display_name) && argument.display_name.length) ||
+            (angular.isDefined(argument.display_name_short) && argument.display_name_short.length) ||
+            (angular.isDefined(argument.name) && argument.name.length)) &&
+            angular.isDefined(argument.value_type) && argument.value_type.length &&
+            angular.isDefined(argument.default_value) && argument.default_value.length &&
+            angular.isDefined(argument.value) && argument.value.length) {
             var_count += 1;
             m.arguments.push(argument);
           } else {
@@ -501,7 +458,7 @@ export class Project {
 
       // Variable arguments
       _.forEach(measure.arguments, (arg) => {
-        if (((typeof arg.specialRowId === 'undefined') || (typeof arg.specialRowId !== 'undefined' && arg.specialRowId.length === 0)) && (arg.variable === true)) {
+        if (((_.isUndefined(arg.specialRowId)) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) && (arg.variable === true)) {
           vm.$log.debug('Project::exportManual arg: ', arg);
           // see what arg is set to in each design alternative
           const valArr = [];
@@ -557,17 +514,17 @@ export class Project {
 
           const v = {};
           v.argument = {};
-          v.argument.display_name = arg.displayName;
+          v.argument.display_name = arg.display_name;
           //v.argument.display_name_short = arg.id; TODO
-          v.argument.display_name_short = arg.displayName;
+          v.argument.display_name_short = arg.display_name;
           v.argument.name = arg.name;
           v.argument.value_type = _.toLower(arg.type); // TODO: see above
-          v.argument.default_value = arg.defaultValue;
+          v.argument.default_value = arg.default_value;
           v.argument.value = _.toString(arg.option_1);
 
-          v.display_name = arg.displayName;  // same as arg
+          v.display_name = arg.display_name;  // same as arg
           //v.display_name_short = arg.id; // entered in PAT TODO
-          v.display_name_short = arg.displayName;
+          v.display_name_short = arg.display_name;
           v.variable_type = 'variable'; //this is always 'variable'
           v.units = arg.units;
           v.minimum = arg.minimum;  // TODO: must be alphabetically ordered if string, otherwise standard order (pick from option values mean must be btw min and max, and max > min)
@@ -662,16 +619,16 @@ export class Project {
       const match = _.find(vm.measures, {uid: measure.uid});
       if (angular.isDefined(match)) {
         // if there's a match, merge (update)
-        angular.merge(match, measure);
+        _.merge(match, measure);
         newMeasures.push(match);
       } else {
         // otherwise add
-        newMeasures.push(measure);
+        newMeasures.push(angular.copy(measure));
       }
     });
 
-    vm.setMeasuresAndOptions(newMeasures);
-
+    vm.setMeasuresAndOptions(updatedMeasures);
+    //vm.measures = updatedMeasures;
   }
 
   getProjectName() {
@@ -696,12 +653,13 @@ export class Project {
 
   setMeasuresAndOptions(measures) {
     const vm = this;
+    vm.savePrettyOptions();
     vm.measures = measures;
   }
 
   getMeasuresAndOptions() {
     const vm = this;
-    //vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
+    vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
     return vm.measures;
   }
 
@@ -723,6 +681,16 @@ export class Project {
   getMeasureDir() {
     const vm = this;
     return vm.myMeasuresDir;
+  }
+
+  getSeedDir() {
+    const vm = this;
+    return vm.seedDir;
+  }
+
+  getWeatherDir() {
+    const vm = this;
+    return vm.weatherDir;
   }
 
   getMongoDir() {

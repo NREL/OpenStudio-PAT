@@ -9,6 +9,12 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
   $window.onbeforeunload = e => {
     Project.exportPAT();
     MeasureManager.stopMeasureManager();
+    OsServer.stopServer().then(response => {
+      //  server is stopped
+    });
+
+    // Prevent exit
+    //e.returnValue = false;
   };
 
   $window.lint = () => {
@@ -23,11 +29,16 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
     if (fromState.name == 'analysis') {
       Project.savePrettyOptions();
     }
+    if (fromState.name == 'run' && ((OsServer.getAnalysisStatus() == 'starting') || (OsServer.getAnalysisStatus() == 'in progress'))) {
+      // warn user that they need to cancel their run before moving from this state
+      event.preventDefault();
+      OsServer.showAnalysisRunningDialog();
+    }
+
   });
 
   DependencyManager.checkDependencies()
-    .then(_.bind(MeasureManager.startMeasureManager, MeasureManager), _.bind(MeasureManager.startMeasureManager, MeasureManager))
-    .finally(Project.computeAllArguments);
+    .then(_.bind(MeasureManager.startMeasureManager, MeasureManager), _.bind(MeasureManager.startMeasureManager, MeasureManager));
 
   const initialLanguage = $translate.use();
   const setLanguage = language => {

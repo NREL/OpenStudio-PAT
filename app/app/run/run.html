@@ -26,6 +26,7 @@
   <div class="col-md-12">
     <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()" translate>run.runEntireWorkflow</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
+    <button type="button" class="btn btn-danger" ng-show="serverStatus == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>
     <!-- <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runSelected()">Run Selected</button>
       <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runUpdated()">Run Updated Design Alternatives Only</button>
       <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runEnergyPlus()">Run up to EnergyPlus</button>
@@ -42,6 +43,7 @@
 
 <div class="row pad-bot-20">
   <div class="col-md-5">
+    <p>Server Status is: {{serverStatus}}</p>
     <p>Analysis ID is: {{analysisID}}</p>
     <p>Analysis Status is: {{analysisStatus}}</p>
   </div>
@@ -55,7 +57,7 @@
         <uib-accordion-group ng-repeat="datapoint in datapoints" id="{{datapoint.id}}" is-open="datapoint.open">
           <uib-accordion-heading>
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
-            {{datapoint.id}} - status: {{datapoint.status}}
+            {{datapoint.id}} - status: {{datapoint.status}} - {{datapoint.final_message}}
           </uib-accordion-heading>
            <p>Datapoint Details Placeholder</p>
         </uib-accordion-group>

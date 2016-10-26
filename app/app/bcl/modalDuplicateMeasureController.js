@@ -9,9 +9,9 @@ export class ModalDuplicateMeasureController {
     vm.$uibModalInstance = $uibModalInstance;
     vm.$log = $log;
     vm.measure = measure;
-    vm.newDisplayName = measure.displayName;
+    vm.newDisplayName = measure.display_name;
     vm.newDescription = measure.description;
-    vm.newModelerDescription = measure.modelerDescription;
+    vm.newModelerDescription = measure.modeler_description;
     //vm.MeasureManager = MeasureManager;
     vm.jetpack = jetpack;
   }
@@ -19,10 +19,10 @@ export class ModalDuplicateMeasureController {
   ok() {
     const vm = this;
     vm.$log.debug('Duplicate Measure measure: ', vm.measure);
-    const oldMeasureDir = vm.measure.measureDir;
+    const oldMeasureDir = vm.measure.measure_dir;
     // store duplicated measures in 'Measures' folder (not LocalBCL)
     const params = {
-      old_measure_dir: vm.measure.measureDir,
+      old_measure_dir: vm.measure.measure_dir,
       measure_dir: vm.jetpack.cwd(oldMeasureDir).path('..', '..', 'Measures', _.snakeCase(vm.newDisplayName)),
       display_name: vm.newDisplayName,
       class_name: _.upperFirst(_.camelCase(vm.newDisplayName)),

@@ -5,11 +5,12 @@ import path from 'path';
 import os from 'os';
 
 export class OsServer {
-  constructor($q, $http, $log, Project) {
+  constructor($q, $http, $log, $uibModal, Project) {
     'ngInject';
     const vm = this;
     vm.Project = Project;
     vm.$log = $log;
+    vm.$uibModal = $uibModal;
     vm.$q = $q;
     vm.$http = $http;
     vm.jetpack = jetpack;
@@ -18,12 +19,13 @@ export class OsServer {
     vm.exec = require('child_process').exec;
 
     vm.serverStatus = 'stopped';  // started, stopped, error?
-    vm.analysisStatus = '';
+    vm.analysisStatus = '';  // '', started, in progress, completed, error
     vm.progressAmount = 0;
     vm.progressMessage = '';
     vm.isDone = true;
     vm.datapoints = [];
-    vm.disabledButtons = false;
+
+    vm.disabledButtons = false;  // display run or cancel button
 
     vm.localServerURL = 'http://localhost:8080';
     vm.cloudServerURL = 'http://bball-130553.nrel.gov:8080'; // TODO: using Brian's machine
@@ -31,19 +33,38 @@ export class OsServer {
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
     vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/bin'));
+    vm.rubyLibPath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/Ruby'));
     vm.OsMetaPath = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/bin/openstudio_meta'));
     vm.mongoBinDir = jetpack.cwd(path.resolve(src.path() + '/mongo/bin'));
     vm.openstudioDir = jetpack.cwd(path.resolve(src.path() + '/openstudio/'));
     vm.projectDir = vm.Project.getProjectDir();
 
     // Depends on system type (windows vs mac)
-    const platform = os.platform();
-    if (platform == 'win32')
+    vm.platform = os.platform();
+    if (vm.platform == 'win32')
       vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby.exe'));
-    else
+    else {
       vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby'));
+      // TODO: temporary (for mac: assume that ruby is in user's home folder at following path)
+      vm.rubyBinDir = jetpack.cwd(app.getPath('home') + '/tempPAT/ruby/bin/ruby');
+    }
 
     vm.analysisID = null;
+
+    if (vm.platform == 'win32')
+      vm.startServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.rubyLibPath.path() + '\"' + ' --mongo-dir=' + '\"' + vm.mongoBinDir.path() + '\" --debug \"' + vm.projectDir.path() + '\"';
+    else
+      vm.startServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.rubyLibPath.path() + '\"' + ' --mongo-dir=' + '\"' + vm.mongoBinDir.path() + '\" --debug \"' + vm.projectDir.path() + '\"';
+    vm.$log.info('start server command: ', vm.startServerCommand);
+
+    if (vm.platform == 'win32')
+      vm.runAnalysisCommand = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis --debug --verbose --ruby-lib-path="${vm.rubyLibPath.path()}" "${vm.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
+    else
+      vm.runAnalysisCommand = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis --debug --verbose --ruby-lib-path="${vm.rubyLibPath.path()}" "${vm.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
+    vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
+
+    vm.stopServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local ' + '\"' + vm.projectDir.path() + '\"';
+    vm.$log.info('stop server command: ', vm.stopServerCommand);
   }
 
   getServerURL() {
@@ -66,12 +87,12 @@ export class OsServer {
     vm.serverStatus = status;
   }
 
-  getAnalysisStat() {
+  getAnalysisStatus() {
     const vm = this;
     return vm.analysisStatus;
   }
 
-  setAnalysisStat(analysisStatus) {
+  setAnalysisStatus(analysisStatus) {
     const vm = this;
     vm.analysisStatus = analysisStatus;
   }
@@ -163,9 +184,10 @@ export class OsServer {
     }
 
     function sleep(milliseconds) {
+      // TODO: Deprecate this method? (Evan)
       const start = new Date().getTime();
       for (let i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds){
+        if ((new Date().getTime() - start) > milliseconds) {
           break;
         }
       }
@@ -174,38 +196,26 @@ export class OsServer {
     // TODO: maybe ping server to make sure it is really started?
     if (vm.serverStatus != 'started') {
       if (serverType.name == 'local') {
-        //vm.localServer().then(response => {
-        //  vm.serverStatus = 'started';
-        //  deferred.resolve(response);
-        //}, response => {
-        //  vm.$log.debug('ERROR in start local server');
-        //  deferred.reject(response);
-        //});
+        vm.localServer().then(response => {
+          vm.$log.debug('localServer promise resolved.  Server should have started');
+          vm.serverStatus = 'started';
 
-        vm.localServer();
-        // TODO revert the above and remove this hack by determining why the server is never reporting in localServer's exec
-        let noFileYet = true;
-        while (noFileYet) {
-          vm.$log.debug('try to read file');
+          // do this just in case?
+          vm.$log.debug('try to read file local_configuration.receipt file');
           const file = jetpack.read(vm.projectDir.path('local_configuration.receipt'));
           vm.$log.debug('file: ', file);
-          if (typeof file !== 'undefined' ) {
+          if (typeof file !== 'undefined') {
             vm.$log.debug('local_configuration.receipt found');
-            noFileYet = false;
-            vm.$log.debug('noFileYet: ', noFileYet);
+            deferred.resolve(response);
           } else {
-            vm.$log.debug('Waiting for local_configuration.receipt to be generated by meta cli');
-            sleep(1000);
+            vm.$log.debug('no local_configuration.receipt found');
+            deferred.reject(response);
           }
-        }
-        const obj = jetpack.read(vm.projectDir.path('local_configuration.json'), 'json');
-        if (obj) {
-          vm.setServerURL(obj.server_url);
-        } else {
-          vm.$log.debug('local_configuration.json obj undefined');
-        }
-        vm.runAnalysis();
 
+        }, response => {
+          vm.$log.debug('ERROR in start local server');
+          deferred.reject(response);
+        });
       }
       else {
         vm.remoteServer().then(response => {
@@ -237,7 +247,6 @@ export class OsServer {
 
     deferred.resolve();
     return deferred.promise;
-
   }
 
   localServer() {
@@ -257,10 +266,9 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: add a timeout here in case this takes too long
-    //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --debug ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\" --verbose';
-    const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\"';
-    vm.$log.debug('Start Local command: ', command);
-    const child = vm.exec(command,
+    // Old server command
+    //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local ' + '\"' + vm.projectDir.path() + '\" \"' + vm.mongoBinDir.path() + '\" \"' + vm.rubyBinDir.path() + '\"';
+    const child = vm.exec(vm.startServerCommand,
       (error, stdout, stderr) => {
         vm.$log.debug('exit code: ', child.exitCode);
         vm.$log.debug('child: ', child);
@@ -289,20 +297,51 @@ export class OsServer {
         }
       });
 
+    console.log(`Child pid: ${child.pid}`);
+
+    child.on('close', (code, signal) => {
+      console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
+    });
+
+    child.on('disconnect', (code, signal) => {
+      console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
+    });
+
+    child.on('exit', (code, signal) => {
+      console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
+      if (code == 0) {
+        vm.$log.debug('Server started');
+        deferred.resolve();
+      } else {
+        vm.$log.debug('Server failed to start');
+        deferred.reject();
+      }
+      return deferred.promise;
+    });
+
+    child.on('error', (code, signal) => {
+      console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
+    });
+
+    child.on('message', (code, signal) => {
+      console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
+    });
+
     return deferred.promise;
   }
 
-  runAnalysis() {
+  runAnalysis(analysis_param) {
     const vm = this;
     vm.$log.debug('***** In osServerService::runAnalysis() *****');
     const deferred = vm.$q.defer();
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: catch what analysis type it is
-    const command = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis "${vm.projectDir.path()}\\${vm.Project.getProjectName()}.json" "${vm.serverURL}" -a batch_datapoints`;
-    //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' run_analysis ' + '\"' + vm.projectDir.path() + '\\' + vm.Project.getProjectName() + '.json\" ' + vm.serverURL  + ' -a batch_datapoints';
-    vm.$log.debug('Run command: ', command);
-    const child = vm.exec(command,
+    // Old server command
+    //const command = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis "${vm.projectDir.path()}\\${vm.Project.getProjectName()}.json" "${vm.serverURL}" -a batch_datapoints`;
+    const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param;
+    vm.$log.debug('FULL run_analysis command: ', full_command);
+    const child = vm.exec(full_command,
       (error, stdout, stderr) => {
         console.log('exit code: ', child.exitCode);
         console.log('child: ', child);
@@ -327,8 +366,37 @@ export class OsServer {
         }
       });
 
-    return deferred.promise;
+    console.log(`Child pid: ${child.pid}`);
 
+    child.on('close', (code, signal) => {
+      console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
+    });
+
+    child.on('disconnect', (code, signal) => {
+      console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
+    });
+
+    child.on('exit', (code, signal) => {
+      console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
+      if (code == 0) {
+        vm.$log.debug('Analysis running');
+        deferred.resolve();
+      } else {
+        vm.$log.debug('Analysis failed to run');
+        deferred.reject();
+      }
+      return deferred.promise;
+    });
+
+    child.on('error', (code, signal) => {
+      console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
+    });
+
+    child.on('message', (code, signal) => {
+      console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
+    });
+
+    return deferred.promise;
   }
 
   stopServer() {
@@ -336,13 +404,13 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType();
 
-    if (vm.serverStatus != 'stopped') {
+    if (vm.serverStatus == 'started') {
 
       if (serverType.name == 'local') {
 
-        const command = 'cd ' + vm.CLIpath + ' && ruby openstudio_meta stop_local ' + vm.projectDir.path();
-        vm.$log.debug('Stop Local command: ', command);
-        const child = vm.exec(command,
+        // Old server command
+        //const command = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local --debug ' + '\"' + vm.projectDir.path() + '\" --verbose';
+        const child = vm.exec(vm.stopServerCommand,
           (error, stdout, stderr) => {
             console.log('THE PROCESS TERMINATED');
             console.log('EXIT CODE: ', child.exitCode);
@@ -353,6 +421,7 @@ export class OsServer {
             if (child.exitCode == 0) {
               // SUCCESS
               vm.$log.debug('Server Stopped');
+              vm.setServerStatus('stopped');
               deferred.resolve(child);
 
             } else {
@@ -372,11 +441,9 @@ export class OsServer {
     }
 
     return deferred.promise;
-
   }
 
-  getAnalysisStatus() {
-
+  retrieveAnalysisStatus() {
     const vm = this;
     const deferred = vm.$q.defer();
 
@@ -393,8 +460,43 @@ export class OsServer {
     });
 
     return deferred.promise;
-
   }
 
+  stopAnalysis() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const url = vm.serverURL + '/analyses/' + vm.analysisID + '/action.json';
+    const params = {analysis_action: 'stop'};
+
+    if (vm.analysisStatus == 'completed') {
+      vm.$log.debug('Analysis is already completed');
+      deferred.resolve();
+    } else {
+      vm.$http.post(url, params)
+        .success((data, status, headers, config) => {
+          vm.$log.debug('stop analysis Success!, status: ', status);
+          vm.setAnalysisStatus('canceled');
+          deferred.resolve(data);
+        })
+        .error((data, status, headers, config) => {
+          vm.$log.debug('stop analysis error: ', data);
+          deferred.reject([]);
+        });
+    }
+    return deferred.promise;
+  }
+
+  // analysis running dialog
+  showAnalysisRunningDialog() {
+    const vm = this;
+    vm.$log.debug('In showAnalysisRunningDialog function');
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalAnalysisRunningController',
+      controllerAs: 'modal',
+      templateUrl: 'app/run/analysisRunning.html',
+      windowClass: 'modal'
+    });
+  }
 
 }
