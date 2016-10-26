@@ -19,7 +19,7 @@ export class OsServer {
     vm.exec = require('child_process').exec;
 
     vm.serverStatus = 'stopped';  // started, stopped, error?
-    vm.analysisStatus = '';
+    vm.analysisStatus = '';  // '', started, in progress, completed, error
     vm.progressAmount = 0;
     vm.progressMessage = '';
     vm.isDone = true;

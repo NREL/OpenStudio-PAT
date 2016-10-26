@@ -73,9 +73,6 @@ export class RunController {
     // 1: make/get OSA
     // 2: make/get zip file?
 
-    vm.OsServer.setAnalysisStatus('starting');
-    vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-
     // 3: hit PAT CLI to start server (local or remote)
     vm.OsServer.setProgressAmount('15');
     vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
@@ -111,9 +108,13 @@ export class RunController {
       else
         analysis_param = vm.$scope.samplingMethod.id;
 
+      vm.OsServer.setAnalysisStatus('starting');
+      vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
       vm.OsServer.runAnalysis(analysis_param).then(response => {
         vm.$log.debug('***** In runController::runEntireWorkflow() analysis running *****');
         vm.$log.debug('Run Analysis response: ', response);
+        vm.OsServer.setAnalysisStatus('in progress');
+        vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
         vm.OsServer.setProgressMessage('Analysis started');
         vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
@@ -128,36 +129,39 @@ export class RunController {
 
           vm.OsServer.retrieveAnalysisStatus().then(response => {
             vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
-            vm.$scope.analysisStatus = 'In progress';
-            //vm.$scope.analysisStatus = response.data.analysis.status;
-            //vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
 
-            // workaround until the item below is fixed
-            vm.OsServer.setIsDone(true);
-            vm.isDone = vm.OsServer.getIsDone();
+            vm.$scope.analysisStatus = response.data.analysis.status;
+            vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
 
             vm.$scope.datapoints = response.data.analysis.data_points;
-
             vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
-            _.forEach(response.data.analysis.data_points, dp => {
-              if (dp.status != 'completed') {
-                vm.OsServer.setIsDone(false);
-                vm.isDone = vm.OsServer.getIsDone();
-              }
-            });
 
-            if (vm.isDone) {
-              vm.OsServer.setAnalysisStatus('completed');
-              vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-              // cancel loop
-              vm.stopAnalysisStatus();
+
+            // workaround until the item below is fixed
+            // vm.OsServer.setIsDone(true);
+            // vm.isDone = vm.OsServer.getIsDone();
+            //
+            // vm.$scope.datapoints = response.data.analysis.data_points;
+            //
+            // vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
+            // _.forEach(response.data.analysis.data_points, dp => {
+            //   if (dp.status != 'completed') {
+            //  vm.OsServer.setIsDone(false);
+            // vm.isDone = vm.OsServer.getIsDone();
+            //   }
+            // });
+            //
+            // if (vm.isDone) {
+            //   vm.OsServer.setAnalysisStatus('completed');
+            //   vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+            //   // cancel loop
+            //   vm.stopAnalysisStatus();
+            // }
+
+            if (response.data.analysis.status == 'completed') {
+             // cancel loop
+             vm.stopAnalysisStatus('completed');
             }
-
-            // TODO: this doesn't work yet b/c analysis status is always completed
-            //if (response.data.analysis.status == 'completed') {
-            //  // cancel loop
-            //  vm.stopAnalysisStatus();
-            //}
 
           }, response => {
             vm.$log.debug('analysis status retrieval error: ', response);
@@ -171,6 +175,8 @@ export class RunController {
         vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
         vm.$log.debug('ANALYSIS NOT STARTED, ERROR: ', response);
         // TODO: show status as 'ERROR'
+        vm.OsServer.setAnalysisStatus('error');
+        vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
         vm.toggleButtons();
       });
 
@@ -178,7 +184,8 @@ export class RunController {
       vm.OsServer.setProgressMessage('Server Error');
       vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
       vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
-      // TODO: show status as 'ERROR'
+      vm.OsServer.setAnalysisStatus('');
+      vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
       vm.toggleButtons();
     });
   }
@@ -190,6 +197,10 @@ export class RunController {
       vm.$interval.cancel(vm.getStatus);
       vm.getStatus = undefined;
     }
+    // set analysis status
+    vm.OsServer.setAnalysisStatus(status);
+    vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+
     // toggle button back to 'run' when done
     // TODO: show status as 'COMPLETED' (once it actually is)
     vm.OsServer.setProgressMessage('Analysis ' + status);
