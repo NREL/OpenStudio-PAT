@@ -74,32 +74,44 @@ export class SetProject {
     vm.$log.debug('newProject');
 
     // pop modal to get new project name
-    // pop modal to allow user to navigate to project parent folder
-    // create folder
+    vm.openModal().then(response => {
+      vm.$log.debug('response:', response);
 
-    // for new: use PAT to create required subfolder and necessary files
+      // pop modal to allow user to navigate to project parent folder
+      const result = vm.dialog.showOpenDialog({
+        title: 'Choose New ParametricAnalysisTool Project Folder',
+        properties: ['openDirectory']
+      });
 
-    // stop server at old location
-    // verify local_configuration.receipt deleted (by the meta CLI?)
-    // update osServer's project location
-    // start server at new location
-    // ... 40 second wait (local_configuration.receipt creation) ...
+      if (!_.isEmpty(result)) {
+        const path = result[0];
+        vm.$log.debug('PAT Project path:', path);
 
-    const result = vm.dialog.showOpenDialog({
-      title: 'New ParametricAnalysisTool Project',
-      buttonLabel: 'openDirectory',
-      properties: ['openDirectory']
+        let newProjectDir = path;
+        newProjectDir += '\\';
+        newProjectDir += vm.project.getProjectName();
+
+        const oldProjectDir = vm.project.projectDir.path();
+        vm.$log.debug('oldProjectDir:', oldProjectDir);
+        vm.$log.debug('newProjectDir:', newProjectDir);
+
+        // set new project directory
+        vm.project.projectDir = newProjectDir;
+
+        // stop server
+        // TODO!
+
+        // for new: use PAT to create required subfolder and necessary files
+        vm.project.initializeProject();
+
+        // start server at new location
+        // TODO!
+        //vm.osServer.startServer().then(response => {
+        //  vm.$log.debug('setProjectService::saveAsProject() server started');
+        //  vm.$log.debug('response: ', response);
+        //});
+      }
     });
-
-    if (!_.isEmpty(result)) {
-      const path = result[0];
-      vm.$log.debug('PAT Project path:', path);
-      const foldername = path.replace(/^.*[\\\/]/, '');
-      vm.$log.debug('PAT Project folder name:', foldername);
-
-      let fullFilename = path;
-      fullFilename += '\\pat.json';
-    }
   }
 
   openProject() {
