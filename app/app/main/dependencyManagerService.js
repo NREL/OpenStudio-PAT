@@ -145,9 +145,6 @@ export class DependencyManager {
   checkDependencies() {
     const vm = this;
 
-    // TEMPORARY! (UNCOMMENT TO STOP AUTO DOWNLOADS)
-    // return vm.$q.resolve();
-
     // Open modal dialog to "disable app during downloads, and inform user of any issues
     //vm.openDependencyModal(); TODO uncomment this later
 

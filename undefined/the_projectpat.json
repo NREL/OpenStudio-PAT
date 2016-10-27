@@ -1,0 +1,22 @@
+{
+  "projectName": "the_project",
+  "seed": null,
+  "weatherFile": null,
+  "analysis_type": "Manual",
+  "runType": {
+    "displayName": "Run Locally",
+    "name": "local"
+  },
+  "samplingMethod": {
+    "id": "BatchRun",
+    "name": "analysis.type.batchRun"
+  },
+  "algorithmSettings": [],
+  "rubyMD5": "",
+  "mongoMD5": "",
+  "openstudioServerMD5": "",
+  "openstudioCLIMD5": "01d3e5ae241c75621eb51beed03ee158",
+  "openstudioMD5": "",
+  "measures": [],
+  "designAlternatives": []
+}

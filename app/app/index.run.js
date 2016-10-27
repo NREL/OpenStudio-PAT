@@ -37,8 +37,9 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
 
   });
 
-  DependencyManager.checkDependencies()
-    .then(_.bind(MeasureManager.startMeasureManager, MeasureManager), _.bind(MeasureManager.startMeasureManager, MeasureManager));
+  // TODO Evan make these calls when a new project is opened
+  //DependencyManager.checkDependencies()
+  //  .then(_.bind(MeasureManager.startMeasureManager, MeasureManager), _.bind(MeasureManager.startMeasureManager, MeasureManager));
 
   const initialLanguage = $translate.use();
   const setLanguage = language => {

@@ -57,7 +57,7 @@ export class SetProject {
         // TODO!
 
         // for saveAs: copy old project's folder structure to new location (from, to)
-        jetpack.copy(oldProjectDir, newProjectDir);
+        vm.jetpack.copy(oldProjectDir, newProjectDir);
 
         // start server at new location
         // TODO!
@@ -135,14 +135,14 @@ export class SetProject {
       // foldername must contain "pat.json"
       let fileExists = false;
       vm.$log.debug('checking for ', fullFilename);
-      const file = jetpack.read(fullFilename);
+      const file = vm.jetpack.read(fullFilename);
       vm.$log.debug('file: ', file);
       if (typeof file !== 'undefined') {
         vm.$log.debug(fullFilename, ' found');
         fileExists = true;
       } else {
         vm.$log.debug(fullFilename, ' not found');
-        const allOSPs = jetpack.find(path, {matching: '*.osp', recursive: false});
+        const allOSPs = vm.jetpack.find(path, {matching: '*.osp', recursive: false});
         if (allOSPs.length > 0) {
           vm.$log.debug('found osp in openProject');
           vm.$log.debug('path: ', path);
@@ -164,6 +164,8 @@ export class SetProject {
       }
 
       if (fileExists) {
+        vm.project.setProject(foldername, path);
+        vm.project.initializeProject();
         vm.relaunchUpdatedServer(path);
       }
     }
@@ -200,7 +202,7 @@ export class SetProject {
       vm.$log.debug('response: ', response);
 
       // update osServer's project location
-      vm.project.setProjectDir = jetpack.dir(projectDir);
+      vm.project.setProjectPath = (projectDir);
 
       // start server at new location
       vm.osServer.startServer().then(response => {

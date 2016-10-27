@@ -18,43 +18,12 @@ export class Project {
     vm.MeasureManager = MeasureManager;
     vm.dialog = dialog;
 
-    vm.projectName = '';
-    // TODO: grab from PAT Electron settings. For now, default to 'the_project'
-    vm.setProjectName('the_project');
-
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
 
-    // TODO: get some of these from electron settings?
-    vm.seedDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/seeds'));
-    vm.weatherDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/weather'));
-    vm.myMeasuresDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/Measures'));
-    vm.localDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
-    vm.projectMeasuresDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/measures'));
-    vm.projectDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName));
-    vm.mongoDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/data/db'));
-    vm.logsDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT/' + vm.projectName + '/logs'));
-
-    const src = jetpack.cwd(app.getPath('userData'));
-    vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
-
-    vm.seeds = [];
-    vm.weatherFiles = [];
-    vm.setSeeds();
-    vm.setWeatherFiles();
-
-    // seed and weather data
-    vm.defaultSeed = vm.seeds.length > 0 ? vm.seeds[0] : null;
-    vm.defaultWeatherFile = vm.weatherFiles.length > 0 ? vm.weatherFiles[0] : null;
-
-    vm.seedsDropdownArr = [];
-    vm.weatherFilesDropdownArr = [];
-    vm.setSeedsDropdownOptions();
-    vm.setWeatherFilesDropdownOptions();
-
     vm.analysisType = 'Manual';
-    //vm.analysisTypes = ['Manual', 'Algorithmic']; // TODO implement this after initial release
     vm.analysisTypes = ['Manual'];
+    //vm.analysisTypes = ['Manual', 'Algorithmic']; // TODO implement this after initial release
 
     vm.reportType = 'Calibration Report';
     vm.reportTypes = [{
@@ -75,7 +44,6 @@ export class Project {
     }];
 
     vm.samplingMethods = Project.setSamplingMethods();
-
     vm.samplingMethod = vm.samplingMethods.length > 0 ? vm.samplingMethods[0] : null;
 
     vm.runTypes = vm.getRunTypes();
@@ -84,6 +52,8 @@ export class Project {
     vm.algorithmOptions = vm.setAlgorithmOptions();
 
     vm.algorithmSettings = [];
+    vm.measures = [];
+    vm.designAlternatives = [];
 
     vm.rubyMD5 = '';
     vm.mongoMD5 = '';
@@ -91,14 +61,17 @@ export class Project {
     vm.openstudioCLIMD5 = '';
     vm.openstudioMD5 = '';
 
-    vm.measures = [];
-    vm.designAlternatives = [];
-
     // set platform
     //const platform = os.platform();
 
-    // do this last...it will overwrite defaults
-    vm.initializeProject();
+    const src = jetpack.cwd(app.getPath('userData'));
+    vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
+
+    vm.myMeasuresDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    vm.localDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
+
+    // TODO Evan call after new project opened
+    //vm.initializeProject();
 
     // json objects
     vm.pat = {};
@@ -111,9 +84,14 @@ export class Project {
   // TODO: if measure is in pat dir, not in json, and user tries to add it, overwrite existing measure in dir? (currently it doesn't overwrite)
   initializeProject() {
     const vm = this;
-    if (vm.jetpack.exists(vm.projectDir.path('pat.json'))) {
-      vm.pat = vm.jetpack.read(vm.projectDir.path('pat.json'), 'json');
-      //vm.$log.debug('PAT JSON: ', vm.pat);
+    vm.$log.debug('Project initializeProject');
+
+    vm.$log.debug('vm.projectDir: ', vm.projectDir);
+
+    const filename = vm.projectDir + '\\pat.json';
+    vm.$log.debug('filename: ', filename);
+    if (vm.jetpack.exists(filename)) {
+      vm.pat = vm.jetpack.read(filename, 'json');
 
       vm.measures = vm.pat.measures;
       if (!angular.isDefined(vm.measures)) {
@@ -126,6 +104,15 @@ export class Project {
       }
 
       vm.projectName = vm.pat.projectName;
+      //vm.projectDir = vm.pat.projectDir; TODO hmmmm... what about this?
+
+      // TODO is this required to make the PAT dir?
+      //vm.projectDir = jetpack.dir(path.resolve(vm.pat.projectDir));
+
+      vm.$log.debug('HELLO');
+      vm.$log.debug('vm.projectName: ', vm.projectName);
+      vm.$log.debug('vm.projectDir: ', vm.projectDir);
+
       vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
       vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
       vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
@@ -139,8 +126,18 @@ export class Project {
       vm.openstudioServerMD5 = vm.pat.openstudioServerMD5 ? vm.pat.openstudioServerMD5 : vm.openstudioServerMD5;
       vm.openstudioCLIMD5 = vm.pat.openstudioCLIMD5 ? vm.pat.openstudioCLIMD5 : vm.openstudioCLIMD5;
       vm.openstudioMD5 = vm.pat.openstudioMD5 ? vm.pat.openstudioMD5 : vm.openstudioMD5;
-    }
 
+      vm.seeds = [];
+      vm.weatherFiles = [];
+      vm.setSeeds();
+      vm.setWeatherFiles();
+      vm.defaultSeed = vm.seeds.length > 0 ? vm.seeds[0] : null;
+      vm.defaultWeatherFile = vm.weatherFiles.length > 0 ? vm.weatherFiles[0] : null;
+      vm.seedsDropdownArr = [];
+      vm.weatherFilesDropdownArr = [];
+      vm.setSeedsDropdownOptions();
+      vm.setWeatherFilesDropdownOptions();
+    }
   }
 
   sleep(ms) {
@@ -262,8 +259,8 @@ export class Project {
     }
 
     // write to file
-    let filename = vm.projectName + '.json';
-    vm.jetpack.write(vm.projectDir.path(filename), vm.osa);
+    let filename = vm.projectDir  + '/' + vm.projectName + '.json';
+    vm.jetpack.write(filename, vm.osa);
     vm.$log.debug('Project OSA file exported to ' + filename);
 
     // create archives
@@ -290,7 +287,7 @@ export class Project {
       }
     });
 
-    filename = vm.projectDir.path() + '/' + vm.projectName + '.zip';
+    filename = vm.projectDir + '/' + vm.projectName + '.zip';
     vm.$log.debug('Zip name: ' + filename);
     zip.generateNodeStream({compression: 'DEFLATE', type: 'nodebuffer', streamFiles: true})
       .pipe(jetpack.createWriteStream(filename))
@@ -587,6 +584,7 @@ export class Project {
     // general
     vm.pat = {};
     vm.pat.projectName = vm.projectName;
+    vm.pat.projectDir = vm.projectDir;
     vm.pat.seed = vm.defaultSeed;
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
@@ -605,7 +603,7 @@ export class Project {
     // design alternatives
     vm.pat.designAlternatives = vm.designAlternatives;
 
-    vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
+    vm.jetpack.write(vm.projectDir + '/' + vm.projectName + 'pat.json', vm.pat);
     vm.$log.debug('Project exported to pat.json');
   }
 
@@ -641,6 +639,33 @@ export class Project {
     vm.projectName = name;
   }
 
+  getProjectDir() {
+    const vm = this;
+    return vm.projectDir;
+  }
+
+  setProjectDir(dir) {
+    const vm = this;
+    vm.projectDir = dir;
+  }
+
+  setProject(projectName, projectDir) {
+    const vm = this;
+    vm.$log.debug('Project setProject');
+
+    vm.$log.debug('projectName:', projectName);
+    vm.$log.debug('projectDir:', projectDir);
+
+    vm.projectName = projectName;
+    vm.projectDir = projectDir;
+
+    vm.mongoDir = jetpack.dir(path.resolve(vm.projectDir + '/data/db'));
+    vm.logsDir = jetpack.dir(path.resolve(vm.projectDir + '/logs'));
+    vm.projectMeasuresDir = jetpack.dir(path.resolve(vm.projectDir + '/measures'));
+    vm.seedDir = jetpack.dir(path.resolve(vm.projectDir + '/seeds'));
+    vm.weatherDir = jetpack.dir(path.resolve(vm.projectDir + '/weather'));
+  }
+
   setDesignAlternatives(alts) {
     const vm = this;
     vm.designAlternatives = alts;
@@ -661,11 +686,6 @@ export class Project {
     const vm = this;
     vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
     return vm.measures;
-  }
-
-  getProjectDir() {
-    const vm = this;
-    return vm.projectDir;
   }
 
   getProjectMeasuresDir() {
