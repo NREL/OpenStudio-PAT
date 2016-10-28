@@ -5,11 +5,12 @@ import path from 'path';
 import os from 'os';
 
 export class OsServer {
-  constructor($q, $http, $log, Project, DependencyManager) {
+  constructor($q, $http, $log, $uibModal, Project, DependencyManager) {
     'ngInject';
     const vm = this;
     vm.Project = Project;
     vm.$log = $log;
+    vm.$uibModal = $uibModal;
     vm.$q = $q;
     vm.$http = $http;
     vm.jetpack = jetpack;
@@ -18,12 +19,13 @@ export class OsServer {
     vm.exec = require('child_process').exec;
 
     vm.serverStatus = 'stopped';  // started, stopped, error?
-    vm.analysisStatus = '';
+    vm.analysisStatus = '';  // '', started, in progress, completed, error
     vm.progressAmount = 0;
     vm.progressMessage = '';
     vm.isDone = true;
     vm.datapoints = [];
-    vm.disabledButtons = false;
+
+    vm.disabledButtons = false;  // display run or cancel button
 
     vm.localServerURL = 'http://localhost:8080';
     vm.cloudServerURL = 'http://bball-130553.nrel.gov:8080'; // TODO: using Brian's machine
@@ -79,12 +81,12 @@ export class OsServer {
     vm.serverStatus = status;
   }
 
-  getAnalysisStat() {
+  getAnalysisStatus() {
     const vm = this;
     return vm.analysisStatus;
   }
 
-  setAnalysisStat(analysisStatus) {
+  setAnalysisStatus(analysisStatus) {
     const vm = this;
     vm.analysisStatus = analysisStatus;
   }
@@ -210,7 +212,6 @@ export class OsServer {
         });
       }
       else {
-        // TODO: fix this for windows
         vm.remoteServer().then(response => {
           vm.serverStatus = 'started';
           deferred.resolve(response);
@@ -397,8 +398,7 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType();
 
-    //if ( vm.serverStatus ==  vm.serverStatus ) { TODO serverStatus is not being set to running, even when it is running
-    if (vm.serverStatus == vm.serverStatus) {
+    if (vm.serverStatus == 'started') {
 
       if (serverType.name == 'local') {
         // Old server command
@@ -414,6 +414,7 @@ export class OsServer {
             if (child.exitCode == 0) {
               // SUCCESS
               vm.$log.debug('Server Stopped');
+              vm.setServerStatus('stopped');
               deferred.resolve(child);
 
             } else {
@@ -435,7 +436,7 @@ export class OsServer {
     return deferred.promise;
   }
 
-  getAnalysisStatus() {
+  retrieveAnalysisStatus() {
     const vm = this;
     const deferred = vm.$q.defer();
 
@@ -452,6 +453,43 @@ export class OsServer {
     });
 
     return deferred.promise;
+  }
+
+  stopAnalysis() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const url = vm.serverURL + '/analyses/' + vm.analysisID + '/action.json';
+    const params = {analysis_action: 'stop'};
+
+    if (vm.analysisStatus == 'completed') {
+      vm.$log.debug('Analysis is already completed');
+      deferred.resolve();
+    } else {
+      vm.$http.post(url, params)
+        .success((data, status, headers, config) => {
+          vm.$log.debug('stop analysis Success!, status: ', status);
+          vm.setAnalysisStatus('canceled');
+          deferred.resolve(data);
+        })
+        .error((data, status, headers, config) => {
+          vm.$log.debug('stop analysis error: ', data);
+          deferred.reject([]);
+        });
+    }
+    return deferred.promise;
+  }
+
+  // analysis running dialog
+  showAnalysisRunningDialog() {
+    const vm = this;
+    vm.$log.debug('In showAnalysisRunningDialog function');
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalAnalysisRunningController',
+      controllerAs: 'modal',
+      templateUrl: 'app/run/analysisRunning.html',
+      windowClass: 'modal'
+    });
   }
 
 }
