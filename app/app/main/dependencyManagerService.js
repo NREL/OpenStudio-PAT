@@ -14,8 +14,6 @@ export class DependencyManager {
   constructor($q, $http, $log, $translate, $uibModal, StatusBar) {
     'ngInject';
 
-    console.log(`this is a test : ${env.testing}`);
-
     const vm = this;
     vm.$http = $http;
     vm.$q = $q;
