@@ -17,7 +17,7 @@
     "arch": "x64",
     "type": "mongo"
   }, {
-    "name": "mongodb-3.2.5",
+    "name": "mongodb-3.2.5-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "mongo"
