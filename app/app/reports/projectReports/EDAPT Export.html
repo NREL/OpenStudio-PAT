@@ -1,9 +1,38 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Something</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <!--TODO Make this css injection work (replace hard-coded CSS paths below)-->
+  <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
+  <!-- inject:bootstrap -->
+  <!-- bootstrap css files will be automatically insert here -->
+  <!-- endinject -->
+  <!-- bower:css -->
+  <!-- run `gulp inject` to automatically populate bower styles dependencies -->
+  <!-- endbower -->
+  <!-- endbuild -->
+
+  <!-- build:css({.tmp/serve,src}) styles/app.css -->
+  <!-- inject:css -->
+  <!-- css files will be automatically insert here -->
+  <!-- endinject -->
+  <!-- endbuild -->
+  <link rel="stylesheet" href="/app/bootstrap.css">
+  <link rel="stylesheet" href="/app/index.css">
+</head>
+<body>
+
 <div ng-app="myApp">
 
   <div ng-controller="MyAppCtrl">
 
+    <h1>EDAPT Export</h1>
     <h2>Select Baselines</h2>
-    <table>
+    <table class="table-bordered table-condensed table-striped">
       <tr>
         <th>Baseline Type</th>
         <th>Name</th>
@@ -40,7 +69,7 @@
       <li>Single Measures are the focus of the PEA report</li>
       <li>Design Alternatives are the focus of the FEA report, but Single Measure results will be included in a separate table</li>
     </ul>
-    <table>
+    <table class="table-bordered table-condensed table-striped">
       <tr>
         <th></th>
         <th>Export?</th>
@@ -394,6 +423,8 @@
         };
 
         // TODO use the correct directory
+        // TODO Zip the file too
+        // TODO show a success/fail message
         var dirString = reportDir + "/results.xml";
 
         // Parse the JSON to XML

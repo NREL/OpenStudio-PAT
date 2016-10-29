@@ -4,17 +4,20 @@
   </div>
   <div class="col-md-5 pad-bot-20 pad-top-5">
     <div class="input-group">
-      <select class="form-control inline form-control-smaller-width" ng-options="type.id as type.name | translate for type in reports.reportTypes" ng-model="selectedReportType" ng-change="reports.setType()"></select>
+      <select ng-model="selectedReportName" ng-change="updateSelectedReport(selectedReportName)"
+              class="form-control inline form-control-smaller-width">
+        <option ng-repeat="report in projectReports">{{report.name}}</option>
+      </select>
       <span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>
     </div>
   </div>
 </div>
 
 <!--TODO do we need nodeintegration when we use the preload?-->
-<!--TODO make the preload path relative-->
 <webview id=wv
-         src="app/reports/measure.html"
+         src="{{ selectedReportURL }}"
          preload="C:\GitRepos\OpenStudio-PAT\app\app\reports\preload.js"
          autosize="on"
-         minheight="432"
-         nodeintegration></webview>
+         style="height:calc(100vh - 150px)"
+         nodeintegration>
+</webview>
