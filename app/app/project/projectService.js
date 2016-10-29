@@ -69,9 +69,7 @@ export class Project {
 
     vm.myMeasuresDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/Measures'));
     vm.localDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
-
-    // TODO Evan call after new project opened
-    //vm.initializeProject();
+    jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT')); // Just create the folder structure
 
     // json objects
     vm.pat = {};
@@ -85,8 +83,6 @@ export class Project {
   initializeProject() {
     const vm = this;
     vm.$log.debug('Project initializeProject');
-
-    vm.$log.debug('vm.projectDir: ', vm.projectDir);
 
     const filename = vm.projectDir + '\\pat.json';
     vm.$log.debug('filename: ', filename);
@@ -102,16 +98,6 @@ export class Project {
       if (!angular.isDefined(vm.designAlternatives)) {
         vm.designAlternatives = [];
       }
-
-      vm.projectName = vm.pat.projectName;
-      //vm.projectDir = vm.pat.projectDir; TODO hmmmm... what about this?
-
-      // TODO is this required to make the PAT dir?
-      //vm.projectDir = jetpack.dir(path.resolve(vm.pat.projectDir));
-
-      vm.$log.debug('HELLO');
-      vm.$log.debug('vm.projectName: ', vm.projectName);
-      vm.$log.debug('vm.projectDir: ', vm.projectDir);
 
       vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
       vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
@@ -649,15 +635,12 @@ export class Project {
     vm.projectDir = dir;
   }
 
-  setProject(projectName, projectDir) {
+  setProject(projectDir) {
     const vm = this;
     vm.$log.debug('Project setProject');
 
-    vm.$log.debug('projectName:', projectName);
-    vm.$log.debug('projectDir:', projectDir);
-
-    vm.projectName = projectName;
     vm.projectDir = projectDir;
+    vm.projectName = projectDir.replace(/^.*[\\\/]/, '');
 
     vm.mongoDir = jetpack.dir(path.resolve(vm.projectDir + '/data/db'));
     vm.logsDir = jetpack.dir(path.resolve(vm.projectDir + '/logs'));

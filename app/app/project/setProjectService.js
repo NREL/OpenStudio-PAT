@@ -21,7 +21,11 @@ export class SetProject {
   saveProject() {
     const vm = this;
     vm.$log.debug('saveProject');
-    vm.project.exportPAT();
+    if (vm.project.projectDir != undefined) {
+      vm.project.exportPAT();
+    } else {
+      vm.$log.debug('saveProject: vm.project.projectDir is undefined');
+    }
   }
 
   saveAsProject() {
@@ -40,31 +44,11 @@ export class SetProject {
 
       if (!_.isEmpty(result)) {
         const path = result[0];
-        vm.$log.debug('PAT Project path:', path);
 
-        let newProjectDir = path;
-        newProjectDir += '\\';
-        newProjectDir += vm.project.getProjectName();
+        const newProjectDir = path + '\\' + vm.project.projectName;
+        vm.$log.error('newProjectDir:', newProjectDir);
 
-        const oldProjectDir = vm.project.projectDir.path();
-        vm.$log.debug('oldProjectDir:', oldProjectDir);
-        vm.$log.debug('newProjectDir:', newProjectDir);
-
-        // set new project directory
-        vm.project.projectDir = newProjectDir;
-
-        // stop server
-        // TODO!
-
-        // for saveAs: copy old project's folder structure to new location (from, to)
-        vm.jetpack.copy(oldProjectDir, newProjectDir);
-
-        // start server at new location
-        // TODO!
-        //vm.osServer.startServer().then(response => {
-        //  vm.$log.debug('setProjectService::saveAsProject() server started');
-        //  vm.$log.debug('response: ', response);
-        //});
+        vm.copyProjectAndRelaunchUpdatedServer(newProjectDir);
       }
     });
   }
@@ -85,31 +69,11 @@ export class SetProject {
 
       if (!_.isEmpty(result)) {
         const path = result[0];
-        vm.$log.debug('PAT Project path:', path);
 
-        let newProjectDir = path;
-        newProjectDir += '\\';
-        newProjectDir += vm.project.getProjectName();
-
-        const oldProjectDir = vm.project.projectDir.path();
-        vm.$log.debug('oldProjectDir:', oldProjectDir);
+        const newProjectDir = path + '\\' + vm.project.projectName;
         vm.$log.debug('newProjectDir:', newProjectDir);
 
-        // set new project directory
-        vm.project.projectDir = newProjectDir;
-
-        // stop server
-        // TODO!
-
-        // for new: use PAT to create required subfolder and necessary files
-        vm.project.initializeProject();
-
-        // start server at new location
-        // TODO!
-        //vm.osServer.startServer().then(response => {
-        //  vm.$log.debug('setProjectService::saveAsProject() server started');
-        //  vm.$log.debug('response: ', response);
-        //});
+        vm.relaunchUpdatedServer(newProjectDir);
       }
     });
   }
@@ -129,8 +93,7 @@ export class SetProject {
       const foldername = path.replace(/^.*[\\\/]/, '');
       vm.$log.debug('PAT Project folder name:', foldername);
 
-      let fullFilename = path;
-      fullFilename += '\\pat.json';
+      const fullFilename = path + '\\pat.json';
 
       // foldername must contain "pat.json"
       let fileExists = false;
@@ -164,8 +127,6 @@ export class SetProject {
       }
 
       if (fileExists) {
-        vm.project.setProject(foldername, path);
-        vm.project.initializeProject();
         vm.relaunchUpdatedServer(path);
       }
     }
@@ -202,7 +163,9 @@ export class SetProject {
       vm.$log.debug('response: ', response);
 
       // update osServer's project location
-      vm.project.setProjectPath = (projectDir);
+      vm.project.setProject(projectDir);
+      // initializeProject will also create the basic folder structure, if it is missing
+      vm.project.initializeProject();
 
       // start server at new location
       vm.osServer.startServer().then(response => {
@@ -211,4 +174,29 @@ export class SetProject {
       });
     });
   }
+
+  copyProjectAndRelaunchUpdatedServer(projectDir) {
+    const vm = this;
+
+    // Stop server before changing projectDir
+    vm.osServer.stopServer().then(response => {
+
+      vm.$log.debug('setProjectService::relaunchUpdatedServer2() server stopped');
+      vm.$log.debug('response: ', response);
+
+      // for saveAs: copy old project's folder structure to new location (from, to)
+      vm.jetpack.copy(vm.project.projectDir, projectDir);
+
+      // update osServer's project location
+      vm.project.setProject(projectDir);
+      vm.project.initializeProject();
+
+      // start server at new location
+      vm.osServer.startServer().then(response => {
+        vm.$log.debug('setProjectService::relaunchUpdatedServer2() server started');
+        vm.$log.debug('response: ', response);
+      });
+    });
+  }
+
 }
