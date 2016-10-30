@@ -1,37 +1,15 @@
-import jetpack from 'fs-jetpack';
 import {remote} from 'electron';
-import fs from 'fs';
 
 const {dialog} = remote;
 
 export class OpenProject {
-  constructor($q, $log, $uibModal, SetProject) {
+  constructor($q, $log, $uibModal) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
     vm.$log = $log;
     vm.$uibModal = $uibModal;
-    vm.fs = fs;
-    vm.jetpack = jetpack;
     vm.dialog = dialog;
-    vm.setProject = SetProject;
-  }
-
-  newProject() {
-    const vm = this;
-    vm.$log.debug('newProject');
-    vm.setProject.newProject();
-  }
-
-  openProject() {
-    const vm = this;
-    vm.$log.debug('openProject');
-    vm.setProject.openProject();
-  }
-
-  cancel() {
-    const vm = this;
-    vm.$log.debug('cancel');
   }
 
   openModal() {

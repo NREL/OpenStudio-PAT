@@ -1,21 +1,15 @@
 <div class="modal-header">
-  <h3 class="modal-title" translate>projectName.title</h3>
+  <h3 class="modal-title" translate>setProject.title</h3>
 </div>
 
 <div class="modal-body">
   <div>
-    <h4 class="modal-title" translate>projectName.heading</h4>
-  </div>
-  <div>
-    <input type="text" name="projectName" ng-model="name" required>
-    <div>
-      <h5 class="modal-title" translate>projectName.blurb</h5>
-    </div>
+    <h4 class="modal-title" translate>setProject.blurb</h4>
   </div>
 
   <div class="modal-footer">
-    <button type="button" class="btn btn-primary" ng-click="modal.new()" translate>Make New Project</button>
-    <button type="button" class="btn btn-primary" ng-click="modal.open()" translate>Open Existing Project</button>
+    <button type="button" class="btn btn-primary" ng-click="modal.newProject()" translate>setProject.make</button>
+    <button type="button" class="btn btn-primary" ng-click="modal.openProject()" translate>setProject.existing</button>
     <button type="button" class="btn btn-primary" ng-click="modal.cancel()" translate>Cancel</button>
   </div>
 </div>

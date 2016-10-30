@@ -2,6 +2,12 @@ export default {
   dependency: {
     title: 'PAT Dependency Download Status'
   },
+  setProject: {
+    title: 'ParametricAnalysisTool',
+    blurb: 'Please open a new or existing project.',
+    make: 'Make New Project',
+    existing: 'Open Existing Project'
+  },
   projectName: {
     title: 'ParametricAnalysisTool',
     heading: 'Enter New Project Name',
