@@ -11,6 +11,7 @@ import { DesignAlternativesController } from '../app/design_alts/designAlternati
 import { MeasureManager } from '../app/main/measureManagerService';
 import { ModalBclController } from '../app/bcl/modalBclController';
 import { ModalDependencyController } from '../app/main/modalDependencyController';
+import { ModalOpenProjectController } from '../app/project/modalOpenProjectController';
 import { ModalProjectNameController } from '../app/project/modalProjectNameController';
 import { ModalDuplicateMeasureController } from '../app/bcl/modalDuplicateMeasureController';
 import { ModalUpdateMeasureController } from '../app/bcl/modalUpdateMeasureController';
@@ -22,6 +23,7 @@ import { ReportsController } from '../app/reports/reportsController';
 import { RunController } from '../app/run/runController';
 import { ModalAnalysisRunningController} from '../app/run/modalAnalysisRunningController';
 import { ServerController } from '../app/server/serverController';
+import { OpenProject } from '../app/project/openProjectService';
 import { SetProject } from '../app/project/setProjectService';
 import { StatusBar } from '../app/status_bar/statusBarService';
 import { StatusBarController } from '../app/status_bar/statusBarController';
@@ -34,6 +36,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalBclController', ModalBclController)
   .controller('ModalDependencyController', ModalDependencyController)
   .controller('ModalProjectNameController', ModalProjectNameController)
+  .controller('ModalOpenProjectController', ModalOpenProjectController)
   .controller('ModalDuplicateMeasureController', ModalDuplicateMeasureController)
   .controller('ModalUpdateMeasureController', ModalUpdateMeasureController)
   .controller('AnalysisController', AnalysisController)
@@ -49,5 +52,6 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .service('DependencyManager', DependencyManager)
   .service('OsServer', OsServer)
   .service('Project', Project)
+  .service('OpenProject', OpenProject)
   .service('SetProject', SetProject)
   .service('StatusBar', StatusBar);
