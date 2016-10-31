@@ -209,13 +209,37 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
       }, {
         type: 'separator'
       }, {
+        label: 'New',
+        accelerator: 'Command+N',
+        click() {
+          SetProject.newProject();
+        }
+      }, {
+        label: 'Open',
+        accelerator: 'Command+O',
+        click() {
+          SetProject.openProject();
+        }
+      }, {
+        label: 'Save',
+        accelerator: 'Command+S',
+        click() {
+          SetProject.saveProject();
+        }
+      }, {
+        label: 'Save As',
+        click() {
+          SetProject.saveAsProject();
+        }
+      }, {
         label: 'Quit',
         accelerator: 'Command+Q',
-        click() {
+        click()    {
           app.quit();
         }
       }]
     });
+
     // Window menu.
     template[3].submenu.push({
       type: 'separator'
