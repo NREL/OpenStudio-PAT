@@ -314,7 +314,7 @@ export class Project {
     vm.osa.analysis.output_variables = [];
 
     vm.osa.analysis.problem = {};
-    //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO Evan which is correct?
+    //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO which is correct?
     vm.osa.analysis.problem.analysis_type = null;
     // empty for manual
     vm.osa.analysis.problem.algorithm = {objective_functions: []};
@@ -347,8 +347,9 @@ export class Project {
       }
       m.measure_definition_class_name = measure.className;
       //m.measure_definition_measureUID = measure.colDef.measureUID; // TODO: fix this
-      m.measure_definition_directory = './measures/' + measure.name;
-      m.measure_definition_directory_local = vm.projectMeasuresDir.path() + '/' + measure.name;
+      const mdir = _.last(_.split(measure.measure_dir));
+      m.measure_definition_directory = './measures/' + mdir;
+      m.measure_definition_directory_local = measure.measure_dir;
       m.measure_definition_display_name = measure.display_name;
       m.measure_definition_name = measure.name;
       m.measure_definition_name_xml = null;
@@ -604,6 +605,10 @@ export class Project {
 
     // design alternatives
     vm.pat.designAlternatives = vm.designAlternatives;
+
+    // run / results
+    vm.pat.analysisID = vm.OsServer.getAnalysisID();
+    vm.pat.datapoints = _.map(vm.OsServer.getDatapoints(), 'id');
 
     vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
     vm.$log.debug('Project exported to pat.json');

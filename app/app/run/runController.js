@@ -15,6 +15,8 @@ export class RunController {
     vm.$scope.analysisID = vm.OsServer.getAnalysisID();
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
     vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+    vm.$scope.datapoints = vm.OsServer.getDatapoints();
+    vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
     vm.$log.debug('SERVER STATUS: ', vm.$scope.serverStatus);
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
@@ -73,6 +75,8 @@ export class RunController {
     // 1: make/get OSA
     // 2: make/get zip file?
 
+
+
     // 3: hit PAT CLI to start server (local or remote)
     vm.OsServer.setProgressAmount('15');
     vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
@@ -85,6 +89,12 @@ export class RunController {
     vm.OsServer.startServer().then(response => {
       vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
       vm.$log.debug('Start Server response: ', response);
+
+      // reset Analysis (clear out some variables)
+      vm.OsServer.resetAnalysis();
+      vm.$scope.analysisId = vm.OsServer.getAnalysisID();
+      vm.$scope.datapoints = vm.OsServer.getDatapoints();
+      vm.$scope.datapoints = vm.OsServer.getDatapoints();
 
       vm.OsServer.setProgressMessage('Server started');
       vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
@@ -123,6 +133,8 @@ export class RunController {
         vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
 
         vm.$scope.analysisID = vm.OsServer.getAnalysisID();
+        // create local results structure
+
 
         // 5: until complete, hit serverAPI for updates (errors, warnings, status)
         vm.getStatus = vm.$interval(function() {
@@ -133,34 +145,25 @@ export class RunController {
             vm.$scope.analysisStatus = response.data.analysis.status;
             vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
 
-            vm.$scope.datapoints = response.data.analysis.data_points;
-            vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
+            vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
+            vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
+            vm.$log.debug('DATAPOINTS Status: ', vm.$scope.datapointsStatus);
 
-            // workaround until the item below is fixed
-            // vm.OsServer.setIsDone(true);
-            // vm.isDone = vm.OsServer.getIsDone();
-            //
-            // vm.$scope.datapoints = response.data.analysis.data_points;
-            //
-            // vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
-            // _.forEach(response.data.analysis.data_points, dp => {
-            //   if (dp.status != 'completed') {
-            //  vm.OsServer.setIsDone(false);
-            // vm.isDone = vm.OsServer.getIsDone();
-            //   }
-            // });
-            //
-            // if (vm.isDone) {
-            //   vm.OsServer.setAnalysisStatus('completed');
-            //   vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-            //   // cancel loop
-            //   vm.stopAnalysisStatus();
-            // }
+            // download/replace out.osw
+            // Should we do this only once at the end?
+            vm.OsServer.updateDatapoints().then( response2 => {
 
-            if (response.data.analysis.status == 'completed') {
-             // cancel loop
-             vm.stopAnalysisStatus('completed');
-            }
+              vm.$scope.datapoints = vm.OsServer.getDatapoints();
+              vm.$log.debug('update datapoints succeeded: ', response2);
+              if (response.data.analysis.status == 'completed') {
+                // cancel loop
+                vm.stopAnalysisStatus('completed');
+              }
+
+            }, response2 => {
+                // error in updateDatapoints
+                vm.$log.debug('update datapoints error: ', response2);
+            });
 
           }, response => {
             vm.$log.debug('analysis status retrieval error: ', response);

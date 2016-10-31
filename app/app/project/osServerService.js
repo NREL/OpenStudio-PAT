@@ -24,6 +24,8 @@ export class OsServer {
     vm.progressMessage = '';
     vm.isDone = true;
     vm.datapoints = [];
+    vm.datapointsStatus = [];
+    vm.analysisChangedFlag = false;
 
     vm.disabledButtons = false;  // display run or cancel button
 
@@ -38,6 +40,7 @@ export class OsServer {
     vm.mongoBinDir = jetpack.cwd(path.resolve(src.path() + '/mongo/bin'));
     vm.openstudioDir = jetpack.cwd(path.resolve(src.path() + '/openstudio/'));
     vm.projectDir = vm.Project.getProjectDir();
+    vm.resultsDir = '';
 
     // Depends on system type (windows vs mac)
     vm.platform = os.platform();
@@ -47,6 +50,8 @@ export class OsServer {
       vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby'));
       // TODO: temporary (for mac: assume that ruby is in user's home folder at following path)
       vm.rubyBinDir = jetpack.cwd(app.getPath('home') + '/tempPAT/ruby/bin/ruby');
+      // TODO: temporary (for mac: openstudio server)
+      vm.OsMetaPath = jetpack.cwd(app.getPath('home') + '/tempPAT/openstudioServer/bin/openstudio_meta');
     }
 
     vm.analysisID = null;
@@ -65,6 +70,17 @@ export class OsServer {
 
     vm.stopServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local ' + '\"' + vm.projectDir.path() + '\"';
     vm.$log.info('stop server command: ', vm.stopServerCommand);
+  }
+
+  resetAnalysis() {
+    const vm = this;
+    vm.setAnalysisChangedFlag(false);
+    // reset analysis ID
+    vm.setAnalysisID('');
+    vm.setDatapoints([]);
+    vm.setDatapointsStatus([]);
+
+    // TODO: clear data from disk (?)
   }
 
   getServerURL() {
@@ -127,6 +143,17 @@ export class OsServer {
     vm.isDone = isDone;
   }
 
+  getAnalysisChangedFlag(){
+    const vm = this;
+    return vm.analysisChangedFlag;
+  }
+
+  setAnalysisChangedFlag(flag){
+    const vm = this;
+    vm.analysisChangedFlag = flag;
+  }
+
+  // full datapoints (out.osw)
   getDatapoints() {
     const vm = this;
     return vm.datapoints;
@@ -135,6 +162,17 @@ export class OsServer {
   setDatapoints(datapoints) {
     const vm = this;
     vm.datapoints = datapoints;
+  }
+
+  // short analysis status
+  getDatapointsStatus() {
+    const vm = this;
+    return vm.datapointsStatus;
+  }
+
+  setDatapointsStatus(datapoints) {
+    const vm = this;
+    vm.datapointsStatus = datapoints;
   }
 
   getDisabledButtons() {
@@ -335,6 +373,9 @@ export class OsServer {
     vm.$log.debug('***** In osServerService::runAnalysis() *****');
     const deferred = vm.$q.defer();
 
+    // create folder
+    vm.resultsDir = vm.jetpack.dir(vm.projectDir.path('localResults'));
+
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: catch what analysis type it is
     // Old server command
@@ -459,6 +500,50 @@ export class OsServer {
       deferred.reject(response);
     });
 
+    return deferred.promise;
+  }
+
+  updateDatapoints() {
+
+    // get Datapoints out.osw for datapoint IDs
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const promises = [];
+
+    _.forEach(vm.datapointsStatus, (dp) => {
+      const url = vm.serverURL + '/data_points/' + dp.id + '/download_result_file?filename=out.osw';
+      const promise = vm.$http.get(url).then( response => {
+        // save OSW to file
+       let datapoint = response.data;
+        vm.jetpack.write(vm.resultsDir.path(dp.id, 'out.osw'), datapoint);
+
+        // also load in datapoints array
+        datapoint.status = dp.status;
+        datapoint.final_message = dp.final_message;
+        datapoint.id = dp.id;
+
+        let dp_match = _.find(vm.datapoints, {id: dp.id});
+        if (Angular.isDefined(dp_match)) {
+          // overwrite
+          dp_match = datapoint;
+        } else {
+          // append datapoint to array
+          vm.datapoints.push(datapoint);
+        }
+
+      }, error => {
+        vm.$log.debug('GET DATAPOINT OUT.OSW ERROR:');
+        vm.$log.debug(error);
+      });
+      promises.push(promise);
+    });
+
+    vm.$q.all(promises).then(response => {
+      deferred.resolve(vm.datapoints);
+    }, error => {
+      vm.$log.debug('ERROR retrieving datapoints OSWs');
+      deferred.reject(error);
+    });
     return deferred.promise;
   }
 
