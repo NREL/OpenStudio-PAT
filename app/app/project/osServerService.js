@@ -34,6 +34,7 @@ export class OsServer {
     vm.serverURL = vm.localServerURL;
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
+    vm.resultsDir = '';
 
     vm.cliPath = DependencyManager.getPath("PAT_OS_CLI_PATH");
     vm.metaCLIPath = DependencyManager.getPath("PAT_OS_META_CLI_PATH");
@@ -43,24 +44,7 @@ export class OsServer {
     vm.openstudioBindingsDirPath = path.dirname(vm.openstudioBindingsPath);
     vm.rubyPath = DependencyManager.getPath("PAT_RUBY_PATH");
 
-    vm.projectDir = vm.Project.getProjectDir();
-
     vm.analysisID = null;
-
-    if (vm.platform == 'win32')
-      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.projectDir.path() + '\"';
-    else
-      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.projectDir.path() + '\"';
-    vm.$log.info('start server command: ', vm.startServerCommand);
-
-    if (vm.platform == 'win32')
-      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
-    else
-      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
-    vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
-
-    vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_local ' + '\"' + vm.projectDir.path() + '\"';
-    vm.$log.info('stop server command: ', vm.stopServerCommand);
   }
 
   resetAnalysis() {
@@ -296,9 +280,9 @@ export class OsServer {
     // run META CLI will return status code: 0 = success, 1 = failure
 
     if (vm.platform == 'win32')
-      vm.startServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.rubyLibPath.path() + '\"' + ' --mongo-dir=' + '\"' + vm.mongoBinDir.path() + '\" --debug \"' + vm.Project.projectDir + '\"';
+      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir + '\"';
     else
-      vm.startServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.rubyLibPath.path() + '\"' + ' --mongo-dir=' + '\"' + vm.mongoBinDir.path() + '\" --debug \"' + vm.Project.projectDir + '\"';
+      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir + '\"';
     vm.$log.info('start server command: ', vm.startServerCommand);
 
     const child = vm.exec(vm.startServerCommand,
@@ -369,15 +353,15 @@ export class OsServer {
     const deferred = vm.$q.defer();
 
     // create folder
-    vm.resultsDir = vm.jetpack.dir(vm.projectDir.path('localResults'));
+    vm.resultsDir = vm.jetpack.dir(vm.projectDir,'localResults');
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: catch what analysis type it is
 
     if (vm.platform == 'win32')
-      vm.runAnalysisCommand = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis --debug --verbose --ruby-lib-path="${vm.rubyLibPath.path()}" "${vm.project.projectDir}/${vm.project.getProjectName()}.json" "${vm.serverURL}"`;
+      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
     else
-      vm.runAnalysisCommand = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis --debug --verbose --ruby-lib-path="${vm.rubyLibPath.path()}" "${vm.project.projectDir}/${vm.project.getProjectName()}.json" "${vm.serverURL}"`;
+      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
     vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
 
     const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param;
@@ -453,7 +437,7 @@ export class OsServer {
         vm.$log.debug('vm.Project:', vm.Project);
         vm.$log.debug('vm.Project.projectDir:', vm.Project.projectDir);
 
-        vm.stopServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local ' + '\"' + vm.Project.projectDir + '\"';
+        vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_local ' + '\"' + vm.Project.projectDir + '\"';
         vm.$log.info('stop server command: ', vm.stopServerCommand);
 
          const child = vm.exec(vm.stopServerCommand,
