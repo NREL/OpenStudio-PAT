@@ -3,7 +3,7 @@
 import {remote} from 'electron';
 const {app, Menu, shell} = remote;
 
-export function runBlock($rootScope, $state, $window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject) {
+export function runBlock($rootScope, $state, $window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log) {
   'ngInject';
 
   $window.onbeforeunload = e => {
@@ -37,11 +37,17 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
 
   });
 
-  // TODO Evan make these calls when a new project is opened
+  // For now don't check for dependencies..wait for Kyle's new code
   //DependencyManager.checkDependencies()
   //  .then(_.bind(MeasureManager.startMeasureManager, MeasureManager), _.bind(MeasureManager.startMeasureManager, MeasureManager));
+  MeasureManager.startMeasureManager();
 
-  OpenProject.openModal();
+  // open project and navigate to analysis tab
+  OpenProject.openModal().then(() => {
+    //$state.go('analysis');
+    $log.debug("RELOADING PAGE / NAVIGATE TO ANALYSIS PAGE");
+    $state.transitionTo('analysis', {}, {reload: true});
+  });
 
   const initialLanguage = $translate.use();
   const setLanguage = language => {

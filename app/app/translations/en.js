@@ -15,6 +15,7 @@ export default {
   },
   analysis: {
     title: 'Analysis',
+    projectName: 'Project Name',
     addMeasure: 'Add Measure',
     addMeasureOption: 'Add Measure Option',
     checkAll: 'Check All',

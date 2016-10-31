@@ -80,6 +80,7 @@ export class SetProject {
   openProject() {
     const vm = this;
     vm.$log.debug('openProject');
+    const deferred = vm.$q.defer();
 
     const result = vm.dialog.showOpenDialog({
       title: 'Open ParametricAnalysisTool Project',
@@ -126,9 +127,39 @@ export class SetProject {
       }
 
       if (fileExists) {
-        vm.relaunchUpdatedServer(projectPath.path());
+        // wait until server is stopped and new project set before closing modal
+        vm.$log.debug('fileExists!');
+        vm.osServer.stopServer().then(response => {
+          vm.$log.debug('SetProjectService::stop server: server stopped');
+          vm.$log.debug('response: ', response);
+
+          // update osServer's project location
+          vm.Project.setProject(projectPath.path());
+          // initializeProject will also create the basic folder structure, if it is missing
+          vm.Project.initializeProject();
+          // resolve promise
+          deferred.resolve('resolve');
+          // start server at new location
+          vm.osServer.startServer().then(response => {
+            vm.$log.debug('setProjectService::start server: server started');
+            vm.$log.debug('response: ', response);
+          });
+
+        }, (error) => {
+          vm.$log.debug('stop server errored, but setting project anyway');
+          // set this anyway
+          // update osServer's project location
+          vm.Project.setProject(projectPath.path());
+          // initializeProject will also create the basic folder structure, if it is missing
+          vm.Project.initializeProject();
+
+          deferred.reject('rejected');
+        });
+      } else {
+        deferred.reject('rejected');
       }
     }
+    return deferred.promise;
   }
 
   openModal() {
@@ -144,6 +175,7 @@ export class SetProject {
     });
 
     modalInstance.result.then(() => {
+      vm.$log.debug('Resolving openModal()');
       deferred.resolve('resolved');
     }, () => {
       // Modal canceled
@@ -152,6 +184,8 @@ export class SetProject {
     return deferred.promise;
   }
 
+
+   // DEPRECATE?!
   relaunchUpdatedServer(projectDir) {
     const vm = this;
 
@@ -162,7 +196,6 @@ export class SetProject {
       vm.$log.debug('response: ', response);
 
       // update osServer's project location
-      vm.$log.debug('projectDIR: ', projectDir);
       vm.Project.setProject(projectDir);
       // initializeProject will also create the basic folder structure, if it is missing
       vm.Project.initializeProject();

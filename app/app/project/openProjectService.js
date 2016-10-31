@@ -25,6 +25,7 @@ export class OpenProject {
     });
 
     modalInstance.result.then(() => {
+      vm.$log.debug('in open modal result function, project should be set');
       deferred.resolve('resolved');
     }, () => {
       // Modal canceled

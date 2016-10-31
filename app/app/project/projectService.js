@@ -86,7 +86,7 @@ export class Project {
     const vm = this;
     vm.$log.debug('Project initializeProject');
 
-    const filename = vm.projectDir + '\\pat.json';
+    const filename = vm.jetpack.cwd(vm.projectDir).path('pat.json');
     vm.$log.debug('filename: ', filename);
     if (vm.jetpack.exists(filename)) {
       vm.pat = vm.jetpack.read(filename, 'json');
@@ -646,10 +646,10 @@ export class Project {
     const vm = this;
     vm.$log.debug('Project setProject');
 
-
-    vm.projectDir = projectDir;
+    vm.setProjectDir(projectDir);
     vm.$log.debug('in set project: projectDir: ', vm.projectDir);
-    vm.projectName = projectDir.replace(/^.*[\\\/]/, '');
+    vm.setProjectName(projectDir.replace(/^.*[\\\/]/, ''));
+    vm.$log.debug('project name: ', vm.projectName);
 
     vm.mongoDir = jetpack.dir(path.resolve(vm.projectDir + '/data/db'));
     vm.logsDir = jetpack.dir(path.resolve(vm.projectDir + '/logs'));
