@@ -221,18 +221,18 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
           SetProject.saveProject();
         }
       }, {
-      label: 'Save As',
+        label: 'Save As',
         click() {
-        SetProject.saveAsProject();
-      }
-    }, {
-      label: 'Quit',
-      accelerator  : 'Command+Q',
+          SetProject.saveAsProject();
+        }
+      }, {
+        label: 'Quit',
+        accelerator: 'Command+Q',
         click()    {
-        app.quit();
+          app.quit();
         }
       }]
-      });
+    });
 
     // Window menu.
     template[3].submenu.push({
