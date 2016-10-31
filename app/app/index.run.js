@@ -3,7 +3,7 @@
 import {remote} from 'electron';
 const {app, Menu, shell} = remote;
 
-export function runBlock($rootScope, $state, $window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer) {
+export function runBlock($rootScope, $state, $window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject) {
   'ngInject';
 
   $window.onbeforeunload = e => {
@@ -37,8 +37,11 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
 
   });
 
-  DependencyManager.checkDependencies()
-    .then(_.bind(MeasureManager.startMeasureManager, MeasureManager), _.bind(MeasureManager.startMeasureManager, MeasureManager));
+  // TODO Evan make these calls when a new project is opened
+  //DependencyManager.checkDependencies()
+  //  .then(_.bind(MeasureManager.startMeasureManager, MeasureManager), _.bind(MeasureManager.startMeasureManager, MeasureManager));
+
+  OpenProject.openModal();
 
   const initialLanguage = $translate.use();
   const setLanguage = language => {
@@ -49,6 +52,21 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
   const fileMenu = {
     label: 'File',
     submenu: [{
+      label: 'New',
+      accelerator: 'Ctrl+N',
+      click: () => SetProject.newProject()
+    }, {
+      label: 'Open',
+      accelerator: 'Ctrl+O',
+      click: () => SetProject.openProject()
+    }, {
+      label: 'Save',
+      accelerator: 'Ctrl+S',
+      click: () => SetProject.saveProject()
+    }, {
+      label: 'Save As',
+      click: () => SetProject.saveAsProject()
+    }, {
       label: 'Quit',
       accelerator: 'Ctrl+Q',
       click: () => app.quit()

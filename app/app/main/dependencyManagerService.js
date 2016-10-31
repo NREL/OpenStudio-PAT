@@ -145,9 +145,6 @@ export class DependencyManager {
   checkDependencies() {
     const vm = this;
 
-    // TEMPORARY! (UNCOMMENT TO STOP AUTO DOWNLOADS)
-    // return vm.$q.resolve();
-
     // Open modal dialog to "disable app during downloads, and inform user of any issues
     //vm.openDependencyModal(); TODO uncomment this later
 
@@ -517,7 +514,7 @@ export class DependencyManager {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    //vm.downloadZip(vm.manifest.endpoint, vm._dependencyFilename(downloadManifest), downloadManifest.type, true).then(deferred.resolve, deferred.reject);
+    vm.downloadZip(vm.manifest.endpoint, vm._dependencyFilename(downloadManifest), downloadManifest.type, true).then(deferred.resolve, deferred.reject);
 
     return deferred.promise;
   }
@@ -546,9 +543,7 @@ export class DependencyManager {
       backdrop: 'static',
       controller: 'ModalDependencyController',
       controllerAs: 'modal',
-      size: 'lg',
-      templateUrl: 'app/main/dependency.html',
-      windowClass: 'wide-modal'
+      templateUrl: 'app/main/dependency.html'
     });
   }
 

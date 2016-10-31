@@ -137,9 +137,9 @@ export class RunController {
 
 
         // 5: until complete, hit serverAPI for updates (errors, warnings, status)
-        vm.getStatus = vm.$interval(function() {
+        vm.getStatus = vm.$interval(function () {
 
-          vm.OsServer.retrieveAnalysisStatus().then( response => {
+          vm.OsServer.retrieveAnalysisStatus().then(response => {
             vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
 
             vm.$scope.analysisStatus = response.data.analysis.status;
@@ -195,7 +195,7 @@ export class RunController {
   stopAnalysisStatus(status = 'completed') {
     const vm = this;
     vm.$log.debug('***** In runController::stopAnalysisStatus() *****');
-    if (angular.isDefined(vm.getStatus)){
+    if (angular.isDefined(vm.getStatus)) {
       vm.$interval.cancel(vm.getStatus);
       vm.getStatus = undefined;
     }
@@ -258,7 +258,7 @@ export class RunController {
       vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
       vm.toggleButtons();
       vm.OsServer.setProgressMessage('');
-      vm.$scope.progressMessage =  vm.OsServer.getProgressMessage();
+      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
       vm.OsServer.setProgressAmount(0);
       vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
 
@@ -267,7 +267,6 @@ export class RunController {
       vm.$log.debug('ERROR attempting to stop analysis / cancel run');
 
     });
-
 
 
   }
