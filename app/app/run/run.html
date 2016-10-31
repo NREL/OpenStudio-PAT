@@ -57,9 +57,11 @@
         <uib-accordion-group ng-repeat="datapoint in datapoints" id="{{datapoint.id}}" is-open="datapoint.open">
           <uib-accordion-heading>
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
-            {{datapoint.id}} - status: {{datapoint.status}} - {{datapoint.final_message}}
+            {{datapoint.name}} - status: {{datapoint.status}} - {{datapoint.final_message}}
           </uib-accordion-heading>
-           <p>Datapoint Details Placeholder</p>
+
+           <p>ID: {{datapoint.id}}</p>
+           <p>Start time: {{datapoint.start_time}}</p>
         </uib-accordion-group>
       </uib-accordion>
     </div>
