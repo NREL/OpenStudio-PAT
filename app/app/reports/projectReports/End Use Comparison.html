@@ -1,0 +1,253 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Something</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <!--TODO Make this css injection work (replace hard-coded CSS paths below)-->
+  <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
+  <!-- inject:bootstrap -->
+  <!-- bootstrap css files will be automatically insert here -->
+  <!-- endinject -->
+  <!-- bower:css -->
+  <!-- run `gulp inject` to automatically populate bower styles dependencies -->
+  <!-- endbower -->
+  <!-- endbuild -->
+
+  <!-- build:css({.tmp/serve,src}) styles/app.css -->
+  <!-- inject:css -->
+  <!-- css files will be automatically insert here -->
+  <!-- endinject -->
+  <!-- endbuild -->
+  <link rel="stylesheet" href="/app/bootstrap.css">
+  <link rel="stylesheet" href="/app/index.css">
+  <!--TODO also include d3 in preload if not included in PAT-->
+  <script src="//d3js.org/d3.v4.min.js"></script>
+</head>
+<body>
+
+<div ng-app="myApp">
+
+  <div ng-controller="MyAppCtrl">
+
+    <h1>End Use Comparison</h1>
+
+    <d3ng-stackedenduse data="elecEndUseData"></d3ng-stackedenduse>
+
+  </div>
+
+</div>
+
+<script type="text/javascript">
+
+  console.info("Loaded End Use Comparison.html script");
+
+  var myApp = angular.module('myApp', []);
+
+  myApp.controller('MyAppCtrl', function ($scope) {
+    // Bind the simulation results to a variable
+    $scope.results = results;
+
+    // Create a CSV of the standard data
+    $scope.elecEndUseData = [];
+
+    // Define the pieces of data in the thing
+    var elecEndUseDataColsKeys = [
+      "Heating",
+      "Cooling",
+      "Interior Lighting",
+      "Exterior Lighting",
+      "Interior Equipment",
+      "Exterior Equipment",
+      "Fans",
+      "Pumps",
+      "Heat Rejection",
+      "Humidification",
+      "Heat Recovery",
+      "Water Systems",
+      "Refrigeration",
+      "Generators"
+    ]
+    _.forEach($scope.results, function (run) {
+      // Get the openstudio reporting measure, which contains the results
+      var reportMeasure = _.find(run.steps, {'measure_dir_name': "standard_reports"});
+      if (!reportMeasure) {
+        console.error("Could not find the standard reports measure.")
+      }
+
+      // Get the report values
+      var vals = reportMeasure.result.step_values;
+
+      // Populate an object with the end use data
+      var data = {};
+      data.name = run.name;
+      var tot = 0.0;
+      _.forEach(elecEndUseDataColsKeys, function (key) {
+        // Define the data header
+        var header = key.toLowerCase().replace(' ', '_');
+        var lookup = 'end_use_electricity_' + header;
+        var val = _.find(vals, {'name': lookup}).value;
+        data[header] = val;
+        tot += val;
+      });
+      data.total = tot;
+
+      // Add this datapoint to the overall set
+      $scope.elecEndUseData.push(data);
+
+    });
+  });
+
+  // Angular directive to create a stacked bar chart
+  // comparing the end uses across models.
+  myApp.directive('d3ngStackedenduse', function () {
+
+    // constants
+    var total_width = 960;
+    var total_height = 500;
+
+    var margin = {top: 20, right: 90, bottom: 30, left: 40},
+      width = total_width - margin.left - margin.right,
+      height = total_height - margin.top - margin.bottom;
+
+    return {
+      restrict: 'E',
+      terminal: true,
+      scope: {
+        data: '='
+      },
+      //template: '<pre ng-repeat="run in elecEndUseData">{{ run | json:2 }}</pre>'
+      link: function (scope, element, attrs) {
+
+        scope.$watch('data', function (newData, oldData) {
+
+          var data = newData;
+
+          // set up initial svg object
+          var svg = d3.select(element[0])
+            .append("svg")
+            .attr("width", total_width)
+            .attr("height", total_height);
+
+          var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+          var x = d3.scaleBand()
+            .rangeRound([0, width])
+            .padding(0.1)
+            .align(0.1);
+
+          var y = d3.scaleLinear()
+            .rangeRound([height, 0]);
+
+          var z = d3.scaleOrdinal()
+            .range(["#EF1C21", "#0071BD", "#F7DF10", "#DEC310", "#4A4D4A", "#B5B2B5", "#FF79AD", "#632C94", "#F75921", "#293094", "#CE5921", "#FFB239", "#29AAE7", "#8CC739"]);
+
+          // TODO figure out how to get these out dynamically
+          var stackKeys = [
+            "heating",
+            "cooling",
+            "interior_lighting",
+            "exterior_lighting",
+            "interior_equipment",
+            "exterior_equipment",
+            "fans",
+            "pumps",
+            "heat_rejection",
+            "humidification",
+            "heat_recovery",
+            "water_systems",
+            "refrigeration",
+            "generators"
+          ]
+
+          var stack = d3.stack()
+            .keys(stackKeys)
+            .order(d3.stackOrderNone)
+            .offset(d3.stackOffsetNone);
+
+          var series = stack(data);
+
+          x.domain(data.map(function (d) {
+            return d.name;
+          }));
+          y.domain([0, d3.max(data, function (d) {
+            return d.total;
+          })]).nice();
+          z.domain(stackKeys);
+
+          g.selectAll(".serie")
+            .data(series)
+            .enter().append("g")
+            .attr("class", "serie")
+            .attr("fill", function (d) {
+              return z(d.key);
+            })
+            .selectAll("rect")
+            .data(function (d) {
+              return d;
+            })
+            .enter().append("rect")
+            .attr("x", function (d) {
+              return x(d.data.name);
+            })
+            .attr("y", function (d) {
+              return y(d[1]);
+            })
+            .attr("height", function (d) {
+              return y(d[0]) - y(d[1]);
+            })
+            .attr("width", x.bandwidth());
+
+          g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+          g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y).ticks(10, "s"))
+            .append("text")
+            .attr("x", 2)
+            .attr("y", y(y.ticks(10).pop()))
+            .attr("dy", "0.35em")
+            .attr("text-anchor", "start")
+            .attr("fill", "#000")
+            .text("Energy Use");
+
+          var legend = g.selectAll(".legend")
+            .data(stackKeys)
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function (d, i) {
+              return "translate(0," + i * 20 + ")";
+            })
+            .style("font", "10px sans-serif");
+
+          legend.append("rect")
+            .attr("x", width - 24)
+            .attr("width", 18)
+            .attr("height", 18)
+            .attr("fill", z);
+
+          legend.append("text")
+            .attr("x", width)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .attr("text-anchor", "start")
+            .text(function (d) {
+              return d.replace('_', ' ');
+            });
+
+        });
+
+      }
+    }
+  });
+
+
+</script>
+
+</body>
+</html>
