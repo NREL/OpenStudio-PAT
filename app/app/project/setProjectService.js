@@ -5,7 +5,7 @@ import fs from 'fs';
 const {dialog} = remote;
 
 export class SetProject {
-  constructor($q, $log, $uibModal, Project, OsServer) {
+  constructor($q, $log, $uibModal, Project, OsServer, BCL) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
@@ -14,8 +14,9 @@ export class SetProject {
     vm.fs = fs;
     vm.jetpack = jetpack;
     vm.dialog = dialog;
-    vm.osServer = OsServer;
+    vm.OsServer = OsServer;
     vm.Project = Project;
+    vm.BCL = BCL;
   }
 
   saveProject() {
@@ -88,12 +89,12 @@ export class SetProject {
     });
 
     if (!_.isEmpty(result)) {
-      const projectPath =  jetpack.cwd(result[0]);
-      vm.$log.debug('PAT Project path:', projectPath.path());
-      const foldername = projectPath.path().replace(/^.*[\\\/]/, '');
+      const projectDir =  jetpack.cwd(result[0]);
+      vm.$log.debug('PAT Project dir path:', projectDir.path());
+      const foldername = projectDir.path().replace(/^.*[\\\/]/, '');
       vm.$log.debug('PAT Project folder name:', foldername);
 
-      const fullFilename = projectPath.path('pat.json');
+      const fullFilename = projectDir.path('pat.json');
 
       // foldername must contain "pat.json"
       let fileExists = false;
@@ -105,10 +106,10 @@ export class SetProject {
         fileExists = true;
       } else {
         vm.$log.debug(fullFilename, ' not found');
-        const allOSPs = vm.jetpack.find(projectPath.path(), {matching: '*.osp', recursive: false});
+        const allOSPs = vm.jetpack.find(projectDir.path(), {matching: '*.osp', recursive: false});
         if (allOSPs.length > 0) {
           vm.$log.debug('found osp in openProject');
-          vm.$log.debug('path: ', projectPath.path());
+          vm.$log.debug('path: ', projectDir.path());
           vm.dialog.showMessageBox({
             type: 'info',
             buttons: ['OK'],
@@ -129,29 +130,26 @@ export class SetProject {
       if (fileExists) {
         // wait until server is stopped and new project set before closing modal
         vm.$log.debug('fileExists!');
-        vm.osServer.stopServer().then(response => {
+        vm.OsServer.stopServer().then(response => {
           vm.$log.debug('SetProjectService::stop server: server stopped');
           vm.$log.debug('response: ', response);
 
-          // update osServer's project location
-          vm.Project.setProject(projectPath.path());
-          // initializeProject will also create the basic folder structure, if it is missing
-          vm.Project.initializeProject();
+          // set project Variables
+          vm.setProjectVariables(projectDir);
+
           // resolve promise
           deferred.resolve('resolve');
           // start server at new location
-          vm.osServer.startServer().then(response => {
+          vm.OsServer.startServer().then(response => {
             vm.$log.debug('setProjectService::start server: server started');
             vm.$log.debug('response: ', response);
+            vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
           });
 
         }, (error) => {
           vm.$log.debug('stop server errored, but setting project anyway');
-          // set this anyway
-          // update osServer's project location
-          vm.Project.setProject(projectPath.path());
-          // initializeProject will also create the basic folder structure, if it is missing
-          vm.Project.initializeProject();
+          // set project Variables anyway
+          vm.setProjectVariables(projectDir);
 
           deferred.reject('rejected');
         });
@@ -184,13 +182,25 @@ export class SetProject {
     return deferred.promise;
   }
 
+  // project initialization
+  setProjectVariables(projectDir) {
+    const vm = this;
 
-   // DEPRECATE?!
+    // update osServer's project location
+    vm.Project.setProject(projectDir);
+
+    // BCL service variables
+    vm.BCL.resetProjectVariables();
+
+  }
+
+
+   // TODO: EVAN: DEPRECATE
   relaunchUpdatedServer(projectDir) {
     const vm = this;
 
     // Stop server before changing projectDir
-    vm.osServer.stopServer().then(response => {
+    vm.OsServer.stopServer().then(response => {
 
       vm.$log.debug('setProjectService::relaunchUpdatedServer() server stopped');
       vm.$log.debug('response: ', response);
@@ -201,18 +211,19 @@ export class SetProject {
       vm.Project.initializeProject();
 
       // start server at new location
-      vm.osServer.startServer().then(response => {
+      vm.OsServer.startServer().then(response => {
         vm.$log.debug('setProjectService::relaunchUpdatedServer() server started');
         vm.$log.debug('response: ', response);
       });
     });
   }
 
+
   copyProjectAndRelaunchUpdatedServer(projectDir) {
     const vm = this;
 
     // Stop server before changing projectDir
-    vm.osServer.stopServer().then(response => {
+    vm.OsServer.stopServer().then(response => {
 
       vm.$log.debug('setProjectService::relaunchUpdatedServer2() server stopped');
       vm.$log.debug('response: ', response);
@@ -225,7 +236,7 @@ export class SetProject {
       vm.Project.initializeProject();
 
       // start server at new location
-      vm.osServer.startServer().then(response => {
+      vm.OsServer.startServer().then(response => {
         vm.$log.debug('setProjectService::relaunchUpdatedServer2() server started');
         vm.$log.debug('response: ', response);
       });

@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 export class RunController {
 
   constructor($log, Project, OsServer, $scope, $interval) {
@@ -9,8 +11,11 @@ export class RunController {
     vm.$scope = $scope;
     vm.Project = Project;
     vm.OsServer = OsServer;
+    vm.shell = shell;
 
     vm.runTypes = vm.Project.getRunTypes();
+    // TEMPORARY:  only show local server
+    vm.runTypes = _.filter(vm.runTypes, {name: 'local'});
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.OsServer.getAnalysisID();
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
@@ -35,6 +40,9 @@ export class RunController {
     vm.$log.debug('Analysis Type: ', vm.$scope.selectedAnalysisType);
     vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod);
 
+    // TROUBLESHOOTING PANEL STATUS
+    vm.$scope.dev = {open: true};
+
   }
 
   setRunType() {
@@ -44,12 +52,12 @@ export class RunController {
 
   viewServer() {
     const vm = this;
-    require('shell').openExternal(vm.OsServer.getServerURL());
+    vm.shell.openExternal(vm.OsServer.getServerURL());
   }
 
-  stopServer() {
+  stopServer(force = false) {
     const vm = this;
-    vm.OsServer.stopServer().then(response => {
+    vm.OsServer.stopServer(force).then(response => {
       vm.$log.debug('***** Server Stopped *****');
 
       vm.OsServer.setProgressAmount(0);
@@ -67,6 +75,30 @@ export class RunController {
     });
   }
 
+  // to start server on its own
+  startServer(force = false) {
+    const vm = this;
+
+    vm.OsServer.startServer(force).then(response => {
+
+      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+      vm.$log.debug('Server Status: ', vm.$scope.serverStatus);
+
+    }, response => {
+      vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
+    });
+  }
+
+  // check if server is alive, if so set its status to 'started', otherwise set status to 'stopped'
+  pingServer() {
+    const vm = this;
+    vm.OsServer.pingServer().then(response => {
+      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+    }, response => {
+      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+    });
+  }
+
   runEntireWorkflow() {
     const vm = this;
     vm.$log.debug('***** In runController::runEntireWorkflow() *****');
@@ -74,8 +106,6 @@ export class RunController {
 
     // 1: make/get OSA
     // 2: make/get zip file?
-
-
 
     // 3: hit PAT CLI to start server (local or remote)
     vm.OsServer.setProgressAmount('15');

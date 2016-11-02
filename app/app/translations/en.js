@@ -3,8 +3,8 @@ export default {
     title: 'PAT Dependency Download Status'
   },
   setProject: {
-    title: 'ParametricAnalysisTool',
-    blurb: 'Please open a new or existing project.',
+    title: 'Select a Project',
+    blurb: 'Create a new or open an existing project',
     make: 'Make New Project',
     existing: 'Open Existing Project'
   },

@@ -24,13 +24,14 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
     $document[0].body.appendChild(s);
   };
 
-  // Save pretty options when leaving analysis state (needed for PAT.json and for DesignAlternatives tab)
+
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+    // Save pretty options when leaving analysis state (needed for PAT.json and for DesignAlternatives tab)
     if (fromState.name == 'analysis') {
       Project.savePrettyOptions();
     }
+    // warn user that they need to cancel their run before moving from this state
     if (fromState.name == 'run' && ((OsServer.getAnalysisStatus() == 'starting') || (OsServer.getAnalysisStatus() == 'in progress'))) {
-      // warn user that they need to cancel their run before moving from this state
       event.preventDefault();
       OsServer.showAnalysisRunningDialog();
     }
@@ -209,6 +210,15 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
       }, {
         type: 'separator'
       }, {
+        label: 'Quit',
+        accelerator: 'Command+Q',
+        click()    {
+          app.quit();
+        }
+      }]
+    },{
+      label: 'File',
+      submenu: [{
         label: 'New',
         accelerator: 'Command+N',
         click() {
@@ -230,12 +240,6 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
         label: 'Save As',
         click() {
           SetProject.saveAsProject();
-        }
-      }, {
-        label: 'Quit',
-        accelerator: 'Command+Q',
-        click()    {
-          app.quit();
         }
       }]
     });

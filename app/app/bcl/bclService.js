@@ -34,8 +34,17 @@ export class BCL {
       vm.BCLCategories = categories;
     });
 
+    // retrieve BCL measures once per app session
     vm.onlineBCLcheck = false;
 
+    // set project
+    vm.resetProjectVariables();
+
+  }
+
+  // reset variables when a different project is set
+  resetProjectVariables() {
+    const vm = this;
     // initialize Project measures (with arguments and options) from Project service
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
     vm.$log.debug('BCL SERVICE Project MEASURES RETRIEVED: ', vm.projectMeasures);
@@ -43,12 +52,7 @@ export class BCL {
     vm.getBCLMeasures().then( () => {
       vm.checkForUpdatesLocalBcl();
       vm.$log.debug('BCL SERVICE CONSTRUCTOR.  LIBMEASURES: ', vm.libMeasures);
-
     });
-
-    // this will be done each time modal is opened.  not needed here
-    // vm.checkForUpdates();
-
   }
 
   // returns libMeasures variable (and check for Updates too)

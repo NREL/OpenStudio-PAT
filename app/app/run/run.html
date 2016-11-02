@@ -1,32 +1,36 @@
 <div class="row">
-  <div class="col-md-1 pad-bot-10">
+  <div class="col-sm-1 pad-bot-10">
     <h4 translate>run.title</h4>
   </div>
-  <div class="col-md-5 pad-bot-20 pad-top-5">
+  <div class="col-sm-2 pad-bot-20 pad-top-5">
     <div class="input-group">
       <select class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-change="run.setRunType()"></select>
     </div>
   </div>
-</div>
-
-<div class="row pad-bot-20">
-  <div class="col-md-12">
-    <button type="button" class="btn btn-info" ng-click="run.exportOSA()" translate>run.exportToOSA</button>
+  <div class="col-sm-5 pad-bot-20 pad-top-10">
+    <div class="tab-text">Server Status&nbsp;
+      <span ng-show="serverStatus=='started'" class="glyphicon glyphicon-ok green-button" aria-label="started"></span>
+      <span ng-show="serverStatus!='started'" class="glyphicon glyphicon-remove red-button" aria-label="stopped"></span>
+   </div>
   </div>
 </div>
 
 <div ng-show="selectedRunType.name == 'remote'" class="row pad-bot-20">
   <div class="col-md-8">
+    <button type="button" class="btn btn-info" ng-click="run.exportOSA()" translate>run.exportToOSA</button>
     <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()" translate>run.runEntireWorkflow</button>
-    <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
+    <button type="button" class="btn btn-danger" ng-show="disabledButtons && serverStatus == 'started'" ng-click="run.cancelRun()" translate>run.cancelRun</button>
+    <button type="button" class="btn btn-primary" ng-show="serverStatus == 'started'" ng-click="run.viewServer()">View Server</button>
   </div>
 </div>
 
 <div ng-show="selectedRunType.name == 'local'" class="row pad-bot-20">
   <div class="col-md-12">
+    <button type="button" class="btn btn-info" ng-click="run.exportOSA()" translate>run.exportToOSA</button>
     <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()" translate>run.runEntireWorkflow</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
     <button type="button" class="btn btn-danger" ng-show="serverStatus == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>
+    <button type="button" class="btn btn-primary" ng-show="serverStatus == 'started'" ng-click="run.viewServer()">View Server</button>
     <!-- <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runSelected()">Run Selected</button>
       <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runUpdated()">Run Updated Design Alternatives Only</button>
       <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runEnergyPlus()">Run up to EnergyPlus</button>
@@ -35,24 +39,31 @@
   </div>
 </div>
 
-<div class="row pad-bot-20">
-  <div class="col-md-5">
+<div class="row">
+  <div class="col-sm-6">
     <uib-progressbar class="progress-striped active" type="success" value="progressAmount">{{progressMessage}}</uib-progressbar>
   </div>
 </div>
 
-<div class="row pad-bot-20">
-  <div class="col-md-5">
-    <p>Server Status is: {{serverStatus}}</p>
-    <p>Analysis ID is: {{analysisID}}</p>
-    <p>Analysis Status is: {{analysisStatus}}</p>
+<div ng-show="analysisID != undefined">
+  <div class="row">
+    <div class="col-sm-12">
+      <h3>Analysis Details</h3>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-5 tab-text">
+       <label>ID</label> {{analysisID}}
+    </div>
+    <div class="col-sm-4 tab-text">
+      <label>Status</label> {{analysisStatus}}
+    </div>
   </div>
 </div>
-<div ng-if="serverStatus == 'started'"><button type="button" class="btn btn-primary" ng-click="run.viewServer()">View Server</button></div>
 
 <div ng-if="datapoints.length > 0">
-  <div class="panel panel-default full-width margin-top-20">
-    <div class="panel-body">
+  <div class="row">
+    <div class="col-sm-12">
       <uib-accordion close-others="false">
         <uib-accordion-group ng-repeat="datapoint in datapoints" id="{{datapoint.id}}" is-open="datapoint.open">
           <uib-accordion-heading>
@@ -60,10 +71,28 @@
             {{datapoint.name}} - status: {{datapoint.status}} - {{datapoint.final_message}}
           </uib-accordion-heading>
 
-           <p>ID: {{datapoint.id}}</p>
-           <p>Start time: {{datapoint.start_time}}</p>
+          <p>ID: {{datapoint.id}}</p>
+          <p>Start time: {{datapoint.started_at}}</p>
         </uib-accordion-group>
       </uib-accordion>
     </div>
   </div>
 </div>
+
+<div class="row pad-top-100">
+  <div class="col-sm-10">
+    <uib-accordion>
+      <uib-accordion-group is-open="dev.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': dev.open, 'glyphicon-chevron-right': !dev.open}"></i>
+          Server Troubleshooting
+        </uib-accordion-heading>
+        <button type="button" class="btn btn-danger" ng-click="run.startServer(true)">Force Server START </button>
+        <button type="button" class="btn btn-danger" ng-click="run.stopServer(true)">Force Server STOP </button>
+        <button type="button" class="btn btn-primary" ng-click="run.pingServer()">Ping Server and Set Status</button>
+      </uib-accordion-group>
+    </uib-accordion>
+  </div>
+</div>
+
+
