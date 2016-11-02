@@ -17,17 +17,13 @@ export class Project {
     vm.jsZip = jsZip;
     vm.MeasureManager = MeasureManager;
     vm.dialog = dialog;
-    vm.projectDir = '';
-    vm.projectName = '';
 
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
 
-    vm.analysisType = 'Manual';
     vm.analysisTypes = ['Manual'];
     //vm.analysisTypes = ['Manual', 'Algorithmic']; // TODO implement this after initial release
 
-    vm.reportType = 'Calibration Report';
     vm.reportTypes = [{
       id: 'Calibration Report',
       name: 'reports.type.calibrationReport'
@@ -45,26 +41,33 @@ export class Project {
       name: 'reports.type.EDAPTReport'
     }];
 
-    vm.samplingMethods = Project.setSamplingMethods();
-    vm.samplingMethod = vm.samplingMethods.length > 0 ? vm.samplingMethods[0] : null;
-
-    vm.runTypes = vm.getRunTypes();
-    vm.runType = vm.runTypes[0];
-
+    vm.samplingMethods = vm.setSamplingMethods();
+    vm.runTypes = vm.setRunTypes();
     vm.algorithmOptions = vm.setAlgorithmOptions();
 
+    vm.analysisType = null;
+    vm.reportType = null;
+    vm.runType = vm.runTypes[0];
+    vm.samplingMethod = vm.samplingMethods[0];
+    vm.rubyMD5 = null;
+    vm.mongoMD5 = null;
+    vm.openstudioServerMD5 = null;
+    vm.openstudioCLIMD5 = null;
+    vm.openstudioMD5 = null;
+    vm.projectDir = null;  // this is a jetpack object (like all other *Dir variables)
+    vm.projectName = null;
+    vm.mongoDir = null;
+    vm.logsDir = null;
+    vm.projectMeasuresDir = null;
+    vm.seedDir = null;
+    vm.weatherDir = null;
+    vm.seeds = [];
+    vm.defaultSeed = null;
+    vm.weatherFiles = [];
+    vm.defaultWeatherFile = null;
     vm.algorithmSettings = [];
     vm.measures = [];
     vm.designAlternatives = [];
-
-    vm.rubyMD5 = '';
-    vm.mongoMD5 = '';
-    vm.openstudioServerMD5 = '';
-    vm.openstudioCLIMD5 = '';
-    vm.openstudioMD5 = '';
-
-    // set platform
-    //const platform = os.platform();
 
     const src = jetpack.cwd(app.getPath('userData'));
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
@@ -78,6 +81,38 @@ export class Project {
     vm.osa = {};
   }
 
+  setDefaults() {
+    const vm = this;
+    vm.seeds = [];
+    vm.weatherFiles = [];
+    vm.setSeeds();
+    vm.setWeatherFiles();
+    vm.defaultSeed = vm.seeds.length > 0 ? vm.seeds[0] : null;
+    vm.defaultWeatherFile = vm.weatherFiles.length > 0 ? vm.weatherFiles[0] : null;
+    vm.seedsDropdownArr = [];
+    vm.weatherFilesDropdownArr = [];
+    vm.setSeedsDropdownOptions();
+    vm.setWeatherFilesDropdownOptions();
+
+    vm.analysisType = 'Manual';
+    vm.reportType = 'Calibration Report';
+    vm.samplingMethod = vm.samplingMethods.length > 0 ? vm.samplingMethods[0] : null;
+    vm.runType = vm.runTypes[0];
+
+    vm.algorithmSettings = [];
+    vm.measures = [];
+    vm.designAlternatives = [];
+    vm.osa = {};
+
+    // TODO: still need these?
+    vm.rubyMD5 = '';
+    vm.mongoMD5 = '';
+    vm.openstudioServerMD5 = '';
+    vm.openstudioCLIMD5 = '';
+    vm.openstudioMD5 = '';
+
+  }
+
   // import from pat.json
   // TODO: add check to ensure that the measures really are in the PAT project folder and haven't been deleted
   // TODO: if measure is in pat dir but not in json, ignore
@@ -85,47 +120,44 @@ export class Project {
   initializeProject() {
     const vm = this;
     vm.$log.debug('Project initializeProject');
+    if (angular.isDefined(vm.projectName)){
+      const filename = vm.projectDir.path('pat.json');
+      vm.$log.debug('filename: ', filename);
+      // for new and existing projects
+      vm.setDefaults();
 
-    const filename = vm.projectDir + '\\pat.json';
-    vm.$log.debug('filename: ', filename);
-    if (vm.jetpack.exists(filename)) {
-      vm.pat = vm.jetpack.read(filename, 'json');
+      if (vm.jetpack.exists(filename)) {
+        // existing project
+        vm.pat = vm.jetpack.read(filename, 'json');
 
-      vm.measures = vm.pat.measures;
-      if (!angular.isDefined(vm.measures)) {
-        vm.measures = [];
+        vm.measures = vm.pat.measures;
+        if (!angular.isDefined(vm.measures)) {
+          vm.measures = [];
+        }
+
+        vm.designAlternatives = vm.pat.designAlternatives;
+        if (!angular.isDefined(vm.designAlternatives)) {
+          vm.designAlternatives = [];
+        }
+
+        vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
+        vm.runType = vm.pat.runType ? vm.pat.runType : vm.runType;
+        vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
+        vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
+        vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
+        vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
+        vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
+        vm.algorithmSettings = vm.pat.algorithmSettings ? vm.pat.algorithmSettings : vm.algorithmSettings;
+        vm.rubyMD5 = vm.pat.rubyMD5 ? vm.pat.rubyMD5 : vm.rubyMD5;
+        vm.mongoMD5 = vm.pat.mongoMD5 ? vm.pat.mongoMD5 : vm.mongoMD5;
+        vm.openstudioServerMD5 = vm.pat.openstudioServerMD5 ? vm.pat.openstudioServerMD5 : vm.openstudioServerMD5;
+        vm.openstudioCLIMD5 = vm.pat.openstudioCLIMD5 ? vm.pat.openstudioCLIMD5 : vm.openstudioCLIMD5;
+        vm.openstudioMD5 = vm.pat.openstudioMD5 ? vm.pat.openstudioMD5 : vm.openstudioMD5;
       }
-
-      vm.designAlternatives = vm.pat.designAlternatives;
-      if (!angular.isDefined(vm.designAlternatives)) {
-        vm.designAlternatives = [];
-      }
-
-      vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
-      vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
-      vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
-      vm.runType = vm.pat.runType ? vm.pat.runType : vm.runType;
-      vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
-      vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
-      vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
-      vm.algorithmSettings = vm.pat.algorithmSettings ? vm.pat.algorithmSettings : vm.algorithmSettings;
-      vm.rubyMD5 = vm.pat.rubyMD5 ? vm.pat.rubyMD5 : vm.rubyMD5;
-      vm.mongoMD5 = vm.pat.mongoMD5 ? vm.pat.mongoMD5 : vm.mongoMD5;
-      vm.openstudioServerMD5 = vm.pat.openstudioServerMD5 ? vm.pat.openstudioServerMD5 : vm.openstudioServerMD5;
-      vm.openstudioCLIMD5 = vm.pat.openstudioCLIMD5 ? vm.pat.openstudioCLIMD5 : vm.openstudioCLIMD5;
-      vm.openstudioMD5 = vm.pat.openstudioMD5 ? vm.pat.openstudioMD5 : vm.openstudioMD5;
-
-      vm.seeds = [];
-      vm.weatherFiles = [];
-      vm.setSeeds();
-      vm.setWeatherFiles();
-      vm.defaultSeed = vm.seeds.length > 0 ? vm.seeds[0] : null;
-      vm.defaultWeatherFile = vm.weatherFiles.length > 0 ? vm.weatherFiles[0] : null;
-      vm.seedsDropdownArr = [];
-      vm.weatherFilesDropdownArr = [];
-      vm.setSeedsDropdownOptions();
-      vm.setWeatherFilesDropdownOptions();
+    } else {
+      vm.$log.error('No project selected...cannot initialize project');
     }
+
   }
 
   sleep(ms) {
@@ -247,7 +279,7 @@ export class Project {
     }
 
     // write to file
-    let filename = vm.projectDir  + '/' + vm.projectName + '.json';
+    let filename = vm.projectDir.path(vm.projectName + '.json');
     vm.jetpack.write(filename, vm.osa);
     vm.$log.debug('Project OSA file exported to ' + filename);
 
@@ -275,7 +307,7 @@ export class Project {
       }
     });
 
-    filename = vm.projectDir + '/' + vm.projectName + '.zip';
+    filename = vm.projectDir.path(vm.projectName + '.zip');
     vm.$log.debug('Zip name: ' + filename);
     zip.generateNodeStream({compression: 'DEFLATE', type: 'nodebuffer', streamFiles: true})
       .pipe(jetpack.createWriteStream(filename))
@@ -573,7 +605,7 @@ export class Project {
     // general
     vm.pat = {};
     vm.pat.projectName = vm.projectName;
-    vm.pat.projectDir = vm.projectDir;
+    vm.pat.projectDir = vm.projectDir.path();
     vm.pat.seed = vm.defaultSeed;
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
@@ -596,7 +628,7 @@ export class Project {
     vm.pat.analysisID = vm.OsServer.getAnalysisID();
     vm.pat.datapoints = _.map(vm.OsServer.getDatapoints(), 'id');
 
-    vm.jetpack.write(vm.projectDir + '/' + 'pat.json', vm.pat);
+    vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
     vm.$log.debug('Project exported to pat.json');
   }
 
@@ -639,23 +671,29 @@ export class Project {
 
   setProjectDir(dir) {
     const vm = this;
+    // this should be a jetpack object (not a string)
     vm.projectDir = dir;
   }
 
+  // projectDir is a jetpack object (not a string)
   setProject(projectDir) {
     const vm = this;
     vm.$log.debug('Project setProject');
 
+    vm.setProjectDir(projectDir);
+    vm.$log.debug('in set project: projectDir: ', vm.projectDir.path());
+    vm.setProjectName(projectDir.path().replace(/^.*[\\\/]/, ''));
+    vm.$log.debug('project name: ', vm.projectName);
 
-    vm.projectDir = projectDir;
-    vm.$log.debug('in set project: projectDir: ', vm.projectDir);
-    vm.projectName = projectDir.replace(/^.*[\\\/]/, '');
+    vm.mongoDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/data/db'));
+    vm.logsDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/logs'));
+    vm.projectMeasuresDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/measures'));
+    vm.seedDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/seeds'));
+    vm.weatherDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/weather'));
 
-    vm.mongoDir = jetpack.dir(path.resolve(vm.projectDir + '/data/db'));
-    vm.logsDir = jetpack.dir(path.resolve(vm.projectDir + '/logs'));
-    vm.projectMeasuresDir = jetpack.dir(path.resolve(vm.projectDir + '/measures'));
-    vm.seedDir = jetpack.dir(path.resolve(vm.projectDir + '/seeds'));
-    vm.weatherDir = jetpack.dir(path.resolve(vm.projectDir + '/weather'));
+    // initializeProject will also create the basic folder structure, if it is missing
+    vm.initializeProject();
+
   }
 
   setDesignAlternatives(alts) {
@@ -715,9 +753,14 @@ export class Project {
     return vm.railsDir;
   }
 
-  getRunTypes() {
+  setRunTypes() {
 
     return [{displayName: 'Run Locally', name: 'local'}, {displayName: 'Run on Cloud', name: 'remote'}];
+  }
+
+  getRunTypes() {
+    const vm = this;
+    return vm.runTypes;
   }
 
   getRunType() {
@@ -1083,7 +1126,8 @@ export class Project {
     return vm.algorithmOptions;
   }
 
-  static setSamplingMethods() {
+  setSamplingMethods() {
+    const vm = this;
 
     return [{
       id: 'BatchRun',
@@ -1179,24 +1223,34 @@ export class Project {
 
   setSeeds() {
     const vm = this;
-    if (vm.jetpack.exists(vm.seedDir.cwd())) {
-      vm.seeds = vm.seedDir.find('.', {matching: '*.osm'}, 'relativePath');
-      _.forEach(vm.seeds, (seed, index) => {
-        vm.seeds[index] = _.replace(seed, './', '');
-      });
+    if (angular.isDefined(vm.seedDir)){
+      if (vm.jetpack.exists(vm.seedDir.cwd())) {
+        vm.seeds = vm.seedDir.find('.', {matching: '*.osm'}, 'relativePath');
+        _.forEach(vm.seeds, (seed, index) => {
+          vm.seeds[index] = _.replace(seed, './', '');
+        });
+      }
+      else vm.$log.error('The seeds directory (%s) does not exist', vm.seedDir.cwd());
+    } else {
+      vm.$log.debug('There is no seed directory defined (project not selected?)');
     }
-    else vm.$log.error('The seeds directory (%s) does not exist', vm.seedDir.cwd());
+
   }
 
   setWeatherFiles() {
     const vm = this;
-    if (vm.jetpack.exists(vm.weatherDir.cwd())) {
-      vm.weatherFiles = vm.weatherDir.find('.', {matching: '*.epw'}, 'relativePath');
-      _.forEach(vm.weatherFiles, (w, index) => {
-        vm.weatherFiles[index] = _.replace(w, './', '');
-      });
+    if (angular.isDefined(vm.weatherDir)){
+      if (vm.jetpack.exists(vm.weatherDir.cwd())) {
+        vm.weatherFiles = vm.weatherDir.find('.', {matching: '*.epw'}, 'relativePath');
+        _.forEach(vm.weatherFiles, (w, index) => {
+          vm.weatherFiles[index] = _.replace(w, './', '');
+        });
+      }
+      else vm.$log.error('The weather file directory (%s) does not exist', vm.weatherDir.cwd());
+    } else {
+      vm.$log.debug('There is no weather directory defined (project not selected?)');
     }
-    else vm.$log.error('The weather file directory (%s) does not exist', vm.weatherDir.cwd());
+
   }
 
   setSeedsDropdownOptions() {
