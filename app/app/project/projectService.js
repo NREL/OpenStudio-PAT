@@ -37,8 +37,8 @@ export class Project {
       id: 'Radar Chart',
       name: 'reports.type.radarChart'
     }, {
-      id: 'EDAPT Chart',
-      name: 'reports.type.EDAPTReport'
+      id: 'EDAPT Export',
+      name: 'reports.type.edaptExport'
     }];
 
     vm.samplingMethods = vm.setSamplingMethods();
@@ -669,6 +669,7 @@ export class Project {
 
   setProjectName(name) {
     const vm = this;
+    vm.$log.debug('Project setProjectName name:', name);
     vm.projectName = name;
   }
 

@@ -1,6 +1,7 @@
 import jetpack from 'fs-jetpack';
 import {remote} from 'electron';
 import fs from 'fs';
+import path from 'path';
 
 const {dialog} = remote;
 
@@ -60,7 +61,7 @@ export class SetProject {
 
     // pop modal to get new project name
     vm.openModal().then(response => {
-      vm.$log.debug('response:', response);
+      vm.$log.debug('newProject response:', response);
 
       // pop modal to allow user to navigate to project parent folder
       const result = vm.dialog.showOpenDialog({
@@ -68,10 +69,9 @@ export class SetProject {
         properties: ['openDirectory']
       });
 
-
       if (!_.isEmpty(result)) {
-        const projectDir = jetpack.cwd(result[0]);
-        vm.$log.debug('PAT Project dir path:', projectDir.path());
+        let projectDir = jetpack.cwd(result[0]);
+        projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
         vm.OsServer.stopServer().then(response => {
           vm.$log.debug('SetProjectService::stop server: server stopped');
