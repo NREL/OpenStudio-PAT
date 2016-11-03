@@ -34,12 +34,12 @@
     "type": "OpenStudio-server"
   }],
   "openstudio": [{
-    "name": "OpenStudio2-1.13.1.807aa17127-Windows.tar.gz",
+    "name": "OpenStudio2-1.13.3.c8b1bd01ac-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "OpenStudio"
   }, {
-    "name": "OpenStudio2-1.13.1.ec682bda8a-darwin.tar.gz",
+    "name": "OpenStudio2-1.13.3.c8b1bd01ac-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio"
