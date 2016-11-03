@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <title>Something</title>
-  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width">
   <!--TODO Make this css injection work (replace hard-coded CSS paths below)-->
@@ -64,10 +64,12 @@
     </table>
 
     <h2>Runs to Export</h2>
-      <li>Only the checked rows will be exported</li>
-      <li>Only unique Measures are shown; always-run and reporting Measures are not shown</li>
-      <li>Single Measures are the focus of the PEA report</li>
-      <li>Design Alternatives are the focus of the FEA report, but Single Measure results will be included in a separate table</li>
+    <li>Only the checked rows will be exported</li>
+    <li>Only unique Measures are shown; always-run and reporting Measures are not shown</li>
+    <li>Single Measures are the focus of the PEA report</li>
+    <li>Design Alternatives are the focus of the FEA report, but Single Measure results will be included in a separate
+      table
+    </li>
     </ul>
     <table class="table-bordered table-condensed table-striped">
       <tr>
@@ -98,9 +100,11 @@
         </td>
       </tr>
     </table>
-
-    <button type="button" class="btn btn-success" ng-click="exportEDAPTXML()"><span class="glyphicon glyphicon-plus"
-                                                                                    aria-hidden="true"></span>
+    <br/>
+    <label class="medium-label">File Name</label>
+    <input ng-model="results_file_name" ng-change="updateResultsFilePath()">
+    <br/>
+    <button type="button" class="btn btn-success" ng-click="exportEDAPTXML()">
       <translate>Export EDAPT XML</translate>
     </button>
 
@@ -129,6 +133,15 @@
     .controller('MyAppCtrl', function ($scope) {
       // Bind the simulation results to a variable
       $scope.results = results;
+
+      // Create a variable for the file save location
+      $scope.results_file_name = "results";
+      $scope.results_file_path = reportDir + "/" + $scope.results_file_name + ".xml";
+
+      // Update the save location when the input changes
+      $scope.updateResultsFilePath = function () {
+        $scope.results_file_path = reportDir + "/" + $scope.results_file_name + ".xml";
+      };
 
       // Create variables for the baseline types
       $scope.eda_baseline = "";
@@ -422,20 +435,27 @@
           }
         };
 
-        // TODO use the correct directory
         // TODO Zip the file too
         // TODO show a success/fail message
-        var dirString = reportDir + "/results.xml";
 
         // Parse the JSON to XML
         var xmlText = js2xmlparser("analysis", analysis, options);
 
-        fs.writeFile(dirString, xmlText, function (err) {
+        // TODO Add the timestamp to the filename
+        //var nonWord = new RegExp("\W+","g");
+        //var timestamp = new Date().toLocaleString()
+        //console.log(timestamp);
+        //timestamp = timestamp.replace('/', '_').replace(',', '_').replace(':', '_').replace(' ', '_');
+        //console.log(timestamp);
+        //var save_path = $scope.results_file_path + "_" + timestamp;
+        var save_path = $scope.results_file_path;
+
+        fs.writeFile(save_path, xmlText, function (err) {
           if (err) {
             return console.log(err);
           }
-
-          console.log("The EDAPT XML report was saved to " + dirString);
+          window.alert("The EDAPT XML report was saved to " + save_path);
+          console.log("The EDAPT XML report was saved to " + save_path);
         });
       }
 
