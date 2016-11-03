@@ -1,0 +1,156 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Something</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <!--TODO Make this css injection work (replace hard-coded CSS paths below)-->
+  <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
+  <!-- inject:bootstrap -->
+  <!-- bootstrap css files will be automatically insert here -->
+  <!-- endinject -->
+  <!-- bower:css -->
+  <!-- run `gulp inject` to automatically populate bower styles dependencies -->
+  <!-- endbower -->
+  <!-- endbuild -->
+
+  <!-- build:css({.tmp/serve,src}) styles/app.css -->
+  <!-- inject:css -->
+  <!-- css files will be automatically insert here -->
+  <!-- endinject -->
+  <!-- endbuild -->
+  <link rel="stylesheet" href="/app/bootstrap.css">
+  <link rel="stylesheet" href="/app/index.css">
+  <!--TODO also include d3 in preload if not included in PAT-->
+  <script src="//d3js.org/d3.v4.min.js"></script>
+</head>
+<body>
+
+<div ng-app="myApp">
+
+  <div ng-controller="MyAppCtrl">
+
+    <h1>Scatter Plot</h1>
+
+    <d3ng-scatter x_var="x_var" y_var="y_var"></d3ng-scatter>
+
+    <h2 ng-model="something">{{ something }}</h2>
+
+  </div>
+
+</div>
+
+<script type="text/javascript">
+
+  console.info("Loaded Scatter Plot.html script");
+
+  var myApp = angular.module('myApp', []);
+
+  myApp.controller('MyAppCtrl', function ($scope) {
+    // Bind the simulation results to a variable
+    $scope.results = results;
+
+    $scope.something = "Initial Value";
+
+    console.log("something inside main controller = " + $scope.something);
+
+    // Find all the possible output variables to look at
+    $scope.out_vars = [];
+    _.forEach($scope.results, function (run) {
+      _.forEach(run.steps, function (measure) {
+        _.forEach(measure.result.step_values, function (output) {
+          $scope.out_vars.push(measure.measure_dir_name + "." + output.name);
+        });
+      });
+    });
+
+    // Set the default values
+    $scope.x_var = out_vars[0];
+    $scope.y_var = out_vars[0];
+
+    // Get the default data
+    data = getData(x_var, y_var);
+
+    // Returns an array of points, with keys x, y, and name
+    // given a specific x and y value.
+    function getXYData(x_var, y_var) {
+      var data = [];
+
+      _.forEach($scope.results, function (run) {
+        _.forEach(run.steps, function (measure) {
+          var run = [];
+          run.name = run.measure_dir_name;
+          run.x = _.find(run.steps, {'name': x_var)};
+          run.y = _.find(run.steps, {'name': y_var)};
+
+        });
+      });
+
+      $scope.data = data;
+
+
+      });
+
+
+
+
+
+
+
+
+
+    console.log("out_vars")
+    console.log($scope.out_vars);
+
+
+  });
+
+  // Angular directive to create a stacked bar chart
+  // comparing the end uses across models.
+  myApp.directive('d3ngStackedenduse', function () {
+
+    // constants
+    var total_width = 960;
+    var total_height = 500;
+
+    var margin = {top: 20, right: 90, bottom: 30, left: 40},
+      width = total_width - margin.left - margin.right,
+      height = total_height - margin.top - margin.bottom;
+
+    return {
+      restrict: 'E',
+      terminal: true,
+      scope: {
+        x_var: '=',
+        y_var: '=',
+        data: '='
+      },
+//      template: '<input type="text" ng-model="something">',
+      link: function (scope, element, attrs) {
+
+        scope.$watch('x_var', function (new_x_var, old_x_var) {
+
+//          console.log("something inside directive = " + newSomething);
+//
+//          scope.something = "Reset inside directive";
+//
+//          console.log("something inside directive = " + newSomething);
+
+
+
+
+
+
+        });
+
+      }
+    }
+  });
+
+
+</script>
+
+</body>
+</html>
