@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 export class RunController {
 
   constructor($log, Project, OsServer, $scope, $interval) {
@@ -9,12 +11,17 @@ export class RunController {
     vm.$scope = $scope;
     vm.Project = Project;
     vm.OsServer = OsServer;
+    vm.shell = shell;
 
     vm.runTypes = vm.Project.getRunTypes();
+    // TEMPORARY:  only show local server
+    vm.runTypes = _.filter(vm.runTypes, {name: 'local'});
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.OsServer.getAnalysisID();
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
     vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+    vm.$scope.datapoints = vm.OsServer.getDatapoints();
+    vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
     vm.$log.debug('SERVER STATUS: ', vm.$scope.serverStatus);
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
@@ -33,6 +40,9 @@ export class RunController {
     vm.$log.debug('Analysis Type: ', vm.$scope.selectedAnalysisType);
     vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod);
 
+    // TROUBLESHOOTING PANEL STATUS
+    vm.$scope.dev = {open: true};
+
   }
 
   setRunType() {
@@ -42,12 +52,12 @@ export class RunController {
 
   viewServer() {
     const vm = this;
-    require('shell').openExternal(vm.OsServer.getServerURL());
+    vm.shell.openExternal(vm.OsServer.getServerURL());
   }
 
-  stopServer() {
+  stopServer(force = false) {
     const vm = this;
-    vm.OsServer.stopServer().then(response => {
+    vm.OsServer.stopServer(force).then(response => {
       vm.$log.debug('***** Server Stopped *****');
 
       vm.OsServer.setProgressAmount(0);
@@ -62,6 +72,30 @@ export class RunController {
       vm.OsServer.setProgressMessage('Error Stopping Server');
       vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
       vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
+    });
+  }
+
+  // to start server on its own
+  startServer(force = false) {
+    const vm = this;
+
+    vm.OsServer.startServer(force).then(response => {
+
+      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+      vm.$log.debug('Server Status: ', vm.$scope.serverStatus);
+
+    }, response => {
+      vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
+    });
+  }
+
+  // check if server is alive, if so set its status to 'started', otherwise set status to 'stopped'
+  pingServer() {
+    const vm = this;
+    vm.OsServer.pingServer().then(response => {
+      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+    }, response => {
+      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
     });
   }
 
@@ -85,6 +119,12 @@ export class RunController {
     vm.OsServer.startServer().then(response => {
       vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
       vm.$log.debug('Start Server response: ', response);
+
+      // reset Analysis (clear out some variables)
+      vm.OsServer.resetAnalysis();
+      vm.$scope.analysisId = vm.OsServer.getAnalysisID();
+      vm.$scope.datapoints = vm.OsServer.getDatapoints();
+      vm.$scope.datapoints = vm.OsServer.getDatapoints();
 
       vm.OsServer.setProgressMessage('Server started');
       vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
@@ -123,44 +163,37 @@ export class RunController {
         vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
 
         vm.$scope.analysisID = vm.OsServer.getAnalysisID();
+        // create local results structure
+
 
         // 5: until complete, hit serverAPI for updates (errors, warnings, status)
-        vm.getStatus = vm.$interval(function() {
+        vm.getStatus = vm.$interval(function () {
 
-          vm.OsServer.retrieveAnalysisStatus().then( response => {
+          vm.OsServer.retrieveAnalysisStatus().then(response => {
             vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
 
             vm.$scope.analysisStatus = response.data.analysis.status;
             vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
 
-            vm.$scope.datapoints = response.data.analysis.data_points;
-            vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
+            vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
+            vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
+            vm.$log.debug('DATAPOINTS Status: ', vm.$scope.datapointsStatus);
 
-            // workaround until the item below is fixed
-            // vm.OsServer.setIsDone(true);
-            // vm.isDone = vm.OsServer.getIsDone();
-            //
-            // vm.$scope.datapoints = response.data.analysis.data_points;
-            //
-            // vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
-            // _.forEach(response.data.analysis.data_points, dp => {
-            //   if (dp.status != 'completed') {
-            //  vm.OsServer.setIsDone(false);
-            // vm.isDone = vm.OsServer.getIsDone();
-            //   }
-            // });
-            //
-            // if (vm.isDone) {
-            //   vm.OsServer.setAnalysisStatus('completed');
-            //   vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-            //   // cancel loop
-            //   vm.stopAnalysisStatus();
-            // }
+            // download/replace out.osw
+            // Should we do this only once at the end?
+            vm.OsServer.updateDatapoints().then( response2 => {
 
-            if (response.data.analysis.status == 'completed') {
-             // cancel loop
-             vm.stopAnalysisStatus('completed');
-            }
+              vm.$scope.datapoints = vm.OsServer.getDatapoints();
+              vm.$log.debug('update datapoints succeeded: ', response2);
+              if (response.data.analysis.status == 'completed') {
+                // cancel loop
+                vm.stopAnalysisStatus('completed');
+              }
+
+            }, response2 => {
+                // error in updateDatapoints
+                vm.$log.debug('update datapoints error: ', response2);
+            });
 
           }, response => {
             vm.$log.debug('analysis status retrieval error: ', response);
@@ -192,7 +225,7 @@ export class RunController {
   stopAnalysisStatus(status = 'completed') {
     const vm = this;
     vm.$log.debug('***** In runController::stopAnalysisStatus() *****');
-    if (angular.isDefined(vm.getStatus)){
+    if (angular.isDefined(vm.getStatus)) {
       vm.$interval.cancel(vm.getStatus);
       vm.getStatus = undefined;
     }
@@ -255,7 +288,7 @@ export class RunController {
       vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
       vm.toggleButtons();
       vm.OsServer.setProgressMessage('');
-      vm.$scope.progressMessage =  vm.OsServer.getProgressMessage();
+      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
       vm.OsServer.setProgressAmount(0);
       vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
 
@@ -264,7 +297,6 @@ export class RunController {
       vm.$log.debug('ERROR attempting to stop analysis / cancel run');
 
     });
-
 
 
   }

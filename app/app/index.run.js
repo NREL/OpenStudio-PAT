@@ -3,7 +3,7 @@
 import {remote} from 'electron';
 const {app, Menu, shell} = remote;
 
-export function runBlock($rootScope, $state, $window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer) {
+export function runBlock($rootScope, $state, $window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log) {
   'ngInject';
 
   $window.onbeforeunload = e => {
@@ -24,21 +24,31 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
     $document[0].body.appendChild(s);
   };
 
-  // Save pretty options when leaving analysis state (needed for PAT.json and for DesignAlternatives tab)
+
   $rootScope.$on('$stateChangeStart', function (event, toState, toParams, fromState, fromParams) {
+    // Save pretty options when leaving analysis state (needed for PAT.json and for DesignAlternatives tab)
     if (fromState.name == 'analysis') {
       Project.savePrettyOptions();
     }
+    // warn user that they need to cancel their run before moving from this state
     if (fromState.name == 'run' && ((OsServer.getAnalysisStatus() == 'starting') || (OsServer.getAnalysisStatus() == 'in progress'))) {
-      // warn user that they need to cancel their run before moving from this state
       event.preventDefault();
       OsServer.showAnalysisRunningDialog();
     }
 
   });
 
-  DependencyManager.checkDependencies()
-    .then(_.bind(MeasureManager.startMeasureManager, MeasureManager), _.bind(MeasureManager.startMeasureManager, MeasureManager));
+  // For now don't check for dependencies..wait for Kyle's new code
+  //DependencyManager.checkDependencies()
+  //  .then(_.bind(MeasureManager.startMeasureManager, MeasureManager), _.bind(MeasureManager.startMeasureManager, MeasureManager));
+  MeasureManager.startMeasureManager();
+
+  // open project and navigate to analysis tab
+  OpenProject.openModal().then(() => {
+    //$state.go('analysis');
+    $log.debug("RELOADING PAGE / NAVIGATE TO ANALYSIS PAGE");
+    $state.transitionTo('analysis', {}, {reload: true});
+  });
 
   const initialLanguage = $translate.use();
   const setLanguage = language => {
@@ -49,6 +59,21 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
   const fileMenu = {
     label: 'File',
     submenu: [{
+      label: 'New',
+      accelerator: 'Ctrl+N',
+      click: () => SetProject.newProject()
+    }, {
+      label: 'Open',
+      accelerator: 'Ctrl+O',
+      click: () => SetProject.openProject()
+    }, {
+      label: 'Save',
+      accelerator: 'Ctrl+S',
+      click: () => SetProject.saveProject()
+    }, {
+      label: 'Save As',
+      click: () => SetProject.saveAsProject()
+    }, {
       label: 'Quit',
       accelerator: 'Ctrl+Q',
       click: () => app.quit()
@@ -187,11 +212,38 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
       }, {
         label: 'Quit',
         accelerator: 'Command+Q',
-        click() {
+        click()    {
           app.quit();
         }
       }]
+    },{
+      label: 'File',
+      submenu: [{
+        label: 'New',
+        accelerator: 'Command+N',
+        click() {
+          SetProject.newProject();
+        }
+      }, {
+        label: 'Open',
+        accelerator: 'Command+O',
+        click() {
+          SetProject.openProject();
+        }
+      }, {
+        label: 'Save',
+        accelerator: 'Command+S',
+        click() {
+          SetProject.saveProject();
+        }
+      }, {
+        label: 'Save As',
+        click() {
+          SetProject.saveAsProject();
+        }
+      }]
     });
+
     // Window menu.
     template[3].submenu.push({
       type: 'separator'

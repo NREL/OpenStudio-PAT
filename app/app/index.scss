@@ -197,6 +197,10 @@ select {
   width: 100%;
 }
 
+.bold {
+  font-weight: bold;
+}
+
 .pad-bot-20 {
   padding-bottom: 20px;
 }
@@ -211,6 +215,14 @@ select {
 
 .pad-top-5 {
   padding-top: 5px;
+}
+
+.pad-top-100 {
+  padding-top:100px;
+}
+
+.pad-top-10 {
+  padding-top:10px;
 }
 
 .margin-top-20 {
@@ -366,6 +378,10 @@ select {
   color: #6CC16F;
 }
 
+.red-button {
+  color: #C9302C;
+}
+
 .blue-button {
   color: #519ED4;
 }
@@ -476,8 +492,12 @@ h5.measure-type {
   margin: 0;
 }
 
-.update-modal {
+.modal-p {
   font-size: 1.6em;
+}
+
+.tab-text {
+  font-size: 2em;
 }
 
 .black-line {

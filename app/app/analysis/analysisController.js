@@ -19,6 +19,7 @@ export class AnalysisController {
     vm.dialog = dialog;
 
     vm.projectDir = vm.Project.getProjectDir();
+    vm.projectName = vm.Project.getProjectName();
 
     vm.analysisTypes = vm.Project.getAnalysisTypes();
     vm.$scope.seeds = vm.Project.getSeeds();

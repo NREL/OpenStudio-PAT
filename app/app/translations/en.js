@@ -2,8 +2,20 @@ export default {
   dependency: {
     title: 'PAT Dependency Download Status'
   },
+  setProject: {
+    title: 'Select a Project',
+    blurb: 'Create a new or open an existing project',
+    make: 'Make New Project',
+    existing: 'Open Existing Project'
+  },
+  projectName: {
+    title: 'ParametricAnalysisTool',
+    heading: 'Enter New Project Name',
+    blurb: 'Enter the name for your new project, this will be the name of the directory containing your project. In the next step you will choose the location for your new project folder.'
+  },
   analysis: {
     title: 'Analysis',
+    projectName: 'Project Name',
     addMeasure: 'Add Measure',
     addMeasureOption: 'Add Measure Option',
     checkAll: 'Check All',
@@ -196,6 +208,7 @@ export default {
   },
   Algorithmic: 'Algorithmic',
   Cancel: 'Cancel',
+  Continue: 'Continue',
   Manual: 'Manual',
   OK: 'OK'
 };

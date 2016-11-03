@@ -1,5 +1,5 @@
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-sm-6">
     <uib-accordion close-others="false">
       <uib-accordion-group class="algorithm-custom" is-open="settings.open">
         <uib-accordion-heading>
@@ -8,7 +8,7 @@
         </uib-accordion-heading>
         <div ng-repeat="option in algorithmSettings">
           <div class="row">
-            <div class="col-md-10">
+            <div class="col-sm-10">
               <label for="{{option.name}}">{{option.name}}</label>
               <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}" ng-model="option.value">
             </div>
@@ -20,12 +20,12 @@
 </div>
 
 <div class="row">
-  <div class="col-md-6">
+  <div class="col-sm-6">
     <h5 class="inline measure-type" translate>analysis.openstudioMeasures</h5>
     <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
     <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ModelMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <translate>analysis.addMeasure</translate></button>
   </div>
-  <div class="col-md-6">
+  <div class="col-sm-6">
     <button type="button" class="btn btn-primary" ng-click="analysis.checkUpdates()"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> <translate>analysis.checkForUpdates</translate></button>
   </div>
 </div>
@@ -51,7 +51,7 @@
 </div>
 <hr class="black-line">
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-sm-12">
     <h5 class="inline measure-type" translate>analysis.energyplusMeasures</h5>
     <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
     <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('EnergyPlusMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <translate>analysis.addMeasure</translate></button>
@@ -80,7 +80,7 @@
 
 <hr class="black-line">
 <div class="row">
-  <div class="col-md-12">
+  <div class="col-sm-12">
     <h5 class="inline measure-type" translate>analysis.reportingMeasures</h5>
     <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
     <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ReportingMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <translate>analysis.addMeasure</translate></button>
