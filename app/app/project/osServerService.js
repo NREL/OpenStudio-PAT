@@ -63,7 +63,7 @@ export class OsServer {
     const vm = this;
     vm.setAnalysisChangedFlag(false);
     // reset analysis ID
-    vm.Project.setAnalysisID('');
+    vm.Project.setAnalysisID(null);
     vm.Project.setDatapoints([]);
     vm.setDatapointsStatus([]);
 
@@ -393,7 +393,7 @@ export class OsServer {
           // SUCCESS
           vm.$log.debug('Analysis Started');
           const analysis_arr = stdout.toString().split('request to run analysis ');
-          const analysis_id = _.last(analysis_arr);
+          const analysis_id = _.trim(_.last(analysis_arr), '\n');
           vm.$log.debug('ANALYSIS ID: ', analysis_id);
           deferred.resolve(analysis_id);
           vm.Project.setAnalysisID(analysis_id);
@@ -592,7 +592,7 @@ export class OsServer {
   stopAnalysis() {
     const vm = this;
     const deferred = vm.$q.defer();
-    const url = vm.serverURL + '/analyses/' + vm.Project.getAnalysisID + '/action.json';
+    const url = vm.serverURL + '/analyses/' + vm.Project.getAnalysisID() + '/action.json';
     const params = {analysis_action: 'stop'};
 
     if (vm.analysisStatus == 'completed') {

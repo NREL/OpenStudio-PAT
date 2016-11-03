@@ -159,6 +159,8 @@ export class Project {
         vm.openstudioServerMD5 = vm.pat.openstudioServerMD5 ? vm.pat.openstudioServerMD5 : vm.openstudioServerMD5;
         vm.openstudioCLIMD5 = vm.pat.openstudioCLIMD5 ? vm.pat.openstudioCLIMD5 : vm.openstudioCLIMD5;
         vm.openstudioMD5 = vm.pat.openstudioMD5 ? vm.pat.openstudioMD5 : vm.openstudioMD5;
+        vm.analysisID = vm.pat.analysisID ? vm.pat.analysisID : vm.analysisID;
+        vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
@@ -631,8 +633,8 @@ export class Project {
     vm.pat.designAlternatives = vm.designAlternatives;
 
     // run / results
-    vm.pat.analysisID = '';
-    vm.pat.datapoints = [];
+    vm.pat.analysisID = vm.analysisID;
+    vm.pat.datapoints = vm.datapoints;
 
     vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
     vm.$log.debug('Project exported to pat.json');
