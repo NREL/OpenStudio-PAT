@@ -50,7 +50,7 @@ export class SetProject {
         projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
         // for saveAs: copy old project's folder structure to new location (from, to)
-        vm.jetpack.copy(vm.Project.projectDir, projectDir);
+        vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
 
         vm.OsServer.stopServer().then(response => {
           vm.$log.debug('SetProjectService::stop server: server stopped');
