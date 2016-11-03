@@ -661,6 +661,7 @@ export class Project {
 
   setProjectName(name) {
     const vm = this;
+    vm.$log.debug('Project setProjectName name:', name);
     vm.projectName = name;
   }
 

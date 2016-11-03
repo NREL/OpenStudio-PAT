@@ -33,7 +33,7 @@ export class ModalOpenProjectController {
   newProject() {
     const vm = this;
     vm.$log.debug('ModalOpenProjectController::newProject');
-    vm.setProject.openProject().then(() => {
+    vm.setProject.newProject().then(() => {
       vm.$uibModalInstance.close();
     }, () => {
       vm.$uibModalInstance.close();
