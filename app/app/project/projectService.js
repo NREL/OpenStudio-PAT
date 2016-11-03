@@ -625,8 +625,8 @@ export class Project {
     vm.pat.designAlternatives = vm.designAlternatives;
 
     // run / results
-    vm.pat.analysisID = vm.OsServer.getAnalysisID();
-    vm.pat.datapoints = _.map(vm.OsServer.getDatapoints(), 'id');
+    vm.pat.analysisID = '';
+    vm.pat.datapoints = [];
 
     vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
     vm.$log.debug('Project exported to pat.json');

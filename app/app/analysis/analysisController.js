@@ -49,7 +49,7 @@ export class AnalysisController {
     vm.initializeGrids();
   }
 
-  initializeGrids() {
+   initializeGrids() {
     const vm = this;
     vm.$log.debug('In initializeGrids in analysis');
     vm.setMeasureTypes();
