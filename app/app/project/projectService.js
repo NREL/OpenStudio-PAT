@@ -69,6 +69,9 @@ export class Project {
     vm.measures = [];
     vm.designAlternatives = [];
 
+    vm.analysisID = '';
+    vm.datapoints = [];
+
     const src = jetpack.cwd(app.getPath('userData'));
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
 
@@ -103,6 +106,9 @@ export class Project {
     vm.measures = [];
     vm.designAlternatives = [];
     vm.osa = {};
+
+    vm.analysisID = '';
+    vm.datapoints = [];
 
     // TODO: still need these?
     vm.rubyMD5 = '';
@@ -694,6 +700,26 @@ export class Project {
     // initializeProject will also create the basic folder structure, if it is missing
     vm.initializeProject();
 
+  }
+
+  setAnalysisID(id) {
+    const vm = this;
+    vm.analysisID = id;
+  }
+
+  getAnalysisID() {
+    const vm = this;
+    return vm.analysisID;
+  }
+
+  setDatapoints(dps) {
+    const vm = this;
+    vm.datapoints = dps;
+  }
+
+  getDatapoints() {
+    const vm = this;
+    return vm.datapoints;
   }
 
   setDesignAlternatives(alts) {

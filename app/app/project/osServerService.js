@@ -23,10 +23,12 @@ export class OsServer {
     vm.progressAmount = 0;
     vm.progressMessage = '';
     vm.isDone = true;
-    vm.datapoints = [];
-    vm.datapointsStatus = [];
     vm.analysisChangedFlag = false;
-    vm.analysisID = null;
+
+    // store these in Project service so they can be exported
+    // vm.analysisID = null;
+    // vm.datapoints = [];
+    vm.datapointsStatus = [];
 
     vm.disabledButtons = false;  // display run or cancel button
 
@@ -61,8 +63,8 @@ export class OsServer {
     const vm = this;
     vm.setAnalysisChangedFlag(false);
     // reset analysis ID
-    vm.setAnalysisID('');
-    vm.setDatapoints([]);
+    vm.Project.setAnalysisID('');
+    vm.Project.setDatapoints([]);
     vm.setDatapointsStatus([]);
 
     // TODO: clear data from disk (?)
@@ -138,17 +140,6 @@ export class OsServer {
     vm.analysisChangedFlag = flag;
   }
 
-  // full datapoints (out.osw)
-  getDatapoints() {
-    const vm = this;
-    return vm.datapoints;
-  }
-
-  setDatapoints(datapoints) {
-    const vm = this;
-    vm.datapoints = datapoints;
-  }
-
   // short analysis status
   getDatapointsStatus() {
     const vm = this;
@@ -180,16 +171,6 @@ export class OsServer {
     vm.serverType = type;
   }
 
-  setAnalysisID(id) {
-    const vm = this;
-    vm.analysisID = id;
-  }
-
-  getAnalysisID() {
-    const vm = this;
-    return vm.analysisID;
-  }
-
   // ping server
   pingServer() {
     const vm = this;
@@ -209,7 +190,6 @@ export class OsServer {
       vm.serverStatus = 'stopped';
       deferred.reject(response);
     });
-
 
     return deferred.promise;
 
@@ -416,7 +396,7 @@ export class OsServer {
           const analysis_id = _.last(analysis_arr);
           vm.$log.debug('ANALYSIS ID: ', analysis_id);
           deferred.resolve(analysis_id);
-          vm.setAnalysisID(analysis_id);
+          vm.Project.setAnalysisID(analysis_id);
 
         } else {
           // TODO: cleanup?
@@ -514,7 +494,7 @@ export class OsServer {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    const url = vm.serverURL + '/analyses/' + vm.analysisID + '/status.json';
+    const url = vm.serverURL + '/analyses/' + vm.Project.getAnalysisID() + '/status.json';
     vm.$log.debug('Analysis Status URL: ', url);
     vm.$http.get(url).then(response => {
       // send json to run controller
@@ -522,7 +502,7 @@ export class OsServer {
       deferred.resolve(response);
 
     }, response => {
-      vm.$log.debug('ERROR getting status for analysis ', vm.analysisID);
+      vm.$log.debug('ERROR getting status for analysis ', vm.Project.getAnalysisID());
       deferred.reject(response);
     });
 
@@ -535,6 +515,8 @@ export class OsServer {
     const vm = this;
     const deferred = vm.$q.defer();
     const promises = [];
+
+    vm.datapoints = vm.Project.getDatapoints();
 
     _.forEach(vm.datapointsStatus, (dp) => {
       vm.$log.debug("DATAPOINT STATUS: ", dp);
@@ -562,7 +544,7 @@ export class OsServer {
           // append datapoint to array
           vm.datapoints.push(datapoint);
         }
-        vm.$log.debug('DATAPOINTS NOW: ', vm.datapoints);
+        vm.$log.debug('PROJECT DATAPOINTS NOW: ', vm.Project.getDatapoints());
 
       }, error => {
         vm.$log.debug('GET DATAPOINT OUT.OSW ERROR (file probably not created yet): ', error);
@@ -587,6 +569,7 @@ export class OsServer {
               vm.datapoints.push(datapoint);
             }
 
+
           }, error2 => {
             vm.$log.debug('GET Datapoint.json ERROR: ', error2);
           });
@@ -609,7 +592,7 @@ export class OsServer {
   stopAnalysis() {
     const vm = this;
     const deferred = vm.$q.defer();
-    const url = vm.serverURL + '/analyses/' + vm.analysisID + '/action.json';
+    const url = vm.serverURL + '/analyses/' + vm.Project.getAnalysisID + '/action.json';
     const params = {analysis_action: 'stop'};
 
     if (vm.analysisStatus == 'completed') {
