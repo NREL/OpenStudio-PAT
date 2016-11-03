@@ -33,6 +33,7 @@ export class SetProject {
   saveAsProject() {
     const vm = this;
     vm.$log.debug('saveAsProject');
+    const deferred = vm.$q.defer();
 
     // pop modal to get new project name
     vm.openModal().then(response => {
@@ -45,13 +46,40 @@ export class SetProject {
       });
 
       if (!_.isEmpty(result)) {
-        const projectPath = result[0];
-        const newProjectDir = jetpack.cwd(projectPath + '/' + vm.Project.projectName);
-        vm.$log.error('newProjectDir:', newProjectDir);
+        let projectDir = jetpack.cwd(result[0]);
+        projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
-        vm.copyProjectAndRelaunchUpdatedServer(newProjectDir.path());
+        // for saveAs: copy old project's folder structure to new location (from, to)
+        vm.jetpack.copy(vm.Project.projectDir, projectDir);
+
+        vm.OsServer.stopServer().then(response => {
+          vm.$log.debug('SetProjectService::stop server: server stopped');
+          vm.$log.debug('response: ', response);
+
+          // set project Variables
+          vm.setProjectVariables(projectDir);
+
+          // resolve promise
+          deferred.resolve('resolve');
+          // start server at new location
+          vm.OsServer.startServer().then(response => {
+            vm.$log.debug('setProjectService::start server: server started');
+            vm.$log.debug('response: ', response);
+            vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+          });
+
+        }, (error) => {
+          vm.$log.debug('stop server errored, but setting project anyway');
+          // set project Variables anyway
+          vm.setProjectVariables(projectDir);
+
+          deferred.reject('rejected');
+        });
+      } else {
+        deferred.reject('rejected');
       }
     });
+    return deferred.promise;
   }
 
   newProject() {
@@ -214,30 +242,6 @@ export class SetProject {
 
     // BCL service variables
     vm.BCL.resetProjectVariables();
-  }
-
-  copyProjectAndRelaunchUpdatedServer(projectDir) {
-    const vm = this;
-
-    // Stop server before changing projectDir
-    vm.OsServer.stopServer().then(response => {
-
-      vm.$log.debug('setProjectService::relaunchUpdatedServer2() server stopped');
-      vm.$log.debug('response: ', response);
-
-      // for saveAs: copy old project's folder structure to new location (from, to)
-      vm.jetpack.copy(vm.Project.projectDir, projectDir);
-
-      // update osServer's project location
-      vm.Project.setProject(projectDir);
-      vm.Project.initializeProject();
-
-      // start server at new location
-      vm.OsServer.startServer().then(response => {
-        vm.$log.debug('setProjectService::relaunchUpdatedServer2() server started');
-        vm.$log.debug('response: ', response);
-      });
-    });
   }
 
 }
