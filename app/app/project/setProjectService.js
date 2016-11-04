@@ -1,6 +1,7 @@
 import jetpack from 'fs-jetpack';
 import {remote} from 'electron';
 import fs from 'fs';
+import path from 'path';
 
 const {dialog} = remote;
 
@@ -32,6 +33,7 @@ export class SetProject {
   saveAsProject() {
     const vm = this;
     vm.$log.debug('saveAsProject');
+    const deferred = vm.$q.defer();
 
     // pop modal to get new project name
     vm.openModal().then(response => {
@@ -44,22 +46,50 @@ export class SetProject {
       });
 
       if (!_.isEmpty(result)) {
-        const projectPath = result[0];
-        const newProjectDir = jetpack.cwd(projectPath + '/' + vm.Project.projectName);
-        vm.$log.error('newProjectDir:', newProjectDir);
+        let projectDir = jetpack.cwd(result[0]);
+        projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
-        vm.copyProjectAndRelaunchUpdatedServer(newProjectDir.path());
+        // for saveAs: copy old project's folder structure to new location (from, to)
+        vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
+
+        vm.OsServer.stopServer().then(response => {
+          vm.$log.debug('SetProjectService::stop server: server stopped');
+          vm.$log.debug('response: ', response);
+
+          // set project Variables
+          vm.setProjectVariables(projectDir);
+
+          // resolve promise
+          deferred.resolve('resolve');
+          // start server at new location
+          vm.OsServer.startServer().then(response => {
+            vm.$log.debug('setProjectService::start server: server started');
+            vm.$log.debug('response: ', response);
+            vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+          });
+
+        }, (error) => {
+          vm.$log.debug('stop server errored, but setting project anyway');
+          // set project Variables anyway
+          vm.setProjectVariables(projectDir);
+
+          deferred.reject('rejected');
+        });
+      } else {
+        deferred.reject('rejected');
       }
     });
+    return deferred.promise;
   }
 
   newProject() {
     const vm = this;
     vm.$log.debug('newProject');
+    const deferred = vm.$q.defer();
 
     // pop modal to get new project name
     vm.openModal().then(response => {
-      vm.$log.debug('response:', response);
+      vm.$log.debug('newProject response:', response);
 
       // pop modal to allow user to navigate to project parent folder
       const result = vm.dialog.showOpenDialog({
@@ -68,14 +98,37 @@ export class SetProject {
       });
 
       if (!_.isEmpty(result)) {
-        const projectPath = result[0];
+        let projectDir = jetpack.cwd(result[0]);
+        projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
-        const newProjectDir = jetpack.cwd(projectPath + '/' + vm.Project.projectName);
-        vm.$log.debug('newProjectDir:', newProjectDir);
+        vm.OsServer.stopServer().then(response => {
+          vm.$log.debug('SetProjectService::stop server: server stopped');
+          vm.$log.debug('response: ', response);
 
-        vm.relaunchUpdatedServer(newProjectDir.path());
+          // set project Variables
+          vm.setProjectVariables(projectDir);
+
+          // resolve promise
+          deferred.resolve('resolve');
+          // start server at new location
+          vm.OsServer.startServer().then(response => {
+            vm.$log.debug('setProjectService::start server: server started');
+            vm.$log.debug('response: ', response);
+            vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+          });
+
+        }, (error) => {
+          vm.$log.debug('stop server errored, but setting project anyway');
+          // set project Variables anyway
+          vm.setProjectVariables(projectDir);
+
+          deferred.reject('rejected');
+        });
+      } else {
+        deferred.reject('rejected');
       }
     });
+    return deferred.promise;
   }
 
   openProject() {
@@ -89,14 +142,12 @@ export class SetProject {
     });
 
     if (!_.isEmpty(result)) {
-      const projectDir =  jetpack.cwd(result[0]);
+      const projectDir = jetpack.cwd(result[0]);
       vm.$log.debug('PAT Project dir path:', projectDir.path());
-      const foldername = projectDir.path().replace(/^.*[\\\/]/, '');
-      vm.$log.debug('PAT Project folder name:', foldername);
 
       const fullFilename = projectDir.path('pat.json');
 
-      // foldername must contain "pat.json"
+      // projectDir must contain "pat.json"
       let fileExists = false;
       vm.$log.debug('checking for ', fullFilename);
       const file = vm.jetpack.read(fullFilename);
@@ -191,56 +242,6 @@ export class SetProject {
 
     // BCL service variables
     vm.BCL.resetProjectVariables();
-
-  }
-
-
-   // TODO: EVAN: DEPRECATE
-  relaunchUpdatedServer(projectDir) {
-    const vm = this;
-
-    // Stop server before changing projectDir
-    vm.OsServer.stopServer().then(response => {
-
-      vm.$log.debug('setProjectService::relaunchUpdatedServer() server stopped');
-      vm.$log.debug('response: ', response);
-
-      // update osServer's project location
-      vm.Project.setProject(projectDir);
-      // initializeProject will also create the basic folder structure, if it is missing
-      vm.Project.initializeProject();
-
-      // start server at new location
-      vm.OsServer.startServer().then(response => {
-        vm.$log.debug('setProjectService::relaunchUpdatedServer() server started');
-        vm.$log.debug('response: ', response);
-      });
-    });
-  }
-
-
-  copyProjectAndRelaunchUpdatedServer(projectDir) {
-    const vm = this;
-
-    // Stop server before changing projectDir
-    vm.OsServer.stopServer().then(response => {
-
-      vm.$log.debug('setProjectService::relaunchUpdatedServer2() server stopped');
-      vm.$log.debug('response: ', response);
-
-      // for saveAs: copy old project's folder structure to new location (from, to)
-      vm.jetpack.copy(vm.Project.projectDir, projectDir);
-
-      // update osServer's project location
-      vm.Project.setProject(projectDir);
-      vm.Project.initializeProject();
-
-      // start server at new location
-      vm.OsServer.startServer().then(response => {
-        vm.$log.debug('setProjectService::relaunchUpdatedServer2() server started');
-        vm.$log.debug('response: ', response);
-      });
-    });
   }
 
 }

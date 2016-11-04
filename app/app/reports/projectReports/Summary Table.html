@@ -1,0 +1,223 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Something</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <!--TODO Make this css injection work (replace hard-coded CSS paths below)-->
+  <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
+  <!-- inject:bootstrap -->
+  <!-- bootstrap css files will be automatically insert here -->
+  <!-- endinject -->
+  <!-- bower:css -->
+  <!-- run `gulp inject` to automatically populate bower styles dependencies -->
+  <!-- endbower -->
+  <!-- endbuild -->
+
+  <!-- build:css({.tmp/serve,src}) styles/app.css -->
+  <!-- inject:css -->
+  <!-- css files will be automatically insert here -->
+  <!-- endinject -->
+  <!-- endbuild -->
+  <link rel="stylesheet" href="/app/bootstrap.css">
+  <link rel="stylesheet" href="/app/index.css">
+</head>
+<body>
+
+<div ng-app="myApp">
+
+  <div ng-controller="MyAppCtrl">
+
+    <h1>Summary Table</h1>
+    <table class="table-bordered table-condensed">
+      <tr>
+        <th>Name</th>
+        <th>Measures</th>
+        <th>Energy Use Intensity (kBtu/ft2-yr)</th>
+        <th>Peak Electric Demand (kW)</th>
+        <th>Electricity Consumption (kWh)</th>
+        <th>Natural Gas Consumption (Million Btu)</th>
+        <th>District Cooling Consumption (Million Btu)</th>
+        <th>District Heating Consumption (Million Btu)</th>
+        <th>First Year Capital Cost ($)</th>
+        <th>Annual Utility Cost ($)</th>
+        <th></th>
+        <th>Total LCC ($)</th>
+      </tr>
+      <tr>
+        <td><select ng-model="baseline_name" ng-change="updateBaseline()">
+          <option ng-repeat="run in results">{{run.name}}</option>
+        </select>
+        </td>
+        <td>
+          <ul>
+            <li ng-repeat="measure_name in run.measure_names">{{ measure_name }}</li>
+          </ul>
+        </td>
+        <td>{{ baseline.eui | number:1}}</td>
+        <td>{{ baseline.peak_electric_demand_ip | number:1}}</td>
+        <td>{{ baseline.electricity_ip | number:1}}</td>
+        <td>{{ baseline.natural_gas_ip | number:1}}</td>
+        <td>{{ baseline.district_cooling_cooling_ip | number:1}}</td>
+        <td>{{ baseline.district_heating_ip | number:1}}</td>
+        <td>{{ baseline.first_year_cap_cost | number:1}}</td>
+        <td>{{ baseline.ann_util_cost | number:1}}</td>
+        <td></td>
+        <td>{{ baseline.total_lcc }}</td>
+      </tr>
+      <tr>
+        <th>Name</th>
+        <th>Measures</th>
+        <th>Energy Use Intensity Reduction (kBtu/ft2-yr)</th>
+        <th>Peak Electric Demand Reduction (kW)</th>
+        <th>Electricity Savings (kWh)</th>
+        <th>Natural Gas Savings (Million Btu)</th>
+        <th>District Cooling Savings (Million Btu)</th>
+        <th>District Heating Savings (Million Btu)</th>
+        <th>First Year Capital Cost Increase ($)</th>
+        <th>Annual Utility Cost Savings ($)</th>
+        <th>Simple Payback (years)</th>
+        <th>Total LCC Savings($)</th>
+      </tr>
+      <tr ng-repeat="run in results">
+        <td>{{ run.name }}</td>
+        <td>
+          <ul>
+            <li ng-repeat="measure_name in run.measure_names">{{ measure_name }}</li>
+          </ul>
+        </td>
+        <td>{{ baseline.eui - run.eui | number:1}}</td>
+        <td>{{ baseline.peak_electric_demand_ip - run.peak_electric_demand_ip | number:1}}</td>
+        <td>{{ baseline.electricity_ip - run.electricity_ip | number:1}}</td>
+        <td>{{ baseline.natural_gas_ip - run.natural_gas_ip | number:1}}</td>
+        <td>{{ baseline.district_cooling_cooling_ip - run.district_cooling_cooling_ip | number:1}}</td>
+        <td>{{ baseline.district_heating_ip - run.district_heating_ip | number:1}}</td>
+        <td>{{ baseline.first_year_cap_cost - run.first_year_cap_cost | number:1}}</td>
+        <td>{{ baseline.ann_util_cost - run.ann_util_cost | number:1}}</td>
+        <td>{{ (baseline.first_year_cap_cost - run.first_year_cap_cost) / (baseline.ann_util_cost - run.ann_util_cost) | number:1}}</td>
+        <td>{{ baseline.total_lcc - run.total_lcc | number:1}}</td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+
+  console.info("Loaded Summary Table.html script");
+
+  angular.module('myApp', [])
+    .controller('MyAppCtrl', function ($scope) {
+      // Bind the simulation results to a variable
+      $scope.results = results;
+
+      // Create variables for the baseline
+      $scope.baseline_name = "";
+      $scope.baseline = "";
+
+      // Update the baseline based on the selected name
+      $scope.updateBaseline = function() {
+        _.forEach($scope.results, function (run) {
+          if (run.name == $scope.baseline_name) {
+            $scope.baseline = run;
+          }
+        });
+      };
+
+      // Get the unique measure counts
+      // TODO make sure to check the arguments AND
+      // whether or not the measure is present in a run,
+      // because you could have a situation where the same
+      // measure is run for all alternatives with different
+      // arguments
+      var measureCounts = {};
+      var numAlts = 0;
+      _.forEach($scope.results, function (run) {
+        $scope.numAlts += 1;
+        _.forEach(run.steps, function (step) {
+          if (step.measure_dir_name) {
+            if (measureCounts[step.measure_dir_name]) {
+              measureCounts[step.measure_dir_name] += 1;
+            } else {
+              measureCounts[step.measure_dir_name] = 1;
+            }
+          }
+        });
+      });
+
+      // Set the measure_names property of each run
+      _.forEach($scope.results, function (run) {
+        run.measure_names = measureNames(run, measureCounts, numAlts);
+      });
+
+      // Set the energy results properties of each run
+      _.forEach($scope.results, function (run) {
+        // Get the openstudio reporting measure, which contains the results
+        var reportMeasure = _.find(run.steps, {'measure_dir_name': "standard_reports"});
+        if (!reportMeasure) {
+          console.error("Could not find the standard reports measure.")
+        }
+
+        // Get the report values
+        var vals = reportMeasure.result.step_values;
+
+        // EUI
+        run.eui = _.find(vals, {'name': "eui"}).value;
+
+        // Peak Electric Demand
+        run.peak_electric_demand_ip = "TODO kW";
+
+        // Electricity Consumption
+        run.electricity_ip = _.find(vals, {'name': "electricity_ip"}).value;
+
+        // Natural Gas Consumption
+        run.natural_gas_ip = _.find(vals, {'name': "natural_gas_ip"}).value;
+
+        //District Cooling Consumption
+        run.district_cooling_cooling_ip = _.find(vals, {'name': "district_cooling_cooling_ip"}).value;
+
+        // District Heating Consumption
+        run.district_heating_ip = _.find(vals, {'name': "district_heating_ip"}).value;
+
+        // First Year Capital Cost
+        run.first_year_cap_cost = "TODO Cap $";
+
+        // Annual Utility Cost
+        run.ann_util_cost = "TODO Util $";
+
+        // Total LCC
+        run.total_lcc = "TODO LCC";
+
+      });
+
+    });
+
+  // returns a list of the user-entered measure names for
+  // a given design alternative.  Does not include
+  function measureNames(alternative, measureCounts, numAlts) {
+    var names = [];
+
+    _(alternative.steps).forEach(function (step) {
+
+      // skip always-run measures
+      if (measureCounts[step.measure_dir_name] == numAlts) {
+        // console.log("Skipping " + step.measure_dir_name + " because it is an always-run Measure.");
+        return;
+      }
+
+      if (step.name) {
+        names.push(step.name);
+      }
+
+    });
+
+    return names;
+
+  }
+
+</script>
+
+</body>
+</html>

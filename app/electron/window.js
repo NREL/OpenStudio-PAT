@@ -6,6 +6,8 @@
 import {app, BrowserWindow, screen} from 'electron';
 import jetpack from 'fs-jetpack';
 
+global.exitClicked = false;
+
 export default function (name, options) {
 
   var userDataDir = jetpack.cwd(app.getPath('userData'));
@@ -67,6 +69,7 @@ export default function (name, options) {
   };
 
   var saveState = function () {
+    global.exitClicked = true;
     if (!win.isMinimized() && !win.isMaximized()) {
       Object.assign(state, getCurrentPosition());
     }

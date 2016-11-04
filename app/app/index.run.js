@@ -2,18 +2,61 @@
 
 import {remote} from 'electron';
 const {app, Menu, shell} = remote;
+import jetpack from 'fs-jetpack';
 
-export function runBlock($rootScope, $state, $window, $document, $translate, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log) {
+export function runBlock($rootScope, $state, $window, $document, $translate, toastr, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log) {
   'ngInject';
 
-  $window.onbeforeunload = e => {
-    Project.exportPAT();
-    MeasureManager.stopMeasureManager();
-    OsServer.stopServer().then(response => {
-      //  server is stopped
-    });
+  let exitReady = false;
 
-    // Prevent exit
+  $window.onbeforeunload = e => {
+    console.log('EXIT BUTTON CLICKED?: ', remote.getGlobal('exitClicked'));
+    if (!exitReady && remote.getGlobal('exitClicked')){
+
+      try {
+        // only if project is set
+        if (Project.getProjectDir() != null) {
+          e.returnValue = false;
+          toastr.info('Preparing to Exit');
+          Project.exportPAT();
+          MeasureManager.stopMeasureManager();
+
+          OsServer.stopServer(true).then(response => {
+            //  server is stopped
+            // for debug: save a random file to make sure server is stopped (when a project is selected)
+            jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
+              status: OsServer.getServerStatus(),
+              stopServer: 'success',
+              response: response
+            });
+            exitReady = true;
+            app.quit();
+
+          }, error => {
+            jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
+              status: OsServer.getServerStatus(),
+              stopServer: 'fail',
+              response: error
+            });
+            exitReady = true;
+            app.quit();
+          });
+        } else {
+          // nothing to do, exit.
+          exitReady = true;
+          app.quit();
+        }
+      } catch(e) {
+        // TODO: log something to a file
+        if (Project.getProjectDir() != null){
+          jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'There was an error closing the app.'});
+        }
+        exitReady = true;
+        app.quit();
+      }
+    }
+
+    // Prevent exit.  Uncomment to test
     //e.returnValue = false;
   };
 
@@ -46,7 +89,7 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
   // open project and navigate to analysis tab
   OpenProject.openModal().then(() => {
     //$state.go('analysis');
-    $log.debug("RELOADING PAGE / NAVIGATE TO ANALYSIS PAGE");
+    $log.debug('RELOADING PAGE / NAVIGATE TO ANALYSIS PAGE');
     $state.transitionTo('analysis', {}, {reload: true});
   });
 
@@ -212,11 +255,11 @@ export function runBlock($rootScope, $state, $window, $document, $translate, Mea
       }, {
         label: 'Quit',
         accelerator: 'Command+Q',
-        click()    {
+        click() {
           app.quit();
         }
       }]
-    },{
+    }, {
       label: 'File',
       submenu: [{
         label: 'New',

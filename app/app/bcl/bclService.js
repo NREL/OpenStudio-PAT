@@ -126,7 +126,7 @@ export class BCL {
   checkForUpdatesLocalBcl() {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug("in BCLService checkForUpdatesLocalBcl method");
+    vm.$log.debug('in BCLService checkForUpdatesLocalBcl method');
     vm.MeasureManager.isReady().then( () => {
       vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates LocalBCL...');
       // the path doesn't work if the trailing slash isn't there!
@@ -134,13 +134,13 @@ export class BCL {
         const newMeasures = [];
         vm.$log.debug('measureManager updates done');
         // update LocalBCL Directory and rerun prepare measure
-        vm.$log.debug("CHECKING FOR UPDATES from ONLINE BCL...");
+        vm.$log.debug('CHECKING FOR UPDATES from ONLINE BCL...');
         _.forEach(updatedMeasures, (measure) => {
           measure = vm.prepareMeasure(measure, 'local');
 
           // measure update from BCL?
           const bclMatch = _.find(vm.libMeasures.bcl, {uid: measure.uid});
-          vm.$log.debug("BCL MATCH: ", bclMatch);
+          vm.$log.debug('BCL MATCH: ', bclMatch);
 
           measure.bcl_update = false;
           let bclChangedDate = null;
@@ -148,7 +148,7 @@ export class BCL {
           if (angular.isDefined(bclMatch)) {
             // for now compare the 'changed' date from the BCL search API to the version_modified from measureManager updateMeasure
             bclChangedDate = new Date(bclMatch.changed);
-            localVersionModified = new Date(measure.version_modified + " UTC");  // returned in UTC from measureManager
+            localVersionModified = new Date(measure.version_modified + ' UTC');  // returned in UTC from measureManager
             if (bclChangedDate > localVersionModified) {
               // bcl update
               measure.bcl_update = true;

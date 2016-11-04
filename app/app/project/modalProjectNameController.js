@@ -17,6 +17,7 @@ export class ModalProjectNameController {
 
   ok() {
     const vm = this;
+    vm.$log.debug('ModalProjectNameController ok');
     vm.project.setProjectName(vm.$scope.name);
     vm.$uibModalInstance.close();
   }

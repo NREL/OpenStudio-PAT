@@ -37,8 +37,8 @@ export class Project {
       id: 'Radar Chart',
       name: 'reports.type.radarChart'
     }, {
-      id: 'EDAPT Chart',
-      name: 'reports.type.EDAPTReport'
+      id: 'EDAPT Export',
+      name: 'reports.type.edaptExport'
     }];
 
     vm.samplingMethods = vm.setSamplingMethods();
@@ -68,6 +68,9 @@ export class Project {
     vm.algorithmSettings = [];
     vm.measures = [];
     vm.designAlternatives = [];
+
+    vm.analysisID = '';
+    vm.datapoints = [];
 
     const src = jetpack.cwd(app.getPath('userData'));
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
@@ -103,6 +106,9 @@ export class Project {
     vm.measures = [];
     vm.designAlternatives = [];
     vm.osa = {};
+
+    vm.analysisID = '';
+    vm.datapoints = [];
 
     // TODO: still need these?
     vm.rubyMD5 = '';
@@ -153,6 +159,8 @@ export class Project {
         vm.openstudioServerMD5 = vm.pat.openstudioServerMD5 ? vm.pat.openstudioServerMD5 : vm.openstudioServerMD5;
         vm.openstudioCLIMD5 = vm.pat.openstudioCLIMD5 ? vm.pat.openstudioCLIMD5 : vm.openstudioCLIMD5;
         vm.openstudioMD5 = vm.pat.openstudioMD5 ? vm.pat.openstudioMD5 : vm.openstudioMD5;
+        vm.analysisID = vm.pat.analysisID ? vm.pat.analysisID : vm.analysisID;
+        vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
@@ -625,8 +633,8 @@ export class Project {
     vm.pat.designAlternatives = vm.designAlternatives;
 
     // run / results
-    vm.pat.analysisID = vm.OsServer.getAnalysisID();
-    vm.pat.datapoints = _.map(vm.OsServer.getDatapoints(), 'id');
+    vm.pat.analysisID = vm.analysisID;
+    vm.pat.datapoints = vm.datapoints;
 
     vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
     vm.$log.debug('Project exported to pat.json');
@@ -661,6 +669,7 @@ export class Project {
 
   setProjectName(name) {
     const vm = this;
+    vm.$log.debug('Project setProjectName name:', name);
     vm.projectName = name;
   }
 
@@ -694,6 +703,26 @@ export class Project {
     // initializeProject will also create the basic folder structure, if it is missing
     vm.initializeProject();
 
+  }
+
+  setAnalysisID(id) {
+    const vm = this;
+    vm.analysisID = id;
+  }
+
+  getAnalysisID() {
+    const vm = this;
+    return vm.analysisID;
+  }
+
+  setDatapoints(dps) {
+    const vm = this;
+    vm.datapoints = dps;
+  }
+
+  getDatapoints() {
+    const vm = this;
+    return vm.datapoints;
   }
 
   setDesignAlternatives(alts) {

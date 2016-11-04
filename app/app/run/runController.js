@@ -17,10 +17,11 @@ export class RunController {
     // TEMPORARY:  only show local server
     vm.runTypes = _.filter(vm.runTypes, {name: 'local'});
     vm.$scope.selectedRunType = vm.Project.getRunType();
-    vm.$scope.analysisID = vm.OsServer.getAnalysisID();
+    vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
     vm.$scope.serverStatus = vm.OsServer.getServerStatus();
-    vm.$scope.datapoints = vm.OsServer.getDatapoints();
+    vm.$scope.datapoints = vm.Project.getDatapoints();
+    // TODO: do we still need datapointsStatus?
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
     vm.$log.debug('SERVER STATUS: ', vm.$scope.serverStatus);
 
@@ -29,10 +30,6 @@ export class RunController {
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
     vm.$log.debug('DISABLED BUTTONS? ', vm.$scope.disabledButtons);
     vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
-
-    vm.$scope.datapoints = vm.OsServer.getDatapoints();
-
-    // TODO: refresh this
     vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
 
     // DEBUG
@@ -122,9 +119,9 @@ export class RunController {
 
       // reset Analysis (clear out some variables)
       vm.OsServer.resetAnalysis();
-      vm.$scope.analysisId = vm.OsServer.getAnalysisID();
-      vm.$scope.datapoints = vm.OsServer.getDatapoints();
-      vm.$scope.datapoints = vm.OsServer.getDatapoints();
+      vm.$scope.analysisID = vm.Project.getAnalysisID();
+      vm.$scope.datapoints = vm.Project.getDatapoints();
+      vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
 
       vm.OsServer.setProgressMessage('Server started');
       vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
@@ -162,7 +159,7 @@ export class RunController {
         vm.OsServer.setProgressAmount(45);
         vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
 
-        vm.$scope.analysisID = vm.OsServer.getAnalysisID();
+        vm.$scope.analysisID = vm.Project.getAnalysisID();
         // create local results structure
 
 
@@ -183,7 +180,7 @@ export class RunController {
             // Should we do this only once at the end?
             vm.OsServer.updateDatapoints().then( response2 => {
 
-              vm.$scope.datapoints = vm.OsServer.getDatapoints();
+              vm.$scope.datapoints = vm.Project.getDatapoints();
               vm.$log.debug('update datapoints succeeded: ', response2);
               if (response.data.analysis.status == 'completed') {
                 // cancel loop
