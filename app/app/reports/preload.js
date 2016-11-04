@@ -19,7 +19,7 @@ var jetpack = require('fs-jetpack');
 console.info('Preloading simulation results.');
 
 // Keep for now
-results = [
+const results = [
   {
     name: 'Baseline',
     description: 'Baseline\'s description',
@@ -21723,4 +21723,4 @@ results = [
 
 // TODO decide where any exported files should be saved
 console.info('Preloading report output directory.');
-reportDir = os.homedir() + 'Openstudio/PAT/Project_Reporting_Measures';
+const reportDir = os.homedir() + 'Openstudio/PAT/Project_Reporting_Measures';
