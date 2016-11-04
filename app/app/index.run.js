@@ -10,8 +10,8 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
   let exitReady = false;
 
   $window.onbeforeunload = e => {
-
-    if (!exitReady){
+    console.log('EXIT BUTTON CLICKED?: ', remote.getGlobal('exitClicked'));
+    if (!exitReady && remote.getGlobal('exitClicked')){
 
       try {
         // only if project is set
@@ -89,7 +89,7 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
   // open project and navigate to analysis tab
   OpenProject.openModal().then(() => {
     //$state.go('analysis');
-    $log.debug("RELOADING PAGE / NAVIGATE TO ANALYSIS PAGE");
+    $log.debug('RELOADING PAGE / NAVIGATE TO ANALYSIS PAGE');
     $state.transitionTo('analysis', {}, {reload: true});
   });
 
@@ -255,11 +255,11 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
       }, {
         label: 'Quit',
         accelerator: 'Command+Q',
-        click()    {
+        click() {
           app.quit();
         }
       }]
-    },{
+    }, {
       label: 'File',
       submenu: [{
         label: 'New',

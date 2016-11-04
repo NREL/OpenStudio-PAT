@@ -446,7 +446,7 @@ export class OsServer {
     const serverType = vm.Project.getRunType();
 
      //if (vm.serverStatus == 'started' && vm.Project.projectDir != undefined) {
-    if ((vm.serverStatus == vm.serverStatus  && vm.Project.projectDir != null) || force) { // TODO This should be removed when the line above is fixed -- serverStatus needs to correctly update
+    if ((vm.serverStatus == vm.serverStatus && vm.Project.projectDir != null) || force) { // TODO This should be removed when the line above is fixed -- serverStatus needs to correctly update
 
       if (serverType.name == 'local') {
         vm.$log.debug('vm.Project:', vm.Project);
@@ -519,7 +519,7 @@ export class OsServer {
     vm.datapoints = vm.Project.getDatapoints();
 
     _.forEach(vm.datapointsStatus, (dp) => {
-      vm.$log.debug("DATAPOINT STATUS: ", dp);
+      vm.$log.debug('DATAPOINT STATUS: ', dp);
       const url = vm.serverURL + '/data_points/' + dp.id + '/download_result_file';
       const params = {filename: 'out.osw'};
       const config = { params: params, headers : {Accept: 'application/json'} };
