@@ -10,7 +10,8 @@ var conf = require('./conf');
 var utils = require('./utils');
 var _ = require('lodash');
 var os = require('os');
-const decompress = require('gulp-decompress');
+var decompress = require('gulp-decompress');
+var clean = require('gulp-clean');
 var merge = require('merge-stream');
 
 
@@ -172,9 +173,21 @@ gulp.task('extract-deps',['download-deps'], function() {
   });
 
   return merge(tasks);
-})
+});
 
-gulp.task('install-deps',['download-deps','extract-deps'], function() {
+gulp.task('remove-deps-tar', ['extract-deps'], function() {
+  var tasks = dependencies.map( depend => {
+    const fileInfo = _.find(manifest[depend], {platform: platform});
+    const fileName = fileInfo.name;
+
+    return gulp.src(path.join(destination, fileName), {read: false})
+      .pipe( clean() );
+  });
+
+  return merge(tasks);
+});
+
+gulp.task('install-deps',['remove-deps-tar'], function() {
 });
 
 

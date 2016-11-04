@@ -16,6 +16,7 @@
     "gulp": "~3.9.1",
     "gulp-angular-templatecache": "~1.8.0",
     "gulp-autoprefixer": "~3.1.0",
+    "gulp-clean": "^0.3.2",
     "gulp-csso": "~1.1.0",
     "gulp-debug": "~2.1.2",
     "gulp-decompress": "^2.0.1",
