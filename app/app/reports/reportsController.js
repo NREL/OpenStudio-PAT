@@ -52,7 +52,7 @@ export class ReportsController {
     };
 
     // Uncomment this to view webview developer tools to debug project reports
-   vm.openWebViewDevTools();
+   //vm.openWebViewDevTools();
 
   }
 
