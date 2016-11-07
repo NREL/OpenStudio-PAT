@@ -220,18 +220,6 @@ export class OsServer {
           vm.$log.debug('localServer promise resolved.  Server should have started');
           vm.setServerStatus('started');
 
-          // do this just in case?
-          vm.$log.debug('try to read file ' + vm.Project.projectDir.path() + ' local_configuration.receipt file');
-          const file = jetpack.read(vm.Project.projectDir.path() + '/local_configuration.receipt');
-          vm.$log.debug('file: ', file);
-          if (typeof file !== 'undefined') {
-            vm.$log.debug('local_configuration.receipt found');
-            deferred.resolve(response);
-          } else {
-            vm.$log.debug('no local_configuration.receipt found');
-            deferred.reject(response);
-          }
-
         }, response => {
           vm.$log.debug('ERROR in start local server');
           deferred.reject(response);
@@ -280,9 +268,6 @@ export class OsServer {
     vm.$log.debug('***** In osServerService::localServer() *****');
     // See "https://github.com/NREL/OpenStudio-server/tree/dockerize-osw/server/spec/files/batch_datapoints" for test files
     const deferred = vm.$q.defer();
-
-    // delete local_configuration.receipt
-    vm.jetpack.remove(vm.Project.projectDir.path() + '/' + 'local_configuration.receipt'); // TODO deprecate this when possible
 
     // run META CLI will return status code: 0 = success, 1 = failure
 
