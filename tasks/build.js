@@ -16,7 +16,13 @@ gulp.task('background', ['scripts'], function () {
     .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
 });
 
-gulp.task('html', ['background', 'inject', 'partials'], function () {
+gulp.task('preload', ['scripts'], function () {
+  gulp.src(path.join(conf.paths.src, '/app/reports/preload.js'))
+    .pipe($.uglify()).on('error', conf.errorHandler('Uglify preload.js'))
+    .pipe(gulp.dest(path.join(conf.paths.dist, '/scripts')));
+});
+
+gulp.task('html', ['background', 'preload', 'inject', 'partials'], function () {
   var htmlFilter = $.filter('*.html', {restore: true});
   var jsFilter = $.filter('**/*.js', {restore: true});
   var cssFilter = $.filter('**/*.css', {restore: true});
