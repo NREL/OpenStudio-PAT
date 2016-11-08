@@ -18,8 +18,6 @@ export class AnalysisController {
     vm.BCL = BCL;
     vm.dialog = dialog;
 
-    vm.projectDir = vm.Project.getProjectDir();
-    vm.projectName = vm.Project.getProjectName();
 
     vm.analysisTypes = vm.Project.getAnalysisTypes();
     vm.$scope.seeds = vm.Project.getSeeds();
@@ -49,7 +47,7 @@ export class AnalysisController {
     vm.initializeGrids();
   }
 
-   initializeGrids() {
+  initializeGrids() {
     const vm = this;
     vm.$log.debug('In initializeGrids in analysis');
     vm.setMeasureTypes();
@@ -279,8 +277,20 @@ export class AnalysisController {
     });
   }
 
+  // update the alternatives
+  updateAlternatives(key) {
+    const vm = this;
+    let alternatives = vm.Project.getDesignAlternatives();
+
+    _.remove(alternatives, alternative => alternative[key] != 'None');
+    vm.Project.setDesignAlternatives(alternatives);
+  }
+
   removeMeasure(measure) {
     const vm = this;
+
+    vm.updateAlternatives(measure.name);
+
     // line below also removes it from bclService 'getProjectMeasures', but not from disk
     // TODO: fix so BCL modal doesn't restore deleted panels
     _.remove(vm.$scope.measures, {uid: measure.uid});
@@ -289,9 +299,16 @@ export class AnalysisController {
     const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.uid + '"]'));
     measurePanel.remove();
 
-    if (!vm.jetpack.remove(vm.projectDir.path('measures/' + measure.name))) {
-      vm.jetpack.remove(vm.projectDir.path('measures/' + measure.class_name));
-    }
+    vm.$log.debug('measure.name: ', measure.name);
+    vm.$log.debug('measure.class_name: ', measure.class_name);
+    vm.$log.debug('measure.display_name: ', measure.display_name);
+
+    // Note: jetpack.remove() does not have any return
+    // TODO required directory removal is not yet robust
+    vm.jetpack.remove(vm.Project.getProjectDir().path('measures/' + measure.name));
+    vm.jetpack.remove(vm.Project.getProjectDir().path('measures/' + measure.class_name));
+    // Use display_name in an attempt to accommodate filenames with whitespace, neither of which are handled above
+    vm.jetpack.remove(vm.Project.getProjectDir().path('measures/' + measure.display_name));
 
     vm.initializeGrids();
   }
@@ -300,7 +317,7 @@ export class AnalysisController {
     const vm = this;
     //vm.$log.debug('In addMeasureOption in analysis');
 
-    if (measure.arguments.length === 0 ) return; // Nothing to see here
+    if (measure.arguments.length === 0) return; // Nothing to see here
 
     const keys = Object.keys(measure.arguments[0]);
     vm.$log.debug('keys: ', keys);
@@ -333,7 +350,7 @@ export class AnalysisController {
 
     _.forEach(measure.arguments, argument => {
       if (argument.specialRowId === 'optionDelete') {
-         argument[opt.field] = opt.field;
+        argument[opt.field] = opt.field;
       }
       else if (argument.specialRowId === 'optionName') {
         argument[opt.field] = opt.display_name + ' Name';
@@ -430,7 +447,7 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In loadMeasureOptions in analysis');
     _.forEach(vm.$scope.measures, (measure) => {
-        vm.$log.debug('measure: ', measure);
+      vm.$log.debug('measure: ', measure);
       _.forEach(measure.options, (option) => {
         vm.loadOption(measure, option);
       });
@@ -508,7 +525,7 @@ export class AnalysisController {
       vm.$log.debug('Seed Model:', seedModelPath);
       const seedModelFilename = seedModelPath.replace(/^.*[\\\/]/, '');
       // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
-      vm.jetpack.copy(seedModelPath, vm.projectDir.path('seeds/' + seedModelFilename));
+      vm.jetpack.copy(seedModelPath, vm.Project.getProjectDir().path('seeds/' + seedModelFilename));
       vm.$log.debug('Seed Model name: ', seedModelFilename);
       // update seeds
       vm.Project.setSeeds();
@@ -535,7 +552,7 @@ export class AnalysisController {
       vm.$log.debug('Weather File:', weatherFilePath);
       const weatherFilename = weatherFilePath.replace(/^.*[\\\/]/, '');
       // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
-      vm.jetpack.copy(weatherFilePath, vm.projectDir.path('weather/' + weatherFilename));
+      vm.jetpack.copy(weatherFilePath, vm.Project.getProjectDir().path('weather/' + weatherFilename));
       vm.$log.debug('Weather file name: ', weatherFilename);
       // update seeds
       vm.Project.setWeatherFiles();
