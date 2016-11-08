@@ -484,4 +484,14 @@
 
   }
 
+  // set $scope.results element in the controller above from PAT data
+  function setData(data) {
+    console.log('Setting results variable to: ', data);
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    $scope.$apply(function() {
+      $scope.results = data;
+    });
+  }
+
 </script>

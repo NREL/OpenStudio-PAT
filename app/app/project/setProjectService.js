@@ -49,6 +49,12 @@ export class SetProject {
         let projectDir = jetpack.cwd(result[0]);
         projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
+        if (projectDir.path().indexOf(' ') >= 0) {
+          // tell user to expect trouble
+          vm.whitespaceModal().then(response => {
+          });
+        }
+
         // for saveAs: copy old project's folder structure to new location (from, to)
         vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
 
@@ -101,6 +107,12 @@ export class SetProject {
         let projectDir = jetpack.cwd(result[0]);
         projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
+        if (projectDir.path().indexOf(' ') >= 0) {
+          // tell user to expect trouble
+          vm.whitespaceModal().then(response => {
+          });
+        }
+
         vm.OsServer.stopServer().then(response => {
           vm.$log.debug('SetProjectService::stop server: server stopped');
           vm.$log.debug('response: ', response);
@@ -144,6 +156,12 @@ export class SetProject {
     if (!_.isEmpty(result)) {
       const projectDir = jetpack.cwd(result[0]);
       vm.$log.debug('PAT Project dir path:', projectDir.path());
+
+      if (projectDir.path().indexOf(' ') >= 0) {
+        // tell user to expect trouble
+        vm.whitespaceModal().then(response => {
+        });
+      }
 
       const fullFilename = projectDir.path('pat.json');
 
@@ -232,6 +250,29 @@ export class SetProject {
     });
     return deferred.promise;
   }
+
+  whitespaceModal() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('setProject::whitespaceModal');
+
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalWhitespaceWarningController',
+      controllerAs: 'modal',
+      templateUrl: 'app/project/whitespace_warning.html'
+    });
+
+    modalInstance.result.then(() => {
+      vm.$log.debug('Resolving openModal()');
+      deferred.resolve('resolved');
+    }, () => {
+      // Modal canceled
+      deferred.reject('rejected');
+    });
+    return deferred.promise;
+  }
+
 
   // project initialization
   setProjectVariables(projectDir) {
