@@ -331,7 +331,6 @@ export class Project {
 
     vm.osa = {};
     vm.osa.analysis = {};
-    vm.osa.analysis.uuid = '';
     vm.osa.analysis.display_name = vm.projectName;
     vm.osa.analysis.name = vm.projectName;
 
@@ -345,7 +344,7 @@ export class Project {
     vm.osa.analysis.problem.algorithm = {objective_functions: []};
     vm.osa.analysis.problem.workflow = [];
 
-    // design alternatives array
+    // DESIGN ALTERNATIVES ARRAY
     vm.osa.analysis.problem.design_alternatives = [];
     _.forEach(vm.designAlternatives, (da) => {
       const da_hash = {};
@@ -354,6 +353,7 @@ export class Project {
       vm.osa.analysis.problem.design_alternatives.push(da_hash);
     });
 
+    // MEASURE DETAILS
     let measure_count = 0;
     _.forEach(vm.measures, (measure) => {
       const m = {};
@@ -362,19 +362,23 @@ export class Project {
       // measure types: ModelMeasure, EnergyPlusMeasure, ReportingMeasure
       // OSA wants: Ruby, EnergyPlus, Reporting
       if (measure.type === 'ModelMeasure') {
-        m.measure_type = 'Ruby';
+        //m.measure_type = 'Ruby';
+        m.measure_type = 'RubyMeasure';
       } else if (measure.type === 'EnergyPlusMeasure') {
-        m.measure_type = 'EnergyPlus';
+        //m.measure_type = 'EnergyPlus';
+        m.measure_type = 'EnergyPlusMeasure';
       } else if (measure.type === 'ReportingMeasure') {
-        m.measure_type = 'Reporting';
+        //m.measure_type = 'Reporting';
+        m.measure_type = 'ReportingMeasure';
       } else {
         m.measure_type = 'unknown';
       }
       m.measure_definition_class_name = measure.className;
       //m.measure_definition_measureUID = measure.colDef.measureUID; // TODO: fix this
-      const mdir = _.last(_.split(measure.measure_dir));
+      const mdir = _.last(_.split(measure.measure_dir, '/'));
       m.measure_definition_directory = './measures/' + mdir;
       m.measure_definition_directory_local = measure.measure_dir;
+      m.measure_definition_class_name = measure.class_name;
       m.measure_definition_display_name = measure.display_name;
       m.measure_definition_name = measure.name;
       m.measure_definition_name_xml = null;
@@ -393,6 +397,7 @@ export class Project {
         return k.indexOf('option_') !== -1;
       });
 
+      // ARGUMENTS
       m.arguments = [];
       // This portion only has arguments that don't have the variable box checked
       _.forEach(measure.arguments, (arg) => {
@@ -400,180 +405,79 @@ export class Project {
           (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) &&
           (_.isUndefined(arg.variable) || arg.variable === false)
         ) {
+          vm.$log.debug('ARGUMENT, not variable!');
           const argument = {};
-          argument.display_name = arg.displayName;
-          //argument.display_name_short = arg.id; TODO
-          argument.display_name_short = arg.display_name;
+          argument.display_name = arg.display_name;
+          argument.display_name_short = arg.display_name_short ? arg.display_name_short: arg.display_name;
           argument.name = arg.name;
           argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
           argument.default_value = arg.default_value;
-          argument.value = arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
+          argument.value = arg.option_1 ? arg.option_1 : arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
           // Make sure that argument is "complete"
-          if (((angular.isDefined(argument.display_name) && argument.display_name.length) ||
-            (angular.isDefined(argument.display_name_short) && argument.display_name_short.length) ||
-            (angular.isDefined(argument.name) && argument.name.length)) &&
-            angular.isDefined(argument.value_type) && argument.value_type.length &&
-            angular.isDefined(argument.default_value) && argument.default_value.length &&
-            angular.isDefined(argument.value) && argument.value.length) {
+          if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value))
+          {
             var_count += 1;
             m.arguments.push(argument);
           } else {
             vm.$log.debug('Not pushing partial arg to m.arguments');
+            vm.$log.debug('partial arg: ', argument);
           }
         }
       });
 
+      // VARIABLES
       let var_count = 0;
       m.variables = [];
 
-      // go through alternatives, see if each has an option selected
-      const vars = [];
-      _.forEach(vm.designAlternatives, (da) => {
-        if (da[measure.name] == 'None') {
-          vars.push(true);
-        } else {
-          vars.push(false);
-        }
-      });
-
-      // need a __SKIP__ argument
-      // TODO: verify that this is still valid syntax-wise
-      // TODO: Should this not appear up here anymore? (b/c it's a variable?)
-      if (_.includes(vars, true)) {
-        const v = {
-          argument: {
-            display_name: '__SKIP__',
-            display_name_short: '__SKIP__',
-            name: '__SKIP__',
-            value_type: 'bool',
-            default_value: false,
-            value: false
-          },
-          display_name: '__SKIP__',
-          display_name_short: '__SKIP__',
-          variable_type: 'variable',
-          units: null,
-          minimum: false,
-          maximum: true,
-          relation_to_output: null,
-          static_value: false,
-          variable: true,
-          uncertainty_description: {
-            attributes: [],
-            type: 'discrete'
+      // if measure does not have options selected (reporting measure), no variables section
+      if (measure.numberOfOptions != 0) {
+        // go through alternatives, see if each has an option selected
+        const vars = [];
+        _.forEach(vm.designAlternatives, (da) => {
+          if (da[measure.name] == 'None') {
+            vars.push(true);
+          } else {
+            vars.push(false);
           }
-        };
-
-        const valArr = [];
-        _.forEach(vars, (skip) => {
-          valArr.push({value: skip, weight: 1 / vars.length});
         });
 
-        v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
-        v.uncertainty_description.attributes.push({name: 'lower_bounds', value: false});
-        v.uncertainty_description.attributes.push({name: 'upper_bounds', value: false});
-        v.uncertainty_description.attributes.push({name: 'modes', value: false});
-        v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
-        v.uncertainty_description.attributes.push({name: 'stddev', value: null});
-
-        v.workflow_index = var_count;
-        var_count += 1;
-
-        m.variables.push(v);
-      }
-
-      // Variable arguments
-      _.forEach(measure.arguments, (arg) => {
-        if (((_.isUndefined(arg.specialRowId)) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) && (arg.variable === true)) {
-          vm.$log.debug('Project::exportManual arg: ', arg);
-          // see what arg is set to in each design alternative
-          const valArr = [];
-          let option_id;
-          _.forEach(vm.designAlternatives, (da) => {
-            vm.$log.debug('Project::exportManual da: ', da);
-            if (da[measure.name] == 'None') {
-              vm.$log.debug('value: None');
-              // TODO: Review what value to assign when no option is selected for that design alternative.
-              // TODO: Does it matter what we put here?  'None' is put there for now, if doesn't work, try value of the same type.
-              valArr.push({value: 'None', weight: 1 / vm.designAlternatives.length});
-            } else {
-              const option_name = da[measure.name];
-              vm.$log.debug('arg: ', arg);
-              vm.$log.debug('option_name: ', option_name);
-              vm.$log.debug('MEASURE', measure);
-              // retrieve the option ID from the option_name in measure.options
-              _.forEach(measure.options, (option) => {
-                if (option.name == option_name) {
-                  option_id = option.id;
-                }
-              });
-              vm.$log.debug('arg[option_id]: ', arg[option_id]);
-              valArr.push({value: arg[option_id], weight: 1 / vm.designAlternatives.length});
+        // need a __SKIP__ argument
+        // TODO: verify that this is still valid syntax-wise
+        // TODO: Should this not appear up here anymore? (b/c it's a variable?)
+        if (_.includes(vars, true)) {
+          const v = {
+            argument: {
+              display_name: '__SKIP__',
+              display_name_short: '__SKIP__',
+              name: '__SKIP__',
+              value_type: 'bool',
+              default_value: false,
+              value: false
+            },
+            display_name: '__SKIP__',
+            display_name_short: '__SKIP__',
+            variable_type: 'variable',
+            units: null,
+            minimum: false,
+            maximum: true,
+            relation_to_output: null,
+            static_value: false,
+            variable: true,
+            uncertainty_description: {
+              attributes: [],
+              type: 'discrete'
             }
-          });
-
-          const values = _.values(_.pick(arg, optionKeys));
-
-
-          const min = _.min(values),
-            max = _.max(values);
-
-          const mode = function mode(ar) {
-            let numMapping = {};
-            let greatestFreq = 0;
-            let currentMode = 0;
-            ar.forEach(function findMode(number) {
-              numMapping[number] = (numMapping[number] || 0) + 1;
-
-              if (greatestFreq < numMapping[number]) {
-                greatestFreq = numMapping[number];
-                currentMode = number;
-              }
-            });
-            return +currentMode;
           };
 
-          arg.units = '';
-          arg.minimum = min; // TODO is this meta data or calculated from options? Is it same as lower_bound below?
-          arg.maximum = max; // TODO is this meta data or calculated from options? Is it same as upper_bound below?
-          arg.mode = mode(values);
-
-          const v = {};
-          v.argument = {};
-          v.argument.display_name = arg.display_name;
-          //v.argument.display_name_short = arg.id; TODO
-          v.argument.display_name_short = arg.display_name;
-          v.argument.name = arg.name;
-          v.argument.value_type = _.toLower(arg.type); // TODO: see above
-          v.argument.default_value = arg.default_value;
-          v.argument.value = _.toString(arg.option_1);
-
-          v.display_name = arg.display_name;  // same as arg
-          //v.display_name_short = arg.id; // entered in PAT TODO
-          v.display_name_short = arg.display_name;
-          v.variable_type = 'variable'; //this is always 'variable'
-          v.units = arg.units;
-          v.minimum = arg.minimum;  // TODO: must be alphabetically ordered if string, otherwise standard order (pick from option values mean must be btw min and max, and max > min)
-          v.maximum = arg.maximum;  // TODO: must be alphabetically ordered
-          v.relation_to_output = null;
-          //v.static_value = false; // TODO: verify that this should always be 1
-          v.static_value = 1;
-          v.uuid = '';
-          v.version_uuid = '';
-          v.variable = true; // this is always true
-          v.uncertainty_description = {};
-          v.uncertainty_description.type = 'discrete'; //options are triangle, uniform, discrete, and normal.  use "discrete" always for manual
-          v.uncertainty_description.attributes = [];
+          const valArr = [];
+          _.forEach(vars, (skip) => {
+            valArr.push({value: skip, weight: 1 / vars.length});
+          });
 
           v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
-          v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.minimum});  // minimum
-          v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.maximum});  // maximum
-          if (valArr.length > 0) {
-            vm.$log.debug('Setting attribute');
-            v.uncertainty_description.attributes.push({name: 'modes', value: arg.mode}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
-          } else {
-            vm.$log.debug('Skipping attribute');
-          }
+          v.uncertainty_description.attributes.push({name: 'lower_bounds', value: false});
+          v.uncertainty_description.attributes.push({name: 'upper_bounds', value: false});
+          v.uncertainty_description.attributes.push({name: 'modes', value: false});
           v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
           v.uncertainty_description.attributes.push({name: 'stddev', value: null});
 
@@ -582,7 +486,108 @@ export class Project {
 
           m.variables.push(v);
         }
-      });
+
+        // Variable arguments
+        _.forEach(measure.arguments, (arg) => {
+          if (((_.isUndefined(arg.specialRowId)) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) && (arg.variable === true)) {
+            vm.$log.debug('Project::exportManual arg: ', arg);
+            // see what arg is set to in each design alternative
+            const valArr = [];
+            let option_id;
+            _.forEach(vm.designAlternatives, (da) => {
+              vm.$log.debug('Project::exportManual da: ', da);
+              if (da[measure.name] == 'None') {
+                vm.$log.debug('value: None');
+                // TODO: Review what value to assign when no option is selected for that design alternative.
+                // TODO: Does it matter what we put here?  'None' is put there for now, if doesn't work, try value of the same type.
+                valArr.push({value: 'None', weight: 1 / vm.designAlternatives.length});
+              } else {
+                const option_name = da[measure.name];
+                vm.$log.debug('arg: ', arg);
+                vm.$log.debug('option_name: ', option_name);
+                vm.$log.debug('MEASURE', measure);
+                // retrieve the option ID from the option_name in measure.options
+                _.forEach(measure.options, (option) => {
+                  if (option.name == option_name) {
+                    option_id = option.id;
+                  }
+                });
+                vm.$log.debug('arg[option_id]: ', arg[option_id]);
+                valArr.push({value: arg[option_id], weight: 1 / vm.designAlternatives.length});
+              }
+            });
+
+            const values = _.values(_.pick(arg, optionKeys));
+
+
+            const min = _.min(values),
+              max = _.max(values);
+
+            const mode = function mode(ar) {
+              let numMapping = {};
+              let greatestFreq = 0;
+              let currentMode = 0;
+              ar.forEach(function findMode(number) {
+                numMapping[number] = (numMapping[number] || 0) + 1;
+
+                if (greatestFreq < numMapping[number]) {
+                  greatestFreq = numMapping[number];
+                  currentMode = number;
+                }
+              });
+              return +currentMode;
+            };
+
+            arg.units = '';
+            arg.minimum = min; // TODO is this meta data or calculated from options? Is it same as lower_bound below?
+            arg.maximum = max; // TODO is this meta data or calculated from options? Is it same as upper_bound below?
+            arg.mode = mode(values);
+
+            // VARIABLE ARGUMENT SECTION
+            const v = {};
+            v.argument = {};
+            v.argument.display_name = arg.display_name;
+            v.argument.display_name_short = arg.display_name;
+            v.argument.name = arg.name;
+            v.argument.value_type = _.toLower(arg.type); // TODO: see above
+            v.argument.default_value = arg.default_value;
+            v.argument.value = arg.option_1;
+
+            // VARIABLE DETAILS
+            v.display_name = arg.display_name;  // same as arg
+            v.display_name_short = arg.display_name;
+            v.variable_type = 'variable'; //this is always 'variable'
+            v.units = arg.units;
+            v.minimum = arg.minimum;  // TODO: must be alphabetically ordered if string, otherwise standard order (pick from option values mean must be btw min and max, and max > min)
+            v.maximum = arg.maximum;  // TODO: must be alphabetically ordered
+            v.relation_to_output = null;
+            v.static_value = arg.default_value;
+            v.uuid = '';
+            v.version_uuid = '';
+            v.variable = true; // this is always true
+            v.uncertainty_description = {};
+            v.uncertainty_description.type = 'discrete'; //use "discrete" always for manual.  options are triangle, uniform, discrete, and normal.
+            v.uncertainty_description.attributes = [];
+
+            v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
+            v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.minimum});  // minimum
+            v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.maximum});  // maximum
+            if (valArr.length > 0) {
+              vm.$log.debug('Setting attribute');
+              v.uncertainty_description.attributes.push({name: 'modes', value: arg.mode}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
+            } else {
+              vm.$log.debug('Skipping attribute');
+            }
+            v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
+            v.uncertainty_description.attributes.push({name: 'stddev', value: null});
+
+            v.workflow_index = var_count;
+            var_count += 1;
+
+            m.variables.push(v);
+          }
+        });
+      }
 
       m.workflow_index = measure_count;
       measure_count += 1;
@@ -592,7 +597,7 @@ export class Project {
 
     vm.osa.analysis.seed = {};
     vm.osa.analysis.seed.file_type = 'OSM';
-    vm.osa.analysis.seed.path = './seed/' + vm.defaultSeed;
+    vm.osa.analysis.seed.path = './seeds/' + vm.defaultSeed;
     vm.osa.analysis.weather_file = {};
     vm.osa.analysis.weather_file.file_type = 'EPW';
     vm.osa.analysis.weather_file.path = './weather/' + vm.defaultWeatherFile;
