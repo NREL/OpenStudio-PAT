@@ -2,6 +2,11 @@ export default {
   dependency: {
     title: 'PAT Dependency Download Status'
   },
+  whitespaceWarning: {
+    title: 'ParametricAnalysisTool',
+    heading: 'Whitespace Warning',
+    blurb: 'You have whitespace in your project path, and this will likely cause problems. In the future, please remove all whitespace from your PAT project path.'
+  },
   setProject: {
     title: 'Select a Project',
     blurb: 'Create a new or open an existing project',

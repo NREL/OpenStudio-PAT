@@ -18,10 +18,9 @@ var jetpack = require('fs-jetpack');
 // to the project reporting measure
 console.info('Preloading simulation results.');
 
-// initialize results array.  Will have to add a 'setData' function to each html report to retrieve the data.
-results =  [];
+// initialize results array
+let results =  [];
 
 // TODO decide where any exported files should be saved
 console.info('Preloading report output directory.');
-reportDir = os.homedir() + 'Openstudio/PAT/Project_Reporting_Measures';
-
+const reportDir = os.homedir() + 'Openstudio/PAT/Project_Reporting_Measures';
