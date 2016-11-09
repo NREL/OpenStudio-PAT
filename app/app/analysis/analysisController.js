@@ -91,6 +91,7 @@ export class AnalysisController {
     const vm = this;
 
     _.forEach(vm.$scope.measures, (measure) => {
+      vm.$log.debug('measure: ', measure);
 
       // set number of options in measure
 
@@ -146,7 +147,7 @@ export class AnalysisController {
         }, {
           name: 'variable',
           displayName: 'analysis.columns.variable',
-          cellTemplate: '<input ng-if="row.entity.displayName.length" type="checkbox" ng-class="\'colt\' + col.uid" ui-grid-checkbox ng-model="MODEL_COL_FIELD">',
+          cellTemplate: '<input ng-if="row.entity.name.length" type="checkbox" ui-grid-checkbox ng-model="MODEL_COL_FIELD">',
           headerCellFilter: 'translate',
           minWidth: 100,
           type: 'boolean',
