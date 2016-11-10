@@ -401,7 +401,6 @@ export class ModalBclController {
     if (_.findIndex(vm.projectMeasures, {type: project_measure.type}) != -1) {
       // figure out where to put new measure in array
       const index = _.findLastIndex(vm.projectMeasures, {type: project_measure.type });
-
       // add to array at the end of the correct measure type section
       project_measure.workflow_index = vm.projectMeasures[index].workflow_index;  // this will set workflow_index to be the same...will need to be incremented
       vm.$log.debug("new project_measure: ", project_measure);
@@ -409,36 +408,33 @@ export class ModalBclController {
       vm.incrementWorkflowIndexes(index + 1);
     } else {
       // first measure of this type
-      switch(project_measure.type){
-        case 'ModelMeasure':
-          // append to front
-          project_measure.workflow_index = 0;
+      if (project_measure.type == 'ModelMeasure') {
+        // append to front
+        project_measure.workflow_index = 0;
+        vm.projectMeasures.splice(0,0, project_measure);
+        vm.incrementWorkflowIndexes(1);
+      }  else if (project_measure.type == 'EnergyPlusMeasure') {
+        const index2 = _.findLastIndex(vm.projectMeasures, {type: 'ModelMeasure' });
+        if (index2 != -1) {
+          // add after model measures
+          project_measure.workflow_index = vm.projectMeasures[index2].workflow_index;
+          vm.projectMeasures.splice(index2 + 1, 0, project_measure);
+          vm.incrementWorkflowIndexes(index2 + 1);
+        } else {
+          // no model measures, append to front
           vm.projectMeasures.splice(0,0, project_measure);
           vm.incrementWorkflowIndexes(1);
-          break;
-        case 'EnergyPlusMeasure':
-          const index2 = _.findLastIndex(vm.projectMeasures, {type: 'ModelMeasure' });
-          if (index2 != -1) {
-            // add after model measures
-            project_measure.workflow_index = vm.projectMeasures[index2].workflow_index;
-            vm.projectMeasures.splice(index2 + 1, 0, project_measure);
-            vm.incrementWorkflowIndexes(index2 + 1);
-          } else {
-            // no model measures, append to front
-            vm.projectMeasures.splice(0,0, project_measure);
-            vm.incrementWorkflowIndexes(1);
-          }
-          break;
-        default:
-          // append to end
-          const workflow_index = _.last(vm.projectMeasures).workflow_index;
-          if (workflow_index != -1) {
-            project_measure.workflow_index = workflow_index + 1;
-          } else {
-            // first measure in array
-            project_measure.workflow_index = 0;
-          }
-          vm.projectMeasures.push(project_measure);
+        }
+      } else {
+        // append to end
+        const workflow_index = _.last(vm.projectMeasures).workflow_index;
+        if (workflow_index != -1) {
+          project_measure.workflow_index = workflow_index + 1;
+        } else {
+          // first measure in array
+          project_measure.workflow_index = 0;
+        }
+        vm.projectMeasures.push(project_measure);
       }
     }
   }

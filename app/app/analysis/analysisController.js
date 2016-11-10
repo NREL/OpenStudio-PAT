@@ -556,7 +556,7 @@ export class AnalysisController {
     const new_index = (direction == 'up') ? index - 1 : index + 1;
     //vm.$log.debug("index: ", index, " new index: ", new_index);
     // find measure to swap with (with same type)
-    const swapping_measure = _.find(vm.$scope.measures, {'workflow_index' : new_index, 'type' : measure.type});
+    const swapping_measure = _.find(vm.$scope.measures, {workflow_index: new_index, type: measure.type});
     // only move if you can
     if (swapping_measure){
       vm.$log.debug('moving measure');
