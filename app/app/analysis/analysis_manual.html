@@ -23,6 +23,8 @@
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
             {{measure.display_name}}
             <span class="pull-right">
+              <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
+              <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
               <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation(); analysis.removeMeasure(measure);">
                 <span class="glyphicon glyphicon-remove"></span>
               </span>
@@ -61,6 +63,8 @@
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
             {{measure.display_name}}
             <span class="pull-right">
+              <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
+              <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
               <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
                 <span class="glyphicon glyphicon-remove"></span>
               </span>
@@ -101,6 +105,8 @@
             <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
             {{measure.display_name}}
             <span class="pull-right">
+              <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
+               <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
               <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
                 <span class="glyphicon glyphicon-remove"></span>
               </span>

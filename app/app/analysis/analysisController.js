@@ -49,9 +49,12 @@ export class AnalysisController {
     vm.initializeGrids();
   }
 
-   initializeGrids() {
+  initializeGrids() {
     const vm = this;
     vm.$log.debug('In initializeGrids in analysis');
+    // sort measures by workflow_index
+    vm.$scope.measures = _.sortBy(vm.$scope.measures, ['workflow_index']);
+    // group by type
     vm.setMeasureTypes();
     if (vm.$scope.selectedAnalysisType === 'Manual') {
       vm.setGridOptions();
@@ -542,6 +545,29 @@ export class AnalysisController {
       vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
       vm.$scope.defaultWeatherFile = weatherFilename;
     }
+  }
+
+  // move measure 'up' or 'down'
+  reorderMeasure(measure, direction) {
+    const vm = this;
+    vm.$log.debug('moving measure: ', direction);
+    // find current index of measure
+    const index = measure.workflow_index;
+    const new_index = (direction == 'up') ? index - 1 : index + 1;
+    //vm.$log.debug("index: ", index, " new index: ", new_index);
+    // find measure to swap with (with same type)
+    const swapping_measure = _.find(vm.$scope.measures, {'workflow_index' : new_index, 'type' : measure.type});
+    // only move if you can
+    if (swapping_measure){
+      vm.$log.debug('moving measure');
+      measure.workflow_index = new_index;
+      swapping_measure.workflow_index = index;
+      vm.$log.debug('measures: ', vm.$scope.measures);
+      // initialize grid to resort
+      vm.initializeGrids();
+    }
+
+
   }
 
 }
