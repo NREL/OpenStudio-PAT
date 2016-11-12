@@ -28,7 +28,7 @@
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-1a16841463-darwin.tar.gz",
+    "name": "OpenStudio-server-4c14304b0e-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"
