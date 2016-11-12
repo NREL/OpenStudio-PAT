@@ -23,4 +23,4 @@ console.info('Preloading simulation results.');
 
 // TODO decide where any exported files should be saved
 console.info('Preloading report output directory.');
-reportDir = os.homedir() + 'Openstudio/PAT/Project_Reporting_Measures';
+let reportDir = os.homedir() + 'Openstudio/PAT/Project_Reporting_Measures';
