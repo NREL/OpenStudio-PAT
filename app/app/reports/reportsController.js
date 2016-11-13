@@ -22,7 +22,6 @@ export class ReportsController {
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
     vm.testResults = vm.$scope.datapoints;
-    vm.jetpack.write(vm.Project.getProjectDir().path('resultsArray.json'), vm.testResults);
 
     // preload.js path depends on environment.  we need full path to file
     if (vm.env == 'production') {

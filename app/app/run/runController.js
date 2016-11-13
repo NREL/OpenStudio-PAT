@@ -21,6 +21,7 @@ export class RunController {
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
     vm.$scope.serverStatus = vm.OsServer.getServerStatus();
     vm.$scope.datapoints = vm.Project.getDatapoints();
+    vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
     // TODO: do we still need datapointsStatus?
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
     vm.$log.debug('SERVER STATUS: ', vm.$scope.serverStatus);
@@ -51,6 +52,68 @@ export class RunController {
     const vm = this;
     vm.shell.openExternal(vm.OsServer.getServerURL());
   }
+
+  viewReports() {
+    const vm = this;
+    // TODO: implement
+  }
+
+  // return MM/DD/YY from date string
+  // takes datestring like this: 20161110T212644Z
+  extractDate(dateString) {
+    const tmp = _.split(dateString, 'T');
+    const y = tmp[0].substring(2, 4);
+    const m = tmp[0].substring(4, 6);
+    const d = tmp[0].substring(6, 8);
+
+    return m + '/' + d + '/' + y;
+  }
+
+  makeDate(dateString) {
+    const tmp = _.split(dateString, 'T');
+    const year = tmp[0].substring(0, 4);
+    const mth = tmp[0].substring(4, 6);
+    const day = tmp[0].substring(6, 8);
+    const hr = tmp[1].substring(0,2);
+    const min = tmp[1].substring(2,4);
+    const sec = tmp[1].substring(4,6);
+
+    return new Date(year, mth, day, hr, min, sec);
+
+  }
+
+  getRunTime(startStr, endStr){
+    const vm = this;
+    const start = vm.makeDate(startStr);
+    const end = vm.makeDate(endStr);
+
+    const diff = end-start;
+    let sec = parseInt((end-start)/1000);
+    sec = (sec < 10) ? '0' + sec : sec;
+    let min = parseInt(sec/60);
+    min = (min < 10) ? '0' + min : min;
+    let hours = parseInt(min/60);
+    hours = (hours < 10) ? '0' + hours : hours;
+    return hours + ":" + min + ":" + sec;
+
+  }
+
+  calculateWarnings(dp){
+    let warn = 0;
+    _.forEach(dp.steps, step => {
+      warn = warn + step.result.step_warnings.length;
+    });
+    return warn;
+  }
+
+  calculateErrors(dp) {
+    let err = 0;
+    _.forEach(dp.steps, step => {
+      err = err + step.result.step_errors.length;
+    });
+    return err;
+  }
+
 
   stopServer(force = false) {
     const vm = this;
