@@ -20,8 +20,7 @@ export class OsServer {
 
     vm.serverStatus = 'stopped';  // started, stopped, error?
     vm.analysisStatus = '';  // '', started, in progress, completed, error
-    vm.progressAmount = 0;
-    vm.progressMessage = '';
+    vm.progress = {amount: 0, message: ''};
     vm.isDone = true;
     vm.analysisChangedFlag = false;
 
@@ -100,24 +99,15 @@ export class OsServer {
     vm.analysisStatus = analysisStatus;
   }
 
-  getProgressAmount() {
+  getProgress() {
     const vm = this;
-    return vm.progressAmount;
+    return vm.progress;
   }
 
-  setProgressAmount(progressAmount) {
+  setProgress(amount, message) {
     const vm = this;
-    vm.progressAmount = progressAmount;
-  }
-
-  getProgressMessage() {
-    const vm = this;
-    return vm.progressMessage;
-  }
-
-  setProgressMessage(progressMessage) {
-    const vm = this;
-    vm.progressMessage = progressMessage;
+    vm.progress.amount = amount;
+    vm.progress.message = message;
   }
 
   getIsDone() {
@@ -569,6 +559,68 @@ export class OsServer {
       deferred.resolve(vm.datapoints);
     }, error => {
       vm.$log.debug('ERROR retrieving datapoints OSWs');
+      deferred.reject(error);
+    });
+    return deferred.promise;
+  }
+
+  downloadReports() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const promises = [];
+
+    // download all reports (result files) as soon as a datapoint completes
+
+    vm.datapoints = vm.Project.getDatapoints();
+
+    _.forEach(vm.datapoints, dp => {
+      if (dp.status == 'completed' && !dp.downloaded_reports) {
+        const url = vm.serverURL + '/data_points/' + dp.id + '.json';
+        const promise = vm.$http.get(url).then(response => {
+          // get result files from response
+          vm.$log.debug('datapoint.json: ', response);
+          const resultFiles = response.data.data_point.result_files;
+          dp.result_files = dp.result_files ? _.merge(dp.result_files, resultFiles) : resultFiles;
+          const reportPromises = [];
+          _.forEach(dp.result_files, file => {
+            if (file.type == 'Report' && !file.downloaded) {
+              // download file
+              const reportUrl = vm.serverURL + '/data_points/' + dp.id + '/download_result_file';
+              const params = {filename: file.attachment_file_name};
+              const config = { params: params, headers : {Accept: 'application/json'} };
+              vm.$log.debug('****URL: ', reportUrl);
+              const reportPromise = vm.$http.get(reportUrl, config).then( response => {
+                // write file and set downloaded flag
+                vm.jetpack.write(vm.resultsDir.path(dp.id, file.attachment_file_name), response.data);
+                file.downloaded = true;
+
+              }, reportError => {
+                vm.$log.debug('GET report error: ', reportError);
+              });
+              reportPromises.push(reportPromise);  // this to set flag
+              promises.push(reportPromise);  // this one to resolve overall function
+            }
+          });
+          // when all reports are downloaded for a single datapoint
+          vm.$q.all(reportPromises).then(response => {
+            // set downloaded_reports flag
+            dp.downloaded_reports = true;
+          }, error => {
+            vm.$log.debug('Error downloading all reports for datapoint: ', dp.id, 'error: ', error);
+          });
+
+        }, error => {
+          vm.$log.debug('GET datapoint.json error: ', error);
+        });
+        promises.push(promise);
+      }
+    });
+
+    vm.$q.all(promises).then(response => {
+      vm.$log.debug("Updated Datapoints with Reports: ", vm.datapoints);
+      deferred.resolve(vm.datapoints);
+    }, error => {
+      vm.$log.debug('ERROR retrieving datapoints JSONs: ', error);
       deferred.reject(error);
     });
     return deferred.promise;

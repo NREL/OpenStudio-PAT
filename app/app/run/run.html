@@ -41,7 +41,7 @@
 
 <div class="row">
   <div class="col-sm-6">
-    <uib-progressbar class="progress-striped active" type="success" value="progressAmount">{{progressMessage}}</uib-progressbar>
+    <uib-progressbar class="progress-striped active" type="success" value="progress.amount">{{progress.message}}</uib-progressbar>
   </div>
 </div>
 
@@ -86,8 +86,8 @@
               <div class="col-sm-1"><span class="badge orange-badge square-badge">{{run.calculateWarnings(datapoint)}}</span></div>
               <div class="col-sm-1"><span class="badge red-badge square-badge">{{run.calculateErrors(datapoint)}}</span></div>
               <div class="col-sm-1">&nbsp;&nbsp;<span class="badge orange-badge">C</span></div>
-              <div class="col-sm-1"><img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.download_status != 'downloaded'" />
-                <img ng-src="assets/images/ReportingMeasure_icon.png" alt="View Reports for datapoint {{datapoint.name}}" ng-show="datapoint.download_status == 'downloaded'" ng-click="run.viewReports()" /></div>
+              <div class="col-sm-1"><img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.downloaded_reports != true" />
+                <img ng-src="assets/images/ReportingMeasure_icon.png" alt="View Reports for datapoint {{datapoint.name}}" ng-show="datapoint.downloaded_reports" ng-click="run.viewReports()" /></div>
             </div>
            <!-- <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
             {{datapoint.name}} - status: {{datapoint.status}} - {{datapoint.final_message}}-->
