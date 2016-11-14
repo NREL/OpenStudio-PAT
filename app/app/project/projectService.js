@@ -4,6 +4,7 @@ import path from 'path';
 import {remote} from 'electron';
 import jsZip from 'jszip';
 import fs from 'fs';
+import archiver from 'archiver';
 
 const {app, dialog} = remote;
 
@@ -17,6 +18,7 @@ export class Project {
     vm.jsZip = jsZip;
     vm.MeasureManager = MeasureManager;
     vm.dialog = dialog;
+    vm.archiver = archiver;
 
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
@@ -291,38 +293,33 @@ export class Project {
     vm.jetpack.write(filename, vm.osa);
     vm.$log.debug('Project OSA file exported to ' + filename);
 
-    // create archives
-    const zip = new vm.jsZip();
+    var output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
+    var archive = archiver('zip');
 
-    let fileContents = jetpack.read(vm.seedDir.path() + '/' + vm.defaultSeed);
-    zip.file('./seeds/' + vm.defaultSeed, fileContents);
-
-    fileContents = jetpack.read(vm.weatherDir.path() + '/' + vm.defaultWeatherFile);
-    zip.file('./weather/' + vm.defaultWeatherFile, fileContents);
-
-    const filenames = fs.readdirSync(vm.projectMeasuresDir.path());
-    filenames.forEach(function (name) {
-      vm.$log.debug('name: ' + name);
-      if (name === '.' || name === '..') {
-        return;
-      }
-      if (fs.lstatSync(vm.projectMeasuresDir.path() + '/' + name).isDirectory()) {
-        fileContents = jetpack.read(vm.projectMeasuresDir.path() + '/' + name + '/' + 'measure.rb');
-        zip.file('./measures/' + name + '/' + 'measure.rb', fileContents);
-
-        fileContents = jetpack.read(vm.projectMeasuresDir.path() + '/' + name + '/' + 'measure.xml');
-        zip.file('./measures/' + name + '/' + 'measure.xml', fileContents);
-      }
+    output.on('close', function () {
+      console.log(archive.pointer() + ' total bytes');
+      console.log('archiver has been finalized and the output file descriptor has closed.');
     });
 
-    filename = vm.projectDir.path(vm.projectName + '.zip');
-    vm.$log.debug('Zip name: ' + filename);
-    zip.generateNodeStream({compression: 'DEFLATE', type: 'nodebuffer', streamFiles: true})
-      .pipe(jetpack.createWriteStream(filename))
-      .on('finish', () => {
-        console.log('zip written successfully');
-      });
+    archive.on('error', function(err){
+      throw err;
+    });
 
+    archive.pipe(output);
+
+    archive.bulk([
+      { expand: true, cwd: vm.projectMeasuresDir.path(), src: ['**'], dest: 'measures/'}
+    ]);
+
+    archive.bulk([
+      { expand: true, cwd: vm.seedDir.path(), src: ['**'], dest: 'seeds/'}
+    ]);
+
+    archive.bulk([
+      { expand: true, cwd: vm.weatherDir.path(), src: ['**'], dest: 'weather/'}
+    ]);
+
+    archive.finalize();
   }
 
   exportManual() {
