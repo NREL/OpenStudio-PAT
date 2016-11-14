@@ -121,6 +121,16 @@ export class RunController {
     return err;
   }
 
+  calculateNAs(dp) {
+    let nas = 0;
+    _.forEach(dp.steps, step => {
+      if (step.step_result == 'NotApplicable') {
+        nas = nas + 1;
+      }
+    });
+    return nas;
+  }
+
   stopServer(force = false) {
     const vm = this;
     vm.OsServer.stopServer(force).then(response => {

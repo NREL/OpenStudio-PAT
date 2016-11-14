@@ -82,7 +82,7 @@
               <div class="col-sm-2">{{run.extractDate(datapoint.updated_at)}}</div>
               <div class="col-sm-1">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
               <div class="col-sm-2 green-text">{{datapoint.status}}</div>
-              <div class="col-sm-1"></div>
+              <div class="col-sm-1">{{run.calculateNAs(datapoint)}}</div>
               <div class="col-sm-1"><span class="badge orange-badge square-badge">{{run.calculateWarnings(datapoint)}}</span></div>
               <div class="col-sm-1"><span class="badge red-badge square-badge">{{run.calculateErrors(datapoint)}}</span></div>
               <div class="col-sm-1">&nbsp;&nbsp;<span class="badge orange-badge">C</span></div>
@@ -103,7 +103,7 @@
                         <div class="col-sm-2">{{run.extractDate(step.result.started_at)}}</div>
                         <div class="col-sm-1">{{run.getRunTime(step.result.started_at, step.result.completed_at)}}</div>
                         <div class="col-sm-2"></div>
-                        <div class="col-sm-1"></div>
+                        <div class="col-sm-1"><span ng-if="step.step_result == 'NotApplicable'">NA</span></div>
                         <div class="col-sm-1"><span class="badge orange-badge square-badge">{{step.result.step_warnings.length}}</span></div>
                         <div class="col-sm-1"><span class="badge red-badge square-badge">{{step.result.step_errors.length}}</span></div>
                         <div class="col-sm-1"></div>
