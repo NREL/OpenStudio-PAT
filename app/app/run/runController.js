@@ -2,7 +2,7 @@ import {shell} from 'electron';
 
 export class RunController {
 
-  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q) {
+  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, toastr) {
     'ngInject';
 
     const vm = this;
@@ -13,6 +13,7 @@ export class RunController {
     vm.$q = $q;
     vm.Project = Project;
     vm.OsServer = OsServer;
+    vm.toastr = toastr;
     vm.shell = shell;
 
     vm.runTypes = vm.Project.getRunTypes();
@@ -338,9 +339,9 @@ export class RunController {
   downloadResults(datapoint) {
     const vm = this;
     vm.OsServer.downloadResults(datapoint).then(() => {
-      // TODO: toaster - success!
+      vm.toastr.success('Results downloaded successfully!');
       }, () => {
-      // TODO: toaster - failed
+      vm.toastr.error('Error downloading Results zip file');
     });
   }
 
