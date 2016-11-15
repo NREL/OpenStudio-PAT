@@ -2,13 +2,15 @@ import {shell} from 'electron';
 
 export class RunController {
 
-  constructor($log, Project, OsServer, $scope, $interval) {
+  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q) {
     'ngInject';
 
     const vm = this;
     vm.$log = $log;
     vm.$interval = $interval;
+    vm.$uibModal = $uibModal;
     vm.$scope = $scope;
+    vm.$q = $q;
     vm.Project = Project;
     vm.OsServer = OsServer;
     vm.shell = shell;
@@ -52,10 +54,36 @@ export class RunController {
     vm.shell.openExternal(vm.OsServer.getServerURL());
   }
 
-  viewReports() {
+  viewReportModal(datapoint, report) {
     const vm = this;
     // TODO: implement
+    vm.$log.debug('In viewReport- ', report);
+    const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalViewReportController',
+      controllerAs: 'modal',
+      templateUrl: 'app/run/viewReport.html',
+      windowClass: 'wide-modal',
+      resolve: {
+        params: function () {
+          return {
+            datapoint: datapoint,
+            report: report
+          };
+        }
+      }
+    });
+
+    modalInstance.result.then(() => {
+      deferred.resolve('resolved');
+    }, () => {
+      // Modal canceled
+      deferred.reject('rejected');
+    });
+    return deferred.promise;
   }
+
 
   // return MM/DD/YY from date string
   // takes datestring like this: 20161110T212644Z

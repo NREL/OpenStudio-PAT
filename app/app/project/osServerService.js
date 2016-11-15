@@ -42,7 +42,6 @@ export class OsServer {
     vm.OsMetaPath = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/bin/openstudio_meta'));
     vm.mongoBinDir = jetpack.cwd(path.resolve(src.path() + '/mongo/bin'));
     vm.openstudioDir = jetpack.cwd(path.resolve(src.path() + '/openstudio/'));
-    vm.resultsDir = '';
 
     // Depends on system type (windows vs mac)
     vm.platform = os.platform();
@@ -343,9 +342,6 @@ export class OsServer {
     vm.$log.debug('***** In osServerService::runAnalysis() *****');
     const deferred = vm.$q.defer();
 
-    // create folder
-    vm.resultsDir = vm.jetpack.dir(vm.Project.projectDir.path('localResults'));
-
     // run META CLI will return status code: 0 = success, 1 = failure
     // TODO: catch what analysis type it is
 
@@ -503,7 +499,7 @@ export class OsServer {
         // save OSW to file
         vm.$log.debug('DATAPOINT OUT.OSW response: ', response.data);
        let datapoint = response.data;
-        vm.jetpack.write(vm.resultsDir.path(dp.id, 'out.osw'), datapoint);
+        vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(dp.id, 'out.osw'), datapoint);
 
         // also load in datapoints array
         datapoint.status = dp.status;
@@ -591,7 +587,7 @@ export class OsServer {
               vm.$log.debug('****URL: ', reportUrl);
               const reportPromise = vm.$http.get(reportUrl, config).then( response => {
                 // write file and set downloaded flag
-                vm.jetpack.write(vm.resultsDir.path(dp.id, file.attachment_file_name), response.data);
+                vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(dp.id, file.attachment_file_name), response.data);
                 file.downloaded = true;
 
               }, reportError => {

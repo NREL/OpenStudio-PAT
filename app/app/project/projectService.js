@@ -55,6 +55,7 @@ export class Project {
     vm.openstudioCLIMD5 = null;
     vm.openstudioMD5 = null;
     vm.projectDir = null;  // this is a jetpack object (like all other *Dir variables)
+    vm.projectLocalResultsDir = null;
     vm.projectName = null;
     vm.mongoDir = null;
     vm.logsDir = null;
@@ -693,6 +694,17 @@ export class Project {
     const vm = this;
     // this should be a jetpack object (not a string)
     vm.projectDir = dir;
+    vm.setProjectLocalResultsDir(dir);
+  }
+
+  setProjectLocalResultsDir(projectDir) {
+    const vm = this;
+    vm.projectLocalResultsDir = vm.jetpack.dir(projectDir.path('localResults'));
+  }
+
+  getProjectLocalResultsDir(){
+    const vm =this;
+    return vm.projectLocalResultsDir;
   }
 
   // projectDir is a jetpack object (not a string)
