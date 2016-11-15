@@ -59,7 +59,7 @@
 <div ng-if="datapoints.length > 0" class="run-datapoints">
   <div class="row datapoint-header">
     <div class="col-sm-2">Name</div>
-    <div class="col-sm-2">Last Run</div>
+    <div class="col-sm-1">Last Run</div>
     <div class="col-sm-1">Run Time</div>
     <div class="col-sm-1">Status</div>
     <div class="col-sm-1">NAs</div>
@@ -87,10 +87,11 @@
               <div class="col-sm-1"><span class="badge red-badge square-badge">{{run.calculateErrors(datapoint)}}</span></div>
               <div class="col-sm-1">&nbsp;&nbsp;<span class="badge orange-badge">C</span></div>
               <div class="col-sm-3">
-                <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM" ng-show="datapoint.status == 'completed' && serverStatus == 'started'"/>
+                <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.id}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_osm"/>
+                <img ng-src="assets/images/resultcloud_blue.png" alt="Download Results for datapoint {{datapoint.id}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_results" />
                 <img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.downloaded_reports != true" />
-                <div class="btn-group" uib-dropdown ng-show="datapoint.downloaded_reports">
-                  <button id="datapoint_{{datapoint.id}}_reports" type="button" class="btn btn-default light-gray-button" uib-dropdown-toggle ng-disabled="disabled">
+                <div class="btn-group" uib-dropdown auto-close="always" ng-show="datapoint.downloaded_reports">
+                  <button id="datapoint_{{datapoint.id}}_reports" type="button" class="btn btn-default light-gray-button" uib-dropdown-toggle ng-disabled="disabled" ng-click="$event.preventDefault();$event.stopPropagation();">
                     <img ng-src="assets/images/ReportingMeasure_icon.png"  alt="View Reports for datapoint {{datapoint.name}}">
                     <span class="caret"></span>
                   </button>

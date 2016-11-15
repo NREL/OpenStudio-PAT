@@ -13,11 +13,11 @@ export class ModalViewReportController {
     vm.$sce = $sce;
 
     // set datapoint and report name
-    vm.datapoint = vm.params.datapoint;
-    vm.report = vm.params.report;
+    vm.$scope.datapoint = vm.params.datapoint;
+    vm.$scope.report = vm.params.report;
 
     // report URL
-    vm.$scope.reportURL = vm.$sce.trustAsResourceUrl('file://' + vm.Project.getProjectLocalResultsDir().path(vm.datapoint.id, vm.report));
+    vm.$scope.reportURL = vm.$sce.trustAsResourceUrl('file://' + vm.Project.getProjectLocalResultsDir().path(vm.$scope.datapoint.id, vm.$scope.report));
     vm.$log.debug('Report PATH: ', vm.$scope.reportURL);
 
   }
