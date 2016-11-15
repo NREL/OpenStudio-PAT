@@ -225,6 +225,14 @@ select {
   padding-top:10px;
 }
 
+.pad-left-25 {
+  padding-left:25px;
+}
+
+.pad-left-5 {
+  padding-left:5px;
+}
+
 .margin-top-20 {
   margin-top: 20px;
 }
@@ -679,6 +687,10 @@ h5.measure-type {
   padding-left:15px;
 }
 
+.big-cell {
+  font-size:25px;
+  padding:10px 20px;
+}
 
 .glyphicon-spin {
   animation: spin 1000ms infinite linear;

@@ -66,7 +66,18 @@
     <div class="col-sm-1">Warnings</div>
     <div class="col-sm-1">Errors</div>
     <div class="col-sm-1"><span class="badge white-badge">C</span> All</div>
-    <div class="col-sm-2"></div>
+    <div class="col-sm-3">
+      <div class="row">
+        <div class="col-sm-4">
+        </div>
+        <div class="col-sm-3 pad-left-5">
+          <img ng-src="assets/images/osmcloud_white.png" alt="Download all OSMs"/>
+        </div>
+        <div class="col-sm-4">
+          <img ng-src="assets/images/resultcloud_white.png" alt="Download all Results" />
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="row">
@@ -87,17 +98,28 @@
               <div class="col-sm-1"><span class="badge red-badge square-badge">{{run.calculateErrors(datapoint)}}</span></div>
               <div class="col-sm-1">&nbsp;&nbsp;<span class="badge orange-badge">C</span></div>
               <div class="col-sm-3">
-                <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.id}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_osm"/>
-                <img ng-src="assets/images/resultcloud_blue.png" alt="Download Results for datapoint {{datapoint.id}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_results" />
-                <img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.downloaded_reports != true" />
-                <div class="btn-group" uib-dropdown auto-close="always" ng-show="datapoint.downloaded_reports">
-                  <button id="datapoint_{{datapoint.id}}_reports" type="button" class="btn btn-default light-gray-button" uib-dropdown-toggle ng-disabled="disabled" ng-click="$event.preventDefault();$event.stopPropagation();">
-                    <img ng-src="assets/images/ReportingMeasure_icon.png"  alt="View Reports for datapoint {{datapoint.name}}">
-                    <span class="caret"></span>
-                  </button>
-                  <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="datapoint_{{datapoint.id}}_reports">
-                    <li role="menuitem" ng-repeat="result in datapoint.result_files | filter: {type: 'Report'}"><a href="#" ng-click="$event.preventDefault(); $event.stopPropagation();run.viewReportModal(datapoint, result.attachment_file_name);">{{result.attachment_file_name}}</a></li>
-                  </ul>
+                <div class="row">
+                  <div class="col-sm-4">
+                    <img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.downloaded_reports != true" />
+
+                    <div class="btn-group" uib-dropdown auto-close="always" ng-show="datapoint.downloaded_reports">
+                      <button id="datapoint_{{datapoint.id}}_reports" type="button" class="btn btn-default light-gray-button" uib-dropdown-toggle ng-disabled="disabled" ng-click="$event.preventDefault();$event.stopPropagation();">
+                        <img ng-src="assets/images/ReportingMeasure_icon.png"  alt="View Reports for datapoint {{datapoint.name}}">
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="datapoint_{{datapoint.id}}_reports">
+                        <li role="menuitem" ng-repeat="result in datapoint.result_files | filter: {type: 'Report'}"><a href="#" ng-click="$event.preventDefault(); $event.stopPropagation();run.viewReportModal(datapoint, result.attachment_file_name);">{{result.attachment_file_name}}</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_osm"/>
+                    <span class="glyphicon glyphicon-ok-sign green-button" ng-show="datapoint.status == 'completed' && datapoint.downloaded_osm"></span>
+                  </div>
+                  <div class="col-sm-4 pad-left-25">
+                    <img ng-src="assets/images/resultcloud_blue.png" alt="Download Results for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_results" ng-click="run.downloadResults(datapoint)"/>
+                    <span class="glyphicon glyphicon-ok-sign green-button big-cell" ng-show="datapoint.status == 'completed' && datapoint.downloaded_results"></span>
+                  </div>
                 </div>
               </div>
             </div>

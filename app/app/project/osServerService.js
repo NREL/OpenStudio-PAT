@@ -622,6 +622,36 @@ export class OsServer {
     return deferred.promise;
   }
 
+  // download data_point.zip
+  downloadResults(datapoint) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    // check for file in result_files to get correct name (in case it changes)
+    const file = _.find(datapoint.result_files, {type: 'Data Point'});
+
+    if (file) {
+      const reportUrl = vm.serverURL + '/data_points/' + datapoint.id + '/download_result_file';
+      const params = {filename: file.attachment_file_name};
+      const config = { params: params, headers : {Accept: 'application/json'} };
+      vm.$log.debug('Download Results URL: ', reportUrl);
+      vm.$http.get(reportUrl, config).then( response => {
+        // write file and set downloaded flag
+        vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
+        file.downloaded = true;
+        datapoint.downloaded_results = true;
+        deferred.resolve();
+      }, error => {
+        vm.$log.debug('GET results zip error: ', error);
+        deferred.reject();
+      });
+    } else {
+      vm.$log.debug('No zip file listed in the result_files for this datapoint');
+      deferred.reject();
+    }
+    return deferred.promise;
+  }
+
   stopAnalysis() {
     const vm = this;
     const deferred = vm.$q.defer();

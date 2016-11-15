@@ -84,7 +84,6 @@ export class RunController {
     return deferred.promise;
   }
 
-
   // return MM/DD/YY from date string
   // takes datestring like this: 20161110T212644Z
   extractDate(dateString) {
@@ -336,7 +335,18 @@ export class RunController {
 
   }
 
+  downloadResults(datapoint) {
+    const vm = this;
+    vm.OsServer.downloadResults(datapoint).then(() => {
+      // TODO: toaster - success!
+      }, () => {
+      // TODO: toaster - failed
+    });
+  }
+
   exportPAT() {
+    // this saves PAT
+    // TODO: deprecate
     const vm = this;
     vm.Project.exportPAT();
 
@@ -350,21 +360,25 @@ export class RunController {
   runSelected() {
     const vm = this;
     vm.toggleButtons();
+    // TODO
   }
 
   runUpdated() {
     const vm = this;
     vm.toggleButtons();
+    // TODO
   }
 
   runEnergyPlus() {
     const vm = this;
     vm.toggleButtons();
+    // TODO
   }
 
   runReportingMeasures() {
     const vm = this;
     vm.toggleButtons();
+    // TODO
   }
 
   toggleButtons() {
