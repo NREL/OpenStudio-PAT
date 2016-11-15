@@ -24,20 +24,20 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
           OsServer.stopServer(true).then(response => {
             //  server is stopped
             // for debug: save a random file to make sure server is stopped (when a project is selected)
-            jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
-              status: OsServer.getServerStatus(),
-              stopServer: 'success',
-              response: response
-            });
+            // jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
+            //   status: OsServer.getServerStatus(),
+            //   stopServer: 'success',
+            //   response: response
+            // });
             exitReady = true;
             app.quit();
 
           }, error => {
-            jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
-              status: OsServer.getServerStatus(),
-              stopServer: 'fail',
-              response: error
-            });
+            // jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
+            //   status: OsServer.getServerStatus(),
+            //   stopServer: 'fail',
+            //   response: error
+            // });
             exitReady = true;
             app.quit();
           });
@@ -49,7 +49,7 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
       } catch(e) {
         // TODO: log something to a file
         if (Project.getProjectDir() != null){
-          jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'There was an error closing the app.'});
+          //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'There was an error closing the app.'});
         }
         exitReady = true;
         app.quit();

@@ -201,7 +201,10 @@ export default {
     modalAnalysisRunning: {
       title: 'Analysis is Running',
       message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'
-    }
+    },
+    viewReport: 'View Report',
+    for: 'for'
+
   },
   statusBar: {
     Downloading: 'Downloading',

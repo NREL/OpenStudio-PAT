@@ -57,6 +57,7 @@ export class Project {
     vm.openstudioCLIMD5 = null;
     vm.openstudioMD5 = null;
     vm.projectDir = null;  // this is a jetpack object (like all other *Dir variables)
+    vm.projectLocalResultsDir = null;
     vm.projectName = null;
     vm.mongoDir = null;
     vm.logsDir = null;
@@ -347,6 +348,12 @@ export class Project {
       const da_hash = {};
       da_hash.name = da.name;
       da_hash.description = da.description;
+      if (da.seedModel != vm.defaultSeed){
+        const seed = {};
+        seed.file_type = 'OSM';
+        seed.path = './seeds/' + da.seedModel;
+        da_hash.seed = seed;
+      }
       vm.osa.analysis.problem.design_alternatives.push(da_hash);
     });
 
@@ -684,6 +691,17 @@ export class Project {
     const vm = this;
     // this should be a jetpack object (not a string)
     vm.projectDir = dir;
+    vm.setProjectLocalResultsDir(dir);
+  }
+
+  setProjectLocalResultsDir(projectDir) {
+    const vm = this;
+    vm.projectLocalResultsDir = vm.jetpack.dir(projectDir.path('localResults'));
+  }
+
+  getProjectLocalResultsDir(){
+    const vm =this;
+    return vm.projectLocalResultsDir;
   }
 
   // projectDir is a jetpack object (not a string)

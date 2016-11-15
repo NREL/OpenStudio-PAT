@@ -296,7 +296,7 @@ select {
   }
 
   .panel-title {
-    font-size: 14px;
+    font-size: 12px;
     border: 0 none;
   }
 
@@ -310,21 +310,27 @@ select {
 }
 
 .bcl-p {
-  font-size: 1em;
+  font-size: 1.3em;
 }
 
 .lib-grid {
   /*font-size: 0.8em;*/
   height: 800px;
+  font-size:1.4em;
 }
 
 .lib-details {
   /*font-size: 0.8em;*/
 }
 
+.lib-filters {
+ font-size:12px;
+}
+
 .grid {
   width: 100%;
   height: 250px;
+  font-size: 12px;
 }
 
 /* TODO: Something is wrong, fix this later */
@@ -392,6 +398,12 @@ select {
 
 .gray-button {
   color: #D6D6D6;
+}
+
+.light-gray-button {
+  color: #333;
+  background-color: #e6e6e6;
+  border-color: #adadad;
 }
 
 .black-button {
@@ -680,6 +692,8 @@ h5.measure-type {
     transform: rotate(359deg);
   }
 }
+
+
 
 /**
  *  Do not remove the comments below. It's the markers used by gulp-inject to inject
