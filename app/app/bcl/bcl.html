@@ -94,17 +94,19 @@
                 <td>{{attr.value}}</td>
               </tr>
             </table>
-            <h4 translate>bcl.aside.files</h4>
-            <table class="table table-striped">
-              <tr ng-repeat="file in modal.selected.files">
-                <td>
-                  <strong>{{file.filename}}</strong>
-                  <span ng-if="file.version.softwareProgram != null"><br><em>{{file.version.softwareProgram}} {{file.version.identifier}}</em></span>
-                  <span ng-if="file.version.minCompatible != null"><br><em><translate>bcl.aside.minCompatibleVersion</translate>: {{file.version.minCompatible}}</em></span>
-                  <span ng-if="file.version.maxCompatible != null"><br><em><translate>bcl.aside.maxCompatibleVersion</translate>: {{file.version.maxCompatible}}</em></span>
-                </td>
-              </tr>
-            </table>
+            <div ng-show="modal.selected.files">
+              <h4 translate>bcl.aside.files</h4>
+              <table class="table table-striped">
+                <tr ng-repeat="file in modal.selected.files">
+                  <td>
+                    <strong>{{file.filename}}</strong>
+                    <span ng-if="file.version.softwareProgram != null"><br><em>{{file.version.softwareProgram}} {{file.version.identifier}}</em></span>
+                    <span ng-if="file.version.minCompatible != null"><br><em><translate>bcl.aside.minCompatibleVersion</translate>: {{file.version.minCompatible}}</em></span>
+                    <span ng-if="file.version.maxCompatible != null"><br><em><translate>bcl.aside.maxCompatibleVersion</translate>: {{file.version.maxCompatible}}</em></span>
+                  </td>
+                </tr>
+              </table>
+            </div>
           </div>
         </div>
       </aside>

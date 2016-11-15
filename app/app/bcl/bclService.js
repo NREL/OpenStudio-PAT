@@ -18,10 +18,6 @@ export class BCL {
     vm.bclMeasures = [];
     vm.bclUrl = 'https://bcl.nrel.gov/api/';
 
-    vm.myMeasuresDir = vm.Project.getMeasureDir();
-    vm.localDir = vm.Project.getLocalBCLDir();
-    vm.projectDir = vm.Project.getProjectMeasuresDir();
-
     // assign measures by type
     vm.libMeasures = {
       my: [],
@@ -38,7 +34,9 @@ export class BCL {
     vm.onlineBCLcheck = false;
 
     // set project
-    vm.resetProjectVariables();
+    if (vm.Project.getProjectName() != null){
+      vm.resetProjectVariables();
+    }
 
   }
 
@@ -83,7 +81,7 @@ export class BCL {
     vm.MeasureManager.isReady().then( () => {
       vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates...');
       // the path doesn't work if the trailing slash isn't there!
-      vm.MeasureManager.updateMeasures(vm.myMeasuresDir.path() + '/').then(updatedMeasures => {
+      vm.MeasureManager.updateMeasures(vm.Project.getMeasureDir().path() + '/').then(updatedMeasures => {
         const newMeasures = [];
         // update MyMeasure Directory and rerun prepare measure
         _.forEach(updatedMeasures, (measure) => {
@@ -130,7 +128,7 @@ export class BCL {
     vm.MeasureManager.isReady().then( () => {
       vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates LocalBCL...');
       // the path doesn't work if the trailing slash isn't there!
-      vm.MeasureManager.updateMeasures(vm.localDir.path() + '/').then(updatedMeasures => {
+      vm.MeasureManager.updateMeasures(vm.Project.getLocalBCLDir().path() + '/').then(updatedMeasures => {
         const newMeasures = [];
         vm.$log.debug('measureManager updates done');
         // update LocalBCL Directory and rerun prepare measure
@@ -451,11 +449,11 @@ export class BCL {
       const zip = new vm.AdmZip(buf);
       // extract to location (and overwrite)
       // TODO: verify that this does in fact overwrite and not error out
-      zip.extractAllTo(vm.localDir.path() + '/', true);
+      zip.extractAllTo(vm.Project.getLocalBCLDir().path() + '/', true);
 
       vm.$log.debug('DOWNLOADED measure name: ', measure.name);
       vm.$log.debug('DOWNLOADED measure display_name: ', measure.display_name);
-      vm.$log.debug('DOWNLOADED measure path: ', vm.localDir.path(measure.display_name));
+      vm.$log.debug('DOWNLOADED measure path: ', vm.Project.getLocalBCLDir().path(measure.display_name));
 
       // use computeArguments to add to localMeasures array
       // vm.$log.debug('new measure before compute args: ', measure);
@@ -467,7 +465,7 @@ export class BCL {
         originalName = bclMatch.name;
       }
 
-      vm.MeasureManager.computeArguments(vm.localDir.path(originalName)).then( (newMeasure) => {
+      vm.MeasureManager.computeArguments(vm.Project.getLocalBCLDir().path(originalName)).then( (newMeasure) => {
         vm.$log.debug('new measure after compute args', newMeasure);
         newMeasure = vm.prepareMeasure(newMeasure, 'local');
 
@@ -512,7 +510,6 @@ export class BCL {
   }
 
   // GET ALL MEASURE CATEGORIES
-  // TODO: SHOULD PROBABLY MOVE THAT TO MAIN ROUTING WITH PROMISES (LIKE CONSTRUCTIONS IN CBECC-COM)
   getCategories() {
     const vm = this;
     const deferred = vm.$q.defer();
@@ -562,7 +559,7 @@ export class BCL {
 
 
   // OPEN BCL LIBRARY MODAL
-  // TODO: update is not necessary: we always check for updates
+  // TODO: update is not necessary: we always check for updates (remove update variable)
   openBCLModal(types = [], filters = [], update = false) {
     const vm = this;
     const deferred = vm.$q.defer();
