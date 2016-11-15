@@ -9,7 +9,7 @@ import archiver from 'archiver';
 const {app, dialog} = remote;
 
 export class Project {
-  constructor($log, MeasureManager) {
+  constructor($q, $log, MeasureManager) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -19,6 +19,7 @@ export class Project {
     vm.MeasureManager = MeasureManager;
     vm.dialog = dialog;
     vm.archiver = archiver;
+    vm.$q = $q;
 
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
@@ -129,7 +130,7 @@ export class Project {
   initializeProject() {
     const vm = this;
     vm.$log.debug('Project initializeProject');
-    if (angular.isDefined(vm.projectName)){
+    if (angular.isDefined(vm.projectName)) {
       const filename = vm.projectDir.path('pat.json');
       vm.$log.debug('filename: ', filename);
       // for new and existing projects
@@ -239,9 +240,11 @@ export class Project {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.$log.debug('in Project computeAllMeasureArguments()');
-    const osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
+    let osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
 
     _.forEach(vm.measures, (measure) => {
+      if (_.isNil(measure.seed)) osmPath = vm.seedDir.path(measure.seed);
+
       vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
         // merge with existing project measure
         vm.$log.debug('New computed measure: ', newMeasure);
@@ -265,6 +268,45 @@ export class Project {
           }
         });
 
+      });
+
+    });
+
+    // recalculate pretty options
+    vm.savePrettyOptions();
+
+    deferred.resolve();
+    return deferred.promise;
+
+  }
+
+  computeMeasureArguments(measure) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('in Project computeMeasureArguments()');
+    const osmPath = vm.seedDir.path(measure.seed);
+
+    vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
+      // merge with existing project measure
+      vm.$log.debug('New computed measure: ', newMeasure);
+
+      // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
+      _.forEachRight(measure.arguments, (arg, index) => {
+        if (_.isUndefined(arg.specialRowId)) {
+          const match = _.find(measure.arguments, {name: arg.name});
+          if (_.isUndefined(match)) {
+            measure.arguments.splice(index, 1);
+          }
+        }
+      });
+      // then add/merge (at argument level)
+      _.forEach(newMeasure.arguments, (arg) => {
+        const match = _.find(measure.arguments, {name: arg.name});
+        if (_.isUndefined(match)) {
+          measure.arguments.push(arg);
+        } else {
+          _.merge(match, arg);
+        }
       });
 
     });
@@ -302,22 +344,22 @@ export class Project {
       console.log('archiver has been finalized and the output file descriptor has closed.');
     });
 
-    archive.on('error', function(err){
+    archive.on('error', function (err) {
       throw err;
     });
 
     archive.pipe(output);
 
     archive.bulk([
-      { expand: true, cwd: vm.projectMeasuresDir.path(), src: ['**'], dest: 'measures/'}
+      {expand: true, cwd: vm.projectMeasuresDir.path(), src: ['**'], dest: 'measures/'}
     ]);
 
     archive.bulk([
-      { expand: true, cwd: vm.seedDir.path(), src: ['**'], dest: 'seeds/'}
+      {expand: true, cwd: vm.seedDir.path(), src: ['**'], dest: 'seeds/'}
     ]);
 
     archive.bulk([
-      { expand: true, cwd: vm.weatherDir.path(), src: ['**'], dest: 'weather/'}
+      {expand: true, cwd: vm.weatherDir.path(), src: ['**'], dest: 'weather/'}
     ]);
 
     archive.finalize();
@@ -348,7 +390,7 @@ export class Project {
       const da_hash = {};
       da_hash.name = da.name;
       da_hash.description = da.description;
-      if (da.seedModel != vm.defaultSeed){
+      if (da.seedModel != vm.defaultSeed) {
         const seed = {};
         seed.file_type = 'OSM';
         seed.path = './seeds/' + da.seedModel;
@@ -412,14 +454,13 @@ export class Project {
           vm.$log.debug('ARGUMENT, not variable!');
           const argument = {};
           argument.display_name = arg.display_name;
-          argument.display_name_short = arg.display_name_short ? arg.display_name_short: arg.display_name;
+          argument.display_name_short = arg.display_name_short ? arg.display_name_short : arg.display_name;
           argument.name = arg.name;
           argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
           argument.default_value = arg.default_value;
           argument.value = arg.option_1 ? arg.option_1 : arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
           // Make sure that argument is "complete"
-          if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value))
-          {
+          if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
             var_count += 1;
             m.arguments.push(argument);
           } else {
@@ -699,8 +740,8 @@ export class Project {
     vm.projectLocalResultsDir = vm.jetpack.dir(projectDir.path('localResults'));
   }
 
-  getProjectLocalResultsDir(){
-    const vm =this;
+  getProjectLocalResultsDir() {
+    const vm = this;
     return vm.projectLocalResultsDir;
   }
 
@@ -1272,7 +1313,7 @@ export class Project {
 
   setSeeds() {
     const vm = this;
-    if (angular.isDefined(vm.seedDir)){
+    if (angular.isDefined(vm.seedDir)) {
       if (vm.jetpack.exists(vm.seedDir.cwd())) {
         vm.seeds = vm.seedDir.find('.', {matching: '*.osm'}, 'relativePath');
         _.forEach(vm.seeds, (seed, index) => {
@@ -1288,7 +1329,7 @@ export class Project {
 
   setWeatherFiles() {
     const vm = this;
-    if (angular.isDefined(vm.weatherDir)){
+    if (angular.isDefined(vm.weatherDir)) {
       if (vm.jetpack.exists(vm.weatherDir.cwd())) {
         vm.weatherFiles = vm.weatherDir.find('.', {matching: '*.epw'}, 'relativePath');
         _.forEach(vm.weatherFiles, (w, index) => {
