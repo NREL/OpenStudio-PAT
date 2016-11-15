@@ -350,6 +350,12 @@ export class Project {
       const da_hash = {};
       da_hash.name = da.name;
       da_hash.description = da.description;
+      if (da.seedModel != vm.defaultSeed){
+        const seed = {};
+        seed.file_type = 'OSM';
+        seed.path = './seeds/' + da.seedModel;
+        da_hash.seed = seed;
+      }
       vm.osa.analysis.problem.design_alternatives.push(da_hash);
     });
 
