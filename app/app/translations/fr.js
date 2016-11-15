@@ -37,6 +37,7 @@ export default {
     duplicateMeasureAndOption: 'Duplicate Measure & Option',
     duplicateOption: 'Duplicate Option',
     energyplusMeasures: 'EnergyPlus Measures',
+    modelToBaseInputsOn: 'Model To Base Inputs On',
     openstudioMeasures: 'OpenStudio Measures',
     reportingMeasures: 'Reporting Measures',
     samplingMethod: 'Sampling Method',
@@ -203,7 +204,7 @@ export default {
       message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'
     },
     viewReport: 'View Report',
-    for: 'for'
+    'for': 'for'
   },
   statusBar: {
     Downloading: 'Downloading',

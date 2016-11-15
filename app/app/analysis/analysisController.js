@@ -18,7 +18,6 @@ export class AnalysisController {
     vm.BCL = BCL;
     vm.dialog = dialog;
 
-
     vm.analysisTypes = vm.Project.getAnalysisTypes();
     vm.$scope.seeds = vm.Project.getSeeds();
     vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
@@ -28,6 +27,9 @@ export class AnalysisController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+    _.forEach(vm.$scope.measures, (measure) => {
+      if (_.isNil(measure.seed)) measure.seed = vm.$scope.defaultSeed;
+    });
     vm.$log.debug('****ANALYSIS TAB****');
     vm.$log.debug('ANALYSIS MEASURES RETRIEVED: ', vm.$scope.measures);
 
@@ -485,8 +487,11 @@ export class AnalysisController {
 
   setSeed() {
     const vm = this;
-    vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
     vm.$log.debug('In Analysis::setSeed');
+    vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
+    _.forEach(vm.$scope.measures, (measure) => {
+      measure.seed = vm.$scope.defaultSeed;
+    });
     // recompute model-dependent measure arguments when resetting seed
     vm.Project.computeAllMeasureArguments();
   }
@@ -576,7 +581,7 @@ export class AnalysisController {
     // find measure to swap with (with same type)
     const swapping_measure = _.find(vm.$scope.measures, {workflow_index: new_index, type: measure.type});
     // only move if you can
-    if (swapping_measure){
+    if (swapping_measure) {
       vm.$log.debug('moving measure');
       measure.workflow_index = new_index;
       swapping_measure.workflow_index = index;
