@@ -345,6 +345,15 @@ export class RunController {
     });
   }
 
+  downloadAllResults() {
+    const vm = this;
+    vm.OsServer.downloadAllResults().then(() => {
+      vm.toastr.success('All Results downloaded successfully!');
+    }, () => {
+      vm.toastr.success('Error downloading Results zip files');
+    });
+  }
+
   exportPAT() {
     // this saves PAT
     // TODO: deprecate

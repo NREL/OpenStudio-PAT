@@ -622,6 +622,30 @@ export class OsServer {
     return deferred.promise;
   }
 
+  // download data_point.zip for all datapoints
+  downloadAllResults() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const promises = [];
+
+    vm.datapoints = vm.Project.getDatapoints();
+
+    _.forEach(vm.datapoints, dp => {
+      const promise = vm.downloadResults(dp);
+      promises.push(promise);
+    });
+
+    vm.$q.all(promises).then(response => {
+      vm.$log.debug('All Datapoint results zip files downloaded');
+      deferred.resolve();
+    }, error => {
+      vm.$log.debug('ERROR downloading all datapoint results zip files', error);
+      deferred.reject(error);
+    });
+    return deferred.promise;
+
+  }
+
   // download data_point.zip
   downloadResults(datapoint) {
     const vm = this;
