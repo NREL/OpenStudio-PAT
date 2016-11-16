@@ -65,7 +65,7 @@
     <div class="col-sm-1">NAs</div>
     <div class="col-sm-1">Warnings</div>
     <div class="col-sm-1">Errors</div>
-    <div class="col-sm-1"><span class="badge white-badge">C</span> All</div>
+    <div class="col-sm-1"><span class="badge white-badge dp-badge" ng-click="$event.preventDefault(); $event.stopPropagation();run.clearAllDatapoints()">C</span> All</div>
     <div class="col-sm-3">
       <div class="row">
         <div class="col-sm-4">
@@ -86,24 +86,24 @@
         <uib-accordion-group ng-repeat="datapoint in datapoints" id="{{datapoint.id}}" is-open="datapoint.open">
           <uib-accordion-heading>
             <div class="row datapoint-header">
-              <div class="col-sm-2">
+              <div class="col-sm-2 pad-top-10">
                 <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
                 {{datapoint.name}}
               </div>
-              <div class="col-sm-1">{{run.extractDate(datapoint.updated_at)}}</div>
-              <div class="col-sm-1">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
-              <div class="col-sm-1 green-text">{{datapoint.status}}</div>
-              <div class="col-sm-1">{{run.calculateNAs(datapoint)}}</div>
-              <div class="col-sm-1"><span class="badge orange-badge square-badge">{{run.calculateWarnings(datapoint)}}</span></div>
-              <div class="col-sm-1"><span class="badge red-badge square-badge">{{run.calculateErrors(datapoint)}}</span></div>
-              <div class="col-sm-1">&nbsp;&nbsp;<span class="badge orange-badge">C</span></div>
+              <div class="col-sm-1 pad-top-10">{{run.extractDate(datapoint.updated_at)}}</div>
+              <div class="col-sm-1 pad-top-10">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
+              <div class="col-sm-1 green-text pad-top-10">{{datapoint.status}}</div>
+              <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
+              <div class="col-sm-1 pad-top-10"><span class="badge orange-badge square-badge dp-badge">{{run.calculateWarnings(datapoint)}}</span></div>
+              <div class="col-sm-1 pad-top-10"><span class="badge red-badge square-badge dp-badge">{{run.calculateErrors(datapoint)}}</span></div>
+              <div class="col-sm-1 pad-top-10">&nbsp;&nbsp;<span class="badge orange-badge dp-badge" ng-click="$event.preventDefault(); $event.stopPropagation();run.clearDatapoint(datapoint)">&nbsp;C&nbsp;</span></div>
               <div class="col-sm-3">
                 <div class="row">
                   <div class="col-sm-4">
                     <img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.downloaded_reports != true" />
 
                     <div class="btn-group" uib-dropdown auto-close="always" ng-show="datapoint.downloaded_reports">
-                      <button id="datapoint_{{datapoint.id}}_reports" type="button" class="btn btn-default light-gray-button" uib-dropdown-toggle ng-disabled="disabled" ng-click="$event.preventDefault();$event.stopPropagation();">
+                      <button id="datapoint_{{datapoint.id}}_reports" type="button" class="btn view-report-button" uib-dropdown-toggle ng-disabled="disabled" ng-click="$event.preventDefault();$event.stopPropagation();">
                         <img ng-src="assets/images/ReportingMeasure_icon.png"  alt="View Reports for datapoint {{datapoint.name}}">
                         <span class="caret"></span>
                       </button>
@@ -114,7 +114,7 @@
                   </div>
                   <div class="col-sm-3">
                     <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_osm" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadOSM(datapoint)"/>
-                    <span class="glyphicon glyphicon-ok-sign green-button" ng-show="datapoint.status == 'completed' && datapoint.downloaded_osm"></span>
+                    <span class="glyphicon glyphicon-ok-sign green-button big-cell" ng-show="datapoint.status == 'completed' && datapoint.downloaded_osm"></span>
                   </div>
                   <div class="col-sm-4 pad-left-25">
                     <img ng-src="assets/images/resultcloud_blue.png" alt="Download Results for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_results" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadResults(datapoint)"/>

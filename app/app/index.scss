@@ -408,10 +408,12 @@ select {
   color: #D6D6D6;
 }
 
-.light-gray-button {
+.view-report-button {
   color: #333;
   background-color: #e6e6e6;
   border-color: #adadad;
+  padding:3px;
+
 }
 
 .black-button {
@@ -690,6 +692,10 @@ h5.measure-type {
 .big-cell {
   font-size:25px;
   padding:10px 20px;
+}
+
+.dp-badge {
+  font-size:14px;
 }
 
 .glyphicon-spin {

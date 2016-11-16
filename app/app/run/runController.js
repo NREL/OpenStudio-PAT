@@ -372,6 +372,26 @@ export class RunController {
     });
   }
 
+  clearDatapoint(datapoint) {
+    const vm = this;
+    vm.$log.debug('In clear datapoint');
+    // TODO:  also clear files from localResults folder?
+    const index = _.findIndex(vm.$scope.datapoints, {id: datapoint.id});
+    if (index != -1) {
+      // datapoint found, delete
+      vm.$scope.datapoints.splice(index, 1);
+    } else {
+      vm.$log.debug('Datapoint ID not found in array');
+    }
+  }
+
+  clearAllDatapoints() {
+    const vm = this;
+    vm.$log.debug('In clear ALL Datapoints');
+    // TODO:  also clear files from localResults folder?
+    vm.Project.setDatapoints([]);
+    vm.$scope.datapoints = vm.Project.getDatapoints();
+  }
 
   exportPAT() {
     // this saves PAT
