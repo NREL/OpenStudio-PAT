@@ -382,6 +382,10 @@ select {
   color: #C9302C;
 }
 
+.orange-button {
+  color: #E7AB5F;
+}
+
 .blue-button {
   color: #519ED4;
 }
@@ -396,6 +400,28 @@ select {
 
 .black-badge {
   background-color: #000000;
+}
+
+.orange-badge {
+  background-color: #E7AB5F;
+}
+
+.square-badge {
+  border-radius: 0 !important;
+}
+
+.red-badge {
+  background-color:#E26A61;
+}
+
+.white-badge {
+  background-color: #ffffff;
+  color: #000000;
+  border: 1px solid #000000;
+}
+
+.green-text {
+  color: #74C277;
 }
 
 .library-grid-button-container {
@@ -497,7 +523,7 @@ h5.measure-type {
 }
 
 .tab-text {
-  font-size: 20px;
+  font-size: 16px;
 }
 
 .black-line {
@@ -517,6 +543,130 @@ h5.measure-type {
   background-color: #333;
   border-color: #4cae4c;
 }
+
+/* RUN tab */
+.row-borders {
+  border-bottom: 1px solid #e9e9e9;
+  border-top: 1px solid #e9e9e9;
+  margin-bottom:10px;
+  padding:10px 0px;
+}
+
+.run-datapoints {
+
+  .panel-body {
+    padding:0px;
+  }
+  .panel-default > .panel-heading {
+    background-color:#E9E9E9;
+
+    .orange-badge {
+      background-color: #E7AB5F;
+    }
+
+    .square-badge {
+      border-radius: 0 !important;
+      color:#000;
+    }
+
+    .red-badge {
+      background-color:#E26A61;
+    }
+  }
+
+  .orange-badge {
+    background-color: #E7AB5F;
+  }
+
+  .square-badge {
+    border-radius: 0 !important;
+    color:#000;
+  }
+
+  .red-badge {
+    background-color:#E26A61;
+  }
+}
+.no-border {
+  border-top: 0px;
+  border-left: 0px;
+  border-right: 0px;
+}
+.run-measures {
+
+  padding:0px;
+
+  .panel {
+    border: 0;
+    /* border-radius: 0; */
+    /* -webkit-box-shadow: 0 0 0 rgba(0, 0, 0, 0.0); */
+    /* box-shadow: 0 0 0 rgba(0, 0, 0, 0.0); */
+
+  }
+
+  .panel-body {
+    padding: 10px 20px;
+  }
+
+  .panel-group {
+    margin-bottom:0px;
+
+  }
+
+  .panel-default {
+
+  }
+
+  a:hover, a:focus {
+    text-decoration: none;
+  }
+
+  .panel-default > .panel-heading {
+    background-color: #ffffff;
+    color: #000;
+    border:0;
+    .orange-badge {
+      background-color: #E7AB5F;
+    }
+
+    .square-badge {
+      border-radius: 0 !important;
+    }
+
+    .red-badge {
+      background-color:#E26A61;
+    }
+  }
+
+  .orange-badge {
+    background-color: #E7AB5F;
+  }
+
+  .square-badge {
+    border-radius: 0 !important;
+    color:#000;
+  }
+
+  .red-badge {
+    background-color:#E26A61;
+  }
+
+}
+
+.datapoint-header {
+  font-size: 14px;
+  font-weight: bold;
+}
+
+.measure-accordion {
+  font-size: 14px;
+}
+
+.measure-accordion-body {
+  font-size: 13px;
+  padding-left:15px;
+}
+
 
 .glyphicon-spin {
   animation: spin 1000ms infinite linear;

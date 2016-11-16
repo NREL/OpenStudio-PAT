@@ -1,6 +1,9 @@
 import jetpack from 'fs-jetpack';
 import os from 'os';
+import {remote} from 'electron';
+import env from '../../env';
 
+const {app} = remote;
 export class ReportsController {
 
   constructor($log, Project, $scope) {
@@ -12,14 +15,26 @@ export class ReportsController {
     vm.$log = $log;
     vm.$scope = $scope;
     vm.Project = Project;
+    vm.env = env;
+    vm.preloadPath = 'file://';
 
     // data to pass to preloader script
     vm.$scope.datapoints = vm.Project.getDatapoints();
+    vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
+    vm.testResults = vm.$scope.datapoints;
 
-    // TODO: we'll have to figure out this if it needs to be an absolute path
-    vm.$scope.preloadPath = '/Users/kflemin/repos/OpenStudio-PAT/app/app/reports/preload.js';
+    // preload.js path depends on environment.  we need full path to file
+    if (vm.env == 'production') {
+      // TODO: this doesn't work correctly
+      vm.$scope.preloadPath = 'asar://scripts/preload.js';
+    } else {
+      vm.$scope.preloadPath = 'file://' + app.getAppPath() + '/scripts/preload.js';
+    }
+
+    vm.$log.debug("PRELOAD PATH: ", vm.$scope.preloadPath);
 
     // Find all possible reports
+    // TODO: this must be reworked for production
     var html_reports = vm.jetpack.find('app/app/reports/projectReports', {matching: '*.html'});
     vm.$scope.projectReports = [];
     _.forEach(html_reports, function (html_report) {
@@ -54,6 +69,10 @@ export class ReportsController {
     // Uncomment this to view webview developer tools to debug project reports
    //vm.openWebViewDevTools();
 
+    //pass data into webview when dom is ready
+    angular.element(document).ready(function () {
+      vm.passData();
+    });
   }
 
   // Opens the developer tools for the webview
@@ -63,6 +82,13 @@ export class ReportsController {
       console.log('Opening the dev tools for the webview.');
       wv.openDevTools();
     });
+  }
+
+  // pass Data to report.html
+  passData() {
+    const vm = this;
+    var wv = document.getElementById('wv');
+    wv.executeJavaScript("setData(" + JSON.stringify(vm.testResults) +  ");");
   }
 
 }

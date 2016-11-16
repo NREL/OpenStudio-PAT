@@ -46,33 +46,79 @@
 </div>
 
 <div ng-show="analysisID != undefined">
-  <div class="row">
-    <div class="col-sm-12">
-      <h3>Analysis Details</h3>
+  <div class="row row-borders">
+    <div class="col-sm-6 tab-text">
+       <label>Analysis ID</label> {{analysisID}}
     </div>
-  </div>
-  <div class="row">
-    <div class="col-sm-5 tab-text">
-       <label>ID</label> {{analysisID}}
-    </div>
-    <div class="col-sm-4 tab-text">
+    <div class="col-sm-4 tab-text" ng-if="analysisStatus != ''">
       <label>Status</label> {{analysisStatus}}
     </div>
   </div>
 </div>
 
-<div ng-if="datapoints.length > 0">
+<div ng-if="datapoints.length > 0" class="run-datapoints">
+  <div class="row datapoint-header">
+    <div class="col-sm-2">Name</div>
+    <div class="col-sm-2">Last Run</div>
+    <div class="col-sm-1">Run Time</div>
+    <div class="col-sm-2">Status</div>
+    <div class="col-sm-1">NAs</div>
+    <div class="col-sm-1">Warnings</div>
+    <div class="col-sm-1">Errors</div>
+    <div class="col-sm-1"><span class="badge white-badge">C</span> All</div>
+    <div class="col-sm-1"></div>
+  </div>
+
   <div class="row">
     <div class="col-sm-12">
       <uib-accordion close-others="false">
         <uib-accordion-group ng-repeat="datapoint in datapoints" id="{{datapoint.id}}" is-open="datapoint.open">
           <uib-accordion-heading>
-            <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
-            {{datapoint.name}} - status: {{datapoint.status}} - {{datapoint.final_message}}
+            <div class="row">
+              <div class="col-sm-2">
+                <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
+                {{datapoint.name}}
+              </div>
+              <div class="col-sm-2">{{run.extractDate(datapoint.updated_at)}}</div>
+              <div class="col-sm-1">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
+              <div class="col-sm-2 green-text">{{datapoint.status}}</div>
+              <div class="col-sm-1"></div>
+              <div class="col-sm-1"><span class="badge orange-badge square-badge">{{run.calculateWarnings(datapoint)}}</span></div>
+              <div class="col-sm-1"><span class="badge red-badge square-badge">{{run.calculateErrors(datapoint)}}</span></div>
+              <div class="col-sm-1">&nbsp;&nbsp;<span class="badge orange-badge">C</span></div>
+              <div class="col-sm-1"><img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.download_status != 'downloaded'" />
+                <img ng-src="assets/images/ReportingMeasure_icon.png" alt="View Reports for datapoint {{datapoint.name}}" ng-show="datapoint.download_status == 'downloaded'" ng-click="run.viewReports()" /></div>
+            </div>
+           <!-- <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
+            {{datapoint.name}} - status: {{datapoint.status}} - {{datapoint.final_message}}-->
           </uib-accordion-heading>
-
-          <p>ID: {{datapoint.id}}</p>
-          <p>Start time: {{datapoint.started_at}}</p>
+          <div class="run-measures"></div>
+            <div class="panel panel-default full-width no-border">
+              <div class="panel-body run-measures">
+                <uib-accordion close-others="false">
+                  <uib-accordion-group ng-repeat="step in datapoint.steps" id="{{datapoint.id}}-{{step.name}}" is-open="step.open">
+                    <uib-accordion-heading>
+                      <div class="row measure-accordion">
+                        <div class="col-sm-2 bold">{{step.name}}</div>
+                        <div class="col-sm-2">{{run.extractDate(step.result.started_at)}}</div>
+                        <div class="col-sm-1">{{run.getRunTime(step.result.started_at, step.result.completed_at)}}</div>
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-1"><span class="badge orange-badge square-badge">{{step.result.step_warnings.length}}</span></div>
+                        <div class="col-sm-1"><span class="badge red-badge square-badge">{{step.result.step_errors.length}}</span></div>
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-1"></div>
+                      </div>
+                    </uib-accordion-heading>
+                    <div class="measure-accordion-body">
+                      <label>Initial Condition: </label> {{step.result.initial_condition}}<br/>
+                      <label>Final Condition: </label> {{step.result.final_condition}}<br/>
+                    </div>
+                  </uib-accordion-group>
+                </uib-accordion>
+              </div>
+            </div>
+          </div>
         </uib-accordion-group>
       </uib-accordion>
     </div>

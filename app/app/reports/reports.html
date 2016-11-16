@@ -1,4 +1,4 @@
-<div class="row" id="reportsCtrl" ng-controller="ReportsController">
+<div class="row" id="reportsCtrl">
   <div class="col-md-1 pad-bot-10">
     <h4 translate>reports.title</h4>
   </div>
@@ -13,10 +13,9 @@
   </div>
 </div>
 
-<!--TODO do we need nodeintegration when we use the preload?-->
 <webview id=wv
          src="{{ selectedReportURL }}"
-         preload="file://{{preloadPath}}"
+         preload="{{preloadPath}}"
          autosize="on"
          style="height:calc(100vh - 150px)"
          nodeintegration>
