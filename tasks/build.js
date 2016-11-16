@@ -151,7 +151,7 @@ gulp.task('download-deps', function() {
     const fileInfo = _.find(manifest[depend], {platform: platform});
     const fileName = fileInfo.name;
 
-    return progress(request(manifest.endpoint + fileName))
+    return progress(request({uri: manifest.endpoint + fileName, timeout: 5000}))
       .on('progress', state => {
         console.log(`Downloading ${depend}, ${(state.percentage * 100).toFixed(0)}%`)
       })
