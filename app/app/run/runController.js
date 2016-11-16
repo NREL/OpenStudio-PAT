@@ -350,9 +350,28 @@ export class RunController {
     vm.OsServer.downloadAllResults().then(() => {
       vm.toastr.success('All Results downloaded successfully!');
     }, () => {
-      vm.toastr.success('Error downloading Results zip files');
+      vm.toastr.error('Error downloading Results zip files');
     });
   }
+
+  downloadOSM(datapoint) {
+    const vm = this;
+    vm.OsServer.downloadOSM(datapoint).then(() => {
+      vm.toastr.success('OSM downloaded successfully!');
+    }, () => {
+      vm.toastr.error('Error downloading OSM');
+    });
+  }
+
+  downloadAllOSMs() {
+    const vm = this;
+    vm.OsServer.downloadAllOSMs().then(() => {
+      vm.toastr.success('All OSMs downloaded successfully!');
+    }, () => {
+      vm.toastr.error('Error downloading OSMs');
+    });
+  }
+
 
   exportPAT() {
     // this saves PAT

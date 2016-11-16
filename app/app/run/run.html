@@ -71,7 +71,7 @@
         <div class="col-sm-4">
         </div>
         <div class="col-sm-3 pad-left-5">
-          <img ng-src="assets/images/osmcloud_white.png" alt="Download all OSMs"/>
+          <img ng-src="assets/images/osmcloud_white.png" alt="Download all OSMs" ng-click="run.downloadAllOSMs();"/>
         </div>
         <div class="col-sm-4">
           <img ng-src="assets/images/resultcloud_white.png" alt="Download all Results" ng-click="run.downloadAllResults();" />
@@ -113,7 +113,7 @@
                     </div>
                   </div>
                   <div class="col-sm-3">
-                    <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_osm"/>
+                    <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_osm" ng-click="run.downloadOSM(datapoint)"/>
                     <span class="glyphicon glyphicon-ok-sign green-button" ng-show="datapoint.status == 'completed' && datapoint.downloaded_osm"></span>
                   </div>
                   <div class="col-sm-4 pad-left-25">

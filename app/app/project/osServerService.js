@@ -676,6 +676,60 @@ export class OsServer {
     return deferred.promise;
   }
 
+  // download OSM for all datapoints
+  downloadAllOSMs() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const promises = [];
+
+    vm.datapoints = vm.Project.getDatapoints();
+
+    _.forEach(vm.datapoints, dp => {
+      const promise = vm.downloadOSM(dp);
+      promises.push(promise);
+    });
+
+    vm.$q.all(promises).then(response => {
+      vm.$log.debug('All OSMs downloaded');
+      deferred.resolve();
+    }, error => {
+      vm.$log.debug('ERROR downloading all OSMs', error);
+      deferred.reject(error);
+    });
+    return deferred.promise;
+
+  }
+
+  // download data_point.zip
+  downloadOSM(datapoint) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    const file = _.find(datapoint.result_files, {type: 'OpenStudio Model'});
+
+    if (file) {
+      const reportUrl = vm.serverURL + '/data_points/' + datapoint.id + '/download_result_file';
+      const params = {filename: file.attachment_file_name};
+      const config = {params: params, headers: {Accept: 'application/json'}};
+      vm.$log.debug('Download OSM URL: ', reportUrl);
+      vm.$http.get(reportUrl, config).then(response => {
+        // write file and set downloaded flag
+        vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
+        file.downloaded = true;
+        datapoint.downloaded_osm = true;
+        deferred.resolve();
+      }, error => {
+        vm.$log.debug('GET OSM error: ', error);
+        deferred.reject();
+      });
+    } else {
+      vm.$log.debug('No OpenStudio model file found');
+      deferred.reject();
+    }
+
+    return deferred.promise;
+  }
+
   stopAnalysis() {
     const vm = this;
     const deferred = vm.$q.defer();
