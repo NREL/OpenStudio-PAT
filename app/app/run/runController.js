@@ -2,15 +2,18 @@ import {shell} from 'electron';
 
 export class RunController {
 
-  constructor($log, Project, OsServer, $scope, $interval) {
+  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, toastr) {
     'ngInject';
 
     const vm = this;
     vm.$log = $log;
     vm.$interval = $interval;
+    vm.$uibModal = $uibModal;
     vm.$scope = $scope;
+    vm.$q = $q;
     vm.Project = Project;
     vm.OsServer = OsServer;
+    vm.toastr = toastr;
     vm.shell = shell;
 
     vm.runTypes = vm.Project.getRunTypes();
@@ -30,8 +33,7 @@ export class RunController {
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
     vm.$log.debug('DISABLED BUTTONS? ', vm.$scope.disabledButtons);
-    vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
-    vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+    vm.$scope.progress = vm.OsServer.getProgress();
 
     // DEBUG
     vm.$log.debug('Run Type: ', vm.$scope.selectedRunType);
@@ -53,23 +55,53 @@ export class RunController {
     vm.shell.openExternal(vm.OsServer.getServerURL());
   }
 
-  viewReports() {
+  viewReportModal(datapoint, report) {
     const vm = this;
     // TODO: implement
+    vm.$log.debug('In viewReport- ', report);
+    const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalViewReportController',
+      controllerAs: 'modal',
+      templateUrl: 'app/run/viewReport.html',
+      windowClass: 'wide-modal',
+      resolve: {
+        params: function () {
+          return {
+            datapoint: datapoint,
+            report: report
+          };
+        }
+      }
+    });
+
+    modalInstance.result.then(() => {
+      deferred.resolve('resolved');
+    }, () => {
+      // Modal canceled
+      deferred.reject('rejected');
+    });
+    return deferred.promise;
   }
 
   // return MM/DD/YY from date string
   // takes datestring like this: 20161110T212644Z
   extractDate(dateString) {
-    const tmp = _.split(dateString, 'T');
-    const y = tmp[0].substring(2, 4);
-    const m = tmp[0].substring(4, 6);
-    const d = tmp[0].substring(6, 8);
+    let theDate = '';
+    if (dateString){
+      const tmp = _.split(dateString, 'T');
+      const y = tmp[0].substring(2, 4);
+      const m = tmp[0].substring(4, 6);
+      const d = tmp[0].substring(6, 8);
+      theDate = m + '/' + d + '/' + y;
+    }
 
-    return m + '/' + d + '/' + y;
+    return theDate;
   }
 
   makeDate(dateString) {
+
     const tmp = _.split(dateString, 'T');
     const year = tmp[0].substring(0, 4);
     const mth = tmp[0].substring(4, 6);
@@ -84,18 +116,21 @@ export class RunController {
 
   getRunTime(startStr, endStr){
     const vm = this;
-    const start = vm.makeDate(startStr);
-    const end = vm.makeDate(endStr);
+    let result = '';
+    if (startStr && endStr){
+      const start = vm.makeDate(startStr);
+      const end = vm.makeDate(endStr);
 
-    const diff = end-start;
-    let sec = parseInt((end-start)/1000);
-    sec = (sec < 10) ? '0' + sec : sec;
-    let min = parseInt(sec/60);
-    min = (min < 10) ? '0' + min : min;
-    let hours = parseInt(min/60);
-    hours = (hours < 10) ? '0' + hours : hours;
-    return hours + ":" + min + ":" + sec;
-
+      const diff = end-start;
+      let sec = parseInt((end-start)/1000);
+      sec = (sec < 10) ? '0' + sec : sec;
+      let min = parseInt(sec/60);
+      min = (min < 10) ? '0' + min : min;
+      let hours = parseInt(min/60);
+      hours = (hours < 10) ? '0' + hours : hours;
+      result = hours + ":" + min + ":" + sec;
+    }
+    return result;
   }
 
   calculateWarnings(dp){
@@ -114,23 +149,26 @@ export class RunController {
     return err;
   }
 
+  calculateNAs(dp) {
+    let nas = 0;
+    _.forEach(dp.steps, step => {
+      if (step.step_result == 'NotApplicable') {
+        nas = nas + 1;
+      }
+    });
+    return nas;
+  }
 
   stopServer(force = false) {
     const vm = this;
     vm.OsServer.stopServer(force).then(response => {
       vm.$log.debug('***** Server Stopped *****');
-
-      vm.OsServer.setProgressAmount(0);
-      vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
-
-      vm.OsServer.setProgressMessage('');
-      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
-
+      vm.OsServer.setProgress(0, '');
       vm.$scope.serverStatus = vm.OsServer.getServerStatus();
 
     }, response => {
-      vm.OsServer.setProgressMessage('Error Stopping Server');
-      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+      vm.OsServer.setProgress(0, 'Error Stopping Server');
+
       vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
     });
   }
@@ -138,10 +176,7 @@ export class RunController {
   // to start server on its own
   startServer(force = false) {
     const vm = this;
-
     vm.OsServer.startServer(force).then(response => {
-
-      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
       vm.$log.debug('Server Status: ', vm.$scope.serverStatus);
 
     }, response => {
@@ -155,7 +190,7 @@ export class RunController {
     vm.OsServer.pingServer().then(response => {
       vm.$scope.serverStatus = vm.OsServer.getServerStatus();
     }, response => {
-      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+      vm.$log.debug("Error pinging server");
     });
   }
 
@@ -168,11 +203,7 @@ export class RunController {
     // 2: make/get zip file?
 
     // 3: hit PAT CLI to start server (local or remote)
-    vm.OsServer.setProgressAmount('15');
-    vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
-
-    vm.OsServer.setProgressMessage('Starting server');
-    vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+    vm.OsServer.setProgress(15,'Starting server');
 
     vm.$log.debug('***** In runController::runEntireWorkflow() ready to start server *****');
 
@@ -186,18 +217,13 @@ export class RunController {
       vm.$scope.datapoints = vm.Project.getDatapoints();
       vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
 
-      vm.OsServer.setProgressMessage('Server started');
-      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+      vm.OsServer.setProgress(30, 'Server started');
 
       vm.$scope.serverStatus = vm.OsServer.getServerStatus();
-      vm.$log.debug('Server Status: ', vm.$scope.serverStatus);
+      //vm.$log.debug('Server Status: ', vm.$scope.serverStatus);
 
       // 4: hit PAT CLI to start run
-      vm.OsServer.setProgressMessage('Starting analysis run');
-      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
-
-      vm.OsServer.setProgressAmount(30);
-      vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+      vm.OsServer.setProgress(40, 'Starting analysis run');
 
       vm.$log.debug('***** In runController::runEntireWorkflow() ready to run analysis *****');
 
@@ -210,31 +236,25 @@ export class RunController {
 
       vm.OsServer.setAnalysisStatus('starting');
       vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+
       vm.OsServer.runAnalysis(analysis_param).then(response => {
         vm.$log.debug('***** In runController::runEntireWorkflow() analysis running *****');
         vm.$log.debug('Run Analysis response: ', response);
         vm.OsServer.setAnalysisStatus('in progress');
         vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-
-        vm.OsServer.setProgressMessage('Analysis started');
-        vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
-
-        vm.OsServer.setProgressAmount(45);
-        vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+        vm.OsServer.setProgress(45, 'Analysis started');
 
         vm.$scope.analysisID = vm.Project.getAnalysisID();
         // create local results structure
-
 
         // 5: until complete, hit serverAPI for updates (errors, warnings, status)
         vm.getStatus = vm.$interval(function () {
 
           vm.OsServer.retrieveAnalysisStatus().then(response => {
             vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
-
+            vm.OsServer.setAnalysisStatus(response.data.analysis.status);
             vm.$scope.analysisStatus = response.data.analysis.status;
             vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
-
             vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
             vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
             vm.$log.debug('DATAPOINTS Status: ', vm.$scope.datapointsStatus);
@@ -242,8 +262,20 @@ export class RunController {
             // download/replace out.osw
             // Should we do this only once at the end?
             vm.OsServer.updateDatapoints().then( response2 => {
-
+              // refresh datapoints
               vm.$scope.datapoints = vm.Project.getDatapoints();
+
+              // download reports
+              vm.OsServer.downloadReports().then ( response3 => {
+                vm.$log.debug('downloaded all available reports');
+                // refresh datapoints again
+                vm.$scope.datapoints = vm.Project.getDatapoints();
+                vm.$log.debug('datapoints after download: ', vm.$scope.datapoints);
+
+              }, response3 => {
+                // error in downloadReports
+                vm.$log.debug('download reports error: ', response3);
+              });
               vm.$log.debug('update datapoints succeeded: ', response2);
               if (response.data.analysis.status == 'completed') {
                 // cancel loop
@@ -251,8 +283,8 @@ export class RunController {
               }
 
             }, response2 => {
-                // error in updateDatapoints
-                vm.$log.debug('update datapoints error: ', response2);
+              // error in updateDatapoints
+              vm.$log.debug('update datapoints error: ', response2);
             });
 
           }, response => {
@@ -263,22 +295,24 @@ export class RunController {
 
       }, response => {
         // analysis not started
-        vm.OsServer.setProgressMessage('Analysis Error');
-        vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+        vm.OsServer.setProgress(45, 'Analysis Error');
+
         vm.$log.debug('ANALYSIS NOT STARTED, ERROR: ', response);
         // TODO: show status as 'ERROR'
         vm.OsServer.setAnalysisStatus('error');
         vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
         vm.toggleButtons();
+
       });
 
     }, response => {
-      vm.OsServer.setProgressMessage('Server Error');
-      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
+      vm.OsServer.setProgress(25, 'Server Error');
+
       vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
       vm.OsServer.setAnalysisStatus('');
       vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
       vm.toggleButtons();
+
     });
   }
 
@@ -295,17 +329,73 @@ export class RunController {
 
     // toggle button back to 'run' when done
     // TODO: show status as 'COMPLETED' (once it actually is)
-    vm.OsServer.setProgressMessage('Analysis ' + status);
-    vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
-
-    vm.OsServer.setProgressAmount(100);
-    vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+    vm.OsServer.setProgress(100, 'Analysis ' + status);
 
     vm.OsServer.setDisabledButtons(false);
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
+
+  }
+
+  downloadResults(datapoint) {
+    const vm = this;
+    vm.OsServer.downloadResults(datapoint).then(() => {
+      vm.toastr.success('Results downloaded successfully!');
+      }, () => {
+      vm.toastr.error('Error downloading Results zip file');
+    });
+  }
+
+  downloadAllResults() {
+    const vm = this;
+    vm.OsServer.downloadAllResults().then(() => {
+      vm.toastr.success('All Results downloaded successfully!');
+    }, () => {
+      vm.toastr.error('Error downloading Results zip files');
+    });
+  }
+
+  downloadOSM(datapoint) {
+    const vm = this;
+    vm.OsServer.downloadOSM(datapoint).then(() => {
+      vm.toastr.success('OSM downloaded successfully!');
+    }, () => {
+      vm.toastr.error('Error downloading OSM');
+    });
+  }
+
+  downloadAllOSMs() {
+    const vm = this;
+    vm.OsServer.downloadAllOSMs().then(() => {
+      vm.toastr.success('All OSMs downloaded successfully!');
+    }, () => {
+      vm.toastr.error('Error downloading OSMs');
+    });
+  }
+
+  clearDatapoint(datapoint) {
+    const vm = this;
+    vm.$log.debug('In clear datapoint');
+    // TODO:  also clear files from localResults folder?
+    const index = _.findIndex(vm.$scope.datapoints, {id: datapoint.id});
+    if (index != -1) {
+      // datapoint found, delete
+      vm.$scope.datapoints.splice(index, 1);
+    } else {
+      vm.$log.debug('Datapoint ID not found in array');
+    }
+  }
+
+  clearAllDatapoints() {
+    const vm = this;
+    vm.$log.debug('In clear ALL Datapoints');
+    // TODO:  also clear files from localResults folder?
+    vm.Project.setDatapoints([]);
+    vm.$scope.datapoints = vm.Project.getDatapoints();
   }
 
   exportPAT() {
+    // this saves PAT
+    // TODO: deprecate
     const vm = this;
     vm.Project.exportPAT();
 
@@ -319,21 +409,25 @@ export class RunController {
   runSelected() {
     const vm = this;
     vm.toggleButtons();
+    // TODO
   }
 
   runUpdated() {
     const vm = this;
     vm.toggleButtons();
+    // TODO
   }
 
   runEnergyPlus() {
     const vm = this;
     vm.toggleButtons();
+    // TODO
   }
 
   runReportingMeasures() {
     const vm = this;
     vm.toggleButtons();
+    // TODO
   }
 
   toggleButtons() {
@@ -345,20 +439,15 @@ export class RunController {
   cancelRun() {
     const vm = this;
     vm.OsServer.stopAnalysis().then(response => {
-      vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+      //vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
       vm.toggleButtons();
-      vm.OsServer.setProgressMessage('');
-      vm.$scope.progressMessage = vm.OsServer.getProgressMessage();
-      vm.OsServer.setProgressAmount(0);
-      vm.$scope.progressAmount = vm.OsServer.getProgressAmount();
+      vm.OsServer.setProgress(0, '');
 
       vm.stopAnalysisStatus('canceled');
     }, response => {
       vm.$log.debug('ERROR attempting to stop analysis / cancel run');
 
     });
-
-
   }
 
 

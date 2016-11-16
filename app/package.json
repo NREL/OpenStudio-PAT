@@ -8,6 +8,7 @@
   "main": "background.js",
   "dependencies": {
     "angular": "~1.5.5",
+    "archiver": "~1.2.0",
     "adm-zip": "~0.4.7",
     "fs-jetpack": "~0.9.2",
     "js2xmlparser": "~1.0.0",

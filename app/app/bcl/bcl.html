@@ -6,7 +6,7 @@
   <div class="row pad-bot-20">
     <div class="col-xs-2">
 
-      <form ng-submit="submit()" name="form" novalidate>
+      <form ng-submit="submit()" name="form" novalidate class="lib-filters">
         <div class="input-group">
           <input type="text" name="search" id="search" ng-model="modal.keyword" class="form-control" ng-attr-placeholder="{{'bcl.search' | translate}}">
           <span class="input-group-btn">
@@ -79,7 +79,7 @@
     <div class="col-xs-4">
       <aside ng-show="modal.selected" class="lib-details">
 
-        <div class="row">
+        <div class="row bcl-p">
           <div class="col-xs-12">
             <h4 translate>bcl.aside.description</h4>
             <p class="bcl-p">{{modal.selected.description}}</p>
@@ -94,17 +94,19 @@
                 <td>{{attr.value}}</td>
               </tr>
             </table>
-            <h4 translate>bcl.aside.files</h4>
-            <table class="table table-striped">
-              <tr ng-repeat="file in modal.selected.files">
-                <td>
-                  <strong>{{file.filename}}</strong>
-                  <span ng-if="file.version.softwareProgram != null"><br><em>{{file.version.softwareProgram}} {{file.version.identifier}}</em></span>
-                  <span ng-if="file.version.minCompatible != null"><br><em><translate>bcl.aside.minCompatibleVersion</translate>: {{file.version.minCompatible}}</em></span>
-                  <span ng-if="file.version.maxCompatible != null"><br><em><translate>bcl.aside.maxCompatibleVersion</translate>: {{file.version.maxCompatible}}</em></span>
-                </td>
-              </tr>
-            </table>
+            <div ng-show="modal.selected.files">
+              <h4 translate>bcl.aside.files</h4>
+              <table class="table table-striped">
+                <tr ng-repeat="file in modal.selected.files">
+                  <td>
+                    <strong>{{file.filename}}</strong>
+                    <span ng-if="file.version.softwareProgram != null"><br><em>{{file.version.softwareProgram}} {{file.version.identifier}}</em></span>
+                    <span ng-if="file.version.minCompatible != null"><br><em><translate>bcl.aside.minCompatibleVersion</translate>: {{file.version.minCompatible}}</em></span>
+                    <span ng-if="file.version.maxCompatible != null"><br><em><translate>bcl.aside.maxCompatibleVersion</translate>: {{file.version.maxCompatible}}</em></span>
+                  </td>
+                </tr>
+              </table>
+            </div>
           </div>
         </div>
       </aside>

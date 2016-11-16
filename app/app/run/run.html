@@ -41,7 +41,7 @@
 
 <div class="row">
   <div class="col-sm-6">
-    <uib-progressbar class="progress-striped active" type="success" value="progressAmount">{{progressMessage}}</uib-progressbar>
+    <uib-progressbar class="progress-striped active" type="success" value="progress.amount">{{progress.message}}</uib-progressbar>
   </div>
 </div>
 
@@ -59,14 +59,25 @@
 <div ng-if="datapoints.length > 0" class="run-datapoints">
   <div class="row datapoint-header">
     <div class="col-sm-2">Name</div>
-    <div class="col-sm-2">Last Run</div>
+    <div class="col-sm-1">Last Run</div>
     <div class="col-sm-1">Run Time</div>
-    <div class="col-sm-2">Status</div>
+    <div class="col-sm-1">Status</div>
     <div class="col-sm-1">NAs</div>
     <div class="col-sm-1">Warnings</div>
     <div class="col-sm-1">Errors</div>
-    <div class="col-sm-1"><span class="badge white-badge">C</span> All</div>
-    <div class="col-sm-1"></div>
+    <div class="col-sm-1"><span class="badge white-badge dp-badge" ng-click="$event.preventDefault(); $event.stopPropagation();run.clearAllDatapoints()">C</span> All</div>
+    <div class="col-sm-3">
+      <div class="row">
+        <div class="col-sm-4">
+        </div>
+        <div class="col-sm-3 pad-left-5">
+          <img ng-src="assets/images/osmcloud_white.png" alt="Download all OSMs" ng-click="run.downloadAllOSMs();"/>
+        </div>
+        <div class="col-sm-4">
+          <img ng-src="assets/images/resultcloud_white.png" alt="Download all Results" ng-click="run.downloadAllResults();" />
+        </div>
+      </div>
+    </div>
   </div>
 
   <div class="row">
@@ -74,20 +85,43 @@
       <uib-accordion close-others="false">
         <uib-accordion-group ng-repeat="datapoint in datapoints" id="{{datapoint.id}}" is-open="datapoint.open">
           <uib-accordion-heading>
-            <div class="row">
-              <div class="col-sm-2">
+            <div class="row datapoint-header">
+              <div class="col-sm-2 pad-top-10">
                 <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
                 {{datapoint.name}}
               </div>
-              <div class="col-sm-2">{{run.extractDate(datapoint.updated_at)}}</div>
-              <div class="col-sm-1">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
-              <div class="col-sm-2 green-text">{{datapoint.status}}</div>
-              <div class="col-sm-1"></div>
-              <div class="col-sm-1"><span class="badge orange-badge square-badge">{{run.calculateWarnings(datapoint)}}</span></div>
-              <div class="col-sm-1"><span class="badge red-badge square-badge">{{run.calculateErrors(datapoint)}}</span></div>
-              <div class="col-sm-1">&nbsp;&nbsp;<span class="badge orange-badge">C</span></div>
-              <div class="col-sm-1"><img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.download_status != 'downloaded'" />
-                <img ng-src="assets/images/ReportingMeasure_icon.png" alt="View Reports for datapoint {{datapoint.name}}" ng-show="datapoint.download_status == 'downloaded'" ng-click="run.viewReports()" /></div>
+              <div class="col-sm-1 pad-top-10">{{run.extractDate(datapoint.updated_at)}}</div>
+              <div class="col-sm-1 pad-top-10">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
+              <div class="col-sm-1 green-text pad-top-10">{{datapoint.status}}</div>
+              <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
+              <div class="col-sm-1 pad-top-10"><span class="badge orange-badge square-badge dp-badge">{{run.calculateWarnings(datapoint)}}</span></div>
+              <div class="col-sm-1 pad-top-10"><span class="badge red-badge square-badge dp-badge">{{run.calculateErrors(datapoint)}}</span></div>
+              <div class="col-sm-1 pad-top-10">&nbsp;&nbsp;<span class="badge orange-badge dp-badge" ng-click="$event.preventDefault(); $event.stopPropagation();run.clearDatapoint(datapoint)">&nbsp;C&nbsp;</span></div>
+              <div class="col-sm-3">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.downloaded_reports != true" />
+
+                    <div class="btn-group" uib-dropdown auto-close="always" ng-show="datapoint.downloaded_reports">
+                      <button id="datapoint_{{datapoint.id}}_reports" type="button" class="btn view-report-button" uib-dropdown-toggle ng-disabled="disabled" ng-click="$event.preventDefault();$event.stopPropagation();">
+                        <img ng-src="assets/images/ReportingMeasure_icon.png"  alt="View Reports for datapoint {{datapoint.name}}">
+                        <span class="caret"></span>
+                      </button>
+                      <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="datapoint_{{datapoint.id}}_reports">
+                        <li role="menuitem" ng-repeat="result in datapoint.result_files | filter: {type: 'Report'}"><a href="#" ng-click="$event.preventDefault(); $event.stopPropagation();run.viewReportModal(datapoint, result.attachment_file_name);">{{result.attachment_file_name}}</a></li>
+                      </ul>
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_osm" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadOSM(datapoint)"/>
+                    <span class="glyphicon glyphicon-ok-sign green-button big-cell" ng-show="datapoint.status == 'completed' && datapoint.downloaded_osm"></span>
+                  </div>
+                  <div class="col-sm-4 pad-left-25">
+                    <img ng-src="assets/images/resultcloud_blue.png" alt="Download Results for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_results" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadResults(datapoint)"/>
+                    <span class="glyphicon glyphicon-ok-sign green-button big-cell" ng-show="datapoint.status == 'completed' && datapoint.downloaded_results"></span>
+                  </div>
+                </div>
+              </div>
             </div>
            <!-- <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
             {{datapoint.name}} - status: {{datapoint.status}} - {{datapoint.final_message}}-->
@@ -100,14 +134,14 @@
                     <uib-accordion-heading>
                       <div class="row measure-accordion">
                         <div class="col-sm-2 bold">{{step.name}}</div>
-                        <div class="col-sm-2">{{run.extractDate(step.result.started_at)}}</div>
+                        <div class="col-sm-1">{{run.extractDate(step.result.started_at)}}</div>
                         <div class="col-sm-1">{{run.getRunTime(step.result.started_at, step.result.completed_at)}}</div>
-                        <div class="col-sm-2"></div>
                         <div class="col-sm-1"></div>
+                        <div class="col-sm-1"><span ng-if="step.step_result == 'NotApplicable'">NA</span></div>
                         <div class="col-sm-1"><span class="badge orange-badge square-badge">{{step.result.step_warnings.length}}</span></div>
                         <div class="col-sm-1"><span class="badge red-badge square-badge">{{step.result.step_errors.length}}</span></div>
                         <div class="col-sm-1"></div>
-                        <div class="col-sm-1"></div>
+                        <div class="col-sm-3"></div>
                       </div>
                     </uib-accordion-heading>
                     <div class="measure-accordion-body">
