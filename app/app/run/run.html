@@ -113,11 +113,11 @@
                     </div>
                   </div>
                   <div class="col-sm-3">
-                    <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_osm" ng-click="run.downloadOSM(datapoint)"/>
+                    <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_osm" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadOSM(datapoint)"/>
                     <span class="glyphicon glyphicon-ok-sign green-button" ng-show="datapoint.status == 'completed' && datapoint.downloaded_osm"></span>
                   </div>
                   <div class="col-sm-4 pad-left-25">
-                    <img ng-src="assets/images/resultcloud_blue.png" alt="Download Results for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_results" ng-click="run.downloadResults(datapoint)"/>
+                    <img ng-src="assets/images/resultcloud_blue.png" alt="Download Results for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_results" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadResults(datapoint)"/>
                     <span class="glyphicon glyphicon-ok-sign green-button big-cell" ng-show="datapoint.status == 'completed' && datapoint.downloaded_results"></span>
                   </div>
                 </div>
