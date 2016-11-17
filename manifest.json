@@ -1,0 +1,48 @@
+{
+  "endpoint": "https://openstudio-resources.s3.amazonaws.com/pat-dependencies2/",
+  "ruby": [{
+    "name": "ruby-2.0.0-p648-win32.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "ruby"
+  }, {
+    "name": "ruby-2.0.0-p647-darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "ruby"
+  }],
+  "mongo": [{
+    "name": "mongodb-3.2.5-win32.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "mongo"
+  }, {
+    "name": "mongodb-3.2.5-darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "mongo"
+  }],
+  "openstudioServer": [{
+    "name": "OpenStudio-server-4c14304b0e-win32.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "OpenStudio-server"
+  }, {
+    "name": "OpenStudio-server-778561610d-darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "OpenStudio-server"
+  }],
+  "openstudio": [{
+    "name": "OpenStudio2-1.13.3.c8b1bd01ac-win32.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "OpenStudio"
+  }, {
+    "name": "OpenStudio2-1.13.3.c8b1bd01ac-darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "OpenStudio"
+  }]
+}
+

@@ -1,4 +1,9 @@
 {
   "name": "development",
-  "description": "Add here any environment specific stuff you like."
+  "description": "Add here any environment specific stuff you like.",
+  "PAT_OS_CLI_PATH": "",
+  "PAT_OS_BINDING_PATH": "",
+  "PAT_OS_SERVER_PATH": "",
+  "PAT_RUBY_PATH": "",
+  "PAT_MONGO_PATH": ""
 }

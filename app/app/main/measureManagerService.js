@@ -2,7 +2,7 @@ import {remote} from 'electron';
 const {app} = remote;
 
 export class MeasureManager {
-  constructor($log, $http, $q) {
+  constructor($log, $http, $q, DependencyManager) {
     'ngInject';
 
     const vm = this;
@@ -17,8 +17,7 @@ export class MeasureManager {
 
     // to run cli
     vm.spawn = require('child_process').spawn;
-    vm.cliPath = app.getPath('userData') + '/openstudioCLI/bin/openstudio' + exeExt;
-    vm.cliPath = vm.cliPath.replace(' ', '\ ');
+    vm.cliPath = DependencyManager.getPath('PAT_OS_CLI_PATH');
 
     vm.url = 'http://localhost:1234';
 

@@ -5,7 +5,7 @@ import path from 'path';
 import os from 'os';
 
 export class OsServer {
-  constructor($q, $http, $log, $uibModal, Project) {
+  constructor($q, $http, $log, $uibModal, Project, DependencyManager) {
     'ngInject';
     const vm = this;
     vm.Project = Project;
@@ -37,23 +37,14 @@ export class OsServer {
     vm.serverURL = vm.localServerURL;
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
-    vm.CLIpath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/bin'));
-    vm.rubyLibPath = jetpack.cwd(path.resolve(src.path() + '/openstudioCLI/Ruby'));
-    vm.OsMetaPath = jetpack.cwd(path.resolve(src.path() + '/openstudioServer/bin/openstudio_meta'));
-    vm.mongoBinDir = jetpack.cwd(path.resolve(src.path() + '/mongo/bin'));
-    vm.openstudioDir = jetpack.cwd(path.resolve(src.path() + '/openstudio/'));
 
-    // Depends on system type (windows vs mac)
-    vm.platform = os.platform();
-    if (vm.platform == 'win32')
-      vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby.exe'));
-    else {
-      vm.rubyBinDir = jetpack.cwd(path.resolve(src.path() + '/ruby/bin/ruby'));
-      // TODO: temporary (for mac: assume that ruby is in user's home folder at following path)
-      vm.rubyBinDir = jetpack.cwd(app.getPath('home') + '/tempPAT/ruby/bin/ruby');
-      // TODO: temporary (for mac: openstudio server)
-      vm.OsMetaPath = jetpack.cwd(app.getPath('home') + '/tempPAT/openstudioServer/bin/openstudio_meta');
-    }
+    vm.cliPath = DependencyManager.getPath("PAT_OS_CLI_PATH");
+    vm.metaCLIPath = DependencyManager.getPath("PAT_OS_META_CLI_PATH");
+    vm.mongoPath = DependencyManager.getPath("PAT_MONGO_PATH");
+    vm.mongoDirPath = path.dirname(vm.mongoPath);
+    vm.openstudioBindingsPath = DependencyManager.getPath("PAT_OS_BINDING_PATH");
+    vm.openstudioBindingsDirPath = path.dirname(vm.openstudioBindingsPath);
+    vm.rubyPath = DependencyManager.getPath("PAT_RUBY_PATH");
 
   }
 
@@ -270,9 +261,9 @@ export class OsServer {
     // run META CLI will return status code: 0 = success, 1 = failure
 
     if (vm.platform == 'win32')
-      vm.startServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.rubyLibPath.path() + '\"' + ' --mongo-dir=' + '\"' + vm.mongoBinDir.path() + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
+      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
     else
-      vm.startServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.rubyLibPath.path() + '\"' + ' --mongo-dir=' + '\"' + vm.mongoBinDir.path() + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
+      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
     vm.$log.info('start server command: ', vm.startServerCommand);
 
     const child = vm.exec(vm.startServerCommand,
@@ -346,9 +337,9 @@ export class OsServer {
     // TODO: catch what analysis type it is
 
     if (vm.platform == 'win32')
-      vm.runAnalysisCommand = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis --debug --verbose --ruby-lib-path="${vm.rubyLibPath.path()}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
+      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
     else
-      vm.runAnalysisCommand = `"${vm.rubyBinDir.path()}" "${vm.OsMetaPath.path()}" run_analysis --debug --verbose --ruby-lib-path="${vm.rubyLibPath.path()}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
+      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
     vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
 
     const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param;
@@ -423,7 +414,7 @@ export class OsServer {
         vm.$log.debug('vm.Project:', vm.Project);
         vm.$log.debug('vm.Project.projectDir:', vm.Project.projectDir.path());
 
-        vm.stopServerCommand = '\"' + vm.rubyBinDir.path() + '\" \"' + vm.OsMetaPath.path() + '\"' + ' stop_local ' + '\"' + vm.Project.projectDir.path() + '\"';
+        vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_local ' + '\"' + vm.Project.projectDir.path() + '\"';
         vm.$log.info('stop server command: ', vm.stopServerCommand);
 
          const child = vm.exec(vm.stopServerCommand,

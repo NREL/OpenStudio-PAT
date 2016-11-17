@@ -243,7 +243,10 @@ export class Project {
     let osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
 
     _.forEach(vm.measures, (measure) => {
-      if (_.isNil(measure.seed)) osmPath = vm.seedDir.path(measure.seed);
+      if (!_.isNil(measure.seed)) {
+        vm.$log.debug(`computeAllMeasureArguments using unique seed for measure: ${measure}`);
+        osmPath = vm.seedDir.path(measure.seed);
+      }
 
       vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
         // merge with existing project measure
