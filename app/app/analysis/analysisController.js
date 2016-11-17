@@ -300,7 +300,7 @@ export class AnalysisController {
     // line below also removes it from bclService 'getProjectMeasures', but not from disk
     // TODO: fix so BCL modal doesn't restore deleted panels
     _.remove(vm.$scope.measures, {uid: measure.uid});
-    //vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+    vm.Project.setMeasuresAndOptions(vm.$scope.measures);
 
     const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.uid + '"]'));
     measurePanel.remove();
@@ -315,6 +315,9 @@ export class AnalysisController {
     vm.jetpack.remove(vm.Project.getProjectDir().path('measures/' + measure.class_name));
     // Use display_name in an attempt to accommodate filenames with whitespace, neither of which are handled above
     vm.jetpack.remove(vm.Project.getProjectDir().path('measures/' + measure.display_name));
+
+    // recalculate workflow indexes
+    vm.Project.recalculateMeasureWorkflowIndexes();
 
     vm.initializeGrids();
   }
@@ -574,23 +577,26 @@ export class AnalysisController {
   reorderMeasure(measure, direction) {
     const vm = this;
     vm.$log.debug('moving measure: ', direction);
-    // find current index of measure
-    const index = measure.workflow_index;
+    // find current index of measure and new index to move to
+    const index = _.findIndex(vm.$scope.measures, {uid: measure.uid});
     const new_index = (direction == 'up') ? index - 1 : index + 1;
-    //vm.$log.debug("index: ", index, " new index: ", new_index);
     // find measure to swap with (with same type)
-    const swapping_measure = _.find(vm.$scope.measures, {workflow_index: new_index, type: measure.type});
+    const swapping_measure = vm.$scope.measures[new_index];
     // only move if you can
     if (swapping_measure) {
       vm.$log.debug('moving measure');
-      measure.workflow_index = new_index;
-      swapping_measure.workflow_index = index;
+      vm.$scope.measures[new_index] = measure;
+      vm.$scope.measures[index] = swapping_measure;
+      vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+
+      // recalculate workflow indexes
+      vm.Project.recalculateMeasureWorkflowIndexes();
+
       vm.$log.debug('measures: ', vm.$scope.measures);
+
       // initialize grid to resort
       vm.initializeGrids();
     }
-
-
   }
 
 }

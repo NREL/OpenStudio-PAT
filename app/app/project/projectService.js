@@ -712,6 +712,19 @@ export class Project {
     //vm.measures = updatedMeasures;
   }
 
+  recalculateMeasureWorkflowIndexes() {
+    // measures should already be in correct order
+    // make sure workflowIndex's are consecutive and match measure index in array
+    const vm = this;
+    vm.$log.debug('ProjectService::RecalculateMeasureWorkflowIndexes');
+    _.forEach(vm.measures, (measure, key) => {
+      measure.workflow_index = key;
+      vm.$log.debug('key: ', key);
+    });
+
+    vm.$log.debug('***REORDERED PROJECT MEASURES: ', vm.measures);
+  }
+
   getProjectName() {
     const vm = this;
     return vm.projectName;
