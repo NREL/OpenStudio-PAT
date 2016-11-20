@@ -165,9 +165,21 @@ export class DesignAlternativesController {
     }
   }
 
+  // update the alternatives
+  updateAlternatives(key) {
+    const vm = this;
+    let alternatives = vm.Project.getDesignAlternatives();
+
+    _.remove(alternatives, alternative => alternative[key] != 'None');
+    vm.Project.setDesignAlternatives(alternatives);
+  }
+
   // create an alternative for each measure option
   createAlternatives() {
     const vm = this;
+
+    let alternatives = vm.Project.getDesignAlternatives();
+
     _.forEach(vm.measures, (measure) => {
       _.forEach(measure.options, (option) => {
         const newAlt = vm.setNewAlternativeDefaults();

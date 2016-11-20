@@ -285,11 +285,59 @@ export class AnalysisController {
 
   // update the alternatives
   updateAlternatives(key) {
+    // Delete a measure
     const vm = this;
     let alternatives = vm.Project.getDesignAlternatives();
+    vm.$log.debug('key: ', key);
+    vm.$log.debug('alternatives: ', alternatives);
+    //_.forEach(alternatives, (alternative) => {
+    //  delete alternative[key];
+    //});
+    //vm.$log.debug('alternatives: ', alternatives);
+    ////vm.Project.setDesignAlternatives(alternatives);
+    //vm.DesignAlternativesController.setGridOptions();
+  }
 
-    _.remove(alternatives, alternative => alternative[key] != 'None');
-    vm.Project.setDesignAlternatives(alternatives);
+  // update the alternatives
+  updateAlternatives2(key) {
+    // Delete an option
+    const vm = this;
+    let alternatives = vm.Project.getDesignAlternatives();
+    vm.$log.debug('key: ', key);
+    vm.$log.debug('alternatives: ', alternatives);
+    _.forEach(alternatives, (alternative) => {
+      delete alternative[key];
+    });
+    vm.$log.debug('alternatives: ', alternatives);
+    //vm.Project.setDesignAlternatives(alternatives);
+    vm.DesignAlternativesController.setGridOptions();
+  }
+
+  // update the alternatives
+  updateAlternativesDeletedMeasure() {
+    const vm = this;
+    _.forEach(vm.measures, (measure) => {
+      _.forEach(measure.options, (option) => {
+        const newAlt = vm.setNewAlternativeDefaults();
+        _.forEach(vm.measures, (m) => {
+          if (m.name == measure.name) {
+            newAlt[m.name] = option.name;
+          } else {
+            newAlt[m.name] = 'None';
+          }
+        });
+        vm.$scope.alternatives.push(newAlt);
+      });
+    });
+  }
+
+  setNewAlternativeDefaults() {
+    const vm = this;
+    const newAlt = {};
+    newAlt.name = vm.uniqueName(vm.$scope.alternatives, _.template('Alternative <%= num %>'));
+    newAlt.seedModel = vm.defaultSeed;
+    newAlt.weatherFile = vm.defaultWeatherFile;
+    return newAlt;
   }
 
   removeMeasure(measure) {
@@ -300,7 +348,11 @@ export class AnalysisController {
     // line below also removes it from bclService 'getProjectMeasures', but not from disk
     // TODO: fix so BCL modal doesn't restore deleted panels
     _.remove(vm.$scope.measures, {uid: measure.uid});
+
     vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+
+
+    //vm.updateAlternativesDeletedMeasure();
 
     const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.uid + '"]'));
     measurePanel.remove();
@@ -310,7 +362,7 @@ export class AnalysisController {
     vm.$log.debug('measure.display_name: ', measure.display_name);
 
     // Note: jetpack.remove() does not have any return
-    // TODO required directory removal is not yet robust
+    // TODO required file removal is not yet robust
     vm.jetpack.remove(vm.Project.getProjectDir().path('measures/' + measure.name));
     vm.jetpack.remove(vm.Project.getProjectDir().path('measures/' + measure.class_name));
     // Use display_name in an attempt to accommodate filenames with whitespace, neither of which are handled above
@@ -388,10 +440,10 @@ export class AnalysisController {
 
   deleteOption(col) {
     const vm = this;
+    vm.$log.debug('In deleteOption in analysis');
 
     vm.$log.debug('col: ', col);
 
-    vm.$log.debug('In deleteOption in analysis');
     const optionCount = Number(col.field.split('_')[1]);
     vm.$log.debug('optionCount: ', optionCount);
     const measureUID = col.colDef.measureUID;
