@@ -651,5 +651,10 @@ export class AnalysisController {
     }
   }
 
+  setIsModified() {
+    const vm = this;
+    vm.Project.setModified(true);
+  }
+
 }
 

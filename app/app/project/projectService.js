@@ -48,6 +48,7 @@ export class Project {
     vm.runTypes = vm.setRunTypes();
     vm.algorithmOptions = vm.setAlgorithmOptions();
 
+    vm.modified = false;
     vm.analysisType = null;
     vm.reportType = null;
     vm.runType = vm.runTypes[0];
@@ -1386,6 +1387,39 @@ export class Project {
   getWeatherFilesDropdownArr() {
     const vm = this;
     return vm.weatherFilesDropdownArr;
+  }
+
+
+  setModified(isModified) {
+    const vm = this;
+    vm.modified = isModified;
+  }
+
+  getModified() {
+    const vm = this;
+    return vm.modified;
+  }
+
+  modifiedModal() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('setProject::modifiedModal');
+
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalModifiedController',
+      controllerAs: 'modal',
+      templateUrl: 'app/project/modified.html'
+    });
+
+    modalInstance.result.then(() => {
+      vm.$log.debug('Resolving openModal()');
+      deferred.resolve('resolved');
+    }, () => {
+      // Modal canceled
+      deferred.reject('rejected');
+    });
+    return deferred.promise;
   }
 
 }

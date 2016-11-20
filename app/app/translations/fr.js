@@ -2,6 +2,11 @@ export default {
   dependency: {
     title: 'PAT Dependency Download Status'
   },
+  modified: {
+    title: 'ParametricAnalysisTool',
+    heading: 'Modified files',
+    blurb: 'You have unsaved changes.'
+  },
   whitespaceWarning: {
     title: 'ParametricAnalysisTool',
     heading: 'Whitespace Warning',

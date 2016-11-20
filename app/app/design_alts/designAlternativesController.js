@@ -235,4 +235,9 @@ export class DesignAlternativesController {
     gridApi.selection.clearSelectedRows();
   }
 
+  setIsModified() {
+    const vm = this;
+    vm.Project.setModified(true);
+  }
+
 }
