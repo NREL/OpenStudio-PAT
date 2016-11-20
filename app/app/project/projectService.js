@@ -1389,7 +1389,6 @@ export class Project {
     return vm.weatherFilesDropdownArr;
   }
 
-
   setModified(isModified) {
     const vm = this;
     vm.modified = isModified;

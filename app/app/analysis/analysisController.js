@@ -263,6 +263,7 @@ export class AnalysisController {
 
   addMeasure(type) {
     const vm = this;
+    vm.setIsModified();
     const types = [type];
     // save pretty options (will be needed to load back)
     vm.Project.savePrettyOptions();
@@ -287,6 +288,7 @@ export class AnalysisController {
   updateAlternatives(key) {
     // Delete a measure
     const vm = this;
+    vm.setIsModified();
     let alternatives = vm.Project.getDesignAlternatives();
     vm.$log.debug('key: ', key);
     vm.$log.debug('alternatives: ', alternatives);
@@ -302,6 +304,7 @@ export class AnalysisController {
   updateAlternatives2(key) {
     // Delete an option
     const vm = this;
+    vm.setIsModified();
     let alternatives = vm.Project.getDesignAlternatives();
     vm.$log.debug('key: ', key);
     vm.$log.debug('alternatives: ', alternatives);
@@ -316,6 +319,7 @@ export class AnalysisController {
   // update the alternatives
   updateAlternativesDeletedMeasure() {
     const vm = this;
+    vm.setIsModified();
     _.forEach(vm.measures, (measure) => {
       _.forEach(measure.options, (option) => {
         const newAlt = vm.setNewAlternativeDefaults();
@@ -333,6 +337,7 @@ export class AnalysisController {
 
   setNewAlternativeDefaults() {
     const vm = this;
+    vm.setIsModified();
     const newAlt = {};
     newAlt.name = vm.uniqueName(vm.$scope.alternatives, _.template('Alternative <%= num %>'));
     newAlt.seedModel = vm.defaultSeed;
@@ -342,7 +347,7 @@ export class AnalysisController {
 
   removeMeasure(measure) {
     const vm = this;
-
+    vm.setIsModified();
     vm.updateAlternatives(measure.name);
 
     // line below also removes it from bclService 'getProjectMeasures', but not from disk
@@ -376,6 +381,7 @@ export class AnalysisController {
 
   addMeasureOption(measure) {
     const vm = this;
+    vm.setIsModified();
     //vm.$log.debug('In addMeasureOption in analysis');
 
     if (measure.arguments.length === 0) return; // Nothing to see here
@@ -431,7 +437,7 @@ export class AnalysisController {
   deleteSelectedOption(measure) {
     const vm = this;
     vm.$log.debug('In deleteSelectedOption in analysis');
-
+    vm.setIsModified();
     if (measure.numberOfOptions > 0) {
       measure.numberOfOptions -= 1;
       vm.$scope.gridOptions[measure.uid].columnDefs.splice(vm.$scope.gridOptions[measure.uid].columnDefs.length - 1, 1);
@@ -441,7 +447,7 @@ export class AnalysisController {
   deleteOption(col) {
     const vm = this;
     vm.$log.debug('In deleteOption in analysis');
-
+    vm.setIsModified();
     vm.$log.debug('col: ', col);
 
     const optionCount = Number(col.field.split('_')[1]);
@@ -474,6 +480,7 @@ export class AnalysisController {
   }
 
   addDefaultArguments(measure, option) {
+    vm.setIsModified();
     _.forEach(measure.arguments, (argument) => {
       if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.default_value))) {
         argument[option.field] = Number(argument.default_value);
@@ -487,7 +494,7 @@ export class AnalysisController {
   duplicateOption(measure) {
     const vm = this;
     vm.$log.debug('In duplicateOption in analysis');
-
+    vm.setIsModified();
     // TODO: For now, we are grabbing whatever's in the first option column
     // TODO  Eventually we will need to use the user-selected option column.
     const opt = vm.addMeasureOption(measure);
@@ -500,8 +507,8 @@ export class AnalysisController {
 
   duplicateMeasureAndOption() {
     const vm = this;
-
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
+    vm.setIsModified();
   }
 
   loadMeasureOptions() {
@@ -543,6 +550,7 @@ export class AnalysisController {
   setSeed() {
     const vm = this;
     vm.$log.debug('In Analysis::setSeed');
+    vm.setIsModified();
     vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
     _.forEach(vm.$scope.measures, (measure) => {
       measure.seed = vm.$scope.defaultSeed;
@@ -553,12 +561,14 @@ export class AnalysisController {
 
   setWeatherFile() {
     const vm = this;
+    vm.setIsModified();
     vm.Project.setDefaultWeatherFile(vm.$scope.defaultWeatherFile);
   }
 
   setType() {
     const vm = this;
     vm.$log.debug('In setType in analysis');
+    vm.setIsModified();
     vm.Project.setAnalysisType(vm.$scope.selectedAnalysisType);
     vm.initializeGrids();
   }
@@ -566,6 +576,7 @@ export class AnalysisController {
   setSamplingMethod() {
     const vm = this;
     vm.$log.debug('In setSamplingMethod in analysis');
+    vm.setIsModified();
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
@@ -573,7 +584,7 @@ export class AnalysisController {
 
   selectSeedModel() {
     const vm = this;
-
+    vm.setIsModified();
     // TODO: set defaultPath
     const result = vm.dialog.showOpenDialog({
       title: 'Select Seed Model',
@@ -600,7 +611,7 @@ export class AnalysisController {
 
   selectWeatherFile() {
     const vm = this;
-
+    vm.setIsModified();
     // TODO: set defaultPath
     const result = vm.dialog.showOpenDialog({
       title: 'Select Weather File',
@@ -629,6 +640,7 @@ export class AnalysisController {
   reorderMeasure(measure, direction) {
     const vm = this;
     vm.$log.debug('moving measure: ', direction);
+    vm.setIsModified();
     // find current index of measure and new index to move to
     const index = _.findIndex(vm.$scope.measures, {uid: measure.uid});
     const new_index = (direction == 'up') ? index - 1 : index + 1;

@@ -127,8 +127,8 @@ export class DesignAlternativesController {
   }
 
   addAlternative() {
-
     const vm = this;
+    vm.setIsModified();
     const newAlt = vm.setNewAlternativeDefaults();
 
     _.forEach(vm.measures, (measure) => {
@@ -138,15 +138,15 @@ export class DesignAlternativesController {
   }
 
   deleteAlternative(alternative) {
-
     const vm = this;
+    vm.setIsModified();
     const index = vm.$scope.alternatives.indexOf(alternative);
     vm.$scope.alternatives.splice(index, 1);
-
   }
 
   moveUp(alternative) {
     const vm = this;
+    vm.setIsModified();
     const index = vm.$scope.alternatives.indexOf(alternative);
     if (index > 0) {
       const temp = angular.copy(vm.$scope.alternatives[index - 1]);
@@ -157,6 +157,7 @@ export class DesignAlternativesController {
 
   moveDown(alternative) {
     const vm = this;
+    vm.setIsModified();
     const index = vm.$scope.alternatives.indexOf(alternative);
     if ((index + 1) != vm.$scope.alternatives.length) {
       const temp = angular.copy(vm.$scope.alternatives[index + 1]);
@@ -168,6 +169,7 @@ export class DesignAlternativesController {
   // update the alternatives
   updateAlternatives(key) {
     const vm = this;
+    vm.setIsModified();
     let alternatives = vm.Project.getDesignAlternatives();
 
     _.remove(alternatives, alternative => alternative[key] != 'None');
@@ -177,7 +179,7 @@ export class DesignAlternativesController {
   // create an alternative for each measure option
   createAlternatives() {
     const vm = this;
-
+    vm.setIsModified();
     let alternatives = vm.Project.getDesignAlternatives();
 
     _.forEach(vm.measures, (measure) => {
@@ -196,13 +198,12 @@ export class DesignAlternativesController {
   }
 
   duplicateAlternative() {
-
     const vm = this;
+    vm.setIsModified();
     const dupAlt = angular.copy(vm.selected);
     delete dupAlt.$$hashKey;
     dupAlt.name = dupAlt.name + ' Duplicate';
     vm.$scope.alternatives.push(dupAlt);
-
   }
 
   setNewAlternativeDefaults() {
@@ -213,7 +214,6 @@ export class DesignAlternativesController {
     newAlt.weatherFile = vm.defaultWeatherFile;
 
     return newAlt;
-
   }
 
   // functions for default alternative names
