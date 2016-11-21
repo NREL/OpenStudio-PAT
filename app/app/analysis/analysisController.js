@@ -480,6 +480,7 @@ export class AnalysisController {
   }
 
   addDefaultArguments(measure, option) {
+    const vm = this;
     vm.setIsModified();
     _.forEach(measure.arguments, (argument) => {
       if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.default_value))) {
