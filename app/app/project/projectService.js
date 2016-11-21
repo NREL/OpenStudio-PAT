@@ -183,14 +183,20 @@ export class Project {
     _.forEach(vm.measures, (measure) => {
 
       const options = [];
-
+      vm.$log.debug('MEASURE: ', measure.name);
       // first find out how many options there are (from the optionDelete special argument)
-      const keys = Object.keys(measure.arguments[0]);
-      const optionKeys = _.filter(keys, function (k) {
-        return k.indexOf('option_') !== -1;
-      });
+      let optionKeys = [];
+      if (measure.arguments.length > 0){
+        const keys = Object.keys(measure.arguments[0]);
+        optionKeys = _.filter(keys, function (k) {
+          return k.indexOf('option_') !== -1;
+        });
+      }
+      vm.$log.debug('Option keys: ', optionKeys);
 
       _.forEach(optionKeys, (key) => {
+
+        vm.$log.debug('key: ', key);
 
         const theOption = {};
         // option name and ID
