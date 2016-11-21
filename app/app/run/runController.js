@@ -22,12 +22,12 @@ export class RunController {
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-    vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+    vm.$scope.serverStatuses = vm.OsServer.getServerStatuses();
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
     // TODO: do we still need datapointsStatus?
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-    vm.$log.debug('SERVER STATUS: ', vm.$scope.serverStatus);
+    vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.selectedServerStatus[vm.$scope.selectedRunType.name]);
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
@@ -164,7 +164,7 @@ export class RunController {
     vm.OsServer.stopServer(force).then(response => {
       vm.$log.debug('***** Server Stopped *****');
       vm.OsServer.setProgress(0, '');
-      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+      //vm.$scope.serverStatuses = vm.OsServer.getServerStatus();
 
     }, response => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
@@ -177,7 +177,7 @@ export class RunController {
   startServer(force = false) {
     const vm = this;
     vm.OsServer.startServer(force).then(response => {
-      vm.$log.debug('Server Status: ', vm.$scope.serverStatus);
+      vm.$log.debug('Server Status for ',vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
 
     }, response => {
       vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);

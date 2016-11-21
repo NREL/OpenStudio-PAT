@@ -9,8 +9,8 @@
   </div>
   <div class="col-sm-5 pad-bot-20 pad-top-10">
     <div class="tab-text">Server Status&nbsp;
-      <span ng-show="serverStatus=='started'" class="glyphicon glyphicon-ok green-button" aria-label="started"></span>
-      <span ng-show="serverStatus!='started'" class="glyphicon glyphicon-remove red-button" aria-label="stopped"></span>
+      <span ng-show="serverStatuses[selectedRunType.name]=='started'" class="glyphicon glyphicon-ok green-button" aria-label="started"></span>
+      <span ng-show="serverStatuses[selectedRunType.name]!='started'" class="glyphicon glyphicon-remove red-button" aria-label="stopped"></span>
    </div>
   </div>
 </div>
