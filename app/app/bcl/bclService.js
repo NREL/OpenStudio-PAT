@@ -78,6 +78,9 @@ export class BCL {
     const deferred = vm.$q.defer();
     vm.$log.debug('in BCLService checkForUpdates method');
 
+    //refresh project measures
+    vm.projectMeasures = vm.Project.getMeasuresAndOptions();
+
     vm.MeasureManager.isReady().then( () => {
       vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates...');
       // the path doesn't work if the trailing slash isn't there!
@@ -125,6 +128,8 @@ export class BCL {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.$log.debug('in BCLService checkForUpdatesLocalBcl method');
+    // refresh measures
+    vm.projectMeasures = vm.Project.getMeasuresAndOptions();
     vm.MeasureManager.isReady().then( () => {
       vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates LocalBCL...');
       // the path doesn't work if the trailing slash isn't there!

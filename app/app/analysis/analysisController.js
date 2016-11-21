@@ -350,28 +350,20 @@ export class AnalysisController {
     vm.setIsModified();
     vm.updateAlternatives(measure.name);
 
+    vm.$log.debug('Deleting measure: ', measure);
+
     // line below also removes it from bclService 'getProjectMeasures', but not from disk
     // TODO: fix so BCL modal doesn't restore deleted panels
     _.remove(vm.$scope.measures, {uid: measure.uid});
-
     vm.Project.setMeasuresAndOptions(vm.$scope.measures);
-
 
     //vm.updateAlternativesDeletedMeasure();
 
     const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.uid + '"]'));
     measurePanel.remove();
 
-    vm.$log.debug('measure.name: ', measure.name);
-    vm.$log.debug('measure.class_name: ', measure.class_name);
-    vm.$log.debug('measure.display_name: ', measure.display_name);
-
     // Note: jetpack.remove() does not have any return
-    // TODO required file removal is not yet robust
-    vm.jetpack.remove(vm.Project.getProjectDir().path('measures/' + measure.name));
-    vm.jetpack.remove(vm.Project.getProjectDir().path('measures/' + measure.class_name));
-    // Use display_name in an attempt to accommodate filenames with whitespace, neither of which are handled above
-    vm.jetpack.remove(vm.Project.getProjectDir().path('measures/' + measure.display_name));
+    vm.jetpack.remove(measure.measure_dir);
 
     // recalculate workflow indexes
     vm.Project.recalculateMeasureWorkflowIndexes();
