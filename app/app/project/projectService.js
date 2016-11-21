@@ -184,7 +184,6 @@ export class Project {
     _.forEach(vm.measures, (measure) => {
 
       const options = [];
-      vm.$log.debug('MEASURE: ', measure.name);
       // first find out how many options there are (from the optionDelete special argument)
       let optionKeys = [];
       if (measure.arguments.length > 0){
@@ -193,11 +192,8 @@ export class Project {
           return k.indexOf('option_') !== -1;
         });
       }
-      vm.$log.debug('Option keys: ', optionKeys);
 
       _.forEach(optionKeys, (key) => {
-
-        vm.$log.debug('key: ', key);
 
         const theOption = {};
         // option name and ID
@@ -448,10 +444,13 @@ export class Project {
       m.taxonomy = measure.tags;
 
       // first find out how many options there are
-      const keys = Object.keys(measure.arguments[0]);
-      const optionKeys = _.filter(keys, function (k) {
-        return k.indexOf('option_') !== -1;
-      });
+      let optionKeys = [];
+      if (measure.arguments.length > 0){
+        const keys = Object.keys(measure.arguments[0]);
+        optionKeys = _.filter(keys, function (k) {
+          return k.indexOf('option_') !== -1;
+        });
+      }
 
       // ARGUMENTS
       m.arguments = [];
@@ -470,7 +469,7 @@ export class Project {
           argument.default_value = arg.default_value;
           argument.value = arg.option_1 ? arg.option_1 : arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
           // Make sure that argument is "complete"
-          if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
+          if ( argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
             var_count += 1;
             m.arguments.push(argument);
           } else {
