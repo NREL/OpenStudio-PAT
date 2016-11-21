@@ -11,6 +11,7 @@ import { DesignAlternativesController } from '../app/design_alts/designAlternati
 import { MeasureManager } from '../app/main/measureManagerService';
 import { ModalBclController } from '../app/bcl/modalBclController';
 import { ModalDependencyController } from '../app/main/modalDependencyController';
+import { ModalModifiedController } from '../app/project/modalModifiedController';
 import { ModalOpenProjectController } from '../app/project/modalOpenProjectController';
 import { ModalProjectNameController } from '../app/project/modalProjectNameController';
 import { ModalWhitespaceWarningController } from '../app/project/modalWhitespaceWarningController';
@@ -39,6 +40,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalDependencyController', ModalDependencyController)
   .controller('ModalProjectNameController', ModalProjectNameController)
   .controller('ModalWhitespaceWarningController', ModalWhitespaceWarningController)
+  .controller('ModalModifiedController', ModalModifiedController)
   .controller('ModalOpenProjectController', ModalOpenProjectController)
   .controller('ModalDuplicateMeasureController', ModalDuplicateMeasureController)
   .controller('ModalUpdateMeasureController', ModalUpdateMeasureController)
