@@ -111,6 +111,7 @@ export class DesignAlternativesController {
     };
 
     // add measure columns
+    //vm.$log.info('DesignAlternativesController constructor measures: ', vm.measures);
     _.forEach(vm.measures, (measure) => {
       const optionsArr = vm.setOptionsArray(measure);
       vm.$log.debug(optionsArr);
