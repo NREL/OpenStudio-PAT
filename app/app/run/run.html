@@ -14,28 +14,52 @@
    </div>
   </div>
 </div>
+<div ng-show="selectedRunType.name == 'remote'" class="row">
+  <div class="col-sm-12">
+    <uib-accordion>
+      <uib-accordion-group is-open="remoteSettings.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': remoteSettings.open, 'glyphicon-chevron-right': !remoteSettings.open}"></i>
+          Remote Server Settings
+        </uib-accordion-heading>
+        <div class="row pad-bot-20">
+        <label for="remoteType" class="col-sm-3 run-label">Remote Server Type</label>
+          <div class="col-sm-6">
+            <select class="form-control" ng-options="remoteType for remoteType in remoteTypes" ng-model="remoteSettings.remoteType" ng-change="run.OsServer.resetSelectedServerURL()"></select>
+          </div>
+        </div>
+        <div class="row" ng-if="remoteSettings.remoteType == 'Existing Remote Server'">
+          <label for="externalURL" class="col-sm-3 run-label">Remote Server URL</label>
+          <div class="col-sm-7">
+            <input class="form-control" id="externalURL" type="text" ng-model="remoteSettings.remoteServerURL" ng-change="run.resetRemoteServerURL()">
+          </div>
+          <div class="col-sm-1">
+            <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] != 'started'" ng-click="run.startServer()">Connect</button>
+            <button type="button" class="btn btn-danger" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()">Disconnect</button>
+          </div>
+        </div>
+          
+      </uib-accordion-group>
+    </uib-accordion>
+  </div>
+</div>
 
 <div ng-show="selectedRunType.name == 'remote'" class="row pad-bot-20">
-  <div class="col-md-8">
+  <div class="col-sm-8">
     <button type="button" class="btn btn-info" ng-click="run.exportOSA()" translate>run.exportToOSA</button>
     <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()" translate>run.runEntireWorkflow</button>
-    <button type="button" class="btn btn-danger" ng-show="disabledButtons && serverStatus == 'started'" ng-click="run.cancelRun()" translate>run.cancelRun</button>
-    <button type="button" class="btn btn-primary" ng-show="serverStatus == 'started'" ng-click="run.viewServer()">View Server</button>
+    <button type="button" class="btn btn-danger" ng-show="disabledButtons && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.cancelRun()" translate>run.cancelRun</button>
+    <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()">View Server</button>
   </div>
 </div>
 
 <div ng-show="selectedRunType.name == 'local'" class="row pad-bot-20">
-  <div class="col-md-12">
+  <div class="col-sm-12">
     <button type="button" class="btn btn-info" ng-click="run.exportOSA()" translate>run.exportToOSA</button>
     <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()" translate>run.runEntireWorkflow</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
-    <button type="button" class="btn btn-danger" ng-show="serverStatus == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>
-    <button type="button" class="btn btn-primary" ng-show="serverStatus == 'started'" ng-click="run.viewServer()">View Server</button>
-    <!-- <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runSelected()">Run Selected</button>
-      <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runUpdated()">Run Updated Design Alternatives Only</button>
-      <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runEnergyPlus()">Run up to EnergyPlus</button>
-      <button type="button" class="btn btn-success" ng-disabled="disabledButtons" ng-click="run.runReportingMeasures()">Run Reporting Measures</button>
-      -->
+    <button type="button" class="btn btn-danger" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>
+    <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()">View Server</button>
   </div>
 </div>
 
@@ -113,11 +137,11 @@
                     </div>
                   </div>
                   <div class="col-sm-3">
-                    <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_osm" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadOSM(datapoint)"/>
+                    <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatuses[selectedRunType.name] == 'started' && !datapoint.downloaded_osm" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadOSM(datapoint)"/>
                     <span class="glyphicon glyphicon-ok-sign green-button big-cell" ng-show="datapoint.status == 'completed' && datapoint.downloaded_osm"></span>
                   </div>
                   <div class="col-sm-4 pad-left-25">
-                    <img ng-src="assets/images/resultcloud_blue.png" alt="Download Results for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatus == 'started' && !datapoint.downloaded_results" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadResults(datapoint)"/>
+                    <img ng-src="assets/images/resultcloud_blue.png" alt="Download Results for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatuses[selectedRunType.name] == 'started' && !datapoint.downloaded_results" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadResults(datapoint)"/>
                     <span class="glyphicon glyphicon-ok-sign green-button big-cell" ng-show="datapoint.status == 'completed' && datapoint.downloaded_results"></span>
                   </div>
                 </div>

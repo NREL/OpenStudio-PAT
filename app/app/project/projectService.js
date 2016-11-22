@@ -46,7 +46,9 @@ export class Project {
 
     vm.samplingMethods = vm.setSamplingMethods();
     vm.runTypes = vm.setRunTypes();
+    vm.remoteTypes = vm.setRemoteTypes();
     vm.algorithmOptions = vm.setAlgorithmOptions();
+    vm.resetRemoteSettings();
 
     vm.modified = false;
     vm.analysisType = null;
@@ -106,6 +108,7 @@ export class Project {
     vm.reportType = 'Calibration Report';
     vm.samplingMethod = vm.samplingMethods.length > 0 ? vm.samplingMethods[0] : null;
     vm.runType = vm.runTypes[0];
+    vm.resetRemoteSettings();
 
     vm.algorithmSettings = [];
     vm.measures = [];
@@ -166,11 +169,12 @@ export class Project {
         vm.openstudioMD5 = vm.pat.openstudioMD5 ? vm.pat.openstudioMD5 : vm.openstudioMD5;
         vm.analysisID = vm.pat.analysisID ? vm.pat.analysisID : vm.analysisID;
         vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
+        vm.remoteSettings = vm.pat.remoteSettings ? vm.pat.remoteSettings : vm.remoteSettings;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
     }
-
+ 
   }
 
   sleep(ms) {
@@ -677,6 +681,7 @@ export class Project {
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
     vm.pat.runType = vm.runType;
+    vm.pat.remoteSettings = vm.remoteSettings;
     vm.pat.samplingMethod = vm.samplingMethod;
     vm.pat.algorithmSettings = vm.algorithmSettings;
     vm.pat.rubyMD5 = vm.rubyMD5;
@@ -883,6 +888,32 @@ export class Project {
   setRunType(type) {
     const vm = this;
     vm.runType = type;
+  }
+
+  getRemoteTypes() {
+    const vm = this;
+    return vm.remoteTypes;
+  }
+
+  setRemoteTypes() {
+    //return ['Existing Remote Server', 'Amazon Cloud'];
+    return ['Existing Remote Server'];
+  }
+
+  resetRemoteSettings() {
+    const vm = this;
+    vm.setRemoteSettings({open: false, remoteType: vm.remoteTypes[0], remoteServerURL: null, cloudServerURL: null});
+    vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
+  }
+
+  setRemoteSettings(settings){
+    const vm = this;
+    vm.remoteSettings = settings;
+  }
+
+  getRemoteSettings(){
+    const vm = this;
+    return vm.remoteSettings;
   }
 
   setAnalysisType(name) {

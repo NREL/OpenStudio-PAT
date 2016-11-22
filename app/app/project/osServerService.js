@@ -31,11 +31,7 @@ export class OsServer {
 
     vm.disabledButtons = false;  // display run or cancel button
 
-    // TODO: this shouldn't stay hardcoded, leave as is for now or ping won't work right away
-    vm.localServerURL = 'http://localhost:8080';
-    //vm.remoteServerURL = 'http://bball-130553.nrel.gov:8080'; // TODO: using Brian's machine
-    //vm.localServerURL = '';
-    vm.remoteServerURL = '';
+    vm.localServerURL = 'http://localhost:8080';  // default URL.  will be reset when starting server
     vm.selectedServerURL = vm.localServerURL;
     
     const src = jetpack.cwd(app.getPath('userData'));
@@ -70,6 +66,24 @@ export class OsServer {
   setSelectedServerURL(url) {
     const vm = this;
     vm.selectedServerURL = url;
+  }
+
+  resetSelectedServerURL(){
+    const vm = this;
+    if (vm.Project.getRunType().name == 'local'){
+      vm.selectedServerURL = vm.localServerURL;
+    } else {
+      // set to URL in remoteSettings (external or cloud)
+      const rs = vm.Project.getRemoteSettings();
+      vm.$log.debug('REMOTE SETTINGS: ', rs);
+      if (rs.remoteType == 'Existing Remote Server'){
+        vm.selectedServerURL = rs.remoteServerURL;
+      } else {
+        vm.selectedServerURL = rs.cloudServerURL;
+      }
+      
+    }
+    vm.$log.debug('Selected Server URL set to: ', vm.selectedServerURL);
   }
 
   getServerStatus(env) {
@@ -159,7 +173,7 @@ export class OsServer {
     vm.serverType = type;
   }
 
-  // ping server
+  // ping server (selectedServerURL)
   pingServer() {
     const vm = this;
     const serverType = vm.Project.getRunType().name;
@@ -193,12 +207,6 @@ export class OsServer {
     vm.$log.debug('SERVER TYPE: ', serverType);
     vm.$log.debug('SERVER STATUS: ', vm.getServerStatus(serverType));
 
-    if (serverType == 'local') {
-      vm.setSelectedServerURL(vm.localServerURL);
-    } else {
-      vm.setSelectedServerURL(vm.cloudServerURL);
-    }
-
     function sleep(milliseconds) {
       // TODO: Deprecate this method? (Evan)
       const start = new Date().getTime();
@@ -224,7 +232,7 @@ export class OsServer {
       }
       else {
         vm.remoteServer().then(response => {
-          vm.seServerStatus(serverType, 'started');
+          vm.setServerStatus(serverType, 'started');
           deferred.resolve(response);
         }, response => {
           vm.$log.debug('ERROR in start remote server');
@@ -239,29 +247,31 @@ export class OsServer {
     return deferred.promise;
   }
 
-  // only manual runs work now locally.
-  // must send '-a batch_datapoints' as the 'analysis_type' to the CLI
-  // example .json and .zip in the project dir is a manual analysis.
-  // to run: pat_meta_cli run_analysis PATH_TO_PROJECT_JSON SERVER_URL -a ANALYSIS_TYPE_ARRAY
-
-  // example OSA: https://github.com/NREL/OpenStudio-analysis-gem/blob/develop/spec/files/analysis/examples/medium_office_example.json
-
   remoteServer() {
-    // TODO: this doesn't work yet
     const vm = this;
+    vm.$log.debug('***** In osServerService::remoteServer() *****');
     const deferred = vm.$q.defer();
 
-    deferred.resolve();
+    // check remote type
+    if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server'){
+      // ping URL to see if started
+      vm.pingServer().then(response => {
+        vm.$log.debug('Existing Remote Server Connected');
+        deferred.resolve();
+      }, error => {
+        vm.$log.debug('Cannot connect to Existing Remote Server at specified URL');
+        deferred.reject();
+      });
+    } else {
+      // TODO: amazon cloud
+      deferred.reject();
+    }
+
     return deferred.promise;
   }
 
   localServer() {
-    // using the dockerize branch of pat_meta_cli repo to start server in a docker at url 192.168.99.100
-    // openstudio-server branch: dockerize-multi-queue
-    // this is a work-around, works on mac, but will only start 1 server (with mongo /data/db NOT in project dir)
-    // will write rails URL to local_configuration.json (check this file to know if started)
-    // command: ruby openstudio_meta start_local ~/OpenStudio/PAT/the_project/  ~/repos/OpenStudio-server-PAT/server  --debug
-
+  
     const vm = this;
     vm.$log.debug('***** In osServerService::localServer() *****');
     // See "https://github.com/NREL/OpenStudio-server/tree/dockerize-osw/server/spec/files/batch_datapoints" for test files
@@ -452,6 +462,17 @@ export class OsServer {
           });
       } else {
         // TODO: stop remote server here
+        if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server'){
+          // remote server: 
+          // TODO: blank out URL?
+          vm.setServerStatus(serverType, 'stopped');
+          deferred.resolve('Server Disconnected');
+
+        } else {
+          // cloud: actually disconnect
+          // TODO
+          deferred.resolve();
+        }
       }
     } else {
       // Server already stopped

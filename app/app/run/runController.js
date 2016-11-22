@@ -18,16 +18,23 @@ export class RunController {
 
     vm.runTypes = vm.Project.getRunTypes();
     // TEMPORARY:  only show local server
-    vm.runTypes = _.filter(vm.runTypes, {name: 'local'});
+    //vm.runTypes = _.filter(vm.runTypes, {name: 'local'});
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
     vm.$scope.serverStatuses = vm.OsServer.getServerStatuses();
+
+    // remote settings
+    vm.$scope.remoteSettings = vm.Project.getRemoteSettings();
+    vm.$log.debug("REMOTE SETTINGS: ", vm.$scope.remoteSettings);
+    vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
+    vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
+
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
     // TODO: do we still need datapointsStatus?
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-    vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.selectedServerStatus[vm.$scope.selectedRunType.name]);
+    vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
@@ -48,11 +55,13 @@ export class RunController {
   setRunType() {
     const vm = this;
     vm.Project.setRunType(vm.$scope.selectedRunType);
+    vm.OsServer.resetSelectedServerURL();
+   // TODO: clear out datapoints?  Display different local vs remotely run ones?  Store in pat.json? recheck statuses? 
   }
 
   viewServer() {
     const vm = this;
-    vm.shell.openExternal(vm.OsServer.getServerURL());
+    vm.shell.openExternal(vm.OsServer.getSelectedServerURL());
   }
 
   viewReportModal(datapoint, report) {
@@ -159,17 +168,37 @@ export class RunController {
     return nas;
   }
 
+  resetRemoteServerURL(){
+    const vm = this;
+    vm.OsServer.stopServer().then(response => {
+      vm.OsServer.resetSelectedServerURL();
+    }, error => {
+      vm.$log.debug('Couldn\'t disconnect from server');
+      // reset anyway
+      vm.OsServer.resetSelectedServerURL();
+    });
+  }
+
   stopServer(force = false) {
     const vm = this;
     vm.OsServer.stopServer(force).then(response => {
-      vm.$log.debug('***** Server Stopped *****');
+      vm.$log.debug('***** ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name], ' Server Stopped *****');
       vm.OsServer.setProgress(0, '');
       //vm.$scope.serverStatuses = vm.OsServer.getServerStatus();
-
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+        vm.toastr.success('PAT successfully disconnected from remote server');
+      } else {
+        vm.toastr.success('Server stopped successfully');
+      }
+     
     }, response => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
-
       vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+        vm.toastr.error('PAT couldn\'t disconnect from remote server');
+      } else {
+        vm.toastr.error('Error: server could not be stopped');
+      }
     });
   }
 
@@ -178,9 +207,19 @@ export class RunController {
     const vm = this;
     vm.OsServer.startServer(force).then(response => {
       vm.$log.debug('Server Status for ',vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+        vm.toastr.success('Connected to remote server!');
+      } else {
+        vm.toastr.success('Server started!');
+      }
 
     }, response => {
       vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+        vm.toastr.error('Error: could not connect to remote server');
+      } else {
+        vm.toastr.error('Error: server did not start');
+      }
     });
   }
 
@@ -188,9 +227,11 @@ export class RunController {
   pingServer() {
     const vm = this;
     vm.OsServer.pingServer().then(response => {
-      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+      //vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+      vm.toastr.success('Server is Alive');
     }, response => {
       vm.$log.debug("Error pinging server");
+      vm.toastr.error('Server is Offline');
     });
   }
 
@@ -219,8 +260,8 @@ export class RunController {
 
       vm.OsServer.setProgress(30, 'Server started');
 
-      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
-      //vm.$log.debug('Server Status: ', vm.$scope.serverStatus);
+      //vm.$scope.serverStatuses = vm.OsServer.getServerStatuses();
+      //vm.$log.debug('Server Statuses: ', vm.$scope.serverStatuses);
 
       // 4: hit PAT CLI to start run
       vm.OsServer.setProgress(40, 'Starting analysis run');

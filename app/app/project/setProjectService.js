@@ -169,7 +169,7 @@ export class SetProject {
       let fileExists = false;
       vm.$log.debug('checking for ', fullFilename);
       const file = vm.jetpack.read(fullFilename);
-      vm.$log.debug('file: ', file);
+      //vm.$log.debug('file: ', file);
       if (typeof file !== 'undefined') {
         vm.$log.debug(fullFilename, ' found');
         fileExists = true;
@@ -208,7 +208,11 @@ export class SetProject {
 
           // resolve promise
           deferred.resolve('resolve');
-          // start server at new location
+          
+          // Only start server if local server is selected?
+          // For now: selected local run type and start local server
+          vm.Project.setRunType(vm.Project.getRunTypes()[0]);
+          // start server at new location 
           vm.OsServer.startServer().then(response => {
             vm.$log.debug('setProjectService::start server: server started');
             vm.$log.debug('response: ', response);
