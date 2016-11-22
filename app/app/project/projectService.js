@@ -9,7 +9,7 @@ import archiver from 'archiver';
 const {app, dialog} = remote;
 
 export class Project {
-  constructor($q, $log, MeasureManager) {
+  constructor($q, $log, $uibModal, MeasureManager) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -20,6 +20,7 @@ export class Project {
     vm.dialog = dialog;
     vm.archiver = archiver;
     vm.$q = $q;
+    vm.$uibModal = $uibModal;
 
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
@@ -46,8 +47,11 @@ export class Project {
 
     vm.samplingMethods = vm.setSamplingMethods();
     vm.runTypes = vm.setRunTypes();
+    vm.remoteTypes = vm.setRemoteTypes();
     vm.algorithmOptions = vm.setAlgorithmOptions();
+    vm.resetRemoteSettings();
 
+    vm.modified = false;
     vm.analysisType = null;
     vm.reportType = null;
     vm.runType = vm.runTypes[0];
@@ -105,6 +109,7 @@ export class Project {
     vm.reportType = 'Calibration Report';
     vm.samplingMethod = vm.samplingMethods.length > 0 ? vm.samplingMethods[0] : null;
     vm.runType = vm.runTypes[0];
+    vm.resetRemoteSettings();
 
     vm.algorithmSettings = [];
     vm.measures = [];
@@ -165,11 +170,12 @@ export class Project {
         vm.openstudioMD5 = vm.pat.openstudioMD5 ? vm.pat.openstudioMD5 : vm.openstudioMD5;
         vm.analysisID = vm.pat.analysisID ? vm.pat.analysisID : vm.analysisID;
         vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
+        vm.remoteSettings = vm.pat.remoteSettings ? vm.pat.remoteSettings : vm.remoteSettings;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
     }
-
+ 
   }
 
   sleep(ms) {
@@ -183,12 +189,14 @@ export class Project {
     _.forEach(vm.measures, (measure) => {
 
       const options = [];
-
       // first find out how many options there are (from the optionDelete special argument)
-      const keys = Object.keys(measure.arguments[0]);
-      const optionKeys = _.filter(keys, function (k) {
-        return k.indexOf('option_') !== -1;
-      });
+      let optionKeys = [];
+      if (measure.arguments.length > 0){
+        const keys = Object.keys(measure.arguments[0]);
+        optionKeys = _.filter(keys, function (k) {
+          return k.indexOf('option_') !== -1;
+        });
+      }
 
       _.forEach(optionKeys, (key) => {
 
@@ -441,10 +449,13 @@ export class Project {
       m.taxonomy = measure.tags;
 
       // first find out how many options there are
-      const keys = Object.keys(measure.arguments[0]);
-      const optionKeys = _.filter(keys, function (k) {
-        return k.indexOf('option_') !== -1;
-      });
+      let optionKeys = [];
+      if (measure.arguments.length > 0){
+        const keys = Object.keys(measure.arguments[0]);
+        optionKeys = _.filter(keys, function (k) {
+          return k.indexOf('option_') !== -1;
+        });
+      }
 
       // ARGUMENTS
       m.arguments = [];
@@ -463,7 +474,7 @@ export class Project {
           argument.default_value = arg.default_value;
           argument.value = arg.option_1 ? arg.option_1 : arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
           // Make sure that argument is "complete"
-          if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
+          if ( argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
             var_count += 1;
             m.arguments.push(argument);
           } else {
@@ -671,6 +682,7 @@ export class Project {
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
     vm.pat.runType = vm.runType;
+    vm.pat.remoteSettings = vm.remoteSettings;
     vm.pat.samplingMethod = vm.samplingMethod;
     vm.pat.algorithmSettings = vm.algorithmSettings;
     vm.pat.rubyMD5 = vm.rubyMD5;
@@ -691,6 +703,7 @@ export class Project {
 
     vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
     vm.$log.debug('Project exported to pat.json');
+    vm.setModified(false);
   }
 
   // reconcile measures and save
@@ -877,6 +890,32 @@ export class Project {
   setRunType(type) {
     const vm = this;
     vm.runType = type;
+  }
+
+  getRemoteTypes() {
+    const vm = this;
+    return vm.remoteTypes;
+  }
+
+  setRemoteTypes() {
+    //return ['Existing Remote Server', 'Amazon Cloud'];
+    return ['Existing Remote Server'];
+  }
+
+  resetRemoteSettings() {
+    const vm = this;
+    vm.setRemoteSettings({open: false, remoteType: vm.remoteTypes[0], remoteServerURL: null, cloudServerURL: null});
+    vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
+  }
+
+  setRemoteSettings(settings){
+    const vm = this;
+    vm.remoteSettings = settings;
+  }
+
+  getRemoteSettings(){
+    const vm = this;
+    return vm.remoteSettings;
   }
 
   setAnalysisType(name) {
@@ -1386,6 +1425,44 @@ export class Project {
   getWeatherFilesDropdownArr() {
     const vm = this;
     return vm.weatherFilesDropdownArr;
+  }
+
+  setModified(isModified) {
+    const vm = this;
+    vm.$log.debug('Project::setModified isModified: ', isModified);
+    vm.modified = isModified;
+  }
+
+  getModified() {
+    const vm = this;
+    return vm.modified;
+  }
+
+  modifiedModal() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('Project::modifiedModal');
+
+    if (vm.getModified()) {
+      const modalInstance = vm.$uibModal.open({
+        backdrop: 'static',
+        controller: 'ModalModifiedController',
+        controllerAs: 'modal',
+        templateUrl: 'app/project/modified.html'
+      });
+
+      modalInstance.result.then(() => {
+        vm.$log.debug('Resolving openModal()');
+        deferred.resolve('resolved');
+      }, () => {
+        // Modal canceled
+        deferred.reject('rejected');
+      });
+    } else {
+      deferred.resolve('resolved');
+    }
+
+    return deferred.promise;
   }
 
 }

@@ -18,16 +18,23 @@ export class RunController {
 
     vm.runTypes = vm.Project.getRunTypes();
     // TEMPORARY:  only show local server
-    vm.runTypes = _.filter(vm.runTypes, {name: 'local'});
+    //vm.runTypes = _.filter(vm.runTypes, {name: 'local'});
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-    vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+    vm.$scope.serverStatuses = vm.OsServer.getServerStatuses();
+
+    // remote settings
+    vm.$scope.remoteSettings = vm.Project.getRemoteSettings();
+    vm.$log.debug("REMOTE SETTINGS: ", vm.$scope.remoteSettings);
+    vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
+    vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
+
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
     // TODO: do we still need datapointsStatus?
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-    vm.$log.debug('SERVER STATUS: ', vm.$scope.serverStatus);
+    vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
@@ -48,11 +55,13 @@ export class RunController {
   setRunType() {
     const vm = this;
     vm.Project.setRunType(vm.$scope.selectedRunType);
+    vm.OsServer.resetSelectedServerURL();
+   // TODO: clear out datapoints?  Display different local vs remotely run ones?  Store in pat.json? recheck statuses? 
   }
 
   viewServer() {
     const vm = this;
-    vm.shell.openExternal(vm.OsServer.getServerURL());
+    vm.shell.openExternal(vm.OsServer.getSelectedServerURL());
   }
 
   viewReportModal(datapoint, report) {
@@ -89,7 +98,7 @@ export class RunController {
   // takes datestring like this: 20161110T212644Z
   extractDate(dateString) {
     let theDate = '';
-    if (dateString){
+    if (dateString) {
       const tmp = _.split(dateString, 'T');
       const y = tmp[0].substring(2, 4);
       const m = tmp[0].substring(4, 6);
@@ -106,34 +115,34 @@ export class RunController {
     const year = tmp[0].substring(0, 4);
     const mth = tmp[0].substring(4, 6);
     const day = tmp[0].substring(6, 8);
-    const hr = tmp[1].substring(0,2);
-    const min = tmp[1].substring(2,4);
-    const sec = tmp[1].substring(4,6);
+    const hr = tmp[1].substring(0, 2);
+    const min = tmp[1].substring(2, 4);
+    const sec = tmp[1].substring(4, 6);
 
     return new Date(year, mth, day, hr, min, sec);
 
   }
 
-  getRunTime(startStr, endStr){
+  getRunTime(startStr, endStr) {
     const vm = this;
     let result = '';
-    if (startStr && endStr){
+    if (startStr && endStr) {
       const start = vm.makeDate(startStr);
       const end = vm.makeDate(endStr);
 
-      const diff = end-start;
-      let sec = parseInt((end-start)/1000);
+      const diff = end - start;
+      let sec = parseInt((end - start) / 1000);
       sec = (sec < 10) ? '0' + sec : sec;
-      let min = parseInt(sec/60);
+      let min = parseInt(sec / 60);
       min = (min < 10) ? '0' + min : min;
-      let hours = parseInt(min/60);
+      let hours = parseInt(min / 60);
       hours = (hours < 10) ? '0' + hours : hours;
       result = hours + ":" + min + ":" + sec;
     }
     return result;
   }
 
-  calculateWarnings(dp){
+  calculateWarnings(dp) {
     let warn = 0;
     _.forEach(dp.steps, step => {
       warn = warn + step.result.step_warnings.length;
@@ -159,17 +168,37 @@ export class RunController {
     return nas;
   }
 
+  resetRemoteServerURL(){
+    const vm = this;
+    vm.OsServer.stopServer().then(response => {
+      vm.OsServer.resetSelectedServerURL();
+    }, error => {
+      vm.$log.debug('Couldn\'t disconnect from server');
+      // reset anyway
+      vm.OsServer.resetSelectedServerURL();
+    });
+  }
+
   stopServer(force = false) {
     const vm = this;
     vm.OsServer.stopServer(force).then(response => {
-      vm.$log.debug('***** Server Stopped *****');
+      vm.$log.debug('***** ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name], ' Server Stopped *****');
       vm.OsServer.setProgress(0, '');
-      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
-
+      //vm.$scope.serverStatuses = vm.OsServer.getServerStatus();
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+        vm.toastr.success('PAT successfully disconnected from remote server');
+      } else {
+        vm.toastr.success('Server stopped successfully');
+      }
+     
     }, response => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
-
       vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+        vm.toastr.error('PAT couldn\'t disconnect from remote server');
+      } else {
+        vm.toastr.error('Error: server could not be stopped');
+      }
     });
   }
 
@@ -177,10 +206,20 @@ export class RunController {
   startServer(force = false) {
     const vm = this;
     vm.OsServer.startServer(force).then(response => {
-      vm.$log.debug('Server Status: ', vm.$scope.serverStatus);
+      vm.$log.debug('Server Status for ',vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+        vm.toastr.success('Connected to remote server!');
+      } else {
+        vm.toastr.success('Server started!');
+      }
 
     }, response => {
       vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+        vm.toastr.error('Error: could not connect to remote server');
+      } else {
+        vm.toastr.error('Error: server did not start');
+      }
     });
   }
 
@@ -188,9 +227,11 @@ export class RunController {
   pingServer() {
     const vm = this;
     vm.OsServer.pingServer().then(response => {
-      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+      //vm.$scope.serverStatus = vm.OsServer.getServerStatus();
+      vm.toastr.success('Server is Alive');
     }, response => {
       vm.$log.debug("Error pinging server");
+      vm.toastr.error('Server is Offline');
     });
   }
 
@@ -203,7 +244,7 @@ export class RunController {
     // 2: make/get zip file?
 
     // 3: hit PAT CLI to start server (local or remote)
-    vm.OsServer.setProgress(15,'Starting server');
+    vm.OsServer.setProgress(15, 'Starting server');
 
     vm.$log.debug('***** In runController::runEntireWorkflow() ready to start server *****');
 
@@ -219,8 +260,8 @@ export class RunController {
 
       vm.OsServer.setProgress(30, 'Server started');
 
-      vm.$scope.serverStatus = vm.OsServer.getServerStatus();
-      //vm.$log.debug('Server Status: ', vm.$scope.serverStatus);
+      //vm.$scope.serverStatuses = vm.OsServer.getServerStatuses();
+      //vm.$log.debug('Server Statuses: ', vm.$scope.serverStatuses);
 
       // 4: hit PAT CLI to start run
       vm.OsServer.setProgress(40, 'Starting analysis run');
@@ -261,12 +302,12 @@ export class RunController {
 
             // download/replace out.osw
             // Should we do this only once at the end?
-            vm.OsServer.updateDatapoints().then( response2 => {
+            vm.OsServer.updateDatapoints().then(response2 => {
               // refresh datapoints
               vm.$scope.datapoints = vm.Project.getDatapoints();
 
               // download reports
-              vm.OsServer.downloadReports().then ( response3 => {
+              vm.OsServer.downloadReports().then(response3 => {
                 vm.$log.debug('downloaded all available reports');
                 // refresh datapoints again
                 vm.$scope.datapoints = vm.Project.getDatapoints();
@@ -340,7 +381,7 @@ export class RunController {
     const vm = this;
     vm.OsServer.downloadResults(datapoint).then(() => {
       vm.toastr.success('Results downloaded successfully!');
-      }, () => {
+    }, () => {
       vm.toastr.error('Error downloading Results zip file');
     });
   }
@@ -398,7 +439,6 @@ export class RunController {
     // TODO: deprecate
     const vm = this;
     vm.Project.exportPAT();
-
   }
 
   exportOSA() {

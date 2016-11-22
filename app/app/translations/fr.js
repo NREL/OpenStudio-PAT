@@ -2,6 +2,11 @@ export default {
   dependency: {
     title: 'PAT Dependency Download Status'
   },
+  modified: {
+    title: 'ParametricAnalysisTool',
+    heading: 'Modified Files',
+    blurb: 'You have unsaved changes. Click the save button to save your changes, or click the cancel button to quit without saving.'
+  },
   whitespaceWarning: {
     title: 'ParametricAnalysisTool',
     heading: 'Whitespace Warning',
@@ -218,5 +223,6 @@ export default {
   Cancel: 'Annuler',
   Continue: 'Continue',
   Manual: 'Manual',
-  OK: 'OK'
+  OK: 'OK',
+  Save: 'Save'
 };

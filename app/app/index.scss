@@ -421,6 +421,11 @@ select {
   font-weight:normal;
 }
 
+.normal-text {
+  font-size:14px;
+  font-weight:normal;
+}
+
 .black-button {
   color: #000000;
 }
@@ -519,6 +524,10 @@ select {
 
 .medium-label {
   font-size: 1.4em;
+}
+
+.run-label {
+  font-size: 14px;
 }
 
 .form-control-smaller-width {

@@ -18,7 +18,7 @@ export class OsServer {
     // to run meta_cli
     vm.exec = require('child_process').exec;
 
-    vm.serverStatus = 'stopped';  // started, stopped, error?
+    vm.serverStatuses = {local:'stopped', remote:'stopped'};  // started, stopped, error?
     vm.analysisStatus = '';  // '', started, in progress, completed, error
     vm.progress = {amount: 0, message: ''};
     vm.isDone = true;
@@ -31,10 +31,9 @@ export class OsServer {
 
     vm.disabledButtons = false;  // display run or cancel button
 
-    vm.localServerURL = 'http://localhost:8080';
-    //vm.cloudServerURL = 'http://bball-130553.nrel.gov:8080'; // TODO: using Brian's machine
-    vm.cloudServerURL = '';
-    vm.serverURL = vm.localServerURL;
+    vm.localServerURL = 'http://localhost:8080';  // default URL.  will be reset when starting server
+    vm.selectedServerURL = vm.localServerURL;
+    
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
 
@@ -59,24 +58,47 @@ export class OsServer {
     // TODO: clear data from disk (?)
   }
 
-  getServerURL() {
+  getSelectedServerURL() {
     const vm = this;
-    return vm.serverURL;
+    return vm.selectedServerURL;
   }
 
-  setServerURL(url) {
+  setSelectedServerURL(url) {
     const vm = this;
-    vm.serverURL = url;
+    vm.selectedServerURL = url;
   }
 
-  getServerStatus() {
+  resetSelectedServerURL(){
     const vm = this;
-    return vm.serverStatus;
+    if (vm.Project.getRunType().name == 'local'){
+      vm.selectedServerURL = vm.localServerURL;
+    } else {
+      // set to URL in remoteSettings (external or cloud)
+      const rs = vm.Project.getRemoteSettings();
+      vm.$log.debug('REMOTE SETTINGS: ', rs);
+      if (rs.remoteType == 'Existing Remote Server'){
+        vm.selectedServerURL = rs.remoteServerURL;
+      } else {
+        vm.selectedServerURL = rs.cloudServerURL;
+      }
+      
+    }
+    vm.$log.debug('Selected Server URL set to: ', vm.selectedServerURL);
   }
 
-  setServerStatus(status) {
+  getServerStatus(env) {
     const vm = this;
-    vm.serverStatus = status;
+    return vm.serverStatuses[env];
+  }
+
+  setServerStatus(env, status) {
+    const vm = this;
+    vm.serverStatuses[env] = status;
+  }
+
+  getServerStatuses(){
+    const vm = this;
+    return vm.serverStatuses;
   }
 
   getAnalysisStatus() {
@@ -151,28 +173,28 @@ export class OsServer {
     vm.serverType = type;
   }
 
-  // ping server
+  // ping server (selectedServerURL)
   pingServer() {
     const vm = this;
-    vm.$log.debug('Pinging Server to see if it is alive');
+    const serverType = vm.Project.getRunType().name;
+    vm.$log.debug('Pinging ', serverType, ' server to see if it is alive: ', vm.selectedServerURL);
     const deferred = vm.$q.defer();
-    const url = vm.serverURL + '/status.json';
+    const url = vm.selectedServerURL + '/status.json';
     vm.$log.debug('Ping Server URL: ', url);
     vm.$http.get(url).then(response => {
       // send json to run controller
       vm.$log.debug('PING: Server is started');
       vm.$log.debug('status JSON response: ', response);
-      vm.serverStatus = 'started';
+      vm.setServerStatus(serverType,'started');
       deferred.resolve(response);
 
     }, response => {
       vm.$log.debug('PING:  Server is not started');
-      vm.serverStatus = 'stopped';
+      vm.setServerStatus(serverType, 'stopped');
       deferred.reject(response);
     });
 
     return deferred.promise;
-
   }
 
   // start server (remote or local)
@@ -181,15 +203,9 @@ export class OsServer {
     vm.$log.debug('***** In osServerService::startServer() *****');
     const deferred = vm.$q.defer();
 
-    const serverType = vm.Project.getRunType();
+    const serverType = vm.Project.getRunType().name;
     vm.$log.debug('SERVER TYPE: ', serverType);
-    vm.$log.debug('SERVER STATUS: ', vm.serverStatus);
-
-    if (serverType.name == 'local') {
-      vm.setServerURL(vm.localServerURL);
-    } else {
-      vm.setServerURL(vm.cloudServerURL);
-    }
+    vm.$log.debug('SERVER STATUS: ', vm.getServerStatus(serverType));
 
     function sleep(milliseconds) {
       // TODO: Deprecate this method? (Evan)
@@ -203,11 +219,11 @@ export class OsServer {
 
     // TODO: maybe ping server to make sure it is really started?
     // TODO: also if start fails, ping server...it might be started already
-    if ((vm.serverStatus != 'started') || force) {
-      if (serverType.name == 'local') {
+    if ((vm.getServerStatus(serverType) != 'started') || force) {
+      if (serverType == 'local') {
         vm.localServer().then(response => {
           vm.$log.debug('localServer promise resolved.  Server should have started');
-          vm.setServerStatus('started');
+          vm.setServerStatus(serverType, 'started');
 
         }, response => {
           vm.$log.debug('ERROR in start local server');
@@ -216,10 +232,11 @@ export class OsServer {
       }
       else {
         vm.remoteServer().then(response => {
-          vm.seServerStatus('started');
+          vm.setServerStatus(serverType, 'started');
           deferred.resolve(response);
         }, response => {
           vm.$log.debug('ERROR in start remote server');
+          // TODO: set serverType to 'error'?
           deferred.reject(response);
         });
       }
@@ -230,29 +247,31 @@ export class OsServer {
     return deferred.promise;
   }
 
-  // only manual runs work now locally.
-  // must send '-a batch_datapoints' as the 'analysis_type' to the CLI
-  // example .json and .zip in the project dir is a manual analysis.
-  // to run: pat_meta_cli run_analysis PATH_TO_PROJECT_JSON SERVER_URL -a ANALYSIS_TYPE_ARRAY
-
-  // example OSA: https://github.com/NREL/OpenStudio-analysis-gem/blob/develop/spec/files/analysis/examples/medium_office_example.json
-
   remoteServer() {
-    // TODO: this doesn't work yet
     const vm = this;
+    vm.$log.debug('***** In osServerService::remoteServer() *****');
     const deferred = vm.$q.defer();
 
-    deferred.resolve();
+    // check remote type
+    if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server'){
+      // ping URL to see if started
+      vm.pingServer().then(response => {
+        vm.$log.debug('Existing Remote Server Connected');
+        deferred.resolve();
+      }, error => {
+        vm.$log.debug('Cannot connect to Existing Remote Server at specified URL');
+        deferred.reject();
+      });
+    } else {
+      // TODO: amazon cloud
+      deferred.reject();
+    }
+
     return deferred.promise;
   }
 
   localServer() {
-    // using the dockerize branch of pat_meta_cli repo to start server in a docker at url 192.168.99.100
-    // openstudio-server branch: dockerize-multi-queue
-    // this is a work-around, works on mac, but will only start 1 server (with mongo /data/db NOT in project dir)
-    // will write rails URL to local_configuration.json (check this file to know if started)
-    // command: ruby openstudio_meta start_local ~/OpenStudio/PAT/the_project/  ~/repos/OpenStudio-server-PAT/server  --debug
-
+  
     const vm = this;
     vm.$log.debug('***** In osServerService::localServer() *****');
     // See "https://github.com/NREL/OpenStudio-server/tree/dockerize-osw/server/spec/files/batch_datapoints" for test files
@@ -279,11 +298,12 @@ export class OsServer {
           // get url from local_configuration.json
           const obj = jetpack.read(vm.Project.projectDir.path() + '/local_configuration.json', 'json');
           if (obj) {
-            vm.setServerURL(obj.server_url);
+            vm.setSelectedServerURL(obj.server_url);
+            vm.localServerURL = obj.server_url;
           } else {
             vm.$log.debug('local_configuration.json obj undefined');
           }
-          vm.$log.debug('SERVER URL: ', vm.serverURL);
+          vm.$log.debug('SERVER URL: ', vm.selectedServerURL);
           deferred.resolve(child);
         } else {
           vm.$log.debug('SERVER ERROR');
@@ -337,9 +357,9 @@ export class OsServer {
     // TODO: catch what analysis type it is
 
     if (vm.platform == 'win32')
-      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
+      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.selectedServerURL}"`;
     else
-      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.serverURL}"`;
+      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.selectedServerURL}"`;
     vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
 
     const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param;
@@ -405,12 +425,11 @@ export class OsServer {
   stopServer(force = false) {
     const vm = this;
     const deferred = vm.$q.defer();
-    const serverType = vm.Project.getRunType();
+    const serverType = vm.Project.getRunType().name;
 
-     //if (vm.serverStatus == 'started' && vm.Project.projectDir != undefined) {
-    if ((vm.serverStatus == vm.serverStatus && vm.Project.projectDir != null) || force) { // TODO This should be removed when the line above is fixed -- serverStatus needs to correctly update
+    if ((vm.getServerStatus(serverType) == 'started' && vm.Project.projectDir != null) || force) { 
 
-      if (serverType.name == 'local') {
+      if (serverType == 'local') {
         vm.$log.debug('vm.Project:', vm.Project);
         vm.$log.debug('vm.Project.projectDir:', vm.Project.projectDir.path());
 
@@ -428,7 +447,7 @@ export class OsServer {
             if (child.exitCode == 0) {
               // SUCCESS
               vm.$log.debug('Server Stopped');
-              vm.setServerStatus('stopped');
+              vm.setServerStatus(serverType, 'stopped');
               deferred.resolve(child);
 
             } else {
@@ -443,6 +462,17 @@ export class OsServer {
           });
       } else {
         // TODO: stop remote server here
+        if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server'){
+          // remote server: 
+          // TODO: blank out URL?
+          vm.setServerStatus(serverType, 'stopped');
+          deferred.resolve('Server Disconnected');
+
+        } else {
+          // cloud: actually disconnect
+          // TODO
+          deferred.resolve();
+        }
       }
     } else {
       // Server already stopped
@@ -456,7 +486,7 @@ export class OsServer {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    const url = vm.serverURL + '/analyses/' + vm.Project.getAnalysisID() + '/status.json';
+    const url = vm.selectedServerURL + '/analyses/' + vm.Project.getAnalysisID() + '/status.json';
     vm.$log.debug('Analysis Status URL: ', url);
     vm.$http.get(url).then(response => {
       // send json to run controller
@@ -482,7 +512,7 @@ export class OsServer {
 
     _.forEach(vm.datapointsStatus, (dp) => {
       vm.$log.debug('DATAPOINT STATUS: ', dp);
-      const url = vm.serverURL + '/data_points/' + dp.id + '/download_result_file';
+      const url = vm.selectedServerURL + '/data_points/' + dp.id + '/download_result_file';
       const params = {filename: 'out.osw'};
       const config = { params: params, headers : {Accept: 'application/json'} };
       vm.$log.debug('****URL: ', url);
@@ -513,7 +543,7 @@ export class OsServer {
         // if 422 error, out.osw doesn't exist yet...get datapoint.json instead
         if (error.status == 422) {
           vm.$log.debug('422 Error...GETting datapoint json instead');
-          const datapointUrl = vm.serverURL + '/data_points/' + dp.id + '.json';
+          const datapointUrl = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
           const promise2 = vm.$http.get(datapointUrl).then( response2 => {
             // set datapoint array
             vm.$log.debug('datapoint JSON response: ', response2.data.data_point);
@@ -562,7 +592,7 @@ export class OsServer {
 
     _.forEach(vm.datapoints, dp => {
       if (dp.status == 'completed' && !dp.downloaded_reports) {
-        const url = vm.serverURL + '/data_points/' + dp.id + '.json';
+        const url = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
         const promise = vm.$http.get(url).then(response => {
           // get result files from response
           vm.$log.debug('datapoint.json: ', response);
@@ -572,7 +602,7 @@ export class OsServer {
           _.forEach(dp.result_files, file => {
             if (file.type == 'Report' && !file.downloaded) {
               // download file
-              const reportUrl = vm.serverURL + '/data_points/' + dp.id + '/download_result_file';
+              const reportUrl = vm.selectedServerURL + '/data_points/' + dp.id + '/download_result_file';
               const params = {filename: file.attachment_file_name};
               const config = { params: params, headers : {Accept: 'application/json'} };
               vm.$log.debug('****URL: ', reportUrl);
@@ -646,7 +676,7 @@ export class OsServer {
     const file = _.find(datapoint.result_files, {type: 'Data Point'});
 
     if (file) {
-      const reportUrl = vm.serverURL + '/data_points/' + datapoint.id + '/download_result_file';
+      const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
       const params = {filename: file.attachment_file_name};
       const config = { params: params, headers : {Accept: 'application/json'} };
       vm.$log.debug('Download Results URL: ', reportUrl);
@@ -699,7 +729,7 @@ export class OsServer {
     const file = _.find(datapoint.result_files, {type: 'OpenStudio Model'});
 
     if (file) {
-      const reportUrl = vm.serverURL + '/data_points/' + datapoint.id + '/download_result_file';
+      const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
       const params = {filename: file.attachment_file_name};
       const config = {params: params, headers: {Accept: 'application/json'}};
       vm.$log.debug('Download OSM URL: ', reportUrl);
@@ -724,7 +754,7 @@ export class OsServer {
   stopAnalysis() {
     const vm = this;
     const deferred = vm.$q.defer();
-    const url = vm.serverURL + '/analyses/' + vm.Project.getAnalysisID() + '/action.json';
+    const url = vm.selectedServerURL + '/analyses/' + vm.Project.getAnalysisID() + '/action.json';
     const params = {analysis_action: 'stop'};
 
     if (vm.analysisStatus == 'completed') {
