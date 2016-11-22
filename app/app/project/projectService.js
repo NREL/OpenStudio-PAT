@@ -9,7 +9,7 @@ import archiver from 'archiver';
 const {app, dialog} = remote;
 
 export class Project {
-  constructor($q, $log, MeasureManager) {
+  constructor($q, $log, $uibModal, MeasureManager) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -20,6 +20,7 @@ export class Project {
     vm.dialog = dialog;
     vm.archiver = archiver;
     vm.$q = $q;
+    vm.$uibModal = $uibModal;
 
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
@@ -702,6 +703,7 @@ export class Project {
 
     vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
     vm.$log.debug('Project exported to pat.json');
+    vm.setModified(false);
   }
 
   // reconcile measures and save
@@ -1427,6 +1429,7 @@ export class Project {
 
   setModified(isModified) {
     const vm = this;
+    vm.$log.debug('Project::setModified isModified: ', isModified);
     vm.modified = isModified;
   }
 
@@ -1438,22 +1441,27 @@ export class Project {
   modifiedModal() {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('setProject::modifiedModal');
+    vm.$log.debug('Project::modifiedModal');
 
-    const modalInstance = vm.$uibModal.open({
-      backdrop: 'static',
-      controller: 'ModalModifiedController',
-      controllerAs: 'modal',
-      templateUrl: 'app/project/modified.html'
-    });
+    if (vm.getModified()) {
+      const modalInstance = vm.$uibModal.open({
+        backdrop: 'static',
+        controller: 'ModalModifiedController',
+        controllerAs: 'modal',
+        templateUrl: 'app/project/modified.html'
+      });
 
-    modalInstance.result.then(() => {
-      vm.$log.debug('Resolving openModal()');
+      modalInstance.result.then(() => {
+        vm.$log.debug('Resolving openModal()');
+        deferred.resolve('resolved');
+      }, () => {
+        // Modal canceled
+        deferred.reject('rejected');
+      });
+    } else {
       deferred.resolve('resolved');
-    }, () => {
-      // Modal canceled
-      deferred.reject('rejected');
-    });
+    }
+
     return deferred.promise;
   }
 

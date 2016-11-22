@@ -4,8 +4,8 @@ export default {
   },
   modified: {
     title: 'ParametricAnalysisTool',
-    heading: 'Modified files',
-    blurb: 'You have unsaved changes.'
+    heading: 'Modified Files',
+    blurb: 'You have unsaved changes. Click the save button to save your changes, or click the cancel button to quit without saving.'
   },
   whitespaceWarning: {
     title: 'ParametricAnalysisTool',
@@ -224,5 +224,6 @@ export default {
   Cancel: 'Cancel',
   Continue: 'Continue',
   Manual: 'Manual',
-  OK: 'OK'
+  OK: 'OK',
+  Save: 'Save'
 };

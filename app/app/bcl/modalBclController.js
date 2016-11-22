@@ -477,6 +477,9 @@ export class ModalBclController {
     const originalStatus = angular.copy(measure.status);
     vm.$log.debug('in UPDATE LOCAL BCL MEASURE function');
 
+    // delete from disk first
+    vm.jetpack.remove(measure.measure_dir);
+
     // download from BCL & prepare (overwrite files on disk)
     vm.download(measure).then(() => {
 
@@ -504,6 +507,10 @@ export class ModalBclController {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.$log.debug('in UPDATE PROJECT MEASURE function');
+
+    // delete old directory first
+    const currentMeasureDir = _.find(vm.projectMeasures, {uid: measure.uid}).measure_dir;
+    vm.jetpack.remove(currentMeasureDir);
 
     // copy on disk
     const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;

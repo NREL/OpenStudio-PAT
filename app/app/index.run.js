@@ -11,44 +11,46 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
 
   $window.onbeforeunload = e => {
     console.log('EXIT BUTTON CLICKED?: ', remote.getGlobal('exitClicked'));
-    if (!exitReady && remote.getGlobal('exitClicked')){
-
+    if (!exitReady && remote.getGlobal('exitClicked')) {
       try {
         // only if project is set
         if (Project.getProjectDir() != null) {
           e.returnValue = false;
           toastr.info('Preparing to Exit');
-          Project.exportPAT();
-          MeasureManager.stopMeasureManager();
+          Project.modifiedModal().then(() => {
+            $log.debug('Resolving modifiedModal()');
+            MeasureManager.stopMeasureManager();
 
-          OsServer.stopServer(true).then(response => {
-            //  server is stopped
-            // for debug: save a random file to make sure server is stopped (when a project is selected)
-            // jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
-            //   status: OsServer.getServerStatus(),
-            //   stopServer: 'success',
-            //   response: response
-            // });
-            exitReady = true;
-            app.quit();
+            OsServer.stopServer(true).then(response => {
+              //  server is stopped
+              // for debug: save a random file to make sure server is stopped (when a project is selected)
+              // jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
+              //   status: OsServer.getServerStatus(),
+              //   stopServer: 'success',
+              //   response: response
+              // });
+              exitReady = true;
+              app.quit();
 
-          }, error => {
-            // jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
-            //   status: OsServer.getServerStatus(),
-            //   stopServer: 'fail',
-            //   response: error
-            // });
-            exitReady = true;
-            app.quit();
+            }, error => {
+              // jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
+              //   status: OsServer.getServerStatus(),
+              //   stopServer: 'fail',
+              //   response: error
+              // });
+              exitReady = true;
+              app.quit();
+            });
+          }, () => {
           });
         } else {
           // nothing to do, exit.
           exitReady = true;
           app.quit();
         }
-      } catch(e) {
+      } catch (e) {
         // TODO: log something to a file
-        if (Project.getProjectDir() != null){
+        if (Project.getProjectDir() != null) {
           //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'There was an error closing the app.'});
         }
         exitReady = true;

@@ -98,7 +98,7 @@ export class RunController {
   // takes datestring like this: 20161110T212644Z
   extractDate(dateString) {
     let theDate = '';
-    if (dateString){
+    if (dateString) {
       const tmp = _.split(dateString, 'T');
       const y = tmp[0].substring(2, 4);
       const m = tmp[0].substring(4, 6);
@@ -115,34 +115,34 @@ export class RunController {
     const year = tmp[0].substring(0, 4);
     const mth = tmp[0].substring(4, 6);
     const day = tmp[0].substring(6, 8);
-    const hr = tmp[1].substring(0,2);
-    const min = tmp[1].substring(2,4);
-    const sec = tmp[1].substring(4,6);
+    const hr = tmp[1].substring(0, 2);
+    const min = tmp[1].substring(2, 4);
+    const sec = tmp[1].substring(4, 6);
 
     return new Date(year, mth, day, hr, min, sec);
 
   }
 
-  getRunTime(startStr, endStr){
+  getRunTime(startStr, endStr) {
     const vm = this;
     let result = '';
-    if (startStr && endStr){
+    if (startStr && endStr) {
       const start = vm.makeDate(startStr);
       const end = vm.makeDate(endStr);
 
-      const diff = end-start;
-      let sec = parseInt((end-start)/1000);
+      const diff = end - start;
+      let sec = parseInt((end - start) / 1000);
       sec = (sec < 10) ? '0' + sec : sec;
-      let min = parseInt(sec/60);
+      let min = parseInt(sec / 60);
       min = (min < 10) ? '0' + min : min;
-      let hours = parseInt(min/60);
+      let hours = parseInt(min / 60);
       hours = (hours < 10) ? '0' + hours : hours;
       result = hours + ":" + min + ":" + sec;
     }
     return result;
   }
 
-  calculateWarnings(dp){
+  calculateWarnings(dp) {
     let warn = 0;
     _.forEach(dp.steps, step => {
       warn = warn + step.result.step_warnings.length;
@@ -244,7 +244,7 @@ export class RunController {
     // 2: make/get zip file?
 
     // 3: hit PAT CLI to start server (local or remote)
-    vm.OsServer.setProgress(15,'Starting server');
+    vm.OsServer.setProgress(15, 'Starting server');
 
     vm.$log.debug('***** In runController::runEntireWorkflow() ready to start server *****');
 
@@ -302,12 +302,12 @@ export class RunController {
 
             // download/replace out.osw
             // Should we do this only once at the end?
-            vm.OsServer.updateDatapoints().then( response2 => {
+            vm.OsServer.updateDatapoints().then(response2 => {
               // refresh datapoints
               vm.$scope.datapoints = vm.Project.getDatapoints();
 
               // download reports
-              vm.OsServer.downloadReports().then ( response3 => {
+              vm.OsServer.downloadReports().then(response3 => {
                 vm.$log.debug('downloaded all available reports');
                 // refresh datapoints again
                 vm.$scope.datapoints = vm.Project.getDatapoints();
@@ -381,7 +381,7 @@ export class RunController {
     const vm = this;
     vm.OsServer.downloadResults(datapoint).then(() => {
       vm.toastr.success('Results downloaded successfully!');
-      }, () => {
+    }, () => {
       vm.toastr.error('Error downloading Results zip file');
     });
   }
@@ -439,7 +439,6 @@ export class RunController {
     // TODO: deprecate
     const vm = this;
     vm.Project.exportPAT();
-
   }
 
   exportOSA() {
