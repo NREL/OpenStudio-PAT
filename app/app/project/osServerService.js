@@ -622,6 +622,24 @@ export class OsServer {
           vm.$q.all(reportPromises).then(response => {
             // set downloaded_reports flag
             dp.downloaded_reports = true;
+
+            // if running locally, also download osm and results
+            if (vm.Project.getRunType().name == 'local'){
+              vm.$log.debug('Run Type is set to Local');
+              const osm_promise = vm.downloadOSM(dp).then(response => {
+                vm.$log.debug('osm downloaded for ', dp.name);
+              }, error => {
+                vm.$log.debug('OSM download failed for ', dp.name);
+              });
+              //promises.push(osm_promise);
+              const result_promise = vm.downloadResults(dp).then(response => {
+                vm.$log.debug('results downloaded for ', dp.name);
+              }, error => {
+                vm.$log.debug('RESULTS download failed for ', dp.name);
+              });
+              //promises.push(result_promise);
+            }
+
           }, error => {
             vm.$log.debug('Error downloading all reports for datapoint: ', dp.id, 'error: ', error);
           });
@@ -630,6 +648,7 @@ export class OsServer {
           vm.$log.debug('GET datapoint.json error: ', error);
         });
         promises.push(promise);
+
       }
     });
 
