@@ -156,7 +156,7 @@ export class Project {
         }
 
         vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
-        vm.runType = vm.pat.runType ? vm.pat.runType : vm.runType;
+        //vm.runType = vm.pat.runType ? vm.pat.runType : vm.runType;
         vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
         vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
         vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
@@ -175,7 +175,7 @@ export class Project {
     } else {
       vm.$log.error('No project selected...cannot initialize project');
     }
- 
+
   }
 
   sleep(ms) {
@@ -681,7 +681,7 @@ export class Project {
     vm.pat.seed = vm.defaultSeed;
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
-    vm.pat.runType = vm.runType;
+    //vm.pat.runType = vm.runType;
     vm.pat.remoteSettings = vm.remoteSettings;
     vm.pat.samplingMethod = vm.samplingMethod;
     vm.pat.algorithmSettings = vm.algorithmSettings;
