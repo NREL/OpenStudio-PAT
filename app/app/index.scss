@@ -455,6 +455,9 @@ select {
 .green-text {
   color: #74C277;
 }
+.red-text {
+  color:#E26A61;
+}
 
 .library-grid-button-container {
   font-size: 2em;
@@ -687,6 +690,11 @@ h5.measure-type {
     background-color:#E26A61;
   }
 
+}
+
+.datapoint-id-display {
+  font-size: 14px;
+  padding:10px 10px 10px 30px;
 }
 
 .datapoint-header {

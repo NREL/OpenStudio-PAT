@@ -56,7 +56,7 @@ export class RunController {
     const vm = this;
     vm.Project.setRunType(vm.$scope.selectedRunType);
     vm.OsServer.resetSelectedServerURL();
-   // TODO: clear out datapoints?  Display different local vs remotely run ones?  Store in pat.json? recheck statuses? 
+   // TODO: clear out datapoints?  Display different local vs remotely run ones?  Store in pat.json? recheck statuses?
   }
 
   viewServer() {
@@ -95,31 +95,38 @@ export class RunController {
   }
 
   // return MM/DD/YY from date string
-  // takes datestring like this: 20161110T212644Z
-  extractDate(dateString) {
+  // takes datestrings like these: 20161110T212644Z, 2016-11-22 11:10:50 -0700, 2016-11-22 04:32:23 UTC, or 2016-11-22T04:32:13.626Z
+  formatDate(dateString) {
+    const vm = this;
     let theDate = '';
-    if (dateString) {
-      const tmp = _.split(dateString, 'T');
-      const y = tmp[0].substring(2, 4);
-      const m = tmp[0].substring(4, 6);
-      const d = tmp[0].substring(6, 8);
-      theDate = m + '/' + d + '/' + y;
+
+    if (dateString){
+      theDate = vm.makeDate(dateString);
+      // format
+      theDate = theDate.getMonth()+1 + "/" + theDate.getDate() + "/" + theDate.getFullYear();
     }
 
     return theDate;
   }
 
+  // takes datestrings like these: 20161110T212644Z, 2016-11-22 11:10:50 -0700, 2016-11-22 04:32:23 UTC, or 2016-11-22T04:32:13.626Z
   makeDate(dateString) {
+    const vm = this;
+    let theDate = '';
+    if (dateString) {
 
-    const tmp = _.split(dateString, 'T');
-    const year = tmp[0].substring(0, 4);
-    const mth = tmp[0].substring(4, 6);
-    const day = tmp[0].substring(6, 8);
-    const hr = tmp[1].substring(0, 2);
-    const min = tmp[1].substring(2, 4);
-    const sec = tmp[1].substring(4, 6);
+      if (dateString.slice(8,9) == 'T') {
+        // YYYYMMDDTHHMMSSZ: add punctuation to convert to valid datetime format and parse normally
+        const tmp = dateString.slice(0, 4) + '-' + dateString.slice(4, 6) + '-' + dateString.slice(6, 11) + ':' + dateString.slice(11, 13) + ':' + dateString.slice(13, 16);
+        theDate = new Date(tmp);
+      } else {
+        theDate = new Date(dateString);
+      }
 
-    return new Date(year, mth, day, hr, min, sec);
+     // vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
+    }
+
+    return theDate;
 
   }
 
@@ -190,7 +197,7 @@ export class RunController {
       } else {
         vm.toastr.success('Server stopped successfully');
       }
-     
+
     }, response => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
       vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
