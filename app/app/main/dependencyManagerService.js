@@ -90,11 +90,12 @@ export class DependencyManager {
     }
 
     if( env[name] ) {
-      // Look in the env.json file 
+      // Look in the env.json file
+      vm.$log.debug('*** DEPENDENCY found in json file: ', env[name], ' ', name);
       return env[name];
     } else if( process.env[name] ) {
       // Look for a system environment variable
-      return process.env[name];  
+      return process.env[name];
     } else {
       // Look in a default location
       if( name == 'PAT_OS_CLI_PATH' ) {

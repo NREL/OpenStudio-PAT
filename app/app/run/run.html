@@ -38,7 +38,7 @@
             <button type="button" class="btn btn-danger" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()">Disconnect</button>
           </div>
         </div>
-          
+
       </uib-accordion-group>
     </uib-accordion>
   </div>
@@ -114,9 +114,9 @@
                 <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
                 {{datapoint.name}}
               </div>
-              <div class="col-sm-1 pad-top-10">{{run.extractDate(datapoint.updated_at)}}</div>
+              <div class="col-sm-1 pad-top-10">{{run.formatDate(datapoint.updated_at)}}</div>
               <div class="col-sm-1 pad-top-10">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
-              <div class="col-sm-1 green-text pad-top-10">{{datapoint.status}}</div>
+              <div class="col-sm-1 pad-top-10" ng-class="{'green-text': datapoint.status == 'completed', 'red-text': datapoint.status == 'errored'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</div>
               <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
               <div class="col-sm-1 pad-top-10"><span class="badge orange-badge square-badge dp-badge">{{run.calculateWarnings(datapoint)}}</span></div>
               <div class="col-sm-1 pad-top-10"><span class="badge red-badge square-badge dp-badge">{{run.calculateErrors(datapoint)}}</span></div>
@@ -132,7 +132,7 @@
                         <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="datapoint_{{datapoint.id}}_reports">
-                        <li role="menuitem" ng-repeat="result in datapoint.result_files | filter: {type: 'Report'}"><a href="#" ng-click="$event.preventDefault(); $event.stopPropagation();run.viewReportModal(datapoint, result.attachment_file_name);">{{result.attachment_file_name}}</a></li>
+                        <li role="menuitem" ng-repeat="result in datapoint.result_files | filter:filterReports"><a href="#" ng-click="$event.preventDefault(); $event.stopPropagation();run.viewReportModal(datapoint, result.attachment_file_name);">{{result.attachment_file_name}}</a></li>
                       </ul>
                     </div>
                   </div>
@@ -147,21 +147,24 @@
                 </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col-sm-6 small-text">Datapoint ID: {{datapoint.id}}</div>
-            </div>
            <!-- <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
-            {{datapoint.name}} - status: {{datapoint.status}} - {{datapoint.final_message}}-->
+            {{datapoint.name}} - status: {{datapoint.status}} - {{datapoint.status_message}}-->
           </uib-accordion-heading>
-          <div class="run-measures"></div>
+          <div class="run-measures">
             <div class="panel panel-default full-width no-border">
               <div class="panel-body run-measures">
+                <div class="row">
+                  <div class="col-sm-6 datapoint-id-display">Datapoint ID: {{datapoint.id}}</div>
+                </div>
                 <uib-accordion close-others="false">
                   <uib-accordion-group ng-repeat="step in datapoint.steps" id="{{datapoint.id}}-{{step.name}}" is-open="step.open">
                     <uib-accordion-heading>
+                      <div class="row measure-accordion pad-bot-10">
+                        <div class="col-sm-6 bold">{{step.name}}</div>
+                      </div>
                       <div class="row measure-accordion">
-                        <div class="col-sm-2 bold">{{step.name}}</div>
-                        <div class="col-sm-1">{{run.extractDate(step.result.started_at)}}</div>
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-1">{{run.formatDate(step.result.started_at)}}</div>
                         <div class="col-sm-1">{{run.getRunTime(step.result.started_at, step.result.completed_at)}}</div>
                         <div class="col-sm-1"></div>
                         <div class="col-sm-1"><span ng-if="step.step_result == 'NotApplicable'">NA</span></div>
@@ -172,8 +175,11 @@
                       </div>
                     </uib-accordion-heading>
                     <div class="measure-accordion-body">
-                      <label>Initial Condition: </label> {{step.result.initial_condition}}<br/>
-                      <label>Final Condition: </label> {{step.result.final_condition}}<br/>
+                      <label>Initial Condition: </label> {{step.result.step_initial_condition}}<br/>
+                      <label>Final Condition: </label> {{step.result.step_final_condition}}<br/>
+                      <div ng-repeat="item in step.result.step_errors"><span class="red-text">Error: </span>{{item}}</div>
+                      <div ng-repeat="item in step.result.step_warnings"><span class="orange-text">Warning: </span>{{item}}</div>
+                      <div ng-repeat="item in step.result.step_info"><span class="green-text">Info: </span>{{item}}</div>
                     </div>
                   </uib-accordion-group>
                 </uib-accordion>

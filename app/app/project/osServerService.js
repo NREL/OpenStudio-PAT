@@ -33,7 +33,7 @@ export class OsServer {
 
     vm.localServerURL = 'http://localhost:8080';  // default URL.  will be reset when starting server
     vm.selectedServerURL = vm.localServerURL;
-    
+
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
 
@@ -82,7 +82,7 @@ export class OsServer {
       } else {
         vm.selectedServerURL = rs.cloudServerURL;
       }
-      
+
     }
     vm.$log.debug('Selected Server URL set to: ', vm.selectedServerURL);
   }
@@ -272,7 +272,7 @@ export class OsServer {
   }
 
   localServer() {
-  
+
     const vm = this;
     vm.$log.debug('***** In osServerService::localServer() *****');
     // See "https://github.com/NREL/OpenStudio-server/tree/dockerize-osw/server/spec/files/batch_datapoints" for test files
@@ -428,7 +428,7 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType().name;
 
-    if ((vm.getServerStatus(serverType) == 'started' && vm.Project.projectDir != null) || force) { 
+    if ((vm.getServerStatus(serverType) == 'started' && vm.Project.projectDir != null) || force) {
 
       if (serverType == 'local') {
         vm.$log.debug('vm.Project:', vm.Project);
@@ -464,7 +464,7 @@ export class OsServer {
       } else {
         // TODO: stop remote server here
         if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server'){
-          // remote server: 
+          // remote server:
           // TODO: blank out URL?
           vm.setServerStatus(serverType, 'stopped');
           deferred.resolve('Server Disconnected');
@@ -623,6 +623,24 @@ export class OsServer {
           vm.$q.all(reportPromises).then(response => {
             // set downloaded_reports flag
             dp.downloaded_reports = true;
+
+            // if running locally, also download osm and results
+            if (vm.Project.getRunType().name == 'local'){
+              vm.$log.debug('Run Type is set to Local');
+              const osm_promise = vm.downloadOSM(dp).then(response => {
+                vm.$log.debug('osm downloaded for ', dp.name);
+              }, error => {
+                vm.$log.debug('OSM download failed for ', dp.name);
+              });
+              //promises.push(osm_promise);
+              const result_promise = vm.downloadResults(dp).then(response => {
+                vm.$log.debug('results downloaded for ', dp.name);
+              }, error => {
+                vm.$log.debug('RESULTS download failed for ', dp.name);
+              });
+              //promises.push(result_promise);
+            }
+
           }, error => {
             vm.$log.debug('Error downloading all reports for datapoint: ', dp.id, 'error: ', error);
           });
@@ -631,6 +649,7 @@ export class OsServer {
           vm.$log.debug('GET datapoint.json error: ', error);
         });
         promises.push(promise);
+
       }
     });
 

@@ -1,20 +1,18 @@
 export class ServerController {
 
-  constructor($log, OsServer, $sce) {
+  constructor($log, Project, OsServer, $sce) {
     'ngInject';
 
     const vm = this;
     vm.OsServer = OsServer;
+    vm.Project = Project;
     vm.$log = $log;
     vm.$sce = $sce;
 
-    vm.serverStatus = vm.OsServer.getServerStatus();
-    vm.serverType = vm.OsServer.getServerType();
-    vm.serverURL = vm.OsServer.getServerURL();
+    vm.serverType = vm.Project.getRunType().name;
+    vm.serverStatus = vm.OsServer.getServerStatus(vm.serverType);
+    vm.serverURL = vm.OsServer.getSelectedServerURL();
     vm.safeURL = vm.$sce.trustAsResourceUrl(vm.serverURL);
-
-    // TODO: fake it for now
-    vm.serverStatus = 'started';
 
   }
 
