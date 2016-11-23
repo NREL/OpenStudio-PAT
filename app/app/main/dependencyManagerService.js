@@ -65,6 +65,8 @@ export class DependencyManager {
           return prefixPath.path('ruby/bin/ruby' + exeExt);
         } else if( name == 'PAT_MONGO_PATH' ) {
           return prefixPath.path('mongo/bin/mongod' + exeExt);
+        } else if( name == 'ENERGYPLUS_EXE_PATH' ) {
+          return prefixPath.path('..', 'EnergyPlus/energyplus' + exeExt);
         }
       } else {
         prefixPath = jetpack.cwd(app.getPath('exe'), '../..', 'Resources');
@@ -79,6 +81,8 @@ export class DependencyManager {
           return prefixPath.path('ruby/bin/ruby' + exeExt);
         } else if( name == 'PAT_MONGO_PATH' ) {
           return prefixPath.path('mongo/bin/mongod' + exeExt);
+        } else if( name == 'ENERGYPLUS_EXE_PATH' ) {
+          return prefixPath.path('EnergyPlus/energyplus' + exeExt);
         }
       }
     } else {
@@ -104,6 +108,9 @@ export class DependencyManager {
         return prefixPath.path('ruby/bin/ruby' + exeExt);
       } else if( name == 'PAT_MONGO_PATH' ) {
         return prefixPath.path('mongo/bin/mongod' + exeExt);
+      } else if( name == 'ENERGYPLUS_EXE_PATH' ) {
+        // No default for EP. OpenStudio will look for ENERGYPLUS_EXE_PATH env var and then in the default, global location.
+        return '';
       }
     }
   }

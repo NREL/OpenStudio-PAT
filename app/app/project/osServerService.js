@@ -44,6 +44,7 @@ export class OsServer {
     vm.openstudioBindingsPath = DependencyManager.getPath("PAT_OS_BINDING_PATH");
     vm.openstudioBindingsDirPath = path.dirname(vm.openstudioBindingsPath);
     vm.rubyPath = DependencyManager.getPath("PAT_RUBY_PATH");
+    vm.energyplusEXEPath = DependencyManager.getPath("ENERGYPLUS_EXE_PATH");
 
   }
 
@@ -357,9 +358,9 @@ export class OsServer {
     // TODO: catch what analysis type it is
 
     if (vm.platform == 'win32')
-      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.selectedServerURL}"`;
+      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --energyplus-exe-path="${vm.energyplusEXEPath}" --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.selectedServerURL}"`;
     else
-      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.selectedServerURL}"`;
+      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --energyplus-exe-path="${vm.energyplusEXEPath}" --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.selectedServerURL}"`;
     vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
 
     const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param;
