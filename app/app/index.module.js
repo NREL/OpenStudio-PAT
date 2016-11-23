@@ -18,6 +18,7 @@ import { ModalWhitespaceWarningController } from '../app/project/modalWhitespace
 import { ModalDuplicateMeasureController } from '../app/bcl/modalDuplicateMeasureController';
 import { ModalUpdateMeasureController } from '../app/bcl/modalUpdateMeasureController';
 import { ModalViewReportController } from '../app/run/modalViewReportController';
+import { ModalClearResultsController } from '../app/run/modalClearResultsController';
 import { NavController } from '../app/nav/navController';
 import { OsServer } from '../app/project/osServerService';
 import { OutputsController } from '../app/outputs/outputsController';
@@ -45,6 +46,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalDuplicateMeasureController', ModalDuplicateMeasureController)
   .controller('ModalUpdateMeasureController', ModalUpdateMeasureController)
   .controller('ModalViewReportController', ModalViewReportController)
+  .controller('ModalClearResultsController', ModalClearResultsController)
   .controller('AnalysisController', AnalysisController)
   .controller('DesignAlternativesController', DesignAlternativesController)
   .controller('OutputsController', OutputsController)

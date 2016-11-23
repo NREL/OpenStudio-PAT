@@ -1,4 +1,5 @@
 import {shell} from 'electron';
+import jetpack from 'fs-jetpack';
 
 export class RunController {
 
@@ -15,6 +16,7 @@ export class RunController {
     vm.OsServer = OsServer;
     vm.toastr = toastr;
     vm.shell = shell;
+    vm.jetpack = jetpack;
 
     vm.runTypes = vm.Project.getRunTypes();
     // TEMPORARY:  only show local server
@@ -247,13 +249,70 @@ export class RunController {
     });
   }
 
+  warnBeforeRun() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    vm.$log.debug('**** In RunController::WarnBeforeRun ****');
+
+    const contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
+    vm.$log.debug('Local results size:', contents.length);
+
+    if (contents.length > 0){
+      // local results exist
+      const modalInstance = vm.$uibModal.open({
+        backdrop: 'static',
+        controller: 'ModalClearResultsController',
+        controllerAs: 'modal',
+        templateUrl: 'app/run/clearResults.html',
+        resolve: {
+          params: function () {
+            return {
+              type: 'run'
+            };
+          }
+        }
+      });
+
+      modalInstance.result.then(() => {
+        // go on to run workflow
+        deferred.resolve();
+        vm.runEntireWorkflow();
+      }, () => {
+        // Modal canceled, do nothing
+        deferred.reject();
+      });
+    } else {
+      // no local results
+      deferred.resolve();
+      vm.runEntireWorkflow();
+    }
+
+    return deferred.promise;
+  }
+
+  deleteResults() {
+    const vm = this;
+    // remove localResults contents
+    vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
+
+    // reset analysis
+    vm.OsServer.resetAnalysis();
+    vm.$scope.analysisID = vm.Project.getAnalysisID();
+    vm.$scope.datapoints = vm.Project.getDatapoints();
+    vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
+
+  }
+
   runEntireWorkflow() {
     const vm = this;
     vm.$log.debug('***** In runController::runEntireWorkflow() *****');
     vm.toggleButtons();
 
-    // 1: make/get OSA
-    // 2: make/get zip file?
+    // 1: delete old results
+    vm.deleteResults();
+
+    // 2: make OSA and zip file
 
     // 3: hit PAT CLI to start server (local or remote)
     vm.OsServer.setProgress(15, 'Starting server');
@@ -263,12 +322,6 @@ export class RunController {
     vm.OsServer.startServer().then(response => {
       vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
       vm.$log.debug('Start Server response: ', response);
-
-      // reset Analysis (clear out some variables)
-      vm.OsServer.resetAnalysis();
-      vm.$scope.analysisID = vm.Project.getAnalysisID();
-      vm.$scope.datapoints = vm.Project.getDatapoints();
-      vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
 
       vm.OsServer.setProgress(30, 'Server started');
 

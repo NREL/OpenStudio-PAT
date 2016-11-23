@@ -208,6 +208,10 @@ export default {
       title: 'Analysis is Running',
       message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'
     },
+    modalClearResults: {
+      title: 'Delete Local Results?',
+      message: 'Running a new analysis will delete your local results. Are you sure you want to continue?'
+    },
     viewReport: 'View Report',
     'for': 'for'
 
