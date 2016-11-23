@@ -50,6 +50,10 @@ export class RunController {
     // TROUBLESHOOTING PANEL STATUS
     vm.$scope.dev = {open: true};
 
+    vm.$scope.filterReports = function(item){
+      return (item.type == 'Report' && item.attachment_file_name != 'out.osw' && item.attachment_file_name != 'objectives.json');
+    };
+
   }
 
   setRunType() {
@@ -93,6 +97,7 @@ export class RunController {
     });
     return deferred.promise;
   }
+
 
   // return MM/DD/YY from date string
   // takes datestrings like these: 20161110T212644Z, 2016-11-22 11:10:50 -0700, 2016-11-22 04:32:23 UTC, or 2016-11-22T04:32:13.626Z

@@ -33,7 +33,7 @@ export class OsServer {
 
     vm.localServerURL = 'http://localhost:8080';  // default URL.  will be reset when starting server
     vm.selectedServerURL = vm.localServerURL;
-    
+
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
 
@@ -81,7 +81,7 @@ export class OsServer {
       } else {
         vm.selectedServerURL = rs.cloudServerURL;
       }
-      
+
     }
     vm.$log.debug('Selected Server URL set to: ', vm.selectedServerURL);
   }
@@ -271,7 +271,7 @@ export class OsServer {
   }
 
   localServer() {
-  
+
     const vm = this;
     vm.$log.debug('***** In osServerService::localServer() *****');
     // See "https://github.com/NREL/OpenStudio-server/tree/dockerize-osw/server/spec/files/batch_datapoints" for test files
@@ -427,7 +427,7 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType().name;
 
-    if ((vm.getServerStatus(serverType) == 'started' && vm.Project.projectDir != null) || force) { 
+    if ((vm.getServerStatus(serverType) == 'started' && vm.Project.projectDir != null) || force) {
 
       if (serverType == 'local') {
         vm.$log.debug('vm.Project:', vm.Project);
@@ -463,7 +463,7 @@ export class OsServer {
       } else {
         // TODO: stop remote server here
         if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server'){
-          // remote server: 
+          // remote server:
           // TODO: blank out URL?
           vm.setServerStatus(serverType, 'stopped');
           deferred.resolve('Server Disconnected');

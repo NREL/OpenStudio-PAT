@@ -132,7 +132,7 @@
                         <span class="caret"></span>
                       </button>
                       <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="datapoint_{{datapoint.id}}_reports">
-                        <li role="menuitem" ng-repeat="result in datapoint.result_files | filter: {type: 'Report'}"><a href="#" ng-click="$event.preventDefault(); $event.stopPropagation();run.viewReportModal(datapoint, result.attachment_file_name);">{{result.attachment_file_name}}</a></li>
+                        <li role="menuitem" ng-repeat="result in datapoint.result_files | filter:filterReports"><a href="#" ng-click="$event.preventDefault(); $event.stopPropagation();run.viewReportModal(datapoint, result.attachment_file_name);">{{result.attachment_file_name}}</a></li>
                       </ul>
                     </div>
                   </div>
