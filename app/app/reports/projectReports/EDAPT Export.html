@@ -114,7 +114,7 @@
 
 <script type="text/javascript">
 
-  console.info("Loaded measure.html script");
+  console.info("Loaded EDAPT Export.html script");
 
   // Code to move an object in an array to a new index
   // Copied from http://stackoverflow.com/questions/5306680/move-an-array-element-from-one-array-position-to-another
@@ -131,8 +131,9 @@
 
   angular.module('myApp', [])
     .controller('MyAppCtrl', function ($scope) {
-      // Bind the simulation results to a variable
-      //$scope.results = [];
+
+      // Store a list of errors in exporting
+      var exportErrs = [];
 
       // Create a variable for the file save location
       $scope.results_file_name = "results";
@@ -148,47 +149,50 @@
       $scope.cost_baseline = "";
       $scope.proposed_baseline = "";
 
-      // Get the unique measure counts
-      // TODO make sure to check the arguments AND
-      // whether or not the measure is present in a run,
-      // because you could have a situation where the same
-      // measure is run for all alternatives with different
-      // arguments
-      var measureCounts = {};
-      var numAlts = 0;
-      _.forEach($scope.results, function (run) {
-        $scope.numAlts += 1;
-        _.forEach(run.steps, function (step) {
-          if (step.measure_dir_name) {
-            if (measureCounts[step.measure_dir_name]) {
-              measureCounts[step.measure_dir_name] += 1;
+      // Set up some additional data properties after the results
+      // are passed in.
+      $scope.setupAfterResultsAvailable = function () {
+
+        // Get the unique measure counts
+        // based on unique name + argument values.
+        $scope.measureCounts = {};
+        $scope.numAlts = 0;
+        _.forEach($scope.results, function (run) {
+          $scope.numAlts += 1;
+          _.forEach(run.steps, function (step) {
+            var namePlusArgs = step.name + JSON.stringify(step.arguments);
+            step.namePlusArgs = namePlusArgs;
+            if ($scope.measureCounts[namePlusArgs]) {
+              $scope.measureCounts[namePlusArgs] += 1;
             } else {
-              measureCounts[step.measure_dir_name] = 1;
+              $scope.measureCounts[namePlusArgs] = 1;
             }
+          });
+        });
+        console.info("There are results for " + $scope.numAlts + " runs");
+
+        // Set the measure_names property of each run
+        console.info("Setting list of Measure names for each run");
+        _.forEach($scope.results, function (run) {
+          run.measure_names = measureNames(run, $scope.measureCounts, $scope.numAlts);
+          console.log(run.name + " measures: " + run.measure_names.join(', '));
+        });
+
+        // Set the default run_type property of each run
+        // based on the number of measures it has
+        $scope.singleMeasure = "Single Measure";
+        $scope.designAlt = "Design Alternative";
+        $scope.runTypes = ["Single Measure", "Design Alternative"];
+        _.forEach($scope.results, function (run) {
+          var numMeasures = run.measure_names.length;
+          if (numMeasures == 1) {
+            run.run_type = $scope.singleMeasure;
+          } else {
+            run.run_type = $scope.designAlt;
           }
         });
-      });
 
-      // Set the measure_names property of each run
-      _.forEach($scope.results, function (run) {
-        run.measure_names = measureNames(run, measureCounts, numAlts);
-        console.log(run.name + "measures" + run.measure_names);
-      });
-
-      // Set the default run_type property of each run
-      // based on the number of measures it has
-      $scope.singleMeasure = "Single Measure";
-      $scope.designAlt = "Design Alternative";
-      $scope.runTypes = ["Single Measure", "Design Alternative"];
-      _.forEach($scope.results, function (run) {
-        var numMeasures = run.measure_names.length;
-        if (numMeasures == 1) {
-          run.run_type = $scope.singleMeasure;
-        } else {
-          run.run_type = $scope.designAlt;
-        }
-        console.log(run.name + "measures" + run.measure_names);
-      });
+      };
 
       // Move the design alternative up one position
       $scope.up = function (index) {
@@ -211,7 +215,7 @@
       $scope.exportEDAPTXML = function () {
         console.info("Exporting EDAPT XML");
         console.log("Measure Counts:");
-        console.log(measureCounts);
+        console.log($scope.measureCounts);
 
         // analysis
         var analysis = {};
@@ -219,7 +223,7 @@
 
         // alternatives
         var alts = [];
-        _(results).forEach(function (run) {
+        _($scope.results).forEach(function (run) {
 
           // Skip any run not selected for export
           if (!run.export) {
@@ -263,9 +267,27 @@
           var measures = [];
           _(run.steps).forEach(function (step) {
 
+            // skip measures that were set to "none"
+            if (!step.arguments.__SKIP__){
+              console.log("Not including " + step.name + " because it was skipped.");
+              return;
+            }
+
+            // skip reporting measures
+            if (step.measure_type == 'ReportingMeasure') {
+              console.log("Not including " + step.name + " because it is a reporting Measure.");
+              return;
+            }
+
             // skip always-run measures
-            if (measureCounts[step.measure_dir_name] == numAlts) {
-              console.log("Skipping " + step.measure_dir_name + " because it is an always-run Measure.");
+            if ($scope.measureCounts[step.namePlusArgs] == $scope.numAlts) {
+              console.log("Not including " + step.name + " because it is an always-run Measure.");
+              return;
+            }
+
+            // skip measures that don't have results
+            if (!step.hasOwnProperty('result')) {
+              console.log("Not including " + step.name + " because it is has no result.");
               return;
             }
 
@@ -287,11 +309,30 @@
             alt.alternative_type = "single_measure";
           }
 
-          // find the EDAPT output report
-          // TODO figure out how to identify this Measure
+          // Find the EDAPT output report measure
           // no matter what the name of the Measure is,
           // because it might be Xcel or Austin or whatever.
-          var reportMeasure = _.find(run.steps, {'measure_dir_name': "DencityReports"});
+          // Find the first measure that has a step_value called
+          // "cash_flows_capital_type", which should be a pretty safe bet.
+          var reportMeasure = null;
+          _(run.steps).forEach(function (step) {
+            if (step.hasOwnProperty('result')) {
+              if (_.find(step.result.step_values, {'name': "cash_flows_capital_type"})) {
+                reportMeasure = step;
+                console.log("EDAPT Measure is: " + reportMeasure.name);
+                return;
+              }
+            }
+          });
+          // var reportMeasure = _.find(run.steps, {'name': "DencityReports"});
+
+          // If the report measure is not found, throw a warning.
+          if (!reportMeasure) {
+            exportErrs.push("No EDAPT Export measure was run for " + alt.name + ", this run will not be included in the EDAPT export.");
+            console.log("No EDAPT Export measure was run for " + alt.name + ", this run will not be included in the EDAPT export.");
+            return;
+          }
+
           var vals = reportMeasure.result.step_values;
 
           // define the fuel types and end uses
@@ -435,6 +476,11 @@
           }
         };
 
+        // Show any errors
+        if (exportErrs.length > 0) {
+          window.alert("There were errors on export:\n" + exportErrs.join('\n'));
+        }
+
         // TODO Zip the file too
         // TODO show a success/fail message
 
@@ -468,9 +514,22 @@
 
     _(alternative.steps).forEach(function (step) {
 
+      // skip measures that were set to "none,"
+      // (which sets __SKIP__ argument to true)
+      if (step.arguments.__SKIP__){
+        console.log("Not including " + step.name + " because it was skipped.");
+        return;
+      }
+
+      // skip reporting measures
+      if (step.measure_type == 'ReportingMeasure') {
+        console.log("Not including " + step.name + " because it is a reporting Measure.");
+        return;
+      }
+
       // skip always-run measures
-      if (measureCounts[step.measure_dir_name] == numAlts) {
-        // console.log("Skipping " + step.measure_dir_name + " because it is an always-run Measure.");
+      if (measureCounts[step.namePlusArgs] == numAlts) {
+        console.log("Not including " + step.name + " because it is an always-run Measure.");
         return;
       }
 
@@ -489,9 +548,13 @@
     console.log('Setting results variable to: ', data);
     var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
     var $scope = angular.element(controllerElement).scope();
-    $scope.$apply(function() {
+    $scope.$apply(function () {
       $scope.results = data;
+      $scope.setupAfterResultsAvailable();
     });
   }
 
 </script>
+
+</body>
+</html>

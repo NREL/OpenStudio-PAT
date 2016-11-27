@@ -34,7 +34,13 @@
 
     <h1>End Use Comparison</h1>
 
+    <h2>Electricity Consumption (kWh)</h2>
+
     <d3ng-stackedenduse data="elecEndUseData"></d3ng-stackedenduse>
+
+    <h2>Natural Gas Consumption (therms)</h2>
+
+    <d3ng-stackedenduse data="gasEndUseData"></d3ng-stackedenduse>
 
   </div>
 
@@ -47,57 +53,102 @@
   var myApp = angular.module('myApp', []);
 
   myApp.controller('MyAppCtrl', function ($scope) {
-    // Bind the simulation results to a variable
-    $scope.results = results;
 
     // Create a CSV of the standard data
     $scope.elecEndUseData = [];
+    $scope.gasEndUseData = [];
+    console.debug('In the controller');
 
-    // Define the pieces of data in the thing
-    var elecEndUseDataColsKeys = [
-      "Heating",
-      "Cooling",
-      "Interior Lighting",
-      "Exterior Lighting",
-      "Interior Equipment",
-      "Exterior Equipment",
-      "Fans",
-      "Pumps",
-      "Heat Rejection",
-      "Humidification",
-      "Heat Recovery",
-      "Water Systems",
-      "Refrigeration",
-      "Generators"
-    ]
-    _.forEach($scope.results, function (run) {
-      // Get the openstudio reporting measure, which contains the results
-      var reportMeasure = _.find(run.steps, {'measure_dir_name': "standard_reports"});
-      if (!reportMeasure) {
-        console.error("Could not find the standard reports measure.")
+    // Set up some additional data properties after the results
+    // are passed in.
+    $scope.setupAfterResultsAvailable = function () {
+
+      console.debug('In setupAfterResultsAvailable');
+
+      // Record any errors
+      var renderErrs = [];
+
+      // Populate arrays of data for electricity and gas by end use
+      var fuels = ['end_use_electricity_', 'end_use_natural_gas_'];
+      _.forEach(fuels, function (fuel) {
+
+        var elecEndUseDataColsKeys = [
+          "Heating",
+          "Cooling",
+          "Interior Lighting",
+          "Exterior Lighting",
+          "Interior Equipment",
+          "Exterior Equipment",
+          "Fans",
+          "Pumps",
+          "Heat Rejection",
+          "Humidification",
+          "Heat Recovery",
+          "Water Systems",
+          "Refrigeration",
+          "Generators"
+        ]
+        var newData = [];
+        _.forEach($scope.results, function (run) {
+          // Get the openstudio reporting measure, which contains the results
+          var reportMeasure = _.find(run.steps, {'name': "open_studio_results"});
+          if (!reportMeasure) {
+            renderErrs.push("Could not find the OpenStudio reports measure in " + run.name);
+            return;
+          }
+
+          // Make sure the reeults exist
+          var vals = reportMeasure.result.step_values;
+          console.log(vals);
+          if (vals.length == 0){
+            renderErrs.push("The OpenStudio reports measure was not run for " + run.name);
+            return;
+          }
+
+          // Make sure the EUI element exists to ensure measure was run
+          if (!_.find(vals, {'name': "eui"})) {
+            renderErrs.push("The OpenStudio reports measure was not run for " + run.name);
+            return;
+          }
+
+          // Populate an object with the end use data
+          var data = {};
+          data.name = run.name;
+          var tot = 0.0;
+          _.forEach(elecEndUseDataColsKeys, function (key) {
+            // Define the data header
+            var header = key.toLowerCase().replace(' ', '_');
+            var lookup = fuel + header;
+            var val = _.find(vals, {'name': lookup}).value;
+            data[header] = val;
+            tot += val;
+          });
+          data.total = tot;
+
+          newData.push(data);
+
+        });
+
+        // Add this datapoint to the overall set
+        //$scope.elecEndUseData.push(data);
+        switch (fuel){
+          case 'end_use_electricity_':
+            $scope.elecEndUseData = newData;
+
+          case 'end_use_natural_gas_':
+            $scope.gasEndUseData = newData;
+        }
+
+      });
+
+      // Show any errors
+      if (renderErrs.length > 0) {
+        window.alert("There were errors:\n" + renderErrs.join('\n'));
       }
 
-      // Get the report values
-      var vals = reportMeasure.result.step_values;
 
-      // Populate an object with the end use data
-      var data = {};
-      data.name = run.name;
-      var tot = 0.0;
-      _.forEach(elecEndUseDataColsKeys, function (key) {
-        // Define the data header
-        var header = key.toLowerCase().replace(' ', '_');
-        var lookup = 'end_use_electricity_' + header;
-        var val = _.find(vals, {'name': lookup}).value;
-        data[header] = val;
-        tot += val;
-      });
-      data.total = tot;
+    };
 
-      // Add this datapoint to the overall set
-      $scope.elecEndUseData.push(data);
-
-    });
   });
 
   // Angular directive to create a stacked bar chart
@@ -108,7 +159,7 @@
     var total_width = 960;
     var total_height = 500;
 
-    var margin = {top: 20, right: 90, bottom: 30, left: 40},
+    var margin = {top: 20, right: 120, bottom: 60, left: 40},
       width = total_width - margin.left - margin.right,
       height = total_height - margin.top - margin.bottom;
 
@@ -118,12 +169,19 @@
       scope: {
         data: '='
       },
-      //template: '<pre ng-repeat="run in elecEndUseData">{{ run | json:2 }}</pre>'
       link: function (scope, element, attrs) {
 
         scope.$watch('data', function (newData, oldData) {
 
+          console.debug('In the directive');
+
           var data = newData;
+
+          // return nothing if the data isn't available yet
+          if (data.length == 0) {
+            console.info("Data is not ready yet, not creating a chart.");
+            return;
+          }
 
           // set up initial svg object
           var svg = d3.select(element[0])
@@ -164,7 +222,7 @@
 
           var stack = d3.stack()
             .keys(stackKeys)
-            .order(d3.stackOrderNone)
+            .order(d3.stackOrderReverse)
             .offset(d3.stackOffsetNone);
 
           var series = stack(data);
@@ -205,6 +263,12 @@
             .attr("transform", "translate(0," + height + ")")
             .call(d3.axisBottom(x));
 
+          // rotate text on x axis
+          g.selectAll(".axis--x text")
+            .attr("transform", function (d) {
+              return "translate(" + this.getBBox().height * -2 + "," + this.getBBox().height + ")rotate(-45)";
+            });
+
           g.append("g")
             .attr("class", "axis axis--y")
             .call(d3.axisLeft(y).ticks(10, "s"))
@@ -214,14 +278,13 @@
             .attr("dy", "0.35em")
             .attr("text-anchor", "start")
             .attr("fill", "#000")
-            .text("Energy Use");
 
           var legend = g.selectAll(".legend")
             .data(stackKeys)
             .enter().append("g")
             .attr("class", "legend")
             .attr("transform", function (d, i) {
-              return "translate(0," + i * 20 + ")";
+              return "translate(30," + i * 20 + ")";
             })
             .style("font", "10px sans-serif");
 
@@ -251,9 +314,12 @@
     console.log('Setting results variable to: ', data);
     var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
     var $scope = angular.element(controllerElement).scope();
-    $scope.$apply(function() {
+    $scope.$apply(function () {
       $scope.results = data;
+      console.debug('In setData');
+      $scope.setupAfterResultsAvailable();
     });
+
   }
 
 
