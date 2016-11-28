@@ -182,6 +182,18 @@
                       <div ng-repeat="item in step.result.step_info"><span class="green-text">Info: </span>{{item}}</div>
                     </div>
                   </uib-accordion-group>
+                  <uib-accordion-group>
+                    <uib-accordion-heading>
+                      <div class="row measure-accordion pad-bot-10">
+                        <div class="col-sm-6 bold">EnergyPlus Results</div>
+                      </div>
+                    </uib-accordion-heading>
+                    <div class="measure-accordion-body">
+                      <div>
+                        {{datapoint.eplusout_err}}
+                      </div>
+                    </div>
+                  </uib-accordion-group>
                 </uib-accordion>
               </div>
             </div>
