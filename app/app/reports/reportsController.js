@@ -64,10 +64,14 @@ export class ReportsController {
           vm.$scope.selectedReportURL = report.url;
         }
       });
+      //pass data into webview when dom is ready
+      angular.element(document).ready(function () {
+        vm.passData();
+      });
     };
 
     // Uncomment this to view webview developer tools to debug project reports
-   //vm.openWebViewDevTools();
+   vm.openWebViewDevTools();
 
     //pass data into webview when dom is ready
     angular.element(document).ready(function () {
