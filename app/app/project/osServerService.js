@@ -3,6 +3,7 @@ import {remote} from 'electron';
 const {app} = remote;
 import path from 'path';
 import os from 'os';
+import AdmZip from 'adm-zip';
 
 export class OsServer {
   constructor($q, $http, $log, $uibModal, Project, DependencyManager) {
@@ -14,6 +15,7 @@ export class OsServer {
     vm.$q = $q;
     vm.$http = $http;
     vm.jetpack = jetpack;
+    vm.AdmZip = AdmZip;
 
     // set number of workers
     vm.numCores = os.cpus().length;
@@ -712,12 +714,20 @@ export class OsServer {
     if (file) {
       const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
       const params = {filename: file.attachment_file_name};
-      const config = { params: params, headers : {Accept: 'application/json'} };
+      const config = { params: params, headers : {Accept: 'application/json'}, responseType: 'arraybuffer' };
       vm.$log.debug('Download Results URL: ', reportUrl);
       vm.$log.debug('params: ', params);
       vm.$http.get(reportUrl, config).then( response => {
         // write file and set downloaded flag
-        vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
+        vm.$log.debug('RESPONSE!! ', response);
+        //extract dir and save to disk in local measures directory
+        // convert arraybuffer to node buffer
+        const buf = new Buffer(new Uint8Array(response.data));
+        const zip = new vm.AdmZip(buf);
+        // save
+        zip.writeZip(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name));
+
+        //vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
         file.downloaded = true;
         datapoint.downloaded_results = true;
         deferred.resolve();
@@ -725,6 +735,11 @@ export class OsServer {
         vm.$log.debug('GET results zip error: ', error);
         deferred.reject();
       });
+
+
+
+
+
     } else {
       vm.$log.debug('No zip file listed in the result_files for this datapoint');
       deferred.reject();
