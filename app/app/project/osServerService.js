@@ -15,6 +15,15 @@ export class OsServer {
     vm.$http = $http;
     vm.jetpack = jetpack;
 
+    // set number of workers
+    vm.numCores = os.cpus().length;
+    vm.numWorkers = 1;
+    if (vm.numCores) {
+      vm.numWorkers = vm.numCores == 1 ? 1 : (vm.numCores - 1);
+    }
+    vm.$log.debug('Number of cores: ', vm.numCores);
+    vm.$log.debug('Number of workers set to: ', vm.numWorkers);
+
     // to run meta_cli
     vm.exec = require('child_process').exec;
 
@@ -57,6 +66,11 @@ export class OsServer {
     vm.setDatapointsStatus([]);
 
     // TODO: clear data from disk (?)
+  }
+
+  getNumWorkers() {
+    const vm = this;
+    return vm.numWorkers;
   }
 
   getSelectedServerURL() {
@@ -281,9 +295,9 @@ export class OsServer {
     // run META CLI will return status code: 0 = success, 1 = failure
 
     if (vm.platform == 'win32')
-      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
+      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --worker-number=' + vm.numWorkers + '--energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
     else
-      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
+      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --worker-number=' + vm.numWorkers + '--energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
     vm.$log.info('start server command: ', vm.startServerCommand);
 
     const child = vm.exec(vm.startServerCommand,
@@ -700,6 +714,7 @@ export class OsServer {
       const params = {filename: file.attachment_file_name};
       const config = { params: params, headers : {Accept: 'application/json'} };
       vm.$log.debug('Download Results URL: ', reportUrl);
+      vm.$log.debug('params: ', params);
       vm.$http.get(reportUrl, config).then( response => {
         // write file and set downloaded flag
         vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
