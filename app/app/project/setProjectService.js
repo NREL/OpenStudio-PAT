@@ -48,7 +48,7 @@ export class SetProject {
 
       if (!_.isEmpty(result)) {
         let projectDir = jetpack.cwd(result[0]);
-        projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
+        projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
         if (projectDir.path().indexOf(' ') >= 0) {
           // tell user to expect trouble
