@@ -40,6 +40,6 @@ export class ModalOpenProjectController {
     const vm = this;
     vm.$log.debug('ModalOpenProjectController::cancel');
     vm.app.quit();
-    vm.$uibModalInstance.close();
+    vm.$uibModalInstance.dismiss('cancel');
   }
 }

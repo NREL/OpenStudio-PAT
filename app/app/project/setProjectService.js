@@ -290,7 +290,7 @@ export class SetProject {
     });
 
     modalInstance.result.then(() => {
-      vm.$log.debug('Resolving openModal()');
+      vm.$log.debug('Resolving whitespaceModal()');
       deferred.resolve('resolved');
     }, () => {
       // Modal canceled
