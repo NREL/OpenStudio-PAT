@@ -406,6 +406,27 @@ export class Project {
         seed.path = './seeds/' + da.seedModel;
         da_hash.seed = seed;
       }
+      // add option names and descriptions
+      const options = [];
+      _.forEach(vm.measures, (measure) => {
+        const option = {};
+        option.measure_name = measure.name;
+        option.name = da[measure.name];
+        if (option.name == 'None') {
+          // use measure name/desc if no option
+          option.name = measure.name;
+          option.description = measure.description;
+        }
+        else {
+          const opt = _.find(measure.options, {name: option.name});
+          if (opt)
+            option.description = opt.description;
+          else
+            option.description = measure.description;
+        }
+        options.push(option);
+      });
+      da_hash.options = options;
       vm.osa.analysis.problem.design_alternatives.push(da_hash);
     });
 

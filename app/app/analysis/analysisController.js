@@ -105,16 +105,16 @@ export class AnalysisController {
       }
 
       let addRows = true;
-      if (measure.arguments.length > 0) {
+      //if (measure.arguments.length > 0) {
         _.forEach(measure.arguments, (argument) => {
           if (_.has(argument, 'specialRowId')) {
             addRows = false;
           }
         });
-      }
-      else {
-        addRows = false;
-      }
+     // }
+     //  else {
+     //    addRows = false;
+     //  }
 
       if (addRows) {
         const row0 = {specialRowId: 'optionDelete'};
