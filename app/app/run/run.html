@@ -212,9 +212,9 @@
           <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': dev.open, 'glyphicon-chevron-right': !dev.open}"></i>
           Server Troubleshooting
         </uib-accordion-heading>
-        <button type="button" class="btn btn-danger" ng-click="run.startServer(true)">Force Server START </button>
-        <button type="button" class="btn btn-danger" ng-click="run.stopServer(true)">Force Server STOP </button>
-        <button type="button" class="btn btn-primary" ng-click="run.pingServer()">Ping Server and Set Status</button>
+        <button type="button" class="btn btn-danger" ng-click="run.startServer('local')">Force Start local Server </button>
+        <button type="button" class="btn btn-danger" ng-click="run.stopServer('local')">Force Stop local Server </button>
+        <button type="button" class="btn btn-primary" ng-click="run.pingServer()">Ping Current Server and Set Status</button>
       </uib-accordion-group>
     </uib-accordion>
   </div>

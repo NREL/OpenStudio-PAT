@@ -113,8 +113,9 @@ export class SetProject {
           });
         }
 
-        vm.OsServer.stopServer().then(response => {
-          vm.$log.debug('SetProjectService::stop server: server stopped');
+        // force stop local server
+        vm.OsServer.stopServer('local').then(response => {
+          vm.$log.debug('SetProjectService::stop server: local server stopped');
           vm.$log.debug('response: ', response);
 
           // set project Variables
@@ -122,7 +123,7 @@ export class SetProject {
 
           // resolve promise
           deferred.resolve('resolve');
-          // start server at new location
+          // start local server at new location
           vm.OsServer.startServer().then(response => {
             vm.$log.debug('setProjectService::start server: server started');
             vm.$log.debug('response: ', response);
@@ -199,7 +200,7 @@ export class SetProject {
       if (fileExists) {
         // wait until server is stopped and new project set before closing modal
         vm.$log.debug('fileExists!');
-        vm.OsServer.stopServer().then(response => {
+        vm.OsServer.stopServer('local').then(response => {
           vm.$log.debug('SetProjectService::stop server: server stopped');
           vm.$log.debug('response: ', response);
 
@@ -208,11 +209,11 @@ export class SetProject {
 
           // resolve promise
           deferred.resolve('resolve');
-          
+
           // Only start server if local server is selected?
           // For now: selected local run type and start local server
           vm.Project.setRunType(vm.Project.getRunTypes()[0]);
-          // start server at new location 
+          // start local server at new location
           vm.OsServer.startServer().then(response => {
             vm.$log.debug('setProjectService::start server: server started');
             vm.$log.debug('response: ', response);

@@ -214,8 +214,8 @@ export class OsServer {
     return deferred.promise;
   }
 
-  // start server (remote or local)
-  startServer(force = false) {
+  // start server (remote or local) if force != null, start the specified server (local only, remote can't be force-started unless 'Run on Cloud' is selected)
+  startServer(force= null) {
     const vm = this;
     vm.$log.debug('***** In osServerService::startServer() *****');
     const deferred = vm.$q.defer();
@@ -237,7 +237,7 @@ export class OsServer {
     // TODO: maybe ping server to make sure it is really started?
     // TODO: also if start fails, ping server...it might be started already
     if ((vm.getServerStatus(serverType) != 'started') || force) {
-      if (serverType == 'local') {
+      if (force == 'local' || serverType == 'local') {
         vm.localServer().then(response => {
           vm.$log.debug('localServer promise resolved.  Server should have started');
           vm.setServerStatus(serverType, 'started');
@@ -439,14 +439,16 @@ export class OsServer {
     return deferred.promise;
   }
 
-  stopServer(force = false) {
+  // stop server (local or remote), if force != null, force close the specified server (local/remote)
+  stopServer(force = null) {
     const vm = this;
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType().name;
 
-    if ((vm.getServerStatus(serverType) == 'started' && vm.Project.projectDir != null) || force) {
+    // can't stop anything if a project isn't selected
+    if ((force || vm.getServerStatus(serverType) == 'started') && vm.Project.projectDir != null) {
 
-      if (serverType == 'local') {
+      if (force == 'local' || serverType == 'local') {
         vm.$log.debug('vm.Project:', vm.Project);
         vm.$log.debug('vm.Project.projectDir:', vm.Project.projectDir.path());
 

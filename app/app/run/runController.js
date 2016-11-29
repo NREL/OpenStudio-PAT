@@ -59,10 +59,11 @@ export class RunController {
   }
 
   setRunType() {
+    // TODO: warn users that datapoints will be deleted first
     const vm = this;
     vm.Project.setRunType(vm.$scope.selectedRunType);
     vm.OsServer.resetSelectedServerURL();
-   // TODO: clear out datapoints?  Display different local vs remotely run ones?  Store in pat.json? recheck statuses?
+
   }
 
   viewServer() {
