@@ -123,6 +123,10 @@ export class SetProject {
 
           // resolve promise
           deferred.resolve('resolve');
+
+          // Only start server if local server is selected?
+          // For now: selected local run type and start local server
+          vm.Project.setRunType(vm.Project.getRunTypes()[0]);
           // start local server at new location
           vm.OsServer.startServer().then(response => {
             vm.$log.debug('setProjectService::start server: server started');
