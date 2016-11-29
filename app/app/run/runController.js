@@ -500,7 +500,9 @@ export class RunController {
   clearDatapoint(datapoint) {
     const vm = this;
     vm.$log.debug('In clear datapoint');
-    // TODO:  also clear files from localResults folder?
+    // clear from disk
+    vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(datapoint.id));
+    // clear from PAT
     const index = _.findIndex(vm.$scope.datapoints, {id: datapoint.id});
     if (index != -1) {
       // datapoint found, delete
