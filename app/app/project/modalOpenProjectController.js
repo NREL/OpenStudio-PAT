@@ -31,12 +31,9 @@ export class ModalOpenProjectController {
     vm.$log.debug('ModalOpenProjectController::newProject');
     vm.setProject.newProject().then(() => {
       vm.$uibModalInstance.close();
-      vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
     }, () => {
       vm.$uibModalInstance.close();
-      vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
     });
-
   }
 
   cancel() {
