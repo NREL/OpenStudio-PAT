@@ -131,7 +131,7 @@ export default {
       add: 'Add',
       date: 'Date',
       name: 'Name',
-      edit: 'Edit',
+      edit: 'Edit/Copy',
       status: 'Update',
       type: 'Type'
     },
