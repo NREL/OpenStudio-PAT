@@ -4,7 +4,7 @@ const {app} = remote;
 
 export class ModalOpenProjectController {
 
-  constructor($log, $scope, $uibModalInstance, SetProject) {
+  constructor($log, $scope, $uibModalInstance, SetProject, Project) {
     'ngInject';
 
     const vm = this;
@@ -13,11 +13,7 @@ export class ModalOpenProjectController {
     vm.$uibModalInstance = $uibModalInstance;
     vm.app = app;
     vm.setProject = SetProject;
-
-    //const updateStatus = function (status) {
-    //  vm.status = status;
-    //  vm.$scope.$digest();
-    //};
+    vm.Project = Project;
   }
 
   openProject() {
@@ -35,8 +31,10 @@ export class ModalOpenProjectController {
     vm.$log.debug('ModalOpenProjectController::newProject');
     vm.setProject.newProject().then(() => {
       vm.$uibModalInstance.close();
+      vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
     }, () => {
       vm.$uibModalInstance.close();
+      vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
     });
 
   }
