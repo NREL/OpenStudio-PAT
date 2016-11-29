@@ -190,7 +190,7 @@ export class Project {
       const options = [];
       // first find out how many options there are (from the optionDelete special argument)
       let optionKeys = [];
-      if (measure.arguments.length > 0){
+      if (measure.arguments.length > 0) {
         const keys = Object.keys(measure.arguments[0]);
         optionKeys = _.filter(keys, function (k) {
           return k.indexOf('option_') !== -1;
@@ -449,7 +449,7 @@ export class Project {
 
       // first find out how many options there are
       let optionKeys = [];
-      if (measure.arguments.length > 0){
+      if (measure.arguments.length > 0) {
         const keys = Object.keys(measure.arguments[0]);
         optionKeys = _.filter(keys, function (k) {
           return k.indexOf('option_') !== -1;
@@ -471,9 +471,11 @@ export class Project {
           argument.name = arg.name;
           argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
           argument.default_value = arg.default_value;
+          vm.$log.info(arg.choice_display_names);
+          argument.choice_display_names = arg.choice_display_names;
           argument.value = arg.option_1 ? arg.option_1 : arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
           // Make sure that argument is "complete"
-          if ( argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
+          if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value) && angular.isDefined(argument.choice_display_names)) {
             var_count += 1;
             m.arguments.push(argument);
           } else {
@@ -609,6 +611,8 @@ export class Project {
             v.argument.name = arg.name;
             v.argument.value_type = _.toLower(arg.type); // TODO: see above
             v.argument.default_value = arg.default_value;
+            vm.$log.info(arg.choice_display_names);
+            v.argument.choice_display_names = arg.choice_display_names;
             v.argument.value = arg.option_1;
 
             // VARIABLE DETAILS
@@ -906,12 +910,12 @@ export class Project {
     vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
-  setRemoteSettings(settings){
+  setRemoteSettings(settings) {
     const vm = this;
     vm.remoteSettings = settings;
   }
 
-  getRemoteSettings(){
+  getRemoteSettings() {
     const vm = this;
     return vm.remoteSettings;
   }

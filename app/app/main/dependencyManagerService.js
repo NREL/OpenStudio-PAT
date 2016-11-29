@@ -43,72 +43,72 @@ export class DependencyManager {
     let prefixPath = undefined;
 
     let exeExt = '';
-    if( os.platform() == 'win32' ) {
+    if (os.platform() == 'win32') {
       exeExt = '.exe';
     }
     let bindingExt = '.bundle';
-    if( os.platform() == 'win32' ) {
+    if (os.platform() == 'win32') {
       bindingExt = '.so';
     }
 
-    if( env.name == 'production' ) {
-      if( os.platform() == 'win32' ) {
+    if (env.name == 'production') {
+      if (os.platform() == 'win32') {
         prefixPath = jetpack.cwd(app.getPath('exe'), '..');
 
-        if( name == 'PAT_OS_CLI_PATH' ) {
-           return prefixPath.path('..', 'bin/openstudio' + exeExt);
-        } else if( name == 'PAT_OS_BINDING_PATH' ) {
+        if (name == 'PAT_OS_CLI_PATH') {
+          return prefixPath.path('..', 'bin/openstudio' + exeExt);
+        } else if (name == 'PAT_OS_BINDING_PATH') {
           return prefixPath.path('..', 'Ruby/openstudio' + bindingExt);
-        } else if( name == 'PAT_OS_META_CLI_PATH' ) {
+        } else if (name == 'PAT_OS_META_CLI_PATH') {
           return prefixPath.path('OpenStudio-server/bin/openstudio_meta');
-        } else if( name == 'PAT_RUBY_PATH' ) {
+        } else if (name == 'PAT_RUBY_PATH') {
           return prefixPath.path('ruby/bin/ruby' + exeExt);
-        } else if( name == 'PAT_MONGO_PATH' ) {
+        } else if (name == 'PAT_MONGO_PATH') {
           return prefixPath.path('mongo/bin/mongod' + exeExt);
-        } else if( name == 'ENERGYPLUS_EXE_PATH' ) {
+        } else if (name == 'ENERGYPLUS_EXE_PATH') {
           return prefixPath.path('..', 'EnergyPlus/energyplus' + exeExt);
         }
       } else {
         prefixPath = jetpack.cwd(app.getPath('exe'), '../..', 'Resources');
 
-        if( name == 'PAT_OS_CLI_PATH' ) {
-           return prefixPath.path('OpenStudio/bin/openstudio' + exeExt);
-        } else if( name == 'PAT_OS_BINDING_PATH' ) {
+        if (name == 'PAT_OS_CLI_PATH') {
+          return prefixPath.path('OpenStudio/bin/openstudio' + exeExt);
+        } else if (name == 'PAT_OS_BINDING_PATH') {
           return prefixPath.path('OpenStudio/Ruby/openstudio' + bindingExt);
-        } else if( name == 'PAT_OS_META_CLI_PATH' ) {
+        } else if (name == 'PAT_OS_META_CLI_PATH') {
           return prefixPath.path('OpenStudio-server/bin/openstudio_meta');
-        } else if( name == 'PAT_RUBY_PATH' ) {
+        } else if (name == 'PAT_RUBY_PATH') {
           return prefixPath.path('ruby/bin/ruby' + exeExt);
-        } else if( name == 'PAT_MONGO_PATH' ) {
+        } else if (name == 'PAT_MONGO_PATH') {
           return prefixPath.path('mongo/bin/mongod' + exeExt);
-        } else if( name == 'ENERGYPLUS_EXE_PATH' ) {
+        } else if (name == 'ENERGYPLUS_EXE_PATH') {
           return prefixPath.path('EnergyPlus/energyplus' + exeExt);
         }
       }
     } else {
-      prefixPath = jetpack.cwd(app.getAppPath(),'..', 'depend');
+      prefixPath = jetpack.cwd(app.getAppPath(), '..', 'depend');
     }
 
-    if( env[name] ) {
+    if (env[name]) {
       // Look in the env.json file
       vm.$log.debug('*** DEPENDENCY found in json file: ', env[name], ' ', name);
       return env[name];
-    } else if( process.env[name] ) {
+    } else if (process.env[name]) {
       // Look for a system environment variable
       return process.env[name];
     } else {
       // Look in a default location
-      if( name == 'PAT_OS_CLI_PATH' ) {
-         return prefixPath.path('OpenStudio/bin/openstudio' + exeExt);
-      } else if( name == 'PAT_OS_BINDING_PATH' ) {
+      if (name == 'PAT_OS_CLI_PATH') {
+        return prefixPath.path('OpenStudio/bin/openstudio' + exeExt);
+      } else if (name == 'PAT_OS_BINDING_PATH') {
         return prefixPath.path('OpenStudio/Ruby/openstudio' + bindingExt);
-      } else if( name == 'PAT_OS_META_CLI_PATH' ) {
+      } else if (name == 'PAT_OS_META_CLI_PATH') {
         return prefixPath.path('OpenStudio-server/bin/openstudio_meta');
-      } else if( name == 'PAT_RUBY_PATH' ) {
+      } else if (name == 'PAT_RUBY_PATH') {
         return prefixPath.path('ruby/bin/ruby' + exeExt);
-      } else if( name == 'PAT_MONGO_PATH' ) {
+      } else if (name == 'PAT_MONGO_PATH') {
         return prefixPath.path('mongo/bin/mongod' + exeExt);
-      } else if( name == 'ENERGYPLUS_EXE_PATH' ) {
+      } else if (name == 'ENERGYPLUS_EXE_PATH') {
         // No default for EP. OpenStudio will look for ENERGYPLUS_EXE_PATH env var and then in the default, global location.
         return '';
       }
