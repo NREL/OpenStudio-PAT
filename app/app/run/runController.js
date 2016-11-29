@@ -332,6 +332,7 @@ export class RunController {
     vm.deleteResults();
 
     // 2: make OSA and zip file
+    vm.exportOSA();
 
     // 3: hit PAT CLI to start server (local or remote)
     vm.OsServer.setProgress(15, 'Starting server');

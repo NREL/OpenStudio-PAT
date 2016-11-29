@@ -619,8 +619,8 @@ export class Project {
             };
 
             arg.units = '';
-            arg.minimum = min; // TODO is this meta data or calculated from options? Is it same as lower_bound below?
-            arg.maximum = max; // TODO is this meta data or calculated from options? Is it same as upper_bound below?
+            arg.minimum = min;
+            arg.maximum = max;
             arg.mode = mode(values);
 
             // VARIABLE ARGUMENT SECTION
