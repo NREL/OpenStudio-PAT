@@ -4,7 +4,7 @@
   </div>
   <div class="col-sm-2 pad-bot-20 pad-top-5">
     <div class="input-group">
-      <select class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-change="run.setRunType()"></select>
+      <select class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-change="run.warnBeforeDelete('runtype')"></select>
     </div>
   </div>
   <div class="col-sm-5 pad-bot-20 pad-top-10">
@@ -47,7 +47,7 @@
 <div ng-show="selectedRunType.name == 'remote'" class="row pad-bot-20">
   <div class="col-sm-8">
     <button type="button" class="btn btn-info" ng-click="run.exportOSA()" translate>run.exportToOSA</button>
-    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeRun()" translate>run.runEntireWorkflow</button>
+    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.cancelRun()" translate>run.cancelRun</button>
     <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()">View Server</button>
   </div>
@@ -56,7 +56,7 @@
 <div ng-show="selectedRunType.name == 'local'" class="row pad-bot-20">
   <div class="col-sm-12">
     <button type="button" class="btn btn-info" ng-click="run.exportOSA()" translate>run.exportToOSA</button>
-    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeRun()" translate>run.runEntireWorkflow</button>
+    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
     <button type="button" class="btn btn-danger" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>
     <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()">View Server</button>

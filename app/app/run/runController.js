@@ -61,6 +61,9 @@ export class RunController {
   setRunType() {
     // TODO: warn users that datapoints will be deleted first
     const vm = this;
+    vm.deleteResults();
+    vm.$log.debug('old run type: ', vm.Project.getRunType());
+    vm.$log.debug('new run type: ', vm.$scope.selectedRunType);
     vm.Project.setRunType(vm.$scope.selectedRunType);
     vm.OsServer.resetSelectedServerURL();
 
@@ -250,11 +253,12 @@ export class RunController {
     });
   }
 
-  warnBeforeRun() {
+  warnBeforeDelete(type) {
+    // type could be 'run' (warning before running an new analysis), or 'runtype' (warning before setting new run type)
     const vm = this;
     const deferred = vm.$q.defer();
 
-    vm.$log.debug('**** In RunController::WarnBeforeRun ****');
+    vm.$log.debug('**** In RunController::WarnBeforeDeleting ****');
 
     const contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
     vm.$log.debug('Local results size:', contents.length);
@@ -269,7 +273,7 @@ export class RunController {
         resolve: {
           params: function () {
             return {
-              type: 'run'
+              type: type
             };
           }
         }
@@ -278,15 +282,29 @@ export class RunController {
       modalInstance.result.then(() => {
         // go on to run workflow
         deferred.resolve();
-        vm.runEntireWorkflow();
+        if (type == 'run') {
+          vm.runEntireWorkflow();
+        } else if (type == 'runtype'){
+          vm.setRunType();
+        }
+
       }, () => {
-        // Modal canceled, do nothing
+        // Modal canceled
+        if (type == 'runtype'){
+          // reset to previous runtype
+          vm.$scope.selectedRunType = vm.Project.getRunType();
+        }
         deferred.reject();
       });
     } else {
       // no local results
       deferred.resolve();
-      vm.runEntireWorkflow();
+      if (type == 'run'){
+        vm.runEntireWorkflow();
+      } else if (type == 'runtype') {
+        vm.setRunType();
+      }
+
     }
 
     return deferred.promise;

@@ -5,7 +5,8 @@
 <div class="modal-body">
   <div class="row pad-bot-20">
     <div class="col-md-12 modal-text">
-      <translate>run.modalClearResults.message</translate>
+      <span ng-show="type=='run'"><translate>run.modalClearResults.rerunAnalysisMessage</translate></span>
+      <span ng-show="type=='runtype'"><translate>run.modalClearResults.setRunTypeMessage</translate></span>
     </div>
   </div>
 </div>
