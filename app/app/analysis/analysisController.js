@@ -485,8 +485,8 @@ export class AnalysisController {
       if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.choice_display_names))) {
         argument[option.field] = Number(argument.choice_display_names);
       }
-      else {
-        argument[option.field] = argument.choice_display_names;
+      else if (angular.isDefined(argument.choice_display_names) && argument.choice_display_names.length > 0){
+        argument[option.field] = argument.choice_display_names[0];
       }
     });
   }
