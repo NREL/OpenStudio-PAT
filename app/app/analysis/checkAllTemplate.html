@@ -1,0 +1,4 @@
+<div ng-if="row.entity.specialRowId == 'optionDelete'">
+  <span class="pad-left-5">All<input type="checkbox" ui-grid-checkbox ng-model="MODEL_COL_FIELD" ng-click="grid.appScope.analysis.checkAllVariables(row, col);"></span>
+</div>
+<input ng-if="row.entity.name.length" type="checkbox" ui-grid-checkbox ng-model="MODEL_COL_FIELD">

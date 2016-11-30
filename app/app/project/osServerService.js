@@ -3,6 +3,7 @@ import {remote} from 'electron';
 const {app} = remote;
 import path from 'path';
 import os from 'os';
+import AdmZip from 'adm-zip';
 
 export class OsServer {
   constructor($q, $http, $log, $uibModal, Project, DependencyManager) {
@@ -14,6 +15,16 @@ export class OsServer {
     vm.$q = $q;
     vm.$http = $http;
     vm.jetpack = jetpack;
+    vm.AdmZip = AdmZip;
+
+    // set number of workers
+    vm.numCores = os.cpus().length;
+    vm.numWorkers = 1;
+    if (vm.numCores) {
+      vm.numWorkers = vm.numCores == 1 ? 1 : (vm.numCores - 1);
+    }
+    vm.$log.debug('Number of cores: ', vm.numCores);
+    vm.$log.debug('Number of workers set to: ', vm.numWorkers);
 
     // to run meta_cli
     vm.exec = require('child_process').exec;
@@ -57,6 +68,11 @@ export class OsServer {
     vm.setDatapointsStatus([]);
 
     // TODO: clear data from disk (?)
+  }
+
+  getNumWorkers() {
+    const vm = this;
+    return vm.numWorkers;
   }
 
   getSelectedServerURL() {
@@ -198,8 +214,8 @@ export class OsServer {
     return deferred.promise;
   }
 
-  // start server (remote or local)
-  startServer(force = false) {
+  // start server (remote or local) if force != null, start the specified server (local only, remote can't be force-started unless 'Run on Cloud' is selected)
+  startServer(force= null) {
     const vm = this;
     vm.$log.debug('***** In osServerService::startServer() *****');
     const deferred = vm.$q.defer();
@@ -221,7 +237,7 @@ export class OsServer {
     // TODO: maybe ping server to make sure it is really started?
     // TODO: also if start fails, ping server...it might be started already
     if ((vm.getServerStatus(serverType) != 'started') || force) {
-      if (serverType == 'local') {
+      if (force == 'local' || serverType == 'local') {
         vm.localServer().then(response => {
           vm.$log.debug('localServer promise resolved.  Server should have started');
           vm.setServerStatus(serverType, 'started');
@@ -281,9 +297,9 @@ export class OsServer {
     // run META CLI will return status code: 0 = success, 1 = failure
 
     if (vm.platform == 'win32')
-      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
+      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --worker-number=' + vm.numWorkers + '--energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
     else
-      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
+      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --worker-number=' + vm.numWorkers + '--energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
     vm.$log.info('start server command: ', vm.startServerCommand);
 
     const child = vm.exec(vm.startServerCommand,
@@ -423,14 +439,16 @@ export class OsServer {
     return deferred.promise;
   }
 
-  stopServer(force = false) {
+  // stop server (local or remote), if force != null, force close the specified server (local/remote)
+  stopServer(force = null) {
     const vm = this;
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType().name;
 
-    if ((vm.getServerStatus(serverType) == 'started' && vm.Project.projectDir != null) || force) {
+    // can't stop anything if a project isn't selected
+    if ((force || vm.getServerStatus(serverType) == 'started') && vm.Project.projectDir != null) {
 
-      if (serverType == 'local') {
+      if (force == 'local' || serverType == 'local') {
         vm.$log.debug('vm.Project:', vm.Project);
         vm.$log.debug('vm.Project.projectDir:', vm.Project.projectDir.path());
 
@@ -698,11 +716,20 @@ export class OsServer {
     if (file) {
       const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
       const params = {filename: file.attachment_file_name};
-      const config = { params: params, headers : {Accept: 'application/json'} };
+      const config = { params: params, headers : {Accept: 'application/json'}, responseType: 'arraybuffer' };
       vm.$log.debug('Download Results URL: ', reportUrl);
+      vm.$log.debug('params: ', params);
       vm.$http.get(reportUrl, config).then( response => {
         // write file and set downloaded flag
-        vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
+        vm.$log.debug('RESPONSE!! ', response);
+        //extract dir and save to disk in local measures directory
+        // convert arraybuffer to node buffer
+        const buf = new Buffer(new Uint8Array(response.data));
+        const zip = new vm.AdmZip(buf);
+        // save
+        zip.writeZip(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name));
+
+        //vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
         file.downloaded = true;
         datapoint.downloaded_results = true;
         deferred.resolve();
@@ -710,6 +737,11 @@ export class OsServer {
         vm.$log.debug('GET results zip error: ', error);
         deferred.reject();
       });
+
+
+
+
+
     } else {
       vm.$log.debug('No zip file listed in the result_files for this datapoint');
       deferred.reject();

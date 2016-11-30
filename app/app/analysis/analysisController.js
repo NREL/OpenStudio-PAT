@@ -37,8 +37,6 @@ export class AnalysisController {
     vm.$scope.epMeasures = [];
     vm.$scope.repMeasures = [];
 
-    vm.$scope.selectedAll = false;
-
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
 
@@ -68,17 +66,24 @@ export class AnalysisController {
 
   getDefaultOptionColDef() {
     const vm = this;
+    vm.$log.debug('AnalysisController getDefaultOptionColDef');
     return {
       display_name: 'Option 1',
       field: 'option_1',
-      editDropdownOptionsFunction: function (rowEntity) {
+      editDropdownOptionsFunction: function (rowEntity, colDef) {
         if (rowEntity.type === 'Choice') {
+          vm.$log.error('rowEntity: ', rowEntity);
+          vm.$log.error('colDef: ', colDef);
           vm.choices = [];
-          _.forEach(rowEntity.choices, (choice) => {
-            vm.choices.push({
-              value: choice.value
+          _.forEach(rowEntity.choice_display_names
+            , (choice) => {
+              vm.$log.error('choice: ', choice);
+              vm.choices.push({
+                id: choice,
+                value: choice
+              });
             });
-          });
+          vm.$log.error('vm.choices: ', vm.choices);
           return vm.choices;
         }
       },
@@ -105,16 +110,16 @@ export class AnalysisController {
       }
 
       let addRows = true;
-      if (measure.arguments.length > 0) {
+      //if (measure.arguments.length > 0) {
         _.forEach(measure.arguments, (argument) => {
           if (_.has(argument, 'specialRowId')) {
             addRows = false;
           }
         });
-      }
-      else {
-        addRows = false;
-      }
+     // }
+     //  else {
+     //    addRows = false;
+     //  }
 
       if (addRows) {
         const row0 = {specialRowId: 'optionDelete'};
@@ -138,25 +143,34 @@ export class AnalysisController {
           displayName: 'analysis.columns.argumentName',
           enableCellEdit: false,
           headerCellFilter: 'translate',
-          width: 200,
-          minWidth: 100
+          pinnedLeft:true,
+          width: 300,
+          minWidth: 100,
+          cellTooltip: function(row) {
+            return row.entity.display_name;
+          }
         }, {
-          name: 'short_name',
-          displayName: 'analysis.columns.shortName',
-          cellEditableCondition: $scope => {
-            return angular.isDefined($scope.row.entity.display_name);
-          },
-          headerCellFilter: 'translate',
-          width: 200,
-          minWidth: 100
+          name: 'description',
+          displayName: 'description',
+          visible: false
+        }, {
+            name: 'short_name',
+            displayName: 'analysis.columns.shortName',
+            cellEditableCondition: $scope => {
+              return angular.isDefined($scope.row.entity.display_name);
+            },
+            headerCellFilter: 'translate',
+            width: 200,
+            minWidth: 100
         }, {
           name: 'variable',
           displayName: 'analysis.columns.variable',
-          cellTemplate: '<input ng-if="row.entity.name.length" type="checkbox" ui-grid-checkbox ng-model="MODEL_COL_FIELD">',
+          measureUID: measure.uid,
+          cellTemplate: 'app/analysis/checkAllTemplate.html',
           headerCellFilter: 'translate',
-          minWidth: 100,
+          minWidth: 30,
           type: 'boolean',
-          width: 200
+          width: 70
         }],
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.uid] = gridApi;
@@ -471,15 +485,33 @@ export class AnalysisController {
     });
   }
 
+  // Toggle all variable checkboxes
+  checkAllVariables(row, col) {
+    const vm = this;
+    const measureUID = col.colDef.measureUID;
+    // toggle checkbox
+    if (row.entity.variable){
+      // set all to true
+      _.forEach(vm.$scope.gridOptions[measureUID].data, (row) => {
+        row.variable = true;
+      });
+    } else {
+      // set all to false
+      _.forEach(vm.$scope.gridOptions[measureUID].data, (row) => {
+        row.variable = false;
+      });
+    }
+  }
+
   addDefaultArguments(measure, option) {
     const vm = this;
     vm.setIsModified();
     _.forEach(measure.arguments, (argument) => {
-      if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.default_value))) {
-        argument[option.field] = Number(argument.default_value);
+      if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.choice_display_names))) {
+        argument[option.field] = Number(argument.choice_display_names);
       }
-      else {
-        argument[option.field] = argument.default_value;
+      else if (angular.isDefined(argument.choice_display_names) && argument.choice_display_names.length > 0){
+        argument[option.field] = argument.choice_display_names[0];
       }
     });
   }
@@ -529,15 +561,6 @@ export class AnalysisController {
     } else {
       vm.$log.error('option id does not match expected format (option_<ID>)');
     }
-  }
-
-  checkAll(measure) {
-    const vm = this;
-    vm.$log.debug('In checkAll in analysis');
-
-    vm.$scope.selectedAll = vm.$scope.selectedAll === false;
-
-    _.forEach(vm.$scope.gridOptions[measure.uid].data, row => row.variable = !!vm.$scope.selectedAll);
   }
 
   setSeed() {

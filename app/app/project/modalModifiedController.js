@@ -19,7 +19,7 @@ export class ModalModifiedController {
 
   cancel() {
     const vm = this;
-    vm.$uibModalInstance.close();
+    vm.$log.debug('ModalModifiedController cancel');
+    vm.$uibModalInstance.dismiss('cancel');
   }
-
 }

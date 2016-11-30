@@ -4,7 +4,7 @@ const {app} = remote;
 
 export class ModalOpenProjectController {
 
-  constructor($log, $scope, $uibModalInstance, SetProject) {
+  constructor($log, $scope, $uibModalInstance, SetProject, Project) {
     'ngInject';
 
     const vm = this;
@@ -13,11 +13,7 @@ export class ModalOpenProjectController {
     vm.$uibModalInstance = $uibModalInstance;
     vm.app = app;
     vm.setProject = SetProject;
-
-    //const updateStatus = function (status) {
-    //  vm.status = status;
-    //  vm.$scope.$digest();
-    //};
+    vm.Project = Project;
   }
 
   openProject() {
@@ -38,13 +34,12 @@ export class ModalOpenProjectController {
     }, () => {
       vm.$uibModalInstance.close();
     });
-
   }
 
   cancel() {
     const vm = this;
     vm.$log.debug('ModalOpenProjectController::cancel');
     vm.app.quit();
-    vm.$uibModalInstance.close();
+    vm.$uibModalInstance.dismiss('cancel');
   }
 }

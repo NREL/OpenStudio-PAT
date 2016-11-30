@@ -15,48 +15,63 @@
   </div>
 </div>
 <div class="analysis-custom">
-  <div class="panel panel-default full-width margin-top-20">
-    <div class="analysis-custom panel-body">
-      <uib-accordion close-others="false">
-        <uib-accordion-group ng-repeat="measure in osMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
-          <uib-accordion-heading>
-            <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
-            {{measure.display_name}}
-            <span class="pull-right">
-              <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
-              <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
-              <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation(); analysis.removeMeasure(measure);">
-                <span class="glyphicon glyphicon-remove"></span>
-              </span>
+  <div class="full-width margin-top-20">
+
+    <uib-accordion close-others="false">
+      <uib-accordion-group ng-repeat="measure in osMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
+          {{measure.display_name}}
+          <span class="pull-right">
+            <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
+            <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
+            <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation(); analysis.removeMeasure(measure);">
+              <span class="glyphicon glyphicon-remove"></span>
             </span>
-          </uib-accordion-heading>
-          <div ng-if="measure.arguments.length > 0">
-            <div class="button-div">
-            <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <translate>analysis.addMeasureOption</translate></button>
-            <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateOption</translate></button>
-            <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
-              <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
-            </button>
-            <p><translate>analysis.checkAll</translate> <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
-            <div class="row">
-              <div class="col-sm-2 pad-bot-10">
-                <label class="small-label" translate>analysis.modelToBaseInputsOn</label>
-              </div>
-              <div class="col-sm-5 pad-bot-20 pad-top-5">
-                <div class="input-group">
-                  <select class="form-control inline form-control-smaller-width" ng-options="seed as seed for seed in seeds" ng-model="measure.seed" ng-change="computeMeasureArguments(measure)"></select>
-                </div>
+          </span>
+        </uib-accordion-heading>
+        <div class="button-div">
+          <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <translate>analysis.addMeasureOption</translate></button>
+          <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateOption</translate></button>
+          <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
+            <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
+          </button>
+          <div class="row pad-top-10">
+            <div class="col-sm-12">
+              <div class="analysis-descriptions">
+                <uib-accordion>
+                  <uib-accordion-group is-open="measure.descOpen">
+                    <uib-accordion-heading>
+                      <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.descOpen, 'glyphicon-chevron-right': !measure.descOpen}"></i>
+                      Descriptions
+                    </uib-accordion-heading>
+                    <div class="row pad-top-10 normal-text">
+                      <div class="col-sm-2"><label>Description</label></div>
+                      <div class="col-sm-10">{{measure.description}}</div>
+                    </div>
+                    <div class="row pad-top-10 normal-text">
+                      <div class="col-sm-2"><label>Modeler Description</label></div>
+                      <div class="col-sm-10">{{measure.modeler_description}}</div>
+                    </div>
+                  </uib-accordion-group>
+                </uib-accordion>
               </div>
             </div>
           </div>
-            <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
+          <div class="row pad-top-10 normal-text">
+            <div class="col-sm-3 pad-bot-10">
+              <label translate>analysis.modelToBaseInputsOn</label>
+            </div>
+            <div class="col-sm-5 pad-bot-20 pad-top-5">
+              <div class="input-group">
+                <select class="form-control inline form-control-smaller-width" ng-options="seed as seed for seed in seeds" ng-model="measure.seed" ng-change="computeMeasureArguments(measure)"></select>
+              </div>
+            </div>
           </div>
-          <div ng-if="measure.arguments.length == 0">
-            <div class="normal-text">This measure has no arguments</div>
-          </div>
-        </uib-accordion-group>
-      </uib-accordion>
-    </div>
+        </div>
+        <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid"></div>
+      </uib-accordion-group>
+    </uib-accordion>
   </div>
 </div>
 
@@ -70,50 +85,64 @@
   </div>
 </div>
 <div class="analysis-custom">
-  <div class="panel panel-default full-width margin-top-20">
-    <div class="analysis-custom panel-body">
-      <uib-accordion close-others="false">
-        <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
-          <uib-accordion-heading>
-            <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
-            {{measure.display_name}}
-            <span class="pull-right">
-              <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
-              <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
-              <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
-                <span class="glyphicon glyphicon-remove"></span>
-              </span>
+  <div class="full-width margin-top-20">
+    <uib-accordion close-others="false">
+      <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
+          {{measure.display_name}}
+          <span class="pull-right">
+            <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
+            <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
+            <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
+              <span class="glyphicon glyphicon-remove"></span>
             </span>
-          </uib-accordion-heading>
-          <div ng-if="measure.arguments.length > 0">
-            <div class="button-div">
-              <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                <translate>analysis.addMeasureOption</translate></button>
-              <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
-                <translate>analysis.duplicateOption</translate></button>
-              <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
-                <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
-              </button>
-              <p><translate>analysis.checkAll</translate> <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
-              <div class="row">
-                <div class="col-sm-2 pad-bot-10">
-                  <label class="small-label" translate>analysis.modelToBaseInputsOn</label>
-                </div>
-                <div class="col-sm-5 pad-bot-20 pad-top-5">
-                  <div class="input-group">
-                    <select class="form-control inline form-control-smaller-width" ng-options="seed as seed for seed in seeds" ng-model="measure.seed" ng-change="computeMeasureArguments(measure)"></select>
-                  </div>
-                </div>
+          </span>
+        </uib-accordion-heading>
+        <div class="button-div">
+          <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            <translate>analysis.addMeasureOption</translate></button>
+          <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
+            <translate>analysis.duplicateOption</translate></button>
+          <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
+            <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
+          </button>
+          <div class="row pad-top-10">
+            <div class="col-sm-12">
+              <div class="analysis-descriptions">
+                <uib-accordion>
+                  <uib-accordion-group is-open="measure.descOpen">
+                    <uib-accordion-heading>
+                      <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.descOpen, 'glyphicon-chevron-right': !measure.descOpen}"></i>
+                      Descriptions
+                    </uib-accordion-heading>
+                    <div class="row pad-top-10 normal-text">
+                      <div class="col-sm-2"><label>Description</label></div>
+                      <div class="col-sm-10">{{measure.description}}</div>
+                    </div>
+                    <div class="row pad-top-10 normal-text">
+                      <div class="col-sm-2"><label>Modeler Description</label></div>
+                      <div class="col-sm-10">{{measure.modeler_description}}</div>
+                    </div>
+                  </uib-accordion-group>
+                </uib-accordion>
               </div>
             </div>
-            <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
           </div>
-          <div ng-if="measure.arguments.length == 0">
-           <div class="normal-text">This measure has no arguments</div>
+          <div class="row pad-top-10 normal-text">
+            <div class="col-sm-3 pad-bot-10">
+              <label translate>analysis.modelToBaseInputsOn</label>
+            </div>
+            <div class="col-sm-5 pad-bot-20 pad-top-5">
+              <div class="input-group">
+                <select class="form-control inline form-control-smaller-width" ng-options="seed as seed for seed in seeds" ng-model="measure.seed" ng-change="computeMeasureArguments(measure)"></select>
+              </div>
+            </div>
           </div>
-        </uib-accordion-group>
-      </uib-accordion>
-    </div>
+        </div>
+        <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid"></div>
+      </uib-accordion-group>
+    </uib-accordion>
   </div>
 </div>
 
@@ -127,49 +156,63 @@
   </div>
 </div>
 <div class="analysis-custom">
-  <div class="panel panel-default full-width margin-top-20">
-    <div class="analysis-custom panel-body">
-      <uib-accordion close-others="false">
-        <uib-accordion-group ng-repeat="measure in repMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
-          <uib-accordion-heading>
-            <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
-            {{measure.display_name}}
-            <span class="pull-right">
-              <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
-               <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
-              <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
-                <span class="glyphicon glyphicon-remove"></span>
-              </span>
+  <div class="full-width margin-top-20">
+    <uib-accordion close-others="false">
+      <uib-accordion-group ng-repeat="measure in repMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
+          {{measure.display_name}}
+          <span class="pull-right">
+            <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
+             <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
+            <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
+              <span class="glyphicon glyphicon-remove"></span>
             </span>
-          </uib-accordion-heading>
-          <div ng-if="measure.arguments.length > 0">
-            <div class="button-div">
-              <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
-                <translate>analysis.addMeasureOption</translate></button>
-              <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
-                <translate>analysis.duplicateOption</translate></button>
-              <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
-                <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
-              </button>
-              <p><translate>analysis.checkAll</translate> <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
-              <div class="row">
-                <div class="col-sm-2 pad-bot-10">
-                  <label class="small-label" translate>analysis.modelToBaseInputsOn</label>
-                </div>
-                <div class="col-sm-5 pad-bot-20 pad-top-5">
-                  <div class="input-group">
-                    <select class="form-control inline form-control-smaller-width" ng-options="seed as seed for seed in seeds" ng-model="measure.seed" ng-change="computeMeasureArguments(measure)"></select>
-                  </div>
-                </div>
+          </span>
+        </uib-accordion-heading>
+        <div class="button-div">
+          <button type="button" class="btn btn-success" ng-click="analysis.addMeasureOption(measure)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+            <translate>analysis.addMeasureOption</translate></button>
+          <button type="button" class="btn btn-success" ng-click="analysis.duplicateOption(measure)"><span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span>
+            <translate>analysis.duplicateOption</translate></button>
+          <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
+            <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
+          </button>
+          <div class="row pad-top-10">
+            <div class="col-sm-12">
+              <div class="analysis-descriptions">
+                <uib-accordion>
+                  <uib-accordion-group is-open="measure.descOpen">
+                    <uib-accordion-heading>
+                      <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.descOpen, 'glyphicon-chevron-right': !measure.descOpen}"></i>
+                      Descriptions
+                    </uib-accordion-heading>
+                    <div class="row pad-top-10 normal-text">
+                      <div class="col-sm-2"><label>Description</label></div>
+                      <div class="col-sm-10">{{measure.description}}</div>
+                    </div>
+                    <div class="row pad-top-10 normal-text">
+                      <div class="col-sm-2"><label>Modeler Description</label></div>
+                      <div class="col-sm-10">{{measure.modeler_description}}</div>
+                    </div>
+                  </uib-accordion-group>
+                </uib-accordion>
               </div>
             </div>
-            <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
           </div>
-          <div ng-if="measure.arguments.length == 0">
-            <div class="normal-text">This measure has no arguments</div>
+          <div class="row pad-top-10 normal-text">
+            <div class="col-sm-3 pad-bot-10">
+              <label translate>analysis.modelToBaseInputsOn</label>
+            </div>
+            <div class="col-sm-5 pad-bot-20 pad-top-5">
+              <div class="input-group">
+                <select class="form-control inline form-control-smaller-width" ng-options="seed as seed for seed in seeds" ng-model="measure.seed" ng-change="computeMeasureArguments(measure)"></select>
+              </div>
+            </div>
           </div>
-        </uib-accordion-group>
-      </uib-accordion>
-    </div>
+        </div>
+        <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid"></div>
+      </uib-accordion-group>
+    </uib-accordion>
   </div>
 </div>

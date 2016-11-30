@@ -20,24 +20,14 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
           Project.modifiedModal().then(() => {
             $log.debug('Resolving modifiedModal()');
             MeasureManager.stopMeasureManager();
-
-            OsServer.stopServer(true).then(response => {
+            // force stop LOCAL server (even if remote server is running)
+            // TODO: what to do about remote server?
+            OsServer.stopServer('local').then(response => {
               //  server is stopped
-              // for debug: save a random file to make sure server is stopped (when a project is selected)
-              // jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
-              //   status: OsServer.getServerStatus(),
-              //   stopServer: 'success',
-              //   response: response
-              // });
               exitReady = true;
               app.quit();
 
             }, error => {
-              // jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {
-              //   status: OsServer.getServerStatus(),
-              //   stopServer: 'fail',
-              //   response: error
-              // });
               exitReady = true;
               app.quit();
             });
@@ -127,16 +117,6 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
   const template = [{
     label: 'Edit',
     submenu: [{
-      label: 'Undo',
-      accelerator: 'CmdOrCtrl+Z',
-      role: 'undo'
-    }, {
-      label: 'Redo',
-      accelerator: 'Shift+CmdOrCtrl+Z',
-      role: 'redo'
-    }, {
-      type: 'separator'
-    }, {
       label: 'Cut',
       accelerator: 'CmdOrCtrl+X',
       role: 'cut'

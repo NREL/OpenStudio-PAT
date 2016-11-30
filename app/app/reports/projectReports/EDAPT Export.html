@@ -6,23 +6,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width">
-  <!--TODO Make this css injection work (replace hard-coded CSS paths below)-->
-  <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
-  <!-- inject:bootstrap -->
-  <!-- bootstrap css files will be automatically insert here -->
-  <!-- endinject -->
-  <!-- bower:css -->
-  <!-- run `gulp inject` to automatically populate bower styles dependencies -->
-  <!-- endbower -->
-  <!-- endbuild -->
-
-  <!-- build:css({.tmp/serve,src}) styles/app.css -->
-  <!-- inject:css -->
-  <!-- css files will be automatically insert here -->
-  <!-- endinject -->
-  <!-- endbuild -->
-  <link rel="stylesheet" href="/app/bootstrap.css">
-  <link rel="stylesheet" href="/app/index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js"></script>
 </head>
 <body>
 
@@ -132,16 +118,16 @@
   angular.module('myApp', [])
     .controller('MyAppCtrl', function ($scope) {
 
+      fs = require('fs');
+      path = require('path');
+      os = require('os');
+
       // Store a list of errors in exporting
       var exportErrs = [];
 
-      // Create a variable for the file save location
-      $scope.results_file_name = "results";
-      $scope.results_file_path = reportDir + "/" + $scope.results_file_name + ".xml";
-
       // Update the save location when the input changes
       $scope.updateResultsFilePath = function () {
-        $scope.results_file_path = reportDir + "/" + $scope.results_file_name + ".xml";
+        $scope.results_file_path = $scope.reportDir + "/" + $scope.results_file_name + ".xml";
       };
 
       // Create variables for the baseline types
@@ -152,6 +138,10 @@
       // Set up some additional data properties after the results
       // are passed in.
       $scope.setupAfterResultsAvailable = function () {
+
+        // Create a variable for the file save location
+        $scope.results_file_name = "results";
+        $scope.results_file_path = $scope.reportDir + "/" + $scope.results_file_name + ".xml";
 
         // Get the unique measure counts
         // based on unique name + argument values.
@@ -544,13 +534,14 @@
   }
 
   // set $scope.results element in the controller above from PAT data
-  function setData(data) {
+  function setData(data, reportDir) {
     console.log('Setting results variable to: ', data);
     var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
     var $scope = angular.element(controllerElement).scope();
     $scope.$apply(function () {
       $scope.results = data;
       $scope.setupAfterResultsAvailable();
+      $scope.reportDir = reportDir;
     });
   }
 

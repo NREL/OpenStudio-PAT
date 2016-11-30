@@ -156,7 +156,6 @@ export class Project {
         }
 
         vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
-        //vm.runType = vm.pat.runType ? vm.pat.runType : vm.runType;
         vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
         vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
         vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
@@ -191,7 +190,7 @@ export class Project {
       const options = [];
       // first find out how many options there are (from the optionDelete special argument)
       let optionKeys = [];
-      if (measure.arguments.length > 0){
+      if (measure.arguments.length > 0) {
         const keys = Object.keys(measure.arguments[0]);
         optionKeys = _.filter(keys, function (k) {
           return k.indexOf('option_') !== -1;
@@ -407,114 +406,136 @@ export class Project {
         seed.path = './seeds/' + da.seedModel;
         da_hash.seed = seed;
       }
+      // add option names and descriptions
+      const options = [];
+      _.forEach(vm.measures, (measure) => {
+        const option = {};
+        option.measure_name = measure.name;
+        option.name = da[measure.name];
+        if (option.name == 'None') {
+          // use measure name/desc if no option
+          option.name = measure.name;
+          option.description = measure.description;
+        }
+        else {
+          const opt = _.find(measure.options, {name: option.name});
+          if (opt)
+            option.description = opt.description;
+          else
+            option.description = measure.description;
+        }
+        options.push(option);
+      });
+      da_hash.options = options;
       vm.osa.analysis.problem.design_alternatives.push(da_hash);
     });
 
     // MEASURE DETAILS
     let measure_count = 0;
     _.forEach(vm.measures, (measure) => {
-      const m = {};
-      m.name = measure.name;
-      m.display_name = measure.display_name;
-      // measure types: ModelMeasure, EnergyPlusMeasure, ReportingMeasure
-      // OSA wants: Ruby, EnergyPlus, Reporting
-      if (measure.type === 'ModelMeasure') {
-        //m.measure_type = 'Ruby';
-        m.measure_type = 'RubyMeasure';
-      } else if (measure.type === 'EnergyPlusMeasure') {
-        //m.measure_type = 'EnergyPlus';
-        m.measure_type = 'EnergyPlusMeasure';
-      } else if (measure.type === 'ReportingMeasure') {
-        //m.measure_type = 'Reporting';
-        m.measure_type = 'ReportingMeasure';
-      } else {
-        m.measure_type = 'unknown';
-      }
-      m.measure_definition_class_name = measure.className;
-      //m.measure_definition_measureUID = measure.colDef.measureUID; // TODO: fix this
-      const mdir = _.last(_.split(measure.measure_dir, '/'));
-      m.measure_definition_directory = './measures/' + mdir;
-      m.measure_definition_directory_local = measure.measure_dir;
-      m.measure_definition_class_name = measure.class_name;
-      m.measure_definition_display_name = measure.display_name;
-      m.measure_definition_name = measure.name;
-      m.measure_definition_name_xml = null;
-      m.measure_definition_uuid = measure.uid;
-      m.measure_definition_version_uuid = measure.version_id;
-
-      // adding these to support EDAPT reporting
-      m.uuid = measure.uid;
-      m.version_uuid = measure.version_id;
-      m.description = measure.description; // TODO: verify this works in JSON (could have line breaks and other special characters)
-      m.taxonomy = measure.tags;
-
-      // first find out how many options there are
-      let optionKeys = [];
-      if (measure.arguments.length > 0){
-        const keys = Object.keys(measure.arguments[0]);
-        optionKeys = _.filter(keys, function (k) {
-          return k.indexOf('option_') !== -1;
-        });
-      }
-
-      // ARGUMENTS
-      m.arguments = [];
-      // This portion only has arguments that don't have the variable box checked
-      _.forEach(measure.arguments, (arg) => {
-        if (
-          (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) &&
-          (_.isUndefined(arg.variable) || arg.variable === false)
-        ) {
-          vm.$log.debug('ARGUMENT, not variable!');
-          const argument = {};
-          argument.display_name = arg.display_name;
-          argument.display_name_short = arg.display_name_short ? arg.display_name_short : arg.display_name;
-          argument.name = arg.name;
-          argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
-          argument.default_value = arg.default_value;
-          argument.value = arg.option_1 ? arg.option_1 : arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
-          // Make sure that argument is "complete"
-          if ( argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
-            var_count += 1;
-            m.arguments.push(argument);
-          } else {
-            vm.$log.debug('Not pushing partial arg to m.arguments');
-            vm.$log.debug('partial arg: ', argument);
-          }
+      // ONLY INCLUDE if measure has options set AND if at least 1 option is added to a DA
+      let measureAdded = false;
+      // go through alternatives, also see if need skip
+      const vars = [];
+      _.forEach(vm.designAlternatives, (da) => {
+        if (da[measure.name] == 'None' || _.isUndefined(da[measure.name])) {
+          vars.push(true);
+        } else {
+          vars.push(false);
+          measureAdded = true; // measure option is added to at least 1 DA
         }
       });
+      vm.$log.debug('Measure: ', measure.name, ', numOfOptions: ', measure.numberOfOptions, ' measure added to at least 1 DA? ', measureAdded);
+      if (measure.numberOfOptions > 0 && measureAdded) {
 
-      // VARIABLES
-      let var_count = 0;
-      m.variables = [];
+        const m = {};
+        m.name = measure.name;
+        m.display_name = measure.display_name;
+        // measure types: ModelMeasure, EnergyPlusMeasure, ReportingMeasure
+        // OSA wants: Ruby, EnergyPlus, Reporting
+        if (measure.type === 'ModelMeasure') {
+          //m.measure_type = 'Ruby';
+          m.measure_type = 'RubyMeasure';
+        } else if (measure.type === 'EnergyPlusMeasure') {
+          //m.measure_type = 'EnergyPlus';
+          m.measure_type = 'EnergyPlusMeasure';
+        } else if (measure.type === 'ReportingMeasure') {
+          //m.measure_type = 'Reporting';
+          m.measure_type = 'ReportingMeasure';
+        } else {
+          m.measure_type = 'unknown';
+        }
+        m.measure_definition_class_name = measure.className;
+        //m.measure_definition_measureUID = measure.colDef.measureUID; // TODO: fix this
+        const mdir = _.last(_.split(measure.measure_dir, '/'));
+        m.measure_definition_directory = './measures/' + mdir;
+        m.measure_definition_directory_local = measure.measure_dir;
+        m.measure_definition_class_name = measure.class_name;
+        m.measure_definition_display_name = measure.display_name;
+        m.measure_definition_name = measure.name;
+        m.measure_definition_name_xml = null;
+        m.measure_definition_uuid = measure.uid;
+        m.measure_definition_version_uuid = measure.version_id;
 
-      // if measure does not have options selected (reporting measure), no variables section
-      if (measure.numberOfOptions != 0) {
-        // go through alternatives, see if each has an option selected
-        const vars = [];
-        _.forEach(vm.designAlternatives, (da) => {
-          if (da[measure.name] == 'None') {
-            vars.push(true);
-          } else {
-            vars.push(false);
+        // adding these to support EDAPT reporting
+        m.uuid = measure.uid;
+        m.version_uuid = measure.version_id;
+        m.description = measure.description; // TODO: verify this works in JSON (could have line breaks and other special characters)
+        m.taxonomy = measure.tags;
+
+        // first find out how many options there are
+        let optionKeys = [];
+        //if (measure.arguments.length > 0) {
+          const keys = Object.keys(measure.arguments[0]);
+          optionKeys = _.filter(keys, function (k) {
+            return k.indexOf('option_') !== -1;
+          });
+        //}
+
+        // ARGUMENTS
+        m.arguments = [];
+        // This portion only has arguments that don't have the variable box checked
+        _.forEach(measure.arguments, (arg) => {
+          if (
+            (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) &&
+            (_.isUndefined(arg.variable) || arg.variable === false)
+          ) {
+            vm.$log.debug('ARGUMENT, not variable!');
+            const argument = {};
+            argument.display_name = arg.display_name;
+            argument.display_name_short = arg.display_name_short ? arg.display_name_short : arg.display_name;
+            argument.name = arg.name;
+            argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
+            argument.default_value = arg.default_value;
+            argument.value = arg.option_1 ? arg.option_1 : arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
+            // Make sure that argument is "complete"
+            if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
+              var_count += 1;
+              m.arguments.push(argument);
+            } else {
+              vm.$log.debug('Not pushing partial arg to m.arguments');
+              vm.$log.debug('partial arg: ', argument);
+            }
           }
         });
 
+        // VARIABLES
+        let var_count = 0;
+        m.variables = [];
+
         // need a __SKIP__ argument
-        // TODO: verify that this is still valid syntax-wise
-        // TODO: Should this not appear up here anymore? (b/c it's a variable?)
         if (_.includes(vars, true)) {
           const v = {
             argument: {
-              display_name: '__SKIP__',
-              display_name_short: '__SKIP__',
+              display_name: 'Skip ' + measure.display_name,
+              display_name_short: 'Skip entire measure',
               name: '__SKIP__',
               value_type: 'bool',
               default_value: false,
               value: false
             },
-            display_name: '__SKIP__',
-            display_name_short: '__SKIP__',
+            display_name: 'Skip ' + measure.display_name,
+            display_name_short: 'Skip entire measure',
             variable_type: 'variable',
             units: null,
             minimum: false,
@@ -557,9 +578,14 @@ export class Project {
               vm.$log.debug('Project::exportManual da: ', da);
               if (da[measure.name] == 'None') {
                 vm.$log.debug('value: None');
-                // TODO: Review what value to assign when no option is selected for that design alternative.
-                // TODO: Does it matter what we put here?  'None' is put there for now, if doesn't work, try value of the same type.
-                valArr.push({value: 'None', weight: 1 / vm.designAlternatives.length});
+                // when set to 'None', sub a value of the right type
+                let the_value = arg.default_value;
+                if (!the_value){
+                  // if no default value, use first option value, otherwise set to None
+                  the_value = (arg.option_1) ? arg.option_1 : 'None';
+                }
+                valArr.push({value: the_value, weight: 1 / vm.designAlternatives.length});
+
               } else {
                 const option_name = da[measure.name];
                 vm.$log.debug('arg: ', arg);
@@ -598,8 +624,8 @@ export class Project {
             };
 
             arg.units = '';
-            arg.minimum = min; // TODO is this meta data or calculated from options? Is it same as lower_bound below?
-            arg.maximum = max; // TODO is this meta data or calculated from options? Is it same as upper_bound below?
+            arg.minimum = min;
+            arg.maximum = max;
             arg.mode = mode(values);
 
             // VARIABLE ARGUMENT SECTION
@@ -610,6 +636,8 @@ export class Project {
             v.argument.name = arg.name;
             v.argument.value_type = _.toLower(arg.type); // TODO: see above
             v.argument.default_value = arg.default_value;
+            vm.$log.info(arg.choice_display_names);
+            v.argument.choice_display_names = arg.choice_display_names;
             v.argument.value = arg.option_1;
 
             // VARIABLE DETAILS
@@ -646,12 +674,12 @@ export class Project {
             m.variables.push(v);
           }
         });
-      }
 
-      m.workflow_index = measure_count;
-      measure_count += 1;
-
-      vm.osa.analysis.problem.workflow.push(m);
+        m.workflow_index = measure_count;
+        measure_count += 1;
+        // push measure to OSA
+        vm.osa.analysis.problem.workflow.push(m);
+      } // end if measure has options or is used
     });
 
     vm.osa.analysis.seed = {};
@@ -681,7 +709,6 @@ export class Project {
     vm.pat.seed = vm.defaultSeed;
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
-    //vm.pat.runType = vm.runType;
     vm.pat.remoteSettings = vm.remoteSettings;
     vm.pat.samplingMethod = vm.samplingMethod;
     vm.pat.algorithmSettings = vm.algorithmSettings;
@@ -908,12 +935,12 @@ export class Project {
     vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
-  setRemoteSettings(settings){
+  setRemoteSettings(settings) {
     const vm = this;
     vm.remoteSettings = settings;
   }
 
-  getRemoteSettings(){
+  getRemoteSettings() {
     const vm = this;
     return vm.remoteSettings;
   }

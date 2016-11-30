@@ -4,7 +4,7 @@
   </div>
   <div class="col-sm-2 pad-bot-20 pad-top-5">
     <div class="input-group">
-      <select class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-change="run.setRunType()"></select>
+      <select class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-change="run.warnBeforeDelete('runtype')"></select>
     </div>
   </div>
   <div class="col-sm-5 pad-bot-20 pad-top-10">
@@ -25,7 +25,7 @@
         <div class="row pad-bot-20">
         <label for="remoteType" class="col-sm-3 run-label">Remote Server Type</label>
           <div class="col-sm-6">
-            <select class="form-control" ng-options="remoteType for remoteType in remoteTypes" ng-model="remoteSettings.remoteType" ng-change="run.OsServer.resetSelectedServerURL()"></select>
+            <select id="remoteType" class="form-control" ng-options="remoteType for remoteType in remoteTypes" ng-model="remoteSettings.remoteType" ng-change="run.OsServer.resetSelectedServerURL()"></select>
           </div>
         </div>
         <div class="row" ng-if="remoteSettings.remoteType == 'Existing Remote Server'">
@@ -46,8 +46,7 @@
 
 <div ng-show="selectedRunType.name == 'remote'" class="row pad-bot-20">
   <div class="col-sm-8">
-    <button type="button" class="btn btn-info" ng-click="run.exportOSA()" translate>run.exportToOSA</button>
-    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()" translate>run.runEntireWorkflow</button>
+    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.cancelRun()" translate>run.cancelRun</button>
     <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()">View Server</button>
   </div>
@@ -55,8 +54,7 @@
 
 <div ng-show="selectedRunType.name == 'local'" class="row pad-bot-20">
   <div class="col-sm-12">
-    <button type="button" class="btn btn-info" ng-click="run.exportOSA()" translate>run.exportToOSA</button>
-    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.runEntireWorkflow()" translate>run.runEntireWorkflow</button>
+    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
     <button type="button" class="btn btn-danger" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>
     <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()">View Server</button>
@@ -116,7 +114,7 @@
               </div>
               <div class="col-sm-1 pad-top-10">{{run.formatDate(datapoint.updated_at)}}</div>
               <div class="col-sm-1 pad-top-10">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
-              <div class="col-sm-1 pad-top-10" ng-class="{'green-text': datapoint.status == 'completed', 'red-text': datapoint.status == 'errored'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</div>
+              <div class="col-sm-1 pad-top-10" ng-class="{'green-text': datapoint.status == 'completed', 'red-text': datapoint.status == 'errored'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</div>
               <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
               <div class="col-sm-1 pad-top-10"><span class="badge orange-badge square-badge dp-badge">{{run.calculateWarnings(datapoint)}}</span></div>
               <div class="col-sm-1 pad-top-10"><span class="badge red-badge square-badge dp-badge">{{run.calculateErrors(datapoint)}}</span></div>
@@ -157,7 +155,7 @@
                   <div class="col-sm-6 datapoint-id-display">Datapoint ID: {{datapoint.id}}</div>
                 </div>
                 <uib-accordion close-others="false">
-                  <uib-accordion-group ng-repeat="step in datapoint.steps" id="{{datapoint.id}}-{{step.name}}" is-open="step.open">
+                  <uib-accordion-group ng-repeat="step in datapoint.steps | filter:filterSkipped" id="{{datapoint.id}}-{{step.name}}" is-open="step.open">
                     <uib-accordion-heading>
                       <div class="row measure-accordion pad-bot-10">
                         <div class="col-sm-6 bold">{{step.name}}</div>
@@ -168,8 +166,8 @@
                         <div class="col-sm-1">{{run.getRunTime(step.result.started_at, step.result.completed_at)}}</div>
                         <div class="col-sm-1"></div>
                         <div class="col-sm-1"><span ng-if="step.step_result == 'NotApplicable'">NA</span></div>
-                        <div class="col-sm-1"><span class="badge orange-badge square-badge">{{step.result.step_warnings.length}}</span></div>
-                        <div class="col-sm-1"><span class="badge red-badge square-badge">{{step.result.step_errors.length}}</span></div>
+                        <div class="col-sm-1"><span class="badge orange-badge square-badge" ng-if="step.result">{{step.result.step_warnings.length}}</span></div>
+                        <div class="col-sm-1"><span class="badge red-badge square-badge" ng-if="step.result">{{step.result.step_errors.length}}</span></div>
                         <div class="col-sm-1"></div>
                         <div class="col-sm-3"></div>
                       </div>
@@ -180,6 +178,18 @@
                       <div ng-repeat="item in step.result.step_errors"><span class="red-text">Error: </span>{{item}}</div>
                       <div ng-repeat="item in step.result.step_warnings"><span class="orange-text">Warning: </span>{{item}}</div>
                       <div ng-repeat="item in step.result.step_info"><span class="green-text">Info: </span>{{item}}</div>
+                    </div>
+                  </uib-accordion-group>
+                  <uib-accordion-group>
+                    <uib-accordion-heading>
+                      <div class="row measure-accordion pad-bot-10">
+                        <div class="col-sm-6 bold">EnergyPlus Results</div>
+                      </div>
+                    </uib-accordion-heading>
+                    <div class="measure-accordion-body">
+                      <div>
+                        {{datapoint.eplusout_err}}
+                      </div>
                     </div>
                   </uib-accordion-group>
                 </uib-accordion>
@@ -200,9 +210,9 @@
           <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': dev.open, 'glyphicon-chevron-right': !dev.open}"></i>
           Server Troubleshooting
         </uib-accordion-heading>
-        <button type="button" class="btn btn-danger" ng-click="run.startServer(true)">Force Server START </button>
-        <button type="button" class="btn btn-danger" ng-click="run.stopServer(true)">Force Server STOP </button>
-        <button type="button" class="btn btn-primary" ng-click="run.pingServer()">Ping Server and Set Status</button>
+        <button type="button" class="btn btn-danger" ng-click="run.startServer('local')">Force Start local Server </button>
+        <button type="button" class="btn btn-danger" ng-click="run.stopServer('local')">Force Stop local Server </button>
+        <button type="button" class="btn btn-primary" ng-click="run.pingServer()">Ping Current Server and Set Status</button>
       </uib-accordion-group>
     </uib-accordion>
   </div>

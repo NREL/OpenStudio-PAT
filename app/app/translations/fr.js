@@ -131,7 +131,7 @@ export default {
       add: 'Add',
       date: 'Date',
       name: 'Name',
-      edit: 'Edit',
+      edit: 'Edit/Copy',
       status: 'Update',
       type: 'Type'
     },
@@ -207,6 +207,11 @@ export default {
     modalAnalysisRunning: {
       title: 'Analysis is Running',
       message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'
+    },
+    modalClearResults: {
+      title: 'Delete Local Results?',
+      rerunAnalysisMessage: 'Running a new analysis will delete your local results. Are you sure you want to continue?',
+      setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?'
     },
     viewReport: 'View Report',
     'for': 'for'

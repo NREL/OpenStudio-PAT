@@ -8,11 +8,6 @@ export class ModalProjectNameController {
     vm.$scope = $scope;
     vm.$uibModalInstance = $uibModalInstance;
     vm.project = Project;
-
-    //const updateStatus = function (status) {
-    //  vm.status = status;
-    //  vm.$scope.$digest();
-    //};
   }
 
   ok() {
@@ -28,6 +23,7 @@ export class ModalProjectNameController {
 
   cancel() {
     const vm = this;
-    vm.$uibModalInstance.close();
+    vm.$log.debug('ModalProjectNameController cancel');
+    vm.$uibModalInstance.dismiss('cancel');
   }
 }

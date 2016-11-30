@@ -1,4 +1,5 @@
 import {shell} from 'electron';
+import jetpack from 'fs-jetpack';
 
 export class RunController {
 
@@ -15,6 +16,7 @@ export class RunController {
     vm.OsServer = OsServer;
     vm.toastr = toastr;
     vm.shell = shell;
+    vm.jetpack = jetpack;
 
     vm.runTypes = vm.Project.getRunTypes();
     // TEMPORARY:  only show local server
@@ -50,17 +52,34 @@ export class RunController {
     // TROUBLESHOOTING PANEL STATUS
     vm.$scope.dev = {open: true};
 
+    // don't show out.osw and objectives.json reports in dropdown
     vm.$scope.filterReports = function(item){
       return (item.type == 'Report' && item.attachment_file_name != 'out.osw' && item.attachment_file_name != 'objectives.json');
+    };
+
+    // don't show skipped measures in datapoint accordion
+    vm.$scope.filterSkipped = function(item){
+      let isSkipped = false;
+      _.forEach(item.arguments, (arg) => {
+        if (arg['__SKIP__']){
+          vm.$log.debug('**Found SKIP argument in item: ', item);
+          isSkipped = true;
+        }
+      });
+      return !isSkipped;
     };
 
   }
 
   setRunType() {
+    // TODO: warn users that datapoints will be deleted first
     const vm = this;
+    vm.deleteResults();
+    vm.$log.debug('old run type: ', vm.Project.getRunType());
+    vm.$log.debug('new run type: ', vm.$scope.selectedRunType);
     vm.Project.setRunType(vm.$scope.selectedRunType);
     vm.OsServer.resetSelectedServerURL();
-   // TODO: clear out datapoints?  Display different local vs remotely run ones?  Store in pat.json? recheck statuses?
+
   }
 
   viewServer() {
@@ -156,27 +175,35 @@ export class RunController {
 
   calculateWarnings(dp) {
     let warn = 0;
-    _.forEach(dp.steps, step => {
-      warn = warn + step.result.step_warnings.length;
-    });
+    if (dp && dp.steps){
+      _.forEach(dp.steps, step => {
+        if (step.result && step.result.step_warnings)
+        warn = warn + step.result.step_warnings.length;
+      });
+    }
     return warn;
   }
 
   calculateErrors(dp) {
     let err = 0;
-    _.forEach(dp.steps, step => {
-      err = err + step.result.step_errors.length;
-    });
+    if (dp && dp.steps) {
+      _.forEach(dp.steps, step => {
+        if (step.result && step.result.step_errors)
+          err = err + step.result.step_errors.length;
+      });
+    }
     return err;
   }
 
   calculateNAs(dp) {
     let nas = 0;
-    _.forEach(dp.steps, step => {
-      if (step.step_result == 'NotApplicable') {
-        nas = nas + 1;
-      }
-    });
+    if (dp && dp.steps) {
+      _.forEach(dp.steps, step => {
+        if (step.step_result == 'NotApplicable') {
+          nas = nas + 1;
+        }
+      });
+    }
     return nas;
   }
 
@@ -247,13 +274,86 @@ export class RunController {
     });
   }
 
+  warnBeforeDelete(type) {
+    // type could be 'run' (warning before running an new analysis), or 'runtype' (warning before setting new run type)
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    vm.$log.debug('**** In RunController::WarnBeforeDeleting ****');
+
+    const contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
+    vm.$log.debug('Local results size:', contents.length);
+
+    if (contents.length > 0){
+      // local results exist
+      const modalInstance = vm.$uibModal.open({
+        backdrop: 'static',
+        controller: 'ModalClearResultsController',
+        controllerAs: 'modal',
+        templateUrl: 'app/run/clearResults.html',
+        resolve: {
+          params: function () {
+            return {
+              type: type
+            };
+          }
+        }
+      });
+
+      modalInstance.result.then(() => {
+        // go on to run workflow
+        deferred.resolve();
+        if (type == 'run') {
+          vm.runEntireWorkflow();
+        } else if (type == 'runtype'){
+          vm.setRunType();
+        }
+
+      }, () => {
+        // Modal canceled
+        if (type == 'runtype'){
+          // reset to previous runtype
+          vm.$scope.selectedRunType = vm.Project.getRunType();
+        }
+        deferred.reject();
+      });
+    } else {
+      // no local results
+      deferred.resolve();
+      if (type == 'run'){
+        vm.runEntireWorkflow();
+      } else if (type == 'runtype') {
+        vm.setRunType();
+      }
+
+    }
+
+    return deferred.promise;
+  }
+
+  deleteResults() {
+    const vm = this;
+    // remove localResults contents
+    vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
+
+    // reset analysis
+    vm.OsServer.resetAnalysis();
+    vm.$scope.analysisID = vm.Project.getAnalysisID();
+    vm.$scope.datapoints = vm.Project.getDatapoints();
+    vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
+
+  }
+
   runEntireWorkflow() {
     const vm = this;
     vm.$log.debug('***** In runController::runEntireWorkflow() *****');
     vm.toggleButtons();
 
-    // 1: make/get OSA
-    // 2: make/get zip file?
+    // 1: delete old results
+    vm.deleteResults();
+
+    // 2: make OSA and zip file
+    vm.exportOSA();
 
     // 3: hit PAT CLI to start server (local or remote)
     vm.OsServer.setProgress(15, 'Starting server');
@@ -263,12 +363,6 @@ export class RunController {
     vm.OsServer.startServer().then(response => {
       vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
       vm.$log.debug('Start Server response: ', response);
-
-      // reset Analysis (clear out some variables)
-      vm.OsServer.resetAnalysis();
-      vm.$scope.analysisID = vm.Project.getAnalysisID();
-      vm.$scope.datapoints = vm.Project.getDatapoints();
-      vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
 
       vm.OsServer.setProgress(30, 'Server started');
 
@@ -428,7 +522,9 @@ export class RunController {
   clearDatapoint(datapoint) {
     const vm = this;
     vm.$log.debug('In clear datapoint');
-    // TODO:  also clear files from localResults folder?
+    // clear from disk
+    vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(datapoint.id));
+    // clear from PAT
     const index = _.findIndex(vm.$scope.datapoints, {id: datapoint.id});
     if (index != -1) {
       // datapoint found, delete

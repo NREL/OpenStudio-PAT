@@ -6,7 +6,7 @@ import path from 'path';
 const {dialog} = remote;
 
 export class SetProject {
-  constructor($q, $log, $uibModal, Project, OsServer, BCL) {
+  constructor($q, $log, $state, $uibModal, Project, OsServer, BCL) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
@@ -18,6 +18,7 @@ export class SetProject {
     vm.OsServer = OsServer;
     vm.Project = Project;
     vm.BCL = BCL;
+    vm.$state = $state;
   }
 
   saveProject() {
@@ -47,7 +48,7 @@ export class SetProject {
 
       if (!_.isEmpty(result)) {
         let projectDir = jetpack.cwd(result[0]);
-        projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
+        projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
         if (projectDir.path().indexOf(' ') >= 0) {
           // tell user to expect trouble
@@ -55,15 +56,17 @@ export class SetProject {
           });
         }
 
-        // for saveAs: copy old project's folder structure to new location (from, to)
-        vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
-
         vm.OsServer.stopServer().then(response => {
           vm.$log.debug('SetProjectService::stop server: server stopped');
           vm.$log.debug('response: ', response);
 
+          // for saveAs: copy old project's folder structure to new location (from, to)
+          vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
+
           // set project Variables
           vm.setProjectVariables(projectDir);
+
+          vm.$state.transitionTo('analysis', {}, {reload: true});
 
           // resolve promise
           deferred.resolve('resolve');
@@ -78,6 +81,8 @@ export class SetProject {
           vm.$log.debug('stop server errored, but setting project anyway');
           // set project Variables anyway
           vm.setProjectVariables(projectDir);
+
+          vm.$state.transitionTo('analysis', {}, {reload: true});
 
           deferred.reject('rejected');
         });
@@ -113,16 +118,25 @@ export class SetProject {
           });
         }
 
-        vm.OsServer.stopServer().then(response => {
-          vm.$log.debug('SetProjectService::stop server: server stopped');
+        // force stop local server
+        vm.OsServer.stopServer('local').then(response => {
+          vm.$log.debug('SetProjectService::stop server: local server stopped');
           vm.$log.debug('response: ', response);
 
           // set project Variables
           vm.setProjectVariables(projectDir);
 
+          vm.$state.transitionTo('analysis', {}, {reload: true});
+
+          vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
+
           // resolve promise
           deferred.resolve('resolve');
-          // start server at new location
+
+          // Only start server if local server is selected?
+          // For now: selected local run type and start local server
+          vm.Project.setRunType(vm.Project.getRunTypes()[0]);
+          // start local server at new location
           vm.OsServer.startServer().then(response => {
             vm.$log.debug('setProjectService::start server: server started');
             vm.$log.debug('response: ', response);
@@ -133,6 +147,10 @@ export class SetProject {
           vm.$log.debug('stop server errored, but setting project anyway');
           // set project Variables anyway
           vm.setProjectVariables(projectDir);
+
+          vm.$state.transitionTo('analysis', {}, {reload: true});
+
+          vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
 
           deferred.reject('rejected');
         });
@@ -199,20 +217,22 @@ export class SetProject {
       if (fileExists) {
         // wait until server is stopped and new project set before closing modal
         vm.$log.debug('fileExists!');
-        vm.OsServer.stopServer().then(response => {
+        vm.OsServer.stopServer('local').then(response => {
           vm.$log.debug('SetProjectService::stop server: server stopped');
           vm.$log.debug('response: ', response);
 
           // set project Variables
           vm.setProjectVariables(projectDir);
 
+          vm.$state.transitionTo('analysis', {}, {reload: true});
+
           // resolve promise
           deferred.resolve('resolve');
-          
+
           // Only start server if local server is selected?
           // For now: selected local run type and start local server
           vm.Project.setRunType(vm.Project.getRunTypes()[0]);
-          // start server at new location 
+          // start local server at new location
           vm.OsServer.startServer().then(response => {
             vm.$log.debug('setProjectService::start server: server started');
             vm.$log.debug('response: ', response);
@@ -223,6 +243,8 @@ export class SetProject {
           vm.$log.debug('stop server errored, but setting project anyway');
           // set project Variables anyway
           vm.setProjectVariables(projectDir);
+
+          vm.$state.transitionTo('analysis', {}, {reload: true});
 
           deferred.reject('rejected');
         });
@@ -268,7 +290,7 @@ export class SetProject {
     });
 
     modalInstance.result.then(() => {
-      vm.$log.debug('Resolving openModal()');
+      vm.$log.debug('Resolving whitespaceModal()');
       deferred.resolve('resolved');
     }, () => {
       // Modal canceled
@@ -276,7 +298,6 @@ export class SetProject {
     });
     return deferred.promise;
   }
-
 
   // project initialization
   setProjectVariables(projectDir) {
