@@ -26,10 +26,13 @@ export class ReportsController {
 
     // preload.js path depends on environment.  we need full path to file
     if (vm.env == 'production') {
-      // TODO: this doesn't work correctly
-      vm.$scope.preloadPath = 'asar://scripts/preload.js';
+      vm.$scope.preloadPath = `file://${app.getAppPath()}/scripts/preload.js`;
+      console.log('preloadPath', vm.$scope.preloadPath);
+      console.log('getAppPath', app.getAppPath());
+      console.log('dirname', __dirname);
     } else {
-      vm.$scope.preloadPath = 'file://' + app.getAppPath() + '/scripts/preload.js';
+      vm.$scope.preloadPath = `file://${app.getAppPath()}/scripts/preload.js`;
+      console.log('preloadPath', vm.$scope.preloadPath);
     }
 
     vm.$log.debug("PRELOAD PATH: ", vm.$scope.preloadPath);
