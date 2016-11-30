@@ -37,8 +37,6 @@ export class AnalysisController {
     vm.$scope.epMeasures = [];
     vm.$scope.repMeasures = [];
 
-    vm.$scope.selectedAll = false;
-
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
 
@@ -563,15 +561,6 @@ export class AnalysisController {
     } else {
       vm.$log.error('option id does not match expected format (option_<ID>)');
     }
-  }
-
-  checkAll(measure) {
-    const vm = this;
-    vm.$log.debug('In checkAll in analysis');
-
-    vm.$scope.selectedAll = vm.$scope.selectedAll === false;
-
-    _.forEach(vm.$scope.gridOptions[measure.uid].data, row => row.variable = !!vm.$scope.selectedAll);
   }
 
   setSeed() {
