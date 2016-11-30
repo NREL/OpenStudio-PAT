@@ -26,12 +26,13 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
               //  server is stopped
               exitReady = true;
               app.quit();
-
             }, error => {
               exitReady = true;
               app.quit();
             });
           }, () => {
+            exitReady = true;
+            app.quit();
           });
         } else {
           // nothing to do, exit.

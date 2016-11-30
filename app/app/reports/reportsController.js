@@ -17,6 +17,7 @@ export class ReportsController {
     vm.Project = Project;
     vm.env = env;
     vm.preloadPath = 'file://';
+    vm.reportDir = os.homedir() + '/Openstudio/PAT/Project_Reporting_Measures';
 
     // data to pass to preloader script
     vm.$scope.datapoints = vm.Project.getDatapoints();
@@ -52,9 +53,13 @@ export class ReportsController {
       vm.$scope.projectReports.push(report);
     });
 
+    var wv = angular.element(document.getElementById('wv'));
+    wv.attr('preload',vm.$scope.preloadPath);
+
     // Set the default project report to the first one found
     vm.$scope.selectedReportName = vm.$scope.projectReports[0].name;
     vm.$scope.selectedReportURL = vm.$scope.projectReports[0].url;
+    wv.attr('src',vm.$scope.selectedReportURL);
 
     // Update the selected report
     $scope.updateSelectedReport = function (newReportName) {
@@ -62,6 +67,8 @@ export class ReportsController {
         if (report.name == newReportName) {
           vm.$scope.selectedReportName = report.name;
           vm.$scope.selectedReportURL = report.url;
+
+      	  wv.attr('src',vm.$scope.selectedReportURL);
         }
       });
       //pass data into webview when dom is ready
@@ -71,7 +78,9 @@ export class ReportsController {
     };
 
     // Uncomment this to view webview developer tools to debug project reports
-   vm.openWebViewDevTools();
+    if (vm.env != 'production') {
+      vm.openWebViewDevTools();
+    }
 
     //pass data into webview when dom is ready
     angular.element(document).ready(function () {
@@ -92,7 +101,7 @@ export class ReportsController {
   passData() {
     const vm = this;
     var wv = document.getElementById('wv');
-    wv.executeJavaScript("setData(" + JSON.stringify(vm.testResults) +  ");");
+    wv.executeJavaScript(`setData("${JSON.stringify(vm.testResults)}","${vm.reportDir}")`);
   }
 
 }

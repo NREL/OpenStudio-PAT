@@ -535,13 +535,12 @@
 
   // set $scope.results element in the controller above from PAT data
   function setData(data, reportDir) {
-    console.log('Setting results variable to: ', data);
     var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
     var $scope = angular.element(controllerElement).scope();
     $scope.$apply(function () {
-      $scope.results = data;
-      $scope.setupAfterResultsAvailable();
+      $scope.results = JSON.parse(data);
       $scope.reportDir = reportDir;
+      $scope.setupAfterResultsAvailable();
     });
   }
 
