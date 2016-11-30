@@ -53,15 +53,15 @@ export class RunController {
     vm.$scope.dev = {open: true};
 
     // don't show out.osw and objectives.json reports in dropdown
-    vm.$scope.filterReports = function(item){
+    vm.$scope.filterReports = function (item) {
       return (item.type == 'Report' && item.attachment_file_name != 'out.osw' && item.attachment_file_name != 'objectives.json');
     };
 
     // don't show skipped measures in datapoint accordion
-    vm.$scope.filterSkipped = function(item){
+    vm.$scope.filterSkipped = function (item) {
       let isSkipped = false;
       _.forEach(item.arguments, (arg) => {
-        if (arg['__SKIP__']){
+        if (arg['__SKIP__']) {
           vm.$log.debug('**Found SKIP argument in item: ', item);
           isSkipped = true;
         }
@@ -124,10 +124,10 @@ export class RunController {
     const vm = this;
     let theDate = '';
 
-    if (dateString){
+    if (dateString) {
       theDate = vm.makeDate(dateString);
       // format
-      theDate = theDate.getMonth()+1 + "/" + theDate.getDate() + "/" + theDate.getFullYear();
+      theDate = theDate.getMonth() + 1 + "/" + theDate.getDate() + "/" + theDate.getFullYear();
     }
 
     return theDate;
@@ -139,7 +139,7 @@ export class RunController {
     let theDate = '';
     if (dateString) {
 
-      if (dateString.slice(8,9) == 'T') {
+      if (dateString.slice(8, 9) == 'T') {
         // YYYYMMDDTHHMMSSZ: add punctuation to convert to valid datetime format and parse normally
         const tmp = dateString.slice(0, 4) + '-' + dateString.slice(4, 6) + '-' + dateString.slice(6, 11) + ':' + dateString.slice(11, 13) + ':' + dateString.slice(13, 16);
         theDate = new Date(tmp);
@@ -147,7 +147,7 @@ export class RunController {
         theDate = new Date(dateString);
       }
 
-     // vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
+      // vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
     }
 
     return theDate;
@@ -175,10 +175,10 @@ export class RunController {
 
   calculateWarnings(dp) {
     let warn = 0;
-    if (dp && dp.steps){
+    if (dp && dp.steps) {
       _.forEach(dp.steps, step => {
         if (step.result && step.result.step_warnings)
-        warn = warn + step.result.step_warnings.length;
+          warn = warn + step.result.step_warnings.length;
       });
     }
     return warn;
@@ -207,7 +207,7 @@ export class RunController {
     return nas;
   }
 
-  resetRemoteServerURL(){
+  resetRemoteServerURL() {
     const vm = this;
     vm.OsServer.stopServer().then(response => {
       vm.OsServer.resetSelectedServerURL();
@@ -224,7 +224,7 @@ export class RunController {
       vm.$log.debug('***** ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name], ' Server Stopped *****');
       vm.OsServer.setProgress(0, '');
       //vm.$scope.serverStatuses = vm.OsServer.getServerStatus();
-      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
         vm.toastr.success('PAT successfully disconnected from remote server');
       } else {
         vm.toastr.success('Server stopped successfully');
@@ -233,7 +233,7 @@ export class RunController {
     }, response => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
       vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
-      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
         vm.toastr.error('PAT couldn\'t disconnect from remote server');
       } else {
         vm.toastr.error('Error: server could not be stopped');
@@ -245,8 +245,8 @@ export class RunController {
   startServer(force = false) {
     const vm = this;
     vm.OsServer.startServer(force).then(response => {
-      vm.$log.debug('Server Status for ',vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
-      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+      vm.$log.debug('Server Status for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
         vm.toastr.success('Connected to remote server!');
       } else {
         vm.toastr.success('Server started!');
@@ -254,7 +254,7 @@ export class RunController {
 
     }, response => {
       vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
-      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server'){
+      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
         vm.toastr.error('Error: could not connect to remote server');
       } else {
         vm.toastr.error('Error: server did not start');
@@ -284,7 +284,7 @@ export class RunController {
     const contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
     vm.$log.debug('Local results size:', contents.length);
 
-    if (contents.length > 0){
+    if (contents.length > 0) {
       // local results exist
       const modalInstance = vm.$uibModal.open({
         backdrop: 'static',
@@ -305,13 +305,13 @@ export class RunController {
         deferred.resolve();
         if (type == 'run') {
           vm.runEntireWorkflow();
-        } else if (type == 'runtype'){
+        } else if (type == 'runtype') {
           vm.setRunType();
         }
 
       }, () => {
         // Modal canceled
-        if (type == 'runtype'){
+        if (type == 'runtype') {
           // reset to previous runtype
           vm.$scope.selectedRunType = vm.Project.getRunType();
         }
@@ -320,7 +320,7 @@ export class RunController {
     } else {
       // no local results
       deferred.resolve();
-      if (type == 'run'){
+      if (type == 'run') {
         vm.runEntireWorkflow();
       } else if (type == 'runtype') {
         vm.setRunType();
@@ -341,12 +341,12 @@ export class RunController {
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-
   }
 
   runEntireWorkflow() {
     const vm = this;
     vm.$log.debug('***** In runController::runEntireWorkflow() *****');
+    vm.setIsModified();
     vm.toggleButtons();
 
     // 1: delete old results
@@ -598,5 +598,8 @@ export class RunController {
     });
   }
 
-
+  setIsModified() {
+    const vm = this;
+    vm.Project.setModified(true);
+  }
 }
