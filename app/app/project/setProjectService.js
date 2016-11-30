@@ -48,7 +48,7 @@ export class SetProject {
 
       if (!_.isEmpty(result)) {
         let projectDir = jetpack.cwd(result[0]);
-        projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
+        projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
         if (projectDir.path().indexOf(' ') >= 0) {
           // tell user to expect trouble
@@ -56,12 +56,12 @@ export class SetProject {
           });
         }
 
-        // for saveAs: copy old project's folder structure to new location (from, to)
-        vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
-
         vm.OsServer.stopServer().then(response => {
           vm.$log.debug('SetProjectService::stop server: server stopped');
           vm.$log.debug('response: ', response);
+
+          // for saveAs: copy old project's folder structure to new location (from, to)
+          vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
 
           // set project Variables
           vm.setProjectVariables(projectDir);
