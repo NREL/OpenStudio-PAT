@@ -145,25 +145,34 @@ export class AnalysisController {
           displayName: 'analysis.columns.argumentName',
           enableCellEdit: false,
           headerCellFilter: 'translate',
-          width: 200,
-          minWidth: 100
+          pinnedLeft:true,
+          width: 300,
+          minWidth: 100,
+          cellTooltip: function(row) {
+            return row.entity.display_name;
+          }
         }, {
-          name: 'short_name',
-          displayName: 'analysis.columns.shortName',
-          cellEditableCondition: $scope => {
-            return angular.isDefined($scope.row.entity.display_name);
-          },
-          headerCellFilter: 'translate',
-          width: 200,
-          minWidth: 100
+          name: 'description',
+          displayName: 'description',
+          visible: false
+        }, {
+            name: 'short_name',
+            displayName: 'analysis.columns.shortName',
+            cellEditableCondition: $scope => {
+              return angular.isDefined($scope.row.entity.display_name);
+            },
+            headerCellFilter: 'translate',
+            width: 200,
+            minWidth: 100
         }, {
           name: 'variable',
           displayName: 'analysis.columns.variable',
-          cellTemplate: '<input ng-if="row.entity.name.length" type="checkbox" ui-grid-checkbox ng-model="MODEL_COL_FIELD">',
+          measureUID: measure.uid,
+          cellTemplate: 'app/analysis/checkAllTemplate.html',
           headerCellFilter: 'translate',
-          minWidth: 100,
+          minWidth: 30,
           type: 'boolean',
-          width: 200
+          width: 70
         }],
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.uid] = gridApi;
@@ -476,6 +485,24 @@ export class AnalysisController {
         measure.numberOfOptions = measure.numberOfOptions - 1;
       }
     });
+  }
+
+  // Toggle all variable checkboxes
+  checkAllVariables(row, col) {
+    const vm = this;
+    const measureUID = col.colDef.measureUID;
+    // toggle checkbox
+    if (row.entity.variable){
+      // set all to true
+      _.forEach(vm.$scope.gridOptions[measureUID].data, (row) => {
+        row.variable = true;
+      });
+    } else {
+      // set all to false
+      _.forEach(vm.$scope.gridOptions[measureUID].data, (row) => {
+        row.variable = false;
+      });
+    }
   }
 
   addDefaultArguments(measure, option) {

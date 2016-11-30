@@ -36,7 +36,7 @@
             <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
               <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
             </button>
-            <p><translate>analysis.checkAll</translate> <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
+
             <div class="row">
               <div class="col-sm-2 pad-bot-10">
                 <label class="small-label" translate>analysis.modelToBaseInputsOn</label>
@@ -48,7 +48,7 @@
               </div>
             </div>
           </div>
-          <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
+          <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid"></div>
         </uib-accordion-group>
       </uib-accordion>
     </div>
@@ -88,7 +88,6 @@
             <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
               <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
             </button>
-            <p><translate>analysis.checkAll</translate> <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
             <div class="row">
               <div class="col-sm-2 pad-bot-10">
                 <label class="small-label" translate>analysis.modelToBaseInputsOn</label>
@@ -100,7 +99,7 @@
               </div>
             </div>
           </div>
-          <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
+          <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid"></div>
         </uib-accordion-group>
       </uib-accordion>
     </div>
@@ -140,7 +139,6 @@
             <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
               <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasureAndOption</translate>
             </button>
-            <p><translate>analysis.checkAll</translate> <input type="checkbox" ng-model="selectedAll" ng-click="analysis.checkAll(measure)"></p>
             <div class="row">
               <div class="col-sm-2 pad-bot-10">
                 <label class="small-label" translate>analysis.modelToBaseInputsOn</label>
@@ -152,7 +150,7 @@
               </div>
             </div>
           </div>
-          <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
+          <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid"></div>
         </uib-accordion-group>
       </uib-accordion>
     </div>

@@ -28,7 +28,7 @@ export default {
     projectName: 'Project Name',
     addMeasure: 'Add Measure',
     addMeasureOption: 'Add Measure Option',
-    checkAll: 'Check All',
+    checkAll: 'Check to make all arguments variable',
     checkForUpdates: 'Check for Updates',
     columns: {
       argumentName: 'Argument Name',
