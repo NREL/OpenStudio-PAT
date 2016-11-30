@@ -411,8 +411,9 @@ export class Project {
       _.forEach(vm.measures, (measure) => {
         const option = {};
         option.measure_name = measure.name;
+        option.workflow_index = measure.workflow_index;
         option.name = da[measure.name];
-        if (option.name == 'None') {
+        if (option.name == 'None' || !option.name) {
           // use measure name/desc if no option
           option.name = measure.name;
           option.description = measure.description;
