@@ -25,21 +25,21 @@ export class ReportsController {
     vm.testResults = vm.$scope.datapoints;
 
     // preload.js path depends on environment.  we need full path to file
-    if (vm.env == 'production') {
-      vm.$scope.preloadPath = `file://${app.getAppPath()}/scripts/preload.js`;
-      console.log('preloadPath', vm.$scope.preloadPath);
-      console.log('getAppPath', app.getAppPath());
-      console.log('dirname', __dirname);
-    } else {
-      vm.$scope.preloadPath = `file://${app.getAppPath()}/scripts/preload.js`;
-      console.log('preloadPath', vm.$scope.preloadPath);
-    }
+    vm.$scope.preloadPath = `file://${app.getAppPath()}/scripts/preload.js`;
 
     vm.$log.debug("PRELOAD PATH: ", vm.$scope.preloadPath);
 
     // Find all possible reports
-    // TODO: this must be reworked for production
-    var html_reports = vm.jetpack.find('app/app/reports/projectReports', {matching: '*.html'});
+    var html_reports = [];
+    if (vm.env.name == 'production') {
+      console.log('preloadPath', vm.$scope.preloadPath);
+      console.log('getAppPath', app.getAppPath());
+      console.log('dirname', __dirname);
+
+      html_reports = vm.jetpack.find(`${os.getAppPath()}/../reports/projectReports`, {matching: '*.html'});
+    } else {
+      html_reports = vm.jetpack.find('app/app/reports/projectReports', {matching: '*.html'});
+    }
     vm.$scope.projectReports = [];
     _.forEach(html_reports, function (html_report) {
       var report = {};

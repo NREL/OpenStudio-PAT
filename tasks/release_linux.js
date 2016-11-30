@@ -42,6 +42,10 @@ var packageBuiltApp = function () {
   return deferred.promise;
 };
 
+var packageReports = function () {
+  return projectDir.copyAsync(projectDir.path('app/app/reports/projectReports'), readyAppDir.path('resources/projectReports'));
+};
+
 var finalize = function () {
   // Create .desktop file from the template
   var desktop = projectDir.read('resources/linux/app.desktop');
@@ -110,6 +114,7 @@ module.exports = function () {
   return init()
     .then(copyRuntime)
     .then(packageBuiltApp)
+    .then(packageReports)
     .then(finalize)
     .then(renameApp)
     //.then(packToDebFile)

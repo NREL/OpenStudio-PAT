@@ -44,6 +44,10 @@ var packageBuiltApp = function () {
   return deferred.promise;
 };
 
+var packageReports = function () {
+  return projectDir.copyAsync(projectDir.path('app/app/reports/projectReports'), finalAppDir.path('Contents/Resources/projectReports'));
+};
+
 var finalize = function () {
   // Prepare main Info.plist
   var info = projectDir.read('resources/osx/Info.plist');
@@ -138,6 +142,7 @@ module.exports = function () {
     .then(copyRuntime)
     .then(cleanupRuntime)
     .then(packageBuiltApp)
+    .then(packageReports)
     .then(finalize)
     .then(renameApp)
     .then(signApp)
