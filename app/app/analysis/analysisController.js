@@ -68,17 +68,24 @@ export class AnalysisController {
 
   getDefaultOptionColDef() {
     const vm = this;
+    vm.$log.debug('AnalysisController getDefaultOptionColDef');
     return {
       display_name: 'Option 1',
       field: 'option_1',
-      editDropdownOptionsFunction: function (rowEntity) {
+      editDropdownOptionsFunction: function (rowEntity, colDef) {
         if (rowEntity.type === 'Choice') {
+          vm.$log.error('rowEntity: ', rowEntity);
+          vm.$log.error('colDef: ', colDef);
           vm.choices = [];
-          _.forEach(rowEntity.choices, (choice) => {
-            vm.choices.push({
-              value: choice.value
+          _.forEach(rowEntity.choice_display_names
+            , (choice) => {
+              vm.$log.error('choice: ', choice);
+              vm.choices.push({
+                id: choice,
+                value: choice
+              });
             });
-          });
+          vm.$log.error('vm.choices: ', vm.choices);
           return vm.choices;
         }
       },
@@ -475,11 +482,11 @@ export class AnalysisController {
     const vm = this;
     vm.setIsModified();
     _.forEach(measure.arguments, (argument) => {
-      if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.default_value))) {
-        argument[option.field] = Number(argument.default_value);
+      if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.choice_display_names))) {
+        argument[option.field] = Number(argument.choice_display_names);
       }
-      else {
-        argument[option.field] = argument.default_value;
+      else if (angular.isDefined(argument.choice_display_names) && argument.choice_display_names.length > 0){
+        argument[option.field] = argument.choice_display_names[0];
       }
     });
   }

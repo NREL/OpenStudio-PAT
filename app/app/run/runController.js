@@ -52,9 +52,22 @@ export class RunController {
     // TROUBLESHOOTING PANEL STATUS
     vm.$scope.dev = {open: true};
 
+    // don't show out.osw and objectives.json reports in dropdown
     vm.$scope.filterReports = function(item){
       return (item.type == 'Report' && item.attachment_file_name != 'out.osw' && item.attachment_file_name != 'objectives.json');
     };
+
+    // don't show skipped measures in datapoint accordion
+    vm.$scope.filterSkipped = function(item){
+      let isSkipped = false;
+      _.forEach(item.arguments, (arg) => {
+        if (arg['__SKIP__']){
+          vm.$log.debug('**Found SKIP argument in item: ', item);
+          isSkipped = true;
+        }
+      });
+      return !isSkipped;
+    }
 
   }
 
@@ -162,27 +175,35 @@ export class RunController {
 
   calculateWarnings(dp) {
     let warn = 0;
-    _.forEach(dp.steps, step => {
-      warn = warn + step.result.step_warnings.length;
-    });
+    if (dp && dp.steps){
+      _.forEach(dp.steps, step => {
+        if (step.result && step.result.step_warnings)
+        warn = warn + step.result.step_warnings.length;
+      });
+    }
     return warn;
   }
 
   calculateErrors(dp) {
     let err = 0;
-    _.forEach(dp.steps, step => {
-      err = err + step.result.step_errors.length;
-    });
+    if (dp && dp.steps) {
+      _.forEach(dp.steps, step => {
+        if (step.result && step.result.step_errors)
+          err = err + step.result.step_errors.length;
+      });
+    }
     return err;
   }
 
   calculateNAs(dp) {
     let nas = 0;
-    _.forEach(dp.steps, step => {
-      if (step.step_result == 'NotApplicable') {
-        nas = nas + 1;
-      }
-    });
+    if (dp && dp.steps) {
+      _.forEach(dp.steps, step => {
+        if (step.step_result == 'NotApplicable') {
+          nas = nas + 1;
+        }
+      });
+    }
     return nas;
   }
 

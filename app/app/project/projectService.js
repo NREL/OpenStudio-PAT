@@ -190,7 +190,7 @@ export class Project {
       const options = [];
       // first find out how many options there are (from the optionDelete special argument)
       let optionKeys = [];
-      if (measure.arguments.length > 0){
+      if (measure.arguments.length > 0) {
         const keys = Object.keys(measure.arguments[0]);
         optionKeys = _.filter(keys, function (k) {
           return k.indexOf('option_') !== -1;
@@ -527,15 +527,15 @@ export class Project {
         if (_.includes(vars, true)) {
           const v = {
             argument: {
-              display_name: '__SKIP__',
-              display_name_short: '__SKIP__',
+              display_name: 'Skip ' + measure.display_name,
+              display_name_short: 'Skip entire measure',
               name: '__SKIP__',
               value_type: 'bool',
               default_value: false,
               value: false
             },
-            display_name: '__SKIP__',
-            display_name_short: '__SKIP__',
+            display_name: 'Skip ' + measure.display_name,
+            display_name_short: 'Skip entire measure',
             variable_type: 'variable',
             units: null,
             minimum: false,
@@ -578,9 +578,14 @@ export class Project {
               vm.$log.debug('Project::exportManual da: ', da);
               if (da[measure.name] == 'None') {
                 vm.$log.debug('value: None');
-                // TODO: Review what value to assign when no option is selected for that design alternative.
-                // TODO: Does it matter what we put here?  'None' is put there for now, if doesn't work, try value of the same type.
-                valArr.push({value: 'None', weight: 1 / vm.designAlternatives.length});
+                // when set to 'None', sub a value of the right type
+                let the_value = arg.default_value;
+                if (!the_value){
+                  // if no default value, use first option value, otherwise set to None
+                  the_value = (arg.option_1) ? arg.option_1 : 'None';
+                }
+                valArr.push({value: the_value, weight: 1 / vm.designAlternatives.length});
+
               } else {
                 const option_name = da[measure.name];
                 vm.$log.debug('arg: ', arg);
@@ -631,6 +636,8 @@ export class Project {
             v.argument.name = arg.name;
             v.argument.value_type = _.toLower(arg.type); // TODO: see above
             v.argument.default_value = arg.default_value;
+            vm.$log.info(arg.choice_display_names);
+            v.argument.choice_display_names = arg.choice_display_names;
             v.argument.value = arg.option_1;
 
             // VARIABLE DETAILS
@@ -928,12 +935,12 @@ export class Project {
     vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
-  setRemoteSettings(settings){
+  setRemoteSettings(settings) {
     const vm = this;
     vm.remoteSettings = settings;
   }
 
-  getRemoteSettings(){
+  getRemoteSettings() {
     const vm = this;
     return vm.remoteSettings;
   }

@@ -155,7 +155,7 @@
                   <div class="col-sm-6 datapoint-id-display">Datapoint ID: {{datapoint.id}}</div>
                 </div>
                 <uib-accordion close-others="false">
-                  <uib-accordion-group ng-repeat="step in datapoint.steps" id="{{datapoint.id}}-{{step.name}}" is-open="step.open">
+                  <uib-accordion-group ng-repeat="step in datapoint.steps | filter:filterSkipped" id="{{datapoint.id}}-{{step.name}}" is-open="step.open">
                     <uib-accordion-heading>
                       <div class="row measure-accordion pad-bot-10">
                         <div class="col-sm-6 bold">{{step.name}}</div>
@@ -166,8 +166,8 @@
                         <div class="col-sm-1">{{run.getRunTime(step.result.started_at, step.result.completed_at)}}</div>
                         <div class="col-sm-1"></div>
                         <div class="col-sm-1"><span ng-if="step.step_result == 'NotApplicable'">NA</span></div>
-                        <div class="col-sm-1"><span class="badge orange-badge square-badge">{{step.result.step_warnings.length}}</span></div>
-                        <div class="col-sm-1"><span class="badge red-badge square-badge">{{step.result.step_errors.length}}</span></div>
+                        <div class="col-sm-1"><span class="badge orange-badge square-badge" ng-if="step.result">{{step.result.step_warnings.length}}</span></div>
+                        <div class="col-sm-1"><span class="badge red-badge square-badge" ng-if="step.result">{{step.result.step_errors.length}}</span></div>
                         <div class="col-sm-1"></div>
                         <div class="col-sm-3"></div>
                       </div>

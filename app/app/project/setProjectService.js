@@ -6,7 +6,7 @@ import path from 'path';
 const {dialog} = remote;
 
 export class SetProject {
-  constructor($q, $log, $uibModal, Project, OsServer, BCL) {
+  constructor($q, $log, $state, $uibModal, Project, OsServer, BCL) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
@@ -18,6 +18,7 @@ export class SetProject {
     vm.OsServer = OsServer;
     vm.Project = Project;
     vm.BCL = BCL;
+    vm.$state = $state;
   }
 
   saveProject() {
@@ -65,6 +66,8 @@ export class SetProject {
           // set project Variables
           vm.setProjectVariables(projectDir);
 
+          vm.$state.transitionTo('analysis', {}, {reload: true});
+
           // resolve promise
           deferred.resolve('resolve');
           // start server at new location
@@ -78,6 +81,8 @@ export class SetProject {
           vm.$log.debug('stop server errored, but setting project anyway');
           // set project Variables anyway
           vm.setProjectVariables(projectDir);
+
+          vm.$state.transitionTo('analysis', {}, {reload: true});
 
           deferred.reject('rejected');
         });
@@ -121,8 +126,16 @@ export class SetProject {
           // set project Variables
           vm.setProjectVariables(projectDir);
 
+          vm.$state.transitionTo('analysis', {}, {reload: true});
+
+          vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
+
           // resolve promise
           deferred.resolve('resolve');
+
+          // Only start server if local server is selected?
+          // For now: selected local run type and start local server
+          vm.Project.setRunType(vm.Project.getRunTypes()[0]);
           // start local server at new location
           vm.OsServer.startServer().then(response => {
             vm.$log.debug('setProjectService::start server: server started');
@@ -134,6 +147,10 @@ export class SetProject {
           vm.$log.debug('stop server errored, but setting project anyway');
           // set project Variables anyway
           vm.setProjectVariables(projectDir);
+
+          vm.$state.transitionTo('analysis', {}, {reload: true});
+
+          vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
 
           deferred.reject('rejected');
         });
@@ -207,6 +224,8 @@ export class SetProject {
           // set project Variables
           vm.setProjectVariables(projectDir);
 
+          vm.$state.transitionTo('analysis', {}, {reload: true});
+
           // resolve promise
           deferred.resolve('resolve');
 
@@ -224,6 +243,8 @@ export class SetProject {
           vm.$log.debug('stop server errored, but setting project anyway');
           // set project Variables anyway
           vm.setProjectVariables(projectDir);
+
+          vm.$state.transitionTo('analysis', {}, {reload: true});
 
           deferred.reject('rejected');
         });
@@ -269,7 +290,7 @@ export class SetProject {
     });
 
     modalInstance.result.then(() => {
-      vm.$log.debug('Resolving openModal()');
+      vm.$log.debug('Resolving whitespaceModal()');
       deferred.resolve('resolved');
     }, () => {
       // Modal canceled
@@ -277,7 +298,6 @@ export class SetProject {
     });
     return deferred.promise;
   }
-
 
   // project initialization
   setProjectVariables(projectDir) {
