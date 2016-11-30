@@ -52,9 +52,13 @@ export class ReportsController {
       vm.$scope.projectReports.push(report);
     });
 
+    var wv = angular.element(document.getElementById('wv'));
+    wv.attr('preload',vm.$scope.preloadPath);
+
     // Set the default project report to the first one found
     vm.$scope.selectedReportName = vm.$scope.projectReports[0].name;
     vm.$scope.selectedReportURL = vm.$scope.projectReports[0].url;
+    wv.attr('src',vm.$scope.selectedReportURL);
 
     // Update the selected report
     $scope.updateSelectedReport = function (newReportName) {
@@ -62,6 +66,8 @@ export class ReportsController {
         if (report.name == newReportName) {
           vm.$scope.selectedReportName = report.name;
           vm.$scope.selectedReportURL = report.url;
+
+      	  wv.attr('src',vm.$scope.selectedReportURL);
         }
       });
       //pass data into webview when dom is ready
