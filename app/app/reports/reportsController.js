@@ -104,7 +104,8 @@ export class ReportsController {
   passData() {
     const vm = this;
     var wv = document.getElementById('wv');
-    wv.executeJavaScript(`setData("${JSON.stringify(vm.testResults)}","${vm.reportDir}")`);
+    wv.executeJavaScript(`setReportDir(${JSON.stringify(vm.reportDir)});`);
+    wv.executeJavaScript(`setData(${JSON.stringify(vm.testResults)});`);
   }
 
 }

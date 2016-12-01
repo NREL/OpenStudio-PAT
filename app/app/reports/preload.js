@@ -8,7 +8,7 @@ console.info('Loaded preload.js');
 //var fs = require('fs');
 //var path = require('path');
 //_ = require('lodash');
-var js2xmlparser = require('js2xmlparser');
+let js2xmlparser = require('js2xmlparser');
 //var angular = require('angular');
 //var os = require('os');
 //

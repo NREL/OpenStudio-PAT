@@ -533,13 +533,23 @@
 
   }
 
-  // set $scope.results element in the controller above from PAT data
-  function setData(data, reportDir) {
+  // set $scope.reportDir element in the report's controller from PAT project directory
+  function setReportDir(reportDir) {
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    console.log("Inside setReportDir");
+    $scope.$apply(function () {
+      console.log("reportDir = " + reportDir);
+      $scope.reportDir = reportDir;
+    });
+  }
+
+  // set $scope.results element in the report's controller from PAT results
+  function setData(data) {
     var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
     var $scope = angular.element(controllerElement).scope();
     $scope.$apply(function () {
-      $scope.results = JSON.parse(data);
-      $scope.reportDir = reportDir;
+      $scope.results = data;
       $scope.setupAfterResultsAvailable();
     });
   }
