@@ -385,8 +385,8 @@ export class ModalBclController {
     const dirNames = _.split(measure.measure_dir, '/');
     //vm.$log.debug('DIR NAMES: ', dirNames);
     const dirName = _.last(dirNames);
-    //vm.$log.debug('DIR NAME: ', dirName);
-    src.copy(dirName, vm.projectDir.path(dirName));
+    //overwrite if measure is already in project folder
+    src.copy(dirName, vm.projectDir.path(dirName), {overwrite: true});
 
     // add to project measures
     measure.addedToProject = true;
