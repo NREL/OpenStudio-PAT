@@ -36,7 +36,7 @@ export class ReportsController {
       console.log('getAppPath', app.getAppPath());
       console.log('dirname', __dirname);
 
-      html_reports = vm.jetpack.find(`${app.getAppPath()}/../reports/projectReports`, {matching: '*.html'});
+      html_reports = vm.jetpack.find(`${app.getAppPath()}/../projectReports`, {matching: '*.html'});
     } else {
       html_reports = vm.jetpack.find('app/app/reports/projectReports', {matching: '*.html'});
     }
