@@ -33,7 +33,9 @@ export class ReportsController {
     var html_reports = [];
     // TODO figure out why vm.env does not seem to be defined in development
     if (vm.env && (vm.env.name == 'production')) {
-      html_reports = vm.jetpack.find(`${app.getAppPath()}/../projectReports`, {matching: '*.html'});
+      // This will resolve to the path to app.asaar
+      var appDir = vm.jetpack.cwd(app.getAppPath());
+      html_reports = appDir.find('../projectReports', {matching: '*.html'});
     } else {
       html_reports = vm.jetpack.find('app/app/reports/projectReports', {matching: '*.html'});
     }
