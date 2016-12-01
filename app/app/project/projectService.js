@@ -599,6 +599,10 @@ export class Project {
                   }
                 });
                 vm.$log.debug('arg[option_id]: ', arg[option_id]);
+                // check that you have a value here...if not error
+                if (!arg[option_id]){
+                  vm.$log.error('Option: ', option_name, 'for measure \'', measure.display_name,'\' does not have a value. Analysis will error.');
+                }
                 valArr.push({value: arg[option_id], weight: 1 / vm.designAlternatives.length});
               }
             });
