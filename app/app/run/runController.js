@@ -346,10 +346,9 @@ export class RunController {
   runEntireWorkflow() {
     const vm = this;
     vm.$log.debug('***** In runController::runEntireWorkflow() *****');
-    vm.setIsModified();
     vm.toggleButtons();
 
-    // 1: delete old results
+    // 1: delete old results (this sets modified flag)
     vm.deleteResults();
 
     // 2: make OSA and zip file
@@ -392,7 +391,6 @@ export class RunController {
         vm.OsServer.setProgress(45, 'Analysis started');
 
         vm.$scope.analysisID = vm.Project.getAnalysisID();
-        // create local results structure
 
         // 5: until complete, hit serverAPI for updates (errors, warnings, status)
         vm.getStatus = vm.$interval(function () {
@@ -445,7 +443,6 @@ export class RunController {
         vm.OsServer.setProgress(45, 'Analysis Error');
 
         vm.$log.debug('ANALYSIS NOT STARTED, ERROR: ', response);
-        // TODO: show status as 'ERROR'
         vm.OsServer.setAnalysisStatus('error');
         vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
         vm.toggleButtons();
@@ -454,7 +451,6 @@ export class RunController {
 
     }, response => {
       vm.OsServer.setProgress(25, 'Server Error');
-
       vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
       vm.OsServer.setAnalysisStatus('');
       vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
@@ -529,6 +525,7 @@ export class RunController {
     if (index != -1) {
       // datapoint found, delete
       vm.$scope.datapoints.splice(index, 1);
+      vm.Project.setModified(true);
     } else {
       vm.$log.debug('Datapoint ID not found in array');
     }
@@ -546,7 +543,7 @@ export class RunController {
 
   exportPAT() {
     // this saves PAT
-    // TODO: deprecate
+    // TODO: deprecate.
     const vm = this;
     vm.Project.exportPAT();
   }
@@ -600,8 +597,4 @@ export class RunController {
     });
   }
 
-  setIsModified() {
-    const vm = this;
-    vm.Project.setModified(true);
-  }
 }

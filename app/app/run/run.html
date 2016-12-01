@@ -67,13 +67,13 @@
   </div>
 </div>
 
-<div ng-show="analysisID != undefined">
+<div ng-show="analysisID != undefined && analysisStatus != ''">
   <div class="row row-borders">
-    <div class="col-sm-6 tab-text">
-       <label>Analysis ID</label> {{analysisID}}
+    <div class="col-sm-4 tab-text">
+      <label>Analysis Status</label> {{analysisStatus}}
     </div>
-    <div class="col-sm-4 tab-text" ng-if="analysisStatus != ''">
-      <label>Status</label> {{analysisStatus}}
+    <div class="col-sm-6 tab-text">
+       <label>ID</label> {{analysisID}}
     </div>
   </div>
 </div>

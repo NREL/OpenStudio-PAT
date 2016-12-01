@@ -67,7 +67,8 @@ export class OsServer {
     vm.Project.setDatapoints([]);
     vm.setDatapointsStatus([]);
 
-    // TODO: clear data from disk (?)
+    vm.Project.setModified(true);
+
   }
 
   getNumWorkers() {
@@ -168,6 +169,7 @@ export class OsServer {
   setDatapointsStatus(datapoints) {
     const vm = this;
     vm.datapointsStatus = datapoints;
+    vm.Project.setModified(true);
   }
 
   getDisabledButtons() {
@@ -396,6 +398,7 @@ export class OsServer {
           vm.$log.debug('ANALYSIS ID: ', analysis_id);
           deferred.resolve(analysis_id);
           vm.Project.setAnalysisID(analysis_id);
+          vm.Project.setModified(true);
 
         } else {
           // TODO: cleanup?
@@ -593,6 +596,7 @@ export class OsServer {
 
     vm.$q.all(promises).then(response => {
       deferred.resolve(vm.datapoints);
+      vm.Project.setModified(true);
     }, error => {
       vm.$log.debug('ERROR retrieving datapoints OSWs');
       deferred.reject(error);
@@ -641,6 +645,7 @@ export class OsServer {
           vm.$q.all(reportPromises).then(response => {
             // set downloaded_reports flag
             dp.downloaded_reports = true;
+            vm.Project.setModified(true);
 
             // if running locally, also download osm and results
             if (vm.Project.getRunType().name == 'local'){
@@ -674,6 +679,7 @@ export class OsServer {
     vm.$q.all(promises).then(response => {
       vm.$log.debug("Updated Datapoints with Reports: ", vm.datapoints);
       deferred.resolve(vm.datapoints);
+      vm.Project.setModified(true);
     }, error => {
       vm.$log.debug('ERROR retrieving datapoints JSONs: ', error);
       deferred.reject(error);
@@ -732,6 +738,7 @@ export class OsServer {
         //vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
         file.downloaded = true;
         datapoint.downloaded_results = true;
+        vm.Project.setModified(true);
         deferred.resolve();
       }, error => {
         vm.$log.debug('GET results zip error: ', error);
@@ -790,6 +797,7 @@ export class OsServer {
         vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
         file.downloaded = true;
         datapoint.downloaded_osm = true;
+        vm.Project.setModified(true);
         deferred.resolve();
       }, error => {
         vm.$log.debug('GET OSM error: ', error);
