@@ -39,8 +39,9 @@ export class AnalysisController {
 
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
-
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
+
+    vm.designAlternatives = vm.Project.getDesignAlternatives();
 
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
@@ -174,8 +175,26 @@ export class AnalysisController {
         }],
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.uid] = gridApi;
+          gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
+            if (newValue != oldValue) {
+              vm.$log.debug('CELL has changed in: ', measure.uid,  ' old val: ', oldValue, ' new val: ', newValue);
+              vm.$log.debug('rowEntity: ', rowEntity);
+              vm.updateDASelectedName(measure, oldValue, newValue);
+            }
+          });
         }
       };
+    });
+  }
+
+  // When an option's name changes, update DAs
+  // option dropdowns will auto-repopulate when navigating to DA tab
+  updateDASelectedName(measure, oldValue, newValue){
+    const vm = this;
+    _.forEach(vm.designAlternatives, (alt) => {
+      if (alt[measure.name] && alt[measure.name] == oldValue){
+        alt[measure.name] = newValue;
+      }
     });
   }
 
@@ -446,6 +465,7 @@ export class AnalysisController {
         measure.numberOfOptions = measure.numberOfOptions - 1;
       }
     });
+    
   }
 
   // Toggle all variable checkboxes
