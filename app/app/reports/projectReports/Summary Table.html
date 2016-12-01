@@ -6,23 +6,9 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width">
-  <!--TODO Make this css injection work (replace hard-coded CSS paths below)-->
-  <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
-  <!-- inject:bootstrap -->
-  <!-- bootstrap css files will be automatically insert here -->
-  <!-- endinject -->
-  <!-- bower:css -->
-  <!-- run `gulp inject` to automatically populate bower styles dependencies -->
-  <!-- endbower -->
-  <!-- endbuild -->
-
-  <!-- build:css({.tmp/serve,src}) styles/app.css -->
-  <!-- inject:css -->
-  <!-- css files will be automatically insert here -->
-  <!-- endinject -->
-  <!-- endbuild -->
-  <link rel="stylesheet" href="/app/bootstrap.css">
-  <link rel="stylesheet" href="/app/index.css">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js"></script>
 </head>
 <body>
 
@@ -57,15 +43,15 @@
           </ul>
         </td>
         <td>{{ baseline.eui | number:1}}</td>
-        <td>{{ baseline.peak_electric_demand_ip }}</td>
+        <td>{{ baseline.peak_electric_demand_ip | number:1}}</td>
         <td>{{ baseline.electricity_ip | number:1}}</td>
         <td>{{ baseline.natural_gas_ip | number:1}}</td>
         <td>{{ baseline.district_cooling_cooling_ip | number:1}}</td>
         <td>{{ baseline.district_heating_ip | number:1}}</td>
-        <td>{{ baseline.first_year_cap_cost }}</td>
-        <td>{{ baseline.ann_util_cost }}</td>
+        <td>{{ baseline.first_year_cap_cost | number:0}}</td>
+        <td>{{ baseline.ann_util_cost | number:0}}</td>
         <td></td>
-        <td>{{ baseline.total_lcc }}</td>
+        <td>{{ baseline.total_lcc | number:0}}</td>
       </tr>
       <tr>
         <th>Name</th>
@@ -178,7 +164,7 @@
         // Set the energy results properties of each run
         _.forEach($scope.results, function (run) {
           // Get the openstudio reporting measure, which contains the results
-          var reportMeasure = _.find(run.steps, {'name': "open_studio_results"});
+          var reportMeasure = _.find(run.steps, {'name': "openstudio_results"});
           if (!reportMeasure) {
             renderErrs.push("Could not find the OpenStudio reports measure in " + run.name);
             return;
@@ -201,7 +187,7 @@
           run.eui = _.find(vals, {'name': "eui"}).value;
 
           // Peak Electric Demand
-          run.peak_electric_demand_ip = "TODO kW";
+          run.peak_electric_demand_ip = _.find(vals, {'name': "annual_peak_electric_demand"}).value;
 
           // Electricity Consumption
           run.electricity_ip = _.find(vals, {'name': "electricity_ip"}).value;
@@ -216,13 +202,13 @@
           run.district_heating_ip = _.find(vals, {'name': "district_heating_ip"}).value;
 
           // First Year Capital Cost
-          run.first_year_cap_cost = "TODO Cap $";
+          run.first_year_cap_cost = _.find(vals, {'name': "first_year_capital_cost"}).value;
 
           // Annual Utility Cost
-          run.ann_util_cost = "TODO Util $";
+          run.ann_util_cost = _.find(vals, {'name': "annual_utility_cost"}).value;
 
           // Total LCC
-          run.total_lcc = "TODO LCC";
+          run.total_lcc = _.find(vals, {'name': "total_lifecycle_cost"}).value;
 
         });
 
