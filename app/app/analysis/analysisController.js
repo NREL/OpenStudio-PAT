@@ -187,17 +187,6 @@ export class AnalysisController {
     });
   }
 
-  // When an option's name changes, update DAs
-  // option dropdowns will auto-repopulate when navigating to DA tab
-  updateDASelectedName(measure, oldValue, newValue){
-    const vm = this;
-    _.forEach(vm.designAlternatives, (alt) => {
-      if (alt[measure.name] && alt[measure.name] == oldValue){
-        alt[measure.name] = newValue;
-      }
-    });
-  }
-
   setAlgorithmicGridOptions() {
     const vm = this;
 
@@ -317,20 +306,41 @@ export class AnalysisController {
     });
   }
 
-  // update the alternatives
-  updateAlternatives(key) {
-    // Delete a measure
+  // update the alternatives when a measure is deleted
+  updateAlternatives(measureName) {
     const vm = this;
     vm.setIsModified();
-    let alternatives = vm.Project.getDesignAlternatives();
-    vm.$log.debug('key: ', key);
-    vm.$log.debug('alternatives: ', alternatives);
-    _.forEach(alternatives, (alternative) => {
-     delete alternative[key];
+    _.forEach(vm.designAlternatives, (alt) => {
+     delete alt[measureName];
     });
-    vm.$log.debug('alternatives: ', alternatives);
-    //vm.Project.setDesignAlternatives(alternatives);
-    vm.DesignAlternativesController.setGridOptions();
+  }
+
+  // When an option's name changes, update DAs
+  // option dropdowns will auto-repopulate when navigating to DA tab
+  updateDASelectedName(measure, oldValue, newValue){
+    const vm = this;
+    _.forEach(vm.designAlternatives, (alt) => {
+      if (alt[measure.name] && alt[measure.name] == oldValue){
+        alt[measure.name] = newValue;
+      }
+    });
+  }
+
+  // When an option is deleted, reset DAs that were using the option
+  unsetOptionInDA(measureUID, value){
+    const vm = this;
+    vm.$log.debug('In Analysis::unsetOptionInDA');
+    vm.$log.debug('DAs: ', vm.designAlternatives);
+    vm.$log.debug('measureUID: ', measureUID, ' optionName: ', value);
+    const measure = _.find(vm.$scope.measures, {uid: measureUID});
+    vm.$log.debug('measure: ', measure);
+    if (measure){
+      _.forEach(vm.designAlternatives, (alt) => {
+        if (alt[measure.name] && alt[measure.name] == value){
+          alt[measure.name] = 'None';
+        }
+      });
+    }
   }
 
   setNewAlternativeDefaults() {
@@ -443,6 +453,10 @@ export class AnalysisController {
     const measureUID = col.colDef.measureUID;
     vm.$log.debug('measureUID: ', measureUID);
 
+    // get option name before deleting it
+    vm.$log.debug('OPTION NAME? ', col.grid.options.data[1][col.name]);
+    const optionName = col.grid.options.data[1][col.name];
+
     let columnIndex = 0;
     _.forEach((vm.$scope.gridOptions[measureUID]).columnDefs, (columnDef) => {
       if (_.has(columnDef, 'field')) {
@@ -465,7 +479,8 @@ export class AnalysisController {
         measure.numberOfOptions = measure.numberOfOptions - 1;
       }
     });
-    
+    // reset DAs that were using this option
+    vm.unsetOptionInDA(measureUID, optionName);
   }
 
   // Toggle all variable checkboxes
@@ -540,6 +555,7 @@ export class AnalysisController {
       const opt = vm.getDefaultOptionColDef();
       opt.display_name = _.startCase(option.id);
       opt.field = option.id;
+      opt.measureUID = measure.uid;  // explicitly set this just in case
       vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
     } else {
       vm.$log.error('option id does not match expected format (option_<ID>)');
