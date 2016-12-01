@@ -306,47 +306,12 @@ export class AnalysisController {
     let alternatives = vm.Project.getDesignAlternatives();
     vm.$log.debug('key: ', key);
     vm.$log.debug('alternatives: ', alternatives);
-    //_.forEach(alternatives, (alternative) => {
-    //  delete alternative[key];
-    //});
-    //vm.$log.debug('alternatives: ', alternatives);
-    ////vm.Project.setDesignAlternatives(alternatives);
-    //vm.DesignAlternativesController.setGridOptions();
-  }
-
-  // update the alternatives
-  updateAlternatives2(key) {
-    // Delete an option
-    const vm = this;
-    vm.setIsModified();
-    let alternatives = vm.Project.getDesignAlternatives();
-    vm.$log.debug('key: ', key);
-    vm.$log.debug('alternatives: ', alternatives);
     _.forEach(alternatives, (alternative) => {
-      delete alternative[key];
+     delete alternative[key];
     });
     vm.$log.debug('alternatives: ', alternatives);
     //vm.Project.setDesignAlternatives(alternatives);
     vm.DesignAlternativesController.setGridOptions();
-  }
-
-  // update the alternatives
-  updateAlternativesDeletedMeasure() {
-    const vm = this;
-    vm.setIsModified();
-    _.forEach(vm.measures, (measure) => {
-      _.forEach(measure.options, (option) => {
-        const newAlt = vm.setNewAlternativeDefaults();
-        _.forEach(vm.measures, (m) => {
-          if (m.name == measure.name) {
-            newAlt[m.name] = option.name;
-          } else {
-            newAlt[m.name] = 'None';
-          }
-        });
-        vm.$scope.alternatives.push(newAlt);
-      });
-    });
   }
 
   setNewAlternativeDefaults() {
@@ -370,8 +335,6 @@ export class AnalysisController {
     // TODO: fix so BCL modal doesn't restore deleted panels
     _.remove(vm.$scope.measures, {uid: measure.uid});
     vm.Project.setMeasuresAndOptions(vm.$scope.measures);
-
-    //vm.updateAlternativesDeletedMeasure();
 
     const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.uid + '"]'));
     measurePanel.remove();
