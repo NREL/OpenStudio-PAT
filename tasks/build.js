@@ -27,7 +27,6 @@ gulp.task('background', ['scripts'], function () {
 
 gulp.task('preload', ['scripts'], function () {
   gulp.src(path.join(conf.paths.src, '/app/reports/preload.js'))
-    .pipe($.uglify()).on('error', () => {})
     .pipe(gulp.dest(path.join(conf.paths.dist, '/scripts')));
 });
 
