@@ -22,6 +22,7 @@ export class DesignAlternativesController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
     vm.$scope.alternatives = vm.Project.getDesignAlternatives();
+
     vm.$scope.gridOptions = [];
     vm.setGridOptions();
 
@@ -110,7 +111,7 @@ export class DesignAlternativesController {
       }
     };
 
-    // add measure columns
+    // add measure columns (in order)
     //vm.$log.info('DesignAlternativesController constructor measures: ', vm.measures);
     _.forEach(vm.measures, (measure) => {
       const optionsArr = vm.setOptionsArray(measure);
@@ -123,6 +124,13 @@ export class DesignAlternativesController {
         editDropdownIdLabel: 'name',
         editDropdownValueLabel: 'name',
         editDropdownOptionsArray: optionsArr
+      });
+
+      // also ensure that options have this measure's key in it (to fix blanks on older projects)
+      _.forEach(vm.$scope.alternatives, (alt) => {
+        if (!alt[measure.name] || alt[measure.name] == ''){
+          alt[measure.name] = 'None';
+        }
       });
     });
   }
@@ -165,16 +173,6 @@ export class DesignAlternativesController {
       vm.$scope.alternatives[index + 1] = alternative;
       vm.$scope.alternatives[index] = temp;
     }
-  }
-
-  // update the alternatives
-  updateAlternatives(key) {
-    const vm = this;
-    vm.setIsModified();
-    let alternatives = vm.Project.getDesignAlternatives();
-
-    _.remove(alternatives, alternative => alternative[key] != 'None');
-    vm.Project.setDesignAlternatives(alternatives);
   }
 
   // create an alternative for each measure option

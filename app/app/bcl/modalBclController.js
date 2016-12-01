@@ -52,6 +52,7 @@ export class ModalBclController {
 
     // get project measures
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
+    vm.designAlternatives = vm.Project.getDesignAlternatives();
     vm.$log.debug('Project Measures(): ', vm.projectMeasures);
 
     // get measures array for Library display
@@ -370,6 +371,7 @@ export class ModalBclController {
     const measure = _.find(vm.$scope.displayMeasures, {uid: rowEntity.uid});
 
     vm.addToProject(measure);
+    vm.setMeasureInExistingDAs(measure);
     vm.$log.debug('Adding the following measure to project: ', measure);
     vm.$log.debug('New project measures array: ', vm.projectMeasures);
   }
@@ -393,6 +395,15 @@ export class ModalBclController {
 
     //vm.projectMeasures.push(project_measure);
     vm.insertIntoProjectMeasuresArray(project_measure);
+  }
+
+  setMeasureInExistingDAs(measure){
+    const vm = this;
+
+    _.forEach(vm.designAlternatives, (alt) => {
+      alt[measure.name] = 'None';
+    });
+
   }
 
   insertIntoProjectMeasuresArray(project_measure) {
