@@ -537,7 +537,9 @@ export class RunController {
   clearAllDatapoints() {
     const vm = this;
     vm.$log.debug('In clear ALL Datapoints');
-    // TODO:  also clear files from localResults folder?
+    // force delete everything in localResults folder in case there is leftover junk not associated with current datapoints
+    vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
+
     vm.Project.setDatapoints([]);
     vm.$scope.datapoints = vm.Project.getDatapoints();
   }
