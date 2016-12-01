@@ -31,11 +31,8 @@ export class ReportsController {
 
     // Find all possible reports
     var html_reports = [];
-    if (vm.env.name == 'production') {
-      console.log('preloadPath', vm.$scope.preloadPath);
-      console.log('getAppPath', app.getAppPath());
-      console.log('dirname', __dirname);
-
+    // TODO figure out why vm.env does not seem to be defined in development
+    if (vm.env && (vm.env.name == 'production')) {
       html_reports = vm.jetpack.find(`${app.getAppPath()}/../projectReports`, {matching: '*.html'});
     } else {
       html_reports = vm.jetpack.find('app/app/reports/projectReports', {matching: '*.html'});
