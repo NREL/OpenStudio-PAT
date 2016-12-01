@@ -14,6 +14,17 @@ export class ServerController {
     vm.serverURL = vm.OsServer.getSelectedServerURL();
     vm.safeURL = vm.$sce.trustAsResourceUrl(vm.serverURL);
 
+    //uncomment to open webview devtools
+    //vm.openWebViewDevTools();
+
+  }
+
+  openWebViewDevTools() {
+    var wv = document.getElementById('wv');
+    wv.addEventListener('dom-ready', function () {
+      console.log('Opening the dev tools for the webview.');
+      wv.openDevTools();
+    });
   }
 
 }

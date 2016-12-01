@@ -11,6 +11,14 @@
 </div>
 <div ng-show="server.serverStatus =='started'" class="row">
   <div class="col-md-12">
-    <iframe ng-src="{{server.safeURL}}" class="server-frame"></iframe>
+    <!--<iframe ng-src="{{server.safeURL}}" class="server-frame"></iframe>-->
+    <webview id="wv"
+             autosize="on"
+             src="{{server.safeURL}}"
+             style="height:calc(100vh - 150px)"
+             allowpopups
+             useragent="Mozilla/5.0 (Windows NT 6.1; WOW64; Trident/7.0; AS; rv:11.0) like Gecko"
+             webpreferences="allowDisplayingInsecureContent=true">
+    </webview>
   </div>
 </div>
