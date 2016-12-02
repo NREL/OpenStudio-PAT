@@ -621,6 +621,12 @@ export class AnalysisController {
       vm.Project.setSeeds();
       vm.$scope.seeds = vm.Project.getSeeds();
       vm.$scope.defaultSeed = seedModelFilename;
+      vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
+      _.forEach(vm.$scope.measures, (measure) => {
+        measure.seed = vm.$scope.defaultSeed;
+      });
+      // recompute model-dependent measure arguments when resetting seed
+      vm.Project.computeAllMeasureArguments();
     }
   }
 
@@ -648,6 +654,7 @@ export class AnalysisController {
       vm.Project.setWeatherFiles();
       vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
       vm.$scope.defaultWeatherFile = weatherFilename;
+      vm.Project.setDefaultWeatherFile(vm.$scope.defaultWeatherFile);
     }
   }
 
