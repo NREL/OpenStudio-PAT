@@ -60,12 +60,16 @@ export class RunController {
     // don't show skipped measures in datapoint accordion
     vm.$scope.filterSkipped = function (item) {
       let isSkipped = false;
-      _.forEach(item.arguments, (arg) => {
-        if (arg['__SKIP__']) {
-          vm.$log.debug('**Found SKIP argument in item: ', item);
-          isSkipped = true;
+      let firstArg = undefined;
+      if (item.arguments){
+        if (_.find(_.keys(item.arguments)), '__SKIP__'){
+          // found a skip..is it TRUE?
+          if (item.arguments['__SKIP__'] == true){
+            vm.$log.debug('Found SKIP=true in item: ', item);
+            isSkipped = true;
+          }
         }
-      });
+      }
       return !isSkipped;
     };
 
