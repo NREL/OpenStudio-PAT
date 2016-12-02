@@ -31,6 +31,7 @@ export class OsServer {
 
     vm.serverStatuses = {local:'stopped', remote:'stopped'};  // started, stopped, error?
     vm.analysisStatus = '';  // '', started, in progress, completed, error
+    vm.analysisRunningFlag = false;
     vm.progress = {amount: 0, message: ''};
     vm.isDone = true;
     vm.analysisChangedFlag = false;
@@ -158,6 +159,16 @@ export class OsServer {
   setAnalysisChangedFlag(flag){
     const vm = this;
     vm.analysisChangedFlag = flag;
+  }
+
+  setAnalysisRunningFlag(flag){
+    const vm = this;
+    vm.analysisRunningFlag = flag;
+  }
+
+  getAnalysisRunningFlag(){
+    const vm = this;
+    return vm.analysisRunningFlag;
   }
 
   // short analysis status

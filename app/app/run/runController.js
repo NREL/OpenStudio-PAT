@@ -364,6 +364,8 @@ export class RunController {
     vm.$log.debug('***** In runController::runEntireWorkflow() ready to start server *****');
 
     vm.OsServer.startServer().then(response => {
+
+      vm.OsServer.setAnalysisRunningFlag(true);
       vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
       vm.$log.debug('Start Server response: ', response);
 
@@ -449,6 +451,7 @@ export class RunController {
         vm.$log.debug('ANALYSIS NOT STARTED, ERROR: ', response);
         vm.OsServer.setAnalysisStatus('error');
         vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+        vm.OsServer.setAnalysisRunningFlag(false);
         vm.toggleButtons();
 
       });
@@ -458,6 +461,7 @@ export class RunController {
       vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
       vm.OsServer.setAnalysisStatus('');
       vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+      vm.OsServer.setAnalysisRunningFlag(false);
       vm.toggleButtons();
 
     });
@@ -475,11 +479,12 @@ export class RunController {
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
     // toggle button back to 'run' when done
-    // TODO: show status as 'COMPLETED' (once it actually is)
     vm.OsServer.setProgress(100, 'Analysis ' + status);
 
     vm.OsServer.setDisabledButtons(false);
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
+
+    vm.OsServer.setAnalysisRunningFlag(false);
 
   }
 
