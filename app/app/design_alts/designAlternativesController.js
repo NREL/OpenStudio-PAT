@@ -198,11 +198,52 @@ export class DesignAlternativesController {
 
   duplicateAlternative() {
     const vm = this;
-    vm.setIsModified();
-    const dupAlt = angular.copy(vm.selected);
-    delete dupAlt.$$hashKey;
-    dupAlt.name = dupAlt.name + ' Duplicate';
-    vm.$scope.alternatives.push(dupAlt);
+    vm.$log.debug('In DesignAlternatives::duplicateAlternative');
+    if (vm.selected){
+      vm.setIsModified();
+      const dupAlt = angular.copy(vm.selected);
+      delete dupAlt.$$hashKey;
+      // find new name
+      dupAlt.name = vm.findNextName(dupAlt.name);
+      vm.$scope.alternatives.push(dupAlt);
+    } else {
+      vm.$log.error('No Alternative Selected.  Cannot Duplicate.');
+    }
+
+  }
+
+  findNextName(name){
+    const vm = this;
+    let newName = name + ' Duplicate';
+    const matchArr = [];
+    _.forEach(vm.$scope.alternatives, (alt) => {
+      if (_.includes(alt.name, newName)){
+        matchArr.push(alt.name);
+      }
+    });
+    if (matchArr.length > 0) {
+      // found at least a match.  find next available number
+      const newMatchArr = [];
+      _.forEach(matchArr, (match) => {
+        let newMatch = _.trim(match.replace(newName, ''));
+        //vm.$log.debug('match after: ', newMatch);
+        if (_.isNumber(_.toNumber(newMatch))){
+          //vm.$log.debug('match is a number');
+          newMatchArr.push(_.toNumber(newMatch));
+        }
+      });
+      vm.$log.debug('New matchArr: ', newMatchArr);
+      if (newMatchArr.length > 0){
+        // find max and add 1
+        newName = newName + ' ' + (_.max(newMatchArr) + 1);
+      } else {
+        newName = newName + ' 1';
+      }
+    } else {
+      newName = newName + ' 1';
+    }
+    vm.$log.debug("newName: ", newName);
+    return newName;
   }
 
   setNewAlternativeDefaults() {
