@@ -619,6 +619,7 @@ export class AnalysisController {
       vm.$log.debug('Seed Model name: ', seedModelFilename);
       // update seeds
       vm.Project.setSeeds();
+      vm.Project.setSeedsDropdownOptions();
       vm.$scope.seeds = vm.Project.getSeeds();
       vm.$scope.defaultSeed = seedModelFilename;
       vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
@@ -652,6 +653,7 @@ export class AnalysisController {
       vm.$log.debug('Weather file name: ', weatherFilename);
       // update seeds
       vm.Project.setWeatherFiles();
+      vm.Project.setWeatherFilesDropdownOptions();
       vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
       vm.$scope.defaultWeatherFile = weatherFilename;
       vm.Project.setDefaultWeatherFile(vm.$scope.defaultWeatherFile);
