@@ -3,18 +3,18 @@
 </div>
 
 <div class="modal-body">
-  <div>
-    <h4 class="modal-title" translate>projectName.heading</h4>
+  <div class="row pad-bot-10">
+    <div class="col-sm-4"><label class="modal-text"><translate>projectName.heading</translate></label></div>
+    <div class="col-sm-8"><input type="text" ng-model="name" size="50" class="modal-text"></div>
   </div>
-  <div>
-    <input type="text" name="projectName" ng-model="name" required>
-    <div>
-      <h5 class="modal-title" translate>projectName.blurb</h5>
+  <div class="row pad-bot-20">
+    <div class="col-sm-12 modal-text">
+      <translate>projectName.blurb</translate>
     </div>
   </div>
 
   <div class="modal-footer">
     <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>Continue</button>
-    <button type="button" class="btn btn-primary" ng-click="modal.cancel()" translate>Cancel</button>
+    <button type="button" class="btn btn-warning" ng-click="modal.cancel()" translate>Cancel</button>
   </div>
 </div>

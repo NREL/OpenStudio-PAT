@@ -70,9 +70,9 @@ export class Project {
     vm.seedDir = null;
     vm.weatherDir = null;
     vm.seeds = [];
-    vm.defaultSeed = null;
+    vm.defaultSeed = 'None';
     vm.weatherFiles = [];
-    vm.defaultWeatherFile = null;
+    vm.defaultWeatherFile = 'None';
     vm.algorithmSettings = [];
     vm.measures = [];
     vm.designAlternatives = [];
@@ -98,8 +98,8 @@ export class Project {
     vm.weatherFiles = [];
     vm.setSeeds();
     vm.setWeatherFiles();
-    vm.defaultSeed = vm.seeds.length > 0 ? vm.seeds[0] : null;
-    vm.defaultWeatherFile = vm.weatherFiles.length > 0 ? vm.weatherFiles[0] : null;
+    vm.defaultSeed = vm.seeds.length > 0 ? vm.seeds[0] : 'None';
+    vm.defaultWeatherFile = vm.weatherFiles.length > 0 ? vm.weatherFiles[0] : 'None';
     vm.seedsDropdownArr = [];
     vm.weatherFilesDropdownArr = [];
     vm.setSeedsDropdownOptions();
@@ -1400,6 +1400,7 @@ export class Project {
 
   setSeeds() {
     const vm = this;
+
     if (angular.isDefined(vm.seedDir)) {
       if (vm.jetpack.exists(vm.seedDir.cwd())) {
         vm.seeds = vm.seedDir.find('.', {matching: '*.osm'}, 'relativePath');
@@ -1434,6 +1435,7 @@ export class Project {
     const vm = this;
     vm.seedsDropdownArr = [];
     vm.setSeeds();
+    vm.seedsDropdownArr.push({id:'none', name: 'None'});
     _.forEach(vm.seeds, (seed) => {
       vm.seedsDropdownArr.push({id: seed, name: seed});
     });
@@ -1444,6 +1446,7 @@ export class Project {
     const vm = this;
     vm.weatherFilesDropdownArr = [];
     vm.setWeatherFiles();
+    vm.weatherFilesDropdownArr.push({id: 'none', name: 'None'});
     _.forEach(vm.weatherFiles, (weather) => {
       vm.weatherFilesDropdownArr.push({id: weather, name: weather});
     });

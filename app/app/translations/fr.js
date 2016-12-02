@@ -19,9 +19,9 @@ export default {
     existing: 'Open Existing Project'
   },
   projectName: {
-    title: 'ParametricAnalysisTool',
-    heading: 'Enter New Project Name',
-    blurb: 'Enter the name for your new project, this will be the name of the directory containing your project. In the next step you will choose the location for your new project folder.'
+    title: 'New Project',
+    heading: 'New Project Name',
+    blurb: 'This will be the name of the directory containing your project. In the next step, you will choose the location for your new project folder.'
   },
   analysis: {
     title: 'Contr�leur d\'Analyse',
