@@ -19,6 +19,10 @@
 
     <h1>End Use Comparison</h1>
 
+    <ul>
+      <li class="alert alert-warning" ng-repeat="warn in renderWarns">{{ warn }}</li>
+    </ul>
+
     <h2>Electricity Consumption (kWh)</h2>
 
     <d3ng-stackedenduse data="elecEndUseData"></d3ng-stackedenduse>
@@ -44,14 +48,16 @@
     $scope.gasEndUseData = [];
     console.debug('In the controller');
 
+    // Show any issues
+    $scope.renderWarns = [];
+
     // Set up some additional data properties after the results
     // are passed in.
     $scope.setupAfterResultsAvailable = function () {
 
-      console.debug('In setupAfterResultsAvailable');
+      var renderWarns = [];
 
-      // Record any errors
-      var renderErrs = [];
+      console.debug('In setupAfterResultsAvailable');
 
       // Populate arrays of data for electricity and gas by end use
       var fuels = ['end_use_electricity_', 'end_use_natural_gas_'];
@@ -76,23 +82,29 @@
         var newData = [];
         _.forEach($scope.results, function (run) {
           // Get the openstudio reporting measure, which contains the results
-          var reportMeasure = _.find(run.steps, {'name': "openstudio_results"});
+          var reportMeasure = _.find(run.steps, {'measure_dir_name': "OpenStudio Results"});
           if (!reportMeasure) {
-            renderErrs.push("Could not find the OpenStudio reports measure in " + run.name);
+            renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
             return;
           }
 
-          // Make sure the reeults exist
+          // Make sure the results exist
+          if (!reportMeasure.hasOwnProperty('result')){
+            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+            return;
+          }
+
+          // Make sure the results have data
           var vals = reportMeasure.result.step_values;
           console.log(vals);
           if (vals.length == 0){
-            renderErrs.push("The OpenStudio reports measure was not run for " + run.name);
+            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
             return;
           }
 
           // Make sure the EUI element exists to ensure measure was run
           if (!_.find(vals, {'name': "eui"})) {
-            renderErrs.push("The OpenStudio reports measure was not run for " + run.name);
+            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
             return;
           }
 
@@ -126,11 +138,8 @@
 
       });
 
-      // Show any errors
-      if (renderErrs.length > 0) {
-        window.alert("There were errors:\n" + renderErrs.join('\n'));
-      }
-
+      // Show a unique set of warnings
+      $scope.renderWarns = _.uniq(renderWarns);
 
     };
 
@@ -293,6 +302,17 @@
       }
     }
   });
+
+  // set $scope.reportDir element in the report's controller from PAT project directory
+  function setReportDir(reportDir) {
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    console.log("Inside setReportDir");
+    $scope.$apply(function () {
+      console.log("reportDir = " + reportDir);
+      $scope.reportDir = reportDir;
+    });
+  }
 
   // set $scope.results element in the controller above from PAT data
   function setData(data) {

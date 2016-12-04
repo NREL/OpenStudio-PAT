@@ -1,5 +1,6 @@
 import jetpack from 'fs-jetpack';
 import os from 'os';
+import path from 'path';
 import {remote} from 'electron';
 import env from '../../env';
 
@@ -17,7 +18,8 @@ export class ReportsController {
     vm.Project = Project;
     vm.env = env;
     vm.preloadPath = 'file://';
-    vm.reportDir = os.homedir() + '/Openstudio/PAT/Project_Reporting_Measures';
+    vm.reportDir = Project.getProjectDir();
+    vm.reportDirPath = path.resolve(vm.reportDir.path());
 
     // data to pass to preloader script
     vm.$scope.datapoints = vm.Project.getDatapoints();
@@ -42,7 +44,7 @@ export class ReportsController {
     vm.$scope.projectReports = [];
     _.forEach(html_reports, function (html_report) {
       var report = {};
-      if (vm.os.platform() == 'win32'){
+      if (vm.os.platform() == 'win32') {
         report.name = html_report.split('\\').pop().replace('.html', '');
         report.url = html_report.replace('app\\app\\', 'app\\');//).replace("\\","/");
       } else {
@@ -56,12 +58,19 @@ export class ReportsController {
     });
 
     var wv = angular.element(document.getElementById('wv'));
-    wv.attr('preload',vm.$scope.preloadPath);
+    wv.attr('preload', vm.$scope.preloadPath);
 
-    // Set the default project report to the first one found
-    vm.$scope.selectedReportName = vm.$scope.projectReports[0].name;
-    vm.$scope.selectedReportURL = vm.$scope.projectReports[0].url;
-    wv.attr('src',vm.$scope.selectedReportURL);
+    // Set the default project report to the summary table
+    if (_.find(vm.$scope.projectReports, {name: "Summary Table"})) {
+      var defReport = _.find(vm.$scope.projectReports, {name: "Summary Table"});
+      vm.$scope.selectedReportName = defReport.name;
+      vm.$scope.selectedReportURL = defReport.url;
+      wv.attr('src', vm.$scope.selectedReportURL);
+    } else {
+      vm.$scope.selectedReportName = vm.$scope.projectReports[0].name;
+      vm.$scope.selectedReportURL = vm.$scope.projectReports[0].url;
+      wv.attr('src', vm.$scope.selectedReportURL);
+    }
 
     // Update the selected report
     $scope.updateSelectedReport = function (newReportName) {
@@ -70,7 +79,7 @@ export class ReportsController {
           vm.$scope.selectedReportName = report.name;
           vm.$scope.selectedReportURL = report.url;
 
-      	  wv.attr('src',vm.$scope.selectedReportURL);
+          wv.attr('src', vm.$scope.selectedReportURL);
         }
       });
       //pass data into webview when dom is ready
@@ -103,7 +112,7 @@ export class ReportsController {
   passData() {
     const vm = this;
     var wv = document.getElementById('wv');
-    wv.executeJavaScript(`setReportDir(${JSON.stringify(vm.reportDir)});`);
+    wv.executeJavaScript(`setReportDir(${JSON.stringify(vm.reportDirPath)});`);
     wv.executeJavaScript(`setData(${JSON.stringify(vm.testResults)});`);
   }
 

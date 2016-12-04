@@ -122,12 +122,9 @@
       path = require('path');
       os = require('os');
 
-      // Store a list of errors in exporting
-      var exportErrs = [];
-
       // Update the save location when the input changes
       $scope.updateResultsFilePath = function () {
-        $scope.results_file_path = $scope.reportDir + "/" + $scope.results_file_name + ".xml";
+        $scope.results_file_path = path.resolve($scope.reportDir + "/" + $scope.results_file_name + ".xml");
       };
 
       // Create variables for the baseline types
@@ -150,19 +147,19 @@
         _.forEach($scope.results, function (run) {
           $scope.numAlts += 1;
           _.forEach(run.steps, function (step) {
-            var namePlusArgs = step.name + JSON.stringify(step.arguments);
-            step.namePlusArgs = namePlusArgs;
-            if ($scope.measureCounts[namePlusArgs]) {
-              $scope.measureCounts[namePlusArgs] += 1;
+            var idPlusArgs = step.measure_id + JSON.stringify(step.arguments);
+            step.idPlusArgs = idPlusArgs;
+            if ($scope.measureCounts[idPlusArgs]) {
+              $scope.measureCounts[idPlusArgs] += 1;
             } else {
-              $scope.measureCounts[namePlusArgs] = 1;
+              $scope.measureCounts[idPlusArgs] = 1;
             }
           });
         });
-        console.info("There are results for " + $scope.numAlts + " runs");
+        console.info("There are results for " + $scope.numAlts + " design alternatives");
 
         // Set the measure_names property of each run
-        console.info("Setting list of Measure names for each run");
+        console.info("Setting list of Measure names for each design alternative");
         _.forEach($scope.results, function (run) {
           run.measure_names = measureNames(run, $scope.measureCounts, $scope.numAlts);
           console.log(run.name + " measures: " + run.measure_names.join(', '));
@@ -207,6 +204,15 @@
         console.log("Measure Counts:");
         console.log($scope.measureCounts);
 
+        // Store a list of warnings and errors in exporting
+        var exportWarnings = [];
+        var exportErrs = [];
+
+        // Make sure there is an EDA baseline selected
+        if ($scope.eda_baseline == "") {
+          exportErrs.push('EDA Baseline cannot be blank.')
+        }
+
         // analysis
         var analysis = {};
         analysis.simulation_software = "OpenStudio";
@@ -221,9 +227,8 @@
             return;
           }
 
-          console.log("Run " + run.name);
+          console.info("Exporting:" + run.name);
           var alt = {};
-          alts.push(alt);
 
           // name
           alt.name = run.name;
@@ -247,10 +252,9 @@
           // description
           alt.description = run.description;
 
-          // TODO characteristics
+          // characteristics
           var chars = {};
           chars.building = {};
-          chars.building.floor_area = 999.99;
           alt.characteristics = chars;
 
           // find all measures that are in this alternative
@@ -258,7 +262,8 @@
           _(run.steps).forEach(function (step) {
 
             // skip measures that were set to "none"
-            if (!step.arguments.__SKIP__){
+            // (which sets __SKIP__ argument to true)
+            if (step.arguments.__SKIP__) {
               console.log("Not including " + step.name + " because it was skipped.");
               return;
             }
@@ -270,7 +275,7 @@
             }
 
             // skip always-run measures
-            if ($scope.measureCounts[step.namePlusArgs] == $scope.numAlts) {
+            if ($scope.measureCounts[step.idPlusArgs] == $scope.numAlts) {
               console.log("Not including " + step.name + " because it is an always-run Measure.");
               return;
             }
@@ -284,10 +289,10 @@
             var measure = {};
             measure.name = step.name;
             measure.id = step.measure_id;
-            measure.category = "Envelope.Opaque"; // TODO step.taxonomy;
+            measure.category = step.taxonomy;
             measure.description = step.description;
-            measure.initial_condition = step.result.initial_condition;
-            measure.final_condition = step.result.final_condition;
+            measure.initial_condition = step.result.step_initial_condition;
+            measure.final_condition = step.result.step_final_condition;
             measures.push(measure);
           });
           alt.measures = measures;
@@ -309,7 +314,7 @@
             if (step.hasOwnProperty('result')) {
               if (_.find(step.result.step_values, {'name': "cash_flows_capital_type"})) {
                 reportMeasure = step;
-                console.log("EDAPT Measure is: " + reportMeasure.name);
+                console.log("EDAPT Export measure is: " + reportMeasure.name);
                 return;
               }
             }
@@ -318,12 +323,21 @@
 
           // If the report measure is not found, throw a warning.
           if (!reportMeasure) {
-            exportErrs.push("No EDAPT Export measure was run for " + alt.name + ", this run will not be included in the EDAPT export.");
-            console.log("No EDAPT Export measure was run for " + alt.name + ", this run will not be included in the EDAPT export.");
+            exportWarnings.push("No EDAPT Export measure was included in " + alt.name + ", it will not be included in the EDAPT XML report.");
+            console.log("No EDAPT Export measure was included in " + alt.name + ", it run will not be included in the EDAPT XML report.");
             return;
           }
 
           var vals = reportMeasure.result.step_values;
+
+          // characteristics (cont'd)
+          var flrArea = _.find(vals, {'name': "charsfloor_area"});
+          if (flrArea) {
+            chars.building.floor_area = flrArea.value;
+          } else {
+            exportErrors.push("Could not find the building area for " + alt.name + ", it will not be reported correctly in the EDAPT XML report.");
+            chars.building.floor_area = 999.99;
+          }
 
           // define the fuel types and end uses
           const cashFlowTypes = ["Capital", "Operating", "Energy", "Water", "Total"];
@@ -454,6 +468,47 @@
           });
           alt.results.monthly.demand = monthlyDemand;
 
+          // checks
+          alt.checks = [];
+
+          // find all the unique IDs of the qaqc checks
+          qaqcIDs = [];
+          _(vals).forEach(function (val) {
+            if (val.name.includes('qaqc_name_')){
+              qaqcIDs.push(val.name.replace('qaqc_name_',''));
+            }
+          });
+
+          _(_.uniq(qaqcIDs)).forEach(function (uid) {
+            check = {};
+            // check name
+            var checkName = _.find(vals, {'name': 'qaqc_name_' + uid});
+            if (checkName) {
+              check.name = checkName.value;
+            }
+            // check category
+            var checkCat = _.find(vals, {'name': 'qaqc_cat_' + uid});
+            if (checkCat) {
+              check.category = checkCat.value;
+            }
+            // check description
+            var checkDesc = _.find(vals, {'name': 'qaqc_desc_' + uid});
+            if (checkDesc) {
+              check.description = checkDesc.value;
+            }
+            // check flags
+            checkFlags = [];
+            _(vals).forEach(function (val) {
+              if (val.name.includes('qaqc_flag_' + uid)){
+                checkFlags.push(val.value);
+              }
+            });
+            check.flag = checkFlags;
+            alt.checks.push(check);
+          });
+
+          alts.push(alt);
+
         });
         analysis.alternatives = alts;
 
@@ -462,30 +517,27 @@
             cash_flows: "cash_flow",
             values: "year",
             measures: "measure",
-            alternatives: "alternative"
+            alternatives: "alternative",
+            checks: "check"
           }
         };
 
-        // Show any errors
-        if (exportErrs.length > 0) {
-          window.alert("There were errors on export:\n" + exportErrs.join('\n'));
+        // Show any warnings and errors
+        if (exportErrs.length > 0 || exportWarnings.length > 0) {
+          window.alert("Errors:\n" + exportErrs.join('\n') + "\nWarnings:\n" + exportWarnings.join('\n'));
         }
 
-        // TODO Zip the file too
-        // TODO show a success/fail message
+        // Do not export the XML if there were errors
+        if (exportErrs.length > 0) {
+          return;
+        }
 
         // Parse the JSON to XML
         var xmlText = js2xmlparser("analysis", analysis, options);
 
-        // TODO Add the timestamp to the filename
-        //var nonWord = new RegExp("\W+","g");
-        //var timestamp = new Date().toLocaleString()
-        //console.log(timestamp);
-        //timestamp = timestamp.replace('/', '_').replace(',', '_').replace(':', '_').replace(' ', '_');
-        //console.log(timestamp);
-        //var save_path = $scope.results_file_path + "_" + timestamp;
         var save_path = $scope.results_file_path;
 
+        // TODO Zip the file if possible
         fs.writeFile(save_path, xmlText, function (err) {
           if (err) {
             return console.log(err);
@@ -518,7 +570,7 @@
       }
 
       // skip always-run measures
-      if (measureCounts[step.namePlusArgs] == numAlts) {
+      if (measureCounts[step.idPlusArgs] == numAlts) {
         console.log("Not including " + step.name + " because it is an always-run Measure.");
         return;
       }

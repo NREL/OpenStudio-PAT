@@ -17,6 +17,9 @@
   <div ng-controller="MyAppCtrl">
 
     <h1>Summary Table</h1>
+    <ul>
+      <li class="alert alert-warning" ng-repeat="warn in renderWarns">{{ warn }}</li>
+    </ul>
     <table class="table-bordered table-condensed">
       <tr>
         <th>Name</th>
@@ -34,7 +37,7 @@
       </tr>
       <tr>
         <td><select ng-model="baseline_name" ng-change="updateBaseline()">
-          <option ng-repeat="run in results">{{run.name}}</option>
+          <option ng-repeat="run in resultsWithInfo">{{run.name}}</option>
         </select>
         </td>
         <td>
@@ -67,7 +70,7 @@
         <th>Simple Payback <br> (years)</th>
         <th>Total LCC Savings <br> ($)</th>
       </tr>
-      <tr ng-repeat="run in results">
+      <tr ng-repeat="run in resultsWithInfo">
         <td>{{ run.name }}</td>
         <td>
           <ul>
@@ -95,13 +98,13 @@
         <td>{{ baseline.first_year_cap_cost - run.first_year_cap_cost | number:1}} <br> {{
           100*(baseline.first_year_cap_cost - run.first_year_cap_cost)/baseline.first_year_cap_cost | number:0}}%
         </td>
-        <td>{{ baseline.ann_util_cost - run.ann_util_cost | number:1}} <br> {{ 100*(baseline.ann_util_cost -
+        <td>{{ baseline.ann_util_cost - run.ann_util_cost | number:0}} <br> {{ 100*(baseline.ann_util_cost -
           run.ann_util_cost)/baseline.ann_util_cost | number:0}}%
         </td>
         <td>{{ (baseline.first_year_cap_cost - run.first_year_cap_cost) / (baseline.ann_util_cost - run.ann_util_cost) |
           number:1}}
         </td>
-        <td>{{ baseline.total_lcc - run.total_lcc | number:1}} <br> {{ 100*(baseline.total_lcc -
+        <td>{{ baseline.total_lcc - run.total_lcc | number:0}} <br> {{ 100*(baseline.total_lcc -
           run.total_lcc)/baseline.total_lcc | number:0}}%
         </td>
       </tr>
@@ -121,6 +124,12 @@
       $scope.baseline_name = "";
       $scope.baseline = "";
 
+      // Subset of runs with results to show
+      $scope.resultsWithInfo = [];
+
+      // Show any issues
+      $scope.renderWarns = [];
+
       // Update the baseline based on the selected name
       $scope.updateBaseline = function () {
         _.forEach($scope.results, function (run) {
@@ -135,8 +144,7 @@
       // are passed in.
       $scope.setupAfterResultsAvailable = function () {
 
-        // Record any errors
-        var renderErrs = [];
+        var renderWarns = [];
 
         // Get the unique measure counts
         // based on unique name + argument values.
@@ -145,12 +153,12 @@
         _.forEach($scope.results, function (run) {
           numAlts += 1;
           _.forEach(run.steps, function (step) {
-            var namePlusArgs = step.name + JSON.stringify(step.arguments);
-            step.namePlusArgs = namePlusArgs;
-            if (measureCounts[namePlusArgs]) {
-              measureCounts[namePlusArgs] += 1;
+            var idPlusArgs = step.measure_id + JSON.stringify(step.arguments);
+            step.idPlusArgs = idPlusArgs;
+            if (measureCounts[idPlusArgs]) {
+              measureCounts[idPlusArgs] += 1;
             } else {
-              measureCounts[namePlusArgs] = 1;
+              measureCounts[idPlusArgs] = 1;
             }
           });
         });
@@ -164,23 +172,28 @@
         // Set the energy results properties of each run
         _.forEach($scope.results, function (run) {
           // Get the openstudio reporting measure, which contains the results
-          var reportMeasure = _.find(run.steps, {'name': "openstudio_results"});
+          var reportMeasure = _.find(run.steps, {'measure_dir_name': "OpenStudio Results"});
           if (!reportMeasure) {
-            renderErrs.push("Could not find the OpenStudio reports measure in " + run.name);
+            renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
             return;
           }
 
-          // Make sure the reeults exist
+          // Make sure the results exist
+          if (!reportMeasure.hasOwnProperty('result')){
+            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+            return;
+          }
+
+          // Make sure the results have data
           var vals = reportMeasure.result.step_values;
-          console.log(vals);
           if (vals.length == 0){
-            renderErrs.push("The OpenStudio reports measure was not run for " + run.name);
+            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
             return;
           }
 
           // Make sure the EUI element exists to ensure measure was run
           if (!_.find(vals, {'name': "eui"})) {
-            renderErrs.push("The OpenStudio reports measure was not run for " + run.name);
+            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
             return;
           }
 
@@ -210,16 +223,18 @@
           // Total LCC
           run.total_lcc = _.find(vals, {'name': "total_lifecycle_cost"}).value;
 
+          console.log(run.name);
+          console.log(run);
+          $scope.resultsWithInfo.push(run);
+
         });
 
         // Make the comparison point the first run to start
-        $scope.baseline = $scope.results.reverse()[0];
+        $scope.baseline = $scope.resultsWithInfo.reverse()[0];
         $scope.baseline_name = $scope.baseline.name;
 
-        // Show any errors
-        if (renderErrs.length > 0) {
-          window.alert("There were errors:\n" + renderErrs.join('\n'));
-        }
+        // Show a unique set of warnings
+        $scope.renderWarns = _.uniq(renderWarns);
 
       };
 
@@ -246,7 +261,7 @@
       }
 
       // skip always-run measures
-      if (measureCounts[step.namePlusArgs] == numAlts) {
+      if (measureCounts[step.idPlusArgs] == numAlts) {
         console.log("Not including " + step.name + " because it is an always-run Measure.");
         return;
       }
@@ -259,6 +274,17 @@
 
     return names;
 
+  }
+
+  // set $scope.reportDir element in the report's controller from PAT project directory
+  function setReportDir(reportDir) {
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    console.log("Inside setReportDir");
+    $scope.$apply(function () {
+      console.log("reportDir = " + reportDir);
+      $scope.reportDir = reportDir;
+    });
   }
 
   // set $scope.results element in the controller above from PAT data
