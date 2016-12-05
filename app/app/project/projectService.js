@@ -83,7 +83,18 @@ export class Project {
     const src = jetpack.cwd(app.getPath('userData'));
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
 
-    vm.myMeasuresDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/Measures'));
+    // set my measures dir
+    vm.MeasureManager.isReady().then( () => {
+      vm.MeasureManager.getMyMeasuresDir().then ( response => {
+        vm.myMeasuresDir = response.my_measures_dir;
+        vm.$log.debug('My measures Dir: ', vm.myMeasuresDir);
+      }, error => {
+        vm.$log.debug('Error in Measure Manager getMyMeasuresDir');
+      });
+    }, error => {
+      vm.$log.debug('Error in Measure Manager isReady function ', error);
+    });
+    
     vm.localDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
     jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT')); // Just create the folder structure
 

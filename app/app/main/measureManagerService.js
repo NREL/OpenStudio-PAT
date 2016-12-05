@@ -145,6 +145,21 @@ export class MeasureManager {
     return deferred.promise;
   }
 
+  // This function returns the path to the myMeasures directory
+  getMyMeasuresDir() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$http.get(vm.url)
+      .success((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager getMyMeasuresDir Success!, status: ', status);
+        deferred.resolve(data);
+      })
+    .error((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager getMyMeasuresDir error: ', data);
+      deferred.reject([]);
+    });
+    return deferred.promise;
+  }
   // Compute Arguments
   // This function computes arguments and returns all metadata for a single measure
   // Expects a measurePath.  and osmPath if evaluating against a specific model
