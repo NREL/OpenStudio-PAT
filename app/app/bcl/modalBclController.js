@@ -390,6 +390,7 @@ export class ModalBclController {
 
     // add to project measures
     measure.addedToProject = true;
+    measure.seed = vm.Project.getDefaultSeed();
     const project_measure = angular.copy(measure);
     project_measure.measure_dir = vm.projectDir.path(dirName);
 

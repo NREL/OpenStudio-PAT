@@ -61,8 +61,9 @@ export class RunController {
     vm.$scope.filterSkipped = function (item) {
       let isSkipped = false;
       let firstArg = undefined;
+      const skipArg = '__SKIP__';
       if (item.arguments){
-        if (_.find(_.keys(item.arguments)), '__SKIP__'){
+        if (_.find(_.keys(item.arguments)), skipArg){
           // found a skip..is it TRUE?
           if (item.arguments['__SKIP__'] == true){
             vm.$log.debug('Found SKIP=true in item: ', item);

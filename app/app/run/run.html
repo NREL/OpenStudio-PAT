@@ -114,7 +114,7 @@
               </div>
               <div class="col-sm-1 pad-top-10">{{run.formatDate(datapoint.updated_at)}}</div>
               <div class="col-sm-1 pad-top-10">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
-              <div class="col-sm-1 pad-top-10" ng-class="{'green-text': datapoint.status == 'completed', 'red-text': datapoint.status == 'errored'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</div>
+              <div class="col-sm-1 pad-top-10" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</div>
               <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
               <div class="col-sm-1 pad-top-10"><span class="badge orange-badge square-badge dp-badge">{{run.calculateWarnings(datapoint)}}</span></div>
               <div class="col-sm-1 pad-top-10"><span class="badge red-badge square-badge dp-badge">{{run.calculateErrors(datapoint)}}</span></div>
