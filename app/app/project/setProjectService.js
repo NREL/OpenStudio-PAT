@@ -36,6 +36,8 @@ export class SetProject {
     vm.$log.debug('saveAsProject');
     const deferred = vm.$q.defer();
 
+    const oldProjectName = vm.Project.projectName;
+
     // pop modal to get new project name
     vm.openModal().then(response => {
       vm.$log.debug('response:', response);
@@ -63,6 +65,15 @@ export class SetProject {
           // for saveAs: copy old project's folder structure to new location (from, to)
           vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
 
+          // rename project's json and zip files, if they exist
+          const oldZip = projectDir.path(oldProjectName + '.zip');
+          const oldJson = projectDir.path(oldProjectName + '.json');
+          const newZip = vm.Project.projectName + '.zip';
+          const newJson = vm.Project.projectName + '.json';
+          // Note "rename" provides no return
+          jetpack.rename(oldZip, newZip);
+          jetpack.rename(oldJson, newJson);
+
           // set project Variables
           vm.setProjectVariables(projectDir);
 
@@ -79,7 +90,20 @@ export class SetProject {
 
         }, (error) => {
           vm.$log.debug('stop server errored, but setting project anyway');
-          // set project Variables anyway
+
+          // for saveAs: copy old project's folder structure to new location (from, to)
+          vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
+
+          // rename project's json and zip files, if they exist
+          const oldZip = projectDir.path(oldProjectName + '.zip');
+          const oldJson = projectDir.path(oldProjectName + '.json');
+          const newZip = vm.Project.projectName + '.zip';
+          const newJson = vm.Project.projectName + '.json';
+          // Note "rename" provides no return
+          jetpack.rename(oldZip, newZip);
+          jetpack.rename(oldJson, newJson);
+
+          // set project Variables
           vm.setProjectVariables(projectDir);
 
           vm.$state.transitionTo('analysis', {}, {reload: true});
