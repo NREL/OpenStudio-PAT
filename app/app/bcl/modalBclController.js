@@ -26,8 +26,7 @@ export class ModalBclController {
     vm.selected = null;
     vm.keyword = '';
 
-    vm.myMeasuresDir = vm.Project.getMeasureDir();
-    vm.localDir = vm.Project.getLocalBCLDir();
+    vm.myMeasuresDir = vm.Project.getMeasuresDir();
     vm.projectDir = vm.Project.getProjectMeasuresDir();
 
     vm.filters = {
@@ -381,12 +380,10 @@ export class ModalBclController {
     vm.$log.debug('ModalBCL::addToProject');
 
     // copy on disk
-    const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;
     const dirNames = _.split(measure.measure_dir, '/');
-    //vm.$log.debug('DIR NAMES: ', dirNames);
     const dirName = _.last(dirNames);
     //overwrite if measure is already in project folder
-    src.copy(dirName, vm.projectDir.path(dirName), {overwrite: true});
+    vm.jetpack.copy(measure.measure_dir, vm.projectDir.path(dirName), {overwrite: true});
 
     // add to project measures
     measure.addedToProject = true;
@@ -525,10 +522,9 @@ export class ModalBclController {
     vm.jetpack.remove(currentMeasureDir);
 
     // copy on disk
-    const src = (measure.location == 'my') ? vm.myMeasuresDir : vm.localDir;
     const dirNames = _.split(measure.measure_dir, '/');
     const dirName = _.last(dirNames);
-    src.copy(dirName, vm.projectDir.path(dirName), {overwrite: true});
+    vm.jetpack.copy(measure.measure_dir, vm.projectDir.path(dirName), {overwrite: true});
 
     // set seed path
     const defaultSeed = vm.Project.getDefaultSeed();

@@ -86,7 +86,10 @@ export class Project {
     // set my measures dir
     vm.MeasureManager.isReady().then( () => {
       vm.MeasureManager.getMyMeasuresDir().then ( response => {
-        vm.myMeasuresDir = response.my_measures_dir;
+        if (response.my_measures_dir){
+          // make this a jetpack object
+          vm.myMeasuresDir = vm.jetpack.cwd(response.my_measures_dir);
+        }
         vm.$log.debug('My measures Dir: ', vm.myMeasuresDir);
       }, error => {
         vm.$log.debug('Error in Measure Manager getMyMeasuresDir');
@@ -94,9 +97,6 @@ export class Project {
     }, error => {
       vm.$log.debug('Error in Measure Manager isReady function ', error);
     });
-    
-    vm.localDir = jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/LocalBCL'));
-    jetpack.dir(path.resolve(os.homedir(), 'OpenStudio/PAT')); // Just create the folder structure
 
     // json objects
     vm.pat = {};
@@ -885,12 +885,7 @@ export class Project {
     return vm.projectMeasuresDir;
   }
 
-  getLocalBCLDir() {
-    const vm = this;
-    return vm.localDir;
-  }
-
-  getMeasureDir() {
+  getMeasuresDir() {
     const vm = this;
     return vm.myMeasuresDir;
   }

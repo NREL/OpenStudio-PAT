@@ -82,9 +82,9 @@ export class BCL {
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
 
     vm.MeasureManager.isReady().then( () => {
-      vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates...');
+      vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates to MyMeasures...');
       // the path doesn't work if the trailing slash isn't there!
-      vm.MeasureManager.updateMeasures(vm.Project.getMeasureDir().path() + '/').then(updatedMeasures => {
+      vm.MeasureManager.updateMeasures(vm.Project.getMeasuresDir().path() + '/').then(updatedMeasures => {
         const newMeasures = [];
         // update MyMeasure Directory and rerun prepare measure
         _.forEach(updatedMeasures, (measure) => {
@@ -131,9 +131,11 @@ export class BCL {
     // refresh measures
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
     vm.MeasureManager.isReady().then( () => {
-      vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates LocalBCL...');
+      vm.$log.debug('MEASURE MANAGER IS READY! Getting LocalBCL...');
       // the path doesn't work if the trailing slash isn't there!
-      vm.MeasureManager.updateMeasures(vm.Project.getLocalBCLDir().path() + '/').then(updatedMeasures => {
+      vm.MeasureManager.getLocalBCLMeasures().then(updatedMeasures => {
+      //vm.MeasureManager.updateMeasures(vm.Project.getLocalBCLDir().path() + '/').then(updatedMeasures => {
+        vm.$log.debug('Response: ', updatedMeasures);
         const newMeasures = [];
         vm.$log.debug('measureManager updates done');
         // update LocalBCL Directory and rerun prepare measure
@@ -454,11 +456,11 @@ export class BCL {
       const zip = new vm.AdmZip(buf);
       // extract to location (and overwrite)
       // TODO: verify that this does in fact overwrite and not error out
-      zip.extractAllTo(vm.Project.getLocalBCLDir().path() + '/', true);
+      zip.extractAllTo(vm.Project.getMeasuresDir().path() + '/', true);
 
       vm.$log.debug('DOWNLOADED measure name: ', measure.name);
       vm.$log.debug('DOWNLOADED measure display_name: ', measure.display_name);
-      vm.$log.debug('DOWNLOADED measure path: ', vm.Project.getLocalBCLDir().path(measure.display_name));
+      vm.$log.debug('DOWNLOADED measure path: ', vm.Project.getMeasuresDir().path(measure.display_name));
 
       // use computeArguments to add to localMeasures array
       // vm.$log.debug('new measure before compute args: ', measure);
@@ -470,7 +472,7 @@ export class BCL {
         originalName = bclMatch.name;
       }
 
-      vm.MeasureManager.computeArguments(vm.Project.getLocalBCLDir().path(originalName)).then( (newMeasure) => {
+      vm.MeasureManager.computeArguments(vm.Project.getMeasuresDir().path(originalName)).then( (newMeasure) => {
         vm.$log.debug('new measure after compute args', newMeasure);
         newMeasure = vm.prepareMeasure(newMeasure, 'local');
 
