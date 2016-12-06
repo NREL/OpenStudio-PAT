@@ -90,7 +90,7 @@ export class Project {
           // make this a jetpack object
           vm.myMeasuresDir = vm.jetpack.cwd(response.my_measures_dir);
         }
-        vm.$log.debug('My measures Dir: ', vm.myMeasuresDir);
+        vm.$log.debug('My measures Dir: ', vm.myMeasuresDir.path());
       }, error => {
         vm.$log.debug('Error in Measure Manager getMyMeasuresDir');
       });
@@ -1470,6 +1470,27 @@ export class Project {
     const vm = this;
     vm.$log.debug('Project::setModified isModified: ', isModified);
     vm.modified = isModified;
+  }
+
+  // takes datestrings like these: 20161110T212644Z, 2016-11-22 11:10:50 -0700, 2016-11-22 04:32:23 UTC, or 2016-11-22T04:32:13.626Z
+  makeDate(dateString) {
+    const vm = this;
+    let theDate = '';
+    if (dateString) {
+
+      if (dateString.slice(8, 9) == 'T') {
+        // YYYYMMDDTHHMMSSZ: add punctuation to convert to valid datetime format and parse normally
+        const tmp = dateString.slice(0, 4) + '-' + dateString.slice(4, 6) + '-' + dateString.slice(6, 11) + ':' + dateString.slice(11, 13) + ':' + dateString.slice(13, 16);
+        theDate = new Date(tmp);
+      } else {
+        theDate = new Date(dateString);
+      }
+
+      // vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
+    }
+
+    return theDate;
+
   }
 
   getModified() {

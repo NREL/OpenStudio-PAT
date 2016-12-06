@@ -156,7 +156,7 @@ export class MeasureManager {
         deferred.resolve(data);
       })
     .error((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager getMyMeasuresDir error: ', data);
+        vm.$log.debug('Measure Manager getMyMeasuresDir Error: ', data);
       deferred.reject([]);
     });
     return deferred.promise;
@@ -171,18 +171,31 @@ export class MeasureManager {
       .success((data, status, headers, config) => {
         vm.$log.debug('Measure Manager bcl_measures Success!, status: ', status);
         deferred.resolve(data);
-    })
-    .error((data, status, headers, config) => {
-      vm.$log.debug('Measure Manager bcl_measures error: ', data);
-      deferred.reject([]);
-    });
+      })
+      .error((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager bcl_measures Error: ', data);
+        deferred.reject([]);
+      });
     return deferred.promise;
   }
 
   // Download a measure from online BCL
-  downloadBCLMeasure() {
+  downloadBCLMeasure(uid) {
     const vm = this;
     const deferred = vm.$q.defer();
+    const params = {uid: uid};
+
+    vm.$http.post(vm.url + '/download_bcl_measure', params)
+      .success((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager download_bcl_measure Success!, status: ', status);
+        vm.$log.debug('Data: ', data);
+        deferred.resolve(data[0]);
+      })
+      .error((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager download_bcl_measure Error: ', data);
+        deferred.reject([]);
+      });
+
 
     return deferred.promise;
   }

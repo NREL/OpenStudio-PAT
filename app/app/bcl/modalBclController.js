@@ -26,7 +26,6 @@ export class ModalBclController {
     vm.selected = null;
     vm.keyword = '';
 
-    vm.myMeasuresDir = vm.Project.getMeasuresDir();
     vm.projectDir = vm.Project.getProjectMeasuresDir();
 
     vm.filters = {
@@ -89,7 +88,10 @@ export class ModalBclController {
         displayName: 'bcl.columns.name',
         enableCellEdit: false,
         headerCellFilter: 'translate',
-        width: '35%'
+        width: '35%',
+        cellTooltip: function(row) {
+          return row.entity.display_name;
+        }
       }, {
         name: 'location',
         displayName: '',
@@ -441,7 +443,7 @@ export class ModalBclController {
   download(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.BCL.downloadMeasure(measure).then(newMeasure => {
+    vm.BCL.downloadBCLMeasure(measure).then(newMeasure => {
       vm.$log.debug('In modal download()');
       vm.$log.debug('Local Measures: ', vm.libMeasures.local);
       vm.$log.debug('new measure: ', newMeasure);
@@ -517,13 +519,12 @@ export class ModalBclController {
     const deferred = vm.$q.defer();
     vm.$log.debug('in UPDATE PROJECT MEASURE function');
 
-    // delete old directory first
-    const currentMeasureDir = _.find(vm.projectMeasures, {uid: measure.uid}).measure_dir;
-    vm.jetpack.remove(currentMeasureDir);
-
-    // copy on disk
+    // delete old directory first (in projectMeasures)
     const dirNames = _.split(measure.measure_dir, '/');
     const dirName = _.last(dirNames);
+    vm.jetpack.remove(vm.projectDir.path(dirName));  // it's possible that the name has changed...if so, the old measureDir will remain.
+
+    // copy on disk
     vm.jetpack.copy(measure.measure_dir, vm.projectDir.path(dirName), {overwrite: true});
 
     // set seed path

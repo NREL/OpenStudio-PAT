@@ -175,9 +175,9 @@
                     <div class="measure-accordion-body">
                       <label>Initial Condition: </label> {{step.result.step_initial_condition}}<br/>
                       <label>Final Condition: </label> {{step.result.step_final_condition}}<br/>
-                      <div ng-repeat="item in step.result.step_errors"><span class="red-text">Error: </span>{{item}}</div>
-                      <div ng-repeat="item in step.result.step_warnings"><span class="orange-text">Warning: </span>{{item}}</div>
-                      <div ng-repeat="item in step.result.step_info"><span class="green-text">Info: </span>{{item}}</div>
+                      <div ng-repeat="item in step.result.step_errors track by $index"><span class="red-text">Error: </span>{{item}}</div>
+                      <div ng-repeat="item in step.result.step_warnings track by $index"><span class="orange-text">Warning: </span>{{item}}</div>
+                      <div ng-repeat="item in step.result.step_info track by $index"><span class="green-text">Info: </span>{{item}}</div>
                     </div>
                   </uib-accordion-group>
                   <uib-accordion-group>
