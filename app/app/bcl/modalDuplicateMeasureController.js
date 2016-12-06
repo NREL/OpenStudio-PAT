@@ -2,11 +2,12 @@ import jetpack from 'fs-jetpack';
 
 export class ModalDuplicateMeasureController {
 
-  constructor($log, $uibModalInstance, measure) {
+  constructor($log, $uibModalInstance, measure, Project) {
     'ngInject';
 
     const vm = this;
     vm.$uibModalInstance = $uibModalInstance;
+    vm.Project = Project;
     vm.$log = $log;
     vm.measure = measure;
     vm.newDisplayName = measure.display_name;
@@ -20,10 +21,10 @@ export class ModalDuplicateMeasureController {
     const vm = this;
     vm.$log.debug('Duplicate Measure measure: ', vm.measure);
     const oldMeasureDir = vm.measure.measure_dir;
-    // store duplicated measures in 'Measures' folder (not LocalBCL)
+    // store duplicated measures in 'Measures'
     const params = {
       old_measure_dir: vm.measure.measure_dir,
-      measure_dir: vm.jetpack.cwd(oldMeasureDir).path('..', '..', 'Measures', _.snakeCase(vm.newDisplayName)),
+      measure_dir: vm.Project.getMeasuresDir().path(_.snakeCase(vm.newDisplayName)),
       display_name: vm.newDisplayName,
       class_name: _.upperFirst(_.camelCase(vm.newDisplayName)),
       taxonomy_tag: vm.measure.tags,

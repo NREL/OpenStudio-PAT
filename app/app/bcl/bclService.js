@@ -47,6 +47,10 @@ export class BCL {
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
     vm.$log.debug('BCL SERVICE Project MEASURES RETRIEVED: ', vm.projectMeasures);
 
+    // reset local and my measures in case they have flags related to project measures
+    vm.libMeasures.my = [];
+    vm.libMeasures.local = [];
+
     vm.getBCLMeasures().then( () => {
       vm.checkForUpdatesLocalBcl();
       vm.$log.debug('BCL SERVICE CONSTRUCTOR.  LIBMEASURES: ', vm.libMeasures);
@@ -77,14 +81,16 @@ export class BCL {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.$log.debug('in BCLService checkForUpdates method');
+    vm.$log.debug('MyMeasures dir? ', vm.Project.getMeasuresDir().path());
 
     //refresh project measures
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
 
     vm.MeasureManager.isReady().then( () => {
-      vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates...');
+      vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates to MyMeasures...');
       // the path doesn't work if the trailing slash isn't there!
-      vm.MeasureManager.updateMeasures(vm.Project.getMeasureDir().path() + '/').then(updatedMeasures => {
+      vm.$log.debug('Updating Measure in: ', vm.Project.getMeasuresDir().path() + '/');
+      vm.MeasureManager.updateMeasures(vm.Project.getMeasuresDir().path() + '/').then(updatedMeasures => {
         const newMeasures = [];
         // update MyMeasure Directory and rerun prepare measure
         _.forEach(updatedMeasures, (measure) => {
@@ -101,21 +107,23 @@ export class BCL {
             // vm.$log.debug('version_ids: ', project_match.version_id, measure.version_id);
 
             // TODO: also compare date (match.version_modified > measure.version_modified)
-            if (projectMatch.version_id != measure.version_id) {
+            let projectVersionModified = vm.Project.makeDate(projectMatch.version_modified);
+            let measureVersionModified = vm.Project.makeDate(measure.version_modified);
+
+            vm.$log.debug('My Measure: ', measure.name, ' projectMatch.version_id: ', projectMatch.version_id, ' measure version id: ', measure.version_id, ' project version_modified: ', projectVersionModified, ' measure version_modified: ', measureVersionModified);
+
+            if (projectMatch.version_id != measure.version_id && measureVersionModified > projectVersionModified) {
               // set status flag
               measure.status = 'update';
             } else {
               measure.status = '';
             }
           }
-
           newMeasures.push(measure);
-
         });
         // overwrite myMeasures (to delete removed measures)
         vm.libMeasures.my = newMeasures;
         deferred.resolve();
-
         vm.$log.debug('NEW MY MEASURES DIR: ', vm.libMeasures.my);
       });
     });
@@ -131,9 +139,10 @@ export class BCL {
     // refresh measures
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
     vm.MeasureManager.isReady().then( () => {
-      vm.$log.debug('MEASURE MANAGER IS READY! Checking for Updates LocalBCL...');
+      vm.$log.debug('MEASURE MANAGER IS READY! Getting LocalBCL...');
       // the path doesn't work if the trailing slash isn't there!
-      vm.MeasureManager.updateMeasures(vm.Project.getLocalBCLDir().path() + '/').then(updatedMeasures => {
+      vm.MeasureManager.getLocalBCLMeasures().then(updatedMeasures => {
+        vm.$log.debug('Response: ', updatedMeasures);
         const newMeasures = [];
         vm.$log.debug('measureManager updates done');
         // update LocalBCL Directory and rerun prepare measure
@@ -150,8 +159,8 @@ export class BCL {
           let localVersionModified = null;
           if (angular.isDefined(bclMatch)) {
             // for now compare the 'changed' date from the BCL search API to the version_modified from measureManager updateMeasure
-            bclChangedDate = new Date(bclMatch.changed);
-            localVersionModified = new Date(measure.version_modified + ' UTC');  // returned in UTC from measureManager
+            bclChangedDate = vm.Project.makeDate(bclMatch.changed);
+            localVersionModified = vm.Project.makeDate(measure.version_modified);
             if (bclChangedDate > localVersionModified) {
               // bcl update
               measure.bcl_update = true;
@@ -161,13 +170,23 @@ export class BCL {
           // is measure added to project?
           const projectMatch = _.find(vm.projectMeasures, {uid: measure.uid});
           measure.status = '';
+          let measureVersionModified = null;
+          let projectVersionModified = null;
           // update from local to project or from bcl to local to project
           if (angular.isDefined(projectMatch)) {
+            vm.$log.debug("ProjectMAtch: ", projectMatch);
+            vm.$log.debug("MEasure: ", measure);
+            projectVersionModified = vm.Project.makeDate(projectMatch.version_modified);
+            measureVersionModified = vm.Project.makeDate(measure.version_modified);
+            vm.$log.debug('projectVersionModified: ', projectVersionModified, ' measureVersionModified: ', measureVersionModified);
             if (measure.bcl_update) {
               // update options:  online BCL to local BCL only, or to local BCL and project
               measure.status = 'update';
-            } else if (projectMatch.version_id != measure.version_id){
+            } else if (projectVersionModified && measureVersionModified && measureVersionModified > projectVersionModified){
               // update options: local BCL to project (no online BCL updates)
+              measure.status = 'update';
+            } else if (projectMatch.version_id != measure.version_id){
+              // assume this means the local version is newer than the project version
               measure.status = 'update';
             }
           }
@@ -417,6 +436,11 @@ export class BCL {
       measure.author = '';
     }
 
+    // give measure a display name if it doesn't have one already
+    if (!measure.display_name) {
+      measure.display_name = measure.name;
+    }
+
     // fix tags to be a string (measure manager returns it as an array)
     if (_.isArray(measure.tags))
       measure.tags = measure.tags[0];
@@ -441,69 +465,97 @@ export class BCL {
     }
   }
 
-  // download measure
-  downloadMeasure(measure) {
+  downloadBCLMeasure(measure){
     const vm = this;
     const deferred = vm.$q.defer();
-    const url = vm.bclUrl + 'component/download?uids=' + measure.uid;
 
-    vm.$http.get(url, {responseType: 'arraybuffer'}).then(response => {
-      //extract dir and save to disk in local measures directory
-      // convert arraybuffer to node buffer
-      const buf = new Buffer(new Uint8Array(response.data));
-      const zip = new vm.AdmZip(buf);
-      // extract to location (and overwrite)
-      // TODO: verify that this does in fact overwrite and not error out
-      zip.extractAllTo(vm.Project.getLocalBCLDir().path() + '/', true);
+    vm.MeasureManager.downloadBCLMeasure(measure.uid).then( (newMeasure) => {
+      vm.$log.debug("new measure: ", newMeasure);
+      // TODO: do some merging with old measure
+      newMeasure = vm.prepareMeasure(newMeasure, 'local');
+      vm.$log.debug('new measure after prepare: ', newMeasure);
 
-      vm.$log.debug('DOWNLOADED measure name: ', measure.name);
-      vm.$log.debug('DOWNLOADED measure display_name: ', measure.display_name);
-      vm.$log.debug('DOWNLOADED measure path: ', vm.Project.getLocalBCLDir().path(measure.display_name));
-
-      // use computeArguments to add to localMeasures array
-      // vm.$log.debug('new measure before compute args: ', measure);
-
-      // get path of newly downloaded measure from online BCL name (measureManager may change the name and the path will not be found)
-      let originalName = measure.name;
-      const bclMatch = _.find(vm.libMeasures.bcl, {uid: measure.uid});
-      if (bclMatch) {
-        originalName = bclMatch.name;
+      // add or merge
+      const libMatch = _.find(vm.libMeasures.local, {uid: newMeasure.uid});
+      if (libMatch) {
+        // TODO: verify this
+        _.merge(libMatch, newMeasure);
+        libMatch.bcl_update = false;
+      } else {
+        vm.libMeasures.local.push(newMeasure);
       }
-
-      vm.MeasureManager.computeArguments(vm.Project.getLocalBCLDir().path(originalName)).then( (newMeasure) => {
-        vm.$log.debug('new measure after compute args', newMeasure);
-        newMeasure = vm.prepareMeasure(newMeasure, 'local');
-
-        // measureManager recomputes name and display name, restore BCL original names:
-        // newMeasure.name = measure.name;
-        // newMeasure.display_name = measure.display_name;
-
-        vm.$log.debug('new measure after prepare and restore names: ', newMeasure);
-
-        // add or merge
-        const libMatch = _.find(vm.libMeasures.local, {uid: newMeasure.uid});
-        if (libMatch) {
-          // TODO: verify this
-          _.merge(libMatch, newMeasure);
-          libMatch.bcl_update = false;
-        } else {
-          vm.libMeasures.local.push(newMeasure);
-        }
-
-        deferred.resolve(newMeasure);
-      }, () => {
-        // failure
-        //vm.$log.debug('Measure Manager computeArguments failed');
-        deferred.reject();
-      });
-
-    }, response => {
+      deferred.resolve(newMeasure);
+    }, error => {
       vm.$log.debug('ERROR downloading BCL measure');
-      deferred.reject(response);
+      deferred.reject(error);
     });
 
     return deferred.promise;
+
   }
+
+  // download measure
+  // downloadMeasure(measure) {
+  //   const vm = this;
+  //   const deferred = vm.$q.defer();
+  //   const url = vm.bclUrl + 'component/download?uids=' + measure.uid;
+  //
+  //   vm.$http.get(url, {responseType: 'arraybuffer'}).then(response => {
+  //     //extract dir and save to disk in local measures directory
+  //     // convert arraybuffer to node buffer
+  //     const buf = new Buffer(new Uint8Array(response.data));
+  //     const zip = new vm.AdmZip(buf);
+  //     // extract to location (and overwrite)
+  //     zip.extractAllTo(vm.Project.getMeasuresDir().path() + '/', true);
+  //
+  //     vm.$log.debug('DOWNLOADED measure name: ', measure.name);
+  //     vm.$log.debug('DOWNLOADED measure display_name: ', measure.display_name);
+  //     vm.$log.debug('DOWNLOADED measure path: ', vm.Project.getMeasuresDir().path(measure.display_name));
+  //
+  //     // use computeArguments to add to localMeasures array
+  //     // vm.$log.debug('new measure before compute args: ', measure);
+  //
+  //     // get path of newly downloaded measure from online BCL name (measureManager may change the name and the path will not be found)
+  //     let originalName = measure.name;
+  //     const bclMatch = _.find(vm.libMeasures.bcl, {uid: measure.uid});
+  //     if (bclMatch) {
+  //       originalName = bclMatch.name;
+  //     }
+  //
+  //     vm.MeasureManager.computeArguments(vm.Project.getMeasuresDir().path(originalName)).then( (newMeasure) => {
+  //       vm.$log.debug('new measure after compute args', newMeasure);
+  //       newMeasure = vm.prepareMeasure(newMeasure, 'local');
+  //
+  //       // measureManager recomputes name and display name, restore BCL original names:
+  //       // newMeasure.name = measure.name;
+  //       // newMeasure.display_name = measure.display_name;
+  //
+  //       vm.$log.debug('new measure after prepare and restore names: ', newMeasure);
+  //
+  //       // add or merge
+  //       const libMatch = _.find(vm.libMeasures.local, {uid: newMeasure.uid});
+  //       if (libMatch) {
+  //         // TODO: verify this
+  //         _.merge(libMatch, newMeasure);
+  //         libMatch.bcl_update = false;
+  //       } else {
+  //         vm.libMeasures.local.push(newMeasure);
+  //       }
+  //
+  //       deferred.resolve(newMeasure);
+  //     }, () => {
+  //       // failure
+  //       //vm.$log.debug('Measure Manager computeArguments failed');
+  //       deferred.reject();
+  //     });
+  //
+  //   }, response => {
+  //     vm.$log.debug('ERROR downloading BCL measure');
+  //     deferred.reject(response);
+  //   });
+  //
+  //   return deferred.promise;
+  // }
 
   // DOWNLOAD COMPONENT BY UID
   download(uids) {

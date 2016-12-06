@@ -130,33 +130,12 @@ export class RunController {
     let theDate = '';
 
     if (dateString) {
-      theDate = vm.makeDate(dateString);
+      theDate = vm.Project.makeDate(dateString);
       // format
       theDate = theDate.getMonth() + 1 + "/" + theDate.getDate() + "/" + theDate.getFullYear();
     }
 
     return theDate;
-  }
-
-  // takes datestrings like these: 20161110T212644Z, 2016-11-22 11:10:50 -0700, 2016-11-22 04:32:23 UTC, or 2016-11-22T04:32:13.626Z
-  makeDate(dateString) {
-    const vm = this;
-    let theDate = '';
-    if (dateString) {
-
-      if (dateString.slice(8, 9) == 'T') {
-        // YYYYMMDDTHHMMSSZ: add punctuation to convert to valid datetime format and parse normally
-        const tmp = dateString.slice(0, 4) + '-' + dateString.slice(4, 6) + '-' + dateString.slice(6, 11) + ':' + dateString.slice(11, 13) + ':' + dateString.slice(13, 16);
-        theDate = new Date(tmp);
-      } else {
-        theDate = new Date(dateString);
-      }
-
-      // vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
-    }
-
-    return theDate;
-
   }
 
   getRunTime(startStr, endStr) {

@@ -45,12 +45,12 @@ export class MeasureManager {
       }
       // TODO: THIS IS TEMPORARY (windows):
       else if (str.indexOf('Only one usage of each socket address') !== -1) {
-        vm.$log.debug('WEBrick already running...using tempMeasureManager');
+        vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
         vm.mmReadyDeferred.resolve();
       }
       // TODO: THIS IS TEMPORARY (mac):
       else if (str.indexOf('Error: Address already in use') !== -1) {
-        vm.$log.debug ('WEBrick already running...using tempMeasureManager');
+        vm.$log.debug ('WEBrick already running...assuming MeasureManager is already up');
         vm.mmReadyDeferred.resolve();
       }
 
@@ -144,6 +144,62 @@ export class MeasureManager {
 
     return deferred.promise;
   }
+
+  // Returns the path to the myMeasures directory
+  getMyMeasuresDir() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$http.get(vm.url, {
+      params: {}})
+      .success((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager getMyMeasuresDir Success!, status: ', status);
+        deferred.resolve(data);
+      })
+    .error((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager getMyMeasuresDir Error: ', data);
+      deferred.reject([]);
+    });
+    return deferred.promise;
+  }
+
+  // Retrieve Local BCL measures
+  getLocalBCLMeasures(){
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const params = {};
+    vm.$http.post(vm.url + '/bcl_measures', params)
+      .success((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager bcl_measures Success!, status: ', status);
+        deferred.resolve(data);
+      })
+      .error((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager bcl_measures Error: ', data);
+        deferred.reject([]);
+      });
+    return deferred.promise;
+  }
+
+  // Download a measure from online BCL
+  downloadBCLMeasure(uid) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const params = {uid: uid};
+
+    vm.$http.post(vm.url + '/download_bcl_measure', params)
+      .success((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager download_bcl_measure Success!, status: ', status);
+        vm.$log.debug('Data: ', data);
+        deferred.resolve(data[0]);
+      })
+      .error((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager download_bcl_measure Error: ', data);
+        deferred.reject([]);
+      });
+
+
+    return deferred.promise;
+  }
+
 
   // Compute Arguments
   // This function computes arguments and returns all metadata for a single measure
