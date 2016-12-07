@@ -86,6 +86,9 @@ export class Project {
     // set my measures dir
     vm.MeasureManager.isReady().then( () => {
       vm.MeasureManager.getMyMeasuresDir().then ( response => {
+        if (angular.isUndefined(response.my_measures_dir)) {
+          vm.$log.error('Houston, we have a problem. response.my_measures_dir is undefined');
+        }
         if (response.my_measures_dir){
           // make this a jetpack object
           vm.myMeasuresDir = vm.jetpack.cwd(response.my_measures_dir);

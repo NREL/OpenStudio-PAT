@@ -1,13 +1,13 @@
 export class ModalProjectNameController {
 
-  constructor($log, $scope, $uibModalInstance, Project) {
+  constructor($log, $scope, $uibModalInstance, SetProject) {
     'ngInject';
 
     const vm = this;
     vm.$log = $log;
     vm.$scope = $scope;
     vm.$uibModalInstance = $uibModalInstance;
-    vm.project = Project;
+    vm.SetProject = SetProject;
   }
 
   ok() {
@@ -17,7 +17,7 @@ export class ModalProjectNameController {
     if (vm.$scope.name.indexOf(' ') >= 0) {
       noWhitespace = vm.$scope.name.replace(/\s/g, '');
     }
-    vm.project.setProjectName(noWhitespace);
+    vm.SetProject.newProjectName = noWhitespace;
     vm.$uibModalInstance.close();
   }
 

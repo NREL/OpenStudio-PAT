@@ -14,6 +14,7 @@ import { ModalDependencyController } from '../app/main/modalDependencyController
 import { ModalModifiedController } from '../app/project/modalModifiedController';
 import { ModalOpenProjectController } from '../app/project/modalOpenProjectController';
 import { ModalProjectNameController } from '../app/project/modalProjectNameController';
+import { ModalNestedProjectWarningController } from '../app/project/modalNestedProjectWarningController';
 import { ModalWhitespaceWarningController } from '../app/project/modalWhitespaceWarningController';
 import { ModalDuplicateMeasureController } from '../app/bcl/modalDuplicateMeasureController';
 import { ModalUpdateMeasureController } from '../app/bcl/modalUpdateMeasureController';
@@ -40,6 +41,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalBclController', ModalBclController)
   .controller('ModalDependencyController', ModalDependencyController)
   .controller('ModalProjectNameController', ModalProjectNameController)
+  .controller('ModalNestedProjectWarningController', ModalNestedProjectWarningController)
   .controller('ModalWhitespaceWarningController', ModalWhitespaceWarningController)
   .controller('ModalModifiedController', ModalModifiedController)
   .controller('ModalOpenProjectController', ModalOpenProjectController)

@@ -7,6 +7,11 @@ export default {
     heading: 'Modified Files',
     blurb: 'You have unsaved changes. Click the save button to save your changes, or click the cancel button to quit without saving.'
   },
+  nestedProjectWarning: {
+    title: 'ParametricAnalysisTool',
+    heading: 'Nested Project Warning',
+    blurb: 'A pat.json file was found in your project path. You cannot nest a PAT project in another PAT project. Please choose another location for you current PAT project.'
+  },
   whitespaceWarning: {
     title: 'ParametricAnalysisTool',
     heading: 'Whitespace Warning',

@@ -19,6 +19,7 @@ export class SetProject {
     vm.Project = Project;
     vm.BCL = BCL;
     vm.$state = $state;
+    vm.newProjectName = null;
   }
 
   saveProject() {
@@ -50,66 +51,94 @@ export class SetProject {
 
       if (!_.isEmpty(result)) {
         let projectDir = jetpack.cwd(result[0]);
-        projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
-
-        if (projectDir.path().indexOf(' ') >= 0) {
-          // tell user to expect trouble
-          vm.whitespaceModal().then(response => {
-          });
+        // Check that path is not in a PAT project subdirectory
+        let count = 0;
+        let maxDirectoriesToCheck = 5;
+        let fileExists = false;
+        let atRoot = false;
+        let currentDir = projectDir;
+        while (!fileExists && !atRoot && count < maxDirectoriesToCheck) {
+          const fullFilename = currentDir.path('pat.json');
+          vm.$log.debug('checking for ', fullFilename);
+          const file = vm.jetpack.read(fullFilename);
+          if (typeof file !== 'undefined') {
+            fileExists = true;
+            vm.nestedProjectModal().then(response => {
+            });
+            vm.$log.error('Found what appears to be a PAT project at ', currentDir.path());
+            deferred.reject('rejected');
+          }
+          currentDir = jetpack.cwd(currentDir.path('..'));
+          const tempDir = jetpack.cwd(currentDir.path('..'));
+          if (currentDir.path() === tempDir.path()) {
+            atRoot = true;
+          }
+          count += 1;
         }
 
-        vm.OsServer.stopServer().then(response => {
-          vm.$log.debug('SetProjectService::stop server: server stopped');
-          vm.$log.debug('response: ', response);
+        if (!fileExists) {
+          vm.Project.setProjectName(vm.newProjectName);
+          projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
-          // for saveAs: copy old project's folder structure to new location (from, to)
-          vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
+          if (projectDir.path().indexOf(' ') >= 0) {
+            // tell user to expect trouble
+            vm.whitespaceModal().then(response => {
+            });
+          }
 
-          // rename project's json and zip files, if they exist
-          const oldZip = projectDir.path(oldProjectName + '.zip');
-          const oldJson = projectDir.path(oldProjectName + '.json');
-          const newZip = vm.Project.projectName + '.zip';
-          const newJson = vm.Project.projectName + '.json';
-          // Note "rename" provides no return
-          jetpack.rename(oldZip, newZip);
-          jetpack.rename(oldJson, newJson);
-
-          // set project Variables
-          vm.setProjectVariables(projectDir);
-
-          vm.$state.transitionTo('analysis', {}, {reload: true});
-
-          // resolve promise
-          deferred.resolve('resolve');
-          // start server at new location
-          vm.OsServer.startServer().then(response => {
-            vm.$log.debug('setProjectService::start server: server started');
+          vm.OsServer.stopServer().then(response => {
+            vm.$log.debug('SetProjectService::stop server: server stopped');
             vm.$log.debug('response: ', response);
-            vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+
+            // for saveAs: copy old project's folder structure to new location (from, to)
+            vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
+
+            // rename project's json and zip files, if they exist
+            const oldZip = projectDir.path(oldProjectName + '.zip');
+            const oldJson = projectDir.path(oldProjectName + '.json');
+            const newZip = vm.Project.projectName + '.zip';
+            const newJson = vm.Project.projectName + '.json';
+            // Note "rename" provides no return
+            jetpack.rename(oldZip, newZip);
+            jetpack.rename(oldJson, newJson);
+
+            // set project Variables
+            vm.setProjectVariables(projectDir);
+
+            vm.$state.transitionTo('analysis', {}, {reload: true});
+
+            // resolve promise
+            deferred.resolve('resolve');
+            // start server at new location
+            vm.OsServer.startServer().then(response => {
+              vm.$log.debug('setProjectService::start server: server started');
+              vm.$log.debug('response: ', response);
+              vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+            });
+
+          }, (error) => {
+            vm.$log.debug('stop server errored, but setting project anyway');
+
+            // for saveAs: copy old project's folder structure to new location (from, to)
+            vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
+
+            // rename project's json and zip files, if they exist
+            const oldZip = projectDir.path(oldProjectName + '.zip');
+            const oldJson = projectDir.path(oldProjectName + '.json');
+            const newZip = vm.Project.projectName + '.zip';
+            const newJson = vm.Project.projectName + '.json';
+            // Note "rename" provides no return
+            jetpack.rename(oldZip, newZip);
+            jetpack.rename(oldJson, newJson);
+
+            // set project Variables
+            vm.setProjectVariables(projectDir);
+
+            vm.$state.transitionTo('analysis', {}, {reload: true});
+
+            deferred.reject('rejected');
           });
-
-        }, (error) => {
-          vm.$log.debug('stop server errored, but setting project anyway');
-
-          // for saveAs: copy old project's folder structure to new location (from, to)
-          vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
-
-          // rename project's json and zip files, if they exist
-          const oldZip = projectDir.path(oldProjectName + '.zip');
-          const oldJson = projectDir.path(oldProjectName + '.json');
-          const newZip = vm.Project.projectName + '.zip';
-          const newJson = vm.Project.projectName + '.json';
-          // Note "rename" provides no return
-          jetpack.rename(oldZip, newZip);
-          jetpack.rename(oldJson, newJson);
-
-          // set project Variables
-          vm.setProjectVariables(projectDir);
-
-          vm.$state.transitionTo('analysis', {}, {reload: true});
-
-          deferred.reject('rejected');
-        });
+        }
       } else {
         deferred.reject('rejected');
       }
@@ -134,50 +163,78 @@ export class SetProject {
 
       if (!_.isEmpty(result)) {
         let projectDir = jetpack.cwd(result[0]);
-        projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
-
-        if (projectDir.path().indexOf(' ') >= 0) {
-          // tell user to expect trouble
-          vm.whitespaceModal().then(response => {
-          });
+        // Check that path is not in a PAT project subdirectory
+        let count = 0;
+        let maxDirectoriesToCheck = 5;
+        let fileExists = false;
+        let atRoot = false;
+        let currentDir = projectDir;
+        while (!fileExists && !atRoot && count < maxDirectoriesToCheck) {
+          const fullFilename = currentDir.path('pat.json');
+          vm.$log.debug('checking for ', fullFilename);
+          const file = vm.jetpack.read(fullFilename);
+          if (typeof file !== 'undefined') {
+            fileExists = true;
+            vm.nestedProjectModal().then(response => {
+            });
+            vm.$log.error('Found what appears to be a PAT project at ', currentDir.path());
+            deferred.reject('rejected');
+          }
+          currentDir = jetpack.cwd(currentDir.path('..'));
+          const tempDir = jetpack.cwd(currentDir.path('..'));
+          if (currentDir.path() === tempDir.path()) {
+            atRoot = true;
+          }
+          count += 1;
         }
 
-        // force stop local server
-        vm.OsServer.stopServer('local').then(response => {
-          vm.$log.debug('SetProjectService::stop server: local server stopped');
-          vm.$log.debug('response: ', response);
+        if (!fileExists) {
+          vm.Project.setProjectName(vm.newProjectName);
+          projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
-          // set project Variables
-          vm.setProjectVariables(projectDir);
+          if (projectDir.path().indexOf(' ') >= 0) {
+            // tell user to expect trouble
+            vm.whitespaceModal().then(response => {
+            });
+          }
 
-          vm.$state.transitionTo('analysis', {}, {reload: true});
-
-          vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
-
-          // resolve promise
-          deferred.resolve('resolve');
-
-          // Only start server if local server is selected?
-          // For now: selected local run type and start local server
-          vm.Project.setRunType(vm.Project.getRunTypes()[0]);
-          // start local server at new location
-          vm.OsServer.startServer().then(response => {
-            vm.$log.debug('setProjectService::start server: server started');
+          // force stop local server
+          vm.OsServer.stopServer('local').then(response => {
+            vm.$log.debug('SetProjectService::stop server: local server stopped');
             vm.$log.debug('response: ', response);
-            vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+
+            // set project Variables
+            vm.setProjectVariables(projectDir);
+
+            vm.$state.transitionTo('analysis', {}, {reload: true});
+
+            vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
+
+            // resolve promise
+            deferred.resolve('resolve');
+
+            // Only start server if local server is selected?
+            // For now: selected local run type and start local server
+            vm.Project.setRunType(vm.Project.getRunTypes()[0]);
+            // start local server at new location
+            vm.OsServer.startServer().then(response => {
+              vm.$log.debug('setProjectService::start server: server started');
+              vm.$log.debug('response: ', response);
+              vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+            });
+
+          }, (error) => {
+            vm.$log.debug('stop server errored, but setting project anyway');
+            // set project Variables anyway
+            vm.setProjectVariables(projectDir);
+
+            vm.$state.transitionTo('analysis', {}, {reload: true});
+
+            vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
+
+            deferred.reject('rejected');
           });
-
-        }, (error) => {
-          vm.$log.debug('stop server errored, but setting project anyway');
-          // set project Variables anyway
-          vm.setProjectVariables(projectDir);
-
-          vm.$state.transitionTo('analysis', {}, {reload: true});
-
-          vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
-
-          deferred.reject('rejected');
-        });
+        }
       } else {
         deferred.reject('rejected');
       }
@@ -293,6 +350,28 @@ export class SetProject {
 
     modalInstance.result.then(() => {
       vm.$log.debug('Resolving openModal()');
+      deferred.resolve('resolved');
+    }, () => {
+      // Modal canceled
+      deferred.reject('rejected');
+    });
+    return deferred.promise;
+  }
+
+  nestedProjectModal() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('setProject::nestedProjectModal');
+
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalNestedProjectWarningController',
+      controllerAs: 'modal',
+      templateUrl: 'app/project/nested_project_warning.html'
+    });
+
+    modalInstance.result.then(() => {
+      vm.$log.debug('Resolving whitespaceModal()');
       deferred.resolve('resolved');
     }, () => {
       // Modal canceled
