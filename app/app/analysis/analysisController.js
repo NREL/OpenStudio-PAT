@@ -73,8 +73,8 @@ export class AnalysisController {
       field: 'option_1',
       editDropdownOptionsFunction: function (rowEntity, colDef) {
         if (rowEntity.type === 'Choice') {
-          vm.$log.error('rowEntity: ', rowEntity);
-          vm.$log.error('colDef: ', colDef);
+          //vm.$log.error('rowEntity: ', rowEntity);
+          //vm.$log.error('colDef: ', colDef);
           vm.choices = [];
           _.forEach(rowEntity.choice_display_names
             , (choice) => {
