@@ -206,13 +206,11 @@ export class MeasureManager {
   // Expects a measurePath.  and osmPath if evaluating against a specific model
   computeArguments(measurePath, osmPath = null) {
     const vm = this;
-    vm.$log.debug("HEY!!!!!  osmPath: ", osmPath);
 
     // TODO: is there a situation where we want to use an empty model even though we have a seed model defined?
     if (!osmPath){
       osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
     }
-    vm.$log.debug('HEY!!! NOW: osmPath: ', osmPath);
     const params =  {measure_dir: measurePath, osm_path: osmPath};
     vm.$log.debug('computeArguments params', params);
     const deferred = vm.$q.defer();
