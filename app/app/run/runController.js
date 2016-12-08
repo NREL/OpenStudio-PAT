@@ -142,8 +142,8 @@ export class RunController {
     const vm = this;
     let result = '';
     if (startStr && endStr) {
-      const start = vm.makeDate(startStr);
-      const end = vm.makeDate(endStr);
+      const start = vm.Project.makeDate(startStr);
+      const end = vm.Project.makeDate(endStr);
 
       const diff = end - start;
       let sec = parseInt((end - start) / 1000);
