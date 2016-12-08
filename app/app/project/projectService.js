@@ -330,12 +330,14 @@ export class Project {
         }
       });
 
+      deferred.resolve(measure);
+
+    }, error => {
+      vm.$log.debug('Error in MM computerArguments: ', error);
+      deferred.reject();
+
     });
 
-    // recalculate pretty options
-    vm.savePrettyOptions();
-
-    deferred.resolve();
     return deferred.promise;
 
   }

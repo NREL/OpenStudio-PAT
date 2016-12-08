@@ -597,6 +597,21 @@ export class AnalysisController {
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
   }
 
+  // compute measure arguments when setting the seed
+  computeMeasureArguments(measure){
+    const vm = this;
+    vm.$log.debug('In computeMeasureArguments in analysis');
+    vm.setIsModified();
+    vm.Project.computeMeasureArguments(measure).then(response => {
+      // get updated measure and set
+      measure = response;
+      vm.$log.debug('new measure: ', measure);
+      vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+    }, error => {
+      vm.$log.debug("Error in Project::computeMeasureArguments: ", error);
+    });
+  }
+
   selectSeedModel() {
     const vm = this;
     vm.setIsModified();

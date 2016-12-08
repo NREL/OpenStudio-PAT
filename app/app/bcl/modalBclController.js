@@ -389,7 +389,14 @@ export class ModalBclController {
 
     // add to project measures
     measure.addedToProject = true;
+    // set default seed (and use to compute arguments
     measure.seed = vm.Project.getDefaultSeed();
+    vm.Project.computeMeasureArguments(measure).then(response => {
+      measure = response;
+      vm.$log.debug('New Measure with computed args: ', measure);
+    }, error => {
+      vm.$log.debug('Error in MM compute args: ', error);
+    });
     const project_measure = angular.copy(measure);
     project_measure.measure_dir = vm.projectDir.path(dirName);
 
