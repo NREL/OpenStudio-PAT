@@ -112,15 +112,15 @@ export class AnalysisController {
 
       let addRows = true;
       //if (measure.arguments.length > 0) {
-        _.forEach(measure.arguments, (argument) => {
-          if (_.has(argument, 'specialRowId')) {
-            addRows = false;
-          }
-        });
-     // }
-     //  else {
-     //    addRows = false;
-     //  }
+      _.forEach(measure.arguments, (argument) => {
+        if (_.has(argument, 'specialRowId')) {
+          addRows = false;
+        }
+      });
+      // }
+      //  else {
+      //    addRows = false;
+      //  }
 
       if (addRows) {
         const row0 = {specialRowId: 'optionDelete'};
@@ -144,10 +144,10 @@ export class AnalysisController {
           displayName: 'analysis.columns.argumentName',
           enableCellEdit: false,
           headerCellFilter: 'translate',
-          pinnedLeft:true,
+          pinnedLeft: true,
           width: 300,
           minWidth: 100,
-          cellTooltip: function(row) {
+          cellTooltip: function (row) {
             return row.entity.display_name;
           }
         }, {
@@ -155,14 +155,14 @@ export class AnalysisController {
           displayName: 'description',
           visible: false
         }, {
-            name: 'short_name',
-            displayName: 'analysis.columns.shortName',
-            cellEditableCondition: $scope => {
-              return angular.isDefined($scope.row.entity.display_name);
-            },
-            headerCellFilter: 'translate',
-            width: 200,
-            minWidth: 100
+          name: 'short_name',
+          displayName: 'analysis.columns.shortName',
+          cellEditableCondition: $scope => {
+            return angular.isDefined($scope.row.entity.display_name);
+          },
+          headerCellFilter: 'translate',
+          width: 200,
+          minWidth: 100
         }, {
           name: 'variable',
           displayName: 'analysis.columns.variable',
@@ -177,7 +177,7 @@ export class AnalysisController {
           vm.gridApis[measure.uid] = gridApi;
           gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
             if (newValue != oldValue) {
-              vm.$log.debug('CELL has changed in: ', measure.uid,  ' old val: ', oldValue, ' new val: ', newValue);
+              vm.$log.debug('CELL has changed in: ', measure.uid, ' old val: ', oldValue, ' new val: ', newValue);
               vm.$log.debug('rowEntity: ', rowEntity);
               vm.updateDASelectedName(measure, oldValue, newValue);
             }
@@ -311,32 +311,32 @@ export class AnalysisController {
     const vm = this;
     vm.setIsModified();
     _.forEach(vm.designAlternatives, (alt) => {
-     delete alt[measureName];
+      delete alt[measureName];
     });
   }
 
   // When an option's name changes, update DAs
   // option dropdowns will auto-repopulate when navigating to DA tab
-  updateDASelectedName(measure, oldValue, newValue){
+  updateDASelectedName(measure, oldValue, newValue) {
     const vm = this;
     _.forEach(vm.designAlternatives, (alt) => {
-      if (alt[measure.name] && alt[measure.name] == oldValue){
+      if (alt[measure.name] && alt[measure.name] == oldValue) {
         alt[measure.name] = newValue;
       }
     });
   }
 
   // When an option is deleted, reset DAs that were using the option
-  unsetOptionInDA(measureUID, value){
+  unsetOptionInDA(measureUID, value) {
     const vm = this;
     vm.$log.debug('In Analysis::unsetOptionInDA');
     vm.$log.debug('DAs: ', vm.designAlternatives);
     vm.$log.debug('measureUID: ', measureUID, ' optionName: ', value);
     const measure = _.find(vm.$scope.measures, {uid: measureUID});
     vm.$log.debug('measure: ', measure);
-    if (measure){
+    if (measure) {
       _.forEach(vm.designAlternatives, (alt) => {
-        if (alt[measure.name] && alt[measure.name] == value){
+        if (alt[measure.name] && alt[measure.name] == value) {
           alt[measure.name] = 'None';
         }
       });
@@ -380,7 +380,7 @@ export class AnalysisController {
   addMeasureOption(measure) {
     const vm = this;
     vm.setIsModified();
-    //vm.$log.debug('In addMeasureOption in analysis');
+    vm.$log.debug('In addMeasureOption in analysis');
 
     if (measure.arguments.length === 0) return; // Nothing to see here
 
@@ -488,7 +488,7 @@ export class AnalysisController {
     const vm = this;
     const measureUID = col.colDef.measureUID;
     // toggle checkbox
-    if (row.entity.variable){
+    if (row.entity.variable) {
       // set all to true
       _.forEach(vm.$scope.gridOptions[measureUID].data, (row) => {
         row.variable = true;
@@ -508,7 +508,7 @@ export class AnalysisController {
       if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.choice_display_names))) {
         argument[option.field] = Number(argument.choice_display_names);
       }
-      else if (angular.isDefined(argument.choice_display_names) && argument.choice_display_names.length > 0){
+      else if (angular.isDefined(argument.choice_display_names) && argument.choice_display_names.length > 0) {
         argument[option.field] = argument.choice_display_names[0];
       }
     });
@@ -523,8 +523,10 @@ export class AnalysisController {
     const opt = vm.addMeasureOption(measure);
 
     // copy from 1st option
+    let count = 0;
     _.forEach(measure.arguments, (arg) => {
-      arg[opt.field] = arg.option_1;
+      // Dont change the first 3 rows regarding naming
+      if (count++ > 2) arg[opt.field] = arg.option_1;
     });
   }
 
