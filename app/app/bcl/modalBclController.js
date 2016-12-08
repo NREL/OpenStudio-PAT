@@ -394,14 +394,16 @@ export class ModalBclController {
     vm.Project.computeMeasureArguments(measure).then(response => {
       measure = response;
       vm.$log.debug('New Measure with computed args: ', measure);
+      const project_measure = angular.copy(measure);
+      project_measure.measure_dir = vm.projectDir.path(dirName);
+      vm.insertIntoProjectMeasuresArray(project_measure);
     }, error => {
-      vm.$log.debug('Error in MM compute args: ', error);
+      vm.$log.debug('Error in MM compute args.  Will add measure as is: ', error);
+      const project_measure = angular.copy(measure);
+      project_measure.measure_dir = vm.projectDir.path(dirName);
+      vm.insertIntoProjectMeasuresArray(project_measure);
     });
-    const project_measure = angular.copy(measure);
-    project_measure.measure_dir = vm.projectDir.path(dirName);
 
-    //vm.projectMeasures.push(project_measure);
-    vm.insertIntoProjectMeasuresArray(project_measure);
   }
 
   setMeasureInExistingDAs(measure){

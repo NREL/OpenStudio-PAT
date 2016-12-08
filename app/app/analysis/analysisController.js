@@ -572,8 +572,15 @@ export class AnalysisController {
     _.forEach(vm.$scope.measures, (measure) => {
       measure.seed = vm.$scope.defaultSeed;
     });
-    // recompute model-dependent measure arguments when resetting seed
-    vm.Project.computeAllMeasureArguments();
+    vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+    // recompute model-dependent measure arguments & refresh grid
+    vm.Project.computeAllMeasureArguments().then(() => {
+      vm.$log.debug('computeAllMeasureArgs success!');
+      vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+      vm.initializeGrids();
+    }, error => {
+      vm.$log.debug('Error in computeALLMeasureArguments: ', error);
+    });
   }
 
   setWeatherFile() {
@@ -606,8 +613,11 @@ export class AnalysisController {
     vm.setIsModified();
     vm.Project.computeMeasureArguments(measure).then(response => {
       // get updated measure and set
+      vm.$log.debug('Success!');
       measure = response;
-      vm.$log.debug('new measure: ', measure);
+      vm.$log.debug('Analysis Tab, new computed measure: ', measure);
+      vm.$log.debug('Scope measures: ', vm.$scope.measures);
+      vm.initializeGrids();
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
     }, error => {
       vm.$log.debug("Error in Project::computeMeasureArguments: ", error);
@@ -643,8 +653,15 @@ export class AnalysisController {
       _.forEach(vm.$scope.measures, (measure) => {
         measure.seed = vm.$scope.defaultSeed;
       });
+      vm.Project.setMeasuresAndOptions(vm.$scope.measures);
       // recompute model-dependent measure arguments when resetting seed
-      vm.Project.computeAllMeasureArguments();
+      vm.Project.computeAllMeasureArguments().then(() => {
+        vm.$log.debug('computeAllMeasureArgs success!');
+        vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+        vm.initializeGrids();
+      }, error => {
+        vm.$log.debug('ERROR in computeAllMeasureArguments');
+      });
     }
   }
 

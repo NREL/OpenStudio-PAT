@@ -260,46 +260,32 @@ export class Project {
   computeAllMeasureArguments() {
     const vm = this;
     const deferred = vm.$q.defer();
+    const promises = [];
+
     vm.$log.debug('in Project computeAllMeasureArguments()');
     let osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
 
     _.forEach(vm.measures, (measure) => {
       if (!_.isNil(measure.seed)) {
         vm.$log.debug(`computeAllMeasureArguments using unique seed for measure: ${measure}`);
-        osmPath = vm.seedDir.path(measure.seed);
       }
-
-      vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
-        // merge with existing project measure
-        vm.$log.debug('New computed measure: ', newMeasure);
-
-        // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
-        _.forEachRight(measure.arguments, (arg, index) => {
-          if (_.isUndefined(arg.specialRowId)) {
-            const match = _.find(measure.arguments, {name: arg.name});
-            if (_.isUndefined(match)) {
-              measure.arguments.splice(index, 1);
-            }
-          }
-        });
-        // then add/merge (at argument level)
-        _.forEach(newMeasure.arguments, (arg) => {
-          const match = _.find(measure.arguments, {name: arg.name});
-          if (_.isUndefined(match)) {
-            measure.arguments.push(arg);
-          } else {
-            _.merge(match, arg);
-          }
-        });
-
-      });
-
+      // todo: ensure that this modifies the vm.measures directly
+      const promise = vm.computeMeasureArguments(measure);
+      promises.push(promise);
     });
 
-    // recalculate pretty options
-    vm.savePrettyOptions();
+    vm.$q.all(promises).then(response => {
+      vm.$log.debug('ComputeAllMeasures resolved');
+      deferred.resolve();
+      vm.setModified(true);
+    }, error => {
+      vm.$log.debug('ERROR in ComputeAllMeasures: ', error);
+      deferred.reject(error);
+    });
 
-    deferred.resolve();
+    // recalculate pretty options (not unless we modify the actual options themselves
+    //vm.savePrettyOptions();
+
     return deferred.promise;
 
   }
