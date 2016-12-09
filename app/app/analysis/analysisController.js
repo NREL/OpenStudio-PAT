@@ -117,10 +117,6 @@ export class AnalysisController {
           addRows = false;
         }
       });
-      // }
-      //  else {
-      //    addRows = false;
-      //  }
 
       if (addRows) {
         const row0 = {specialRowId: 'optionDelete'};
@@ -538,6 +534,8 @@ export class AnalysisController {
     vm.$log.debug('In loadMeasureOptions in analysis');
     _.forEach(vm.$scope.measures, (measure) => {
       vm.$log.debug('measure: ', measure);
+      // check choice arg selected values in case seed was reset
+      vm.resetChoiceArgumentSelections(measure);
       _.forEach(measure.options, (option) => {
         vm.loadOption(measure, option);
       });
@@ -561,6 +559,35 @@ export class AnalysisController {
     }
   }
 
+  // reset selections (to default) when choice argument is no longer in list
+  resetChoiceArgumentSelections(measure) {
+    const vm = this;
+    vm.$log.debug('in resetChoiceArgumentSelections in analysis');
+    _.forEach(measure.arguments, (arg) => {
+      if (arg.type == 'Choice'){
+        vm.$log.debug("Choice Arg: ", arg.name);
+        const keys =_.keys(arg);
+        const optionKeys = _.filter(keys, function (k) {
+          return k.indexOf('option_') !== -1;
+        });
+        _.forEach(optionKeys, (key) => {
+          if (_.isUndefined(_.find(arg.choice_display_names, arg[key]))) {
+            vm.$log.debug('Argument value ', arg[key], ' was not found in choice list...resetting to default_value');
+            arg[key] = arg.default_value ? arg.default_value : '';
+          }
+        });
+      }
+    });
+  }
+
+  resetAllChoiceArgumentSelections() {
+    const vm = this;
+    vm.$log.debug('in resetAllChoiceArgumentSelections in anaysis');
+    _.forEach(vm.$scope.measures, (measure) => {
+      vm.resetChoiceArgumentSelections(measure);
+    });
+  }
+
   setSeed() {
     const vm = this;
     vm.$log.debug('In Analysis::setSeed');
@@ -570,10 +597,12 @@ export class AnalysisController {
       measure.seed = vm.$scope.defaultSeed;
     });
     vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+    vm.Project.savePrettyOptions();
     // recompute model-dependent measure arguments & refresh grid
     vm.Project.computeAllMeasureArguments().then(() => {
       vm.$log.debug('computeAllMeasureArgs success!');
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+      vm.resetAllChoiceArgumentSelections();
       vm.initializeGrids();
     }, error => {
       vm.$log.debug('Error in computeALLMeasureArguments: ', error);
@@ -612,7 +641,7 @@ export class AnalysisController {
       // get updated measure and set
       vm.$log.debug('Success!');
       measure = response;
-      vm.$log.debug('Analysis Tab, new computed measure: ', measure);
+      vm.$log.debug('Analysis Tab, new computed measure: ', angular.copy(measure));
       vm.$log.debug('Scope measures: ', vm.$scope.measures);
       vm.initializeGrids();
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
@@ -651,10 +680,12 @@ export class AnalysisController {
         measure.seed = vm.$scope.defaultSeed;
       });
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+      vm.Project.savePrettyOptions();
       // recompute model-dependent measure arguments when resetting seed
       vm.Project.computeAllMeasureArguments().then(() => {
         vm.$log.debug('computeAllMeasureArgs success!');
         vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+        vm.resetAllChoiceArgumentSelections();
         vm.initializeGrids();
       }, error => {
         vm.$log.debug('ERROR in computeAllMeasureArguments');
