@@ -65,7 +65,7 @@ export class SetProject {
             fileExists = true;
             vm.nestedProjectModal().then(response => {
             });
-            vm.$log.error('Found what appears to be a PAT project at ', currentDir.path());
+            vm.$log.debug('Found what appears to be a PAT project at ', currentDir.path());
             deferred.reject('rejected');
           }
           currentDir = jetpack.cwd(currentDir.path('..'));
@@ -177,7 +177,7 @@ export class SetProject {
             fileExists = true;
             vm.nestedProjectModal().then(response => {
             });
-            vm.$log.error('Found what appears to be a PAT project at ', currentDir.path());
+            vm.$log.debug('Found what appears to be a PAT project at ', currentDir.path());
             deferred.reject('rejected');
           }
           currentDir = jetpack.cwd(currentDir.path('..'));
