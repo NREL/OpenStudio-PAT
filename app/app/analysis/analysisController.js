@@ -504,13 +504,10 @@ export class AnalysisController {
   addDefaultArguments(measure, option) {
     const vm = this;
     vm.setIsModified();
+    // TODO: add logic related to whether an arg is variable or not (if not, use option1's value in subsequent options)
     _.forEach(measure.arguments, (argument) => {
-      if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.choice_display_names))) {
-        argument[option.field] = Number(argument.choice_display_names);
-      }
-      else if (angular.isDefined(argument.choice_display_names) && argument.choice_display_names.length > 0) {
-        argument[option.field] = argument.choice_display_names[0];
-      }
+      // use default value, otherwise leave blank
+      argument[option.field] = argument.default_value ? argument.default_value : '';
     });
   }
 
