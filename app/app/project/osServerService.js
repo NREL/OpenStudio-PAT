@@ -58,6 +58,32 @@ export class OsServer {
     vm.rubyPath = DependencyManager.getPath("PAT_RUBY_PATH");
     vm.energyplusEXEPath = DependencyManager.getPath("ENERGYPLUS_EXE_PATH");
 
+    // server start in progress?
+    vm.serverStartInProgress = false;
+    vm.serverStartDeferred = vm.$q.defer();
+
+  }
+
+  isServerReady() {
+    const vm = this;
+    return vm.serverStartDeferred.promise;
+  }
+
+  serverProgressStart() {
+    const vm = this;
+    vm.serverStartInProgress = true;
+    vm.serverStartDeferred = vm.$q.defer();
+  }
+
+  serverProgressStop(type, message) {
+    const vm = this;
+    vm.serverStartInProgress = false;
+    if (type == 'resolve') {
+      vm.serverStartDeferred.resolve(message);
+    } else {
+      //reject
+      vm.serverStartDeferred.reject(message);
+    }
   }
 
   resetAnalysis() {
@@ -204,6 +230,7 @@ export class OsServer {
   }
 
   // ping server (selectedServerURL)
+  // TODO: get URL from local_configuration.json file
   pingServer() {
     const vm = this;
     const serverType = vm.Project.getRunType().name;
@@ -237,28 +264,37 @@ export class OsServer {
     vm.$log.debug('SERVER TYPE: ', serverType);
     vm.$log.debug('SERVER STATUS: ', vm.getServerStatus(serverType));
 
-    function sleep(milliseconds) {
-      // TODO: Deprecate this method? (Evan)
-      const start = new Date().getTime();
-      for (let i = 0; i < 1e7; i++) {
-        if ((new Date().getTime() - start) > milliseconds) {
-          break;
-        }
-      }
-    }
-
-    // TODO: maybe ping server to make sure it is really started?
-    // TODO: also if start fails, ping server...it might be started already
     if ((vm.getServerStatus(serverType) != 'started') || force) {
       if (force == 'local' || serverType == 'local') {
-        vm.localServer().then(response => {
-          vm.$log.debug('localServer promise resolved.  Server should have started');
-          vm.setServerStatus(serverType, 'started');
+        // check if server is currently starting
+        if (vm.serverStartInProgress){
+          vm.$log.debug('***Server is already in the process of starting...waiting on serverStartDeferred to resolve');
+          vm.isServerReady().then((response) => {
+            vm.$log.debug('Server is started!');
+            deferred.resolve(response);
+          }, (error) => {
+            vm.$log.debug('ERROR in start local server');
+            deferred.reject(error);
+          });
+        } else {
+          // start server (reset promise)
+          vm.$log.debug('***Server start not already in progress...start server');
+          vm.serverProgressStart();
+          vm.localServer().then(response => {
+            vm.$log.debug('localServer promise resolved.  Server should have started');
+            vm.setServerStatus(serverType, 'started');
+            // server start no longer in progress
+            vm.serverProgressStop('resolve', response);
+            deferred.resolve(response);
 
-        }, response => {
-          vm.$log.debug('ERROR in start local server');
-          deferred.reject(response);
-        });
+          }, error => {
+            vm.$log.debug('ERROR in start local server: ', error);
+            vm.serverStopProgress('reject', error);
+            deferred.reject(error);
+
+          });
+        }
+
       }
       else {
         vm.remoteServer().then(response => {
@@ -271,6 +307,8 @@ export class OsServer {
         });
       }
     } else {
+      // server already started
+      vm.$log.debug('Server already started!');
       deferred.resolve();
     }
 
@@ -481,6 +519,7 @@ export class OsServer {
               // SUCCESS
               vm.$log.debug('Server Stopped');
               vm.setServerStatus(serverType, 'stopped');
+              vm.localServerCleanup();
               deferred.resolve(child);
 
             } else {
@@ -489,7 +528,8 @@ export class OsServer {
                 console.log('exec error: ', error);
               }
               // Note: even if there is an error stopping the server in one location,
-              //       return resolved so promise can be used to start new server
+              // return resolved so promise can be used to start new server
+              vm.localServerCleanup();
               deferred.resolve(error);
             }
           });
@@ -513,6 +553,23 @@ export class OsServer {
     }
 
     return deferred.promise;
+  }
+
+  localServerCleanup() {
+    const vm = this;
+
+    vm.$log.debug('LOCAL SERVER CLEANUP');
+    // delete local_configuration.json and .receipt
+    vm.jetpack.remove(vm.Project.getProjectDir().path('local_configuration.json'));
+    vm.jetpack.remove(vm.Project.getProjectDir().path('local_configuration.receipt'));
+    // delete server.pid
+    vm.jetpack.remove(vm.Project.getProjectDir().path('server.pid'));
+    // delete temp_data folder
+    vm.jetpack.remove(vm.Project.getProjectDir().path('temp_data'));
+    // delete everything in data/db
+    vm.jetpack.remove(vm.Project.getProjectDir().path('data/db/*'));
+    vm.$log.debug("SERVER CLEANUP COMPLETE");
+
   }
 
   retrieveAnalysisStatus() {
