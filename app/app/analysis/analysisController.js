@@ -419,6 +419,10 @@ export class AnalysisController {
       else if (argument.specialRowId === 'optionDescription') {
         argument[opt.field] = opt.display_name + ' Description';
       }
+      else if (angular.isUndefined(argument.variable)) {
+        vm.$log.debug('argument.variable undefined')
+        argument.variable = false;
+      }
       else if (!argument.variable) {
         argument[opt.field] = argument.option_1;
       }
