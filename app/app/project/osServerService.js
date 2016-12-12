@@ -229,11 +229,16 @@ export class OsServer {
     vm.serverType = type;
   }
 
-  // ping server (selectedServerURL)
-  // TODO: get URL from local_configuration.json file
+  // ping server
   pingServer() {
     const vm = this;
     const serverType = vm.Project.getRunType().name;
+
+    if (serverType == 'local'){
+      // in case server didn't shut down correctly before
+      vm.getLocalServerUrlFromFile();
+    }
+
     vm.$log.debug('Pinging ', serverType, ' server to see if it is alive: ', vm.selectedServerURL);
     const deferred = vm.$q.defer();
     const url = vm.selectedServerURL + '/status.json';
@@ -277,24 +282,27 @@ export class OsServer {
             deferred.reject(error);
           });
         } else {
-          // start server (reset promise)
-          vm.$log.debug('***Server start not already in progress...start server');
-          vm.serverProgressStart();
-          vm.localServer().then(response => {
-            vm.$log.debug('localServer promise resolved.  Server should have started');
-            vm.setServerStatus(serverType, 'started');
-            // server start no longer in progress
-            vm.serverProgressStop('resolve', response);
-            deferred.resolve(response);
 
-          }, error => {
-            vm.$log.debug('ERROR in start local server: ', error);
-            vm.serverStopProgress('reject', error);
-            deferred.reject(error);
-
+          // **always attempt to stop the server first in case local_config file or server.pid already exists**
+          // stopServer always resolves
+          vm.$log.debug('force stopping server just in case...');
+          vm.stopServer(true).then( () => {
+            // start server (reset promise)
+            vm.$log.debug('***Server start not already in progress...start server');
+            vm.serverProgressStart();
+            vm.localServer().then(response => {
+              vm.$log.debug('localServer promise resolved.  Server should have started');
+              vm.setServerStatus(serverType, 'started');
+              // server start no longer in progress
+              vm.serverProgressStop('resolve', response);
+              deferred.resolve(response);
+            }, error => {
+              vm.$log.debug('ERROR in start local server: ', error);
+              vm.serverProgressStop('reject', error);
+              deferred.reject(error);
+            });
           });
         }
-
       }
       else {
         vm.remoteServer().then(response => {
@@ -364,18 +372,11 @@ export class OsServer {
           // SUCCESS
           vm.$log.debug('SERVER SUCCESS');
           // get url from local_configuration.json
-          const obj = jetpack.read(vm.Project.projectDir.path() + '/local_configuration.json', 'json');
-          if (obj) {
-            vm.setSelectedServerURL(obj.server_url);
-            vm.localServerURL = obj.server_url;
-          } else {
-            vm.$log.debug('local_configuration.json obj undefined');
-          }
+          vm.getLocalServerUrlFromFile();
           vm.$log.debug('SERVER URL: ', vm.selectedServerURL);
           deferred.resolve(child);
         } else {
           vm.$log.debug('SERVER ERROR');
-          // TODO: cleanup?
           if (error !== null) {
             console.log('exec error:', error);
           }
@@ -414,6 +415,18 @@ export class OsServer {
     });
 
     return deferred.promise;
+  }
+
+  getLocalServerUrlFromFile() {
+    const vm = this;
+    // get url from local_configuration.json
+    const obj = jetpack.read(vm.Project.projectDir.path() + '/local_configuration.json', 'json');
+    if (obj) {
+      vm.setSelectedServerURL(obj.server_url);
+      vm.localServerURL = obj.server_url;
+    } else {
+      vm.$log.debug('local_configuration.json obj undefined');
+    }
   }
 
   runAnalysis(analysis_param) {
@@ -492,6 +505,7 @@ export class OsServer {
   }
 
   // stop server (local or remote), if force != null, force close the specified server (local/remote)
+  // this ALWAYS resolves
   stopServer(force = null) {
     const vm = this;
     const deferred = vm.$q.defer();
