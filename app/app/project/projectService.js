@@ -469,8 +469,18 @@ export class Project {
           m.measure_type = 'unknown';
         }
         m.measure_definition_class_name = measure.className;
-        //m.measure_definition_measureUID = measure.colDef.measureUID; // TODO: fix this
-        const mdir = _.last(_.split(measure.measure_dir, '/'));
+        //m.measure_definition_measureUID = measure.colDef.measureUID;
+
+        // windows path vs. mac
+        let mdir = '';
+        if (measure.measure_dir.indexOf('/') != -1 ){
+          // correct paths
+           mdir = _.last(_.split(measure.measure_dir, '/'));
+        } else {
+          // assume windows paths '\\'
+          mdir = _.last(_.split(measure.measure_dir, '\\'));
+        }
+        vm.$log.debug("***MEASURE DIR NAME: ", mdir);
         m.measure_definition_directory = './measures/' + mdir;
         m.measure_definition_directory_local = measure.measure_dir;
         m.measure_definition_class_name = measure.class_name;
