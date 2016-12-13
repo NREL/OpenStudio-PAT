@@ -90,8 +90,7 @@ export class Project {
           vm.$log.error('response.my_measures_dir undefined');
         }
         if (response.my_measures_dir){
-          // make this a jetpack object
-          vm.myMeasuresDir = vm.jetpack.cwd(response.my_measures_dir);
+          vm.setMeasuresDir(response.my_measures_dir);
         }
         vm.$log.debug('My measures Dir: ', vm.myMeasuresDir.path());
       }, error => {
@@ -785,6 +784,18 @@ export class Project {
     vm.$log.debug('***REORDERED PROJECT MEASURES: ', vm.measures);
   }
 
+  openSetMyMeasuresDirModal() {
+    const vm = this;
+    vm.$log.debug('in SetMyMeasures Modal function');
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalSetMeasuresDirController',
+      controllerAs: 'modal',
+      templateUrl: 'app/project/setMeasuresDir.html',
+      windowClass: 'modal'
+    });
+  }
+
   getProjectName() {
     const vm = this;
     return vm.projectName;
@@ -889,6 +900,11 @@ export class Project {
   getMeasuresDir() {
     const vm = this;
     return vm.myMeasuresDir;
+  }
+
+  setMeasuresDir(strPath) {
+    const vm = this;
+    vm.myMeasuresDir = vm.jetpack.cwd(strPath);
   }
 
   getSeedDir() {

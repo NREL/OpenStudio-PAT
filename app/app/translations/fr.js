@@ -30,6 +30,10 @@ export default {
     ping: 'Ping Current Server and Set Status',
     noProject: 'You must open a project first'
   },
+  setMeasuresDir: {
+    title: 'Set MyMeasures Directory',
+    measuresDir: 'MyMeasures Directory'
+  },
   projectName: {
     title: 'New Project',
     heading: 'New Project Name',

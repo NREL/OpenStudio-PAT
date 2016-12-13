@@ -191,6 +191,9 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
         });
       }
     }, {
+      label: 'Set MyMeasures Directory',
+      click: () => Project.openSetMyMeasuresDirModal()
+    }, {
       label: 'Server Tools',
       click: () => OsServer.openServerToolsModal()
     }]
