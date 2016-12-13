@@ -399,7 +399,7 @@ export class BCL {
     if (measure.display_name == undefined) measure.display_name = measure.name;
 
     // fix tags
-    measure.tags = _.join(_.split(measure.tags, '.'), ' -> ');
+    //measure.tags = _.join(_.split(measure.tags, '.'), ' -> ');
 
     return measure;
   }
