@@ -605,7 +605,7 @@ export class OsServer {
     // delete .temp
     vm.jetpack.remove(vm.Project.getProjectDir().path('.temp'));
     // delete logs
-    vm.jetpack.remove(vm.Project.getProjectDir().path('logs'));
+    vm.jetpack.remove(vm.Project.getProjectDir().path('logs/*'));
     vm.$log.debug("SERVER CLEANUP COMPLETE");
 
   }
