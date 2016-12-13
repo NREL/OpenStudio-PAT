@@ -23,6 +23,13 @@ export default {
     make: 'Make New Project',
     existing: 'Open Existing Project'
   },
+  serverTools: {
+    title: 'Server Troubleshooting Tools',
+    start: 'Force Start Local Server',
+    stop: 'Force Stop Local Server',
+    ping: 'Ping Current Server and Set Status',
+    noProject: 'You must open a project first'
+  },
   projectName: {
     title: 'New Project',
     heading: 'New Project Name',

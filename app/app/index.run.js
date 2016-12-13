@@ -190,6 +190,9 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
           // Do something
         });
       }
+    }, {
+      label: 'Server Tools',
+      click: () => OsServer.openServerToolsModal()
     }]
   }, {
     label: 'Help',

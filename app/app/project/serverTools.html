@@ -1,0 +1,21 @@
+<div class="modal-header">
+  <h3 class="modal-title" translate>serverTools.title</h3>
+</div>
+
+<div class="modal-body">
+  <div class="row pad-bot-20">
+    <div class="col-sm-12 modal-text" ng-if="projectDir != null">
+      <button type="button" class="btn btn-success" ng-click="modal.startLocalServer()" translate>serverTools.start</button>
+      <button type="button" class="btn btn-danger" ng-click="modal.stopLocalServer()" translate>serverTools.stop</button>
+      <button type="button" class="btn btn-primary" ng-click="modal.pingServer()" translate>serverTools.ping</button>
+    </div>
+    <div class="col-sm-12 modal-text" ng-if="projectDir == null">
+      <translate>serverTools.noProject</translate>
+      {{projectDir}}
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
+  </div>
+</div>

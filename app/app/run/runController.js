@@ -205,10 +205,10 @@ export class RunController {
   stopServer(force = false) {
     const vm = this;
     vm.OsServer.stopServer(force).then(response => {
-      vm.$log.debug('***** ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name], ' Server Stopped *****');
+      vm.$log.debug('***** ', vm.$scope.selectedRunType.name, ' Server Stopped *****');
       vm.OsServer.setProgress(0, '');
       //vm.$scope.serverStatuses = vm.OsServer.getServerStatus();
-      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
+      if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
         vm.toastr.success('PAT successfully disconnected from remote server');
       } else {
         vm.toastr.success('Server stopped successfully');
@@ -217,46 +217,44 @@ export class RunController {
     }, response => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
       vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
-      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
-        vm.toastr.error('PAT couldn\'t disconnect from remote server');
+      if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
+        vm.toastr.error('PAT could not disconnect from remote server');
       } else {
         vm.toastr.error('Error: server could not be stopped');
       }
     });
   }
 
-  // to start server on its own
-  startServer(force = false) {
-    const vm = this;
-    vm.OsServer.startServer(force).then(response => {
-      vm.$log.debug('Server Status for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
-      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
-        vm.toastr.success('Connected to remote server!');
-      } else {
-        vm.toastr.success('Server started!');
-      }
-
-    }, response => {
-      vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
-      if (vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
-        vm.toastr.error('Error: could not connect to remote server');
-      } else {
-        vm.toastr.error('Error: server did not start');
-      }
-    });
-  }
-
-  // check if server is alive, if so set its status to 'started', otherwise set status to 'stopped'
-  pingServer() {
-    const vm = this;
-    vm.OsServer.pingServer().then(response => {
-      //vm.$scope.serverStatus = vm.OsServer.getServerStatus();
-      vm.toastr.success('Server is Alive');
-    }, response => {
-      vm.$log.debug("Error pinging server");
-      vm.toastr.error('Server is Offline');
-    });
-  }
+  // // to start server on its own
+  // startServer(force = false) {
+  //   const vm = this;
+  //   vm.OsServer.startServer(force).then(response => {
+  //     vm.$log.debug('Server Status for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
+  //     if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
+  //       vm.toastr.success('Connected to remote server!');
+  //     } else {
+  //       vm.toastr.success('Server started!');
+  //     }
+  //
+  //   }, response => {
+  //     vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
+  //     if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
+  //       vm.toastr.error('Error: could not connect to remote server');
+  //     } else {
+  //       vm.toastr.error('Error: server did not start');
+  //     }
+  //   });
+  // }
+  //
+  // // check if server is alive, if so set its status to 'started', otherwise set status to 'stopped'
+  // pingServer() {
+  //   const vm = this;
+  //   vm.OsServer.pingServer().then(response => {
+  //     vm.toastr.success('Server is Alive');
+  //   }, error => {
+  //     vm.toastr.error('Server is Offline');
+  //   });
+  // }
 
   warnBeforeDelete(type) {
     // type could be 'run' (warning before running an new analysis), or 'runtype' (warning before setting new run type)

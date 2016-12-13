@@ -420,7 +420,7 @@ export class AnalysisController {
         argument[opt.field] = opt.display_name + ' Description';
       }
       else if (angular.isUndefined(argument.variable)) {
-        vm.$log.debug('argument.variable undefined')
+        vm.$log.debug('argument.variable undefined');
         argument.variable = false;
       }
       else if (!argument.variable) {

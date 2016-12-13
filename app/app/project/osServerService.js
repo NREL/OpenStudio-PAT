@@ -86,6 +86,27 @@ export class OsServer {
     }
   }
 
+  openServerToolsModal() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalServerToolsController',
+      controllerAs: 'modal',
+      templateUrl: 'app/project/serverTools.html'
+
+    });
+
+    modalInstance.result.then(() => {
+      deferred.resolve();
+    }, () => {
+      // Modal canceled
+      deferred.reject();
+    });
+    return deferred.promise;
+
+  }
+
   resetAnalysis() {
     const vm = this;
     vm.setAnalysisChangedFlag(false);
@@ -286,7 +307,7 @@ export class OsServer {
           // **always attempt to stop the server first in case local_config file or server.pid already exists**
           // stopServer always resolves
           vm.$log.debug('force stopping server just in case...');
-          vm.stopServer(true).then( () => {
+          vm.stopServer('local').then( () => {
             // start server (reset promise)
             vm.$log.debug('***Server start not already in progress...start server');
             vm.serverProgressStart();
@@ -571,7 +592,6 @@ export class OsServer {
 
   localServerCleanup() {
     const vm = this;
-
     vm.$log.debug('LOCAL SERVER CLEANUP');
     // delete local_configuration.json and .receipt
     vm.jetpack.remove(vm.Project.getProjectDir().path('local_configuration.json'));
@@ -582,6 +602,10 @@ export class OsServer {
     vm.jetpack.remove(vm.Project.getProjectDir().path('temp_data'));
     // delete everything in data/db
     vm.jetpack.remove(vm.Project.getProjectDir().path('data/db/*'));
+    // delete .temp
+    vm.jetpack.remove(vm.Project.getProjectDir().path('.temp'));
+    // delete logs
+    vm.jetpack.remove(vm.Project.getProjectDir().path('logs'));
     vm.$log.debug("SERVER CLEANUP COMPLETE");
 
   }
