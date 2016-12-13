@@ -209,6 +209,7 @@ export default {
     stopServer: 'Stop Server',
     exportToOSA: 'Export to OSA',
     runEntireWorkflow: 'Run Entire Workflow',
+    viewServer: 'View Server',
     modalAnalysisRunning: {
       title: 'Analysis is Running',
       message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'
@@ -219,8 +220,19 @@ export default {
       setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?'
     },
     viewReport: 'View Report',
-    'for': 'for'
-
+    'for': 'for',
+    remote: {
+      osServerVersion: 'OpenStudio Server Version',
+      connect: 'Connect',
+      disconnect: 'Disconnect',
+      serverURL: 'Existing Server URL',
+      serverType: 'Remote Server Type',
+      serverSettings: 'Remote Server Settings',
+      serverInstanceType: 'Server Instance Type',
+      cpus: 'CPU Count',
+      memory: 'Memory',
+      storage: 'Storage'
+    }
   },
   statusBar: {
     Downloading: 'Downloading',

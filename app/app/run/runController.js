@@ -31,6 +31,8 @@ export class RunController {
     vm.$log.debug("REMOTE SETTINGS: ", vm.$scope.remoteSettings);
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
     vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
+    vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
+    vm.$scope.serverInstanceTypes = vm.Project.getServerInstanceTypes();
 
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
