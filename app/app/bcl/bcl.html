@@ -115,5 +115,6 @@
 </div>
 
 <div class="modal-footer">
-  <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
+  <button type="button" ng-if="!addInProgress" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
+  <button type="button" ng-if="addInProgress" class="btn btn-warning disabled" translate>bcl.wait</button>
 </div>

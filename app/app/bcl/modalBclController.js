@@ -26,6 +26,8 @@ export class ModalBclController {
     vm.selected = null;
     vm.keyword = '';
 
+    vm.$scope.addingInProgress = false;
+
     vm.projectDir = vm.Project.getProjectMeasuresDir();
 
     vm.filters = {
@@ -381,6 +383,9 @@ export class ModalBclController {
     const vm = this;
     vm.$log.debug('ModalBCL::addToProject');
 
+    // prevent user from closing modal until measure is done getting added
+    vm.$scope.addInProgress = true;
+
     // copy on disk
     const dirNames = _.split(measure.measure_dir, '/');
     const dirName = _.last(dirNames);
@@ -397,11 +402,15 @@ export class ModalBclController {
       const project_measure = angular.copy(measure);
       project_measure.measure_dir = vm.projectDir.path(dirName);
       vm.insertIntoProjectMeasuresArray(project_measure);
+      vm.toastr.success('Measure Added to Project!');
+      vm.$scope.addInProgress = false;
     }, error => {
       vm.$log.debug('Error in MM compute args.  Will add measure as is: ', error);
       const project_measure = angular.copy(measure);
       project_measure.measure_dir = vm.projectDir.path(dirName);
       vm.insertIntoProjectMeasuresArray(project_measure);
+      vm.toastr.error('Measure added to project without computing arguments');
+      vm.$scope.addInProgress = false;
     });
 
   }

@@ -86,6 +86,7 @@ export default {
   },
   bcl: {
     title: 'Building Component Library',
+    wait: 'Please wait',
     aside: {
       attributes: 'Attributes',
       description: 'Description',
