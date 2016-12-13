@@ -122,22 +122,6 @@ export class RunController {
     return deferred.promise;
   }
 
-
-  // return MM/DD/YY from date string
-  // takes datestrings like these: 20161110T212644Z, 2016-11-22 11:10:50 -0700, 2016-11-22 04:32:23 UTC, or 2016-11-22T04:32:13.626Z
-  formatDate(dateString) {
-    const vm = this;
-    let theDate = '';
-
-    if (dateString) {
-      theDate = vm.Project.makeDate(dateString);
-      // format
-      theDate = theDate.getMonth() + 1 + "/" + theDate.getDate() + "/" + theDate.getFullYear();
-    }
-
-    return theDate;
-  }
-
   getRunTime(startStr, endStr) {
     const vm = this;
     let result = '';

@@ -1510,6 +1510,19 @@ export class Project {
 
   }
 
+  formatDate(dateString) {
+    const vm = this;
+    let theDate = '';
+
+    if (dateString) {
+      theDate = vm.makeDate(dateString);
+      // format
+      theDate = theDate.getMonth() + 1 + "/" + theDate.getDate() + "/" + theDate.getFullYear();
+    }
+
+    return theDate;
+  }
+
   getModified() {
     const vm = this;
     return vm.modified;
