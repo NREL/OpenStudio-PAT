@@ -84,12 +84,12 @@ export class Project {
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
 
     // set my measures dir
-    vm.MeasureManager.isReady().then( () => {
-      vm.MeasureManager.getMyMeasuresDir().then ( response => {
+    vm.MeasureManager.isReady().then(() => {
+      vm.MeasureManager.getMyMeasuresDir().then(response => {
         if (angular.isUndefined(response.my_measures_dir)) {
           vm.$log.error('response.my_measures_dir undefined');
         }
-        if (response.my_measures_dir){
+        if (response.my_measures_dir) {
           vm.setMeasuresDir(response.my_measures_dir);
         }
         vm.$log.debug('My measures Dir: ', vm.myMeasuresDir.path());
@@ -293,7 +293,18 @@ export class Project {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.$log.debug('in Project computeMeasureArguments()');
-    const osmPath = vm.seedDir.path(measure.seed);
+    let osmPath;
+    if (_.isNil(vm.seedDir)) {
+      vm.$log.error('vm.seedDir is undefined. Unable to compute measure arguments.');
+      deferred.reject('vm.seedDir isNil');
+      return deferred.promise;
+    } else if (_.isNil(measure.seed)) {
+      vm.$log.error('measure.seed is undefined. Unable to compute measure arguments.');
+      deferred.reject('measure.seed isNil');
+      return deferred.promise;
+    } else {
+      osmPath = vm.seedDir.path(measure.seed);
+    }
 
     vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
       // merge with existing project measure
@@ -472,9 +483,9 @@ export class Project {
 
         // windows path vs. mac
         let mdir = '';
-        if (measure.measure_dir.indexOf('/') != -1 ){
+        if (measure.measure_dir.indexOf('/') != -1) {
           // correct paths
-           mdir = _.last(_.split(measure.measure_dir, '/'));
+          mdir = _.last(_.split(measure.measure_dir, '/'));
         } else {
           // assume windows paths '\\'
           mdir = _.last(_.split(measure.measure_dir, '\\'));
@@ -498,10 +509,10 @@ export class Project {
         // first find out how many options there are
         let optionKeys = [];
         //if (measure.arguments.length > 0) {
-          const keys = Object.keys(measure.arguments[0]);
-          optionKeys = _.filter(keys, function (k) {
-            return k.indexOf('option_') !== -1;
-          });
+        const keys = Object.keys(measure.arguments[0]);
+        optionKeys = _.filter(keys, function (k) {
+          return k.indexOf('option_') !== -1;
+        });
         //}
 
         // ARGUMENTS
@@ -592,7 +603,7 @@ export class Project {
                 vm.$log.debug('value: None');
                 // when set to 'None', sub a value of the right type
                 let the_value = arg.default_value;
-                if (!the_value){
+                if (!the_value) {
                   // if no default value, use first option value, otherwise set to None
                   the_value = (arg.option_1) ? arg.option_1 : 'None';
                 }
@@ -611,8 +622,8 @@ export class Project {
                 });
                 vm.$log.debug('arg[option_id]: ', arg[option_id]);
                 // check that you have a value here...if not error
-                if (!arg[option_id]){
-                  vm.$log.error('Option: ', option_name, 'for measure \'', measure.display_name,'\' does not have a value. Analysis will error.');
+                if (!arg[option_id]) {
+                  vm.$log.error('Option: ', option_name, 'for measure \'', measure.display_name, '\' does not have a value. Analysis will error.');
                 }
                 valArr.push({value: arg[option_id], weight: 1 / vm.designAlternatives.length});
               }
