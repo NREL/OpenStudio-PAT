@@ -54,6 +54,7 @@ export class Project {
     vm.setOsServerVersions();
     vm.setServerInstanceTypes();
 
+    vm.clusters = [];
     vm.modified = false;
     vm.analysisType = null;
     vm.reportType = null;
@@ -964,6 +965,22 @@ export class Project {
     return vm.remoteSettings;
   }
 
+  // always get from disk and extract unique name
+  getClusters() {
+    const vm = this;
+    vm.clusters = [];
+    const tempClusters = vm.jetpack.find(vm.projectDir.path(), {matching: '*_cluster.json'});
+    _.forEach(tempClusters, cluster => {
+      vm.$log.debug('CLUSTER: ', cluster);
+      cluster = _.last(_.split(cluster, '/'));
+      cluster = _.replace(cluster, '_cluster.json', '');
+      vm.clusters.push(cluster);
+    });
+
+    vm.$log.debug('Cluster files found: ', vm.clusters);
+    return vm.clusters;
+  }
+
   getOsServerVersions() {
     const vm = this;
     return vm.osServerVersions;
@@ -1072,13 +1089,8 @@ export class Project {
         cpus:'32',
         memory:'244 GiB',
         storage:'2 x 320 GB'
-      },
-
-
-
+      }
     ];
-
-
   }
 
   getServerInstanceTypes() {

@@ -231,7 +231,18 @@ export default {
       serverInstanceType: 'Server Instance Type',
       cpus: 'CPU Count',
       memory: 'Memory',
-      storage: 'Storage'
+      storage: 'Storage',
+      numberOfWorkers: 'Number of Workers',
+      selectCluster: 'Select an Existing Cluster',
+      newCluster: 'Make a new Cluster',
+      newClusterName: 'New Cluster Name',
+      awsUserID: 'AWS UserID',
+      saveCluster: 'Save Cluster Settings',
+      status: 'Status'
+    },
+    modalNewCluster: {
+      title: 'New Cluster',
+      name: 'Cluster Name'
     }
   },
   statusBar: {

@@ -33,10 +33,10 @@ export class RunController {
     vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
     vm.$scope.serverInstanceTypes = vm.Project.getServerInstanceTypes();
+    vm.$scope.clusters = vm.Project.getClusters();
 
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
-    // TODO: do we still need datapointsStatus?
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
     vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
 
@@ -94,9 +94,77 @@ export class RunController {
     vm.shell.openExternal(vm.OsServer.getSelectedServerURL());
   }
 
+  newClusterModal(){
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalNewClusterController',
+      controllerAs: 'modal',
+      templateUrl: 'app/run/newCluster.html'
+    });
+
+    modalInstance.result.then((name) => {
+      vm.$log.debug('In modal result function, name: ', name);
+      // get cluster files
+      vm.$scope.clusters = vm.Project.getClusters();
+      // select new one
+      vm.$scope.remoteSettings.aws = {};
+      vm.$scope.remoteSettings.aws.cluster_name = name;
+      // run the onclick function to set fields in remote settings)
+      vm.resetClusterSettings();
+      deferred.resolve();
+    }, () => {
+      // Modal canceled
+      deferred.reject();
+    });
+    return deferred.promise;
+  }
+
+  resetClusterSettings(){
+    const vm = this;
+    // read in json file
+    const clusterFile = vm.jetpack.read(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json');
+
+    // set variables
+    vm.$scope.remoteSettings.aws.server_instance_type = null;
+    if (clusterFile.server_instance_type) {
+      const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.server_instance_type});
+      vm.$log.debug("Server match: ", match);
+      if (match) {
+        vm.$scope.remoteSettings.aws.server_instance_type = match;
+      }
+    }
+    vm.$scope.remoteSettings.aws.worker_instance_type = null;
+    if (clusterFile.worker_instance_type) {
+      const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.worker_instance_type});
+      vm.$log.debug('Worker match: ', match);
+      if (match) {
+        vm.$scope.remoteSettings.aws.worker_instance_type = match;
+      }
+    }
+    vm.$scope.remoteSettings.aws.user_id = clusterFile.user_id ? clusterFile.user_id : null;
+    vm.$scope.remoteSettings.aws.worker_node_number = clusterFile.worker_node_number ? clusterFile.worker_node_number: null;
+    vm.$scope.remoteSettings.aws.aws_tags = []; // leave empty for now
+    vm.$scope.remoteSettings.aws.openstudio_server_version = clusterFile.openstudio_server_version ? clusterFile.openstudio_server_version: null;
+    // TODO: fix this
+    vm.$scope.remoteSettings.aws.connected = false;
+
+    vm.$log.debug('remote settings.aws reset: ', vm.$scope.remoteSettings.aws);
+  }
+
+  saveClusterToFile() {
+    const vm = this;
+    const cluster = angular.copy(vm.$scope.remoteSettings.aws);
+    cluster.server_instance_type = cluster.server_instance_type.name;
+    cluster.worker_instance_type = cluster.worker_instance_type.name;
+    vm.$log.debug('FILE DATA: ', cluster);
+    vm.jetpack.write(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), cluster);
+    vm.toastr.success('Cluster saved!');
+  }
+
   viewReportModal(datapoint, report) {
     const vm = this;
-    // TODO: implement
     vm.$log.debug('In viewReport- ', report);
     const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({

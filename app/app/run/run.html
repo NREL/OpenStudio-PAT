@@ -3,9 +3,7 @@
     <h4 translate>run.title</h4>
   </div>
   <div class="col-sm-2 pad-bot-20 pad-top-5">
-    <div class="input-group">
-      <select class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-change="run.warnBeforeDelete('runtype')"></select>
-    </div>
+    <select id="runType" class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-change="run.warnBeforeDelete('runtype')"></select>
   </div>
   <div class="col-sm-5 pad-bot-20 pad-top-10">
     <div class="tab-text">Server Status&nbsp;
