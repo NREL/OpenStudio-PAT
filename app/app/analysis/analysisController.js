@@ -104,7 +104,10 @@ export class AnalysisController {
       editableCellTemplate: 'app/analysis/optionInputTemplate.html',
       width: 200,
       minWidth: 100,
-      enableCellEdit: true
+      //enableCellEdit: true
+      cellEditableCondition: $scope => {
+        return $scope.row.entity.variable;
+      }
     };
   }
 
@@ -493,10 +496,83 @@ export class AnalysisController {
     vm.unsetOptionInDA(measureUID, optionName);
   }
 
+  variableCheckboxChanged(row, col) {
+    const vm = this;
+    vm.$log.debug('In variableCheckboxChanged in analysis');
+    //vm.$log.debug('row', row);
+    //vm.$log.debug('col', col);
+    vm.setIsModified();
+
+    const measureUID = col.colDef.measureUID;
+    //vm.$log.debug('measureUID: ', measureUID);
+
+    const measure = _.find(vm.$scope.measures, {uid: measureUID});
+    //vm.$log.debug('measure: ', measure);
+
+    const display_name = row.entity.display_name;
+    //vm.$log.debug('display_name: ', display_name);
+
+    const variable = row.entity.variable;
+    //vm.$log.debug('variable: ', variable);
+
+    if (!variable) {
+      for (let i = 0; i < measure.arguments.length; i++) {
+        if (measure.arguments[i].display_name === display_name) {
+          const keys = _.keys(measure.arguments[i]);
+          const optionKeys = _.filter(keys, function (k) {
+            return k.indexOf('option_') !== -1;
+          });
+          for (let j = 1; j < optionKeys.length; j++) {
+            //vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[j]]);
+            //vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[0]]);
+            measure.arguments[i][optionKeys[j]] = measure.arguments[i][optionKeys[0]];
+          }
+          break;
+        }
+      }
+    }
+    vm.$scope.$broadcast('uiGridEventEndCellEdit');
+  }
+
   optionCheckboxChanged() {
     const vm = this;
     vm.$log.debug('In optionCheckboxChanged in analysis');
     vm.setIsModified();
+
+    vm.$scope.$broadcast('uiGridEventEndCellEdit');
+  }
+
+  allVariableCheckboxesChanged(row, col) {
+    const vm = this;
+    vm.$log.debug('In allVariableCheckboxesChanged in analysis');
+    //vm.$log.debug('row', row);
+    //vm.$log.debug('col', col);
+    vm.setIsModified();
+
+    const measureUID = col.colDef.measureUID;
+    //vm.$log.debug('measureUID: ', measureUID);
+
+    const measure = _.find(vm.$scope.measures, {uid: measureUID});
+    //vm.$log.debug('measure: ', measure);
+
+    const variable = row.entity.variable;
+    //vm.$log.debug('variable: ', variable);
+
+    if (!variable) {
+      // Dont change the first 3 rows regarding naming
+      for (let i = 3; i < measure.arguments.length; i++) {
+        const keys = _.keys(measure.arguments[i]);
+        const optionKeys = _.filter(keys, function (k) {
+          return k.indexOf('option_') !== -1;
+        });
+        for (let j = 1; j < optionKeys.length; j++) {
+          //vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[j]]);
+          //vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[0]]);
+          measure.arguments[i][optionKeys[j]] = measure.arguments[i][optionKeys[0]];
+        }
+      }
+    }
+    vm.$scope.$broadcast('uiGridEventEndCellEdit');
   }
 
   // Toggle all variable checkboxes
@@ -515,6 +591,7 @@ export class AnalysisController {
         row.variable = false;
       });
     }
+    vm.allVariableCheckboxesChanged(row, col);
   }
 
   addDefaultArguments(measure, option) {
