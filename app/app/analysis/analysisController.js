@@ -48,7 +48,7 @@ export class AnalysisController {
     vm.initializeGrids();
 
     // size grids according to data
-    vm.$scope.getTableHeight = function(uid) {
+    vm.$scope.getTableHeight = function (uid) {
       var rowHeight = 30; // your row height
       var headerHeight = 30; // your header height
       return {
@@ -110,6 +110,7 @@ export class AnalysisController {
 
   setGridOptions() {
     const vm = this;
+    vm.$log.debug('in setGridOptions');
 
     _.forEach(vm.$scope.measures, (measure) => {
       vm.$log.debug('measure: ', measure);
@@ -429,8 +430,7 @@ export class AnalysisController {
       else if (argument.specialRowId === 'optionDescription') {
         argument[opt.field] = opt.display_name + ' Description';
       }
-      else if (angular.isUndefined(argument.variable)) {
-        vm.$log.debug('argument.variable undefined');
+      else if (!argument.variable) {
         argument.variable = false;
       }
       else if (!argument.variable) {
@@ -491,6 +491,12 @@ export class AnalysisController {
     });
     // reset DAs that were using this option
     vm.unsetOptionInDA(measureUID, optionName);
+  }
+
+  optionCheckboxChanged() {
+    const vm = this;
+    vm.$log.debug('In optionCheckboxChanged in analysis');
+    vm.setIsModified();
   }
 
   // Toggle all variable checkboxes
@@ -578,9 +584,9 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('in resetChoiceArgumentSelections in analysis');
     _.forEach(measure.arguments, (arg) => {
-      if (arg.type == 'Choice'){
+      if (arg.type == 'Choice') {
         vm.$log.debug("Choice Arg: ", arg.name);
-        const keys =_.keys(arg);
+        const keys = _.keys(arg);
         const optionKeys = _.filter(keys, function (k) {
           return k.indexOf('option_') !== -1;
         });
@@ -647,7 +653,7 @@ export class AnalysisController {
   }
 
   // compute measure arguments when setting the seed
-  computeMeasureArguments(measure){
+  computeMeasureArguments(measure) {
     const vm = this;
     vm.$log.debug('In computeMeasureArguments in analysis');
     vm.setIsModified();
