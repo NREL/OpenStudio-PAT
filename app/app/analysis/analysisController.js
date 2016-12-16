@@ -632,7 +632,8 @@ export class AnalysisController {
     _.forEach(vm.$scope.measures, (measure) => {
       vm.$log.debug('measure: ', measure);
       // check choice arg selected values in case seed was reset
-      vm.resetChoiceArgumentSelections(measure);
+      // Note from Evan: do not uncomment the line below as it clobbers the selected dropdown values
+      //vm.resetChoiceArgumentSelections(measure);
       _.forEach(measure.options, (option) => {
         vm.loadOption(measure, option);
       });
