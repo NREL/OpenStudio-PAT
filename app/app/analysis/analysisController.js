@@ -106,7 +106,11 @@ export class AnalysisController {
       minWidth: 100,
       //enableCellEdit: true
       cellEditableCondition: $scope => {
-        return $scope.row.entity.variable;
+        if (!_.isNil($scope.row.entity.specialRowId)) {
+          return true;
+        } else {
+          return $scope.row.entity.variable;
+        }
       }
     };
   }
