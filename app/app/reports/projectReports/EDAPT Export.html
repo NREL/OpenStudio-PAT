@@ -323,8 +323,8 @@
 
           // If the report measure is not found, throw a warning.
           if (!reportMeasure) {
-            exportWarnings.push("No EDAPT Export measure was included in " + alt.name + ", it will not be included in the EDAPT XML report.");
-            console.log("No EDAPT Export measure was included in " + alt.name + ", it run will not be included in the EDAPT XML report.");
+            exportWarnings.push("No EDAPT Export measure was included in " + run.name + ", it will not be included in the EDAPT XML report.");
+            console.log("No EDAPT Export measure was included in " + run.name + ", it run will not be included in the EDAPT XML report.");
             return;
           }
 

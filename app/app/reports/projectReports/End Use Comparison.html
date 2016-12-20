@@ -81,8 +81,9 @@
         ]
         var newData = [];
         _.forEach($scope.results, function (run) {
-          // Get the openstudio reporting measure, which contains the results
-          var reportMeasure = _.find(run.steps, {'measure_dir_name': "OpenStudio Results"});
+
+          // Get the OpenStudio Results measure, which contains the results
+          var reportMeasure = _.find(run.steps, {'measure_id': "a25386cd-60e4-46bc-8b11-c755f379d916"});
           if (!reportMeasure) {
             renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
             return;
@@ -96,7 +97,6 @@
 
           // Make sure the results have data
           var vals = reportMeasure.result.step_values;
-          console.log(vals);
           if (vals.length == 0){
             renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
             return;
