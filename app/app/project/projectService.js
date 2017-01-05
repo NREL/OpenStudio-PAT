@@ -991,17 +991,46 @@ export class Project {
   // always get from disk and extract unique name
   getClusters() {
     const vm = this;
-    vm.clusters = [];
+    vm.clusters = {running: [], terminated: []};
     const tempClusters = vm.jetpack.find(vm.projectDir.path(), {matching: '*_cluster.json'});
     _.forEach(tempClusters, cluster => {
       vm.$log.debug('CLUSTER: ', cluster);
-      cluster = _.last(_.split(cluster, '/'));
-      cluster = _.replace(cluster, '_cluster.json', '');
-      vm.clusters.push(cluster);
+      const clusterFile = vm.jetpack.read(cluster);
+      let clusterName = _.last(_.split(cluster, '/'));
+      clusterName = _.replace(clusterName, '_cluster.json', '');
+      if (clusterFile.server && clusterFile.server.dns){
+        // PING
+        vm.pingCluster(clusterFile.server.dns).then(() => {
+          // running
+          vm.clusters.running.push(clusterName);
+        }, () => {
+          // terminated
+          vm.clusters.terminated.push(clusterName);
+        });
+      }
+      else {
+        // terminated
+        vm.clusters.terminated.push(clusterName);
+      }
     });
 
     vm.$log.debug('Cluster files found: ', vm.clusters);
     return vm.clusters;
+  }
+
+  pingCluster(dns) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$http.get(dns).then(response => {
+      // send json to run controller
+      vm.$log.debug('Cluster running at: ', dns);
+      vm.$log.debug('JSON response: ', response);
+      deferred.resolve();
+    }, () => {
+      vm.$log.debug('Cluster terminated at: ', dns);
+      deferred.reject();
+    });
+    return deferred.promise;
   }
 
   getOsServerVersions() {

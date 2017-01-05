@@ -23,13 +23,19 @@
           </div>
         </div>
         <div ng-if="remoteSettings.remoteType == 'Amazon Cloud'">
+          <div class="row pad-bot-10 pad-top-10 normal-text">
+            <div class="col-sm-12" translate>run.remote.clusterText</div>
+          </div>
           <div class="row pad-bot-10 normal-text">
-            <div class="col-sm-4">
-              <label for="cluster" class="run-label" translate>run.remote.selectCluster</label>
-              <select id="cluster" class="form-control" ng-options="option for option in clusters" ng-model="remoteSettings.aws.cluster_name" ng-change="run.resetClusterSettings()"></select>
+            <div class="col-sm-3">
+              <label for="clusterRunning" class="run-label" translate>run.remote.selectRunningCluster</label>
+              <select id="clusterRunning" class="form-control" ng-options="option for option in clusters.running" ng-model="remoteSettings.aws.cluster_name" ng-change="run.resetClusterSettings()"></select>
             </div>
-            <div class="col-sm-1 pad-top-25">or</div>
-            <div class="col-sm-3 pad-top-25">
+            <div class="col-sm-3">
+              <label for="cluster" class="run-label" translate>run.remote.selectTerminatedCluster</label>
+              <select id="cluster" class="form-control" ng-options="option for option in clusters.terminated" ng-model="remoteSettings.aws.cluster_name" ng-change="run.resetClusterSettings()"></select>
+            </div>
+            <div class="col-sm-2 pad-top-25">
               <button type="button" class="btn btn-primary" ng-click="run.newClusterModal()" translate>run.remote.newCluster</button>
             </div>
             <div class="col-sm-2 col-sm-offset-2 pad-top-25"><translate>run.remote.status</translate>

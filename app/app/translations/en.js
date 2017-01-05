@@ -245,12 +245,15 @@ export default {
       memory: 'Memory',
       storage: 'Storage',
       numberOfWorkers: 'Number of Workers',
-      selectCluster: 'Select an Existing Cluster',
-      newCluster: 'Make a new Cluster',
+      clusterText: 'Select a running cluster, terminated cluster, or make a new one.',
+      selectRunningCluster: 'Running Clusters',
+      selectTerminatedCluster: 'Terminated Clusters',
+      or: 'or',
+      newCluster: 'New Cluster',
       newClusterName: 'New Cluster Name',
       awsUserID: 'AWS UserID',
       saveCluster: 'Save Cluster Settings',
-      status: 'Status'
+      status: 'Cluster Status'
     },
     modalNewCluster: {
       title: 'New Cluster',
