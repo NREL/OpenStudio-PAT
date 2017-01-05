@@ -125,6 +125,16 @@ export class RunController {
     const vm = this;
     // read in json file
     const clusterFile = vm.jetpack.read(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json');
+    vm.$scope.remoteSettings.aws.connected = false;
+    vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
+
+    // see if cluster is running; if so, set status
+    if (clusterFile.server && clusterFile.server.dns){
+      vm.Project.pingCluster(clusterFile.server.dns).then(() => {
+        // running
+        vm.$scope.remoteSettings.aws.cluster_status = 'running';
+      });
+    }
 
     // set variables
     vm.$scope.remoteSettings.aws.server_instance_type = null;
@@ -147,8 +157,6 @@ export class RunController {
     vm.$scope.remoteSettings.aws.worker_node_number = clusterFile.worker_node_number ? clusterFile.worker_node_number: null;
     vm.$scope.remoteSettings.aws.aws_tags = []; // leave empty for now
     vm.$scope.remoteSettings.aws.openstudio_server_version = clusterFile.openstudio_server_version ? clusterFile.openstudio_server_version: null;
-    // TODO: fix this
-    vm.$scope.remoteSettings.aws.connected = false;
 
     vm.$log.debug('remote settings.aws reset: ', vm.$scope.remoteSettings.aws);
   }
