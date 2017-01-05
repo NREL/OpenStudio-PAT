@@ -156,9 +156,25 @@ export class MeasureManager {
         deferred.resolve(data);
       })
     .error((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager getMyMeasuresDir Error: ', data);
+      vm.$log.debug('Measure Manager getMyMeasuresDir Error: ', data);
       deferred.reject([]);
     });
+    return deferred.promise;
+  }
+
+  setMyMeasuresDir(path) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const params = {my_measures_dir: path};
+    vm.$http.post(vm.url + '/set', params)
+      .success((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager setMyMeasuresDir Success!, status: ', status);
+        deferred.resolve(data);
+      })
+      .error((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager SetMyMeasuresDir Error: ', data);
+        deferred.reject([]);
+      });
     return deferred.promise;
   }
 

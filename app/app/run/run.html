@@ -24,7 +24,7 @@
 </div>
 
 <div class="row">
-  <div class="col-sm-6">
+  <div class="col-sm-12">
     <uib-progressbar class="progress-striped active" type="success" value="progress.amount">{{progress.message}}</uib-progressbar>
   </div>
 </div>
@@ -74,7 +74,7 @@
                 <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
                 {{datapoint.name}}
               </div>
-              <div class="col-sm-1 pad-top-10">{{run.formatDate(datapoint.updated_at)}}</div>
+              <div class="col-sm-1 pad-top-10">{{run.Project.formatDate(datapoint.updated_at)}}</div>
               <div class="col-sm-1 pad-top-10">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
               <div class="col-sm-1 pad-top-10" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</div>
               <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
@@ -124,7 +124,7 @@
                       </div>
                       <div class="row measure-accordion">
                         <div class="col-sm-2"></div>
-                        <div class="col-sm-1">{{run.formatDate(step.result.started_at)}}</div>
+                        <div class="col-sm-1">{{run.Project.formatDate(step.result.started_at)}}</div>
                         <div class="col-sm-1">{{run.getRunTime(step.result.started_at, step.result.completed_at)}}</div>
                         <div class="col-sm-1"></div>
                         <div class="col-sm-1"><span ng-if="step.step_result == 'NotApplicable'">NA</span></div>
@@ -164,20 +164,5 @@
   </div>
 </div>
 
-<div class="row pad-top-100">
-  <div class="col-sm-10">
-    <uib-accordion>
-      <uib-accordion-group is-open="dev.open">
-        <uib-accordion-heading>
-          <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': dev.open, 'glyphicon-chevron-right': !dev.open}"></i>
-          Server Troubleshooting
-        </uib-accordion-heading>
-        <button type="button" class="btn btn-danger" ng-click="run.startServer('local')">Force Start local Server </button>
-        <button type="button" class="btn btn-danger" ng-click="run.stopServer('local')">Force Stop local Server </button>
-        <button type="button" class="btn btn-primary" ng-click="run.pingServer()">Ping Current Server and Set Status</button>
-      </uib-accordion-group>
-    </uib-accordion>
-  </div>
-</div>
 
 

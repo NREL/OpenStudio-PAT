@@ -6,7 +6,7 @@ import path from 'path';
 const {dialog} = remote;
 
 export class SetProject {
-  constructor($q, $log, $state, $uibModal, Project, OsServer, BCL) {
+  constructor($q, $log, $state, $uibModal, Project, OsServer, BCL, toastr) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
@@ -20,6 +20,7 @@ export class SetProject {
     vm.BCL = BCL;
     vm.$state = $state;
     vm.newProjectName = null;
+    vm.toastr = toastr;
   }
 
   saveProject() {
@@ -27,6 +28,7 @@ export class SetProject {
     vm.$log.debug('saveProject');
     if (vm.Project.projectDir != undefined) {
       vm.Project.exportPAT();
+      vm.toastr.success('Project Saved!');
     } else {
       vm.$log.debug('saveProject: vm.Project.projectDir is undefined');
     }
@@ -65,7 +67,7 @@ export class SetProject {
             fileExists = true;
             vm.nestedProjectModal().then(response => {
             });
-            vm.$log.error('Found what appears to be a PAT project at ', currentDir.path());
+            vm.$log.debug('Found what appears to be a PAT project at ', currentDir.path());
             deferred.reject('rejected');
           }
           currentDir = jetpack.cwd(currentDir.path('..'));
@@ -104,12 +106,13 @@ export class SetProject {
 
             // set project Variables
             vm.setProjectVariables(projectDir);
-
+            vm.toastr.success('Project Saved!');
             vm.$state.transitionTo('analysis', {}, {reload: true});
 
             // resolve promise
             deferred.resolve('resolve');
             // start server at new location
+            vm.toastr.info('Starting Local Server...This make take a while.');
             vm.OsServer.startServer().then(response => {
               vm.$log.debug('setProjectService::start server: server started');
               vm.$log.debug('response: ', response);
@@ -117,7 +120,7 @@ export class SetProject {
             });
 
           }, (error) => {
-            vm.$log.debug('stop server errored, but setting project anyway');
+            vm.$log.debug('stop server errored, but setting project anyway and starting new local server');
 
             // for saveAs: copy old project's folder structure to new location (from, to)
             vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
@@ -133,10 +136,18 @@ export class SetProject {
 
             // set project Variables
             vm.setProjectVariables(projectDir);
-
+            vm.toastr.success('Project Saved!');
             vm.$state.transitionTo('analysis', {}, {reload: true});
 
-            deferred.reject('rejected');
+            // start server at new location
+            vm.toastr.info('Starting Local Server...This make take a while.');
+            vm.OsServer.startServer().then(response => {
+              vm.$log.debug('setProjectService::start server: server started');
+              vm.$log.debug('response: ', response);
+              vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+            });
+
+            deferred.resolve('resolve');
           });
         }
       } else {
@@ -177,7 +188,7 @@ export class SetProject {
             fileExists = true;
             vm.nestedProjectModal().then(response => {
             });
-            vm.$log.error('Found what appears to be a PAT project at ', currentDir.path());
+            vm.$log.debug('Found what appears to be a PAT project at ', currentDir.path());
             deferred.reject('rejected');
           }
           currentDir = jetpack.cwd(currentDir.path('..'));
@@ -217,6 +228,7 @@ export class SetProject {
             // For now: selected local run type and start local server
             vm.Project.setRunType(vm.Project.getRunTypes()[0]);
             // start local server at new location
+            vm.toastr.info('Starting Local Server...This make take a while.');
             vm.OsServer.startServer().then(response => {
               vm.$log.debug('setProjectService::start server: server started');
               vm.$log.debug('response: ', response);
@@ -314,6 +326,7 @@ export class SetProject {
           // For now: selected local run type and start local server
           vm.Project.setRunType(vm.Project.getRunTypes()[0]);
           // start local server at new location
+          vm.toastr.info('Starting Local Server...This make take a while.');
           vm.OsServer.startServer().then(response => {
             vm.$log.debug('setProjectService::start server: server started');
             vm.$log.debug('response: ', response);

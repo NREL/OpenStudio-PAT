@@ -46,6 +46,16 @@ export class AnalysisController {
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
     vm.initializeGrids();
+
+    // size grids according to data
+    vm.$scope.getTableHeight = function (uid) {
+      var rowHeight = 30; // your row height
+      var headerHeight = 30; // your header height
+      return {
+        height: (vm.$scope.gridOptions[uid].data.length * rowHeight + headerHeight + 10) + "px"
+      };
+    };
+
   }
 
   initializeGrids() {
@@ -73,18 +83,18 @@ export class AnalysisController {
       field: 'option_1',
       editDropdownOptionsFunction: function (rowEntity, colDef) {
         if (rowEntity.type === 'Choice') {
-          //vm.$log.error('rowEntity: ', rowEntity);
-          //vm.$log.error('colDef: ', colDef);
+          //vm.$log.debug('rowEntity: ', rowEntity);
+          //vm.$log.debug('colDef: ', colDef);
           vm.choices = [];
           _.forEach(rowEntity.choice_display_names
             , (choice) => {
-              vm.$log.error('choice: ', choice);
+              vm.$log.debug('choice: ', choice);
               vm.choices.push({
                 id: choice,
                 value: choice
               });
             });
-          vm.$log.error('vm.choices: ', vm.choices);
+          vm.$log.debug('vm.choices: ', vm.choices);
           return vm.choices;
         }
       },
@@ -94,12 +104,20 @@ export class AnalysisController {
       editableCellTemplate: 'app/analysis/optionInputTemplate.html',
       width: 200,
       minWidth: 100,
-      enableCellEdit: true
+      //enableCellEdit: true
+      cellEditableCondition: $scope => {
+        if (!_.isNil($scope.row.entity.specialRowId)) {
+          return true;
+        } else {
+          return $scope.row.entity.variable;
+        }
+      }
     };
   }
 
   setGridOptions() {
     const vm = this;
+    vm.$log.debug('in setGridOptions');
 
     _.forEach(vm.$scope.measures, (measure) => {
       vm.$log.debug('measure: ', measure);
@@ -117,10 +135,6 @@ export class AnalysisController {
           addRows = false;
         }
       });
-      // }
-      //  else {
-      //    addRows = false;
-      //  }
 
       if (addRows) {
         const row0 = {specialRowId: 'optionDelete'};
@@ -424,6 +438,9 @@ export class AnalysisController {
         argument[opt.field] = opt.display_name + ' Description';
       }
       else if (!argument.variable) {
+        argument.variable = false;
+      }
+      else if (!argument.variable) {
         argument[opt.field] = argument.option_1;
       }
     });
@@ -483,6 +500,85 @@ export class AnalysisController {
     vm.unsetOptionInDA(measureUID, optionName);
   }
 
+  variableCheckboxChanged(row, col) {
+    const vm = this;
+    vm.$log.debug('In variableCheckboxChanged in analysis');
+    //vm.$log.debug('row', row);
+    //vm.$log.debug('col', col);
+    vm.setIsModified();
+
+    const measureUID = col.colDef.measureUID;
+    //vm.$log.debug('measureUID: ', measureUID);
+
+    const measure = _.find(vm.$scope.measures, {uid: measureUID});
+    //vm.$log.debug('measure: ', measure);
+
+    const display_name = row.entity.display_name;
+    //vm.$log.debug('display_name: ', display_name);
+
+    const variable = row.entity.variable;
+    //vm.$log.debug('variable: ', variable);
+
+    if (!variable) {
+      for (let i = 0; i < measure.arguments.length; i++) {
+        if (measure.arguments[i].display_name === display_name) {
+          const keys = _.keys(measure.arguments[i]);
+          const optionKeys = _.filter(keys, function (k) {
+            return k.indexOf('option_') !== -1;
+          });
+          for (let j = 1; j < optionKeys.length; j++) {
+            //vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[j]]);
+            //vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[0]]);
+            measure.arguments[i][optionKeys[j]] = measure.arguments[i][optionKeys[0]];
+          }
+          break;
+        }
+      }
+    }
+    vm.$scope.$broadcast('uiGridEventEndCellEdit');
+  }
+
+  optionCheckboxChanged() {
+    const vm = this;
+    vm.$log.debug('In optionCheckboxChanged in analysis');
+    vm.setIsModified();
+
+    vm.$scope.$broadcast('uiGridEventEndCellEdit');
+  }
+
+  allVariableCheckboxesChanged(row, col) {
+    const vm = this;
+    vm.$log.debug('In allVariableCheckboxesChanged in analysis');
+    //vm.$log.debug('row', row);
+    //vm.$log.debug('col', col);
+    vm.setIsModified();
+
+    const measureUID = col.colDef.measureUID;
+    //vm.$log.debug('measureUID: ', measureUID);
+
+    const measure = _.find(vm.$scope.measures, {uid: measureUID});
+    //vm.$log.debug('measure: ', measure);
+
+    const variable = row.entity.variable;
+    //vm.$log.debug('variable: ', variable);
+
+    if (!variable) {
+      // Dont change the first 3 rows regarding naming
+      for (let i = 3; i < measure.arguments.length; i++) {
+        const keys = _.keys(measure.arguments[i]);
+        const optionKeys = _.filter(keys, function (k) {
+          return k.indexOf('option_') !== -1;
+        });
+        for (let j = 1; j < optionKeys.length; j++) {
+          //vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[j]]);
+          //vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[0]]);
+          measure.arguments[i][optionKeys[j]] = measure.arguments[i][optionKeys[0]];
+        }
+      }
+    }
+    vm.$scope.$broadcast('uiGridEventEndCellEdit');
+  }
+
   // Toggle all variable checkboxes
   checkAllVariables(row, col) {
     const vm = this;
@@ -499,18 +595,16 @@ export class AnalysisController {
         row.variable = false;
       });
     }
+    vm.allVariableCheckboxesChanged(row, col);
   }
 
   addDefaultArguments(measure, option) {
     const vm = this;
     vm.setIsModified();
+    // TODO: add logic related to whether an arg is variable or not (if not, use option1's value in subsequent options)
     _.forEach(measure.arguments, (argument) => {
-      if ((argument.type == 'Double' || argument.type == 'Int') && (Number(argument.choice_display_names))) {
-        argument[option.field] = Number(argument.choice_display_names);
-      }
-      else if (angular.isDefined(argument.choice_display_names) && argument.choice_display_names.length > 0) {
-        argument[option.field] = argument.choice_display_names[0];
-      }
+      // use default value, otherwise leave blank
+      argument[option.field] = argument.default_value ? argument.default_value : '';
     });
   }
 
@@ -541,6 +635,9 @@ export class AnalysisController {
     vm.$log.debug('In loadMeasureOptions in analysis');
     _.forEach(vm.$scope.measures, (measure) => {
       vm.$log.debug('measure: ', measure);
+      // check choice arg selected values in case seed was reset
+      // Note from Evan: do not uncomment the line below as it clobbers the selected dropdown values
+      //vm.resetChoiceArgumentSelections(measure);
       _.forEach(measure.options, (option) => {
         vm.loadOption(measure, option);
       });
@@ -564,6 +661,35 @@ export class AnalysisController {
     }
   }
 
+  // reset selections (to default) when choice argument is no longer in list
+  resetChoiceArgumentSelections(measure) {
+    const vm = this;
+    vm.$log.debug('in resetChoiceArgumentSelections in analysis');
+    _.forEach(measure.arguments, (arg) => {
+      if (arg.type == 'Choice') {
+        vm.$log.debug("Choice Arg: ", arg.name);
+        const keys = _.keys(arg);
+        const optionKeys = _.filter(keys, function (k) {
+          return k.indexOf('option_') !== -1;
+        });
+        _.forEach(optionKeys, (key) => {
+          if (_.isUndefined(_.find(arg.choice_display_names, arg[key]))) {
+            vm.$log.debug('Argument value ', arg[key], ' was not found in choice list...resetting to default_value');
+            arg[key] = arg.default_value ? arg.default_value : '';
+          }
+        });
+      }
+    });
+  }
+
+  resetAllChoiceArgumentSelections() {
+    const vm = this;
+    vm.$log.debug('in resetAllChoiceArgumentSelections in anaysis');
+    _.forEach(vm.$scope.measures, (measure) => {
+      vm.resetChoiceArgumentSelections(measure);
+    });
+  }
+
   setSeed() {
     const vm = this;
     vm.$log.debug('In Analysis::setSeed');
@@ -572,8 +698,17 @@ export class AnalysisController {
     _.forEach(vm.$scope.measures, (measure) => {
       measure.seed = vm.$scope.defaultSeed;
     });
-    // recompute model-dependent measure arguments when resetting seed
-    vm.Project.computeAllMeasureArguments();
+    vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+    vm.Project.savePrettyOptions();
+    // recompute model-dependent measure arguments & refresh grid
+    vm.Project.computeAllMeasureArguments().then(() => {
+      vm.$log.debug('computeAllMeasureArgs success!');
+      vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+      vm.resetAllChoiceArgumentSelections();
+      vm.initializeGrids();
+    }, error => {
+      vm.$log.debug('Error in computeALLMeasureArguments: ', error);
+    });
   }
 
   setWeatherFile() {
@@ -600,14 +735,17 @@ export class AnalysisController {
   }
 
   // compute measure arguments when setting the seed
-  computeMeasureArguments(measure){
+  computeMeasureArguments(measure) {
     const vm = this;
     vm.$log.debug('In computeMeasureArguments in analysis');
     vm.setIsModified();
     vm.Project.computeMeasureArguments(measure).then(response => {
       // get updated measure and set
+      vm.$log.debug('Success!');
       measure = response;
-      vm.$log.debug('new measure: ', measure);
+      vm.$log.debug('Analysis Tab, new computed measure: ', angular.copy(measure));
+      vm.$log.debug('Scope measures: ', vm.$scope.measures);
+      vm.initializeGrids();
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
     }, error => {
       vm.$log.debug("Error in Project::computeMeasureArguments: ", error);
@@ -643,8 +781,17 @@ export class AnalysisController {
       _.forEach(vm.$scope.measures, (measure) => {
         measure.seed = vm.$scope.defaultSeed;
       });
+      vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+      vm.Project.savePrettyOptions();
       // recompute model-dependent measure arguments when resetting seed
-      vm.Project.computeAllMeasureArguments();
+      vm.Project.computeAllMeasureArguments().then(() => {
+        vm.$log.debug('computeAllMeasureArgs success!');
+        vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+        vm.resetAllChoiceArgumentSelections();
+        vm.initializeGrids();
+      }, error => {
+        vm.$log.debug('ERROR in computeAllMeasureArguments');
+      });
     }
   }
 

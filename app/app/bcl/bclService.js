@@ -399,7 +399,7 @@ export class BCL {
     if (measure.display_name == undefined) measure.display_name = measure.name;
 
     // fix tags
-    measure.tags = _.join(_.split(measure.tags, '.'), ' -> ');
+    //measure.tags = _.join(_.split(measure.tags, '.'), ' -> ');
 
     return measure;
   }
@@ -420,12 +420,8 @@ export class BCL {
     // is measure added to project?
     measure.addedToProject = !!angular.isDefined(_.find(vm.projectMeasures, {uid: measure.uid}));
 
-    // measure.addedToProject = (type == 'project' || !_.isUndefined(_.find(vm.projectMeasures, {uid: measure.uid})));
-
     if (measure.version_modified) {
-      // assuming yyyy-mm-dd
-      measure.date = new Date(measure.version_modified.substring(0, 4), measure.version_modified.substring(5, 7), measure.version_modified.substring(8, 10));
-
+      measure.date = vm.Project.formatDate(measure.version_modified);
     } else {
       measure.date = '';
     }

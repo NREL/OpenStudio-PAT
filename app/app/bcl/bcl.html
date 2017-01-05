@@ -79,14 +79,14 @@
     <div class="col-xs-4">
       <aside ng-show="modal.selected" class="lib-details">
 
-        <div class="row bcl-p">
+        <div class="row normal-text">
           <div class="col-xs-12">
             <h4 translate>bcl.aside.description</h4>
-            <p class="bcl-p">{{modal.selected.description}}</p>
+            <p class="normal-text">{{modal.selected.description}}</p>
             <h4 translate>bcl.aside.modelerDescription</h4>
-            <p class="bcl-p">{{modal.selected.modelerDescription}}</p>
+            <p class="normal-text">{{modal.selected.modelerDescription}}</p>
             <h4 translate>bcl.aside.tags</h4>
-            <p class="bcl-p">{{modal.selected.tags}}</p>
+            <p class="normal-text">{{modal.selected.tags}}</p>
             <h4 translate>bcl.aside.attributes</h4>
             <table class="table table-striped">
               <tr ng-repeat="attr in modal.selected.attributes">
@@ -115,5 +115,6 @@
 </div>
 
 <div class="modal-footer">
-  <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
+  <button type="button" ng-if="!addInProgress" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
+  <button type="button" ng-if="addInProgress" class="btn btn-warning disabled" translate>bcl.wait</button>
 </div>

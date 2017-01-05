@@ -23,6 +23,17 @@ export default {
     make: 'Make New Project',
     existing: 'Open Existing Project'
   },
+  serverTools: {
+    title: 'Server Troubleshooting Tools',
+    start: 'Force Start Local Server',
+    stop: 'Force Stop Local Server',
+    ping: 'Ping Current Server and Set Status',
+    noProject: 'You must open a project first'
+  },
+  setMeasuresDir: {
+    title: 'Set MyMeasures Directory',
+    measuresDir: 'MyMeasures Directory'
+  },
   projectName: {
     title: 'New Project',
     heading: 'New Project Name',
@@ -75,6 +86,7 @@ export default {
   },
   bcl: {
     title: 'Building Component Library',
+    wait: 'Please wait',
     aside: {
       attributes: 'Attributes',
       description: 'Description',

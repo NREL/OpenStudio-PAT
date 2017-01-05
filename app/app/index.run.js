@@ -24,6 +24,7 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
             // TODO: what to do about remote server?
             OsServer.stopServer('local').then(response => {
               //  server is stopped
+              //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
               exitReady = true;
               app.quit();
             }, error => {
@@ -190,6 +191,12 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
           // Do something
         });
       }
+    }, {
+      label: 'Set MyMeasures Directory',
+      click: () => Project.openSetMyMeasuresDirModal()
+    }, {
+      label: 'Server Tools',
+      click: () => OsServer.openServerToolsModal()
     }]
   }, {
     label: 'Help',

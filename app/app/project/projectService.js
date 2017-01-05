@@ -88,14 +88,13 @@ export class Project {
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
 
     // set my measures dir
-    vm.MeasureManager.isReady().then( () => {
-      vm.MeasureManager.getMyMeasuresDir().then ( response => {
+    vm.MeasureManager.isReady().then(() => {
+      vm.MeasureManager.getMyMeasuresDir().then(response => {
         if (angular.isUndefined(response.my_measures_dir)) {
-          vm.$log.error('Houston, we have a problem. response.my_measures_dir is undefined');
+          vm.$log.error('response.my_measures_dir undefined');
         }
-        if (response.my_measures_dir){
-          // make this a jetpack object
-          vm.myMeasuresDir = vm.jetpack.cwd(response.my_measures_dir);
+        if (response.my_measures_dir) {
+          vm.setMeasuresDir(response.my_measures_dir);
         }
         vm.$log.debug('My measures Dir: ', vm.myMeasuresDir.path());
       }, error => {
@@ -264,46 +263,32 @@ export class Project {
   computeAllMeasureArguments() {
     const vm = this;
     const deferred = vm.$q.defer();
+    const promises = [];
+
     vm.$log.debug('in Project computeAllMeasureArguments()');
     let osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
 
     _.forEach(vm.measures, (measure) => {
       if (!_.isNil(measure.seed)) {
         vm.$log.debug(`computeAllMeasureArguments using unique seed for measure: ${measure}`);
-        osmPath = vm.seedDir.path(measure.seed);
       }
-
-      vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
-        // merge with existing project measure
-        vm.$log.debug('New computed measure: ', newMeasure);
-
-        // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
-        _.forEachRight(measure.arguments, (arg, index) => {
-          if (_.isUndefined(arg.specialRowId)) {
-            const match = _.find(measure.arguments, {name: arg.name});
-            if (_.isUndefined(match)) {
-              measure.arguments.splice(index, 1);
-            }
-          }
-        });
-        // then add/merge (at argument level)
-        _.forEach(newMeasure.arguments, (arg) => {
-          const match = _.find(measure.arguments, {name: arg.name});
-          if (_.isUndefined(match)) {
-            measure.arguments.push(arg);
-          } else {
-            _.merge(match, arg);
-          }
-        });
-
-      });
-
+      // todo: ensure that this modifies the vm.measures directly
+      const promise = vm.computeMeasureArguments(measure);
+      promises.push(promise);
     });
 
-    // recalculate pretty options
-    vm.savePrettyOptions();
+    vm.$q.all(promises).then(response => {
+      vm.$log.debug('ComputeAllMeasures resolved');
+      deferred.resolve();
+      vm.setModified(true);
+    }, error => {
+      vm.$log.debug('ERROR in ComputeAllMeasures: ', error);
+      deferred.reject(error);
+    });
 
-    deferred.resolve();
+    // recalculate pretty options (not unless we modify the actual options themselves
+    //vm.savePrettyOptions();
+
     return deferred.promise;
 
   }
@@ -312,7 +297,18 @@ export class Project {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.$log.debug('in Project computeMeasureArguments()');
-    const osmPath = vm.seedDir.path(measure.seed);
+    let osmPath;
+    if (_.isNil(vm.seedDir)) {
+      vm.$log.error('vm.seedDir is undefined. Unable to compute measure arguments.');
+      deferred.reject('vm.seedDir isNil');
+      return deferred.promise;
+    } else if (_.isNil(measure.seed)) {
+      vm.$log.error('measure.seed is undefined. Unable to compute measure arguments.');
+      deferred.reject('measure.seed isNil');
+      return deferred.promise;
+    } else {
+      osmPath = vm.seedDir.path(measure.seed);
+    }
 
     vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
       // merge with existing project measure
@@ -487,8 +483,18 @@ export class Project {
           m.measure_type = 'unknown';
         }
         m.measure_definition_class_name = measure.className;
-        //m.measure_definition_measureUID = measure.colDef.measureUID; // TODO: fix this
-        const mdir = _.last(_.split(measure.measure_dir, '/'));
+        //m.measure_definition_measureUID = measure.colDef.measureUID;
+
+        // windows path vs. mac
+        let mdir = '';
+        if (measure.measure_dir.indexOf('/') != -1) {
+          // correct paths
+          mdir = _.last(_.split(measure.measure_dir, '/'));
+        } else {
+          // assume windows paths '\\'
+          mdir = _.last(_.split(measure.measure_dir, '\\'));
+        }
+        vm.$log.debug("***MEASURE DIR NAME: ", mdir);
         m.measure_definition_directory = './measures/' + mdir;
         m.measure_definition_directory_local = measure.measure_dir;
         m.measure_definition_class_name = measure.class_name;
@@ -507,10 +513,10 @@ export class Project {
         // first find out how many options there are
         let optionKeys = [];
         //if (measure.arguments.length > 0) {
-          const keys = Object.keys(measure.arguments[0]);
-          optionKeys = _.filter(keys, function (k) {
-            return k.indexOf('option_') !== -1;
-          });
+        const keys = Object.keys(measure.arguments[0]);
+        optionKeys = _.filter(keys, function (k) {
+          return k.indexOf('option_') !== -1;
+        });
         //}
 
         // ARGUMENTS
@@ -601,7 +607,7 @@ export class Project {
                 vm.$log.debug('value: None');
                 // when set to 'None', sub a value of the right type
                 let the_value = arg.default_value;
-                if (!the_value){
+                if (!the_value) {
                   // if no default value, use first option value, otherwise set to None
                   the_value = (arg.option_1) ? arg.option_1 : 'None';
                 }
@@ -620,8 +626,8 @@ export class Project {
                 });
                 vm.$log.debug('arg[option_id]: ', arg[option_id]);
                 // check that you have a value here...if not error
-                if (!arg[option_id]){
-                  vm.$log.error('Option: ', option_name, 'for measure \'', measure.display_name,'\' does not have a value. Analysis will error.');
+                if (!arg[option_id]) {
+                  vm.$log.error('Option: ', option_name, 'for measure \'', measure.display_name, '\' does not have a value. Analysis will error.');
                 }
                 valArr.push({value: arg[option_id], weight: 1 / vm.designAlternatives.length});
               }
@@ -793,6 +799,18 @@ export class Project {
     vm.$log.debug('***REORDERED PROJECT MEASURES: ', vm.measures);
   }
 
+  openSetMyMeasuresDirModal() {
+    const vm = this;
+    vm.$log.debug('in SetMyMeasures Modal function');
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalSetMeasuresDirController',
+      controllerAs: 'modal',
+      templateUrl: 'app/project/setMeasuresDir.html',
+      windowClass: 'modal'
+    });
+  }
+
   getProjectName() {
     const vm = this;
     return vm.projectName;
@@ -897,6 +915,11 @@ export class Project {
   getMeasuresDir() {
     const vm = this;
     return vm.myMeasuresDir;
+  }
+
+  setMeasuresDir(strPath) {
+    const vm = this;
+    vm.myMeasuresDir = vm.jetpack.cwd(strPath);
   }
 
   getSeedDir() {
@@ -1633,6 +1656,19 @@ export class Project {
 
     return theDate;
 
+  }
+
+  formatDate(dateString) {
+    const vm = this;
+    let theDate = '';
+
+    if (dateString) {
+      theDate = vm.makeDate(dateString);
+      // format
+      theDate = theDate.getMonth() + 1 + "/" + theDate.getDate() + "/" + theDate.getFullYear();
+    }
+
+    return theDate;
   }
 
   getModified() {
