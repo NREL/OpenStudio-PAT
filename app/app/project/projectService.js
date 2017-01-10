@@ -53,6 +53,7 @@ export class Project {
     vm.resetRemoteSettings();
     vm.setOsServerVersions();
     vm.setServerInstanceTypes();
+    vm.setAwsRegions();
 
     vm.clusters = [];
     vm.modified = false;
@@ -86,6 +87,8 @@ export class Project {
 
     const src = jetpack.cwd(app.getPath('userData'));
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
+    // aws path
+    vm.awsDir = jetpack.dir(app.getAppPath() + '/.aws');
 
     // set my measures dir
     vm.MeasureManager.isReady().then(() => {
@@ -844,6 +847,11 @@ export class Project {
     return vm.projectLocalResultsDir;
   }
 
+  getAwsDir() {
+    const vm = this;
+    return vm.awsDir;
+  }
+
   // projectDir is a jetpack object (not a string)
   setProject(projectDir) {
     const vm = this;
@@ -974,7 +982,7 @@ export class Project {
 
   resetRemoteSettings() {
     const vm = this;
-    vm.setRemoteSettings({open: true, remoteType: vm.remoteTypes[0], remoteServerURL: null, cloudServerURL: null});
+    vm.setRemoteSettings({open: true, remoteType: vm.remoteTypes[0], remoteServerURL: null, cloudServerURL: null, aws: {}, credentials: {yamlFilename: null, accessKey: null, region: null}});
     vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
@@ -986,6 +994,17 @@ export class Project {
   getRemoteSettings() {
     const vm = this;
     return vm.remoteSettings;
+  }
+
+  // always get from disk and extract unique name
+  getAwsYamlFiles() {
+    const vm = this;
+    vm.awsYamlFiles = [];
+    const files = vm.jetpack.find(vm.awsDir.path(), {matching: '*.yml'});
+    _.forEach(files, file => {
+      vm.awsYamlFiles.push(_.last(_.split(file, '/')));
+    });
+    return vm.awsYamlFiles;
   }
 
   // always get from disk and extract unique name
@@ -1148,6 +1167,18 @@ export class Project {
   getServerInstanceTypes() {
     const vm = this;
     return vm.serverInstanceTypes;
+  }
+
+  setAwsRegions() {
+    const vm = this;
+    vm.awsRegions = [
+      'us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 'eu-central-1', 'eu-west-1'
+    ];
+  }
+
+  getAwsRegions() {
+    const vm = this;
+    return vm.awsRegions;
   }
 
   setAnalysisType(name) {

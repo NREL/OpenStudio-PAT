@@ -361,6 +361,7 @@ export class OsServer {
       });
     } else {
       // TODO: amazon cloud
+
       deferred.reject();
     }
 

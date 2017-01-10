@@ -1,5 +1,6 @@
 import {shell} from 'electron';
 import jetpack from 'fs-jetpack';
+import YAML from 'yamljs';
 
 export class RunController {
 
@@ -33,7 +34,9 @@ export class RunController {
     vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
     vm.$scope.serverInstanceTypes = vm.Project.getServerInstanceTypes();
+    vm.$scope.awsRegions = vm.Project.getAwsRegions();
     vm.$scope.clusters = vm.Project.getClusters();
+    vm.$scope.awsYamlFiles = vm.Project.getAwsYamlFiles();
 
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
@@ -94,6 +97,39 @@ export class RunController {
     vm.shell.openExternal(vm.OsServer.getSelectedServerURL());
   }
 
+  selectAwsCredentials() {
+    const vm = this;
+    // open file, set truncatedAccessKey
+    const yamlStr = vm.jetpack.read(vm.Project.getAwsDir().path(vm.$scope.remoteSettings.credentials.yamlFilename));
+    let yamlData = YAML.parse(yamlStr);
+    vm.$scope.remoteSettings.credentials.accessKey = yamlData.accessKey.substr(0,4) + '****';
+    yamlData = null;
+  }
+
+  newAwsCredentialsModal(){
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalNewAwsCredentialsController',
+      controllerAs: 'modal',
+      templateUrl: 'app/run/newAwsCredentials.html'
+    });
+
+    modalInstance.result.then((name, truncatedAccessKey) => {
+      vm.$log.debug('In modal new credentials result function, name: ', name);
+      vm.$scope.awsYamlFiles = vm.Project.getAwsYamlFiles();
+      // set selected file to new file
+      vm.remoteSettings.credentials.yamlFilename = name;
+      vm.remoteSettings.credentials.accessKey = truncatedAccessKey;
+      deferred.resolve();
+    }, () => {
+      // Modal canceled
+      deferred.reject();
+    });
+    return deferred.promise;
+  }
+
   newClusterModal(){
     const vm = this;
     const deferred = vm.$q.defer();
@@ -105,7 +141,7 @@ export class RunController {
     });
 
     modalInstance.result.then((name) => {
-      vm.$log.debug('In modal result function, name: ', name);
+      vm.$log.debug('In modal new cluster result function, name: ', name);
       // get cluster files
       vm.$scope.clusters = vm.Project.getClusters();
       // select new one

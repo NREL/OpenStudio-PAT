@@ -241,7 +241,12 @@ export default {
       serverType: 'Remote Server Type',
       serverSettings: 'Remote Server Settings',
       serverInstanceType: 'Server Instance Type',
-      cpus: 'CPU Count',
+      awsCredentials: 'AWS Credentials',
+      selectAws: 'Select YAML file or make new one',
+      newAwsCredentials: 'New',
+      awsAccessKey: 'Access Key',
+      awsRegion: 'Region',
+      cpus: 'CPUs',
       memory: 'Memory',
       storage: 'Storage',
       numberOfWorkers: 'Number of Workers',
@@ -258,6 +263,12 @@ export default {
     modalNewCluster: {
       title: 'New Cluster',
       name: 'Cluster Name'
+    },
+    modalNewAwsCredentials: {
+      title: 'New AWS Credentials File',
+      name: 'File name',
+      accessKey: 'Access Key',
+      secretKey: 'Secret Key'
     }
   },
   statusBar: {
