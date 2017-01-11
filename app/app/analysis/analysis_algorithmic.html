@@ -58,7 +58,43 @@
             </div>
           </div>
         </div>
-        <div ng-attr-id="{{'grid_' + measure.uid}}" ui-if="gridOptions[measure.uid].data.length>0" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid" ng-style="getTableHeight(measure.uid)"></div>
+
+        <div class="container" ng-repeat="measure in osMeasures">
+          <div class="row">
+            <div class="col-sm-1">
+              Name
+            </div>
+            <div class="col-sm-2">
+              Short Name
+            </div>
+            <div class="col-sm-2">
+              Variable Settings
+            </div>
+            <div class="col-sm-2">
+              Static/Default
+            </div>
+            <div class="col-sm-5">
+              Measure Inputs
+            </div>
+          </div>
+          <div class="row" ng-repeat="argument in measure.arguments">
+            <div class="col-sm-1">
+              {{argument.display_name}}
+            </div>
+            <div class="col-sm-2">
+              {{argument.name}}
+            </div>
+            <div class="col-sm-2">
+              <select class="form-control" ng-options="seed as seed for seed in seeds" ng-model="defaultSeed" ng-change="analysis.setSeed()"></select>
+            </div>
+            <div class="col-sm-2">
+              <input type="text" name="staticDefaultValue">
+            </div>
+            <div class="col-sm-5">
+              Measure Inputs here
+            </div>
+          </div>
+
       </uib-accordion-group>
     </uib-accordion>
   </div>
