@@ -236,7 +236,8 @@ export default {
     remote: {
       osServerVersion: 'OpenStudio Server Version',
       connect: 'Connect',
-      disconnect: 'Disconnect',
+      terminate: 'Terminate',
+      start: 'Start',
       serverURL: 'Existing Server URL',
       serverType: 'Remote Server Type',
       serverSettings: 'Remote Server Settings',

@@ -351,6 +351,7 @@ export class OsServer {
 
     // check remote type
     if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server'){
+      // Existing Remote Server
       // ping URL to see if started
       vm.pingServer().then(response => {
         vm.$log.debug('Existing Remote Server Connected');
@@ -360,13 +361,170 @@ export class OsServer {
         deferred.reject();
       });
     } else {
-      // TODO: amazon cloud
+      // amazon cloud
+      vm.remoteSettings = vm.Project.getRemoteSettings();
+      vm.$log.debug("in OSServerService::remoteServer, remoteSettings: ", vm.remoteSettings);
 
-      deferred.reject();
+      // initialize potentially missing variables
+      vm.remoteSettings.aws.server = vm.remoteSettings.aws.server? vm.remoteSettings.aws.server : {};
+      vm.remoteSettings.aws.server.dns = vm.remoteSettings.aws.server.dns? vm.remoteSettings.aws.server.dns : null;
+
+      // see if cluster is running
+      vm.Project.pingCluster(vm.remoteSettings.aws.server.dns).then(() => {
+
+
+        // cluster running, connect with DNS
+        vm.$log.debug('Connecting to existing cluster running at: ', vm.remoteSettings.aws.server.dns);
+        vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" ' + vm.remoteSettings.aws.server.dns;
+        vm.$log.debug('Start Server Command: ', vm.startServerCommand);
+
+        const child = vm.exec(vm.startServerCommand,
+          (error, stdout, stderr) => {
+            vm.$log.debug('exit code: ', child.exitCode);
+            vm.$log.debug('child: ', child);
+            vm.$log.debug('stdout: ', stdout);
+            vm.$log.debug('stderr: ', stderr);
+
+            if (child.exitCode == 0) {
+              // SUCCESS
+              vm.$log.debug('CLOUD SERVER CONNECTION SUCCESS');
+
+              // TODO: find server dns (from a file? from what comes back of cli?)
+              // TODO: set vm.selectedServerURL
+
+              deferred.resolve(child);
+
+            } else {
+              vm.$log.debug('CLOUD SERVER CONNECTION ERROR');
+              if (error !== null) {
+                console.log('exec error:', error);
+              }
+              deferred.reject(error);
+            }
+          });
+
+        console.log(`Child pid: ${child.pid}`);
+
+        child.on('close', (code, signal) => {
+          console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
+        });
+
+        child.on('disconnect', (code, signal) => {
+          console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
+        });
+
+        child.on('exit', (code, signal) => {
+          console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
+          if (code == 0) {
+            vm.$log.debug('Server connected');
+            deferred.resolve();
+          } else {
+            vm.$log.debug('Server failed to connect');
+            deferred.reject();
+          }
+          return deferred.promise;
+        });
+
+        child.on('error', (code, signal) => {
+          console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
+        });
+
+        child.on('message', (code, signal) => {
+          console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
+        });
+
+      }, () => {
+        // cluster terminated or new, connect with file
+
+        // make sure file is saved
+        vm.Project.saveClusterToFile();
+        vm.$log.debug('Connecting to terminated/new cluster');
+        vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" -s \"' + vm.Project.projectDir.path(vm.remoteSettings.aws.cluster_name + '_cluster.json') + '\" aws';
+        vm.$log.debug('Start Server Command: ', vm.startServerCommand);
+
+        const envCopy = vm.setAwsEnvVars();
+
+        const child = vm.exec(vm.startServerCommand, { env: envCopy },
+          (error, stdout, stderr) => {
+            vm.$log.debug('exit code: ', child.exitCode);
+            vm.$log.debug('child: ', child);
+            vm.$log.debug('stdout: ', stdout);
+            vm.$log.debug('stderr: ', stderr);
+
+            if (child.exitCode == 0) {
+              // SUCCESS
+              vm.$log.debug('CLOUD SERVER START SUCCESS');
+
+              // TODO: find server dns (from a file? from what comes back of cli?)
+              // TODO: set vm.selectedServerURL
+
+              deferred.resolve(child);
+
+            } else {
+              vm.$log.debug('CLOUD SERVER START ERROR');
+              if (error !== null) {
+                console.log('exec error:', error);
+              }
+              deferred.reject(error);
+            }
+          });
+
+        console.log(`Child pid: ${child.pid}`);
+
+        child.on('close', (code, signal) => {
+          console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
+        });
+
+        child.on('disconnect', (code, signal) => {
+          console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
+        });
+
+        child.on('exit', (code, signal) => {
+          console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
+          if (code == 0) {
+            vm.$log.debug('Server started');
+            deferred.resolve();
+          } else {
+            vm.$log.debug('Server failed to start');
+            deferred.reject();
+          }
+          return deferred.promise;
+        });
+
+        child.on('error', (code, signal) => {
+          console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
+        });
+
+        child.on('message', (code, signal) => {
+          console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
+        });
+      });
     }
 
     return deferred.promise;
   }
+
+  setAwsEnvVars() {
+    const vm = this;
+    vm.remoteSettings = vm.Project.getRemoteSettings();
+    // need aws credentials as ENV vars
+    vm.$log.debug('PROCESS.ENV: ', process.env);
+    // TODO: need to set all other vars from process.env?
+    const envCopy = {};
+
+    // open file, set truncatedAccessKey
+    const yamlStr = vm.jetpack.read(vm.Project.getAwsDir().path(vm.remoteSettings.credentials.yamlFilename));
+    let yamlData = YAML.parse(yamlStr);
+
+    envCopy['AWS_ACCESS_KEY'] = yamlData.accessKey;
+    envCopy['AWS_SECRET_KEY'] = yamlData.secretKey;
+    envCopy['AWS_DEFAULT_REGION'] = vm.remoteSettings.credentials.region;
+
+    yamlData = null;
+
+    return envCopy;
+  }
+
 
   localServer() {
 
@@ -559,7 +717,6 @@ export class OsServer {
               deferred.resolve(child);
 
             } else {
-              // TODO: cleanup?
               if (error !== null) {
                 console.log('exec error: ', error);
               }
@@ -578,8 +735,32 @@ export class OsServer {
           deferred.resolve('Server Disconnected');
 
         } else {
-          // cloud: actually disconnect
-          // TODO
+          // cloud: terminate server
+          vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_remote ' + '\"' + vm.Project.projectDir.path(vm.Project.getRemoteSettings().aws.cluster_name + '_cluster.json') + '\"';
+          vm.$log.info('stop server command: ', vm.stopServerCommand);
+          const envCopy = vm.setAwsEnvVars();
+          const child = vm.exec(vm.stopServerCommand, {env: envCopy},
+            (error, stdout, stderr) => {
+              console.log('THE PROCESS TERMINATED');
+              console.log('EXIT CODE: ', child.exitCode);
+              console.log('child: ', child);
+              console.log('stdout: ', stdout);
+              console.log('stderr: ', stderr);
+
+              if (child.exitCode == 0) {
+                // SUCCESS
+                vm.$log.debug('Cloud Server Terminated');
+                vm.setServerStatus(serverType, 'stopped');
+                deferred.resolve(child);
+
+              } else {
+                if (error !== null) {
+                  console.log('exec error: ', error);
+                }
+                deferred.resolve(error);
+              }
+            });
+
           deferred.resolve();
         }
       }

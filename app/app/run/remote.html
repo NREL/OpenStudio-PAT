@@ -57,7 +57,7 @@
               <div class="row pad-bot-10" ng-if="remoteSettings.aws.cluster_name">
                 <div class="col-sm-6">
                   <label for="serverInstanceType" class="run-label" translate>run.remote.serverInstanceType</label>
-                  <select id="serverInstanceType" class="form-control" ng-options="option.name for option in serverInstanceTypes" ng-model="remoteSettings.aws.server_instance_type" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
+                  <select id="serverInstanceType" class="form-control" ng-options="option.name for option in serverInstanceTypes track by option.name" ng-model="remoteSettings.aws.server_instance_type" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
                 </div>
                 <div class="col-sm-2">
                   <label for="cpus" class="run-label" translate>run.remote.cpus</label>
@@ -75,7 +75,7 @@
               <div class="row pad-bot-10" ng-if="remoteSettings.aws.cluster_name">
                 <div class="col-sm-4">
                   <label for="workerInstanceType" class="run-label" translate>run.remote.serverInstanceType</label>
-                  <select id="workerInstanceType" class="form-control" ng-options="option.name for option in serverInstanceTypes" ng-model="remoteSettings.aws.worker_instance_type" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
+                  <select id="workerInstanceType" class="form-control" ng-options="option.name for option in serverInstanceTypes track by option.name" ng-model="remoteSettings.aws.worker_instance_type" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
                 </div>
                 <div class="col-sm-3">
                   <label for="numWorkers" class="run-label" translate>run.remote.numberOfWorkers</label>
@@ -99,8 +99,9 @@
                </div>
               <div class="row">
                 <div class="col-sm-4 col-sm-offset-3">
-                  <button type="button" ng-show="remoteSettings.aws.connected" class="btn btn-danger" ng-click="run.disconnectCluster()" translate>run.remote.disconnect</button>
-                  <button type="button" ng-show="!remoteSettings.aws.connected" class="btn btn-primary" ng-click="run.connectCluster()" translate>run.remote.connect</button>
+                  <button type="button" ng-show="remoteSettings.aws.connected" class="btn btn-danger" ng-click="run.terminateAws()" translate>run.remote.terminate</button>
+                  <button type="button" ng-show="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == 'running'" class="btn btn-primary" ng-click="run.connectAws('connect')" translate>run.remote.connect</button>
+                  <button type="button" ng-show="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == 'terminated'" class="btn btn-success" ng-click="run.connectAws('start')" translate>run.remote.start</button>
                 </div>
               </div>
               <div class="row pad-top-25 pad-bot-10">

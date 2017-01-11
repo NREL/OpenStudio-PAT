@@ -1040,21 +1040,35 @@ export class Project {
   pingCluster(dns) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$http.get(dns).then(response => {
-      // send json to run controller
-      vm.$log.debug('Cluster running at: ', dns);
-      vm.$log.debug('JSON response: ', response);
-      deferred.resolve();
-    }, () => {
-      vm.$log.debug('Cluster terminated at: ', dns);
+    vm.$log.debug('Pinging cluster at: ', dns);
+    if (dns){
+      vm.$http.get(dns).then(response => {
+        // send json to run controller
+        vm.$log.debug('Cluster running at: ', dns);
+        vm.$log.debug('JSON response: ', response);
+        deferred.resolve();
+      }, () => {
+        vm.$log.debug('Cluster terminated at: ', dns);
+        deferred.reject();
+      });
+    } else {
+      // nothing to ping
+      vm.$log.debug("Nothing to ping");
       deferred.reject();
-    });
+    }
+
     return deferred.promise;
   }
 
   getOsServerVersions() {
     const vm = this;
     return vm.osServerVersions;
+  }
+
+  saveClusterToFile() {
+    const vm = this;
+    vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
+    vm.jetpack.write(vm.getProjectDir().path(vm.remoteSettings.aws.cluster_name + '_cluster.json'), vm.remoteSettings.aws);
   }
 
   setOsServerVersions() {

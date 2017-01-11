@@ -199,12 +199,27 @@ export class RunController {
 
   saveClusterToFile() {
     const vm = this;
-    const cluster = angular.copy(vm.$scope.remoteSettings.aws);
-    cluster.server_instance_type = cluster.server_instance_type.name;
-    cluster.worker_instance_type = cluster.worker_instance_type.name;
-    vm.$log.debug('FILE DATA: ', cluster);
-    vm.jetpack.write(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), cluster);
+    vm.Project.saveClusterToFile();
     vm.toastr.success('Cluster saved!');
+  }
+
+  connectAws(type) {
+    // type = 'connect' or 'start' depending on whether cluster is already running or not
+    const vm = this;
+    vm.OsServer.startServer().then( response => {
+      if (type == 'connect')
+        vm.toastr.success('Connected to AWS!');
+      else
+        vm.toastr.success('AWS server started!');
+      // started toastr
+    }, error => {
+      // error toastr
+      if (type == 'connect')
+        vm.toastr.error('Error connecting to AWS');
+      else
+        vm.toastr.error('Error starting AWS server');
+
+    });
   }
 
   viewReportModal(datapoint, report) {
@@ -323,36 +338,6 @@ export class RunController {
     });
   }
 
-  // // to start server on its own
-  // startServer(force = false) {
-  //   const vm = this;
-  //   vm.OsServer.startServer(force).then(response => {
-  //     vm.$log.debug('Server Status for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
-  //     if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
-  //       vm.toastr.success('Connected to remote server!');
-  //     } else {
-  //       vm.toastr.success('Server started!');
-  //     }
-  //
-  //   }, response => {
-  //     vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
-  //     if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
-  //       vm.toastr.error('Error: could not connect to remote server');
-  //     } else {
-  //       vm.toastr.error('Error: server did not start');
-  //     }
-  //   });
-  // }
-  //
-  // // check if server is alive, if so set its status to 'started', otherwise set status to 'stopped'
-  // pingServer() {
-  //   const vm = this;
-  //   vm.OsServer.pingServer().then(response => {
-  //     vm.toastr.success('Server is Alive');
-  //   }, error => {
-  //     vm.toastr.error('Server is Offline');
-  //   });
-  // }
 
   warnBeforeDelete(type) {
     // type could be 'run' (warning before running an new analysis), or 'runtype' (warning before setting new run type)
