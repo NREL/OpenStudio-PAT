@@ -41,6 +41,8 @@ export class AnalysisController {
     vm.samplingMethods = vm.Project.getSamplingMethods();
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
 
+    vm.$scope.variableSettings = vm.Project.getVariableSettings(vm.$scope.selectedSamplingMethod.id);
+
     vm.designAlternatives = vm.Project.getDesignAlternatives();
 
     vm.gridApis = [];
@@ -202,83 +204,6 @@ export class AnalysisController {
   }
 
   setAlgorithmicGridOptions() {
-    const vm = this;
-
-    _.forEach(vm.$scope.measures, (measure) => {
-
-      // set number of options in measure
-      if ((!_.has(measure, 'numberOfOptions'))) {
-        measure.numberOfOptions = 0;
-      }
-
-      vm.$scope.gridOptions[measure.uid] = {
-        data: measure.arguments,
-        enableSorting: false,
-        autoResize: true,
-        enableRowSelection: false,
-        enableSelectAll: false,
-        enableColumnMenus: false,
-        enableRowHeaderSelection: false,
-        enableCellEditOnFocus: true,
-        enableHiding: false,
-        columnDefs: [{
-          name: 'display_name',
-          displayName: 'analysis.columns.argumentName',
-          enableCellEdit: false,
-          headerCellFilter: 'translate',
-          minWidth: 100,
-          width: 200
-        }, {
-          name: 'name',
-          displayName: 'analysis.columns.shortName',
-          headerCellFilter: 'translate',
-          minWidth: 100,
-          width: 200
-        }, {
-          name: 'variableSettings',
-          displayName: 'analysis.columns.variableSettings',
-          editType: 'dropdown',
-          enableCellEdit: true,
-          headerCellFilter: 'translate',
-          minWidth: 100,
-          width: 200,
-          editableCellTemplate: 'ui-grid/dropdownEditor',
-          editDropdownOptionsFunction: function (rowEntity, colDef) {
-            if (_.includes(['LHS', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
-              return [{
-                ID: 1,
-                type: 'Static'
-              }, {
-                ID: 2,
-                type: 'Discrete'
-              }, {
-                ID: 3,
-                type: 'Continuous'
-              }, {
-                ID: 4,
-                type: 'Pivot'
-              }];
-            } else {
-              return [{
-                ID: 1,
-                type: 'Static'
-              }, {
-                ID: 2,
-                type: 'Discrete'
-              }, {
-                ID: 3,
-                type: 'Continuous'
-              }];
-            }
-          },
-          editDropdownIdLabel: 'type',
-          editDropdownValueLabel: 'type'
-        }],
-        onRegisterApi: function (gridApi) {
-          vm.gridApis[measure.uid] = gridApi;
-        }
-      };
-    });
   }
 
   setMeasureTypes() {
@@ -732,6 +657,7 @@ export class AnalysisController {
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
+    vm.$scope.variableSettings = vm.Project.getVariableSettings(vm.$scope.selectedSamplingMethod.id);
   }
 
   // compute measure arguments when setting the seed
@@ -854,6 +780,18 @@ export class AnalysisController {
   setIsModified() {
     const vm = this;
     vm.Project.setModified(true);
+  }
+
+  setVariableSetting(variable) {
+    const vm = this;
+    vm.$log.debug('In setVariableSetting');
+    vm.variableSetting = variable;
+  }
+
+  getVariableSetting() {
+    const vm = this;
+    vm.$log.debug('In getVariableSetting');
+    return vm.variableSetting;
   }
 
 }

@@ -1565,4 +1565,15 @@ export class Project {
     return deferred.promise;
   }
 
+  getVariableSettings(selectedSamplingMethodID) {
+    const vm = this;
+    vm.$log.debug('In getVariableSettings')
+
+    if (_.includes(['LHS', 'DOE'], selectedSamplingMethodID)) {
+      return ['Static', 'Discrete', 'Continuous', 'Pivot'];
+    } else {
+      return ['Static', 'Discrete', 'Continuous'];
+    }
+  }
+
 }
