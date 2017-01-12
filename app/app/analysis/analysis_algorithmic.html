@@ -77,7 +77,7 @@
               Measure Inputs
             </div>
           </div>
-          <div class="row" ng-repeat="argument in measure.arguments">
+          <div class="row" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
             <div class="col-sm-1">
               {{argument.display_name}}
             </div>
