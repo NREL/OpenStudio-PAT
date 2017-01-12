@@ -86,10 +86,10 @@
               {{argument.name}}
             </div>
             <div class="col-sm-2">
-              <select class="form-control" ng-options="variableSetting as variableSetting for variableSetting in variableSettings" ng-model="variableSetting" ng-change="analysis.setVariableSetting()"></select>
+              <select class="form-control" ng-options="variableSetting as variableSetting for variableSetting in variableSettings" ng-model="argument.variableSetting" ng-change="analysis.setVariableSetting()"></select>
             </div>
             <div class="col-sm-2">
-              <input type="text" name="staticDefaultValue">
+              <input type="text" ng-model="argument.staticDefaultValue">
             </div>
             <div class="col-sm-5">
               Measure Inputs here
