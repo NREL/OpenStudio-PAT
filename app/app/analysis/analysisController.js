@@ -41,7 +41,7 @@ export class AnalysisController {
     vm.samplingMethods = vm.Project.getSamplingMethods();
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
 
-    vm.$scope.variableSettings = vm.Project.getVariableSettings(vm.$scope.selectedSamplingMethod.id);
+    vm.$scope.variableSettings = vm.getVariableSettings(vm.$scope.selectedSamplingMethod.id);
 
     vm.designAlternatives = vm.Project.getDesignAlternatives();
 
@@ -657,7 +657,7 @@ export class AnalysisController {
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
-    vm.$scope.variableSettings = vm.Project.getVariableSettings(vm.$scope.selectedSamplingMethod.id);
+    vm.$scope.variableSettings = vm.getVariableSettings(vm.$scope.selectedSamplingMethod.id);
   }
 
   // compute measure arguments when setting the seed
@@ -782,6 +782,17 @@ export class AnalysisController {
     vm.Project.setModified(true);
   }
 
+  getVariableSettings(selectedSamplingMethodID) {
+    const vm = this;
+    vm.$log.debug('In getVariableSettings')
+
+    if (_.includes(['LHS', 'DOE'], selectedSamplingMethodID)) {
+      return ['Static', 'Discrete', 'Continuous', 'Pivot'];
+    } else {
+      return ['Static', 'Discrete', 'Continuous'];
+    }
+  }
+
   setVariableSetting(variable) {
     const vm = this;
     vm.$log.debug('In setVariableSetting');
@@ -792,6 +803,12 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In getVariableSetting');
     return vm.variableSetting;
+  }
+
+  getDistributions() {
+    const vm = this;
+    vm.$log.debug('In getDistributions');
+    return ['Normal', 'Uniform', 'Triangle', 'Discrete'];
   }
 
 }
