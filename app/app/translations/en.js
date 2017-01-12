@@ -78,7 +78,7 @@ export default {
       baselinePerturbation: 'BaselinePerturbation'
     },
     algorithmic: {
-      algorithmSetting: 'Algorithm Setting'
+      algorithmSetting: 'Algorithm Settings'
     },
     manual: {
       projectMeasuresAndOptions: 'Project Measures and Options'
