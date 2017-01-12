@@ -86,14 +86,32 @@
               {{argument.name}}
             </div>
             <div class="col-sm-2">
-              <select class="form-control" ng-options="variableSetting as variableSetting for variableSetting in variableSettings" ng-model="argument.variableSetting" ng-change="analysis.setVariableSetting()"></select>
+              <select class="form-control" ng-options="variableSetting as variableSetting for variableSetting in variableSettings" ng-model="argument.variableSetting"></select>
             </div>
             <div class="col-sm-2">
               <input type="text" ng-model="argument.staticDefaultValue">
             </div>
-            <div class="col-sm-5">
-              Measure Inputs here
+
+            <div class="col-sm-5" ng-if="!_.includes(['SPEA2, PSO'], analysis.selectedSamplingMethod.id) && argument.type == 'Double'">
+              <div class="row">
+                <div class="col-sm-2">
+                  Minimum
+                </div>
+                <div class="col-sm-2">
+                  Maximum
+                </div>
+              </div>
+
+              <div class="row">
+                <div class="col-sm-2">
+                  <input type="text" ng-model="argument.minimum">
+                </div>
+                <div class="col-sm-2">
+                  <input type="text" ng-model="argument.maximum">
+                </div>
+              </div>
             </div>
+
           </div>
 
       </uib-accordion-group>
