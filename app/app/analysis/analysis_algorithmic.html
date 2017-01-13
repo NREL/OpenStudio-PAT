@@ -120,7 +120,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-if="!_.includes(['RGENOUD, Optim'], analysis.selectedSamplingMethod.id) && argument.type == 'Double'">
+            <div class="col-sm-5" ng-if="_.includes(['RGENOUD, Optim'], analysis.selectedSamplingMethod.id) && argument.type == 'Double'">
               <div class="row">
                 <div class="col-sm-4">
                   Minimum
@@ -144,6 +144,80 @@
               </div>
               </div>
             </div>
+
+
+            <div class="col-sm-5" ng-if="!_.includes(['PreFlight'], analysis.selectedSamplingMethod.id) && argument.type == 'Double'">
+              <div class="row">
+                <div class="col-sm-4">
+                  Minimum
+                </div>
+                <div class="col-sm-4">
+                  Maximum
+                </div>
+                <div class="col-sm-4">
+                  Mean
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4">
+                  <input type="number" ng-model="argument.minimum">
+                </div>
+                <div class="col-sm-4">
+                  <input type="number" ng-model="argument.maximum">
+                </div>
+                <div class="col-sm-4">
+                  <input type="number" ng-model="argument.mean">
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-5" ng-if="!_.includes(['PreFlight'], analysis.selectedSamplingMethod.id) && argument.type == 'String'">
+            <div class="row">
+              <div class="col-sm-4">
+                Minimum
+              </div>
+              <div class="col-sm-4">
+                Maximum
+              </div>
+              <div class="col-sm-4">
+                Mean
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-4">
+                <input type="text" ng-model="argument.minimum">
+              </div>
+              <div class="col-sm-4">
+                <input type="text" ng-model="argument.maximum">
+              </div>
+              <div class="col-sm-4">
+                <input type="text" ng-model="argument.mean">
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-5" ng-if="!_.includes(['PreFlight'], analysis.selectedSamplingMethod.id) && argument.type == 'Choice'">
+            <div class="row">
+              <div class="col-sm-4">
+                Minimum
+              </div>
+              <div class="col-sm-4">
+                Maximum
+              </div>
+              <div class="col-sm-4">
+                Mean
+              </div>
+            </div>
+            <div class="row">
+              <div class="col-sm-4">
+                <select class="form-control" ng-options="display_name as display_name for display_name in argument.some_min_values" ng-model="argument.some_min_value"></select>
+              </div>
+              <div class="col-sm-4">
+                <select class="form-control" ng-options="display_name as display_name for display_name in argument.some_min_values" ng-model="argument.some_max_value"></select>
+              </div>
+              <div class="col-sm-4">
+                <select class="form-control" ng-options="display_name as display_name for display_name in argument.some_min_values" ng-model="argument.some_mean_value"></select>
+              </div>
+            </div>
+          </div>
 
           </div>
 
