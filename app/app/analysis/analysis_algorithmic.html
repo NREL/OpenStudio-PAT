@@ -101,7 +101,7 @@
               <input type="number" ng-model="argument.default_value">
             </div>
 
-            <div class="col-sm-5" ng-if="!_.includes(['SPEA2, PSO'], analysis.selectedSamplingMethod.id) && argument.type == 'Double'">
+            <div class="col-sm-5" ng-if="_.includes(['SPEA2, PSO'], analysis.selectedSamplingMethod.id) && argument.type == 'Double'">
               <div class="row">
                 <div class="col-sm-6">
                   Minimum
@@ -117,6 +117,31 @@
                 <div class="col-sm-6">
                   <input type="number" ng-model="argument.maximum">
                 </div>
+              </div>
+            </div>
+
+            <div class="col-sm-5" ng-if="!_.includes(['RGENOUD, Optim'], analysis.selectedSamplingMethod.id) && argument.type == 'Double'">
+              <div class="row">
+                <div class="col-sm-4">
+                  Minimum
+                </div>
+                <div class="col-sm-4">
+                  Maximum
+                </div>
+                <div class="col-sm-4">
+                  Delta X
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4">
+                  <input type="number" ng-model="argument.minimum">
+                </div>
+                <div class="col-sm-4">
+                  <input type="number" ng-model="argument.maximum">
+                </div>
+                <div class="col-sm-4">
+                <input type="number" ng-model="argument.deltaX">
+              </div>
               </div>
             </div>
 
