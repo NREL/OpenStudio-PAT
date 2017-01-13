@@ -120,8 +120,8 @@ export class RunController {
       vm.$log.debug('In modal new credentials result function, name: ', name);
       vm.$scope.awsYamlFiles = vm.Project.getAwsYamlFiles();
       // set selected file to new file
-      vm.remoteSettings.credentials.yamlFilename = name;
-      vm.remoteSettings.credentials.accessKey = truncatedAccessKey;
+      vm.$scope.remoteSettings.credentials.yamlFilename = name;
+      vm.$scope.remoteSettings.credentials.accessKey = truncatedAccessKey;
       deferred.resolve();
     }, () => {
       // Modal canceled

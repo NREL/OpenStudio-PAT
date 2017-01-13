@@ -242,6 +242,7 @@ export default {
       serverType: 'Remote Server Type',
       serverSettings: 'Remote Server Settings',
       serverInstanceType: 'Server Instance Type',
+      workerInstanceType: 'Worker Instance Type',
       awsCredentials: 'AWS Credentials',
       selectAws: 'Select YAML file or make new one',
       newAwsCredentials: 'New',

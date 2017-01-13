@@ -1068,7 +1068,14 @@ export class Project {
   saveClusterToFile() {
     const vm = this;
     vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
-    vm.jetpack.write(vm.getProjectDir().path(vm.remoteSettings.aws.cluster_name + '_cluster.json'), vm.remoteSettings.aws);
+    // copy and clean up what you don't need
+    const cluster = angular.copy(vm.remoteSettings.aws);
+    cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : null;
+    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name : null;
+    // make sure worker number is a number
+    cluster.worker_node_number =
+
+    vm.jetpack.write(vm.getProjectDir().path(vm.remoteSettings.aws.cluster_name + '_cluster.json'), cluster);
   }
 
   setOsServerVersions() {
