@@ -41,8 +41,6 @@ export class AnalysisController {
     vm.samplingMethods = vm.Project.getSamplingMethods();
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
 
-    vm.$scope.variableSettings = vm.getVariableSettings(vm.$scope.selectedSamplingMethod.id);
-
     vm.designAlternatives = vm.Project.getDesignAlternatives();
 
     vm.gridApis = [];
@@ -657,7 +655,6 @@ export class AnalysisController {
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
-    vm.$scope.variableSettings = vm.getVariableSettings(vm.$scope.selectedSamplingMethod.id);
   }
 
   // compute measure arguments when setting the seed
@@ -782,14 +779,41 @@ export class AnalysisController {
     vm.Project.setModified(true);
   }
 
-  getVariableSettings(selectedSamplingMethodID) {
+  getVariableSettings(argumentType) {
     const vm = this;
-    vm.$log.debug('In getVariableSettings');
+    vm.$log.debug('In getVariableSettings2');
 
-    if (_.includes(['LHS', 'DOE'], selectedSamplingMethodID)) {
-      return ['Static', 'Discrete', 'Continuous', 'Pivot'];
-    } else {
-      return ['Static', 'Discrete', 'Continuous'];
+    // TODO unhandled cases
+    //'BatchRun'
+    //'Morris'
+    //'DOE'
+    //'SingleRun'
+    //'RepeatRun'
+    //'BaselinePerturbation'
+
+    switch (vm.$scope.selectedSamplingMethod.id) {
+      case 'SPEA2':
+      case 'PSO':
+        if (argumentType === 'Double') {
+          return ['Static', 'Discrete', 'Continuous'];
+        } else {
+          return ['Static'];
+        }
+      case 'RGENOUD':
+      case 'Optim':
+        if (argumentType === 'Double') {
+          return ['Static', 'Discrete', 'Continuous'];
+        } else {
+          return ['Static'];
+        }
+      case 'NSGA2':
+      case 'PreFlight':
+        return ['Static', 'Discrete', 'Continuous'];
+      case 'LHS':
+      case 'DOE':
+        return ['Static', 'Discrete', 'Continuous', 'Pivot'];
+      default:
+        return ['Unhandled Sampling Method'];
     }
   }
 

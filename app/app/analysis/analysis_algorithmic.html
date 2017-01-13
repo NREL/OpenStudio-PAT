@@ -87,11 +87,8 @@
               {{argument.name}}
             </div>
 
-            <div class="col-sm-2" ng-if="argument.type == 'Double'">
-              <select class="form-control" ng-options="variableSetting as variableSetting for variableSetting in variableSettings" ng-model="argument.variableSetting"></select>
-            </div>
-            <div class="col-sm-2" ng-if="argument.type != 'Double'">
-              <label>Static</label>
+            <div class="col-sm-2">
+              <select class="form-control" ng-options="variableSetting as variableSetting for variableSetting in variableSettings" ng-init="variableSettings=analysis.getVariableSettings(argument.type)" ng-model="argument.variableSetting"></select>
             </div>
 
             <div class="col-sm-2" ng-if="argument.type == 'Choice'">
