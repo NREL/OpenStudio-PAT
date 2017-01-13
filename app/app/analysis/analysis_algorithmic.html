@@ -82,32 +82,43 @@
             <div class="col-sm-1">
               {{argument.display_name}}
             </div>
+
             <div class="col-sm-2">
               {{argument.name}}
             </div>
-            <div class="col-sm-2">
+
+            <div class="col-sm-2" ng-if="argument.type == 'Double'">
               <select class="form-control" ng-options="variableSetting as variableSetting for variableSetting in variableSettings" ng-model="argument.variableSetting"></select>
             </div>
-            <div class="col-sm-2">
-              <input type="text" ng-model="argument.staticDefaultValue">
+            <div class="col-sm-2" ng-if="argument.type != 'Double'">
+              <label>Static</label>
+            </div>
+
+            <div class="col-sm-2" ng-if="argument.type == 'Choice'">
+              <select class="form-control" ng-options="display_name as display_name for display_name in argument.choice_display_names" ng-model="argument.default_value"></select>
+            </div>
+            <div class="col-sm-2" ng-if="argument.type == 'String'">
+              <input type="text" ng-model="argument.default_value">
+            </div>
+            <div class="col-sm-2" ng-if="argument.type == 'Double'">
+              <input type="number" ng-model="argument.default_value">
             </div>
 
             <div class="col-sm-5" ng-if="!_.includes(['SPEA2, PSO'], analysis.selectedSamplingMethod.id) && argument.type == 'Double'">
               <div class="row">
-                <div class="col-sm-2">
+                <div class="col-sm-6">
                   Minimum
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-6">
                   Maximum
                 </div>
               </div>
-
               <div class="row">
-                <div class="col-sm-2">
-                  <input type="text" ng-model="argument.minimum">
+                <div class="col-sm-6">
+                  <input type="number" ng-model="argument.minimum">
                 </div>
-                <div class="col-sm-2">
-                  <input type="text" ng-model="argument.maximum">
+                <div class="col-sm-6">
+                  <input type="number" ng-model="argument.maximum">
                 </div>
               </div>
             </div>
