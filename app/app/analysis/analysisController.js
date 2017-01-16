@@ -822,22 +822,9 @@ export class AnalysisController {
     argument.variableSetting = argument.variableSettings[0];
   }
 
-  setVariableSetting(variable) {
+  addDiscreteVariable() {
     const vm = this;
-    vm.$log.debug('In setVariableSetting');
-    vm.variableSetting = variable;
-  }
-
-  getVariableSetting() {
-    const vm = this;
-    vm.$log.debug('In getVariableSetting');
-    return vm.variableSetting;
-  }
-
-  getDistributions() {
-    const vm = this;
-    vm.$log.debug('In getDistributions');
-    return ['Normal', 'Uniform', 'Triangle', 'Discrete'];
+    vm.$log.debug('In addDiscreteVariable');
   }
 
 }
