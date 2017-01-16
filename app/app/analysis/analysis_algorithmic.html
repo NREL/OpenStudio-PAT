@@ -101,7 +101,7 @@
               <input type="number" ng-model="argument.default_value">
             </div>
 
-            <div class="col-sm-5" ng-show="_.includes(['SPEA2, PSO'], analysis.$scope.selectedSamplingMethod.id) && argument.type == 'Double'">
+            <div class="col-sm-5" ng-show="(analysis.$scope.selectedSamplingMethod.id == 'SPEA2' || analysis.$scope.selectedSamplingMethod.id == 'PSO') && argument.type == 'Double'">
               <div class="row">
                 <div class="col-sm-6">
                   Minimum
@@ -120,7 +120,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="_.includes(['RGENOUD, Optim'], analysis.$scope.selectedSamplingMethod.id) && argument.type == 'Double'">
+            <div class="col-sm-5" ng-show="(analysis.$scope.selectedSamplingMethod.id == 'RGENOUD' || analysis.$scope.selectedSamplingMethod.id == 'Optim') && argument.type == 'Double'">
               <div class="row">
                 <div class="col-sm-4">
                   Minimum
