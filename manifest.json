@@ -1,7 +1,7 @@
 {
   "endpoint": "https://openstudio-resources.s3.amazonaws.com/pat-dependencies2/",
   "ruby": [{
-    "name": "ruby-2.0.0-p648-win32.tar.gz",
+    "name": "ruby-2.2.4-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "ruby"
