@@ -779,9 +779,9 @@ export class AnalysisController {
     vm.Project.setModified(true);
   }
 
-  getVariableSettings(argumentType) {
+  getVariableSettings(argument) {
     const vm = this;
-    vm.$log.debug('In getVariableSettings2');
+    vm.$log.debug('In getVariableSettings');
 
     // TODO unhandled cases
     //'BatchRun'
@@ -794,27 +794,32 @@ export class AnalysisController {
     switch (vm.$scope.selectedSamplingMethod.id) {
       case 'SPEA2':
       case 'PSO':
-        if (argumentType === 'Double') {
-          return ['Static', 'Discrete', 'Continuous'];
+        if (argument.type === 'Double') {
+          argument.variableSettings = ['Static', 'Discrete', 'Continuous'];
         } else {
-          return ['Static'];
+          argument.variableSettings =  ['Static'];
         }
+        break;
       case 'RGENOUD':
       case 'Optim':
-        if (argumentType === 'Double') {
-          return ['Static', 'Discrete', 'Continuous'];
+        if (argument.type === 'Double') {
+          argument.variableSettings =  ['Static', 'Discrete', 'Continuous'];
         } else {
-          return ['Static'];
+          argument.variableSettings =  ['Static'];
         }
+        break;
       case 'NSGA2':
       case 'PreFlight':
-        return ['Static', 'Discrete', 'Continuous'];
+        argument.variableSettings =  ['Static', 'Discrete', 'Continuous'];
+        break;
       case 'LHS':
       case 'DOE':
-        return ['Static', 'Discrete', 'Continuous', 'Pivot'];
+        argument.variableSettings =  ['Static', 'Discrete', 'Continuous', 'Pivot'];
+        break;
       default:
-        return ['Unhandled Sampling Method'];
+        argument.variableSettings =  ['Unhandled Sampling Method'];
     }
+    argument.variableSetting = argument.variableSettings[0];
   }
 
   setVariableSetting(variable) {

@@ -88,7 +88,7 @@
             </div>
 
             <div class="col-sm-2">
-              <select class="form-control" ng-options="variableSetting as variableSetting for variableSetting in variableSettings" ng-init="variableSettings=analysis.getVariableSettings(argument.type)" ng-model="argument.variableSetting"></select>
+              <select class="form-control" ng-options="variableSetting as variableSetting for variableSetting in argument.variableSettings" ng-init="analysis.getVariableSettings(argument)" ng-model="argument.variableSetting"></select>
             </div>
 
             <div class="col-sm-2" ng-if="argument.type == 'Choice'">
