@@ -797,27 +797,27 @@ export class AnalysisController {
         if (argument.type === 'Double') {
           argument.variableSettings = ['Static', 'Discrete', 'Continuous'];
         } else {
-          argument.variableSettings =  ['Static'];
+          argument.variableSettings = ['Static'];
         }
         break;
       case 'RGENOUD':
       case 'Optim':
         if (argument.type === 'Double') {
-          argument.variableSettings =  ['Static', 'Discrete', 'Continuous'];
+          argument.variableSettings = ['Static', 'Discrete', 'Continuous'];
         } else {
-          argument.variableSettings =  ['Static'];
+          argument.variableSettings = ['Static'];
         }
         break;
       case 'NSGA2':
       case 'PreFlight':
-        argument.variableSettings =  ['Static', 'Discrete', 'Continuous'];
+        argument.variableSettings = ['Static', 'Discrete', 'Continuous'];
         break;
       case 'LHS':
       case 'DOE':
-        argument.variableSettings =  ['Static', 'Discrete', 'Continuous', 'Pivot'];
+        argument.variableSettings = ['Static', 'Discrete', 'Continuous', 'Pivot'];
         break;
       default:
-        argument.variableSettings =  ['Unhandled Sampling Method'];
+        argument.variableSettings = ['Unhandled Sampling Method'];
     }
     argument.variableSetting = argument.variableSettings[0];
   }

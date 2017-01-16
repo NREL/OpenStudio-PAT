@@ -140,11 +140,10 @@
                   <input type="number" ng-model="argument.maximum">
                 </div>
                 <div class="col-sm-4">
-                <input type="number" ng-model="argument.deltaX">
-              </div>
+                  <input type="number" ng-model="argument.deltaX">
+                </div>
               </div>
             </div>
-
 
             <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'PreFlight' && argument.type == 'Double'">
               <div class="row">
@@ -171,53 +170,84 @@
               </div>
             </div>
             <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'PreFlight' && argument.type == 'String'">
-            <div class="row">
-              <div class="col-sm-4">
-                Minimum
+              <div class="row">
+                <div class="col-sm-4">
+                  Minimum
+                </div>
+                <div class="col-sm-4">
+                  Maximum
+                </div>
+                <div class="col-sm-4">
+                  Mean
+                </div>
               </div>
-              <div class="col-sm-4">
-                Maximum
-              </div>
-              <div class="col-sm-4">
-                Mean
-              </div>
-            </div>
-            <div class="row">
-              <div class="col-sm-4">
-                <input type="text" ng-model="argument.minimum">
-              </div>
-              <div class="col-sm-4">
-                <input type="text" ng-model="argument.maximum">
-              </div>
-              <div class="col-sm-4">
-                <input type="text" ng-model="argument.mean">
-              </div>
-            </div>
-          </div>
-          <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'PreFlight' && argument.type == 'Choice'">
-            <div class="row">
-              <div class="col-sm-4">
-                Minimum
-              </div>
-              <div class="col-sm-4">
-                Maximum
-              </div>
-              <div class="col-sm-4">
-                Mean
+              <div class="row">
+                <div class="col-sm-4">
+                  <input type="text" ng-model="argument.minimum">
+                </div>
+                <div class="col-sm-4">
+                  <input type="text" ng-model="argument.maximum">
+                </div>
+                <div class="col-sm-4">
+                  <input type="text" ng-model="argument.mean">
+                </div>
               </div>
             </div>
-            <div class="row">
-              <div class="col-sm-4">
-                <select class="form-control" ng-options="display_name as display_name for display_name in argument.some_min_values" ng-model="argument.some_min_value"></select>
+            <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'PreFlight' && argument.type == 'Choice'">
+              <div class="row">
+                <div class="col-sm-4">
+                  Minimum
+                </div>
+                <div class="col-sm-4">
+                  Maximum
+                </div>
+                <div class="col-sm-4">
+                  Mean
+                </div>
               </div>
-              <div class="col-sm-4">
-                <select class="form-control" ng-options="display_name as display_name for display_name in argument.some_min_values" ng-model="argument.some_max_value"></select>
-              </div>
-              <div class="col-sm-4">
-                <select class="form-control" ng-options="display_name as display_name for display_name in argument.some_min_values" ng-model="argument.some_mean_value"></select>
+              <div class="row">
+                <div class="col-sm-4">
+                  <select class="form-control" ng-options="display_name as display_name for display_name in argument.some_min_values" ng-model="argument.some_min_value"></select>
+                </div>
+                <div class="col-sm-4">
+                  <select class="form-control" ng-options="display_name as display_name for display_name in argument.some_min_values" ng-model="argument.some_max_value"></select>
+                </div>
+                <div class="col-sm-4">
+                  <select class="form-control" ng-options="display_name as display_name for display_name in argument.some_min_values" ng-model="argument.some_mean_value"></select>
+                </div>
               </div>
             </div>
-          </div>
+
+            <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'NSGA2'">
+              <div class="row">
+                <div class="col-sm-3">
+                  Minimum
+                </div>
+                <div class="col-sm-3">
+                  Maximum
+                </div>
+                <div class="col-sm-3">
+                  Delta X
+                </div>
+                <div class="col-sm-3">
+                  Discrete Variables
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-3">
+                  <input type="text" ng-model="argument.minimum">
+                </div>
+                <div class="col-sm-3">
+                  <input type="text" ng-model="argument.maximum">
+                </div>
+                <div class="col-sm-3">
+                  <input type="text" ng-model="argument.deltaX">
+                </div>
+                <div class="col-sm-3">
+                  <input type="text" ng-model="argument.discrete_variable">
+                </div>
+              </div>
+            </div>
 
           </div>
 
