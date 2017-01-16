@@ -59,8 +59,12 @@ export class OsServer {
     vm.energyplusEXEPath = DependencyManager.getPath("ENERGYPLUS_EXE_PATH");
 
     // server start in progress?
+    // local
     vm.serverStartInProgress = false;
     vm.serverStartDeferred = vm.$q.defer();
+    // remote
+    vm.remoteStartInProgress = false;
+    vm.remoteStartDeferred = vm.$q.defer();
 
   }
 
@@ -84,6 +88,38 @@ export class OsServer {
       //reject
       vm.serverStartDeferred.reject(message);
     }
+  }
+
+  getServerStartInProgressFlag() {
+    const vm = this;
+    return vm.serverStartInProgress;
+  }
+
+  remoteProgressStart() {
+    const vm = this;
+    vm.remoteStartInProgress = true;
+    vm.remoteStartDeferred = vm.$q.defer();
+  }
+
+  remoteProgressStop(type, message) {
+    const vm = this;
+    vm.remoteStartInProgress = false;
+    if (type == 'resolve') {
+      vm.remoteStartDeferred.resolve(message);
+    } else {
+      //reject
+      vm.remoteStartDeferred.reject(message);
+    }
+  }
+
+  isRemoteReady() {
+    const vm = this;
+    return vm.remoteStartDeferred.promise;
+  }
+
+  getRemoteStartInProgress() {
+    const vm = this;
+    return vm.remoteStartInProgress;
   }
 
   openServerToolsModal() {
@@ -292,6 +328,7 @@ export class OsServer {
 
     if ((vm.getServerStatus(serverType) != 'started') || force) {
       if (force == 'local' || serverType == 'local') {
+        // local server
         // check if server is currently starting
         if (vm.serverStartInProgress){
           vm.$log.debug('***Server is already in the process of starting...waiting on serverStartDeferred to resolve');
@@ -326,14 +363,29 @@ export class OsServer {
         }
       }
       else {
-        vm.remoteServer().then(response => {
-          vm.setServerStatus(serverType, 'started');
-          deferred.resolve(response);
-        }, response => {
-          vm.$log.debug('ERROR in start remote server');
-          // TODO: set serverType to 'error'?
-          deferred.reject(response);
-        });
+        // remote server
+        if (vm.remoteStartInProgress){
+          vm.$log.debug('***Remote Server is already in the process of starting...waiting on serverStartDeferred to resolve');
+          vm.isRemoteReady().then((response) => {
+            vm.$log.debug('Server is started!');
+            deferred.resolve(response);
+          }, (error) => {
+            vm.$log.debug('ERROR in start local server');
+            deferred.reject(error);
+          });
+        } else {
+          vm.remoteProgressStart();
+          vm.remoteServer().then(response => {
+            vm.$log.debug('OsServerService::StartServer: setting server to started');
+            vm.setServerStatus(serverType, 'started');
+            vm.remoteProgressStop('resolve', response);
+            deferred.resolve(response);
+          }, response => {
+            vm.$log.debug('ERROR in start remote server');
+            vm.remoteProgressStop('reject', error);
+            deferred.reject(response);
+          });
+        }
       }
     } else {
       // server already started
@@ -370,12 +422,11 @@ export class OsServer {
       vm.remoteSettings.aws.server.dns = vm.remoteSettings.aws.server.dns? vm.remoteSettings.aws.server.dns : null;
 
       // see if cluster is running
-      vm.Project.pingCluster(vm.remoteSettings.aws.server.dns).then(() => {
-
-
+      vm.Project.pingCluster(vm.remoteSettings.aws.cluster_name).then((dns) => {
         // cluster running, connect with DNS
-        vm.$log.debug('Connecting to existing cluster running at: ', vm.remoteSettings.aws.server.dns);
-        vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" ' + vm.remoteSettings.aws.server.dns;
+        vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
+        vm.$log.debug('Connecting to existing cluster running at: ', dns);
+        vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" ' + dns;
         vm.$log.debug('Start Server Command: ', vm.startServerCommand);
 
         const child = vm.exec(vm.startServerCommand,
@@ -389,9 +440,9 @@ export class OsServer {
               // SUCCESS
               vm.$log.debug('CLOUD SERVER CONNECTION SUCCESS');
 
-              // TODO: find server dns (from a file? from what comes back of cli?)
-              // TODO: set vm.selectedServerURL
-
+              //set vm.selectedServerURL
+              vm.setSelectedServerURL(dns);
+              vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
               deferred.resolve(child);
 
             } else {
@@ -417,6 +468,8 @@ export class OsServer {
           console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
           if (code == 0) {
             vm.$log.debug('Server connected');
+            vm.setSelectedServerURL(dns);
+            vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
             deferred.resolve();
           } else {
             vm.$log.debug('Server failed to connect');
@@ -455,9 +508,11 @@ export class OsServer {
               // SUCCESS
               vm.$log.debug('CLOUD SERVER START SUCCESS');
 
-              // TODO: find server dns (from a file? from what comes back of cli?)
-              // TODO: set vm.selectedServerURL
-
+              // get DNS and set server
+              const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
+              vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
+              vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
+              vm.setSelectedServerURL(newDNS);
               deferred.resolve(child);
 
             } else {
@@ -483,6 +538,11 @@ export class OsServer {
           console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
           if (code == 0) {
             vm.$log.debug('Server started');
+            // get DNS and set server
+            const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
+            vm.setSelectedServerURL(newDNS);
+            vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
+            vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
             deferred.resolve();
           } else {
             vm.$log.debug('Server failed to start');
@@ -578,6 +638,8 @@ export class OsServer {
       console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
       if (code == 0) {
         vm.$log.debug('Server started');
+        vm.getLocalServerUrlFromFile();
+        vm.$log.debug('SERVER URL: ', vm.selectedServerURL);
         deferred.resolve();
       } else {
         vm.$log.debug('Server failed to start');

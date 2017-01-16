@@ -30,6 +30,7 @@ export class RunController {
     // remote settings
     vm.$scope.remoteSettings = vm.Project.getRemoteSettings();
     vm.$log.debug("REMOTE SETTINGS: ", vm.$scope.remoteSettings);
+    vm.checkIfClusterIsRunning(); // check if selected cluster is running
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
     vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
@@ -53,6 +54,15 @@ export class RunController {
     vm.$log.debug('Run Type: ', vm.$scope.selectedRunType);
     vm.$log.debug('Analysis Type: ', vm.$scope.selectedAnalysisType);
     vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod);
+
+    // disabled button class
+    vm.$scope.disabledButtonClass = function() {
+      if (vm.OsServer.getRemoteStartInProgress()){
+        return 'disabled';
+      } else {
+        return '';
+      }
+    };
 
     // TROUBLESHOOTING PANEL STATUS
     vm.$scope.dev = {open: true};
@@ -157,20 +167,32 @@ export class RunController {
     return deferred.promise;
   }
 
+  checkIfClusterIsRunning(){
+    const vm = this;
+    // see if cluster is running; if so, set status
+    vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
+      // running
+      vm.$scope.remoteSettings.aws.cluster_status = 'running';
+    }, () => {
+      // terminated
+      vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
+    });
+  }
+
   resetClusterSettings(){
     const vm = this;
     // read in json file
     const clusterFile = vm.jetpack.read(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json');
     vm.$scope.remoteSettings.aws.connected = false;
-    vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
 
     // see if cluster is running; if so, set status
-    if (clusterFile.server && clusterFile.server.dns){
-      vm.Project.pingCluster(clusterFile.server.dns).then(() => {
-        // running
-        vm.$scope.remoteSettings.aws.cluster_status = 'running';
-      });
-    }
+    vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
+      // running
+      vm.$scope.remoteSettings.aws.cluster_status = 'running';
+    }, () => {
+      // terminated
+      vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
+    });
 
     // set variables
     vm.$scope.remoteSettings.aws.server_instance_type = null;
@@ -207,6 +229,7 @@ export class RunController {
     // type = 'connect' or 'start' depending on whether cluster is already running or not
     const vm = this;
     vm.OsServer.startServer().then( response => {
+      vm.$log.debug('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType]);
       if (type == 'connect')
         vm.toastr.success('Connected to AWS!');
       else

@@ -68,6 +68,7 @@ export class Project {
     vm.openstudioMD5 = null;
     vm.projectDir = null;  // this is a jetpack object (like all other *Dir variables)
     vm.projectLocalResultsDir = null;
+    vm.projectClustersDir = null;
     vm.projectName = null;
     vm.mongoDir = null;
     vm.logsDir = null;
@@ -835,6 +836,7 @@ export class Project {
     // this should be a jetpack object (not a string)
     vm.projectDir = dir;
     vm.setProjectLocalResultsDir(dir);
+    vm.setProjectClustersDir(dir);
   }
 
   setProjectLocalResultsDir(projectDir) {
@@ -845,6 +847,16 @@ export class Project {
   getProjectLocalResultsDir() {
     const vm = this;
     return vm.projectLocalResultsDir;
+  }
+
+  setProjectClustersDir(projectDir){
+    const vm = this;
+    return vm.projectClustersDir = vm.jetpack.dir(projectDir.path('clusters'));
+  }
+
+  getProjectClustersDir() {
+    const vm = this;
+    return vm.projectClustersDir;
   }
 
   getAwsDir() {
@@ -1010,45 +1022,56 @@ export class Project {
   // always get from disk and extract unique name
   getClusters() {
     const vm = this;
-    vm.clusters = {running: [], terminated: []};
+    vm.clusters = {running: [], all: []};
     const tempClusters = vm.jetpack.find(vm.projectDir.path(), {matching: '*_cluster.json'});
     _.forEach(tempClusters, cluster => {
       vm.$log.debug('CLUSTER: ', cluster);
       const clusterFile = vm.jetpack.read(cluster);
       let clusterName = _.last(_.split(cluster, '/'));
       clusterName = _.replace(clusterName, '_cluster.json', '');
-      if (clusterFile.server && clusterFile.server.dns){
-        // PING
-        vm.pingCluster(clusterFile.server.dns).then(() => {
-          // running
-          vm.clusters.running.push(clusterName);
-        }, () => {
-          // terminated
-          vm.clusters.terminated.push(clusterName);
-        });
-      }
-      else {
+      vm.clusters.all.push(clusterName);
+      // PING (by name)
+      vm.pingCluster(clusterName).then((dns) => {
+        // running
+        vm.clusters.running.push(clusterName);
+      }, () => {
         // terminated
-        vm.clusters.terminated.push(clusterName);
-      }
+      });
     });
 
     vm.$log.debug('Cluster files found: ', vm.clusters);
     return vm.clusters;
   }
 
-  pingCluster(dns) {
+  getDNSFromFile(clusterName){
+    const vm = this;
+    let dns = null;
+    if (vm.jetpack.exists(vm.projectClustersDir.path(clusterName + '.json'))) {
+      const clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName + '.json'), 'json');
+      vm.$log.debug('Cluster File Data: ', clusterData);
+      if (clusterData && clusterData.server && clusterData.server.dns) {
+        dns = clusterData.server.dns;
+      }
+    }
+    return dns;
+  }
+
+  pingCluster(clusterName) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('Pinging cluster at: ', dns);
-    if (dns){
-      vm.$http.get(dns).then(response => {
+    vm.$log.debug('Locating config file for cluster: ', clusterName);
+
+    const dns = vm.getDNSFromFile(clusterName);
+
+    if (dns) {
+      vm.$log.debug('PING: ', dns);
+      vm.$http.get('http://' + dns).then(response => {
         // send json to run controller
-        vm.$log.debug('Cluster running at: ', dns);
+        vm.$log.debug('Cluster RUNNING at: ', dns);
         vm.$log.debug('JSON response: ', response);
-        deferred.resolve();
+        deferred.resolve(dns);
       }, () => {
-        vm.$log.debug('Cluster terminated at: ', dns);
+        vm.$log.debug('Cluster TERMINATED at: ', dns);
         deferred.reject();
       });
     } else {
