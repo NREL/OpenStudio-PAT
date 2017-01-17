@@ -192,8 +192,8 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'NSGA2' && argument.variableSetting != 'Static'">
-              <div class="row">
+            <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'NSGA2'">
+              <div class="row" ng-if="argument.variableSetting == 'Continuous'">
                 <div class="col-sm-3">
                   Minimum
                 </div>
@@ -203,21 +203,20 @@
                 <div class="col-sm-3">
                   Delta X
                 </div>
-                <div class="col-sm-3">
-                  Discrete Variables
-                </div>
               </div>
-              <div class="row">
-                <div class="col-sm-3">
+              <div class="row" ng-if="argument.variableSetting == 'Continuous'">
+                <div class="col-sm-4">
                   <input type="text" ng-model="argument.minimum">
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   <input type="text" ng-model="argument.maximum">
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   <input type="text" ng-model="argument.deltaX">
                 </div>
-                <div class="col-sm-3">
+              </div>
+              <div class="row" ng-if="argument.variableSetting == 'Discrete'">
+                <div class="col-sm-12">
                   <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
                 </div>
               </div>
