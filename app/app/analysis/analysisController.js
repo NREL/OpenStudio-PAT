@@ -791,35 +791,37 @@ export class AnalysisController {
     //'RepeatRun'
     //'BaselinePerturbation'
 
+    if(_.isNil(argument.inputs)) argument.inputs = {};
+
     switch (vm.$scope.selectedSamplingMethod.id) {
       case 'SPEA2':
       case 'PSO':
         if (argument.type === 'Double') {
-          argument.variableSettings = ['Static', 'Discrete', 'Continuous'];
+          argument.inputs.variableSettings = ['Static', 'Discrete', 'Continuous'];
         } else {
-          argument.variableSettings = ['Static'];
+          argument.inputs.variableSettings = ['Static'];
         }
         break;
       case 'RGENOUD':
       case 'Optim':
         if (argument.type === 'Double') {
-          argument.variableSettings = ['Static', 'Discrete', 'Continuous'];
+          argument.inputs.variableSettings = ['Static', 'Discrete', 'Continuous'];
         } else {
-          argument.variableSettings = ['Static'];
+          argument.inputs.variableSettings = ['Static'];
         }
         break;
       case 'NSGA2':
       case 'PreFlight':
-        argument.variableSettings = ['Static', 'Discrete', 'Continuous'];
+        argument.inputs.variableSettings = ['Static', 'Discrete', 'Continuous'];
         break;
       case 'LHS':
       case 'DOE':
-        argument.variableSettings = ['Static', 'Discrete', 'Continuous', 'Pivot'];
+        argument.inputs.variableSettings = ['Static', 'Discrete', 'Continuous', 'Pivot'];
         break;
       default:
-        argument.variableSettings = ['Unhandled Sampling Method'];
+        argument.inputs.variableSettings = ['Unhandled Sampling Method'];
     }
-    argument.variableSetting = argument.variableSettings[0];
+    argument.inputs.variableSetting = argument.inputs.variableSettings[0];
   }
 
   addDiscreteVariable() {

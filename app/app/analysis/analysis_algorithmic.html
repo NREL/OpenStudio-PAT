@@ -88,7 +88,7 @@
             </div>
 
             <div class="col-sm-2">
-              <select class="form-control" ng-options="variableSetting as variableSetting for variableSetting in argument.variableSettings" ng-init="analysis.getVariableSettings(argument)" ng-model="argument.variableSetting"></select>
+              <select class="form-control" ng-options="variableSetting as variableSetting for variableSetting in argument.inputs.variableSettings" ng-init="analysis.getVariableSettings(argument)" ng-model="argument.inputs.variableSetting"></select>
             </div>
 
             <div class="col-sm-2" ng-if="argument.type == 'Choice'">
@@ -101,7 +101,7 @@
               <input type="number" ng-model="argument.default_value">
             </div>
 
-            <div class="col-sm-5" ng-show="(analysis.$scope.selectedSamplingMethod.id == 'SPEA2' || analysis.$scope.selectedSamplingMethod.id == 'PSO') && argument.type == 'Double' && argument.variableSetting != 'Static'">
+            <div class="col-sm-5" ng-show="(analysis.$scope.selectedSamplingMethod.id == 'SPEA2' || analysis.$scope.selectedSamplingMethod.id == 'PSO') && argument.type == 'Double' && argument.inputs.variableSetting != 'Static'">
               <div class="row">
                 <div class="col-sm-6">
                   Minimum
@@ -120,7 +120,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="(analysis.$scope.selectedSamplingMethod.id == 'RGENOUD' || analysis.$scope.selectedSamplingMethod.id == 'Optim') && argument.type == 'Double'  && argument.variableSetting != 'Static'">
+            <div class="col-sm-5" ng-show="(analysis.$scope.selectedSamplingMethod.id == 'RGENOUD' || analysis.$scope.selectedSamplingMethod.id == 'Optim') && argument.type == 'Double'  && argument.inputs.variableSetting != 'Static'">
               <div class="row">
                 <div class="col-sm-4">
                   Minimum
@@ -145,7 +145,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'PreFlight' && argument.variableSetting != 'Static'">
+            <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'PreFlight' && argument.inputs.variableSetting != 'Static'">
               <div class="row">
                 <div class="col-sm-4">
                   Minimum
@@ -193,7 +193,7 @@
             </div>
 
             <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'NSGA2'">
-              <div class="row" ng-if="argument.variableSetting == 'Continuous'">
+              <div class="row" ng-if="argument.inputs.variableSetting == 'Continuous'">
                 <div class="col-sm-3">
                   Minimum
                 </div>
@@ -204,7 +204,7 @@
                   Delta X
                 </div>
               </div>
-              <div class="row" ng-if="argument.variableSetting == 'Continuous'">
+              <div class="row" ng-if="argument.inputs.variableSetting == 'Continuous'">
                 <div class="col-sm-4">
                   <input type="text" ng-model="argument.minimum">
                 </div>
@@ -215,7 +215,7 @@
                   <input type="text" ng-model="argument.deltaX">
                 </div>
               </div>
-              <div class="row" ng-if="argument.variableSetting == 'Discrete'">
+              <div class="row" ng-if="argument.inputs.variableSetting == 'Discrete'">
                 <div class="col-sm-12">
                   <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
                 </div>
