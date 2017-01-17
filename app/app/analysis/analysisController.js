@@ -824,9 +824,22 @@ export class AnalysisController {
     argument.inputs.variableSetting = argument.inputs.variableSettings[0];
   }
 
-  addDiscreteVariable() {
+  addDiscreteVariable(argument) {
     const vm = this;
     vm.$log.debug('In addDiscreteVariable');
+    //vm.$log.debug('argument: ', argument);
+    //vm.$log.error('argument.type: ', argument.type);
+
+    // Add 'Value', add 'Weight'
+    const discreteVariable = {
+      value: '',
+      weight: ''
+    };
+
+    if (_.isNil(argument.inputs)) argument.inputs = {};
+    if (_.isNil(argument.inputs.discreteVariables)) argument.inputs.discreteVariables = [];
+
+    argument.inputs.discreteVariables.push(discreteVariable);
   }
 
 }

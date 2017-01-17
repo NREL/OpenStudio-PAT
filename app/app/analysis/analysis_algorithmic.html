@@ -204,7 +204,18 @@
                   Delta X
                 </div>
               </div>
-              <div class="row" ng-if="argument.inputs.variableSetting == 'Continuous'">
+              <div class="row" ng-if="argument.inputs.variableSetting == 'Continuous' && argument.type == 'Double'">
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.minimum">
+                </div>
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.maximum">
+                </div>
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.deltaX">
+                </div>
+              </div>
+              <div class="row" ng-if="argument.inputs.variableSetting == 'Continuous' && argument.type == 'String'">
                 <div class="col-sm-4">
                   <input class="form-control" type="text" ng-model="argument.minimum">
                 </div>
@@ -215,15 +226,26 @@
                   <input class="form-control" type="text" ng-model="argument.deltaX">
                 </div>
               </div>
-              <div class="row" ng-if="argument.inputs.variableSetting == 'Discrete'">
+              <div class="row" ng-if="argument.inputs.variableSetting == 'Discrete' && (argument.type == 'Double' || argument.type == 'Integer')">
                 <div class="col-sm-12">
-                  <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                  <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                    <input class="form-control" type="number" ng-model="discreteVariable.value">
+                    <input class="form-control" type="number" ng-model="discreteVariable.weight">
+                  </div>
+                  <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
                 </div>
               </div>
+              <div class="row" ng-if="argument.inputs.variableSetting == 'Discrete' && argument.type == 'String'">
+              <div class="col-sm-12">
+                <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                  <input class="form-control" type="text" ng-model="discreteVariable.value">
+                  <input class="form-control" type="text" ng-model="discreteVariable.weight">
+                </div>
+                <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+              </div>
             </div>
-
           </div>
-
+        </div>
       </uib-accordion-group>
     </uib-accordion>
   </div>
