@@ -44,7 +44,7 @@ export class OsServer {
     vm.disabledButtons = false;  // display run or cancel button
 
     vm.localServerURL = 'http://localhost:8080';  // default URL.  will be reset when starting server
-    vm.selectedServerURL = vm.localServerURL;
+    vm.selectedServerURL = vm.resetSelectedServerURL();
 
     const src = jetpack.cwd(app.getPath('userData'));
     vm.$log.debug('src.path(): ', src.path());
@@ -181,7 +181,7 @@ export class OsServer {
       if (rs.remoteType == 'Existing Remote Server'){
         vm.selectedServerURL = rs.remoteServerURL;
       } else {
-        vm.selectedServerURL = rs.cloudServerURL;
+        vm.selectedServerURL = null;
       }
 
     }
@@ -380,10 +380,10 @@ export class OsServer {
             vm.setServerStatus(serverType, 'started');
             vm.remoteProgressStop('resolve', response);
             deferred.resolve(response);
-          }, response => {
+          }, error => {
             vm.$log.debug('ERROR in start remote server');
             vm.remoteProgressStop('reject', error);
-            deferred.reject(response);
+            deferred.reject(error);
           });
         }
       }
@@ -407,10 +407,10 @@ export class OsServer {
       // ping URL to see if started
       vm.pingServer().then(response => {
         vm.$log.debug('Existing Remote Server Connected');
-        deferred.resolve();
+        deferred.resolve(response);
       }, error => {
         vm.$log.debug('Cannot connect to Existing Remote Server at specified URL');
-        deferred.reject();
+        deferred.reject(error);
       });
     } else {
       // amazon cloud
@@ -426,7 +426,7 @@ export class OsServer {
         // cluster running, connect with DNS
         vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
         vm.$log.debug('Connecting to existing cluster running at: ', dns);
-        vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" ' + dns;
+        vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" '  + vm.Project.fixURL(dns);
         vm.$log.debug('Start Server Command: ', vm.startServerCommand);
 
         const child = vm.exec(vm.startServerCommand,
@@ -441,7 +441,7 @@ export class OsServer {
               vm.$log.debug('CLOUD SERVER CONNECTION SUCCESS');
 
               //set vm.selectedServerURL
-              vm.setSelectedServerURL(dns);
+              vm.setSelectedServerURL(vm.Project.fixURL(dns));
               vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
               deferred.resolve(child);
 
@@ -468,12 +468,12 @@ export class OsServer {
           console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
           if (code == 0) {
             vm.$log.debug('Server connected');
-            vm.setSelectedServerURL(dns);
+            vm.setSelectedServerURL(vm.Project.fixURL(dns));
             vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
-            deferred.resolve();
+            deferred.resolve('success');
           } else {
             vm.$log.debug('Server failed to connect');
-            deferred.reject();
+            deferred.reject('error');
           }
           return deferred.promise;
         });
@@ -512,7 +512,7 @@ export class OsServer {
               const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
               vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
               vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
-              vm.setSelectedServerURL(newDNS);
+              vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
               deferred.resolve(child);
 
             } else {
@@ -540,13 +540,13 @@ export class OsServer {
             vm.$log.debug('Server started');
             // get DNS and set server
             const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
-            vm.setSelectedServerURL(newDNS);
+            vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
             vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
             vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
-            deferred.resolve();
+            deferred.resolve('success');
           } else {
             vm.$log.debug('Server failed to start');
-            deferred.reject();
+            deferred.reject('error');
           }
           return deferred.promise;
         });
@@ -789,15 +789,16 @@ export class OsServer {
             }
           });
       } else {
-        // TODO: stop remote server here
         if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server'){
-          // remote server:
-          // TODO: blank out URL?
+          // remote server
+          vm.$log.debug('Stopping Existing Remote Server');
           vm.setServerStatus(serverType, 'stopped');
+          vm.setSelectedServerURL(null);
           deferred.resolve('Server Disconnected');
 
         } else {
           // cloud: terminate server
+          vm.$log.debug('Terminating AWS cluster');
           vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_remote ' + '\"' + vm.Project.projectDir.path(vm.Project.getRemoteSettings().aws.cluster_name + '_cluster.json') + '\"';
           vm.$log.info('stop server command: ', vm.stopServerCommand);
           const envCopy = vm.setAwsEnvVars();
@@ -819,11 +820,11 @@ export class OsServer {
                 if (error !== null) {
                   console.log('exec error: ', error);
                 }
-                deferred.resolve(error);
+                deferred.reject(error);
               }
             });
 
-          deferred.resolve();
+          //deferred.resolve();
         }
       }
     } else {

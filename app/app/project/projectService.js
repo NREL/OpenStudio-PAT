@@ -994,7 +994,7 @@ export class Project {
 
   resetRemoteSettings() {
     const vm = this;
-    vm.setRemoteSettings({open: true, remoteType: vm.remoteTypes[0], remoteServerURL: null, cloudServerURL: null, aws: {}, credentials: {yamlFilename: null, accessKey: null, region: null}});
+    vm.setRemoteSettings({open: true, remoteType: vm.remoteTypes[0], remoteServerURL: null, aws: {}, credentials: {yamlFilename: null, accessKey: null, region: null}});
     vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
@@ -1065,7 +1065,7 @@ export class Project {
 
     if (dns) {
       vm.$log.debug('PING: ', dns);
-      vm.$http.get('http://' + dns).then(response => {
+      vm.$http.get(vm.fixURL(dns)).then(response => {
         // send json to run controller
         vm.$log.debug('Cluster RUNNING at: ', dns);
         vm.$log.debug('JSON response: ', response);
@@ -1081,6 +1081,14 @@ export class Project {
     }
 
     return deferred.promise;
+  }
+
+  fixURL(url) {
+    // if http:// is missing from URL, $http actions won't work
+    if (url.indexOf('http://') == -1 && url.indexOf('https://') == -1) {
+      url = 'http://' + url;
+    }
+    return url;
   }
 
   getOsServerVersions() {

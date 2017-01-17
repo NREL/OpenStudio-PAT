@@ -30,7 +30,12 @@ export class RunController {
     // remote settings
     vm.$scope.remoteSettings = vm.Project.getRemoteSettings();
     vm.$log.debug("REMOTE SETTINGS: ", vm.$scope.remoteSettings);
-    vm.checkIfClusterIsRunning(); // check if selected cluster is running
+
+    // if remote and amazon is selected, ping cluster
+    if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+      vm.checkIfClusterIsRunning();
+    }
+
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
     vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
@@ -91,8 +96,17 @@ export class RunController {
 
   }
 
+
+  remoteTypeChange() {
+    const vm = this;
+    vm.OsServer.resetSelectedServerURL();
+    // if switching to remote and amazon is selected, ping cluster
+    if (vm.$scope.remoteSettings.remoteType == 'Amazon Cloud'){
+      vm.checkIfClusterIsRunning();
+    }
+  }
+
   setRunType() {
-    // TODO: warn users that datapoints will be deleted first
     const vm = this;
     vm.deleteResults();
     vm.$log.debug('old run type: ', vm.Project.getRunType());
@@ -100,10 +114,16 @@ export class RunController {
     vm.Project.setRunType(vm.$scope.selectedRunType);
     vm.OsServer.resetSelectedServerURL();
 
+    // if switching to remote and amazon is selected, ping cluster
+    if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+      vm.checkIfClusterIsRunning();
+    }
   }
 
   viewServer() {
     const vm = this;
+    vm.$log.debug("in Run::viewServer");
+    vm.$log.debug("selected Server URL: ", vm.OsServer.getSelectedServerURL());
     vm.shell.openExternal(vm.OsServer.getSelectedServerURL());
   }
 
@@ -173,9 +193,11 @@ export class RunController {
     vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
       // running
       vm.$scope.remoteSettings.aws.cluster_status = 'running';
+      vm.$log.debug('Run::checkIfClusterIsRunning Current Cluster RUNNING!');
     }, () => {
       // terminated
       vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
+      vm.$log.debug("Run::checkIfClusterIsRunning Current cluster TERMINATED");
     });
   }
 
@@ -329,32 +351,43 @@ export class RunController {
 
   resetRemoteServerURL() {
     const vm = this;
-    vm.OsServer.stopServer().then(response => {
-      vm.OsServer.resetSelectedServerURL();
-    }, error => {
-      vm.$log.debug('Couldn\'t disconnect from server');
+
+    // disconnect if connected to remote existing server
+    if (vm.$scope.remoteSettings.remoteType == 'Existing Remote Server' && vm.$scope.selectedRunType.name == 'Remote' && vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]){
+      vm.OsServer.stopServer().then(response => {
+        vm.OsServer.resetSelectedServerURL();
+      }, error => {
+        vm.$log.debug('Couldn\'t disconnect from server: ', error);
+        // reset anyway
+        vm.OsServer.resetSelectedServerURL();
+      });
+    } else {
       // reset anyway
       vm.OsServer.resetSelectedServerURL();
-    });
+    }
   }
 
   stopServer(force = false) {
     const vm = this;
     vm.OsServer.stopServer(force).then(response => {
+      vm.$log.debug('Run::stopServer response: ', response);
       vm.$log.debug('***** ', vm.$scope.selectedRunType.name, ' Server Stopped *****');
       vm.OsServer.setProgress(0, '');
       //vm.$scope.serverStatuses = vm.OsServer.getServerStatus();
       if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
         vm.toastr.success('PAT successfully disconnected from remote server');
+      } else if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+        vm.toastr.success('PAT successfully terminated AWS cluster');
       } else {
         vm.toastr.success('Server stopped successfully');
       }
-
     }, response => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
       vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
       if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
         vm.toastr.error('PAT could not disconnect from remote server');
+      } else if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+        vm.toastr.error('PAT could not terminate AWS cluster');
       } else {
         vm.toastr.error('Error: server could not be stopped');
       }
