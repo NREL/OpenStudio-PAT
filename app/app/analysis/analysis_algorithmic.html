@@ -101,7 +101,7 @@
               <input type="number" ng-model="argument.default_value">
             </div>
 
-            <div class="col-sm-5" ng-show="(analysis.$scope.selectedSamplingMethod.id == 'SPEA2' || analysis.$scope.selectedSamplingMethod.id == 'PSO') && argument.type == 'Double'">
+            <div class="col-sm-5" ng-show="(analysis.$scope.selectedSamplingMethod.id == 'SPEA2' || analysis.$scope.selectedSamplingMethod.id == 'PSO') && argument.type == 'Double' && argument.variableSetting != 'Static'">
               <div class="row">
                 <div class="col-sm-6">
                   Minimum
@@ -120,7 +120,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="(analysis.$scope.selectedSamplingMethod.id == 'RGENOUD' || analysis.$scope.selectedSamplingMethod.id == 'Optim') && argument.type == 'Double'">
+            <div class="col-sm-5" ng-show="(analysis.$scope.selectedSamplingMethod.id == 'RGENOUD' || analysis.$scope.selectedSamplingMethod.id == 'Optim') && argument.type == 'Double'  && argument.variableSetting != 'Static'">
               <div class="row">
                 <div class="col-sm-4">
                   Minimum
@@ -145,7 +145,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'PreFlight'">
+            <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'PreFlight' && argument.variableSetting != 'Static'">
               <div class="row">
                 <div class="col-sm-4">
                   Minimum
@@ -192,7 +192,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'NSGA2'">
+            <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'NSGA2' && argument.variableSetting != 'Static'">
               <div class="row">
                 <div class="col-sm-3">
                   Minimum
