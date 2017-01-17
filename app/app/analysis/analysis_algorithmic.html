@@ -112,10 +112,10 @@
               </div>
               <div class="row">
                 <div class="col-sm-6">
-                  <input type="number" ng-model="argument.minimum">
+                  <input class="form-control" type="number" ng-model="argument.minimum">
                 </div>
                 <div class="col-sm-6">
-                  <input type="number" ng-model="argument.maximum">
+                  <input class="form-control" type="number" ng-model="argument.maximum">
                 </div>
               </div>
             </div>
@@ -134,13 +134,13 @@
               </div>
               <div class="row">
                 <div class="col-sm-4">
-                  <input type="number" ng-model="argument.minimum">
+                  <input class="form-control" type="number" ng-model="argument.minimum">
                 </div>
                 <div class="col-sm-4">
-                  <input type="number" ng-model="argument.maximum">
+                  <input class="form-control" type="number" ng-model="argument.maximum">
                 </div>
                 <div class="col-sm-4">
-                  <input type="number" ng-model="argument.deltaX">
+                  <input class="form-control" type="number" ng-model="argument.deltaX">
                 </div>
               </div>
             </div>
@@ -159,24 +159,24 @@
               </div>
               <div class="row" ng-if="argument.type == 'Double'">
                 <div class="col-sm-4">
-                  <input type="number" ng-model="argument.minimum">
+                  <input class="form-control" type="number" ng-model="argument.minimum">
                 </div>
                 <div class="col-sm-4">
-                  <input type="number" ng-model="argument.maximum">
+                  <input class="form-control" type="number" ng-model="argument.maximum">
                 </div>
                 <div class="col-sm-4">
-                  <input type="number" ng-model="argument.mean">
+                  <input class="form-control" type="number" ng-model="argument.mean">
                 </div>
               </div>
               <div class="row" ng-if="argument.type == 'String'">
                 <div class="col-sm-4">
-                  <input type="text" ng-model="argument.minimum">
+                  <input class="form-control" type="text" ng-model="argument.minimum">
                 </div>
                 <div class="col-sm-4">
-                  <input type="text" ng-model="argument.maximum">
+                  <input class="form-control" type="text" ng-model="argument.maximum">
                 </div>
                 <div class="col-sm-4">
-                  <input type="text" ng-model="argument.mean">
+                  <input class="form-control" type="text" ng-model="argument.mean">
                 </div>
               </div>
               <div class="row" ng-if="argument.type == 'Choice'">
@@ -194,25 +194,25 @@
 
             <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'NSGA2'">
               <div class="row" ng-if="argument.inputs.variableSetting == 'Continuous'">
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   Minimum
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   Maximum
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   Delta X
                 </div>
               </div>
               <div class="row" ng-if="argument.inputs.variableSetting == 'Continuous'">
                 <div class="col-sm-4">
-                  <input type="text" ng-model="argument.minimum">
+                  <input class="form-control" type="text" ng-model="argument.minimum">
                 </div>
                 <div class="col-sm-4">
-                  <input type="text" ng-model="argument.maximum">
+                  <input class="form-control" type="text" ng-model="argument.maximum">
                 </div>
                 <div class="col-sm-4">
-                  <input type="text" ng-model="argument.deltaX">
+                  <input class="form-control" type="text" ng-model="argument.deltaX">
                 </div>
               </div>
               <div class="row" ng-if="argument.inputs.variableSetting == 'Discrete'">
