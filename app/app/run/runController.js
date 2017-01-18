@@ -62,11 +62,14 @@ export class RunController {
 
     // disabled button class
     vm.$scope.disabledButtonClass = function() {
-      if (vm.OsServer.getRemoteStartInProgress()){
-        return 'disabled';
-      } else {
-        return '';
-      }
+      const disable = vm.OsServer.getRemoteStartInProgress() ? 'disabled' : '';
+      return disable;
+    };
+
+    // disabled stop button class
+    vm.$scope.disabledStopButtonClass = function() {
+      const disable = vm.OsServer.getRemoteStopInProgress() ? 'disabled' : '';
+      return disable;
     };
 
     // TROUBLESHOOTING PANEL STATUS
@@ -250,6 +253,13 @@ export class RunController {
   connectAws(type) {
     // type = 'connect' or 'start' depending on whether cluster is already running or not
     const vm = this;
+    if (type == 'connect') {
+      // toastr
+      vm.toastr.info('Connecting to the Cloud...this may take a few minutes.');
+    } else {
+      // toastr
+      vm.toastr.info('Starting Cloud cluster...this may take up to 10 minutes', {closeButton: true, timeOut: 60000});
+    }
     vm.OsServer.startServer().then( response => {
       vm.$log.debug('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType]);
       if (type == 'connect')
@@ -369,24 +379,33 @@ export class RunController {
 
   stopServer(force = false) {
     const vm = this;
+
+    if(vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud')
+    {
+      vm.toastr.info('Terminating Cloud Clusters...', {closeButton: true, timeOut: 30000});
+    }
+
     vm.OsServer.stopServer(force).then(response => {
       vm.$log.debug('Run::stopServer response: ', response);
       vm.$log.debug('***** ', vm.$scope.selectedRunType.name, ' Server Stopped *****');
       vm.OsServer.setProgress(0, '');
-      //vm.$scope.serverStatuses = vm.OsServer.getServerStatus();
-      if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
+      vm.toastr.clear();
+      if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
         vm.toastr.success('PAT successfully disconnected from remote server');
-      } else if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+      } else if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
         vm.toastr.success('PAT successfully terminated AWS cluster');
+        // debug
+        vm.$log.debug('***Cloud Cluster status: ', vm.$scope.remoteSettings.aws.cluster_status);
+        vm.$log.debug('***remoteSettings.Aws: ', vm.$scope.remoteSettings.aws);
       } else {
         vm.toastr.success('Server stopped successfully');
       }
     }, response => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
       vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
-      if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
+      if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
         vm.toastr.error('PAT could not disconnect from remote server');
-      } else if (vm.$scope.selectedRunType.name != 'local' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+      } else if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
         vm.toastr.error('PAT could not terminate AWS cluster');
       } else {
         vm.toastr.error('Error: server could not be stopped');

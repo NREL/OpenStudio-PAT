@@ -1112,9 +1112,10 @@ export class Project {
   setOsServerVersions() {
     const vm = this;
     vm.osServerVersions = [];
-    const amiURL = 'http://s3.amazonaws.com//openstudio-resources/server/api/v2/amis.json';
+    const amiURL = 'http://s3.amazonaws.com/openstudio-resources/server/api/v2/amis.json';
     vm.$http.get(amiURL).then(response => {
       if (response.data && response.data.openstudio_server) {
+        vm.$log.debug('OPENSTUDIO SERVER AMIS: ', response.data.openstudio_server);
         _.forEach(_.keys(response.data.openstudio_server), version => {
           vm.osServerVersions.push(version);
         });

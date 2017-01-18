@@ -4,6 +4,7 @@ const {app} = remote;
 import path from 'path';
 import os from 'os';
 import AdmZip from 'adm-zip';
+import YAML from 'yamljs';
 
 export class OsServer {
   constructor($q, $http, $log, $uibModal, Project, DependencyManager) {
@@ -62,9 +63,14 @@ export class OsServer {
     // local
     vm.serverStartInProgress = false;
     vm.serverStartDeferred = vm.$q.defer();
+    // local stop
+    vm.serverStopInProgress = false;
     // remote
     vm.remoteStartInProgress = false;
     vm.remoteStartDeferred = vm.$q.defer();
+    // remote stop
+    vm.remoteStopInProgress = false;
+
 
   }
 
@@ -120,6 +126,16 @@ export class OsServer {
   getRemoteStartInProgress() {
     const vm = this;
     return vm.remoteStartInProgress;
+  }
+
+  getRemoteStopInProgress() {
+    const vm = this;
+    return vm.remoteStopInProgress;
+  }
+
+  setRemoteStopInProgress(value) {
+    const vm = this;
+    vm.remoteStopInProgress = value;
   }
 
   openServerToolsModal() {
@@ -510,8 +526,7 @@ export class OsServer {
 
               // get DNS and set server
               const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
-              vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
-              vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
+              vm.connectCluster();
               vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
               deferred.resolve(child);
 
@@ -541,8 +556,7 @@ export class OsServer {
             // get DNS and set server
             const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
             vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
-            vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
-            vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
+            vm.connectCluster();
             deferred.resolve('success');
           } else {
             vm.$log.debug('Server failed to start');
@@ -798,8 +812,10 @@ export class OsServer {
 
         } else {
           // cloud: terminate server
+          vm.setRemoteStopInProgress(true);
           vm.$log.debug('Terminating AWS cluster');
-          vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_remote ' + '\"' + vm.Project.projectDir.path(vm.Project.getRemoteSettings().aws.cluster_name + '_cluster.json') + '\"';
+          // use cluster.json file in clusters/ folder to terminate
+          vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_remote ' + '\"' + vm.Project.getProjectClustersDir().path(vm.Project.getRemoteSettings().aws.cluster_name + '.json') + '\"';
           vm.$log.info('stop server command: ', vm.stopServerCommand);
           const envCopy = vm.setAwsEnvVars();
           const child = vm.exec(vm.stopServerCommand, {env: envCopy},
@@ -814,12 +830,15 @@ export class OsServer {
                 // SUCCESS
                 vm.$log.debug('Cloud Server Terminated');
                 vm.setServerStatus(serverType, 'stopped');
+                vm.disconnectCluster();
+                vm.setRemoteStopInProgress(false);
                 deferred.resolve(child);
 
               } else {
                 if (error !== null) {
                   console.log('exec error: ', error);
                 }
+                vm.setRemoteStopInProgress(false);
                 deferred.reject(error);
               }
             });
@@ -833,6 +852,22 @@ export class OsServer {
     }
 
     return deferred.promise;
+  }
+
+  disconnectCluster() {
+    const vm = this;
+    vm.remoteSettings = vm.Project.getRemoteSettings();
+    vm.remoteSettings.aws.cluster_status = 'terminated';
+    vm.remoteSettings.aws.connected = false;
+    vm.$log.debug('Cluster Terminated and Disconnected');
+  }
+
+  connectCluster() {
+    const vm = this;
+    vm.remoteSettings = vm.Project.getRemoteSettings();
+    vm.remoteSettings.aws.cluster_status = 'running';
+    vm.remoteSettings.aws.connected = true;
+    vm.$log.debug('Cluster Started and Connected');
   }
 
   localServerCleanup() {
@@ -858,7 +893,6 @@ export class OsServer {
   retrieveAnalysisStatus() {
     const vm = this;
     const deferred = vm.$q.defer();
-
     const url = vm.selectedServerURL + '/analyses/' + vm.Project.getAnalysisID() + '/status.json';
     vm.$log.debug('Analysis Status URL: ', url);
     vm.$http.get(url).then(response => {
