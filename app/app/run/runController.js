@@ -262,6 +262,7 @@ export class RunController {
     }
     vm.OsServer.startServer().then( response => {
       vm.$log.debug('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType]);
+      vm.toastr.clear();
       if (type == 'connect')
         vm.toastr.success('Connected to AWS!');
       else
@@ -269,11 +270,11 @@ export class RunController {
       // started toastr
     }, error => {
       // error toastr
+      vm.toastr.clear();
       if (type == 'connect')
         vm.toastr.error('Error connecting to AWS');
       else
         vm.toastr.error('Error starting AWS server');
-
     });
   }
 

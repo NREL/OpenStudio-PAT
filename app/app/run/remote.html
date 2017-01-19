@@ -29,7 +29,7 @@
               <div class="row pad-bot-20 normal-text">
                 <div class="col-sm-8">
                   <label for="cluster" class="run-label" translate>run.remote.clusterText</label>
-                  <select id="cluster" class="form-control" ng-options="option for option in clusters.all" ng-model="remoteSettings.aws.cluster_name" ng-change="run.resetClusterSettings()"></select>
+                  <select id="cluster" class="form-control" ng-options="option for option in clusters.all" ng-model="remoteSettings.aws.cluster_name"  ng-disabled="remoteSettings.aws.connected" ng-change="run.resetClusterSettings()"></select>
                   <div class="normal-text" ng-if="clusters.running.size > 0"><translate>run.remote.runningClusters</translate>: {{clusters.running}}</div>
                 </div>
                 <div class="col-sm-2 pad-top-25">
