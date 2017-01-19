@@ -783,13 +783,32 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In getVariableSettings');
 
-    // TODO unhandled cases
-    //'BatchRun'
-    //'Morris'
-    //'DOE'
-    //'SingleRun'
-    //'RepeatRun'
-    //'BaselinePerturbation'
+    if(_.isNil(argument.inputs)) argument.inputs = {};
+
+    switch (vm.$scope.selectedSamplingMethod.id) {
+      case 'SPEA2':
+      case 'PSO':
+      case 'RGENOUD':
+      case 'Optim':
+      case 'NSGA2':
+      case 'PreFlight':
+      case 'LHS':
+      case 'DOE':
+        if (argument.type === 'Double') {
+          argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
+        } else {
+          argument.inputs.variableSettings = ['Argument', 'Discrete', 'Pivot'];
+        }
+        break;
+      default:
+        argument.inputs.variableSettings = ['Unhandled Sampling Method'];
+    }
+    argument.inputs.variableSetting = argument.inputs.variableSettings[0];
+  }
+
+  checkVariableSettings(argument) {
+    const vm = this;
+    vm.$log.debug('In checkVariableSettings');
 
     if(_.isNil(argument.inputs)) argument.inputs = {};
 
