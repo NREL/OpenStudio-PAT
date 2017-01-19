@@ -779,6 +779,32 @@ export class AnalysisController {
     vm.Project.setModified(true);
   }
 
+  getDistributions(argument) {
+    const vm = this;
+    vm.$log.debug('In getDistributions');
+
+    if(_.isNil(argument.inputs)) argument.inputs = {};
+
+    switch (vm.$scope.selectedSamplingMethod.id) {
+      case 'PSO':
+      case 'Optim':
+        argument.inputs.distributions = ['Uniform'];
+        break;
+      case 'SPEA2':
+      case 'RGENOUD':
+      case 'NSGA2':
+      case 'LHS':
+      case 'PreFlight':
+      case 'Morris':
+      case 'DOE':
+        argument.inputs.distributions = ['Uniform', 'Triangle', 'Normal', 'LogNormal'];
+      break;
+      default:
+        argument.inputs.distributions = ['Unhandled Sampling Method'];
+    }
+    argument.inputs.distribution = argument.inputs.distributions[0];
+  }
+
   getVariableSettings(argument) {
     const vm = this;
     vm.$log.debug('In getVariableSettings');
@@ -791,8 +817,9 @@ export class AnalysisController {
       case 'RGENOUD':
       case 'Optim':
       case 'NSGA2':
-      case 'PreFlight':
       case 'LHS':
+      case 'PreFlight':
+      case 'Morris':
       case 'DOE':
         if (argument.type === 'Double') {
           argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
@@ -816,26 +843,26 @@ export class AnalysisController {
       case 'SPEA2':
       case 'PSO':
         if (argument.type === 'Double') {
-          argument.inputs.variableSettings = ['Static', 'Discrete', 'Continuous'];
+          argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
         } else {
-          argument.inputs.variableSettings = ['Static'];
+          argument.inputs.variableSettings = ['Argument'];
         }
         break;
       case 'RGENOUD':
       case 'Optim':
         if (argument.type === 'Double') {
-          argument.inputs.variableSettings = ['Static', 'Discrete', 'Continuous'];
+          argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
         } else {
-          argument.inputs.variableSettings = ['Static'];
+          argument.inputs.variableSettings = ['Argument'];
         }
         break;
       case 'NSGA2':
       case 'PreFlight':
-        argument.inputs.variableSettings = ['Static', 'Discrete', 'Continuous'];
+        argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
         break;
       case 'LHS':
       case 'DOE':
-        argument.inputs.variableSettings = ['Static', 'Discrete', 'Continuous', 'Pivot'];
+        argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
         break;
       default:
         argument.inputs.variableSettings = ['Unhandled Sampling Method'];
