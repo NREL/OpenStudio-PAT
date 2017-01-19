@@ -37,7 +37,7 @@
                 </div>
               </div>
               <div class="row pad-bot-10" ng-if="remoteSettings.aws.cluster_name">
-                <div class="col-sm-4">
+                <div class="col-sm-5">
                   <label for="serverVersion" class="run-label" translate>run.remote.osServerVersion</label>
                   <select id="serverVersion" class="form-control" ng-options="option for option in osServerVersions" ng-model="remoteSettings.aws.openstudio_server_version" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
                 </div>
