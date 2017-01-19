@@ -231,6 +231,10 @@ export default {
       rerunAnalysisMessage: 'Running a new analysis will delete your local results. Are you sure you want to continue?',
       setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?'
     },
+    modalCloudRunning: {
+      title: 'Cloud Cluster is Running',
+      message: 'You are still connected to AWS. Terminate the cluster?'
+    },
     viewReport: 'View Report',
     'for': 'for',
     remote: {

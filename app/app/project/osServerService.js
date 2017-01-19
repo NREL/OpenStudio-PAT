@@ -391,6 +391,8 @@ export class OsServer {
           });
         } else {
           vm.remoteProgressStart();
+          // DEBUG
+          vm.$log.debug('HEY CURRENT WORKING DIRECTORY!!!!!: ', process.cwd());
           vm.remoteServer().then(response => {
             vm.$log.debug('OsServerService::StartServer: setting server to started');
             vm.setServerStatus(serverType, 'started');
@@ -948,11 +950,14 @@ export class OsServer {
       }, error => {
         vm.$log.debug('GET DATAPOINT OUT.OSW ERROR (file probably not created yet): ', error);
         // if 422 error, out.osw doesn't exist yet...get datapoint.json instead
-        if (error.status == 422) {
-          vm.$log.debug('422 Error...GETting datapoint json instead');
+        if (error.status == 422 || error.status == 404) {
+          vm.$log.debug('422/404 Error...GETting datapoint json instead');
           const datapointUrl = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
+          vm.$log.debug('DATAPOINT URL: ', datapointUrl);
+          vm.$log.debug('DP: ', dp);
           const promise2 = vm.$http.get(datapointUrl).then( response2 => {
             // set datapoint array
+            vm.$log.debug('datapoint JSON raw response: ', response2);
             vm.$log.debug('datapoint JSON response: ', response2.data.data_point);
             let datapoint = response2.data.data_point;
             datapoint.status = dp.status;

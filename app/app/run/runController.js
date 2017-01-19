@@ -379,6 +379,7 @@ export class RunController {
 
   stopServer(force = false) {
     const vm = this;
+    const deferred = vm.$q.defer();
 
     if(vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud')
     {
@@ -400,6 +401,7 @@ export class RunController {
       } else {
         vm.toastr.success('Server stopped successfully');
       }
+      deferred.resolve();
     }, response => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
       vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
@@ -410,12 +412,53 @@ export class RunController {
       } else {
         vm.toastr.error('Error: server could not be stopped');
       }
+      deferred.reject();
     });
+
+    return deferred.promise;
+  }
+
+  warnCloudRunning(type=null, oldValue) {
+   const vm = this;
+    const deferred = vm.$q.defer();
+
+    vm.$log.debug('**** In RunController::WarnCloudRUnning ****');
+    // if connected to cloud
+    vm.$log.debug('old runtype: ', oldValue, ' aws connected? ', vm.$scope.remoteSettings.aws.connected);
+    if (((type == 'runtype' && oldValue.includes('"remote"')) || (type == 'remotetype' && oldValue.includes('Amazon Cloud'))) && vm.$scope.remoteSettings.aws.connected){
+      // local results exist
+      const modalInstance = vm.$uibModal.open({
+        backdrop: 'static',
+        controller: 'ModalCloudRunningController',
+        controllerAs: 'modal',
+        templateUrl: 'app/run/cloudRunning.html'
+      });
+
+      modalInstance.result.then(() => {
+        // stop server before switching run type
+        vm.stopServer().then(() => {
+          deferred.resolve();
+          (type == 'runtype') ? vm.warnBeforeDelete('runtype'): vm.remoteTypeChange();
+        }, () => {
+          deferred.reject();
+          (type == 'runtype') ? vm.warnBeforeDelete('runtype'): vm.remoteTypeChange();
+        });
+      }, () => {
+        // Modal canceled
+        deferred.reject();
+        (type == 'runtype') ? vm.warnBeforeDelete('runtype'): vm.remoteTypeChange();
+      });
+    } else {
+      // no local results
+      deferred.resolve();
+      (type == 'runtype') ? vm.warnBeforeDelete('runtype'): vm.remoteTypeChange();
+    }
+    return deferred.promise;
   }
 
 
   warnBeforeDelete(type) {
-    // type could be 'run' (warning before running an new analysis), or 'runtype' (warning before setting new run type)
+    // type could be 'run' (warning before running a new analysis), or 'runtype' (warning before setting new run type)
     const vm = this;
     const deferred = vm.$q.defer();
 
@@ -544,7 +587,7 @@ export class RunController {
             vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
             vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
             vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-            vm.$log.debug('DATAPOINTS Status: ', vm.$scope.datapointsStatus);
+            vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
 
             // download/replace out.osw
             // Should we do this only once at the end?
@@ -552,17 +595,20 @@ export class RunController {
               // refresh datapoints
               vm.$scope.datapoints = vm.Project.getDatapoints();
 
-              // download reports
-              vm.OsServer.downloadReports().then(response3 => {
-                vm.$log.debug('downloaded all available reports');
-                // refresh datapoints again
-                vm.$scope.datapoints = vm.Project.getDatapoints();
-                vm.$log.debug('datapoints after download: ', vm.$scope.datapoints);
+              // download reports (local only)
+              if (vm.$scope.selectedRunType.name == 'local'){
+                vm.OsServer.downloadReports().then(response3 => {
+                  vm.$log.debug('downloaded all available reports');
+                  // refresh datapoints again
+                  vm.$scope.datapoints = vm.Project.getDatapoints();
+                  vm.$log.debug('datapoints after download: ', vm.$scope.datapoints);
 
-              }, response3 => {
-                // error in downloadReports
-                vm.$log.debug('download reports error: ', response3);
-              });
+                }, response3 => {
+                  // error in downloadReports
+                  vm.$log.debug('download reports error: ', response3);
+                });
+              }
+
               vm.$log.debug('update datapoints succeeded: ', response2);
               if (response.data.analysis.status == 'completed') {
                 // cancel loop

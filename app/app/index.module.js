@@ -24,6 +24,7 @@ import { ModalViewReportController } from '../app/run/modalViewReportController'
 import { ModalClearResultsController } from '../app/run/modalClearResultsController';
 import { ModalNewClusterController } from '../app/run/modalNewClusterController';
 import { ModalNewAwsCredentialsController } from '../app/run/modalNewAwsCredentialsController';
+import { ModalCloudRunningController } from '../app/run/modalCloudRunningController';
 import { NavController } from '../app/nav/navController';
 import { OsServer } from '../app/project/osServerService';
 import { OutputsController } from '../app/outputs/outputsController';
@@ -57,6 +58,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalClearResultsController', ModalClearResultsController)
   .controller('ModalNewClusterController', ModalNewClusterController)
   .controller('ModalNewAwsCredentialsController', ModalNewAwsCredentialsController)
+  .controller('ModalCloudRunningController', ModalCloudRunningController)
   .controller('AnalysisController', AnalysisController)
   .controller('DesignAlternativesController', DesignAlternativesController)
   .controller('OutputsController', OutputsController)

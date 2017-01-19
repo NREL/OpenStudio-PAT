@@ -9,7 +9,7 @@
         <div class="row pad-bot-20">
           <label for="remoteType" class="col-sm-3 run-label" translate>run.remote.serverType</label>
           <div class="col-sm-6">
-            <select id="remoteType" class="form-control" ng-options="remoteType for remoteType in remoteTypes" ng-model="remoteSettings.remoteType" ng-change="run.remoteTypeChange()"></select>
+            <select id="remoteType" class="form-control" ng-options="remoteType for remoteType in remoteTypes" ng-model="remoteSettings.remoteType" ng-change="run.warnCloudRunning('remotetype', '{{remoteSettings.remoteType}}')"></select>
           </div>
         </div>
         <div class="row" ng-if="remoteSettings.remoteType == 'Existing Remote Server'">
