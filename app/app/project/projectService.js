@@ -994,7 +994,7 @@ export class Project {
 
   resetRemoteSettings() {
     const vm = this;
-    vm.setRemoteSettings({open: true, remoteType: vm.remoteTypes[0], remoteServerURL: null, aws: {}, credentials: {yamlFilename: null, accessKey: null, region: null}});
+    vm.setRemoteSettings({open: true, remoteType: vm.remoteTypes[1], remoteServerURL: null, aws: {}, credentials: {yamlFilename: null, accessKey: null, region: null}});
     vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
@@ -1014,7 +1014,7 @@ export class Project {
     vm.awsYamlFiles = [];
     const files = vm.jetpack.find(vm.awsDir.path(), {matching: '*.yml'});
     _.forEach(files, file => {
-      vm.awsYamlFiles.push(_.last(_.split(file, '/')));
+      vm.awsYamlFiles.push(_.replace(_.last(_.split(file, '/')), '.yml', ''));
     });
     return vm.awsYamlFiles;
   }

@@ -36,7 +36,7 @@ export class ModalNewAwsCredentialsController {
     vm.$scope.accessKey = null;
     vm.$scope.secretKey = null;
 
-    vm.$uibModalInstance.close(vm.$scope.name, truncatedAccessKey);
+    vm.$uibModalInstance.close(_.replace(vm.$scope.name, '.yml', ''), truncatedAccessKey);
   }
 
   cancel() {

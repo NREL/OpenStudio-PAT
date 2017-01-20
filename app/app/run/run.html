@@ -2,13 +2,26 @@
   <div class="col-sm-1 pad-bot-10">
     <h4 translate>run.title</h4>
   </div>
-  <div class="col-sm-2 pad-bot-20 pad-top-5">
+  <div class="col-sm-2 pad-bot-20 pad-top-5 align-middle">
     <select id="runType" class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-change="run.warnCloudRunning('runtype', '{{selectedRunType}}')"></select>
   </div>
-  <div class="col-sm-5 pad-bot-20 pad-top-10">
-    <div class="tab-text">Server Status&nbsp;
-      <span ng-show="serverStatuses[selectedRunType.name]=='started'" class="glyphicon glyphicon-ok green-button" aria-label="started"></span>
-      <span ng-show="serverStatuses[selectedRunType.name]!='started'" class="glyphicon glyphicon-remove red-button" aria-label="stopped"></span>
+  <div ng-if="selectedRunType.name == 'local'" class="inline">
+    <div class="col-sm-5 pad-bot-20 pad-top-10 align-middle">
+      <div class="tab-text">Server Status&nbsp;
+        <span ng-show="serverStatuses[selectedRunType.name]=='started'" class="glyphicon glyphicon-ok green-button" aria-label="started"></span>
+        <span ng-show="serverStatuses[selectedRunType.name]!='started'" class="glyphicon glyphicon-remove red-button" aria-label="stopped"></span>
+      </div>
+    </div>
+  </div>
+    <div ng-if="selectedRunType.name == 'remote'" class="inline">
+      <div class="col-sm-5 pad-bot-20 pad-top-5 align-middle">
+        <div class="tab-text">Server Status&nbsp;
+          <img ng-src="assets/images/cloudConnected.png" ng-show="serverStatuses[selectedRunType.name]=='started'" alt="started" />
+          <img ng-src="assets/images/cloudDisconnected.png" ng-show="serverStatuses[selectedRunType.name]!='started' && !run.OsServer.getRemoteStartInProgress()" alt="stopped" />
+          <img ng-src="assets/images/cloudConnecting.png" ng-show="run.OsServer.getRemoteStartInProgress()" alt="connecting" />
+        </div>
+      </div>
+    </div>
    </div>
   </div>
 </div>

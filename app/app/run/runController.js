@@ -133,7 +133,7 @@ export class RunController {
   selectAwsCredentials() {
     const vm = this;
     // open file, set truncatedAccessKey
-    const yamlStr = vm.jetpack.read(vm.Project.getAwsDir().path(vm.$scope.remoteSettings.credentials.yamlFilename));
+    const yamlStr = vm.jetpack.read(vm.Project.getAwsDir().path(vm.$scope.remoteSettings.credentials.yamlFilename + '.yml'));
     let yamlData = YAML.parse(yamlStr);
     vm.$scope.remoteSettings.credentials.accessKey = yamlData.accessKey.substr(0,4) + '****';
     yamlData = null;

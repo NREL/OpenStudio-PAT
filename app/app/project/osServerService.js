@@ -589,7 +589,7 @@ export class OsServer {
     const envCopy = {};
 
     // open file, set truncatedAccessKey
-    const yamlStr = vm.jetpack.read(vm.Project.getAwsDir().path(vm.remoteSettings.credentials.yamlFilename));
+    const yamlStr = vm.jetpack.read(vm.Project.getAwsDir().path(vm.remoteSettings.credentials.yamlFilename + '.yml'));
     let yamlData = YAML.parse(yamlStr);
 
     envCopy['AWS_ACCESS_KEY'] = yamlData.accessKey;

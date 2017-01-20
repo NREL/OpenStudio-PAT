@@ -249,7 +249,7 @@ export default {
       serverInstanceType: 'Server Instance Type',
       workerInstanceType: 'Worker Instance Type',
       awsCredentials: 'AWS Credentials',
-      selectAws: 'Select AWS credentials or make new ones',
+      selectAws: 'Select AWS Credentials to use',
       newAwsCredentials: 'New',
       awsAccessKey: 'Access Key',
       awsRegion: 'Region',
@@ -272,8 +272,8 @@ export default {
       name: 'Cluster Name'
     },
     modalNewAwsCredentials: {
-      title: 'New AWS Credentials File',
-      name: 'File name',
+      title: 'New AWS Credentials',
+      name: 'Name',
       accessKey: 'Access Key',
       secretKey: 'Secret Key'
     }
