@@ -131,6 +131,11 @@ export class RunController {
     vm.shell.openExternal(vm.OsServer.getSelectedServerURL());
   }
 
+  viewAwsConsole() {
+    const vm = this;
+    vm.shell.openExternal('https://console.aws.amazon.com');
+  }
+
   selectAwsCredentials() {
     const vm = this;
     // open file, set truncatedAccessKey

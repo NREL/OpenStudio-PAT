@@ -265,7 +265,8 @@ export default {
       newClusterName: 'New Cluster Name',
       awsUserID: 'AWS UserID',
       saveCluster: 'Save Cluster Settings',
-      status: 'Cluster Status'
+      status: 'Cluster Status',
+      viewAws: 'View AWS Console'
     },
     modalNewCluster: {
       title: 'New Cluster',

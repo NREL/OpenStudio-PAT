@@ -98,9 +98,11 @@
                     <button type="button" ng-show="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == 'terminated'" class="btn btn-success" ng-click="run.connectAws('start')" ng-class="disabledButtonClass()" translate>run.remote.start</button>
                   </div>
                 </div>
-              <div class="row">
+              </div>
+              <div class="row pad-top-10">
                 <div class="col-sm-4 col-sm-offset-3">
-                        </div>
+                  <button type="button" class="btn btn-info" ng-click="run.viewAwsConsole()" translate>run.remote.viewAws</button>
+                </div>
               </div>
               <div class="row pad-top-25 pad-bot-10">
                 <div class="col-sm-11">
