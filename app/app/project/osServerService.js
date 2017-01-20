@@ -435,146 +435,151 @@ export class OsServer {
       vm.remoteSettings = vm.Project.getRemoteSettings();
       vm.$log.debug("in OSServerService::remoteServer, remoteSettings: ", vm.remoteSettings);
 
-      // initialize potentially missing variables
-      vm.remoteSettings.aws.server = vm.remoteSettings.aws.server? vm.remoteSettings.aws.server : {};
-      vm.remoteSettings.aws.server.dns = vm.remoteSettings.aws.server.dns? vm.remoteSettings.aws.server.dns : null;
+      if (!vm.remoteSettings.credentials || !vm.remoteSettings.credentials.yamlFilename){
+        // must select credentials
+        deferred.reject('No Credentials');
+      } else {
+        // initialize potentially missing variables
+        vm.remoteSettings.aws.server = vm.remoteSettings.aws.server? vm.remoteSettings.aws.server : {};
+        vm.remoteSettings.aws.server.dns = vm.remoteSettings.aws.server.dns? vm.remoteSettings.aws.server.dns : null;
 
-      // see if cluster is running
-      vm.Project.pingCluster(vm.remoteSettings.aws.cluster_name).then((dns) => {
-        // cluster running, connect with DNS
-        vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
-        vm.$log.debug('Connecting to existing cluster running at: ', dns);
-        vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" '  + vm.Project.fixURL(dns);
-        vm.$log.debug('Start Server Command: ', vm.startServerCommand);
+        // see if cluster is running
+        vm.Project.pingCluster(vm.remoteSettings.aws.cluster_name).then((dns) => {
+          // cluster running, connect with DNS
+          vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
+          vm.$log.debug('Connecting to existing cluster running at: ', dns);
+          vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" '  + vm.Project.fixURL(dns);
+          vm.$log.debug('Start Server Command: ', vm.startServerCommand);
 
-        const child = vm.exec(vm.startServerCommand,
-          (error, stdout, stderr) => {
-            vm.$log.debug('exit code: ', child.exitCode);
-            vm.$log.debug('child: ', child);
-            vm.$log.debug('stdout: ', stdout);
-            vm.$log.debug('stderr: ', stderr);
+          const child = vm.exec(vm.startServerCommand,
+            (error, stdout, stderr) => {
+              vm.$log.debug('exit code: ', child.exitCode);
+              vm.$log.debug('child: ', child);
+              vm.$log.debug('stdout: ', stdout);
+              vm.$log.debug('stderr: ', stderr);
 
-            if (child.exitCode == 0) {
-              // SUCCESS
-              vm.$log.debug('CLOUD SERVER CONNECTION SUCCESS');
+              if (child.exitCode == 0) {
+                // SUCCESS
+                vm.$log.debug('CLOUD SERVER CONNECTION SUCCESS');
 
-              //set vm.selectedServerURL
+                //set vm.selectedServerURL
+                vm.setSelectedServerURL(vm.Project.fixURL(dns));
+                vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
+                deferred.resolve(child);
+
+              } else {
+                vm.$log.debug('CLOUD SERVER CONNECTION ERROR');
+                if (error !== null) {
+                  console.log('exec error:', error);
+                }
+                deferred.reject(error);
+              }
+            });
+
+          console.log(`Child pid: ${child.pid}`);
+
+          child.on('close', (code, signal) => {
+            console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
+          });
+
+          child.on('disconnect', (code, signal) => {
+            console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
+          });
+
+          child.on('exit', (code, signal) => {
+            console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
+            if (code == 0) {
+              vm.$log.debug('Server connected');
               vm.setSelectedServerURL(vm.Project.fixURL(dns));
               vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
-              deferred.resolve(child);
-
+              deferred.resolve('success');
             } else {
-              vm.$log.debug('CLOUD SERVER CONNECTION ERROR');
-              if (error !== null) {
-                console.log('exec error:', error);
-              }
-              deferred.reject(error);
+              vm.$log.debug('Server failed to connect');
+              deferred.reject('error');
             }
+            return deferred.promise;
           });
 
-        console.log(`Child pid: ${child.pid}`);
+          child.on('error', (code, signal) => {
+            console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
+          });
 
-        child.on('close', (code, signal) => {
-          console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
-        });
+          child.on('message', (code, signal) => {
+            console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
+          });
 
-        child.on('disconnect', (code, signal) => {
-          console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
-        });
+        }, () => {
+          // cluster terminated or new, connect with file
 
-        child.on('exit', (code, signal) => {
-          console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
-          if (code == 0) {
-            vm.$log.debug('Server connected');
-            vm.setSelectedServerURL(vm.Project.fixURL(dns));
-            vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
-            deferred.resolve('success');
-          } else {
-            vm.$log.debug('Server failed to connect');
-            deferred.reject('error');
-          }
-          return deferred.promise;
-        });
+          // make sure file is saved
+          vm.Project.saveClusterToFile();
+          vm.$log.debug('Connecting to terminated/new cluster');
+          vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" -s \"' + vm.Project.projectDir.path(vm.remoteSettings.aws.cluster_name + '_cluster.json') + '\" aws';
+          vm.$log.debug('Start Server Command: ', vm.startServerCommand);
 
-        child.on('error', (code, signal) => {
-          console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
-        });
+          const envCopy = vm.setAwsEnvVars();
 
-        child.on('message', (code, signal) => {
-          console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
-        });
+          const child = vm.exec(vm.startServerCommand, { env: envCopy },
+            (error, stdout, stderr) => {
+              vm.$log.debug('exit code: ', child.exitCode);
+              vm.$log.debug('child: ', child);
+              vm.$log.debug('stdout: ', stdout);
+              vm.$log.debug('stderr: ', stderr);
 
-      }, () => {
-        // cluster terminated or new, connect with file
+              if (child.exitCode == 0) {
+                // SUCCESS
+                vm.$log.debug('CLOUD SERVER START SUCCESS');
 
-        // make sure file is saved
-        vm.Project.saveClusterToFile();
-        vm.$log.debug('Connecting to terminated/new cluster');
-        vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" -s \"' + vm.Project.projectDir.path(vm.remoteSettings.aws.cluster_name + '_cluster.json') + '\" aws';
-        vm.$log.debug('Start Server Command: ', vm.startServerCommand);
+                // get DNS and set server
+                const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
+                vm.connectCluster();
+                vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
+                deferred.resolve(child);
 
-        const envCopy = vm.setAwsEnvVars();
+              } else {
+                vm.$log.debug('CLOUD SERVER START ERROR');
+                if (error !== null) {
+                  console.log('exec error:', error);
+                }
+                deferred.reject(error);
+              }
+            });
 
-        const child = vm.exec(vm.startServerCommand, { env: envCopy },
-          (error, stdout, stderr) => {
-            vm.$log.debug('exit code: ', child.exitCode);
-            vm.$log.debug('child: ', child);
-            vm.$log.debug('stdout: ', stdout);
-            vm.$log.debug('stderr: ', stderr);
+          console.log(`Child pid: ${child.pid}`);
 
-            if (child.exitCode == 0) {
-              // SUCCESS
-              vm.$log.debug('CLOUD SERVER START SUCCESS');
+          child.on('close', (code, signal) => {
+            console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
+          });
 
+          child.on('disconnect', (code, signal) => {
+            console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
+          });
+
+          child.on('exit', (code, signal) => {
+            console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
+            if (code == 0) {
+              vm.$log.debug('Server started');
               // get DNS and set server
               const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
-              vm.connectCluster();
               vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
-              deferred.resolve(child);
-
+              vm.connectCluster();
+              deferred.resolve('success');
             } else {
-              vm.$log.debug('CLOUD SERVER START ERROR');
-              if (error !== null) {
-                console.log('exec error:', error);
-              }
-              deferred.reject(error);
+              vm.$log.debug('Server failed to start');
+              deferred.reject('error');
             }
+            return deferred.promise;
           });
 
-        console.log(`Child pid: ${child.pid}`);
+          child.on('error', (code, signal) => {
+            console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
+          });
 
-        child.on('close', (code, signal) => {
-          console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
+          child.on('message', (code, signal) => {
+            console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
+          });
         });
-
-        child.on('disconnect', (code, signal) => {
-          console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
-        });
-
-        child.on('exit', (code, signal) => {
-          console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
-          if (code == 0) {
-            vm.$log.debug('Server started');
-            // get DNS and set server
-            const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
-            vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
-            vm.connectCluster();
-            deferred.resolve('success');
-          } else {
-            vm.$log.debug('Server failed to start');
-            deferred.reject('error');
-          }
-          return deferred.promise;
-        });
-
-        child.on('error', (code, signal) => {
-          console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
-        });
-
-        child.on('message', (code, signal) => {
-          console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
-        });
-      });
+      }
     }
 
     return deferred.promise;

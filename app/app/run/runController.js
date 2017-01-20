@@ -199,15 +199,20 @@ export class RunController {
   checkIfClusterIsRunning(){
     const vm = this;
     // see if cluster is running; if so, set status
-    vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
-      // running
-      vm.$scope.remoteSettings.aws.cluster_status = 'running';
-      vm.$log.debug('Run::checkIfClusterIsRunning Current Cluster RUNNING!');
-    }, () => {
-      // terminated
-      vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
-      vm.$log.debug("Run::checkIfClusterIsRunning Current cluster TERMINATED");
-    });
+    if (vm.$scope.remoteSettings.aws && vm.$scope.remoteSettings.aws.cluster_name){
+      vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
+        // running
+        vm.$scope.remoteSettings.aws.cluster_status = 'running';
+        vm.$log.debug('Run::checkIfClusterIsRunning Current Cluster RUNNING!');
+      }, () => {
+        // terminated
+        vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
+        vm.$log.debug("Run::checkIfClusterIsRunning Current cluster TERMINATED");
+      });
+    } else {
+      vm.$scope.remoteSettings.aws = {};
+      vm.$scope.remoteSettings.aws.cluster_status;
+    }
   }
 
   resetClusterSettings(){
@@ -276,11 +281,15 @@ export class RunController {
       // started toastr
     }, error => {
       // error toastr
+      let msg = '';
+      if (error = 'No Credentials') {
+        msg = ': No AWS Credentials Selected';
+      }
       vm.toastr.clear();
       if (type == 'connect')
-        vm.toastr.error('Error connecting to AWS');
+        vm.toastr.error('Error connecting to AWS' + msg);
       else
-        vm.toastr.error('Error starting AWS server');
+        vm.toastr.error('Error starting AWS server' + msg);
     });
   }
 
@@ -431,10 +440,9 @@ export class RunController {
 
     // type = runtype, remotetype, or null (when called from PAT exit)
 
-    vm.$log.debug('**** In RunController::WarnCloudRUnning ****');
+    vm.$log.debug('**** In RunController::WarnCloudRunning ****');
     // if connected to cloud
-    vm.$log.debug('old runtype: ', oldValue, ' aws connected? ', vm.$scope.remoteSettings.aws.connected);
-    if (((type == 'runtype' && oldValue.includes('"remote"')) || (type == 'remotetype' && oldValue.includes('Amazon Cloud')) || (type == null && oldValue == null)) && vm.$scope.remoteSettings.aws.connected){
+    if (((type == 'runtype' && oldValue.includes('"remote"')) || (type == 'remotetype' && oldValue.includes('Amazon Cloud')) || (type == null && oldValue == null)) && vm.$scope.remoteSettings.aws && vm.$scope.remoteSettings.aws.connected){
       // local results exist
       const modalInstance = vm.$uibModal.open({
         backdrop: 'static',
