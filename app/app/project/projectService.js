@@ -994,7 +994,7 @@ export class Project {
 
   resetRemoteSettings() {
     const vm = this;
-    vm.setRemoteSettings({open: true, remoteType: vm.remoteTypes[1], remoteServerURL: null, aws: {}, credentials: {yamlFilename: null, accessKey: null, region: null}});
+    vm.setRemoteSettings({open: true, remoteType: vm.remoteTypes[1], remoteServerURL: null, aws: {}, credentials: {yamlFilename: null, accessKey: null, region: 'us-east-1'}});
     vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 

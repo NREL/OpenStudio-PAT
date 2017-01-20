@@ -127,10 +127,11 @@
                         <p class="normal-text" id="awsAccessKey">{{remoteSettings.credentials.accessKey}}</p>
                       </div>
                     </div>
-                    <div class="row" ng-show="remoteSettings.credentials.yamlFilename" >
+                    <div class="row" ng-show="remoteSettings.credentials.yamlFilename">
                       <div class="col-sm-12">
                         <label for="awsRegion" class="run-label" translate>run.remote.awsRegion</label>
-                        <select id="awsRegion" class="form-control" ng-options="option for option in awsRegions" ng-model="remoteSettings.credentials.region" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
+                        <!--<select id="awsRegion" class="form-control" ng-options="option for option in awsRegions" ng-model="remoteSettings.credentials.region" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>-->
+                        <p class="normal-text" id="awsRegion">{{remoteSettings.credentials.region}}</p>
                       </div>
                     </div>
                   </div>

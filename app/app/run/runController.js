@@ -40,7 +40,8 @@ export class RunController {
     vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
     vm.$scope.serverInstanceTypes = vm.Project.getServerInstanceTypes();
-    vm.$scope.awsRegions = vm.Project.getAwsRegions();
+    // only valid region is us-east-1 for now
+    vm.$scope.awsRegions = vm.Project.getAwsRegions()[0];
     vm.$scope.clusters = vm.Project.getClusters();
     vm.$scope.awsYamlFiles = vm.Project.getAwsYamlFiles();
 
