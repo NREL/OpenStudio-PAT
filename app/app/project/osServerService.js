@@ -1238,4 +1238,37 @@ export class OsServer {
     });
   }
 
+  cloudRunningModal() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.remoteSettings = vm.Project.getRemoteSettings();
+    vm.runType = vm.Project.getRunType();
+    // if connected to cloud
+    if (vm.remoteSettings.aws.connected && vm.runType.name == 'remote'){
+      // local results exist
+      const modalInstance = vm.$uibModal.open({
+        backdrop: 'static',
+        controller: 'ModalCloudRunningController',
+        controllerAs: 'modal',
+        templateUrl: 'app/run/cloudRunning.html'
+      });
+
+      modalInstance.result.then(() => {
+        // stop server
+        vm.stopServer().then(() => {
+          deferred.resolve('resolve');
+        }, () => {
+          deferred.reject('rejected');
+        });
+      }, () => {
+        // Modal canceled
+        deferred.reject('rejected');
+      });
+    } else {
+      // cloud not running
+      deferred.resolve('resolved');
+    }
+    return deferred.promise;
+  }
+
 }

@@ -401,7 +401,7 @@ export class RunController {
       if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
         vm.toastr.success('PAT successfully disconnected from remote server');
       } else if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
-        vm.toastr.success('PAT successfully terminated AWS cluster');
+        vm.toastr.success('PAT successfully terminated AWS cluster.  You should double check that the servers were terminated in the AWS Console.');
         // debug
         vm.$log.debug('***Cloud Cluster status: ', vm.$scope.remoteSettings.aws.cluster_status);
         vm.$log.debug('***remoteSettings.Aws: ', vm.$scope.remoteSettings.aws);
@@ -415,7 +415,7 @@ export class RunController {
       if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
         vm.toastr.error('PAT could not disconnect from remote server');
       } else if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
-        vm.toastr.error('PAT could not terminate AWS cluster');
+        vm.toastr.error('PAT could not terminate AWS cluster.  Check the AWS console.');
       } else {
         vm.toastr.error('Error: server could not be stopped');
       }
@@ -425,14 +425,16 @@ export class RunController {
     return deferred.promise;
   }
 
-  warnCloudRunning(type=null, oldValue) {
-   const vm = this;
+  warnCloudRunning(type=null, oldValue=null) {
+    const vm = this;
     const deferred = vm.$q.defer();
+
+    // type = runtype, remotetype, or null (when called from PAT exit)
 
     vm.$log.debug('**** In RunController::WarnCloudRUnning ****');
     // if connected to cloud
     vm.$log.debug('old runtype: ', oldValue, ' aws connected? ', vm.$scope.remoteSettings.aws.connected);
-    if (((type == 'runtype' && oldValue.includes('"remote"')) || (type == 'remotetype' && oldValue.includes('Amazon Cloud'))) && vm.$scope.remoteSettings.aws.connected){
+    if (((type == 'runtype' && oldValue.includes('"remote"')) || (type == 'remotetype' && oldValue.includes('Amazon Cloud')) || (type == null && oldValue == null)) && vm.$scope.remoteSettings.aws.connected){
       // local results exist
       const modalInstance = vm.$uibModal.open({
         backdrop: 'static',
@@ -445,24 +447,43 @@ export class RunController {
         // stop server before switching run type
         vm.stopServer().then(() => {
           deferred.resolve();
-          (type == 'runtype') ? vm.warnBeforeDelete('runtype'): vm.remoteTypeChange();
+          if (type == 'runtype'){
+            vm.warnBeforeDelete('runtype');
+          }
+          else if (type == 'remotetype'){
+            vm.remoteTypeChange();
+          }
         }, () => {
           deferred.reject();
-          (type == 'runtype') ? vm.warnBeforeDelete('runtype'): vm.remoteTypeChange();
+          if (type == 'runtype'){
+            vm.warnBeforeDelete('runtype');
+          }
+          else if (type == 'remotetype'){
+            vm.remoteTypeChange();
+          }
         });
       }, () => {
         // Modal canceled
         deferred.reject();
-        (type == 'runtype') ? vm.warnBeforeDelete('runtype'): vm.remoteTypeChange();
+        if (type == 'runtype'){
+          vm.warnBeforeDelete('runtype');
+        }
+        else if (type == 'remotetype'){
+          vm.remoteTypeChange();
+        }
       });
     } else {
       // no local results
       deferred.resolve();
-      (type == 'runtype') ? vm.warnBeforeDelete('runtype'): vm.remoteTypeChange();
+      if (type == 'runtype'){
+        vm.warnBeforeDelete('runtype');
+      }
+      else if (type == 'remotetype'){
+        vm.remoteTypeChange();
+      }
     }
     return deferred.promise;
   }
-
 
   warnBeforeDelete(type) {
     // type could be 'run' (warning before running a new analysis), or 'runtype' (warning before setting new run type)
