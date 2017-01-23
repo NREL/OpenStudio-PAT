@@ -888,5 +888,14 @@ export class AnalysisController {
     argument.inputs.discreteVariables.push(discreteVariable);
   }
 
+  showValueAndWeights(){
+    const vm = this;
+    vm.$log.debug('In showValueAndWeights');
+    if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
+      return true;
+    } else {
+      return false;
+    }
+  }
 }
 
