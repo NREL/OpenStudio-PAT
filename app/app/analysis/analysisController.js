@@ -57,6 +57,9 @@ export class AnalysisController {
     };
 
     vm.showDeltaX();
+    vm.showValueAndWeights();
+    vm.showMinAndMax();
+    vm.showDistributions();
 
   }
 
@@ -658,6 +661,9 @@ export class AnalysisController {
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
     vm.showDeltaX();
+    vm.showValueAndWeights();
+    vm.showMinAndMax();
+    vm.showDistributions();
   }
 
   // compute measure arguments when setting the seed
@@ -895,9 +901,9 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In showValueAndWeights');
     if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
-      return true;
+      vm.$scope.showValueAndWeights = true;
     } else {
-      return false;
+      vm.$scope.showValueAndWeights = false;
     }
   }
 
@@ -908,6 +914,26 @@ export class AnalysisController {
       vm.$scope.showDeltaX = true;
     } else {
       vm.$scope.showDeltaX = false;
+    }
+  }
+
+  showMinAndMax(){
+    const vm = this;
+    vm.$log.debug('In showMinAndMax');
+    if (_.includes(['PreFlight'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showMinAndMax = true;
+    } else {
+      vm.$scope.showMinAndMax = false;
+    }
+  }
+
+  showDistributions(){
+    const vm = this;
+    vm.$log.debug('In showDistributions');
+    if (!_.includes(['PSO', 'Optim'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showDistributions = true;
+    } else {
+      vm.$scope.showDistributions = false;
     }
   }
 

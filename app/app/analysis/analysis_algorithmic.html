@@ -169,40 +169,46 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="analysis.$scope.selectedSamplingMethod.id == 'vvvv'">
-              <div class="row" ng-if="argument.inputs.variableSetting == 'Continuous'">
-                <div class="col-sm-4">
+            <div class="col-sm-5" ng-show="argument.inputs.variableSetting != 'Continuous'">
+              <div class="row">
+                <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
+                  Distribution
+                </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
                   Minimum
                 </div>
-                <div class="col-sm-4">
+                <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
                   Maximum
                 </div>
-                <div class="col-sm-4">
-                  Delta X
-                </div>
               </div>
-              <div class="row" ng-if="argument.inputs.variableSetting == 'Continuous' && (argument.type == 'Double' || argument.type == 'Integer')">
-                <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
-                </div>
-                <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
-                </div>
-                <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.deltaX">
-                </div>
+              <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
+                <select class="form-control" ng-options="distribution as distribution for distribution in argument.inputs.distributions" ng-init="analysis.getDistributions(argument)" ng-model="argument.inputs.distribution"></select>
               </div>
-              <div class="row" ng-if="argument.inputs.variableSetting == 'Continuous' && argument.type == 'String'">
-                <div class="col-sm-4">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
-                </div>
-                <div class="col-sm-4">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
-                </div>
-                <div class="col-sm-4">
-                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX">
-                </div>
+              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
+                <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
               </div>
+              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
+                <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
+              </div>
+              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
+                <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
+              </div>
+              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
+                <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
+              </div>
+              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Bool'">
+                <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMinimum">
+              </div>
+              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Bool'">
+                <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMaximum">
+              </div>
+              <div class="col-sm-4" ng-if="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
+                <select class="form-control" ng-options="discreteMinimum as discreteMinimum for discreteMinimum in argument.inputs.discreteMinimums" ng-init="argument.inputs.discreteMinimums = argument.discreteMinimums" ng-model="argument.inputs.discreteMinimum"></select>
+              </div>
+              <div class="col-sm-4" ng-if="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
+                <select class="form-control" ng-options="discreteMaximum as discreteMaximum for discreteMaximum in argument.inputs.discreteMaximums" ng-init="argument.inputs.discreteMaximums = argument.discreteMaximums" ng-model="argument.inputs.discreteMaximum"></select>
+              </div>
+
               <div class="row" ng-if="argument.inputs.variableSetting == 'Discrete' && (argument.type == 'Double' || argument.type == 'Integer')">
                 <div class="col-sm-12">
                   <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
