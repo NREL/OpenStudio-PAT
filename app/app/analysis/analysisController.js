@@ -56,6 +56,8 @@ export class AnalysisController {
       };
     };
 
+    vm.showDeltaX();
+
   }
 
   initializeGrids() {
@@ -655,6 +657,7 @@ export class AnalysisController {
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
+    vm.showDeltaX();
   }
 
   // compute measure arguments when setting the seed
@@ -897,5 +900,16 @@ export class AnalysisController {
       return false;
     }
   }
+
+  showDeltaX(){
+    const vm = this;
+    vm.$log.debug('In showDeltaX');
+    if (_.includes(['RGENOUD', 'Optim'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showDeltaX = true;
+    } else {
+      vm.$scope.showDeltaX = false;
+    }
+  }
+
 }
 
