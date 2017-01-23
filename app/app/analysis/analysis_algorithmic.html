@@ -209,24 +209,18 @@
                 <select class="form-control" ng-options="discreteMaximum as discreteMaximum for discreteMaximum in argument.inputs.discreteMaximums" ng-init="argument.inputs.discreteMaximums = argument.discreteMaximums" ng-model="argument.inputs.discreteMaximum"></select>
               </div>
 
-              <div class="row" ng-if="argument.inputs.variableSetting == 'Discrete' && (argument.type == 'Double' || argument.type == 'Integer')">
-                <div class="col-sm-12">
-                  <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                    <input class="form-control" type="number" ng-model="discreteVariable.value">
-                    <input class="form-control" type="number" ng-model="discreteVariable.weight">
-                  </div>
-                  <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+              <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                <div class="col-sm-4">
+                  <select class="form-control" ng-options="value as value for value in argument.inputs.choice_display_names" ng-model="discreteVariable.value"></select>
+                </div>
+                <div class="col-sm-3">
+                  <input class="form-control" type="number" min="0" max="1" step="0.1" value="0" ng-model="discreteVariable.weight">
                 </div>
               </div>
-              <div class="row" ng-if="argument.inputs.variableSetting == 'Discrete' && argument.type == 'String'">
-              <div class="col-sm-12">
-                <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                  <input class="form-control" type="text" ng-model="discreteVariable.value">
-                  <input class="form-control" type="text" ng-model="discreteVariable.weight">
-                </div>
+              <div class="col-sm-1">
                 <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
               </div>
-            </div>
+
           </div>
         </div>
       </uib-accordion-group>
