@@ -203,7 +203,17 @@ export default {
   },
   outputs: {
     title: 'Outputs',
-    noOutputsInManual: 'There are no outputs to set in Manual mode.'
+    noOutputsInManual: 'There are no outputs to set in Manual mode.',
+    columns: {
+      displayName: 'Display Name',
+      shortName: 'Short Name',
+      visualize: 'Visualize',
+      objectiveFunction: 'Objective Function',
+      targetValue: 'Target Value',
+      units: 'Units',
+      weightingFactor: 'Weighting Factor',
+      objectiveFunctionGroup: 'Objective Function Group'
+    }
   },
   reports: {
     title: 'Reports',

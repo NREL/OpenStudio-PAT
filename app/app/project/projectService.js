@@ -25,8 +25,7 @@ export class Project {
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
 
-    vm.analysisTypes = ['Manual'];
-    //vm.analysisTypes = ['Manual', 'Algorithmic']; // TODO implement this after initial release
+    vm.analysisTypes = ['Manual', 'Algorithmic'];
 
     vm.reportTypes = [{
       id: 'Calibration Report',
