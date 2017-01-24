@@ -345,6 +345,13 @@ select {
   height: 700px;
   font-size: 12px;
 }
+
+/* this wraps text on ui-grid headers. */
+.ui-grid-header-cell-label {
+  display:inline-block;
+  white-space:initial;
+}
+
 /* TODO: Something is wrong, fix this later */
 .input-group > select + .input-group-btn > button {
   height: 34px;

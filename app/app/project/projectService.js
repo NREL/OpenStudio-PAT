@@ -9,7 +9,7 @@ import archiver from 'archiver';
 const {app, dialog} = remote;
 
 export class Project {
-  constructor($q, $log, $uibModal, MeasureManager) {
+  constructor($q, $log, $uibModal, MeasureManager, $sce) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -21,6 +21,7 @@ export class Project {
     vm.archiver = archiver;
     vm.$q = $q;
     vm.$uibModal = $uibModal;
+    vm.$sce = $sce;
 
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
@@ -1563,6 +1564,11 @@ export class Project {
     }
 
     return deferred.promise;
+  }
+
+  html(input) {
+    const vm = this;
+    return vm.$sce.trustAsHtml(input);
   }
 
 }

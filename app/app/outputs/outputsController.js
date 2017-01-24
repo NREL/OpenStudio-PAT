@@ -19,21 +19,24 @@ export class OutputsController {
     // (current) output measures
     vm.setOutputMeasures();
 
+    // initialize grid dropdowns
+    vm.booleanDropdownArr = [{id: 'true', name: 'true'}, {id: 'false', name: 'false'}];
+    vm.$log.debug('booleanDropdownArr: ', vm.booleanDropdownArr);
+    vm.objFunctionGroupDropdownArr = vm.setObjFunctionGroupDropdown();
+
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
     vm.initializeGrids();
 
-    // initialize grip dropdowns
-    vm.booleanDropdownArr = [{id: 'true', value: true}, {id: 'false', value: false}];
-    vm.setObjFunctionGroupDropdown();
-
     // size grids according to data
     vm.$scope.getTableHeight = function (uid) {
-      var rowHeight = 30; // your row height
-      var headerHeight = 30; // your header height
-      vm.$log.debug('data length: ', vm.$scope.gridOptions[uid].data.length);
+      var rowHeight = 30; // row height
+      var headerHeight = 55; // header height
+      const m = _.find(vm.$scope.measures, {uid: uid});
+      const length = _.filter(m.outputs, {checked: true}).length;
+      vm.$log.debug('data length: ', length);
       return {
-        height: (vm.$scope.gridOptions[uid].data.length * rowHeight + headerHeight + 10) + "px"
+        height: (length * rowHeight + headerHeight + 10) + "px"
       };
     };
 
@@ -41,10 +44,12 @@ export class OutputsController {
 
   setObjFunctionGroupDropdown() {
     const vm = this;
-    vm.objFunctionGroupDropdownArr = [];
+    const arr = [];
     _.forEach([1,2,3,4,5,6,7,8,9,10], (num) => {
-      vm.objFunctionGroupDropdownArr.push({id: num, value: num});
+      arr.push({id: num, name: num});
     });
+    vm.$log.debug('ObjFunctionGroupDropdownArr: ', arr);
+    return arr;
   }
 
   setOutputMeasures() {
@@ -82,13 +87,20 @@ export class OutputsController {
 
   }
 
+  getBooleanDropdownArr() {
+    const vm = this;
+    return vm.booleanDropdownArr;
+  }
+
   setGridOptions() {
     const vm = this;
-
     _.forEach(vm.$scope.outputMeasures, (measure) => {
 
       if (measure.analysisOutputs == undefined) measure.analysisOutputs = [];
       vm.$log.debug('measure: ', measure);
+      vm.$log.debug('boolean Arr: ', vm.booleanDropdownArr);
+
+      vm.$log.debug('booleanArr other way: ', vm.getBooleanDropdownArr());
 
       vm.$scope.gridOptions[measure.uid] = {
         data: 'measure.analysisOutputs',
@@ -98,6 +110,7 @@ export class OutputsController {
         enableSelectAll: false,
         enableColumnMenus: false,
         enableRowHeaderSelection: false,
+        headerRowHeight: 50,
         enableCellEditOnFocus: true,
         enableHiding: false,
         columnDefs: [{
@@ -106,8 +119,8 @@ export class OutputsController {
           enableCellEdit: false,
           headerCellFilter: 'translate',
           pinnedLeft: true,
-          width: 300,
-          minWidth: 100,
+          width: 250,
+          minWidth: 70,
           cellTooltip: function (row) {
             return row.entity.display_name;
           }
@@ -115,50 +128,56 @@ export class OutputsController {
           name: 'short_name',
           displayName: 'outputs.columns.shortName',
           headerCellFilter: 'translate',
-          width: 200,
-          minWidth: 100
+          width: 150,
+          minWidth: 80
         }, {
           name: 'visualize',
           displayName: 'outputs.columns.visualize',
           editableCellTemplate: 'ui-grid/dropdownEditor',
-          editDropdownIdLabel: 'id',
+          editDropdownIdLabel: 'name',
+          editDropdownValueLabel: 'name',
           editDropdownOptionsArray: vm.booleanDropdownArr,
-          editDropdownValueLabel: 'value',
           headerCellFilter: 'translate',
-          minWidth: 50
+          width:100,
+          minWidth: 70
         }, {
           name: 'objective_function',
           displayName: 'outputs.columns.objectiveFunction',
           editableCellTemplate: 'ui-grid/dropdownEditor',
           editDropdownIdLabel: 'id',
           editDropdownOptionsArray: vm.booleanDropdownArr,
-          editDropdownValueLabel: 'value',
+          editDropdownValueLabel: 'name',
           headerCellFilter: 'translate',
-          minWidth: 50
+          width: 100,
+          minWidth: 40
         }, {
           name: 'target_value',
           displayName: 'outputs.columns.targetValue',
           headerCellFilter: 'translate',
+          width: 100,
           minWidth: 50
         }, {
           name: 'units',
           displayName: 'outputs.columns.units',
           headerCellFilter: 'translate',
-          minWidth: 50
+          width:70,
+          minWidth: 40
         }, {
           name: 'weighting_factor',
           displayName: 'outputs.columns.weightingFactor',
           headerCellFilter: 'translate',
+          width: 100,
           minWidth: 50
         }, {
           name: 'obj_function_group',
           displayName: 'outputs.columns.objectiveFunctionGroup',
           editableCellTemplate: 'ui-grid/dropdownEditor',
-          editDropdownIdLabel: 'id',
+          editDropdownIdLabel: 'name',
           editDropdownOptionsArray: vm.objFunctionGroupDropdownArr,
-          editDropdownValueLabel: 'value',
+          editDropdownValueLabel: 'name',
           headerCellFilter: 'translate',
-          minWidth: 50
+          width: 100,
+          minWidth: 40
         }],
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.uid] = gridApi;
@@ -190,6 +209,7 @@ export class OutputsController {
       controller: 'ModalSelectOutputsController',
       controllerAs: 'modal',
       templateUrl: 'app/outputs/selectOutputs.html',
+      windowClass: 'wide-modal',
       resolve: {
         params: function () {
           return {

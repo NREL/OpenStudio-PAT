@@ -206,7 +206,9 @@ export default {
     noOutputsInManual: 'There are no outputs to set in Manual mode.',
     modalSelectOutputs: {
       title: 'Select Outputs',
-      message: 'Select which outputs you would like to add to your analysis.'
+      message: 'Select which outputs you would like to add to your analysis.',
+      selectAll: 'Select All',
+      deselectAll: 'Deselect All'
     },
     columns: {
       displayName: 'Display Name',
