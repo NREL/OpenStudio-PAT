@@ -103,10 +103,10 @@
 
         <div class="container" ng-repeat="measure in osMeasures">
           <div class="row">
-            <div class="col-sm-1">
+            <div class="col-sm-2">
               Name
             </div>
-            <div class="col-sm-2">
+            <div class="col-sm-1">
               Short Name
             </div>
             <div class="col-sm-2">
@@ -120,11 +120,11 @@
             </div>
           </div>
           <div class="row" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
-            <div class="col-sm-1">
-              {{argument.display_name}}
+            <div class="col-sm-2">
+              <input class="form-control" type="text" ng-model="argument.inputs.display_name" ng-init="argument.inputs.display_name = argument.display_name" ng-mouseover="argument.inputs.display_name">
             </div>
 
-            <div class="col-sm-2">
+            <div class="col-sm-1">
               {{argument.name}}
             </div>
 
