@@ -82,11 +82,11 @@ export class SetProject {
           vm.Project.setProjectName(vm.newProjectName);
           projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
-          if (projectDir.path().indexOf(' ') >= 0) {
-            // tell user to expect trouble
-            vm.whitespaceModal().then(response => {
-            });
-          }
+          // if (projectDir.path().indexOf(' ') >= 0) {
+          //   // tell user to expect trouble
+          //   vm.whitespaceModal().then(response => {
+          //   });
+          // }
 
           vm.OsServer.stopServer().then(response => {
             vm.$log.debug('SetProjectService::stop server: server stopped');
@@ -203,11 +203,11 @@ export class SetProject {
           vm.Project.setProjectName(vm.newProjectName);
           projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
-          if (projectDir.path().indexOf(' ') >= 0) {
-            // tell user to expect trouble
-            vm.whitespaceModal().then(response => {
-            });
-          }
+          // if (projectDir.path().indexOf(' ') >= 0) {
+          //   // tell user to expect trouble
+          //   vm.whitespaceModal().then(response => {
+          //   });
+          // }
 
           // force stop local server
           vm.OsServer.stopServer('local').then(response => {
@@ -268,11 +268,11 @@ export class SetProject {
       const projectDir = jetpack.cwd(result[0]);
       vm.$log.debug('PAT Project dir path:', projectDir.path());
 
-      if (projectDir.path().indexOf(' ') >= 0) {
-        // tell user to expect trouble
-        vm.whitespaceModal().then(response => {
-        });
-      }
+      // if (projectDir.path().indexOf(' ') >= 0) {
+      //   // tell user to expect trouble
+      //   vm.whitespaceModal().then(response => {
+      //   });
+      // }
 
       const fullFilename = projectDir.path('pat.json');
 
