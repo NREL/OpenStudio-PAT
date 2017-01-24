@@ -1,6 +1,6 @@
 export class OutputsController {
 
-  constructor($log, Project, $scope) {
+  constructor($log, Project, $scope, $uibModal, $q) {
     'ngInject';
 
     const vm = this;
@@ -8,6 +8,8 @@ export class OutputsController {
     vm.$log = $log;
     vm.$scope = $scope;
     vm.Project = Project;
+    vm.$uibModal = $uibModal;
+    vm.$q = $q;
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
@@ -29,6 +31,7 @@ export class OutputsController {
     vm.$scope.getTableHeight = function (uid) {
       var rowHeight = 30; // your row height
       var headerHeight = 30; // your header height
+      vm.$log.debug('data length: ', vm.$scope.gridOptions[uid].data.length);
       return {
         height: (vm.$scope.gridOptions[uid].data.length * rowHeight + headerHeight + 10) + "px"
       };
@@ -83,10 +86,12 @@ export class OutputsController {
     const vm = this;
 
     _.forEach(vm.$scope.outputMeasures, (measure) => {
+
+      if (measure.analysisOutputs == undefined) measure.analysisOutputs = [];
       vm.$log.debug('measure: ', measure);
 
       vm.$scope.gridOptions[measure.uid] = {
-        data: measure.analysisOutputs,
+        data: 'measure.analysisOutputs',
         enableSorting: false,
         autoResize: true,
         enableRowSelection: false,
@@ -169,12 +174,41 @@ export class OutputsController {
 
   }
 
-  addOutputs() {
+  // only display outputs with checked = true in grid
+  filterOutputs(measure) {
+    return _.filter(measure.outputs, {checked: true});
+  }
+
+  addOutputs(measure) {
     const vm = this;
+    const deferred = vm.$q.defer();
     vm.$log.debug('Output::addOutputs');
 
     // open modal for user to select outputs. Already selected outputs are shown as checked ?
-    
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalSelectOutputsController',
+      controllerAs: 'modal',
+      templateUrl: 'app/outputs/selectOutputs.html',
+      resolve: {
+        params: function () {
+          return {
+            measure: measure
+          };
+        }
+      }
+    });
+
+    modalInstance.result.then(() => {
+      deferred.resolve();
+      vm.$log.debug('NEW Analysis OUTPUTS: ', measure.analysisOutputs);
+
+    }, () => {
+      // Modal canceled
+      deferred.reject();
+    });
+
+    return deferred.promise;
   }
 
   removeMeasure(measure) {
