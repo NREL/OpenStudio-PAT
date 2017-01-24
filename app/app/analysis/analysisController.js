@@ -60,6 +60,8 @@ export class AnalysisController {
     vm.showValueAndWeights();
     vm.showMinAndMax();
     vm.showDistributions();
+    vm.showDiscreteVariables();
+    vm.showPivotVariables();
 
   }
 
@@ -377,7 +379,7 @@ export class AnalysisController {
     return opt;
   }
 
-  deleteSelectedOption(measure) {
+  deleteSelectedOption(measure) { // TODO is this dead code? Evan
     const vm = this;
     vm.$log.debug('In deleteSelectedOption in analysis');
     vm.setIsModified();
@@ -664,6 +666,8 @@ export class AnalysisController {
     vm.showValueAndWeights();
     vm.showMinAndMax();
     vm.showDistributions();
+    vm.showDiscreteVariables();
+    vm.showPivotVariables();
   }
 
   // compute measure arguments when setting the seed
@@ -934,6 +938,26 @@ export class AnalysisController {
       vm.$scope.showDistributions = true;
     } else {
       vm.$scope.showDistributions = false;
+    }
+  }
+
+  showDiscreteVariables() {
+    const vm = this;
+    vm.$log.debug('In showDiscreteVariables');
+    if (_.includes(['NSGA2', 'LHS', 'Morris', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showDiscreteVariables = true;
+    } else {
+      vm.$scope.showDiscreteVariables = false;
+    }
+  }
+
+  showPivotVariables() {
+    const vm = this;
+    vm.$log.debug('In showPivotVariables');
+    if (_.includes(['LHS', 'Morris', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showPivotVariables = true;
+    } else {
+      vm.$scope.showPivotVariables = false;
     }
   }
 

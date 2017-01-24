@@ -141,6 +141,9 @@
             <div class="col-sm-2" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
               <input type="number" ng-model="argument.inputs.default_value" ng-init="argument.inputs.default_value = argument.default_value">
             </div>
+            <div class="col-sm-2" ng-if="argument.type == 'Boolean'">
+              <input class="form-control" type="checkbox" ng-model="argument.inputs.default_value">
+            </div>
 
             <div class="col-sm-5" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'">
               <div class="row">
@@ -210,7 +213,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="argument.inputs.variableSetting != 'Continuous'">
+            <div class="col-sm-5" ng-show="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))" ng-init="analysis.showDiscreteVariables(argument)">
               <div class="row">
                 <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
                   Distribution
