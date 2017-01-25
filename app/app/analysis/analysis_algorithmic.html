@@ -133,16 +133,16 @@
             </div>
 
             <div class="col-sm-2" ng-if="argument.type == 'Choice'">
-              <select class="form-control" ng-options="default_value as default_value for default_value in argument.inputs.choice_display_names" ng-model="argument.inputs.default_value" ng-init="argument.inputs.choice_display_names = argument.choice_display_names" ng-init="argument.inputs.default_value = argument.default_value"></select>
+              <select class="form-control" ng-options="default_value as default_value for default_value in argument.inputs.choice_display_names" ng-model="argument.inputs.default_value" ng-init="argument.inputs.choice_display_names = argument.choice_display_names" ng-init="argument.inputs.default_value = _.isNil(argument.inputs.default_value) ? argument.default_value : argument.inputs.default_value"></select>
             </div>
             <div class="col-sm-2" ng-if="argument.type == 'String'">
-              <input type="text" ng-model="argument.inputs.default_value" ng-init="argument.inputs.default_value = argument.default_value">
+              <input type="text" ng-model="argument.inputs.default_value" ng-init="argument.inputs.default_value = _.isNil(argument.inputs.default_value) ? argument.default_value : argument.inputs.default_value">
             </div>
             <div class="col-sm-2" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-              <input type="number" ng-model="argument.inputs.default_value" ng-init="argument.inputs.default_value = argument.default_value">
+              <input type="number" ng-model="argument.inputs.default_value" ng-init="argument.inputs.default_value = _.isNil(argument.inputs.default_value) ? argument.default_value : argument.inputs.default_value">
             </div>
             <div class="col-sm-2" ng-if="argument.type == 'Boolean'">
-              <input class="form-control" type="checkbox" ng-model="argument.inputs.default_value">
+              <input class="form-control" type="checkbox" ng-model="argument.inputs.default_value" ng-init="argument.inputs.default_value = _.isNil(argument.inputs.default_value) ? argument.default_value : argument.inputs.default_value">
             </div>
 
             <div class="col-sm-5" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'">
@@ -165,19 +165,19 @@
               </div>
               <div class="row">
                 <div class="col-sm-3">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-init="argument.inputs.minimum = _.isNil(argument.inputs.minimum) ? 0 : argument.inputs.minimum">
                 </div>
                 <div class="col-sm-3">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-init="argument.inputs.maximum = _.isNil(argument.inputs.maximum) ? 0 : argument.inputs.maximum">
                 </div>
                 <div class="col-sm-3" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <input class="form-control" type="number" ng-model="argument.inputs.mean">
+                  <input class="form-control" type="number" ng-model="argument.inputs.mean" ng-init="argument.inputs.mean = _.isNil(argument.inputs.mean) ? 0 : argument.inputs.mean">
                 </div>
                 <div class="col-sm-3">
-                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
+                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev" ng-init="argument.inputs.stdDev = _.isNil(argument.inputs.stdDev) ? 0 : argument.inputs.stdDev">
                 </div>
                 <div class="col-sm-3" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control" ng-options="distribution as distribution for distribution in argument.inputs.distributions" ng-init="analysis.getDistributions(argument)" ng-model="argument.inputs.distribution"></select>
+                  <select class="form-control" ng-options="distribution as distribution for distribution in argument.inputs.distributions" ng-init="argument.inputs.distribution = _.isNil(argument.inputs.distribution) ? analysis.getDistributions(argument)  : argument.inputs.distribution" ng-model="argument.inputs.distribution"></select>
                 </div>
               </div>
             </div>
@@ -205,22 +205,22 @@
               </div>
               <div class="row">
                 <div class="col-sm-3">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-init="argument.inputs.minimum = _.isNil(argument.inputs.minimum) ? 0 : argument.inputs.minimum">
                 </div>
                 <div class="col-sm-3">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-init="argument.inputs.maximum = _.isNil(argument.inputs.maximum) ? 0 : argument.inputs.maximum">
                 </div>
                 <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.deltaX" step="0.01" value="0.001">
+                  <input class="form-control" type="number" ng-model="argument.inputs.deltaX" step="0.01"  ng-init="argument.inputs.deltaX = _.isNil(argument.inputs.deltaX) ? 0.001 : argument.inputs.deltaX">
                 </div>
                 <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <input class="form-control" type="number" ng-model="argument.inputs.mean">
+                  <input class="form-control" type="number" ng-model="argument.inputs.mean" ng-init="argument.inputs.mean = _.isNil(argument.inputs.mean) ? 0 : argument.inputs.mean">
                 </div>
                 <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
+                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev" ng-init="argument.inputs.stdDev = _.isNil(argument.inputs.stdDev) ? 0 : argument.inputs.stdDev">
                 </div>
                 <div class="col-sm-3" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control" ng-options="distribution as distribution for distribution in argument.inputs.distributions" ng-init="analysis.getDistributions(argument)" ng-model="argument.inputs.distribution"></select>
+                  <select class="form-control" ng-options="distribution as distribution for distribution in argument.inputs.distributions" ng-init="argument.inputs.distributions = _.isNil(argument.inputs.distributions) ? analysis.getDistributions(argument) : argument.inputs.distributions" ng-model="argument.inputs.distribution"></select>
                 </div>
               </div>
             </div>
@@ -235,36 +235,36 @@
                 </div>
               </div>
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
-                <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
+                <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum" ng-init="argument.inputs.discreteMinimum = _.isNil(argument.inputs.discreteMinimum) ? 0 : argument.inputs.discreteMinimum">
               </div>
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
-                <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
+                <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum" ng-init="argument.inputs.discreteMaximum = _.isNil(argument.inputs.discreteMaximum) ? 0 : argument.inputs.discreteMaximum">
               </div>
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
+                <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum" ng-init="argument.inputs.discreteMinimum = _.isNil(argument.inputs.discreteMinimum) ? '' : argument.inputs.discreteMinimum">
               </div>
-              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
+              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'" ng-init="argument.inputs.discreteMaximum = _.isNil(argument.inputs.discreteMaximum) ? '' : argument.inputs.discreteMaximum">
                 <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
               </div>
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMinimum">
+                <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMinimum" ng-init="argument.inputs.discreteMinimum = _.isNil(argument.inputs.discreteMinimum) ? true : argument.inputs.discreteMinimum">
               </div>
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMaximum">
+                <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMaximum" ng-init="argument.inputs.discreteMaximum = _.isNil(argument.inputs.discreteMaximum) ? true : argument.inputs.discreteMaximum">
               </div>
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
-                <select class="form-control" ng-options="discreteMinimum as discreteMinimum for discreteMinimum in argument.inputs.discreteMinimums" ng-init="argument.inputs.discreteMinimums = argument.discreteMinimums" ng-model="argument.inputs.discreteMinimum"></select>
+                <select class="form-control" ng-options="discreteMinimum as discreteMinimum for discreteMinimum in argument.inputs.discreteMinimums" ng-init="argument.inputs.discreteMinimums = argument.discreteMinimums" ng-init="argument.inputs.discreteMinimum = _.isNil(argument.inputs.discreteMinimum) ? argument.inputs.discreteMinimums[0] : argument.inputs.discreteMinimum" ng-model="argument.inputs.discreteMinimum"></select>
               </div>
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
-                <select class="form-control" ng-options="discreteMaximum as discreteMaximum for discreteMaximum in argument.inputs.discreteMaximums" ng-init="argument.inputs.discreteMaximums = argument.discreteMaximums" ng-model="argument.inputs.discreteMaximum"></select>
+                <select class="form-control" ng-options="discreteMaximum as discreteMaximum for discreteMaximum in argument.inputs.discreteMaximums" ng-init="argument.inputs.discreteMaximums = argument.discreteMaximums" ng-init="argument.inputs.discreteMaximum = _.isNil(argument.inputs.discreteMaximum) ? argument.inputs.discreteMaximums[0] : argument.inputs.discreteMaximum" ng-model="argument.inputs.discreteMaximum"></select>
               </div>
 
               <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
                 <div class="col-sm-4">
-                  <select class="form-control" ng-options="value as value for value in argument.inputs.choice_display_names" ng-model="discreteVariable.value"></select>
+                  <select class="form-control" ng-options="value as value for value in argument.inputs.choice_display_names" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? argument.inputs.choice_display_names[0] : discreteVariable.value"></select>
                 </div>
                 <div class="col-sm-3">
-                  <input class="form-control" type="number" min="0" max="1" step="0.1" value="0" ng-model="discreteVariable.weight">
+                  <input class="form-control" type="number" min="0" max="1" step="0.1" ng-model="discreteVariable.weight" ng-init="discreteVariable.weight = _.isNil(discreteVariable.weight) ? 0 : discreteVariable.weight">
                 </div>
               </div>
               <div class="col-sm-1">
