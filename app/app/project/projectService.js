@@ -346,6 +346,9 @@ export class Project {
     const vm = this;
     vm.$log.debug('In Project::exportOSA');
 
+    // first export common data
+    vm.exportCommon();
+
     // check what kind of analysis it is
     if (vm.analysisType == 'Manual') {
       vm.exportManual();
@@ -387,24 +390,37 @@ export class Project {
     archive.finalize();
   }
 
-  exportManual() {
-    const vm = this;
-    vm.$log.debug('In Project::exportManual');
+  // export data common to both manual and algorithmic workflows
+  exportCommon() {
 
+    const vm = this;
     vm.osa = {};
     vm.osa.analysis = {};
     vm.osa.analysis.display_name = vm.projectName;
     vm.osa.analysis.name = vm.projectName;
 
-    // empty for manual
+    // these are all empty for manual / initialized for algorithmic
     vm.osa.analysis.output_variables = [];
-
     vm.osa.analysis.problem = {};
+    vm.osa.analysis.problem.workflow = [];
+    vm.osa.analysis.problem.algorithm = {objective_functions: []};
+
+    vm.osa.analysis.seed = {};
+    vm.osa.analysis.seed.file_type = 'OSM';
+    vm.osa.analysis.seed.path = './seeds/' + vm.defaultSeed;
+    vm.osa.analysis.weather_file = {};
+    vm.osa.analysis.weather_file.file_type = 'EPW';
+    vm.osa.analysis.weather_file.path = './weather/' + vm.defaultWeatherFile;
+    vm.osa.analysis.file_format_version = 1;
+
+  }
+
+  exportManual() {
+    const vm = this;
+    vm.$log.debug('In Project::exportManual');
+
     //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO which is correct?
     vm.osa.analysis.problem.analysis_type = null;
-    // empty for manual
-    vm.osa.analysis.problem.algorithm = {objective_functions: []};
-    vm.osa.analysis.problem.workflow = [];
 
     // DESIGN ALTERNATIVES ARRAY
     vm.osa.analysis.problem.design_alternatives = [];
@@ -708,20 +724,35 @@ export class Project {
         vm.osa.analysis.problem.workflow.push(m);
       } // end if measure has options or is used
     });
-
-    vm.osa.analysis.seed = {};
-    vm.osa.analysis.seed.file_type = 'OSM';
-    vm.osa.analysis.seed.path = './seeds/' + vm.defaultSeed;
-    vm.osa.analysis.weather_file = {};
-    vm.osa.analysis.weather_file.file_type = 'EPW';
-    vm.osa.analysis.weather_file.path = './weather/' + vm.defaultWeatherFile;
-    vm.osa.analysis.file_format_version = 1;
   }
 
   exportAlgorithmic() {
     const vm = this;
     vm.$log.debug('In Project::exportAlgorithmic');
-    // TODO
+
+    // TODO: we are assuming here that output order doesn't matter (for now: match order measures are added to project, not order outputs were added)
+    let index = 0;
+    _.forEach(vm.measures, (measure) => {
+      _.forEach(measure.analysisOutputs, (out) => {
+        vm.$log.debug('OUTPUT: ', out);
+        const outHash = {};
+        outHash.units = out.units;
+        outHash.objective_function = out.objective_function == 'true';  // true or false
+        outHash.objective_function_index = outHash.objective_function ? index : null;
+        if (outHash.objective_function) index = index + 1; // increment
+        outHash.objective_function_target = out.target_value;
+        outHash.objective_function_group = out.obj_function_group ? out.obj_function_group : null;
+        outHash.scaling_factor = out.weighting_factor;
+        outHash.display_name = out.display_name;
+        outHash.display_name_short = out.short_name;
+        outHash.metadata_id = null; // always null for now.  This is related to DEnCity?
+        outHash.name =   measure.name + '.' + out.name; // always measure.name . measure.argument.name
+        outHash.visualize = out.visualize;
+        outHash.export = true; // always true
+        outHash.variable_type = out.type;  // options are: string, bool, double, integer?  TODO: find out what these can be. for now: use argument type
+        vm.osa.analysis.output_variables.push(outHash);
+      });
+    });
   }
 
   // export variables to pat.json

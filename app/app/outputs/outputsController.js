@@ -21,7 +21,6 @@ export class OutputsController {
 
     // initialize grid dropdowns
     vm.booleanDropdownArr = [{id: 'true', name: 'true'}, {id: 'false', name: 'false'}];
-    vm.$log.debug('booleanDropdownArr: ', vm.booleanDropdownArr);
     vm.objFunctionGroupDropdownArr = vm.setObjFunctionGroupDropdown();
 
     vm.gridApis = [];
@@ -98,9 +97,6 @@ export class OutputsController {
 
       if (measure.analysisOutputs == undefined) measure.analysisOutputs = [];
       vm.$log.debug('measure: ', measure);
-      vm.$log.debug('boolean Arr: ', vm.booleanDropdownArr);
-
-      vm.$log.debug('booleanArr other way: ', vm.getBooleanDropdownArr());
 
       vm.$scope.gridOptions[measure.uid] = {
         data: 'measure.analysisOutputs',
@@ -116,7 +112,6 @@ export class OutputsController {
         columnDefs: [{
           name: 'display_name',
           displayName: 'outputs.columns.displayName',
-          enableCellEdit: false,
           headerCellFilter: 'translate',
           pinnedLeft: true,
           width: 250,
@@ -166,6 +161,7 @@ export class OutputsController {
           name: 'weighting_factor',
           displayName: 'outputs.columns.weightingFactor',
           headerCellFilter: 'translate',
+          type: 'number',
           width: 100,
           minWidth: 50
         }, {
@@ -173,6 +169,7 @@ export class OutputsController {
           displayName: 'outputs.columns.objectiveFunctionGroup',
           editableCellTemplate: 'ui-grid/dropdownEditor',
           editDropdownIdLabel: 'name',
+          type: 'number',
           editDropdownOptionsArray: vm.objFunctionGroupDropdownArr,
           editDropdownValueLabel: 'name',
           headerCellFilter: 'translate',
@@ -181,12 +178,10 @@ export class OutputsController {
         }],
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.uid] = gridApi;
-          // gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
-          //   if (newValue != oldValue) {
-          //     vm.$log.debug('CELL has changed in: ', measure.uid, ' old val: ', oldValue, ' new val: ', newValue);
-          //     vm.$log.debug('rowEntity: ', rowEntity);
-          //   }
-          // });
+          gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
+            // set modified
+            vm.setIsModified();
+          });
         }
       };
     });
@@ -220,8 +215,9 @@ export class OutputsController {
     });
 
     modalInstance.result.then(() => {
-      deferred.resolve();
       vm.$log.debug('NEW Analysis OUTPUTS: ', measure.analysisOutputs);
+      vm.setIsModified();
+      deferred.resolve();
 
     }, () => {
       // Modal canceled
@@ -233,9 +229,18 @@ export class OutputsController {
 
   removeMeasure(measure) {
     const vm = this;
-    // todo:
-    // set outputMeasure: false;
-    // remote other obj function settings?
+    measure.outputMeasure = false;
+    // todo: remote anything else from data structure? For now: keep just in case
+  }
+
+  setIsModified() {
+    const vm = this;
+    vm.Project.setModified(true);
+  }
+
+  exportOSA() {
+    const vm = this;
+    vm.Project.exportOSA();
   }
 
 }
