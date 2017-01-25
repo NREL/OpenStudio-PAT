@@ -1035,7 +1035,6 @@ export class Project {
   setAlgorithmOptions() {
     const at = {};
 
-    at.BatchRun = [];
     at.Morris = [{
       name: 'r',
       description: 'integer giving the number of repetitions of the design',
@@ -1364,9 +1363,6 @@ export class Project {
     const vm = this;
 
     return [{
-      id: 'BatchRun',
-      name: 'analysis.type.batchRun'
-    }, {
       id: 'NSGA2',
       name: 'analysis.type.nsga2'
     }, {
