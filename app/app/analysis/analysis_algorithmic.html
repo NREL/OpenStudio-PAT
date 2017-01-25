@@ -211,7 +211,7 @@
                   <input class="form-control" type="number" ng-model="argument.inputs.maximum">
                 </div>
                 <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.deltaX">
+                  <input class="form-control" type="number" ng-model="argument.inputs.deltaX" step="0.01" value="0.001">
                 </div>
                 <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
                   <input class="form-control" type="number" ng-model="argument.inputs.mean">
