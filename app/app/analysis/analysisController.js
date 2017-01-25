@@ -25,6 +25,8 @@ export class AnalysisController {
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
+    vm.$scope.dirToInclude = vm.Project.getDirToInclude();
+    vm.$scope.dirToUnpackTo = vm.Project.getDirToUnpackTo();
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
     _.forEach(vm.$scope.measures, (measure) => {
@@ -655,6 +657,20 @@ export class AnalysisController {
     vm.initializeGrids();
   }
 
+  setDirToInclude() {
+    const vm = this;
+    vm.$log.debug('In setDirToInclude in analysis');
+    vm.setIsModified();
+    vm.Project.setDirToInclude(vm.$scope.dirToInclude);
+  }
+
+  setDirToUnpackTo() {
+    const vm = this;
+    vm.$log.debug('In setDirToUnpackTo in analysis');
+    vm.setIsModified();
+    vm.Project.setDirToUnpackTo(vm.$scope.dirToUnpackTo);
+  }
+
   setSamplingMethod() {
     const vm = this;
     vm.$log.debug('In setSamplingMethod in analysis');
@@ -686,6 +702,21 @@ export class AnalysisController {
     }, error => {
       vm.$log.debug("Error in Project::computeMeasureArguments: ", error);
     });
+  }
+
+  selectDirToInclude() {
+    const vm = this;
+
+    const result = vm.dialog.showOpenDialog({
+      title: 'Select Directory To Include',
+      properties: ['openDirectory']
+    });
+
+    if (!_.isEmpty(result)) {
+      vm.$log.debug(' result[0]:', result[0]);
+      vm.$scope.dirToInclude = result[0];
+      vm.setDirToInclude(result[0]);
+    }
   }
 
   selectSeedModel() {
@@ -796,7 +827,7 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In getDistributions');
 
-    if(_.isNil(argument.inputs)) argument.inputs = {};
+    if (_.isNil(argument.inputs)) argument.inputs = {};
 
     switch (vm.$scope.selectedSamplingMethod.id) {
       case 'PSO':
@@ -811,7 +842,7 @@ export class AnalysisController {
       case 'Morris':
       case 'DOE':
         argument.inputs.distributions = ['Uniform', 'Triangle', 'Normal', 'LogNormal'];
-      break;
+        break;
       default:
         argument.inputs.distributions = ['Unhandled Sampling Method'];
     }
@@ -822,7 +853,7 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In getVariableSettings');
 
-    if(_.isNil(argument.inputs)) argument.inputs = {};
+    if (_.isNil(argument.inputs)) argument.inputs = {};
 
     switch (vm.$scope.selectedSamplingMethod.id) {
       case 'SPEA2':
@@ -850,7 +881,7 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In checkVariableSettings');
 
-    if(_.isNil(argument.inputs)) argument.inputs = {};
+    if (_.isNil(argument.inputs)) argument.inputs = {};
 
     switch (vm.$scope.selectedSamplingMethod.id) {
       case 'SPEA2':
@@ -901,7 +932,7 @@ export class AnalysisController {
     argument.inputs.discreteVariables.push(discreteVariable);
   }
 
-  showValueAndWeights(){
+  showValueAndWeights() {
     const vm = this;
     vm.$log.debug('In showValueAndWeights');
     if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
@@ -911,7 +942,7 @@ export class AnalysisController {
     }
   }
 
-  showDeltaX(){
+  showDeltaX() {
     const vm = this;
     vm.$log.debug('In showDeltaX');
     if (_.includes(['RGENOUD', 'Optim'], vm.$scope.selectedSamplingMethod.id)) {
@@ -921,7 +952,7 @@ export class AnalysisController {
     }
   }
 
-  showMinAndMax(){
+  showMinAndMax() {
     const vm = this;
     vm.$log.debug('In showMinAndMax');
     if (_.includes(['PreFlight'], vm.$scope.selectedSamplingMethod.id)) {
@@ -931,7 +962,7 @@ export class AnalysisController {
     }
   }
 
-  showDistributions(){
+  showDistributions() {
     const vm = this;
     vm.$log.debug('In showDistributions');
     if (!_.includes(['PSO', 'Optim'], vm.$scope.selectedSamplingMethod.id)) {

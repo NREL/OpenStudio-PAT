@@ -36,10 +36,10 @@
           <div class="col-sm-5">
             <div class="input-group">
               <div class="col-sm-4">
-                <input class="form-control" type="text">
+                {{analysis.$scope.dirToInclude}}
               </div>
               <span class="input-group-btn">
-                <button class="btn btn-default" type="button" ng-click="analysis.selectSeedModel()"><span class="glyphicon glyphicon-folder-open"></span></button>
+                <button class="btn btn-default" type="button" ng-click="analysis.selectDirToInclude()"><span class="glyphicon glyphicon-folder-open"></span></button>
               </span>
             </div>
           </div>
@@ -51,7 +51,7 @@
           <div class="col-sm-5">
             <div class="input-group">
               <div class="col-sm-4">
-                <input class="form-control" type="text">
+                <input class="form-control" type="text" ng-model="analysis.$scope.dirToUnpackTo"  ng-blur="analysis.setDirToUnpackTo()">
               </div>
             </div>
           </div>
@@ -153,7 +153,7 @@
                 <div class="col-sm-3">
                   Maximum
                 </div>
-                <div class="col-sm-3" ng-if="argument.inputs.distribution != 'Uniform'" ng-model="argument.inputs.mean">
+                <div class="col-sm-3" ng-show="argument.inputs.distribution != 'Uniform'" ng-model="argument.inputs.mean">
                   Mean
                 </div>
                 <div class="col-sm-3">

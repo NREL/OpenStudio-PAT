@@ -182,6 +182,8 @@ export class Project {
         vm.analysisID = vm.pat.analysisID ? vm.pat.analysisID : vm.analysisID;
         vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
         vm.remoteSettings = vm.pat.remoteSettings ? vm.pat.remoteSettings : vm.remoteSettings;
+        vm.dirToInclude = vm.pat.dirToInclude ? vm.pat.dirToInclude : vm.dirToInclude;
+        vm.dirToUnpackTo = vm.pat.dirToUnpackTo ? vm.pat.dirToUnpackTo : vm.dirToUnpackTo;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
@@ -735,6 +737,8 @@ export class Project {
     vm.pat.seed = vm.defaultSeed;
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
+    vm.pat.dirToInclude = vm.dirToInclude;
+    vm.pat.dirToUnpackTo = vm.dirToUnpackTo;
     vm.pat.remoteSettings = vm.remoteSettings;
     vm.pat.samplingMethod = vm.samplingMethod;
     vm.pat.algorithmSettings = vm.algorithmSettings;
@@ -991,6 +995,26 @@ export class Project {
   getAnalysisType() {
     const vm = this;
     return vm.analysisType;
+  }
+
+  setDirToInclude(dir) {
+    const vm = this;
+    vm.dirToInclude = dir;
+  }
+
+  getDirToInclude() {
+    const vm = this;
+    return vm.dirToInclude;
+  }
+
+  setDirToUnpackTo(dir) {
+    const vm = this;
+    vm.dirToUnpackTo = dir;
+  }
+
+  getDirToUnpackTo() {
+    const vm = this;
+    return vm.dirToUnpackTo;
   }
 
   setSamplingMethod(method) {
