@@ -153,11 +153,14 @@
                 <div class="col-sm-3">
                   Maximum
                 </div>
-                <div class="col-sm-3" ng-show="argument.inputs.distribution != 'Uniform'" ng-model="argument.inputs.mean">
+                <div class="col-sm-3" ng-show="argument.inputs.distribution != 'Uniform'">
                   Mean
                 </div>
                 <div class="col-sm-3">
                   Std Dev
+                </div>
+                <div class="col-sm-3" ng-show="analysis.$scope.showDistributions">
+                  Distribution
                 </div>
               </div>
               <div class="row">
@@ -167,11 +170,14 @@
                 <div class="col-sm-3">
                   <input class="form-control" type="number" ng-model="argument.inputs.maximum">
                 </div>
-                <div class="col-sm-3">
-                  <input class="form-control" type="number" ng-model="argument.inputs.mean" ng-if="argument.inputs.distribution != 'Uniform'" ng-model="argument.inputs.mean">
+                <div class="col-sm-3" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <input class="form-control" type="number" ng-model="argument.inputs.mean">
                 </div>
                 <div class="col-sm-3">
                   <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
+                </div>
+                <div class="col-sm-3" ng-show="analysis.$scope.showDistributions">
+                  <select class="form-control" ng-options="distribution as distribution for distribution in argument.inputs.distributions" ng-init="analysis.getDistributions(argument)" ng-model="argument.inputs.distribution"></select>
                 </div>
               </div>
             </div>
@@ -187,11 +193,14 @@
                 <div class="col-sm-2">
                   Delta X
                 </div>
-                <div class="col-sm-2" ng-if="argument.inputs.distribution != 'Uniform'" ng-model="argument.inputs.mean">
+                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
                   Mean
                 </div>
                 <div class="col-sm-2">
                   Std Dev
+                </div>
+                <div class="col-sm-3" ng-show="analysis.$scope.showDistributions">
+                  Distribution
                 </div>
               </div>
               <div class="row">
@@ -204,29 +213,26 @@
                 <div class="col-sm-2">
                   <input class="form-control" type="number" ng-model="argument.inputs.deltaX">
                 </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-if="argument.inputs.distribution != 'Uniform'" ng-model="argument.inputs.mean">
+                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <input class="form-control" type="number" ng-model="argument.inputs.mean">
                 </div>
                 <div class="col-sm-2">
                   <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
+                </div>
+                <div class="col-sm-3" ng-show="analysis.$scope.showDistributions">
+                  <select class="form-control" ng-options="distribution as distribution for distribution in argument.inputs.distributions" ng-init="analysis.getDistributions(argument)" ng-model="argument.inputs.distribution"></select>
                 </div>
               </div>
             </div>
 
             <div class="col-sm-5" ng-show="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))" ng-init="analysis.showDiscreteVariables(argument)">
               <div class="row">
-                <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
-                  Distribution
-                </div>
                 <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
                   Minimum
                 </div>
                 <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
                   Maximum
                 </div>
-              </div>
-              <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
-                <select class="form-control" ng-options="distribution as distribution for distribution in argument.inputs.distributions" ng-init="analysis.getDistributions(argument)" ng-model="argument.inputs.distribution"></select>
               </div>
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
                 <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
@@ -246,10 +252,10 @@
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
                 <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMaximum">
               </div>
-              <div class="col-sm-4" ng-if="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
+              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
                 <select class="form-control" ng-options="discreteMinimum as discreteMinimum for discreteMinimum in argument.inputs.discreteMinimums" ng-init="argument.inputs.discreteMinimums = argument.discreteMinimums" ng-model="argument.inputs.discreteMinimum"></select>
               </div>
-              <div class="col-sm-4" ng-if="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
+              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
                 <select class="form-control" ng-options="discreteMaximum as discreteMaximum for discreteMaximum in argument.inputs.discreteMaximums" ng-init="argument.inputs.discreteMaximums = argument.discreteMaximums" ng-model="argument.inputs.discreteMaximum"></select>
               </div>
 
