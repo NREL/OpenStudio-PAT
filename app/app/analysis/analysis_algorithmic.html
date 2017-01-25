@@ -260,7 +260,16 @@
               </div>
 
               <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                <div class="col-sm-4">
+                <div class="col-sm-4" ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                  <input class="form-control" type="number" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? 0 : discreteVariable.value">
+                </div>
+                <div class="col-sm-4" ng-if="argument.type == 'String'">
+                  <input class="form-control" type="text" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? '' : discreteVariable.value">
+                </div>
+                <div class="col-sm-4" ng-if="argument.type == 'Boolean'">
+                  <input class="form-control" type="checkbox" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? true : discreteVariable.value">
+                </div>
+                <div class="col-sm-4" ng-if="argument.type == 'Choice'">
                   <select class="form-control" ng-options="value as value for value in argument.inputs.choice_display_names" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? argument.inputs.choice_display_names[0] : discreteVariable.value"></select>
                 </div>
                 <div class="col-sm-3">
@@ -474,7 +483,16 @@
               </div>
 
               <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                <div class="col-sm-4">
+                <div class="col-sm-4" ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                  <input class="form-control" type="number" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? 0 : discreteVariable.value">
+                </div>
+                <div class="col-sm-4" ng-if="argument.type == 'String'">
+                  <input class="form-control" type="text" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? '' : discreteVariable.value">
+                </div>
+                <div class="col-sm-4" ng-if="argument.type == 'Boolean'">
+                  <input class="form-control" type="checkbox" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? true : discreteVariable.value">
+                </div>
+                <div class="col-sm-4" ng-if="argument.type == 'Choice'">
                   <select class="form-control" ng-options="value as value for value in argument.inputs.choice_display_names" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? argument.inputs.choice_display_names[0] : discreteVariable.value"></select>
                 </div>
                 <div class="col-sm-3">
@@ -688,7 +706,16 @@
               </div>
 
               <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                <div class="col-sm-4">
+                <div class="col-sm-4" ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                  <input class="form-control" type="number" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? 0 : discreteVariable.value">
+                </div>
+                <div class="col-sm-4" ng-if="argument.type == 'String'">
+                  <input class="form-control" type="text" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? '' : discreteVariable.value">
+                </div>
+                <div class="col-sm-4" ng-if="argument.type == 'Boolean'">
+                  <input class="form-control" type="checkbox" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? true : discreteVariable.value">
+                </div>
+                <div class="col-sm-4" ng-if="argument.type == 'Choice'">
                   <select class="form-control" ng-options="value as value for value in argument.inputs.choice_display_names" ng-model="discreteVariable.value" ng-init="discreteVariable.value = _.isNil(discreteVariable.value) ? argument.inputs.choice_display_names[0] : discreteVariable.value"></select>
                 </div>
                 <div class="col-sm-3">
