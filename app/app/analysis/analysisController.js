@@ -874,7 +874,8 @@ export class AnalysisController {
       default:
         argument.inputs.variableSettings = ['Unhandled Sampling Method'];
     }
-    argument.inputs.variableSetting = argument.inputs.variableSettings[0];
+
+    argument.inputs.variableSetting = _.isNil(argument.inputs.variableSetting) ? argument.inputs.variableSettings[0] : argument.inputs.variableSetting;
   }
 
   checkVariableSettings(argument) {
