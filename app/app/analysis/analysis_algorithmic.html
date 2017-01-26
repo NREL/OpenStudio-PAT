@@ -121,11 +121,11 @@
           </div>
           <div class="row" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
             <div class="col-sm-2">
-              <input class="form-control" type="text" ng-model="argument.inputs.display_name" ng-init="argument.inputs.display_name = argument.display_name" ng-mouseover="argument.inputs.display_name">
+              {{argument.display_name}}
             </div>
 
             <div class="col-sm-1">
-              {{argument.name}}
+              <input class="form-control" type="text" ng-model="argument.inputs.name" ng-init="argument.inputs.name = argument.name" ng-mouseover="argument.inputs.name">
             </div>
 
             <div class="col-sm-2">
@@ -344,11 +344,11 @@
           </div>
           <div class="row" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
             <div class="col-sm-2">
-              <input class="form-control" type="text" ng-model="argument.inputs.display_name" ng-init="argument.inputs.display_name = argument.display_name" ng-mouseover="argument.inputs.display_name">
+              {{argument.display_name}}
             </div>
 
             <div class="col-sm-1">
-              {{argument.name}}
+              <input class="form-control" type="text" ng-model="argument.inputs.name" ng-init="argument.inputs.name = argument.name" ng-mouseover="argument.inputs.name">
             </div>
 
             <div class="col-sm-2">
@@ -567,11 +567,11 @@
           </div>
           <div class="row" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
             <div class="col-sm-2">
-              <input class="form-control" type="text" ng-model="argument.inputs.display_name" ng-init="argument.inputs.display_name = argument.display_name" ng-mouseover="argument.inputs.display_name">
+              {{argument.display_name}}
             </div>
 
             <div class="col-sm-1">
-              {{argument.name}}
+              <input class="form-control" type="text" ng-model="argument.inputs.name" ng-init="argument.inputs.name = argument.name" ng-mouseover="argument.inputs.name">
             </div>
 
             <div class="col-sm-2">
