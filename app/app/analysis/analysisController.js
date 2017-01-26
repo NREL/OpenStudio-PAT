@@ -40,7 +40,7 @@ export class AnalysisController {
     vm.$scope.repMeasures = [];
 
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
-    vm.samplingMethods = vm.Project.getSamplingMethods();
+    vm.$scope.samplingMethods = vm.Project.getSamplingMethods();
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
 
     vm.designAlternatives = vm.Project.getDesignAlternatives();
@@ -841,6 +841,8 @@ export class AnalysisController {
       case 'PreFlight':
       case 'Morris':
       case 'DOE':
+      case 'SingleRun':
+      case 'RepeatRun':
         argument.inputs.distributions = ['Uniform', 'Triangle', 'Normal', 'LogNormal'];
         break;
       default:
@@ -865,6 +867,8 @@ export class AnalysisController {
       case 'PreFlight':
       case 'Morris':
       case 'DOE':
+      case 'SingleRun':
+      case 'RepeatRun':
         if (argument.type === 'Double') {
           argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
         } else {
@@ -903,6 +907,8 @@ export class AnalysisController {
         break;
       case 'NSGA2':
       case 'PreFlight':
+      case 'SingleRun':
+      case 'RepeatRun':
         argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
         break;
       case 'LHS':
