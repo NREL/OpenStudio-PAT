@@ -982,7 +982,7 @@ export class AnalysisController {
   showDiscreteVariables() {
     const vm = this;
     vm.$log.debug('In showDiscreteVariables');
-    if (_.includes(['NSGA2', 'LHS', 'Morris', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDiscreteVariables = true;
     } else {
       vm.$scope.showDiscreteVariables = false;
