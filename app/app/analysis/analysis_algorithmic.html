@@ -145,7 +145,7 @@
               <input class="form-control" type="checkbox" ng-model="argument.inputs.default_value" ng-init="argument.inputs.default_value = _.isNil(argument.inputs.default_value) ? argument.default_value : argument.inputs.default_value">
             </div>
 
-            <div class="col-sm-5" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'">
+            <div class="col-sm-5" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
               <div class="row">
                 <div class="col-sm-3">
                   Minimum
@@ -182,7 +182,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'">
+            <div class="col-sm-5" ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'&& (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
               <div class="row">
                 <div class="col-sm-3">
                   Minimum
@@ -225,13 +225,13 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))" ng-init="analysis.showDiscreteVariables(argument)">
+            <div class="col-sm-5" ng-show="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot'))) && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')" ng-init="analysis.showDiscreteVariables(argument)">
               <div class="row">
                 <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
-                  Minimum
+                  Min Relation to EUI
                 </div>
                 <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
-                  Maximum
+                  Max Relation to EUI
                 </div>
               </div>
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
@@ -368,7 +368,7 @@
               <input class="form-control" type="checkbox" ng-model="argument.inputs.default_value" ng-init="argument.inputs.default_value = _.isNil(argument.inputs.default_value) ? argument.default_value : argument.inputs.default_value">
             </div>
 
-            <div class="col-sm-5" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'">
+            <div class="col-sm-5" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
               <div class="row">
                 <div class="col-sm-3">
                   Minimum
@@ -405,7 +405,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'">
+            <div class="col-sm-5" ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'&& (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
               <div class="row">
                 <div class="col-sm-3">
                   Minimum
@@ -448,13 +448,13 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))" ng-init="analysis.showDiscreteVariables(argument)">
+            <div class="col-sm-5" ng-show="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot'))) && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')" ng-init="analysis.showDiscreteVariables(argument)">
               <div class="row">
                 <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
-                  Minimum
+                  Min Relation to EUI
                 </div>
                 <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
-                  Maximum
+                  Max Relation to EUI
                 </div>
               </div>
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
@@ -591,7 +591,7 @@
               <input class="form-control" type="checkbox" ng-model="argument.inputs.default_value" ng-init="argument.inputs.default_value = _.isNil(argument.inputs.default_value) ? argument.default_value : argument.inputs.default_value">
             </div>
 
-            <div class="col-sm-5" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'">
+            <div class="col-sm-5" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
               <div class="row">
                 <div class="col-sm-3">
                   Minimum
@@ -628,7 +628,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'">
+            <div class="col-sm-5" ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'&& (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
               <div class="row">
                 <div class="col-sm-3">
                   Minimum
@@ -671,13 +671,13 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))" ng-init="analysis.showDiscreteVariables(argument)">
+            <div class="col-sm-5" ng-show="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot'))) && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')" ng-init="analysis.showDiscreteVariables(argument)">
               <div class="row">
                 <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
-                  Minimum
+                  Min Relation to EUI
                 </div>
                 <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
-                  Maximum
+                  Max Relation to EUI
                 </div>
               </div>
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
