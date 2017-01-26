@@ -109,11 +109,15 @@ export class OutputsController {
         headerRowHeight: 50,
         enableCellEditOnFocus: true,
         enableHiding: false,
+        headerTemplate: 'app/outputs/headerTemplate.html',
+        treeRowHeaderAlwaysVisible: true,
+        category: [{name: 'Output Selection', visible: true}, {name: 'Objective Function Settings', visible: true}],
         columnDefs: [{
           name: 'display_name',
           displayName: 'outputs.columns.displayName',
           headerCellFilter: 'translate',
-          pinnedLeft: true,
+          category: 'Output Selection',
+          /*pinnedLeft: true,*/
           width: 250,
           minWidth: 70,
           cellTooltip: function (row) {
@@ -123,6 +127,7 @@ export class OutputsController {
           name: 'short_name',
           displayName: 'outputs.columns.shortName',
           headerCellFilter: 'translate',
+          category: 'Output Selection',
           width: 150,
           minWidth: 80
         }, {
@@ -133,6 +138,7 @@ export class OutputsController {
           editDropdownValueLabel: 'name',
           editDropdownOptionsArray: vm.booleanDropdownArr,
           headerCellFilter: 'translate',
+          category: 'Output Selection',
           width:100,
           minWidth: 70
         }, {
@@ -143,30 +149,35 @@ export class OutputsController {
           editDropdownOptionsArray: vm.booleanDropdownArr,
           editDropdownValueLabel: 'name',
           headerCellFilter: 'translate',
+          category: 'Output Selection',
           width: 100,
           minWidth: 40
         }, {
           name: 'target_value',
           displayName: 'outputs.columns.targetValue',
           headerCellFilter: 'translate',
+          category: 'Objective Function Settings',
           width: 100,
           minWidth: 50
         }, {
           name: 'units',
           displayName: 'outputs.columns.units',
           headerCellFilter: 'translate',
+          category: 'Objective Function Settings',
           width:70,
           minWidth: 40
         }, {
           name: 'weighting_factor',
           displayName: 'outputs.columns.weightingFactor',
           headerCellFilter: 'translate',
+          category: 'Objective Function Settings',
           type: 'number',
           width: 100,
           minWidth: 50
         }, {
           name: 'obj_function_group',
           displayName: 'outputs.columns.objectiveFunctionGroup',
+          category: 'Objective Function Settings',
           editableCellTemplate: 'ui-grid/dropdownEditor',
           editDropdownIdLabel: 'name',
           type: 'number',

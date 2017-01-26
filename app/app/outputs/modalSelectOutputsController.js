@@ -20,7 +20,7 @@ export class ModalSelectOutputsController {
       _.forEach($scope.measure.outputs, function(out){
         out.checked = vm.$scope.allSelected;
       });
-    }
+    };
 
   }
 
