@@ -282,7 +282,7 @@ export class RunController {
     }, error => {
       // error toastr
       let msg = '';
-      if (error = 'No Credentials') {
+      if (error == 'No Credentials') {
         msg = ': No AWS Credentials Selected';
       }
       vm.toastr.clear();

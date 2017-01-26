@@ -391,8 +391,6 @@ export class OsServer {
           });
         } else {
           vm.remoteProgressStart();
-          // DEBUG
-          vm.$log.debug('HEY CURRENT WORKING DIRECTORY!!!!!: ', process.cwd());
           vm.remoteServer().then(response => {
             vm.$log.debug('OsServerService::StartServer: setting server to started');
             vm.setServerStatus(serverType, 'started');
@@ -822,7 +820,7 @@ export class OsServer {
           vm.setRemoteStopInProgress(true);
           vm.$log.debug('Terminating AWS cluster');
           // use cluster.json file in clusters/ folder to terminate
-          vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_remote ' + '\"' + vm.Project.getProjectClustersDir().path(vm.Project.getRemoteSettings().aws.cluster_name + '.json') + '\"';
+          vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_remote ' + '\"' + vm.Project.getProjectClustersDir().path(vm.Project.getRemoteSettings().aws.cluster_name, vm.Project.getRemoteSettings().aws.cluster_name + '.json') + '\"';
           vm.$log.info('stop server command: ', vm.stopServerCommand);
           const envCopy = vm.setAwsEnvVars();
           const child = vm.exec(vm.stopServerCommand, {env: envCopy},
@@ -866,6 +864,8 @@ export class OsServer {
     vm.remoteSettings = vm.Project.getRemoteSettings();
     vm.remoteSettings.aws.cluster_status = 'terminated';
     vm.remoteSettings.aws.connected = false;
+    // delete cluster directory completely
+    vm.jetpack.remove(vm.Project.getProjectClustersDir().path(vm.remoteSettings.aws.cluster_name));
     vm.$log.debug('Cluster Terminated and Disconnected');
   }
 
