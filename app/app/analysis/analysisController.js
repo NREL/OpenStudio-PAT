@@ -1003,7 +1003,6 @@ export class AnalysisController {
   initializeValues() {
     const vm = this;
     vm.$log.debug('In initializeValues');
-    vm.$log.error('In initializeValues');
 
     _.forEach(vm.$scope.measures, (measure) => {
       _.forEach(measure.arguments, (arg) => {
@@ -1037,7 +1036,6 @@ export class AnalysisController {
             let maximum = 0;
             let mean = 0;
             let minimum = 0;
-            let name = 0;
             let stdDev = 0;
 
             let distribution = 'Uniform';
