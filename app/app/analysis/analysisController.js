@@ -58,6 +58,7 @@ export class AnalysisController {
       };
     };
 
+    vm.initializeValues();
     vm.showDeltaX();
     vm.showValueAndWeights();
     vm.showMinAndMax();
@@ -997,6 +998,91 @@ export class AnalysisController {
     } else {
       vm.$scope.showPivotVariables = false;
     }
+  }
+
+  initializeValues() {
+    const vm = this;
+    vm.$log.debug('In initializeValues');
+    vm.$log.error('In initializeValues');
+
+    _.forEach(vm.$scope.measures, (measure) => {
+      _.forEach(measure.arguments, (arg) => {
+        if (_.isNil(arg.inputs)) {
+          let defaultValue = 0;
+          let choiceDisplayNames = _.isNil(arg.choice_display_names) ? '' : arg.choice_display_names;
+          let name = _.isNil(arg.name) ? [] : arg.name;
+          let displayName = _.isNil(arg.display_name) ? '' : arg.display_name;
+          if (_.isNil(arg.specialRowId)) {
+            if (_.isNil(arg.default_value)) {
+              if (arg.type == 'Integer' || arg.type == 'Double') {
+                defaultValue = 0;
+              } else if (arg.type == 'Boolean') {
+                defaultValue = true;
+              } else if (arg.type == 'String') {
+                defaultValue = '';
+              } else if (arg.type == 'Choice') {
+                if (!_.isNil(arg.choice_display_names && arg.choice_display_names.length)) {
+                  defaultValue = arg.choice_display_names[0];
+                } else {
+                  defaultValue = '';
+                }
+              }
+            } else {
+              defaultValue = arg.default_value;
+            }
+
+            let deltaX = 0.001;
+            let discreteMinimum = 0;
+            let discreteMaximum = 0;
+            let maximum = 0;
+            let mean = 0;
+            let minimum = 0;
+            let name = 0;
+            let stdDev = 0;
+
+            let distribution = 'Uniform';
+            let variableSetting = 'Argument';
+
+            let inputs = {
+              choice_display_names: choiceDisplayNames,
+              default_value: defaultValue,
+              deltaX: deltaX,
+              discreteMinimum: discreteMinimum,
+              discreteMaximum: discreteMaximum,
+              discreteVariables: [
+                {
+                  value: "",
+                  weight: "",
+                  $$hashKey: ""
+                }
+              ],
+              display_name: displayName,
+              distribution: distribution,
+              distributions: [
+                "Uniform",
+                "Triangle",
+                "Normal",
+                "LogNormal"
+              ],
+              maximum: maximum,
+              mean: mean,
+              minimum: minimum,
+              name: name,
+              stdDev: stdDev,
+              variableSetting: variableSetting,
+              variableSettings: [
+                "Argument",
+                "Discrete",
+                "Continuous",
+                "Pivot"
+              ]
+            };
+            arg.inputs = inputs;
+          }
+        }
+
+      });
+    });
   }
 
 }
