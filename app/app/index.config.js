@@ -21,6 +21,6 @@ export function config($logProvider, $translateProvider, toastrConfig) {
   toastrConfig.positionClass = 'toast-top-right';
   toastrConfig.preventDuplicates = false; // need duplicates on BCL library view
   toastrConfig.progressBar = true;
-  toastrConfig.toastClass = 'toastr-text'
+  toastrConfig.toastClass = 'toastr-text';
 
 }
