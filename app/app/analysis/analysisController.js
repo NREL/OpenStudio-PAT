@@ -40,7 +40,7 @@ export class AnalysisController {
     vm.$scope.repMeasures = [];
 
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
-    vm.$scope.samplingMethods = vm.Project.getSamplingMethods();
+    vm.samplingMethods = vm.Project.getSamplingMethods();
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
 
     vm.designAlternatives = vm.Project.getDesignAlternatives();
