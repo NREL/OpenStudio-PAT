@@ -136,6 +136,44 @@
                         <p class="normal-text" id="awsRegion">{{remoteSettings.credentials.region}}</p>
                       </div>
                     </div>
+                    <div class="row" ng-show="remoteSettings.aws.connected">
+                      <div class="col-sm-12">
+                        <uib-accordion>
+                          <uib-accordion-group is-open="remoteSettings.aws.open">
+                            <uib-accordion-heading>
+                              <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': remoteSettings.aws.open, 'glyphicon-chevron-right': !remoteSettings.aws.open}"></i>
+                              <translate>run.remote.awsServerDetails</translate>
+                            </uib-accordion-heading>
+                              <div class="row">
+                                <div class="col-sm-12">
+                                  <label for="serverprivatekey" class="run-label" translate>run.remote.serverPrivateKey</label>
+                                  <p class="normal-text wrap-text" id="serverprivatekey" ng-if="clusterData.server.private_key_file_name">{{clusterData.server.private_key_file_name}}</p>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-sm-12">
+                                  <label for="workerprivatekey" class="run-label" translate>run.remote.workerPrivateKey</label>
+                                  <p class="normal-text wrap-text" id="workerprivatekey" ng-if="clusterData.workers[0].private_key_file_name">{{clusterData.workers[0].private_key_file_name}}</p>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-sm-12">
+                                  <label for="serverDNS" class="run-label" translate>run.remote.serverDNS</label>
+                                  <p class="normal-text" id="serverDNS" ng-if="clusterData.server.dns">{{clusterData.server.dns}}</p>
+                                </div>
+                              </div>
+                              <div class="row">
+                                <div class="col-sm-12">
+                                  <label for="workerDNS" class="run-label" translate>run.remote.workerPrivateKey</label>
+                                  <p class="normal-text" id="workerDNS" ng-repeat="worker in clusterData.workers">
+                                    {{worker.dns}}<br/>
+                                  </p>
+                                </div>
+                              </div>
+                          </uib-accordion-group>
+                        </uib-accordion>
+                      </div>
+                    </div>
                   </div>
                 </div>
               </div>

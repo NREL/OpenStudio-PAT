@@ -1056,6 +1056,15 @@ export class Project {
     return dns;
   }
 
+  readClusterFile(clusterName){
+    const vm = this;
+    let clusterData = {};
+    if (vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
+      clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName, clusterName + '.json'), 'json');
+    }
+    return clusterData;
+  }
+
   pingCluster(clusterName) {
     const vm = this;
     const deferred = vm.$q.defer();

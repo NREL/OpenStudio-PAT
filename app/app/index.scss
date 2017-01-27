@@ -503,6 +503,12 @@ select {
   padding-right: 6px;
 }
 
+.wrap-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
+}
+
 
 /*
 .ui-grid-cell.dropdown-button {

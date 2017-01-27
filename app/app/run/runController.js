@@ -31,9 +31,11 @@ export class RunController {
     vm.$scope.remoteSettings = vm.Project.getRemoteSettings();
     vm.$log.debug("REMOTE SETTINGS: ", vm.$scope.remoteSettings);
 
+    vm.$scope.clusterData = {};
     // if remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
       vm.checkIfClusterIsRunning();
+      vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
     }
 
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
@@ -107,6 +109,7 @@ export class RunController {
     // if switching to remote and amazon is selected, ping cluster
     if (vm.$scope.remoteSettings.remoteType == 'Amazon Cloud'){
       vm.checkIfClusterIsRunning();
+      vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
     }
   }
 
@@ -252,6 +255,8 @@ export class RunController {
     vm.$scope.remoteSettings.aws.aws_tags = []; // leave empty for now
     vm.$scope.remoteSettings.aws.openstudio_server_version = clusterFile.openstudio_server_version ? clusterFile.openstudio_server_version: null;
 
+    vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
+
     vm.$log.debug('remote settings.aws reset: ', vm.$scope.remoteSettings.aws);
   }
 
@@ -274,11 +279,15 @@ export class RunController {
     vm.OsServer.startServer().then( response => {
       vm.$log.debug('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType]);
       vm.toastr.clear();
-      if (type == 'connect')
+      if (type == 'connect'){
         vm.toastr.success('Connected to AWS!');
-      else
+        vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
+        vm.$log.debug('clusterData: ', vm.$scope.clusterData);
+      }
+      else{
         vm.toastr.success('AWS server started!');
-      // started toastr
+        vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
+      }
     }, error => {
       // error toastr
       let msg = '';

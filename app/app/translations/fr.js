@@ -266,7 +266,12 @@ export default {
       awsUserID: 'AWS UserID',
       saveCluster: 'Save Cluster Settings',
       status: 'Cluster Status',
-      viewAws: 'View AWS Console'
+      viewAws: 'View AWS Console',
+      awsServerDetails: 'AWS Server Details',
+      serverPrivateKey: 'Server Private Key File',
+      workerPrivateKey: 'Workers Private Key File',
+      serverDNS: 'Server DNS',
+      workerDNS: 'Workers DNS'
     },
     modalNewCluster: {
       title: 'New Cluster',
