@@ -634,37 +634,35 @@ export class RunController {
             vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
             vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
 
-            // download/replace out.osw
-            // Should we do this only once at the end?
-            vm.OsServer.updateDatapoints().then(response2 => {
-              // refresh datapoints
-              vm.$scope.datapoints = vm.Project.getDatapoints();
-
-              // download reports (local only)
-              if (vm.$scope.selectedRunType.name == 'local'){
+            // download/replace out.osw (local only)
+            if(vm.$scope.selectedRunType.name == 'local') {
+              vm.OsServer.updateDatapoints().then(response2 => {
+                // refresh datapoints
+                vm.$scope.datapoints = vm.Project.getDatapoints();
+                // download reports
                 vm.OsServer.downloadReports().then(response3 => {
                   vm.$log.debug('downloaded all available reports');
                   // refresh datapoints again
                   vm.$scope.datapoints = vm.Project.getDatapoints();
                   vm.$log.debug('datapoints after download: ', vm.$scope.datapoints);
-
                 }, response3 => {
                   // error in downloadReports
                   vm.$log.debug('download reports error: ', response3);
                 });
-              }
 
-              vm.$log.debug('update datapoints succeeded: ', response2);
-              if (response.data.analysis.status == 'completed') {
-                // cancel loop
-                vm.stopAnalysisStatus('completed');
-              }
-
-            }, response2 => {
-              // error in updateDatapoints
-              vm.$log.debug('update datapoints error: ', response2);
-            });
-
+                vm.$log.debug('update datapoints succeeded: ', response2);
+              }, response2 => {
+                // error in updateDatapoints
+                vm.$log.debug('update datapoints error: ', response2);
+              });
+            } else {
+              // set datapointsStatus as datapoints
+              vm.$scope.datapoints = vm.$scope.datapointsStatus;
+            }
+            if (response.data.analysis.status == 'completed') {
+              // cancel loop
+              vm.stopAnalysisStatus('completed');
+            }
           }, response => {
             vm.$log.debug('analysis status retrieval error: ', response);
           });

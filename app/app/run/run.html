@@ -85,11 +85,12 @@
             <div class="row datapoint-header">
               <div class="col-sm-2 pad-top-10">
                 <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
-                {{datapoint.name}}
+                <span ng-if="datapoint.name">{{datapoint.name}}</span><span ng-if="datapoint.name == undefined && datapoint.id">{{datapoint.id}}</span>
               </div>
               <div class="col-sm-1 pad-top-10">{{run.Project.formatDate(datapoint.updated_at)}}</div>
               <div class="col-sm-1 pad-top-10">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
-              <div class="col-sm-1 pad-top-10" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</div>
+              <div class="col-sm-1 pad-top-10" ng-if="datapoint.completed_status" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</div>
+              <div class="col-sm-1 pad-top-10" ng-if="datapoint.status_message" ng-class="{'green-text': datapoint.status_message.includes('normal'), 'red-text': datapoint.status_message == 'datapoint failure'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</div>
               <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
               <div class="col-sm-1 pad-top-10"><span class="badge orange-badge square-badge dp-badge">{{run.calculateWarnings(datapoint)}}</span></div>
               <div class="col-sm-1 pad-top-10"><span class="badge red-badge square-badge dp-badge">{{run.calculateErrors(datapoint)}}</span></div>
