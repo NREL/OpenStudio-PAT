@@ -221,6 +221,7 @@ export default {
     stopServer: 'Stop Server',
     exportToOSA: 'Export to OSA',
     runEntireWorkflow: 'Run Entire Workflow',
+    viewServer: 'View Server',
     modalAnalysisRunning: {
       title: 'Analysis is Running',
       message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'
@@ -230,8 +231,58 @@ export default {
       rerunAnalysisMessage: 'Running a new analysis will delete your local results. Are you sure you want to continue?',
       setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?'
     },
+    modalCloudRunning: {
+      title: 'Cloud Cluster is Running',
+      message: 'You are still connected to AWS. Terminate the cluster?'
+    },
     viewReport: 'View Report',
-    'for': 'for'
+    'for': 'for',
+    remote: {
+      osServerVersion: 'OpenStudio Server Version',
+      connect: 'Connect',
+      terminate: 'Terminate',
+      disconnect: 'Disconnect',
+      start: 'Start',
+      serverURL: 'Existing Server URL',
+      serverType: 'Remote Server Type',
+      serverSettings: 'Remote Server Settings',
+      serverInstanceType: 'Server Instance Type',
+      workerInstanceType: 'Worker Instance Type',
+      awsCredentials: 'AWS Credentials',
+      selectAws: 'Select AWS Credentials to use',
+      newAwsCredentials: 'New',
+      awsAccessKey: 'Access Key',
+      awsRegion: 'Region',
+      cpus: 'CPUs',
+      memory: 'Memory',
+      storage: 'Storage',
+      numberOfWorkers: 'Number of Workers',
+      clusterText: 'Select a cluster or make a new one',
+      selectCluster: 'Clusters',
+      runningClusters: 'Running clusters',
+      or: 'or',
+      newCluster: 'New Cluster',
+      newClusterName: 'New Cluster Name',
+      awsUserID: 'AWS UserID',
+      saveCluster: 'Save Cluster Settings',
+      status: 'Cluster Status',
+      viewAws: 'View AWS Console',
+      awsServerDetails: 'AWS Server Details',
+      serverPrivateKey: 'Server Private Key File',
+      workerPrivateKey: 'Workers Private Key File',
+      serverDNS: 'Server DNS',
+      workerDNS: 'Workers DNS'
+    },
+    modalNewCluster: {
+      title: 'New Cluster',
+      name: 'Cluster Name'
+    },
+    modalNewAwsCredentials: {
+      title: 'New AWS Credentials',
+      name: 'Name',
+      accessKey: 'Access Key',
+      secretKey: 'Secret Key'
+    }
   },
   statusBar: {
     Downloading: 'Downloading',
