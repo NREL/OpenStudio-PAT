@@ -243,57 +243,61 @@
                 </div>
               </div>
               <div class="row">
-              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
-                <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
-              </div>
-              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
-                <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
-              </div>
-              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
-              </div>
-              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
-              </div>
-              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMinimum">
-              </div>
-              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMaximum" >
-              </div>
-              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
-                <select class="form-control" ng-options="discreteMinimum as discreteMinimum for discreteMinimum in argument.inputs.discreteMinimums" ng-model="argument.inputs.discreteMinimum"></select>
-              </div>
-              <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
-                <select class="form-control" ng-options="discreteMaximum as discreteMaximum for discreteMaximum in argument.inputs.discreteMaximums" ng-model="argument.inputs.discreteMaximum"></select>
-              </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
+                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
+                </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
+                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
+                </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
+                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
+                </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
+                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
+                </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
+                  <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMinimum">
+                </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
+                  <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMaximum">
+                </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
+                  <select class="form-control" ng-options="discreteMinimum as discreteMinimum for discreteMinimum in argument.inputs.discreteMinimums" ng-model="argument.inputs.discreteMinimum"></select>
+                </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
+                  <select class="form-control" ng-options="discreteMaximum as discreteMaximum for discreteMaximum in argument.inputs.discreteMaximums" ng-model="argument.inputs.discreteMaximum"></select>
+                </div>
 
-              <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                <div class="col-sm-4" ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
-                  <input class="form-control" type="number" ng-model="discreteVariable.value">
+                <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                  <div class="col-sm-4" ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                    <input class="form-control" type="number" ng-model="discreteVariable.value">
+                  </div>
+                  <div class="col-sm-4" ng-if="argument.type == 'String'">
+                    <input class="form-control" type="text" ng-model="discreteVariable.value">
+                  </div>
+                  <div class="col-sm-4" ng-if="argument.type == 'Boolean'">
+                    <input class="form-control" type="checkbox" ng-model="discreteVariable.value">
+                  </div>
+                  <div class="col-sm-4" ng-if="argument.type == 'Choice'">
+                    <select class="form-control" ng-options="value as value for value in argument.inputs.choice_display_names" ng-model="discreteVariable.value"></select>
+                  </div>
+                  <div class="col-sm-3" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                    <input class="form-control" type="number" min="0" max="1" step="0.1" ng-model="discreteVariable.weight">
+                  </div>
                 </div>
-                <div class="col-sm-4" ng-if="argument.type == 'String'">
-                  <input class="form-control" type="text" ng-model="discreteVariable.value">
+                <div class="col-sm-1">
+                  <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
                 </div>
-                <div class="col-sm-4" ng-if="argument.type == 'Boolean'">
-                  <input class="form-control" type="checkbox" ng-model="discreteVariable.value">
-                </div>
-                <div class="col-sm-4" ng-if="argument.type == 'Choice'">
-                  <select class="form-control" ng-options="value as value for value in argument.inputs.choice_display_names" ng-model="discreteVariable.value"></select>
-                </div>
-                <div class="col-sm-3" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                  <input class="form-control" type="number" min="0" max="1" step="0.1" ng-model="discreteVariable.weight">
+                <div class="col-sm-4" ng-hide="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))">
+                  <p><span class="glyphicon glyphicon-alert" style="color:red"></span></p>
                 </div>
               </div>
-              <div class="col-sm-1">
-                <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
-              </div>
->
             </div>
-
+          </div>
+          <div ng-show="false">
+            <p>Invalid variable settings for this algorithm<span class="glyphicon glyphicon-alert" style="color:red"></span></p>
           </div>
         </div>
-
       </uib-accordion-group>
     </uib-accordion>
   </div>
@@ -514,9 +518,15 @@
               <div class="col-sm-1">
                 <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
               </div>
-
+              <div class="col-sm-4" ng-hide="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))">
+                <p><span class="glyphicon glyphicon-alert" style="color:red"></span></p>
+              </div>
             </div>
           </div>
+        </div>
+        <div ng-show="false">
+          <p>Invalid variable settings for this algorithm<span class="glyphicon glyphicon-alert" style="color:red"></span></p>
+        </div>
       </uib-accordion-group>
     </uib-accordion>
   </div>
@@ -737,9 +747,15 @@
               <div class="col-sm-1">
                 <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
               </div>
-
+              <div class="col-sm-4" ng-hide="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))">
+                <p><span class="glyphicon glyphicon-alert" style="color:red"></span></p>
+              </div>
             </div>
           </div>
+        </div>
+        <div ng-show="false">
+          <p>Invalid variable settings for this algorithm<span class="glyphicon glyphicon-alert" style="color:red"></span></p>
+        </div>
       </uib-accordion-group>
     </uib-accordion>
   </div>
