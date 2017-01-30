@@ -9,7 +9,7 @@ import archiver from 'archiver';
 const {app, dialog} = remote;
 
 export class Project {
-  constructor($q, $log, $uibModal, MeasureManager) {
+  constructor($q, $log, $http, $uibModal, MeasureManager) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -20,6 +20,7 @@ export class Project {
     vm.dialog = dialog;
     vm.archiver = archiver;
     vm.$q = $q;
+    vm.$http = $http;
     vm.$uibModal = $uibModal;
 
     // ignore camelcase for this file
@@ -50,7 +51,11 @@ export class Project {
     vm.remoteTypes = vm.setRemoteTypes();
     vm.algorithmOptions = vm.setAlgorithmOptions();
     vm.resetRemoteSettings();
+    vm.setOsServerVersions();
+    vm.setServerInstanceTypes();
+    vm.setAwsRegions();
 
+    vm.clusters = [];
     vm.modified = false;
     vm.analysisType = null;
     vm.reportType = null;
@@ -63,6 +68,7 @@ export class Project {
     vm.openstudioMD5 = null;
     vm.projectDir = null;  // this is a jetpack object (like all other *Dir variables)
     vm.projectLocalResultsDir = null;
+    vm.projectClustersDir = null;
     vm.projectName = null;
     vm.mongoDir = null;
     vm.logsDir = null;
@@ -82,6 +88,8 @@ export class Project {
 
     const src = jetpack.cwd(app.getPath('userData'));
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
+    // aws path
+    vm.awsDir = jetpack.dir(app.getAppPath() + '/.aws');
 
     // set my measures dir
     vm.MeasureManager.isReady().then(() => {
@@ -828,6 +836,7 @@ export class Project {
     // this should be a jetpack object (not a string)
     vm.projectDir = dir;
     vm.setProjectLocalResultsDir(dir);
+    vm.setProjectClustersDir(dir);
   }
 
   setProjectLocalResultsDir(projectDir) {
@@ -838,6 +847,21 @@ export class Project {
   getProjectLocalResultsDir() {
     const vm = this;
     return vm.projectLocalResultsDir;
+  }
+
+  setProjectClustersDir(projectDir){
+    const vm = this;
+    return vm.projectClustersDir = vm.jetpack.dir(projectDir.path('clusters'));
+  }
+
+  getProjectClustersDir() {
+    const vm = this;
+    return vm.projectClustersDir;
+  }
+
+  getAwsDir() {
+    const vm = this;
+    return vm.awsDir;
   }
 
   // projectDir is a jetpack object (not a string)
@@ -964,13 +988,13 @@ export class Project {
   }
 
   setRemoteTypes() {
-    //return ['Existing Remote Server', 'Amazon Cloud'];
-    return ['Existing Remote Server'];
+    return ['Existing Remote Server', 'Amazon Cloud'];
+    //return ['Existing Remote Server'];
   }
 
   resetRemoteSettings() {
     const vm = this;
-    vm.setRemoteSettings({open: false, remoteType: vm.remoteTypes[0], remoteServerURL: null, cloudServerURL: null});
+    vm.setRemoteSettings({open: true, remoteType: vm.remoteTypes[1], remoteServerURL: null, aws: {}, credentials: {yamlFilename: null, accessKey: null, region: 'us-east-1'}});
     vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
@@ -982,6 +1006,241 @@ export class Project {
   getRemoteSettings() {
     const vm = this;
     return vm.remoteSettings;
+  }
+
+  // always get from disk and extract unique name
+  getAwsYamlFiles() {
+    const vm = this;
+    vm.awsYamlFiles = [];
+    const files = vm.jetpack.find(vm.awsDir.path(), {matching: '*.yml'});
+    _.forEach(files, file => {
+      vm.awsYamlFiles.push(_.replace(_.last(_.split(file, '/')), '.yml', ''));
+    });
+    return vm.awsYamlFiles;
+  }
+
+  // always get from disk and extract unique name
+  getClusters() {
+    const vm = this;
+    vm.clusters = {running: [], all: []};
+    const tempClusters = vm.jetpack.find(vm.projectDir.path(), {matching: '*_cluster.json'});
+    _.forEach(tempClusters, cluster => {
+      vm.$log.debug('CLUSTER: ', cluster);
+      const clusterFile = vm.jetpack.read(cluster);
+      let clusterName = _.last(_.split(cluster, '/'));
+      clusterName = _.replace(clusterName, '_cluster.json', '');
+      vm.clusters.all.push(clusterName);
+      // PING (by name)
+      vm.pingCluster(clusterName).then((dns) => {
+        // running
+        vm.clusters.running.push(clusterName);
+      }, () => {
+        // terminated
+      });
+    });
+
+    vm.$log.debug('Cluster files found: ', vm.clusters);
+    return vm.clusters;
+  }
+
+  getDNSFromFile(clusterName){
+    const vm = this;
+    let dns = null;
+    if (vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
+      const clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName, clusterName + '.json'), 'json');
+      vm.$log.debug('Cluster File Data: ', clusterData);
+      if (clusterData && clusterData.server && clusterData.server.dns) {
+        dns = clusterData.server.dns;
+      }
+    }
+    return dns;
+  }
+
+  readClusterFile(clusterName){
+    const vm = this;
+    let clusterData = {};
+    if (vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
+      clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName, clusterName + '.json'), 'json');
+    }
+    return clusterData;
+  }
+
+  pingCluster(clusterName) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('Locating config file for cluster: ', clusterName);
+
+    const dns = vm.getDNSFromFile(clusterName);
+
+    if (dns) {
+      vm.$log.debug('PING: ', dns);
+      vm.$http.get(vm.fixURL(dns)).then(response => {
+        // send json to run controller
+        vm.$log.debug('Cluster RUNNING at: ', dns);
+        vm.$log.debug('JSON response: ', response);
+        deferred.resolve(dns);
+      }, () => {
+        vm.$log.debug('Cluster TERMINATED at: ', dns);
+        deferred.reject();
+      });
+    } else {
+      // nothing to ping
+      vm.$log.debug("Nothing to ping");
+      deferred.reject();
+    }
+
+    return deferred.promise;
+  }
+
+  fixURL(url) {
+    // if http:// is missing from URL, $http actions won't work
+    if (url.indexOf('http://') == -1 && url.indexOf('https://') == -1) {
+      url = 'http://' + url;
+    }
+    return url;
+  }
+
+  getOsServerVersions() {
+    const vm = this;
+    return vm.osServerVersions;
+  }
+
+  saveClusterToFile() {
+    const vm = this;
+    vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
+    // copy and clean up what you don't need
+    const cluster = angular.copy(vm.remoteSettings.aws);
+    cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : null;
+    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name : null;
+    // make sure worker number is a number
+    cluster.worker_node_number =
+
+    vm.jetpack.write(vm.getProjectDir().path(vm.remoteSettings.aws.cluster_name + '_cluster.json'), cluster);
+  }
+
+  setOsServerVersions() {
+    const vm = this;
+    vm.osServerVersions = [];
+    const amiURL = 'http://s3.amazonaws.com/openstudio-resources/server/api/v2/amis.json';
+    vm.$http.get(amiURL, {cache: false}).then(response => {
+      if (response.data && response.data.openstudio_server) {
+        vm.$log.debug('OPENSTUDIO SERVER AMIS: ', response.data.openstudio_server);
+        _.forEach(_.keys(response.data.openstudio_server), version => {
+          vm.osServerVersions.push(version);
+        });
+      }
+      vm.$log.debug('OS Server Versions: ', vm.osServerVersions);
+
+    }, error => {
+      vm.$log.debug('Error retrieving the OsServerVersions: ', error);
+    });
+  }
+
+  setServerInstanceTypes() {
+    const vm = this;
+    vm.serverInstanceTypes = [
+      {
+        name:'m3.medium',
+        cpus:'1',
+        memory:'3.75 GiB',
+        storage:'1 x 4 GB'
+      },
+      {
+        name:'m3.large',
+        cpus:'2',
+        memory:'7.5 GiB',
+        storage:'1 x 32 GB'
+      },
+      {
+        name:'m3.xlarge',
+        cpus:'4',
+        memory:'15 GiB',
+        storage:'2 x 40 GB'
+      },
+      {
+        name:'m3.2xlarge',
+        cpus:'8',
+        memory:'30 GiB',
+        storage:'2 x 80 GB'
+      },
+      {
+        name:'c3.large',
+        cpus:'2',
+        memory:'3.75 GiB',
+        storage:'2 x 16 GB'
+      },
+      {
+        name:'c3.xlarge',
+        cpus:'4',
+        memory:'7.5 GiB',
+        storage:'2 x 40 GB'
+      },
+      {
+        name:'c3.2xlarge',
+        cpus:'8',
+        memory:'15 GiB',
+        storage:'2 x 80 GB'
+      },
+      {
+        name:'c3.4xlarge',
+        cpus:'16',
+        memory:'30 GiB',
+        storage:'2 x 160 GB'
+      },
+      {
+        name:'c3.8xlarge',
+        cpus:'32',
+        memory:'60 GiB',
+        storage:'2 x 320 GB'
+      },
+      {
+        name:'r3.large',
+        cpus:'2',
+        memory:'15.25 GiB',
+        storage:'1 x 32 GB'
+      },
+      {
+        name:'r3.xlarge',
+        cpus:'4',
+        memory:'30.5 GiB',
+        storage:'1 x 80 GB'
+      },
+      {
+        name:'r3.2xlarge',
+        cpus:'8',
+        memory:'61 GiB',
+        storage:'1 x 160 GB'
+      },
+      {
+        name:'r3.4xlarge',
+        cpus:'16',
+        memory:'122 GiB',
+        storage:'1 x 320 GB'
+      },
+      {
+        name:'r3.8xlarge',
+        cpus:'32',
+        memory:'244 GiB',
+        storage:'2 x 320 GB'
+      }
+    ];
+  }
+
+  getServerInstanceTypes() {
+    const vm = this;
+    return vm.serverInstanceTypes;
+  }
+
+  setAwsRegions() {
+    const vm = this;
+    vm.awsRegions = [
+      'us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 'eu-central-1', 'eu-west-1'
+    ];
+  }
+
+  getAwsRegions() {
+    const vm = this;
+    return vm.awsRegions;
   }
 
   setAnalysisType(name) {

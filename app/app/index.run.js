@@ -17,23 +17,65 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
         if (Project.getProjectDir() != null) {
           e.returnValue = false;
           toastr.info('Preparing to Exit');
-          Project.modifiedModal().then(() => {
+          Project.modifiedModal().then( () => {
             $log.debug('Resolving modifiedModal()');
             MeasureManager.stopMeasureManager();
-            // force stop LOCAL server (even if remote server is running)
-            // TODO: what to do about remote server?
-            OsServer.stopServer('local').then(response => {
-              //  server is stopped
-              //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
-              exitReady = true;
-              app.quit();
-            }, error => {
-              exitReady = true;
-              app.quit();
+            // stop cloud?
+            OsServer.cloudRunningModal().then( resp => {
+              // stop success or nothing to stop
+              // force stop LOCAL server (even if remote server is running)
+              OsServer.stopServer('local').then(response => {
+                //  server is stopped
+                //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
+                exitReady = true;
+                app.quit();
+              }, error => {
+                exitReady = true;
+                app.quit();
+              });
+            }, err => {
+              // stop error
+              // force stop LOCAL server (even if remote server is running)
+              OsServer.stopServer('local').then(response => {
+                //  server is stopped
+                //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
+                exitReady = true;
+                app.quit();
+              }, error => {
+                exitReady = true;
+                app.quit();
+              });
             });
           }, () => {
-            exitReady = true;
-            app.quit();
+            $log.debug('Rejected modifiedModal()');
+            // stop cloud?
+            OsServer.cloudRunningModal().then( resp => {
+              // cloud stop success or nothing to stop
+              MeasureManager.stopMeasureManager();
+              // force stop LOCAL server (even if remote server is running)
+              OsServer.stopServer('local').then(response => {
+                //  server is stopped
+                //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
+                exitReady = true;
+                app.quit();
+              }, error => {
+                exitReady = true;
+                app.quit();
+              });
+            }, err => {
+              // cloud stop error
+              MeasureManager.stopMeasureManager();
+              // force stop LOCAL server (even if remote server is running)
+              OsServer.stopServer('local').then(response => {
+                //  server is stopped
+                //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
+                exitReady = true;
+                app.quit();
+              }, error => {
+                exitReady = true;
+                app.quit();
+              });
+            });
           });
         } else {
           // nothing to do, exit.
@@ -42,9 +84,9 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
         }
       } catch (e) {
         // TODO: log something to a file
-        if (Project.getProjectDir() != null) {
-          //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'There was an error closing the app.'});
-        }
+        // if (Project.getProjectDir() != null) {
+        //   //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'There was an error closing the app.'});
+        // }
         exitReady = true;
         app.quit();
       }
