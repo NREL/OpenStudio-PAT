@@ -225,7 +225,7 @@
               </div>
             </div>
 
-            <div class="col-sm-5" ng-show="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot'))) && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')" ng-init="analysis.showDiscreteVariables(argument)">
+            <div class="col-sm-5" ng-show="(argument.inputs.variableSetting == 'Discrete' || argument.inputs.variableSetting == 'Pivot') && analysis.$scope.samplingMethods != 'SingleRun' && analysis.$scope.samplingMethods != 'RepeatRun'" ng-init="analysis.showDiscreteVariables(argument)">
               <div class="row">
                 <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
                   Min Relation to EUI
@@ -233,7 +233,16 @@
                 <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax">
                   Max Relation to EUI
                 </div>
+                <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                  <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                    Value
+                  </div>
+                  <div class="col-sm-4">
+                    Weight
+                  </div>
+                </div>
               </div>
+              <div class="row">
               <div class="col-sm-4" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
                 <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
               </div>
@@ -279,9 +288,12 @@
               <div class="col-sm-1">
                 <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
               </div>
+>
+            </div>
 
           </div>
         </div>
+
       </uib-accordion-group>
     </uib-accordion>
   </div>
