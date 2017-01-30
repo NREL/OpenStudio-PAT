@@ -1007,6 +1007,7 @@ export class AnalysisController {
     _.forEach(vm.$scope.measures, (measure) => {
       _.forEach(measure.arguments, (arg) => {
         if (_.isNil(arg.inputs)) {
+          let skip = 'false';
           let defaultValue = 0;
           let choiceDisplayNames = _.isNil(arg.choice_display_names) ? '' : arg.choice_display_names;
           let name = _.isNil(arg.name) ? [] : arg.name;
@@ -1045,6 +1046,7 @@ export class AnalysisController {
             let variableSetting = 'Argument';
 
             let inputs = {
+              __SKIP__: skip,
               choice_display_names: choiceDisplayNames,
               default_value: defaultValue,
               deltaX: deltaX,

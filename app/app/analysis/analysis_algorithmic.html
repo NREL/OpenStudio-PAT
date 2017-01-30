@@ -109,13 +109,16 @@
             <div class="col-sm-1">
               Short Name
             </div>
+            <div class="col-sm-1">
+              SKIP
+            </div>
             <div class="col-sm-2">
               Variable Settings
             </div>
             <div class="col-sm-2">
               Static/Default
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-4">
               Measure Inputs
             </div>
           </div>
@@ -126,6 +129,10 @@
 
             <div class="col-sm-1">
               <input class="form-control" type="text" ng-model="argument.inputs.name" ng-mouseover="argument.inputs.name">
+            </div>
+
+            <div class="col-sm-1">
+              <input class="form-control" type="checkbox" ng-model="argument.inputs.__SKIP__">
             </div>
 
             <div class="col-sm-2">
@@ -145,7 +152,7 @@
               <input class="form-control" type="checkbox" ng-model="argument.inputs.default_value">
             </div>
 
-            <div class="col-sm-5" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
+            <div class="col-sm-4" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
               <div class="row">
                 <div class="col-sm-3">
                   Minimum
@@ -348,13 +355,16 @@
             <div class="col-sm-1">
               Short Name
             </div>
+            <div class="col-sm-1">
+              SKIP
+            </div>
             <div class="col-sm-2">
               Variable Settings
             </div>
             <div class="col-sm-2">
               Static/Default
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-4">
               Measure Inputs
             </div>
           </div>
@@ -365,6 +375,10 @@
 
             <div class="col-sm-1">
               <input class="form-control" type="text" ng-model="argument.inputs.name" ng-mouseover="argument.inputs.name">
+            </div>
+
+            <div class="col-sm-1">
+              <input class="form-control" type="checkbox" ng-model="argument.inputs.__SKIP__">
             </div>
 
             <div class="col-sm-2">
@@ -384,7 +398,7 @@
               <input class="form-control" type="checkbox" ng-model="argument.inputs.default_value">
             </div>
 
-            <div class="col-sm-5" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
+            <div class="col-sm-4" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
               <div class="row">
                 <div class="col-sm-3">
                   Minimum
@@ -577,13 +591,16 @@
             <div class="col-sm-1">
               Short Name
             </div>
+            <div class="col-sm-1">
+              SKIP
+            </div>
             <div class="col-sm-2">
               Variable Settings
             </div>
             <div class="col-sm-2">
               Static/Default
             </div>
-            <div class="col-sm-5">
+            <div class="col-sm-4">
               Measure Inputs
             </div>
           </div>
@@ -594,6 +611,10 @@
 
             <div class="col-sm-1">
               <input class="form-control" type="text" ng-model="argument.inputs.name" ng-mouseover="argument.inputs.name">
+            </div>
+
+            <div class="col-sm-1">
+              <input class="form-control" type="checkbox" ng-model="argument.inputs.__SKIP__">
             </div>
 
             <div class="col-sm-2">
@@ -613,7 +634,7 @@
               <input class="form-control" type="checkbox" ng-model="argument.inputs.default_value">
             </div>
 
-            <div class="col-sm-5" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
+            <div class="col-sm-4" ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun')">
               <div class="row">
                 <div class="col-sm-3">
                   Minimum
