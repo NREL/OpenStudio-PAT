@@ -1031,12 +1031,15 @@ export class AnalysisController {
             }
 
             let deltaX = 0.001;
-            let discreteMinimum = 0;
-            let discreteMaximum = 0;
-            let maximum = 0;
-            let mean = 0;
-            let minimum = 0;
-            let stdDev = 0;
+            let discreteMinimum = defaultValue;
+            let discreteMaximum = defaultValue;
+            let maximum = defaultValue;
+            let mean = defaultValue;
+            let minimum = defaultValue;
+            let stdDev = defaultValue;
+            if (arg.type == 'Double') {
+              stdDev = (maximum - minimum) / 6;
+            }
 
             let distribution = 'Uniform';
             let variableSetting = 'Argument';
