@@ -234,11 +234,14 @@
 
             <div class="col-sm-7" ng-show="(argument.inputs.variableSetting == 'Discrete' || argument.inputs.variableSetting == 'Pivot') && analysis.$scope.samplingMethods != 'SingleRun' && analysis.$scope.samplingMethods != 'RepeatRun'" ng-init="analysis.showDiscreteVariables(argument)">
               <div class="row">
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  Min Relation to EUI
+                <div class="col-sm-2" ng-show="analysis.$scope.showMinAndMax">
+                  Relation to EUI
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  Max Relation to EUI
+                  Min
+                </div>
+                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
+                  Max
                 </div>
                 <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
                   <div class="col-sm-1" ng-show="argument.inputs.variableSetting != 'Pivot'">
@@ -250,6 +253,9 @@
                 </div>
               </div>
               <div class="row">
+                <div class="col-sm-2" ng-show="analysis.$scope.showMinAndMax">
+                  <select class="form-control" ng-options="relationship as relationship for relationship in relationships" ng-model="argument.inputs.relationship" ng-init="relationships = ['Standard', 'Inverse']" ng-init="relationship = 'Inverse'"></select>
+                </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
                   <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
                 </div>
