@@ -348,6 +348,17 @@ select {
   height: 700px;
   font-size: 12px;
 }
+
+/* this wraps text on ui-grid headers. */
+.ui-grid-header-cell-label {
+  display:inline-block;
+  white-space:initial;
+}
+
+.ui-grid-category {
+  text-align: center;border-right: 0px;box-shadow: -1px 1px #d4d4d4
+}
+
 /* TODO: Something is wrong, fix this later */
 .input-group > select + .input-group-btn > button {
   height: 34px;
@@ -384,6 +395,10 @@ select {
 
 .modal-text {
   font-size: 14px;
+}
+
+.header-text {
+  font-size: 18px;
 }
 
 .icon-cell {

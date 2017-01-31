@@ -207,7 +207,27 @@ export default {
   },
   outputs: {
     title: 'Outputs',
-    noOutputsInManual: 'There are no outputs to set in Manual mode.'
+    noOutputsInManual: 'There are no outputs to set in Manual mode.',
+    modalSelectOutputs: {
+      title: 'Select Outputs',
+      message: 'Select which outputs you would like to add to your analysis.',
+      selectAll: 'Select All',
+      deselectAll: 'Deselect All',
+      newOutputs: 'If the output you want is not listed above, you can enter additional outputs below.  Enter the \'unique name\' of the output.'
+    },
+    selectOutputs: 'Select Outputs',
+    addMeasure: 'Select measure to add more outputs',
+    columns: {
+      displayName: 'Display Name',
+      shortName: 'Short Name',
+      variableType: 'Variable Type',
+      visualize: 'Visualize',
+      objectiveFunction: 'Objective Function',
+      targetValue: 'Target Value',
+      units: 'Units',
+      weightingFactor: 'Weighting Factor',
+      objectiveFunctionGroup: 'Objective Function Group'
+    }
   },
   reports: {
     title: 'Reports',

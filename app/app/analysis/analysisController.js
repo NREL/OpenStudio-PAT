@@ -52,7 +52,7 @@ export class AnalysisController {
     // size grids according to data
     vm.$scope.getTableHeight = function (uid) {
       var rowHeight = 30; // your row height
-      var headerHeight = 30; // your header height
+      var headerHeight = 40; // your header height
       return {
         height: (vm.$scope.gridOptions[uid].data.length * rowHeight + headerHeight + 10) + "px"
       };

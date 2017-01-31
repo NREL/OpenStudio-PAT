@@ -9,7 +9,7 @@ import archiver from 'archiver';
 const {app, dialog} = remote;
 
 export class Project {
-  constructor($q, $log, $http, $uibModal, MeasureManager) {
+  constructor($q, $log, $http, $uibModal, MeasureManager, $sce) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -22,6 +22,7 @@ export class Project {
     vm.$q = $q;
     vm.$http = $http;
     vm.$uibModal = $uibModal;
+    vm.$sce = $sce;
 
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
@@ -355,6 +356,9 @@ export class Project {
     const vm = this;
     vm.$log.debug('In Project::exportOSA');
 
+    // first export common data
+    vm.exportCommon();
+
     // check what kind of analysis it is
     if (vm.analysisType == 'Manual') {
       vm.exportManual();
@@ -396,24 +400,37 @@ export class Project {
     archive.finalize();
   }
 
-  exportManual() {
-    const vm = this;
-    vm.$log.debug('In Project::exportManual');
+  // export data common to both manual and algorithmic workflows
+  exportCommon() {
 
+    const vm = this;
     vm.osa = {};
     vm.osa.analysis = {};
     vm.osa.analysis.display_name = vm.projectName;
     vm.osa.analysis.name = vm.projectName;
 
-    // empty for manual
+    // these are all empty for manual / initialized for algorithmic
     vm.osa.analysis.output_variables = [];
-
     vm.osa.analysis.problem = {};
+    vm.osa.analysis.problem.workflow = [];
+    vm.osa.analysis.problem.algorithm = {objective_functions: []};
+
+    vm.osa.analysis.seed = {};
+    vm.osa.analysis.seed.file_type = 'OSM';
+    vm.osa.analysis.seed.path = './seeds/' + vm.defaultSeed;
+    vm.osa.analysis.weather_file = {};
+    vm.osa.analysis.weather_file.file_type = 'EPW';
+    vm.osa.analysis.weather_file.path = './weather/' + vm.defaultWeatherFile;
+    vm.osa.analysis.file_format_version = 1;
+
+  }
+
+  exportManual() {
+    const vm = this;
+    vm.$log.debug('In Project::exportManual');
+
     //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO which is correct?
     vm.osa.analysis.problem.analysis_type = null;
-    // empty for manual
-    vm.osa.analysis.problem.algorithm = {objective_functions: []};
-    vm.osa.analysis.problem.workflow = [];
 
     // DESIGN ALTERNATIVES ARRAY
     vm.osa.analysis.problem.design_alternatives = [];
@@ -717,20 +734,121 @@ export class Project {
         vm.osa.analysis.problem.workflow.push(m);
       } // end if measure has options or is used
     });
-
-    vm.osa.analysis.seed = {};
-    vm.osa.analysis.seed.file_type = 'OSM';
-    vm.osa.analysis.seed.path = './seeds/' + vm.defaultSeed;
-    vm.osa.analysis.weather_file = {};
-    vm.osa.analysis.weather_file.file_type = 'EPW';
-    vm.osa.analysis.weather_file.path = './weather/' + vm.defaultWeatherFile;
-    vm.osa.analysis.file_format_version = 1;
   }
 
   exportAlgorithmic() {
     const vm = this;
     vm.$log.debug('In Project::exportAlgorithmic');
-    // TODO
+
+    let groupFlag = false;
+    let currentGroup = null;
+    if (['NSGA2', 'SPEA2'].indexOf(vm.samplingMethod.id) != -1) {
+      // this sampling method supports groups
+      groupFlag = true;
+    }
+    let index = 0;
+    // flatten outputs
+    let tempOutputs = [];
+    _.forEach(vm.measures, (measure) => {
+      _.forEach(measure.analysisOutputs, (out) => {
+        out.measure_name = measure.name;
+        out.measure_uid = measure.uid;
+        tempOutputs.push(out);
+      });
+    });
+
+    // order
+    if (groupFlag) {
+      tempOutputs = _.sortBy(tempOutputs, ['obj_function_group']);
+    }
+    vm.$log.debug("tempOutputs sorted: ", tempOutputs);
+
+    _.forEach(tempOutputs, (out) => {
+      vm.$log.debug('OUTPUT: ', out);
+      const outHash = {};
+      outHash.units = out.units;
+      outHash.objective_function = out.objective_function == 'true';  // true or false
+      // only set following fields if object_function is true, otherwise null
+      if (outHash.objective_function){
+
+        if (outHash.objective_function) {
+          if (groupFlag){
+            if (out.obj_function_group == null){
+              if (currentGroup) {
+                // get out of group and increment
+                currentGroup = null;
+                index = index + 1;
+              }
+              outHash.objective_function_index = index;
+              index = index + 1;
+            } else {
+              // group defined
+              if (currentGroup == out.obj_function_group){
+                // same group, don't increment
+                outHash.objective_function_index = index;
+
+              } else if (currentGroup == null){
+                // no group, assign, don't increment
+                currentGroup = out.obj_function_group;
+                outHash.objective_function_index = index;
+
+              } else {
+                // currentGroup != obj_function_group
+                // change group, increment
+                currentGroup = out.obj_function_group;
+                index = index + 1;
+                outHash.objective_function_index = index;
+              }
+            }
+          } else {
+            outHash.objective_function_index = index;
+            // increment
+            index = index + 1;
+          }
+        } else {
+          outHash.objective_function_index = null;
+        }
+        outHash.objective_function_target = vm.typeTargetValue(out.target_value, out.type);
+        outHash.objective_function_group = out.obj_function_group ? out.obj_function_group : null;
+        outHash.scaling_factor = out.weighting_factor ? out.weighting_factor : null;
+      } else {
+        outHash.objective_function_index = null;
+        outHash.objective_function_target = null;
+        outHash.objective_function_group = null;
+        outHash.scaling_factor = null;
+      }
+      outHash.display_name = out.display_name;
+      outHash.display_name_short = out.short_name;
+      outHash.metadata_id = null; // always null for now.  This is related to DEnCity?
+      outHash.name =   out.measure_name + '.' + out.name; // always measure.name . measure.argument.name
+      outHash.visualize = out.visualize;
+      outHash.export = true; // always true
+      outHash.variable_type = out.type;  // options are: string, bool, double, integer?  TODO: find out what these can be. for now: use argument type
+      vm.osa.analysis.output_variables.push(outHash);
+    });
+  }
+
+  typeTargetValue(value, type) {
+    const vm = this;
+    let newVal;
+    if (value == null){
+      newVal = value;
+    } else if (type == 'Double' || type == 'Integer'){
+      // this might be NAN if value cannot be converted
+      newVal = Number(value);
+    } else if (type == 'Bool'){
+      if (value == 'true' || value == '1'){
+        newVal = true;
+      } else if (value == 'false' || value == '0'){
+        newVal = false;
+      } else {
+        // this will cause an error
+        newVal = value;
+      }
+    } else {
+      newVal = value;
+    }
+    return newVal;
   }
 
   // export variables to pat.json
@@ -1842,6 +1960,11 @@ export class Project {
     }
 
     return deferred.promise;
+  }
+
+  html(input) {
+    const vm = this;
+    return vm.$sce.trustAsHtml(input);
   }
 
 }
