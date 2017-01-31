@@ -212,6 +212,9 @@ select {
 .pad-top-20 {
   padding-top: 20px;
 }
+.pad-top-25 {
+  padding-top: 25px;
+}
 
 .pad-top-5 {
   padding-top: 5px;
@@ -431,12 +434,21 @@ select {
   color: #D6D6D6;
 }
 
+.status-text {
+  font-size: 16px;
+}
+
 .view-report-button {
   color: #333;
   background-color: #e6e6e6;
   border-color: #adadad;
   padding:3px;
 
+}
+
+.credentials {
+  border: 1px solid #ddd;
+  padding: 10px;
 }
 
 .small-text {
@@ -447,6 +459,10 @@ select {
 .normal-text {
   font-size:14px;
   font-weight:normal;
+}
+
+.toastr-text {
+  font-size: 14px;
 }
 
 .black-button {
@@ -500,6 +516,12 @@ select {
 
 .library-grid-pencil {
   padding-right: 6px;
+}
+
+.wrap-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 
@@ -573,7 +595,7 @@ select {
 }
 
 .medium-label {
-  font-size: 1.4em;
+  font-size: 1em;
 }
 
 .run-label {

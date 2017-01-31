@@ -33,6 +33,7 @@ export class DependencyManager {
     vm.$log.debug('TEMPDIR HERE: ', app.getPath('temp'));
     vm.src = jetpack.cwd(app.getAppPath() + "/Resources/");
     vm.$log.debug('src:', vm.src.path());
+
   }
 
   // The following are valid names to ask for
