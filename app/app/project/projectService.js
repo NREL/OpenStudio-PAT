@@ -26,8 +26,7 @@ export class Project {
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
 
-    vm.analysisTypes = ['Manual'];
-    //vm.analysisTypes = ['Manual', 'Algorithmic']; // TODO implement this after initial release
+    vm.analysisTypes = ['Manual', 'Algorithmic'];
 
     vm.reportTypes = [{
       id: 'Calibration Report',
@@ -191,6 +190,8 @@ export class Project {
         vm.analysisID = vm.pat.analysisID ? vm.pat.analysisID : vm.analysisID;
         vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
         vm.remoteSettings = vm.pat.remoteSettings ? vm.pat.remoteSettings : vm.remoteSettings;
+        vm.dirToInclude = vm.pat.dirToInclude ? vm.pat.dirToInclude : vm.dirToInclude;
+        vm.dirToUnpackTo = vm.pat.dirToUnpackTo ? vm.pat.dirToUnpackTo : vm.dirToUnpackTo;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
@@ -744,6 +745,8 @@ export class Project {
     vm.pat.seed = vm.defaultSeed;
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
+    vm.pat.dirToInclude = vm.dirToInclude;
+    vm.pat.dirToUnpackTo = vm.dirToUnpackTo;
     vm.pat.remoteSettings = vm.remoteSettings;
     vm.pat.samplingMethod = vm.samplingMethod;
     vm.pat.algorithmSettings = vm.algorithmSettings;
@@ -1253,6 +1256,26 @@ export class Project {
     return vm.analysisType;
   }
 
+  setDirToInclude(dir) {
+    const vm = this;
+    vm.dirToInclude = dir;
+  }
+
+  getDirToInclude() {
+    const vm = this;
+    return vm.dirToInclude;
+  }
+
+  setDirToUnpackTo(dir) {
+    const vm = this;
+    vm.dirToUnpackTo = dir;
+  }
+
+  getDirToUnpackTo() {
+    const vm = this;
+    return vm.dirToUnpackTo;
+  }
+
   setSamplingMethod(method) {
     const vm = this;
     vm.samplingMethod = method;
@@ -1271,7 +1294,6 @@ export class Project {
   setAlgorithmOptions() {
     const at = {};
 
-    at.BatchRun = [];
     at.Morris = [{
       name: 'r',
       description: 'integer giving the number of repetitions of the design',
@@ -1600,9 +1622,6 @@ export class Project {
     const vm = this;
 
     return [{
-      id: 'BatchRun',
-      name: 'analysis.type.batchRun'
-    }, {
       id: 'NSGA2',
       name: 'analysis.type.nsga2'
     }, {

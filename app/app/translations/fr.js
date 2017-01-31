@@ -78,7 +78,10 @@ export default {
       baselinePerturbation: 'BaselinePerturbation'
     },
     algorithmic: {
-      algorithmSetting: 'Algorithm Setting'
+      algorithmSetting: 'Algorithm Settings',
+      filesToInclude: 'Files to Include',
+      dirToInclude: 'Dir to include',
+      dirToUnpackTo: 'Dir to unpack to'
     },
     manual: {
       projectMeasuresAndOptions: 'Project Measures and Options'
