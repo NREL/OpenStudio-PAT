@@ -9,6 +9,10 @@ import YAML from 'yamljs';
 export class OsServer {
   constructor($q, $http, $log, $uibModal, Project, DependencyManager) {
     'ngInject';
+
+    // ignore camelcase for this file
+    /* eslint camelcase: 0 */
+
     const vm = this;
     vm.Project = Project;
     vm.$log = $log;
@@ -320,7 +324,7 @@ export class OsServer {
       // send json to run controller
       vm.$log.debug('PING: Server is started');
       vm.$log.debug('status JSON response: ', response);
-      vm.setServerStatus(serverType,'started');
+      vm.setServerStatus(serverType, 'started');
       deferred.resolve(response);
 
     }, response => {
@@ -431,7 +435,7 @@ export class OsServer {
     } else {
       // amazon cloud
       vm.remoteSettings = vm.Project.getRemoteSettings();
-      vm.$log.debug("in OSServerService::remoteServer, remoteSettings: ", vm.remoteSettings);
+      vm.$log.debug('in OSServerService::remoteServer, remoteSettings: ', vm.remoteSettings);
 
       if (!vm.remoteSettings.credentials || !vm.remoteSettings.credentials.yamlFilename){
         // must select credentials
@@ -446,7 +450,7 @@ export class OsServer {
           // cluster running, connect with DNS
           vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
           vm.$log.debug('Connecting to existing cluster running at: ', dns);
-          vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" '  + vm.Project.fixURL(dns);
+          vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" ' + vm.Project.fixURL(dns);
           vm.$log.debug('Start Server Command: ', vm.startServerCommand);
 
           const child = vm.exec(vm.startServerCommand,
@@ -893,7 +897,7 @@ export class OsServer {
     vm.jetpack.remove(vm.Project.getProjectDir().path('.temp'));
     // delete logs
     vm.jetpack.remove(vm.Project.getProjectDir().path('logs/*'));
-    vm.$log.debug("SERVER CLEANUP COMPLETE");
+    vm.$log.debug('SERVER CLEANUP COMPLETE');
 
   }
 
