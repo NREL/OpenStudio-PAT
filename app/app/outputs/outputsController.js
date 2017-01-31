@@ -12,6 +12,7 @@ export class OutputsController {
     vm.$q = $q;
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
+    vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
 
     // all measures
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
@@ -172,15 +173,6 @@ export class OutputsController {
           type: 'number',
           width: 100,
           minWidth: 50
-        }, {
-          name: 'obj_function_group',
-          displayName: 'outputs.columns.objectiveFunctionGroup',
-          category: 'Objective Function Settings',
-          editDropdownIdLabel: 'name',
-          type: 'number',
-          headerCellFilter: 'translate',
-          width: 100,
-          minWidth: 40
         }],
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.uid] = gridApi;
@@ -190,6 +182,25 @@ export class OutputsController {
           });
         }
       };
+
+      // add objective function groups for SPEA and NSGA only
+      vm.$log.debug('sampling method: ', vm.$scope.selectedSamplingMethod);
+
+      if (['NSGA2', 'SPEA2'].indexOf(vm.$scope.selectedSamplingMethod.id) != -1) {
+        vm.$log.debug('adding objective function group column');
+        const ofg = {
+          name: 'obj_function_group',
+            displayName: 'outputs.columns.objectiveFunctionGroup',
+          category: 'Objective Function Settings',
+          editDropdownIdLabel: 'name',
+          type: 'number',
+          headerCellFilter: 'translate',
+          width: 100,
+          minWidth: 40
+        };
+        vm.$scope.gridOptions[measure.uid].columnDefs.push(ofg);
+      }
+
     });
 
   }
