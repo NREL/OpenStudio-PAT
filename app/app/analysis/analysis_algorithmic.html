@@ -46,33 +46,36 @@
              ng-class="{'glyphicon-chevron-down': settings.open, 'glyphicon-chevron-right': !settings.open}"></i>
           <translate>analysis.algorithmic.filesToInclude</translate>
         </uib-accordion-heading>
-        <div class="row">
-          <div class="col-sm-3">
-            <translate>analysis.algorithmic.dirToInclude</translate>
-          </div>
-          <div class="col-sm-5">
-            <div class="input-group">
-              <div class="col-sm-4">
-                {{analysis.$scope.dirToInclude}}
-              </div>
-              <span class="input-group-btn">
-                <button class="btn btn-default" type="button" ng-click="analysis.selectDirToInclude()"><span class="glyphicon glyphicon-folder-open"></span></button>
-              </span>
-            </div>
-          </div>
+
+        <div class="row pad-bot-10">
+          <div class="col-sm-12 normal-text" translate>analysis.algorithmic.filesToIncludeMessage</div>
         </div>
-        <div class="row">
-          <div class="col-sm-3">
-            <translate>analysis.algorithmic.dirToUnpackTo</translate>
-          </div>
-          <div class="col-sm-5">
-            <div class="input-group">
-              <div class="col-sm-4">
-                <input class="form-control" type="text" ng-model="analysis.$scope.dirToUnpackTo"  ng-blur="analysis.setDirToUnpackTo()">
+
+        <div ng-repeat="file in filesToInclude">
+          <div class="row pad-bot-20">
+            <div class="col-sm-6">
+              <label class="medium-label display-block" translate>analysis.algorithmic.dirToInclude</label>
+              <button class="btn btn-default inline" type="button" ng-click="analysis.selectDirToInclude(file)"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;<translate>analysis.algorithmic.selectDir</translate></button>
+              <span class="normal-text pad-left-5 inline">{{file.dirToInclude}}</span>
+            </div>
+            <div class="col-sm-5">
+              <label class="medium-label inline" for="{{name}}_{{$index}}" translate>analysis.algorithmic.dirToUnpackTo</label>
+              <div class="input-group">
+                <input class="form-control" id="{{name}}_{{$index}}" type="text" ng-model="file.unpackDirName" size="60">
               </div>
             </div>
+            <div class="col-sm-1">
+              <span class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25" ng-click="analysis.deleteDirToInclude($index)" aria-hidden="true" aria-label="Delete Directory"></span>
+            </div>
+           </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-3">
+            <button class="btn btn-success" type="button" ng-click="analysis.addDirToInclude()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;<translate>analysis.algorithmic.addDir</translate></button>
           </div>
         </div>
+
       </uib-accordion-group>
     </uib-accordion>
   </div>

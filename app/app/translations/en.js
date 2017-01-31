@@ -79,9 +79,12 @@ export default {
     },
     algorithmic: {
       algorithmSetting: 'Algorithm Settings',
-      filesToInclude: 'Files to Include',
-      dirToInclude: 'Dir to include',
-      dirToUnpackTo: 'Dir to unpack to'
+      filesToIncludeMessage: 'If your analysis requires additional files to be uploaded to the server, list each directory to include along with the name of the folder to extract to on the server, below.',
+      filesToInclude: 'Additional Analysis Files',
+      dirToInclude: 'Directory to Include',
+      selectDir: 'Select Directory',
+      addDir: 'Add Directory',
+      dirToUnpackTo: 'Directory Name to Unpack to on Server'
     },
     manual: {
       projectMeasuresAndOptions: 'Project Measures and Options'

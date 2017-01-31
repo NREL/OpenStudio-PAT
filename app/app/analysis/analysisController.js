@@ -25,8 +25,7 @@ export class AnalysisController {
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
-    vm.$scope.dirToInclude = vm.Project.getDirToInclude();
-    vm.$scope.dirToUnpackTo = vm.Project.getDirToUnpackTo();
+    vm.$scope.filesToInclude = vm.Project.getFilesToInclude();
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
     _.forEach(vm.$scope.measures, (measure) => {
@@ -658,19 +657,19 @@ export class AnalysisController {
     vm.initializeGrids();
   }
 
-  setDirToInclude() {
-    const vm = this;
-    vm.$log.debug('In setDirToInclude in analysis');
-    vm.setIsModified();
-    vm.Project.setDirToInclude(vm.$scope.dirToInclude);
-  }
+  // setDirToInclude() {
+  //   const vm = this;
+  //   vm.$log.debug('In setDirToInclude in analysis');
+  //   vm.setIsModified();
+  //   vm.Project.setDirToInclude(vm.$scope.dirToInclude);
+  // }
 
-  setDirToUnpackTo() {
-    const vm = this;
-    vm.$log.debug('In setDirToUnpackTo in analysis');
-    vm.setIsModified();
-    vm.Project.setDirToUnpackTo(vm.$scope.dirToUnpackTo);
-  }
+  // setDirToUnpackTo() {
+  //   const vm = this;
+  //   vm.$log.debug('In setDirToUnpackTo in analysis');
+  //   vm.setIsModified();
+  //   vm.Project.setDirToUnpackTo(vm.$scope.dirToUnpackTo);
+  // }
 
   setSamplingMethod() {
     const vm = this;
@@ -705,7 +704,7 @@ export class AnalysisController {
     });
   }
 
-  selectDirToInclude() {
+  selectDirToInclude(file) {
     const vm = this;
 
     const result = vm.dialog.showOpenDialog({
@@ -715,9 +714,25 @@ export class AnalysisController {
 
     if (!_.isEmpty(result)) {
       vm.$log.debug(' result[0]:', result[0]);
-      vm.$scope.dirToInclude = result[0];
-      vm.setDirToInclude(result[0]);
+      file.dirToInclude = result[0];
+      vm.setIsModified();
     }
+  }
+
+  addDirToInclude() {
+    const vm = this;
+    vm.$log.debug('In analysis::addDirToInclude');
+    vm.$scope.filesToInclude.push({dirToInclude: null, unpackDirName: null});
+    vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
+  }
+
+  deleteDirToInclude(index) {
+    const vm = this;
+    vm.$log.debug('In analysis::deleteDirToInclude, remove at index: ', index);
+    if (index){
+      _.pullAt(vm.$scope.filesToInclude, index);
+    }
+    vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
   }
 
   selectSeedModel() {

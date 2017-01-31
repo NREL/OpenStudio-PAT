@@ -82,6 +82,8 @@ export class Project {
     vm.algorithmSettings = [];
     vm.measures = [];
     vm.designAlternatives = [];
+    vm.filesToInclude = [];
+    vm.serverScripts = [];
 
     vm.analysisID = '';
     vm.datapoints = [];
@@ -125,6 +127,8 @@ export class Project {
     vm.weatherFilesDropdownArr = [];
     vm.setSeedsDropdownOptions();
     vm.setWeatherFilesDropdownOptions();
+    vm.filesToInclude = [];
+    vm.serverScripts = [];
 
     vm.analysisType = 'Manual';
     vm.reportType = 'Calibration Report';
@@ -191,8 +195,8 @@ export class Project {
         vm.analysisID = vm.pat.analysisID ? vm.pat.analysisID : vm.analysisID;
         vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
         vm.remoteSettings = vm.pat.remoteSettings ? vm.pat.remoteSettings : vm.remoteSettings;
-        vm.dirToInclude = vm.pat.dirToInclude ? vm.pat.dirToInclude : vm.dirToInclude;
-        vm.dirToUnpackTo = vm.pat.dirToUnpackTo ? vm.pat.dirToUnpackTo : vm.dirToUnpackTo;
+        vm.filesToInclude = vm.pat.filesToInclude ? vm.pat.filesToInclude : vm.filesToInclude;
+        vm.serverScripts = vm.pat.serverScripts ? vm.pat.serverScripts : vm.serverScripts;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
@@ -877,6 +881,10 @@ export class Project {
     // measures and options
     vm.pat.measures = vm.measures;
 
+    // files to include
+    vm.pat.filesToInclude = vm.filesToInclude;
+    vm.pat.serverScripts = vm.serverScripts;
+
     // design alternatives
     vm.pat.designAlternatives = vm.designAlternatives;
 
@@ -1374,24 +1382,9 @@ export class Project {
     return vm.analysisType;
   }
 
-  setDirToInclude(dir) {
+  getFilesToInclude() {
     const vm = this;
-    vm.dirToInclude = dir;
-  }
-
-  getDirToInclude() {
-    const vm = this;
-    return vm.dirToInclude;
-  }
-
-  setDirToUnpackTo(dir) {
-    const vm = this;
-    vm.dirToUnpackTo = dir;
-  }
-
-  getDirToUnpackTo() {
-    const vm = this;
-    return vm.dirToUnpackTo;
+    return vm.filesToInclude;
   }
 
   setSamplingMethod(method) {
