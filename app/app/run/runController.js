@@ -50,6 +50,9 @@ export class RunController {
     vm.$scope.clusters = vm.Project.getClusters();
     vm.$scope.awsYamlFiles = vm.Project.getAwsYamlFiles();
 
+    // clear out aws settings if can't find file
+    vm.resetAwsCredentials();
+
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
@@ -149,6 +152,14 @@ export class RunController {
     let yamlData = YAML.parse(yamlStr);
     vm.$scope.remoteSettings.credentials.accessKey = yamlData.accessKey.substr(0,4) + '****';
     yamlData = null;
+  }
+
+  resetAwsCredentials() {
+    const vm = this;
+    if (_.find(vm.$scope.awsYamlFiles, vm.$scope.remoteSettings.credentials.yamlFilename) == undefined) {
+      vm.$scope.remoteSettings.credentials.accessKey = null;
+      vm.$scope.remoteSettings.credentials.awsYamlFile = null;
+    }
   }
 
   newAwsCredentialsModal(){
