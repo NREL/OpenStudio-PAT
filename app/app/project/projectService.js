@@ -730,36 +730,91 @@ export class Project {
     const vm = this;
     vm.$log.debug('In Project::exportAlgorithmic');
 
-    // TODO: we are assuming here that output order doesn't matter (for now: match order measures are added to project, not order outputs were added)
+    let groupFlag = false;
+    let currentGroup = null;
+    if (['NSGA2', 'SPEA2'].indexOf(vm.samplingMethod.id) != -1) {
+      // this sampling method supports groups
+      groupFlag = true;
+    }
     let index = 0;
+    // flatten outputs
+    let tempOutputs = [];
     _.forEach(vm.measures, (measure) => {
       _.forEach(measure.analysisOutputs, (out) => {
-        vm.$log.debug('OUTPUT: ', out);
-        const outHash = {};
-        outHash.units = out.units;
-        outHash.objective_function = out.objective_function == 'true';  // true or false
-        // only set following fields if object_function is true, otherwise null
-        if (out.objective_function){
-          outHash.objective_function_index = outHash.objective_function ? index : null;
-          if (outHash.objective_function) index = index + 1; // increment
-          outHash.objective_function_target = vm.typeTargetValue(out.target_value, out.type);
-          outHash.objective_function_group = out.obj_function_group ? out.obj_function_group : null;
-          outHash.scaling_factor = out.weighting_factor ? out.weighting_factor : null;
+        out.measure_name = measure.name;
+        out.measure_uid = measure.uid;
+        tempOutputs.push(out);
+      });
+    });
+
+    // order
+    if (groupFlag) {
+      tempOutputs = _.sortBy(tempOutputs, ['obj_function_group']);
+    }
+    vm.$log.debug("tempOutputs sorted: ", tempOutputs);
+
+    _.forEach(tempOutputs, (out) => {
+      vm.$log.debug('OUTPUT: ', out);
+      const outHash = {};
+      outHash.units = out.units;
+      outHash.objective_function = out.objective_function == 'true';  // true or false
+      // only set following fields if object_function is true, otherwise null
+      if (outHash.objective_function){
+
+        if (outHash.objective_function) {
+          if (groupFlag){
+            if (out.obj_function_group == null){
+              if (currentGroup) {
+                // get out of group and increment
+                currentGroup = null;
+                index = index + 1;
+              }
+              outHash.objective_function_index = index;
+              index = index + 1;
+            } else {
+              // group defined
+              if (currentGroup == out.obj_function_group){
+                // same group, don't increment
+                outHash.objective_function_index = index;
+
+              } else if (currentGroup == null){
+                // no group, assign, don't increment
+                currentGroup = out.obj_function_group;
+                outHash.objective_function_index = index;
+
+              } else {
+                // currentGroup != obj_function_group
+                // change group, increment
+                currentGroup = out.obj_function_group;
+                index = index + 1;
+                outHash.objective_function_index = index;
+              }
+            }
+          } else {
+            outHash.objective_function_index = index;
+            // increment
+            index = index + 1;
+          }
         } else {
           outHash.objective_function_index = null;
-          outHash.objective_function_target = null;
-          outHash.objective_function_group = null;
-          outHash.scaling_factor = null;
         }
-        outHash.display_name = out.display_name;
-        outHash.display_name_short = out.short_name;
-        outHash.metadata_id = null; // always null for now.  This is related to DEnCity?
-        outHash.name =   measure.name + '.' + out.name; // always measure.name . measure.argument.name
-        outHash.visualize = out.visualize;
-        outHash.export = true; // always true
-        outHash.variable_type = out.type;  // options are: string, bool, double, integer?  TODO: find out what these can be. for now: use argument type
-        vm.osa.analysis.output_variables.push(outHash);
-      });
+        outHash.objective_function_target = vm.typeTargetValue(out.target_value, out.type);
+        outHash.objective_function_group = out.obj_function_group ? out.obj_function_group : null;
+        outHash.scaling_factor = out.weighting_factor ? out.weighting_factor : null;
+      } else {
+        outHash.objective_function_index = null;
+        outHash.objective_function_target = null;
+        outHash.objective_function_group = null;
+        outHash.scaling_factor = null;
+      }
+      outHash.display_name = out.display_name;
+      outHash.display_name_short = out.short_name;
+      outHash.metadata_id = null; // always null for now.  This is related to DEnCity?
+      outHash.name =   out.measure_name + '.' + out.name; // always measure.name . measure.argument.name
+      outHash.visualize = out.visualize;
+      outHash.export = true; // always true
+      outHash.variable_type = out.type;  // options are: string, bool, double, integer?  TODO: find out what these can be. for now: use argument type
+      vm.osa.analysis.output_variables.push(outHash);
     });
   }
 
