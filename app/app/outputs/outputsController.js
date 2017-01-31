@@ -22,6 +22,7 @@ export class OutputsController {
 
     // initialize grid dropdowns
     vm.booleanDropdownArr = [{id: 'true', name: 'true'}, {id: 'false', name: 'false'}];
+    vm.variableTypeDropdownArr = [{id: 'Double'}, {id: 'Integer'}, {id:'Bool'}, {id:'String'}];
 
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
@@ -129,7 +130,18 @@ export class OutputsController {
           category: 'Output Selection',
           width: 150,
           minWidth: 80
-        }, {
+        },{
+          name: 'type',
+          displayName: 'outputs.columns.variableType',
+          headerCellFilter: 'translate',
+          editDropdownOptionsArray: vm.variableTypeDropdownArr,
+          editableCellTemplate: 'ui-grid/dropdownEditor',
+          editDropdownIdLabel: 'id',
+          editDropdownValueLabel: 'id',
+          category: 'Output Selection',
+          width: 100,
+          minWidth: 70
+        },{
           name: 'visualize',
           displayName: 'outputs.columns.visualize',
           editableCellTemplate: 'ui-grid/dropdownEditor',

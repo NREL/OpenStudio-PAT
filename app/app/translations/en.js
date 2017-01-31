@@ -215,6 +215,7 @@ export default {
     columns: {
       displayName: 'Display Name',
       shortName: 'Short Name',
+      variableType: 'Variable Type',
       visualize: 'Visualize',
       objectiveFunction: 'Objective Function',
       targetValue: 'Target Value',
