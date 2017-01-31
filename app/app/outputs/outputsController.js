@@ -1,6 +1,6 @@
 export class OutputsController {
 
-  constructor($log, Project, $scope, $uibModal, $q) {
+  constructor($log, Project, $scope, $uibModal, $q, $window) {
     'ngInject';
 
     const vm = this;
@@ -10,6 +10,7 @@ export class OutputsController {
     vm.Project = Project;
     vm.$uibModal = $uibModal;
     vm.$q = $q;
+    vm.$window = $window;
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
@@ -93,6 +94,7 @@ export class OutputsController {
 
   setGridOptions() {
     const vm = this;
+
     _.forEach(vm.$scope.outputMeasures, (measure) => {
 
       if (measure.analysisOutputs == undefined) measure.analysisOutputs = [];
@@ -191,6 +193,11 @@ export class OutputsController {
           gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
             // set modified
             vm.setIsModified();
+            // check if obj function is selected on an invalid variable type (only when editing objective_function or type
+            if ((['objective_function', 'type'].indexOf(colDef.name) != -1) && oldValue != newValue && rowEntity.objective_function == 'true' && ['Double', 'Integer', 'Bool'].indexOf(rowEntity.type) == -1 ){
+              // invalid choice for objective function
+              vm.$window.alert('Objective Functions can only be used with outputs of type Double, Integer, or Bool.');
+            }
           });
         }
       };
