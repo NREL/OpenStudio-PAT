@@ -21,7 +21,6 @@ export class OutputsController {
 
     // initialize grid dropdowns
     vm.booleanDropdownArr = [{id: 'true', name: 'true'}, {id: 'false', name: 'false'}];
-    vm.objFunctionGroupDropdownArr = vm.setObjFunctionGroupDropdown();
 
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
@@ -32,28 +31,20 @@ export class OutputsController {
       var rowHeight = 30; // row height
       var headerHeight = 55; // header height
       const m = _.find(vm.$scope.measures, {uid: uid});
-      const length = _.filter(m.outputs, {checked: true}).length;
+      const length = _.filter(m.analysisOutputs).length;
       vm.$log.debug('data length: ', length);
       return {
-        height: (length * rowHeight + headerHeight + 10) + "px"
+        height: (length * rowHeight + headerHeight + 15) + "px"
       };
     };
 
   }
 
-  setObjFunctionGroupDropdown() {
-    const vm = this;
-    const arr = [];
-    _.forEach([1,2,3,4,5,6,7,8,9,10], (num) => {
-      arr.push({id: num, name: num});
-    });
-    vm.$log.debug('ObjFunctionGroupDropdownArr: ', arr);
-    return arr;
-  }
-
   setOutputMeasures() {
     const vm = this;
-    vm.$scope.outputMeasures = [];
+    if (!vm.$scope.outputMeasures){
+      vm.$scope.outputMeasures = [];
+    }
 
     // always add openstudio result measure first, followed by calibration measure (if they exist)
     // retrieve by name or uid?
@@ -73,6 +64,13 @@ export class OutputsController {
     // user-added measures
     const others = _.filter(vm.$scope.measures, {outputMeasure: true} );
     vm.$scope.outputMeasures = _.union(vm.$scope.outputMeasures, others);
+
+    // ensure there's a key for user-defined outputs
+    _.forEach(vm.$scope.outputMeasures, (measure) => {
+      if (!measure.userDefinedOutputs){
+        measure.userDefinedOutputs = [];
+      }
+    });
 
     vm.$log.debug('Output Measures: ', vm.$scope.outputMeasures);
 
@@ -178,11 +176,8 @@ export class OutputsController {
           name: 'obj_function_group',
           displayName: 'outputs.columns.objectiveFunctionGroup',
           category: 'Objective Function Settings',
-          editableCellTemplate: 'ui-grid/dropdownEditor',
           editDropdownIdLabel: 'name',
           type: 'number',
-          editDropdownOptionsArray: vm.objFunctionGroupDropdownArr,
-          editDropdownValueLabel: 'name',
           headerCellFilter: 'translate',
           width: 100,
           minWidth: 40

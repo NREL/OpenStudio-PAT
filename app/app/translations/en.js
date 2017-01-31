@@ -208,7 +208,8 @@ export default {
       title: 'Select Outputs',
       message: 'Select which outputs you would like to add to your analysis.',
       selectAll: 'Select All',
-      deselectAll: 'Deselect All'
+      deselectAll: 'Deselect All',
+      newOutputs: 'If the output you want is not listed above, you can enter additional outputs below.  Enter the \'unique name\' of the output.'
     },
     selectOutputs: 'Select Outputs',
     columns: {

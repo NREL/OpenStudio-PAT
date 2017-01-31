@@ -35,15 +35,37 @@ export class ModalSelectOutputsController {
         // remove
         _.remove(vm.$scope.measure.analysisOutputs, {name: output.name});
       }
-
     });
-    vm.$uibModalInstance.close(vm.$scope.measure);
+    // check for userDefined Outputs
+    _.forEach(vm.$scope.measure.userDefinedOutputs, (output) => {
+      if (!_.find(vm.$scope.measure.analysisOutputs, {name: output.name})) {
+        // add
+        output.display_name = output.display_name ? output.display_name : output.name;
+        output.short_name = output.short_name ? output.short_name : output.name;
+        vm.$scope.measure.analysisOutputs.push(output);
+      }
+    });
 
+    vm.$uibModalInstance.close(vm.$scope.measure);
   }
 
   cancel() {
     const vm = this;
     vm.$uibModalInstance.dismiss('cancel');
+  }
+
+  addOutput() {
+    const vm = this;
+    vm.$scope.measure.userDefinedOutputs.push({name: '', userDefined: true});
+    
+  }
+
+  deleteOutput(output) {
+    const vm = this;
+    // remove from userDefinedArray
+    _.remove(vm.$scope.measure.userDefinedOutputs, {name: output.name});
+    // remove from analysisOutputs also
+    _.remove(vm.$scope.measure.analysisOutputs, {name: output.name, userDefined: true});
   }
 
 }

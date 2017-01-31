@@ -4,7 +4,7 @@
 
 <div class="modal-body">
   <div class="row pad-bot-20">
-    <div class="col-md-12 modal-text">
+    <div class="col-sm-12 modal-text">
       <translate>outputs.modalSelectOutputs.message</translate>
     </div>
   </div>
@@ -38,7 +38,26 @@
       </div>
     </div>
   </div>
+  <div class="row pad-bot-10">
+    <div class="col-sm-12 modal-text">
+      <translate>outputs.modalSelectOutputs.newOutputs</translate>
+    </div>
+  </div>
+  <div class="row pad-bot-10">
+    <div class="col-sm-12 bold ">
+      <div class="row pad-bot-10" ng-repeat="output in measure.userDefinedOutputs">
+        <div class="col-sm-8 pad-left-25 normal-text">
+          <input type="text" id="userDefinedOutput_{{$index}}" ng-model="output.name" class="form-control">
+        </div>
+        <div class="col-sm-1 pad-top-5">
+          <span class="glyphicon glyphicon-remove-sign black-button header-text" ng-click="modal.deleteOutput(output)" aria-hidden="true" aria-label="Delete Output"></span>
+        </div>
+      </div>
+      <button type="button" class="btn btn-success" ng-click="modal.addOutput()"><span class="glyphicon glyphicon-plus" aria-hidden="true" aria-label="Add Output"></span> Add Output</button>
+    </div>
+  </div>
 </div>
+
 
 <div class="modal-footer">
   <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
