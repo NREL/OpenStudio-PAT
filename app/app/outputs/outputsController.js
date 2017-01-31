@@ -17,6 +17,7 @@ export class OutputsController {
 
     // all measures
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+    vm.$scope.measureToAdd = null;
 
     // (current) output measures
     vm.setOutputMeasures();
@@ -72,6 +73,13 @@ export class OutputsController {
     _.forEach(vm.$scope.outputMeasures, (measure) => {
       if (!measure.userDefinedOutputs){
         measure.userDefinedOutputs = [];
+      }
+    });
+
+    // make sure all measures have a outputMeasure key
+    _.forEach(vm.$scope.measures, (measure) => {
+      if (!measure.outputMeasure){
+        measure.outputMeasure = false;
       }
     });
 
@@ -266,7 +274,21 @@ export class OutputsController {
   removeMeasure(measure) {
     const vm = this;
     measure.outputMeasure = false;
-    // todo: remote anything else from data structure? For now: keep just in case
+    _.remove(vm.$scope.outputMeasures, {uid: measure.uid});
+  }
+
+  addMeasure() {
+    const vm = this;
+    vm.$log.debug('in Outputs::addMeasure');
+    if (vm.$scope.measureToAdd){
+      vm.$log.debug('Adding this measure: ', vm.$scope.measureToAdd);
+      const measure = _.find(vm.$scope.measures, {uid: vm.$scope.measureToAdd.uid});
+      if (measure) {
+        measure.outputMeasure = true;
+        vm.setOutputMeasures();
+        vm.initializeGrids();
+      }
+    }
   }
 
   setIsModified() {

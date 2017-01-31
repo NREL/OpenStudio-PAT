@@ -212,6 +212,7 @@ export default {
       newOutputs: 'If the output you want is not listed above, you can enter additional outputs below.  Enter the \'unique name\' of the output.'
     },
     selectOutputs: 'Select Outputs',
+    addMeasure: 'Select measure to add more outputs',
     columns: {
       displayName: 'Display Name',
       shortName: 'Short Name',
