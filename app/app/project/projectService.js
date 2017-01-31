@@ -738,11 +738,19 @@ export class Project {
         const outHash = {};
         outHash.units = out.units;
         outHash.objective_function = out.objective_function == 'true';  // true or false
-        outHash.objective_function_index = outHash.objective_function ? index : null;
-        if (outHash.objective_function) index = index + 1; // increment
-        outHash.objective_function_target = out.target_value;
-        outHash.objective_function_group = out.obj_function_group ? out.obj_function_group : null;
-        outHash.scaling_factor = out.weighting_factor;
+        // only set following fields if object_function is true, otherwise null
+        if (out.objective_function){
+          outHash.objective_function_index = outHash.objective_function ? index : null;
+          if (outHash.objective_function) index = index + 1; // increment
+          outHash.objective_function_target = vm.typeTargetValue(out.target_value, out.type);
+          outHash.objective_function_group = out.obj_function_group ? out.obj_function_group : null;
+          outHash.scaling_factor = out.weighting_factor ? out.weighting_factor : null;
+        } else {
+          outHash.objective_function_index = null;
+          outHash.objective_function_target = null;
+          outHash.objective_function_group = null;
+          outHash.scaling_factor = null;
+        }
         outHash.display_name = out.display_name;
         outHash.display_name_short = out.short_name;
         outHash.metadata_id = null; // always null for now.  This is related to DEnCity?
@@ -753,6 +761,29 @@ export class Project {
         vm.osa.analysis.output_variables.push(outHash);
       });
     });
+  }
+
+  typeTargetValue(value, type) {
+    const vm = this;
+    let newVal;
+    if (value == null){
+      newVal = value;
+    } else if (type == 'Double' || type == 'Integer'){
+      // this might be NAN if value cannot be converted
+      newVal = Number(value);
+    } else if (type == 'Bool'){
+      if (value == 'true' || value == '1'){
+        newVal = true;
+      } else if (value == 'false' || value == '0'){
+        newVal = false;
+      } else {
+        // this will cause an error
+        newVal = value;
+      }
+    } else {
+      newVal = value;
+    }
+    return newVal
   }
 
   // export variables to pat.json
