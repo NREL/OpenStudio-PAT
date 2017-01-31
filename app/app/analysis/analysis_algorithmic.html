@@ -6,15 +6,32 @@
           <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': settings.open, 'glyphicon-chevron-right': !settings.open}"></i>
           <translate>analysis.algorithmic.algorithmSetting</translate>
         </uib-accordion-heading>
-        <div ng-repeat="option in algorithmSettings">
-          <div class="row">
-            <div class="col-sm-10">
-              <label for="{{option.name}}">{{option.name}}</label><br/>
-              <label for="{{option.name}}">{{option.description}}</label>
-              <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}" ng-model="option.value">
+
+        <div class="row pad-bot-10">
+          <div class="col-sm-6">
+            <div ng-repeat="option in algorithmSettings" ng-if="$odd">
+              <div class="row pad-bot-10">
+                <div class="col-sm-12">
+                  <label class="medium-label" for="{{option.name}}">{{option.name}}</label>
+                  <span ng-if="option.description" class="small-text inline">&mdash; {{option.description}}</span>
+                    <input type="text" class="form-control" id="{{option.name}}" placeholder="{{option.defaultValue}}" ng-model="option.value">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div ng-repeat="option in algorithmSettings" ng-if="$even">
+              <div class="row pad-bot-10">
+                <div class="col-sm-12">
+                  <label class="medium-label" for="{{option.name}}">{{option.name}}</label>
+                  <span class="small-text inline">{{option.description}}</span>
+                  <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}" ng-model="option.value">
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
       </uib-accordion-group>
     </uib-accordion>
   </div>
