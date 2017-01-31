@@ -81,7 +81,8 @@ export default {
       algorithmSetting: 'Algorithm Settings',
       filesToInclude: 'Files to Include',
       dirToInclude: 'Dir to include',
-      dirToUnpackTo: 'Dir to unpack to'
+      dirToUnpackTo: 'Dir to unpack to',
+      skipThisMeasure: 'Skip this measure'
     },
     manual: {
       projectMeasuresAndOptions: 'Project Measures and Options'

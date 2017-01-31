@@ -1005,10 +1005,12 @@ export class AnalysisController {
     vm.$log.debug('In initializeValues');
 
     _.forEach(vm.$scope.measures, (measure) => {
+
+      measure.skip = _.isNil(measure.skip) ? false : measure.skip;
+
       _.forEach(measure.arguments, (arg) => {
         if (_.isNil(arg.inputs)) {
           let relationship = 'Standard';
-          let skip = 'false';
           let defaultValue = 0;
           let choiceDisplayNames = _.isNil(arg.choice_display_names) ? '' : arg.choice_display_names;
           let name = _.isNil(arg.name) ? [] : arg.name;
@@ -1048,7 +1050,6 @@ export class AnalysisController {
 
             let inputs = {
               relationship: relationship,
-              __SKIP__: skip,
               choice_display_names: choiceDisplayNames,
               default_value: defaultValue,
               deltaX: deltaX,
