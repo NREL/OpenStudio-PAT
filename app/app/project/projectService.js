@@ -83,7 +83,7 @@ export class Project {
     vm.measures = [];
     vm.designAlternatives = [];
     vm.filesToInclude = [];
-    vm.serverScripts = [];
+    vm.setServerScripts();
 
     vm.analysisID = '';
     vm.datapoints = [];
@@ -128,7 +128,7 @@ export class Project {
     vm.setSeedsDropdownOptions();
     vm.setWeatherFilesDropdownOptions();
     vm.filesToInclude = [];
-    vm.serverScripts = [];
+    vm.setServerScripts();
 
     vm.analysisType = 'Manual';
     vm.reportType = 'Calibration Report';
@@ -169,6 +169,8 @@ export class Project {
       if (vm.jetpack.exists(filename)) {
         // existing project
         vm.pat = vm.jetpack.read(filename, 'json');
+        vm.$log.debug('PAT.json: ', vm.pat);
+        vm.$log.debug('filename: ', filename);
 
         vm.measures = vm.pat.measures;
         if (!angular.isDefined(vm.measures)) {
@@ -201,6 +203,8 @@ export class Project {
     } else {
       vm.$log.error('No project selected...cannot initialize project');
     }
+
+    vm.$log.debug("Server Scripts: ", vm.serverScripts);
 
   }
 
@@ -1385,6 +1389,22 @@ export class Project {
   getFilesToInclude() {
     const vm = this;
     return vm.filesToInclude;
+  }
+
+  setServerScripts() {
+    const vm = this;
+    vm.serverScripts = {
+      server_initialization: {file: null, arguments: []},
+      server_finalization: {file: null, arguments: []},
+      worker_initialization: {file: null, arguments: []},
+      worker_finalization: {file: null, arguments: []}
+    };
+    vm.$log.debug('setServerScripts: ', vm.serverScripts);
+  }
+
+  getServerScripts() {
+    const vm = this;
+    return vm.serverScripts;
   }
 
   setSamplingMethod(method) {

@@ -84,7 +84,16 @@ export default {
       dirToInclude: 'Directory to Include',
       selectDir: 'Select Directory',
       addDir: 'Add Directory',
-      dirToUnpackTo: 'Directory Name to Unpack to on Server'
+      dirToUnpackTo: 'Directory Name to Unpack to on Server',
+      server_initialization: 'Server Initialization Script',
+      server_finalization: 'Server Finalization Script',
+      worker_initialization: 'Worker Initialization Script',
+      worker_finalization: 'Worker Finalization Script',
+      selectScript: 'Select Script File',
+      args: 'Script Arguments',
+      addArg: 'Add Argument',
+      serverScripts: 'Server Scripts',
+      serverScriptsMessage: 'If your analysis requires server and worker initialization or finalization scripts, add them here.  Note that these scripts will not run on a local server; they can only be run on a cloud server.'
     },
     manual: {
       projectMeasuresAndOptions: 'Project Measures and Options'

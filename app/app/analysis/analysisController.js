@@ -26,6 +26,8 @@ export class AnalysisController {
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.filesToInclude = vm.Project.getFilesToInclude();
+    vm.$scope.serverScripts = vm.Project.getServerScripts();
+    vm.$log.debug('ServerScripts: ', vm.$scope.serverScripts);
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
     _.forEach(vm.$scope.measures, (measure) => {
@@ -729,10 +731,39 @@ export class AnalysisController {
   deleteDirToInclude(index) {
     const vm = this;
     vm.$log.debug('In analysis::deleteDirToInclude, remove at index: ', index);
-    if (index){
-      _.pullAt(vm.$scope.filesToInclude, index);
+    if (!_.isNil(index)){
+      vm.$scope.filesToInclude.splice(index, 1);
     }
     vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
+  }
+
+  selectScript(type){
+    const vm = this;
+    const result = vm.dialog.showOpenDialog({
+      title: 'Select Script',
+      properties: ['openFile']
+    });
+
+    if (!_.isEmpty(result)) {
+      vm.$log.debug(' result[0]:', result[0]);
+      vm.$scope.serverScripts[type].file = result[0];
+      vm.setIsModified();
+    }
+  }
+
+  addScriptArgument(type) {
+    const vm = this;
+    vm.$scope.serverScripts[type].arguments.push(null);
+  }
+
+  deleteScriptArgument(type, index){
+    const vm = this;
+    vm.$log.debug("deleting at index: ", index);
+    vm.$log.debug('arguments: ', vm.$scope.serverScripts[type].arguments);
+    if (!_.isNil(index)){
+      vm.$scope.serverScripts[type].arguments.splice(index, 1);
+    }
+    vm.$log.debug('New Arguments for type: ', type, ' are: ', vm.$scope.serverScripts[type].arguments);
   }
 
   selectSeedModel() {
