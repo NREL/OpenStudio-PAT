@@ -1175,7 +1175,7 @@ export class Project {
   getDNSFromFile(clusterName){
     const vm = this;
     let dns = null;
-    if (vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
+    if (clusterName && vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
       const clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName, clusterName + '.json'), 'json');
       vm.$log.debug('Cluster File Data: ', clusterData);
       if (clusterData && clusterData.server && clusterData.server.dns) {
@@ -1188,7 +1188,7 @@ export class Project {
   readClusterFile(clusterName){
     const vm = this;
     let clusterData = {};
-    if (vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
+    if (clusterName && vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
       clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName, clusterName + '.json'), 'json');
     }
     return clusterData;
