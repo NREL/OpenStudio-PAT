@@ -15,7 +15,8 @@
                 <div class="col-sm-12">
                   <label class="medium-label" for="{{option.name}}">{{option.name}}</label>
                   <span ng-if="option.description" class="small-text inline">&mdash; {{option.description}}</span>
-                    <input type="text" class="form-control" id="{{option.name}}" placeholder="{{option.defaultValue}}" ng-model="option.value">
+                  <input type="text" class="form-control" id="{{option.name}}" placeholder="{{option.defaultValue}}"
+                         ng-model="option.value">
                 </div>
               </div>
             </div>
@@ -26,7 +27,8 @@
                 <div class="col-sm-12">
                   <label class="medium-label" for="{{option.name}}">{{option.name}}</label>
                   <span class="small-text inline">{{option.description}}</span>
-                  <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}" ng-model="option.value">
+                  <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}"
+                         ng-model="option.value">
                 </div>
               </div>
             </div>
@@ -56,24 +58,34 @@
           <div class="row pad-bot-20">
             <div class="col-sm-6">
               <label class="medium-label display-block" translate>analysis.algorithmic.dirToInclude</label>
-              <button class="btn btn-default inline" type="button" ng-click="analysis.selectDirToInclude(file)"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;<translate>analysis.algorithmic.selectDir</translate></button>
+              <button class="btn btn-default inline" type="button" ng-click="analysis.selectDirToInclude(file)"><span
+                class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;
+                <translate>analysis.algorithmic.selectDir</translate>
+              </button>
               <span class="normal-text pad-left-5 inline">{{file.dirToInclude}}</span>
             </div>
             <div class="col-sm-5">
-              <label class="medium-label inline" for="{{name}}_{{$index}}" translate>analysis.algorithmic.dirToUnpackTo</label>
+              <label class="medium-label inline" for="{{name}}_{{$index}}"
+                     translate>analysis.algorithmic.dirToUnpackTo</label>
               <div class="input-group">
-                <input class="form-control" id="{{name}}_{{$index}}" type="text" ng-model="file.unpackDirName" size="60">
+                <input class="form-control" id="{{name}}_{{$index}}" type="text" ng-model="file.unpackDirName"
+                       size="60">
               </div>
             </div>
             <div class="col-sm-1">
-              <span class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25" ng-click="analysis.deleteDirToInclude($index)" aria-hidden="true" aria-label="Delete Directory"></span>
+              <span class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25"
+                    ng-click="analysis.deleteDirToInclude($index)" aria-hidden="true"
+                    aria-label="Delete Directory"></span>
             </div>
-           </div>
+          </div>
         </div>
 
         <div class="row">
           <div class="col-sm-3">
-            <button class="btn btn-success" type="button" ng-click="analysis.addDirToInclude()"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;<translate>analysis.algorithmic.addDir</translate></button>
+            <button class="btn btn-success" type="button" ng-click="analysis.addDirToInclude()"><span
+              class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;
+              <translate>analysis.algorithmic.addDir</translate>
+            </button>
           </div>
         </div>
 
@@ -99,8 +111,12 @@
         <div ng-repeat="(scriptType, scriptData) in serverScripts">
           <div class="row pad-top-10 pad-bot-20 border-bot">
             <div class="col-sm-6">
-              <label class="medium-label display-block"><span translate='analysis.algorithmic.{{scriptType}}'></span></label>
-              <button class="btn btn-default inline" type="button" ng-click="analysis.selectScript(scriptType)"><span class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;<translate>analysis.algorithmic.selectScript</translate></button>
+              <label class="medium-label display-block"><span
+                translate='analysis.algorithmic.{{scriptType}}'></span></label>
+              <button class="btn btn-default inline" type="button" ng-click="analysis.selectScript(scriptType)"><span
+                class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;
+                <translate>analysis.algorithmic.selectScript</translate>
+              </button>
               <span class="normal-text pad-left-5 inline">{{scriptData.file}}</span>
             </div>
             <div class="col-sm-6">
@@ -109,10 +125,16 @@
               <div class="row">
                 <div class="col-sm-10">
                   <div ng-repeat="arg in scriptData.arguments track by $index">
-                    <input type="text" class="form-control margin-bot-5 width-80 inline" name="arg_{{$index}}" ng-model="scriptData.arguments[$index]">
-                    &nbsp;<span class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25 inline" ng-click="analysis.deleteScriptArgument(scriptType, $index)" aria-hidden="true" aria-label="Delete Argument"></span>
+                    <input type="text" class="form-control margin-bot-5 width-80 inline" name="arg_{{$index}}"
+                           ng-model="scriptData.arguments[$index]">
+                    &nbsp;<span class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25 inline"
+                                ng-click="analysis.deleteScriptArgument(scriptType, $index)" aria-hidden="true"
+                                aria-label="Delete Argument"></span>
                   </div>
-                  <button class="btn btn-success" type="button" ng-click="analysis.addScriptArgument(scriptType)"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;<translate>analysis.algorithmic.addArg</translate></button>
+                  <button class="btn btn-success" type="button" ng-click="analysis.addScriptArgument(scriptType)"><span
+                    class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;
+                    <translate>analysis.algorithmic.addArg</translate>
+                  </button>
                 </div>
 
               </div>
@@ -419,10 +441,10 @@
                   <input class="form-control" type="text" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMinimum">
+                  <input type="checkbox" ng-model="argument.inputs.discreteMinimum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMaximum">
+                  <input type="checkbox" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
                   <select class="form-control"
@@ -443,7 +465,7 @@
                     <input class="form-control" type="text" ng-model="discreteVariable.value">
                   </div>
                   <div class="col-sm-1" ng-if="argument.type == 'Boolean'">
-                    <input class="form-control" type="checkbox" ng-model="discreteVariable.value">
+                    <input type="checkbox" ng-model="discreteVariable.value">
                   </div>
                   <div class="col-sm-1" ng-if="argument.type == 'Choice'">
                     <select class="form-control"
@@ -764,10 +786,10 @@
                   <input class="form-control" type="text" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMinimum">
+                  <input type="checkbox" ng-model="argument.inputs.discreteMinimum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMaximum">
+                  <input type="checkbox" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
                   <select class="form-control"
@@ -788,7 +810,7 @@
                     <input class="form-control" type="text" ng-model="discreteVariable.value">
                   </div>
                   <div class="col-sm-1" ng-if="argument.type == 'Boolean'">
-                    <input class="form-control" type="checkbox" ng-model="discreteVariable.value">
+                    <input type="checkbox" ng-model="discreteVariable.value">
                   </div>
                   <div class="col-sm-1" ng-if="argument.type == 'Choice'">
                     <select class="form-control"
@@ -1109,10 +1131,10 @@
                   <input class="form-control" type="text" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMinimum">
+                  <input type="checkbox" ng-model="argument.inputs.discreteMinimum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMaximum">
+                  <input type="checkbox" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
                   <select class="form-control"
@@ -1133,7 +1155,7 @@
                     <input class="form-control" type="text" ng-model="discreteVariable.value">
                   </div>
                   <div class="col-sm-1" ng-if="argument.type == 'Boolean'">
-                    <input class="form-control" type="checkbox" ng-model="discreteVariable.value">
+                    <input type="checkbox" ng-model="discreteVariable.value">
                   </div>
                   <div class="col-sm-1" ng-if="argument.type == 'Choice'">
                     <select class="form-control"
