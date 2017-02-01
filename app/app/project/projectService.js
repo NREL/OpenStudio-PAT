@@ -769,11 +769,11 @@ export class Project {
       outHash.units = out.units;
       outHash.objective_function = out.objective_function == 'true';  // true or false
       // only set following fields if object_function is true, otherwise null
-      if (outHash.objective_function){
+      if (outHash.objective_function) {
 
         if (outHash.objective_function) {
-          if (groupFlag){
-            if (out.obj_function_group == null){
+          if (groupFlag) {
+            if (out.obj_function_group == null) {
               if (currentGroup) {
                 // get out of group and increment
                 currentGroup = null;
@@ -783,11 +783,11 @@ export class Project {
               index = index + 1;
             } else {
               // group defined
-              if (currentGroup == out.obj_function_group){
+              if (currentGroup == out.obj_function_group) {
                 // same group, don't increment
                 outHash.objective_function_index = index;
 
-              } else if (currentGroup == null){
+              } else if (currentGroup == null) {
                 // no group, assign, don't increment
                 currentGroup = out.obj_function_group;
                 outHash.objective_function_index = index;
@@ -820,7 +820,7 @@ export class Project {
       outHash.display_name = out.display_name;
       outHash.display_name_short = out.short_name;
       outHash.metadata_id = null; // always null for now.  This is related to DEnCity?
-      outHash.name =   out.measure_name + '.' + out.name; // always measure.name . measure.argument.name
+      outHash.name = out.measure_name + '.' + out.name; // always measure.name . measure.argument.name
       outHash.visualize = out.visualize;
       outHash.export = true; // always true
       outHash.variable_type = out.type;  // options are: string, bool, double, integer?  TODO: find out what these can be. for now: use argument type
@@ -831,15 +831,15 @@ export class Project {
   typeTargetValue(value, type) {
     const vm = this;
     let newVal;
-    if (value == null){
+    if (value == null) {
       newVal = value;
-    } else if (type == 'Double' || type == 'Integer'){
+    } else if (type == 'Double' || type == 'Integer') {
       // this might be NAN if value cannot be converted
       newVal = Number(value);
-    } else if (type == 'Bool'){
-      if (value == 'true' || value == '1'){
+    } else if (type == 'Bool') {
+      if (value == 'true' || value == '1') {
         newVal = true;
-      } else if (value == 'false' || value == '0'){
+      } else if (value == 'false' || value == '0') {
         newVal = false;
       } else {
         // this will cause an error
@@ -970,7 +970,7 @@ export class Project {
     return vm.projectLocalResultsDir;
   }
 
-  setProjectClustersDir(projectDir){
+  setProjectClustersDir(projectDir) {
     const vm = this;
     return vm.projectClustersDir = vm.jetpack.dir(projectDir.path('clusters'));
   }
@@ -1115,7 +1115,13 @@ export class Project {
 
   resetRemoteSettings() {
     const vm = this;
-    vm.setRemoteSettings({open: true, remoteType: vm.remoteTypes[1], remoteServerURL: null, aws: {}, credentials: {yamlFilename: null, accessKey: null, region: 'us-east-1'}});
+    vm.setRemoteSettings({
+      open: true,
+      remoteType: vm.remoteTypes[1],
+      remoteServerURL: null,
+      aws: {},
+      credentials: {yamlFilename: null, accessKey: null, region: 'us-east-1'}
+    });
     vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
@@ -1164,7 +1170,7 @@ export class Project {
     return vm.clusters;
   }
 
-  getDNSFromFile(clusterName){
+  getDNSFromFile(clusterName) {
     const vm = this;
     let dns = null;
     if (vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
@@ -1177,7 +1183,7 @@ export class Project {
     return dns;
   }
 
-  readClusterFile(clusterName){
+  readClusterFile(clusterName) {
     const vm = this;
     let clusterData = {};
     if (vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
@@ -1236,7 +1242,7 @@ export class Project {
     // make sure worker number is a number
     cluster.worker_node_number =
 
-    vm.jetpack.write(vm.getProjectDir().path(vm.remoteSettings.aws.cluster_name + '_cluster.json'), cluster);
+      vm.jetpack.write(vm.getProjectDir().path(vm.remoteSettings.aws.cluster_name + '_cluster.json'), cluster);
   }
 
   setOsServerVersions() {
@@ -1261,88 +1267,88 @@ export class Project {
     const vm = this;
     vm.serverInstanceTypes = [
       {
-        name:'m3.medium',
-        cpus:'1',
-        memory:'3.75 GiB',
-        storage:'1 x 4 GB'
+        name: 'm3.medium',
+        cpus: '1',
+        memory: '3.75 GiB',
+        storage: '1 x 4 GB'
       },
       {
-        name:'m3.large',
-        cpus:'2',
-        memory:'7.5 GiB',
-        storage:'1 x 32 GB'
+        name: 'm3.large',
+        cpus: '2',
+        memory: '7.5 GiB',
+        storage: '1 x 32 GB'
       },
       {
-        name:'m3.xlarge',
-        cpus:'4',
-        memory:'15 GiB',
-        storage:'2 x 40 GB'
+        name: 'm3.xlarge',
+        cpus: '4',
+        memory: '15 GiB',
+        storage: '2 x 40 GB'
       },
       {
-        name:'m3.2xlarge',
-        cpus:'8',
-        memory:'30 GiB',
-        storage:'2 x 80 GB'
+        name: 'm3.2xlarge',
+        cpus: '8',
+        memory: '30 GiB',
+        storage: '2 x 80 GB'
       },
       {
-        name:'c3.large',
-        cpus:'2',
-        memory:'3.75 GiB',
-        storage:'2 x 16 GB'
+        name: 'c3.large',
+        cpus: '2',
+        memory: '3.75 GiB',
+        storage: '2 x 16 GB'
       },
       {
-        name:'c3.xlarge',
-        cpus:'4',
-        memory:'7.5 GiB',
-        storage:'2 x 40 GB'
+        name: 'c3.xlarge',
+        cpus: '4',
+        memory: '7.5 GiB',
+        storage: '2 x 40 GB'
       },
       {
-        name:'c3.2xlarge',
-        cpus:'8',
-        memory:'15 GiB',
-        storage:'2 x 80 GB'
+        name: 'c3.2xlarge',
+        cpus: '8',
+        memory: '15 GiB',
+        storage: '2 x 80 GB'
       },
       {
-        name:'c3.4xlarge',
-        cpus:'16',
-        memory:'30 GiB',
-        storage:'2 x 160 GB'
+        name: 'c3.4xlarge',
+        cpus: '16',
+        memory: '30 GiB',
+        storage: '2 x 160 GB'
       },
       {
-        name:'c3.8xlarge',
-        cpus:'32',
-        memory:'60 GiB',
-        storage:'2 x 320 GB'
+        name: 'c3.8xlarge',
+        cpus: '32',
+        memory: '60 GiB',
+        storage: '2 x 320 GB'
       },
       {
-        name:'r3.large',
-        cpus:'2',
-        memory:'15.25 GiB',
-        storage:'1 x 32 GB'
+        name: 'r3.large',
+        cpus: '2',
+        memory: '15.25 GiB',
+        storage: '1 x 32 GB'
       },
       {
-        name:'r3.xlarge',
-        cpus:'4',
-        memory:'30.5 GiB',
-        storage:'1 x 80 GB'
+        name: 'r3.xlarge',
+        cpus: '4',
+        memory: '30.5 GiB',
+        storage: '1 x 80 GB'
       },
       {
-        name:'r3.2xlarge',
-        cpus:'8',
-        memory:'61 GiB',
-        storage:'1 x 160 GB'
+        name: 'r3.2xlarge',
+        cpus: '8',
+        memory: '61 GiB',
+        storage: '1 x 160 GB'
       },
       {
-        name:'r3.4xlarge',
-        cpus:'16',
-        memory:'122 GiB',
-        storage:'1 x 320 GB'
+        name: 'r3.4xlarge',
+        cpus: '16',
+        memory: '122 GiB',
+        storage: '1 x 320 GB'
       },
       {
-        name:'r3.8xlarge',
-        cpus:'32',
-        memory:'244 GiB',
-        storage:'2 x 320 GB'
+        name: 'r3.8xlarge',
+        cpus: '32',
+        memory: '244 GiB',
+        storage: '2 x 320 GB'
       }
     ];
   }
@@ -1411,7 +1417,16 @@ export class Project {
 
   setAlgorithmOptions() {
     const at = {};
-
+    at.BaselinePerturbation =[];
+    at.Diagonal = [{
+      name: 'Number of Samples',
+      description: 'positive integer (this discretizes a continuous variable)',
+      defaultValue: 2
+    }, {
+      name: 'Run_Baseline',
+      description: '(1/0) Run static values',
+      defaultValue: 1
+    }];
     at.Morris = [{
       name: 'r',
       description: 'integer giving the number of repetitions of the design',
@@ -1740,6 +1755,9 @@ export class Project {
     const vm = this;
 
     return [{
+      id: 'Diagonal',
+      name: 'analysis.type.diagonal'
+    },{
       id: 'NSGA2',
       name: 'analysis.type.nsga2'
     }, {
