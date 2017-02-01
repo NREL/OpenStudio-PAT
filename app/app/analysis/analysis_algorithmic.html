@@ -198,7 +198,7 @@
                   Distribution
                 </div>
               </div>
-              <div class="row">
+              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                 <div class="col-sm-2">
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
@@ -218,6 +218,28 @@
                           ng-model="argument.inputs.distribution"></select>
                 </div>
               </div>
+
+              <div class="row" ng-if="argument.type == 'String'">
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
+                </div>
+                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
+                </div>
+                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
+                          ng-init="analysis.getDistributions(argument)"
+                          ng-model="argument.inputs.distribution"></select>
+                </div>
+              </div>
+
             </div>
 
             <div class="col-sm-7"
@@ -242,7 +264,7 @@
                   Distribution
                 </div>
               </div>
-              <div class="row">
+              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                 <div class="col-sm-2">
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
@@ -265,6 +287,31 @@
                           ng-model="argument.inputs.distribution"></select>
                 </div>
               </div>
+
+              <div class="row" ng-if="argument.type == 'String'">
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01">
+                </div>
+                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
+                </div>
+                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
+                          ng-init="analysis.getDistributions(argument)"
+                          ng-model="argument.inputs.distribution"></select>
+                </div>
+              </div>
+
             </div>
 
             <div class="col-sm-7"
@@ -297,18 +344,18 @@
                           ng-init="relationship = 'Inverse'"></select>
                 </div>
                 <div class="col-sm-1"
-                     ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
+                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
                   <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
                 </div>
                 <div class="col-sm-1"
-                     ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
+                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
                   <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
+                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMinimum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
+                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
                   <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMinimum">
@@ -496,7 +543,7 @@
                   Distribution
                 </div>
               </div>
-              <div class="row">
+              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                 <div class="col-sm-2">
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
@@ -516,6 +563,28 @@
                           ng-model="argument.inputs.distribution"></select>
                 </div>
               </div>
+
+              <div class="row" ng-if="argument.type == 'String'">
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
+                </div>
+                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
+                </div>
+                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
+                          ng-init="analysis.getDistributions(argument)"
+                          ng-model="argument.inputs.distribution"></select>
+                </div>
+              </div>
+
             </div>
 
             <div class="col-sm-7"
@@ -540,7 +609,7 @@
                   Distribution
                 </div>
               </div>
-              <div class="row">
+              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                 <div class="col-sm-2">
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
@@ -563,6 +632,31 @@
                           ng-model="argument.inputs.distribution"></select>
                 </div>
               </div>
+
+              <div class="row" ng-if="argument.type == 'String'">
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01">
+                </div>
+                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
+                </div>
+                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
+                          ng-init="analysis.getDistributions(argument)"
+                          ng-model="argument.inputs.distribution"></select>
+                </div>
+              </div>
+
             </div>
 
             <div class="col-sm-7"
@@ -595,18 +689,18 @@
                           ng-init="relationship = 'Inverse'"></select>
                 </div>
                 <div class="col-sm-1"
-                     ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
+                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
                   <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
                 </div>
                 <div class="col-sm-1"
-                     ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
+                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
                   <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
+                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMinimum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
+                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
                   <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMinimum">
@@ -794,7 +888,7 @@
                   Distribution
                 </div>
               </div>
-              <div class="row">
+              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                 <div class="col-sm-2">
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
@@ -814,6 +908,28 @@
                           ng-model="argument.inputs.distribution"></select>
                 </div>
               </div>
+
+              <div class="row" ng-if="argument.type == 'String'">
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
+                </div>
+                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
+                </div>
+                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
+                          ng-init="analysis.getDistributions(argument)"
+                          ng-model="argument.inputs.distribution"></select>
+                </div>
+              </div>
+
             </div>
 
             <div class="col-sm-7"
@@ -838,7 +954,7 @@
                   Distribution
                 </div>
               </div>
-              <div class="row">
+              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                 <div class="col-sm-2">
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
@@ -861,6 +977,31 @@
                           ng-model="argument.inputs.distribution"></select>
                 </div>
               </div>
+
+              <div class="row" ng-if="argument.type == 'String'">
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01">
+                </div>
+                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
+                </div>
+                <div class="col-sm-2">
+                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
+                </div>
+                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
+                          ng-init="analysis.getDistributions(argument)"
+                          ng-model="argument.inputs.distribution"></select>
+                </div>
+              </div>
+
             </div>
 
             <div class="col-sm-7"
@@ -893,18 +1034,18 @@
                           ng-init="relationship = 'Inverse'"></select>
                 </div>
                 <div class="col-sm-1"
-                     ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
+                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
                   <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
                 </div>
                 <div class="col-sm-1"
-                     ng-show="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
+                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
                   <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
+                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMinimum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
+                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMaximum">
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
                   <input class="form-control" type="checkbox" ng-model="argument.inputs.discreteMinimum">
