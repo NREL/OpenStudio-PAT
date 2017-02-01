@@ -63,7 +63,7 @@ export default {
     reportingMeasures: 'Reporting Measures',
     samplingMethod: 'Sampling Method',
     type: {
-      batchRun: 'BatchRun',
+      diagonal: 'Diagonal',
       nsga2: 'Nondominated Sorting Genetic Algorithm 2',
       spea2: 'Strength Pareto Evolutionary Algorithm 2',
       pso: 'Particle Swarm',

@@ -943,7 +943,7 @@ export class AnalysisController {
   showValueAndWeights() {
     const vm = this;
     vm.$log.debug('In showValueAndWeights');
-    if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showValueAndWeights = true;
     } else {
       vm.$scope.showValueAndWeights = false;
@@ -983,7 +983,7 @@ export class AnalysisController {
   showDiscreteVariables() {
     const vm = this;
     vm.$log.debug('In showDiscreteVariables');
-    if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE', 'Diagonal', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDiscreteVariables = true;
     } else {
       vm.$scope.showDiscreteVariables = false;
@@ -993,7 +993,7 @@ export class AnalysisController {
   showPivotVariables() {
     const vm = this;
     vm.$log.debug('In showPivotVariables');
-    if (_.includes(['LHS', 'Morris', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['LHS', 'Morris', 'DOE', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showPivotVariables = true;
     } else {
       vm.$scope.showPivotVariables = false;
