@@ -156,9 +156,11 @@ export class RunController {
 
   resetAwsCredentials() {
     const vm = this;
-    if (_.find(vm.$scope.awsYamlFiles, vm.$scope.remoteSettings.credentials.yamlFilename) == undefined) {
-      vm.$scope.remoteSettings.credentials.accessKey = null;
-      vm.$scope.remoteSettings.credentials.awsYamlFile = null;
+    if (vm.$scope.remoteSettings && vm.$scope.remoteSettings.credentials && vm.$scope.remoteSettings.yamlFilename){
+      if (_.find(vm.$scope.awsYamlFiles, vm.$scope.remoteSettings.credentials.yamlFilename) == undefined) {
+        vm.$scope.remoteSettings.credentials.accessKey = null;
+        vm.$scope.remoteSettings.credentials.awsYamlFile = null;
+      }
     }
   }
 

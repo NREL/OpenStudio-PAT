@@ -32,13 +32,13 @@ export class OutputsController {
 
     // size grids according to data
     vm.$scope.getTableHeight = function (uid) {
-      var rowHeight = 30; // row height
-      var headerHeight = 55; // header height
+      let rowHeight = 30; // row height
+      let headerHeight = 55; // header height
       const m = _.find(vm.$scope.measures, {uid: uid});
       const length = _.filter(m.analysisOutputs).length;
       vm.$log.debug('data length: ', length);
       return {
-        height: (length * rowHeight + headerHeight + 15) + "px"
+        height: (length * rowHeight + headerHeight + 15) + 'px'
       };
     };
 
@@ -140,7 +140,7 @@ export class OutputsController {
           category: 'Output Selection',
           width: 150,
           minWidth: 80
-        },{
+        }, {
           name: 'type',
           displayName: 'outputs.columns.variableType',
           headerCellFilter: 'translate',
@@ -151,7 +151,7 @@ export class OutputsController {
           category: 'Output Selection',
           width: 100,
           minWidth: 70
-        },{
+        }, {
           name: 'visualize',
           displayName: 'outputs.columns.visualize',
           editableCellTemplate: 'ui-grid/dropdownEditor',

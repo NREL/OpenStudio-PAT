@@ -79,10 +79,22 @@ export default {
     },
     algorithmic: {
       algorithmSetting: 'Algorithm Settings',
-      filesToInclude: 'Files to Include',
-      dirToInclude: 'Dir to include',
-      dirToUnpackTo: 'Dir to unpack to',
-      skipThisMeasure: 'Skip this measure'
+      skipThisMeasure: 'Skip this measure',
+      filesToIncludeMessage: 'If your analysis requires additional files to be uploaded to the server, list each directory to include along with the name of the folder to extract to on the server, below.',
+      filesToInclude: 'Additional Analysis Files',
+      dirToInclude: 'Directory to Include',
+      selectDir: 'Select Directory',
+      addDir: 'Add Directory',
+      dirToUnpackTo: 'Directory Name to Unpack to on Server',
+      server_initialization: 'Server Initialization Script',
+      server_finalization: 'Server Finalization Script',
+      worker_initialization: 'Worker Initialization Script',
+      worker_finalization: 'Worker Finalization Script',
+      selectScript: 'Select Script File',
+      args: 'Script Arguments',
+      addArg: 'Add Argument',
+      serverScripts: 'Server Scripts',
+      serverScriptsMessage: 'If your analysis requires server and worker initialization or finalization scripts, add them here.  Note that these scripts will not run on a local server; they can only be run on a cloud server.'
     },
     manual: {
       projectMeasuresAndOptions: 'Project Measures and Options'

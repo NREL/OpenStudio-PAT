@@ -25,8 +25,9 @@ export class AnalysisController {
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
-    vm.$scope.dirToInclude = vm.Project.getDirToInclude();
-    vm.$scope.dirToUnpackTo = vm.Project.getDirToUnpackTo();
+    vm.$scope.filesToInclude = vm.Project.getFilesToInclude();
+    vm.$scope.serverScripts = vm.Project.getServerScripts();
+    vm.$log.debug('ServerScripts: ', vm.$scope.serverScripts);
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
     _.forEach(vm.$scope.measures, (measure) => {
@@ -658,19 +659,19 @@ export class AnalysisController {
     vm.initializeGrids();
   }
 
-  setDirToInclude() {
-    const vm = this;
-    vm.$log.debug('In setDirToInclude in analysis');
-    vm.setIsModified();
-    vm.Project.setDirToInclude(vm.$scope.dirToInclude);
-  }
+  // setDirToInclude() {
+  //   const vm = this;
+  //   vm.$log.debug('In setDirToInclude in analysis');
+  //   vm.setIsModified();
+  //   vm.Project.setDirToInclude(vm.$scope.dirToInclude);
+  // }
 
-  setDirToUnpackTo() {
-    const vm = this;
-    vm.$log.debug('In setDirToUnpackTo in analysis');
-    vm.setIsModified();
-    vm.Project.setDirToUnpackTo(vm.$scope.dirToUnpackTo);
-  }
+  // setDirToUnpackTo() {
+  //   const vm = this;
+  //   vm.$log.debug('In setDirToUnpackTo in analysis');
+  //   vm.setIsModified();
+  //   vm.Project.setDirToUnpackTo(vm.$scope.dirToUnpackTo);
+  // }
 
   setSamplingMethod() {
     const vm = this;
@@ -705,7 +706,7 @@ export class AnalysisController {
     });
   }
 
-  selectDirToInclude() {
+  selectDirToInclude(file) {
     const vm = this;
 
     const result = vm.dialog.showOpenDialog({
@@ -715,9 +716,54 @@ export class AnalysisController {
 
     if (!_.isEmpty(result)) {
       vm.$log.debug(' result[0]:', result[0]);
-      vm.$scope.dirToInclude = result[0];
-      vm.setDirToInclude(result[0]);
+      file.dirToInclude = result[0];
+      vm.setIsModified();
     }
+  }
+
+  addDirToInclude() {
+    const vm = this;
+    vm.$log.debug('In analysis::addDirToInclude');
+    vm.$scope.filesToInclude.push({dirToInclude: null, unpackDirName: null});
+    vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
+  }
+
+  deleteDirToInclude(index) {
+    const vm = this;
+    vm.$log.debug('In analysis::deleteDirToInclude, remove at index: ', index);
+    if (!_.isNil(index)){
+      vm.$scope.filesToInclude.splice(index, 1);
+    }
+    vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
+  }
+
+  selectScript(type){
+    const vm = this;
+    const result = vm.dialog.showOpenDialog({
+      title: 'Select Script',
+      properties: ['openFile']
+    });
+
+    if (!_.isEmpty(result)) {
+      vm.$log.debug(' result[0]:', result[0]);
+      vm.$scope.serverScripts[type].file = result[0];
+      vm.setIsModified();
+    }
+  }
+
+  addScriptArgument(type) {
+    const vm = this;
+    vm.$scope.serverScripts[type].arguments.push(null);
+  }
+
+  deleteScriptArgument(type, index){
+    const vm = this;
+    vm.$log.debug("deleting at index: ", index);
+    vm.$log.debug('arguments: ', vm.$scope.serverScripts[type].arguments);
+    if (!_.isNil(index)){
+      vm.$scope.serverScripts[type].arguments.splice(index, 1);
+    }
+    vm.$log.debug('New Arguments for type: ', type, ' are: ', vm.$scope.serverScripts[type].arguments);
   }
 
   selectSeedModel() {

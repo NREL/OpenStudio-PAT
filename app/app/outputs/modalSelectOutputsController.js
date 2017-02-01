@@ -3,6 +3,9 @@ export class ModalSelectOutputsController {
   constructor($log, $uibModalInstance, params, $scope) {
     'ngInject';
 
+    // ignore camelcase for this file
+    /* eslint camelcase: 0 */
+
     const vm = this;
     vm.$uibModalInstance = $uibModalInstance;
     vm.$log = $log;
@@ -57,7 +60,6 @@ export class ModalSelectOutputsController {
   addOutput() {
     const vm = this;
     vm.$scope.measure.userDefinedOutputs.push({name: '', userDefined: true});
-    
   }
 
   deleteOutput(output) {
