@@ -25,9 +25,9 @@ export default {
   },
   serverTools: {
     title: 'Server Troubleshooting Tools',
-    start: 'Force Start Local Server',
-    stop: 'Force Stop Local Server',
-    ping: 'Ping Current Server and Set Status',
+    start: 'Start Local Server',
+    stop: 'Stop Local Server',
+    ping: 'Ping Server and Set Status',
     noProject: 'You must open a project first'
   },
   setMeasuresDir: {
@@ -40,11 +40,11 @@ export default {
     blurb: 'This will be the name of the directory containing your project. In the next step, you will choose the location for your new project folder.'
   },
   analysis: {
-    title: 'Contr�leur d\'Analyse',
+    title: 'Analysis',
     projectName: 'Project Name',
     addMeasure: 'Add Measure',
     addMeasureOption: 'Add Measure Option',
-    checkAll: 'Check All',
+    checkAll: 'Check to make all arguments variable',
     checkForUpdates: 'Check for Updates',
     columns: {
       argumentName: 'Argument Name',
@@ -62,6 +62,11 @@ export default {
     openstudioMeasures: 'OpenStudio Measures',
     reportingMeasures: 'Reporting Measures',
     samplingMethod: 'Sampling Method',
+    helpAnalysis: 'In Manual mode, users create Measure Options and set up different Design Alternatives by hand.  In Algorithmic mode, users specify ranges for each Measure Argument.  The Sampling Method that is selected will automatically create a series of Design Alternatives for the user.  Manual mode is most useful for  targeted analysis.  Algorithmic mode is most useful when the user wants to explore a large number of designs or wants to optimize for a certain outcome.',
+    helpProjectyMeasuresAndOptions: 'A Measure is a script that is used to modify an energy model or create a report about the model.  Measures can be downloaded from the Building Component Library (BCL) or written by the user.',
+    helpOpenStudioMeasures: 'An OpenStudio Measure is a script that modifies the OpenStudio model (.osm file).',
+    helpEnergyPlusMeasures: 'An EnergyPlus Measure is a script that modifies the EnergyPlus model (.idf file).  This happens after the OpenStudio model (.osm) is translated to EnergyPlus format (.idf).  EnergyPlus Measures are typically used to add objects that are not yet supported by OpenStudio to the input file.',
+    helpReportingMeasures: 'A Reporting Measure is a script that creates a report describing some aspect of the or the simulation results.  These Measures have access to the OpenStudio model, the EnergyPlus IDF, and the simulation results.',
     type: {
       diagonal: 'Diagonal',
       nsga2: 'Nondominated Sorting Genetic Algorithm 2',
@@ -215,7 +220,8 @@ export default {
     },
     createOneDesignAlternative: 'Create One Design Alternative with Each Measure Option',
     duplicateAlternative: 'Duplicate Alternative',
-    noAlternativesInAlgorithmic: 'There are no design alternatives to set for an Algorithmic Analysis.'
+    noAlternativesInAlgorithmic: 'For an Algorithmic Analysis, Design Alternatives are created automatically.',
+    helpDesignAlternatives: 'A Design Alternative is a single simulation run.  Each Design Altenative can have one or more Measure Options applied to it.  In Manual mode, Design Alternatives are created by the user.   In Algorithmic mode, the Sampling Method creates the Design Alternatives automatically.'
   },
   outputs: {
     title: 'Outputs',
@@ -225,10 +231,11 @@ export default {
       message: 'Select which outputs you would like to add to your analysis.',
       selectAll: 'Select All',
       deselectAll: 'Deselect All',
-      newOutputs: 'If the output you want is not listed above, you can enter additional outputs below.  Enter the \'unique name\' of the output.'
+      newOutputs: 'If the output you want is not listed above, you can enter additional outputs below.  Enter the \'unique name\' of the output.',
+      helpOutputs: 'Outputs are pieces of information that are created for every Design Alternative.  In Manual mode, outputs are not set.  In Algorithmic mode, some Sampling Methods (such as optimization) require an objective function (for example, minimize annual energy consumption).  In this case, the outputs are used to describe the objective function.'
     },
     selectOutputs: 'Select Outputs',
-    addMeasure: 'Add another measure to select outputs',
+    addMeasure: 'Select measure to add more outputs',
     columns: {
       displayName: 'Display Name',
       shortName: 'Short Name',
@@ -249,7 +256,8 @@ export default {
       radarChart: 'Radar Chart',
       radianceReport: 'Radiance Report',
       edaptExport: 'EDAPT Export'
-    }
+    },
+    helpReports: 'Reports present information from the Design Alternatives.  Some reports make more sense in Manual mode, while others make more sense in Algorithmic model.  Some reports require the user to include specific Reporting Measures (on the Project Measures and Options tab) to function correctly.'
   },
   run: {
     title: 'Run',
@@ -285,7 +293,7 @@ export default {
       serverInstanceType: 'Server Instance Type',
       workerInstanceType: 'Worker Instance Type',
       awsCredentials: 'AWS Credentials',
-      selectAws: 'Select AWS Credentials to use',
+      selectAws: 'Select AWS credentials to use',
       newAwsCredentials: 'New',
       awsAccessKey: 'Access Key',
       awsRegion: 'Region',
@@ -329,7 +337,7 @@ export default {
     Extracting: 'Extracting'
   },
   Algorithmic: 'Algorithmic',
-  Cancel: 'Annuler',
+  Cancel: 'Cancel',
   Continue: 'Continue',
   Manual: 'Manual',
   OK: 'OK',
