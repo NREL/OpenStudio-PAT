@@ -759,6 +759,11 @@ export class AnalysisController {
     }
   }
 
+  deleteScript(type) {
+    const vm = this;
+    vm.$scope.serverScripts[type].file = null;
+  }
+
   addScriptArgument(type) {
     const vm = this;
     vm.$scope.serverScripts[type].arguments.push(null);

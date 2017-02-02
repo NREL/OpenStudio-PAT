@@ -117,7 +117,10 @@
                 class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;
                 <translate>analysis.algorithmic.selectScript</translate>
               </button>
-              <span class="normal-text pad-left-5 inline">{{scriptData.file}}</span>
+              <span class="normal-text pad-left-5 inline">{{scriptData.file}}</span>&nbsp;&nbsp;
+              <span ng-if="scriptData.file" class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25 inline"
+                    ng-click="analysis.deleteScript(scriptType)" aria-hidden="true"
+                    aria-label="Delete Script"></span>
             </div>
             <div class="col-sm-6">
               <!-- todo: list of arguments -->
