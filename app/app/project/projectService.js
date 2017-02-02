@@ -418,6 +418,19 @@ export class Project {
       }
     });
 
+    // add 'files to include
+    _.forEach(vm.filesToInclude, (file) => {
+      if (file.dirToInclude){
+        if (!file.unpackDirName){
+          // use same name if no name is provided
+          file.unpackDirName = dirToInclude.replace(/^.*[\\\/]/, '');
+        }
+        archive.bulk([
+          {expand: true, cwd: file.dirToInclude, src: ['**'], dest: 'lib/' + file.unpackDirName}
+        ]);
+      }
+    });
+
 
 
     archive.finalize();
@@ -452,7 +465,7 @@ export class Project {
       vm.osa.analysis.server_scripts[type] = './scripts/' + type + '/' + script.file;
     });
 
-    // TODO: files to include
+    // TODO: files to include ?
 
   }
 
