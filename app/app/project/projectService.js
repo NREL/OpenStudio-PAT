@@ -1467,7 +1467,11 @@ export class Project {
 
   setAlgorithmOptions() {
     const at = {};
-    at.BaselinePerturbation =[];
+    at.BaselinePerturbation =[{
+      name: 'in_measure_combinations',
+      description: '(TRUE/FALSE) Run full factorial search over in-measure variable combinations',
+      defaultValue: 'TRUE'
+    }];
     at.Diagonal = [{
       name: 'Number of Samples',
       description: 'positive integer (this discretizes a continuous variable)',
