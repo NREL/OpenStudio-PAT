@@ -745,8 +745,16 @@ export class AnalysisController {
     });
 
     if (!_.isEmpty(result)) {
-      vm.$log.debug(' result[0]:', result[0]);
-      vm.$scope.serverScripts[type].file = result[0];
+      const scriptPath = result[0];
+      vm.$log.debug('script path:', scriptPath);
+      const scriptFilename = scriptPath.replace(/^.*[\\\/]/, '');
+      // ensure appropriate folders exist
+      vm.jetpack.dir(vm.Project.getProjectDir().path('scripts', type));
+      // copy/overwrite
+      vm.jetpack.copy(scriptPath, vm.Project.getProjectDir().path('scripts',  type, scriptFilename), {overwrite: true});
+      vm.$log.debug('Script filename: ', scriptFilename);
+      // update project
+      vm.$scope.serverScripts[type].file = scriptFilename;
       vm.setIsModified();
     }
   }

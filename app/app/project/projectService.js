@@ -374,6 +374,10 @@ export class Project {
       vm.exportAlgorithmic();
     }
 
+    // export serverScripts
+    vm.exportScripts();
+
+
     // write to file
     let filename = vm.projectDir.path(vm.projectName + '.json');
     vm.jetpack.write(filename, vm.osa);
@@ -405,6 +409,17 @@ export class Project {
       {expand: true, cwd: vm.weatherDir.path(), src: ['**'], dest: 'weather/'}
     ]);
 
+    // add server scripts (if they exist)
+    _.forEach(vm.serverScripts, (script, type) => {
+      if (script.file){
+        archive.bulk([
+          {expand: true, cwd: vm.projectDir.path('scripts', type), src: ['**'], dest: 'scripts/' + type}
+        ]);
+      }
+    });
+
+
+
     archive.finalize();
   }
 
@@ -430,6 +445,14 @@ export class Project {
     vm.osa.analysis.weather_file.file_type = 'EPW';
     vm.osa.analysis.weather_file.path = './weather/' + vm.defaultWeatherFile;
     vm.osa.analysis.file_format_version = 1;
+
+    // server scripts (will only work on the cloud, but always put in OSA?)
+    vm.osa.analysis.server_scripts = {};
+    _.forEach(vm.serverScripts, (script, type) => {
+      vm.osa.analysis.server_scripts[type] = './scripts/' + type + '/' + script.file;
+    });
+
+    // TODO: files to include
 
   }
 
@@ -833,6 +856,20 @@ export class Project {
       outHash.export = true; // always true
       outHash.variable_type = out.type;  // options are: string, bool, double, integer?  TODO: find out what these can be. for now: use argument type
       vm.osa.analysis.output_variables.push(outHash);
+    });
+  }
+
+  exportScripts() {
+    const vm = this;
+    vm.$log.debug('exporting server scripts');
+    _.forEach(vm.serverScripts, (script, type) => {
+      // vm.$log.debug('type: ', type, 'scriptdata: ', script);
+      if (script.file) {
+        // create argument file
+        let argFilename = script.file.substr(0, script.file.lastIndexOf('.')) || script.file;
+        argFilename = argFilename + '.args';
+        vm.jetpack.write(vm.projectDir.path('scripts', type, argFilename), script.arguments);
+      }
     });
   }
 
