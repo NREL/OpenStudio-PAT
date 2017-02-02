@@ -686,6 +686,7 @@ export class AnalysisController {
     vm.showDistributions();
     vm.showDiscreteVariables();
     vm.showPivotVariables();
+    vm.showWarningIcons();
   }
 
   // compute measure arguments when setting the seed
@@ -731,13 +732,13 @@ export class AnalysisController {
   deleteDirToInclude(index) {
     const vm = this;
     vm.$log.debug('In analysis::deleteDirToInclude, remove at index: ', index);
-    if (!_.isNil(index)){
+    if (!_.isNil(index)) {
       vm.$scope.filesToInclude.splice(index, 1);
     }
     vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
   }
 
-  selectScript(type){
+  selectScript(type) {
     const vm = this;
     const result = vm.dialog.showOpenDialog({
       title: 'Select Script',
@@ -769,11 +770,11 @@ export class AnalysisController {
     vm.$scope.serverScripts[type].arguments.push(null);
   }
 
-  deleteScriptArgument(type, index){
+  deleteScriptArgument(type, index) {
     const vm = this;
     vm.$log.debug("deleting at index: ", index);
     vm.$log.debug('arguments: ', vm.$scope.serverScripts[type].arguments);
-    if (!_.isNil(index)){
+    if (!_.isNil(index)) {
       vm.$scope.serverScripts[type].arguments.splice(index, 1);
     }
     vm.$log.debug('New Arguments for type: ', type, ' are: ', vm.$scope.serverScripts[type].arguments);
@@ -1057,6 +1058,49 @@ export class AnalysisController {
     } else {
       vm.$scope.showPivotVariables = false;
     }
+  }
+
+  showWarningIcon(argument) {
+    const vm = this;
+    vm.$log.debug('In showWarningIcon');
+
+    // vm.$scope.showPivotVariables vm.$scope.showDiscreteVariables vm.$scope.showDistributions vm.$scope.showMinAndMax vm.$scope.showDeltaX vm.$scope.showValueAndWeights
+    if (_.isNil(argument) || _.isNil(argument.inputs) || _.isNil(argument.inputs.variableSetting)) {
+      return true;
+    }
+
+    if ((vm.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')) ||
+      (vm.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) ||
+      (argument.inputs.variableSetting == 'Continuous') ||
+      (argument.inputs.variableSetting == 'Argument')) {
+      argument.inputs.showWarningIcon = false;
+    } else {
+      argument.inputs.showWarningIcon = true;
+    }
+  }
+
+  showWarningIcons() {
+    const vm = this;
+    vm.$log.debug('In showWarningIcons');
+    _.forEach(vm.$scope.measures, (measure) => {
+      _.forEach(measure.arguments, (argument) => {
+        vm.showWarningIcon(argument);
+      });
+      vm.showWarningText(measure);
+    });
+  }
+
+  showWarningText(measure) {
+    const vm = this;
+    vm.$log.debug('In showWarningText');
+    measure.showWarningText = false;
+    _.forEach(measure.arguments, (argument) => {
+      if (_.isNil(argument.inputs) == false && _.isNil(argument.inputs.showWarningIcon) == false) {
+        if (argument.inputs.showWarningIcon) {
+          measure.showWarningText = true;
+        }
+      }
+    });
   }
 
   initializeValues() {

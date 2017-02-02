@@ -247,7 +247,8 @@
               <select class="form-control"
                       ng-options="variableSetting as variableSetting for variableSetting in argument.inputs.variableSettings"
                       ng-init="analysis.getVariableSettings(argument)"
-                      ng-model="argument.inputs.variableSetting"></select>
+                      ng-model="argument.inputs.variableSetting"
+                      ng-change="analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
             </div>
 
             <div class="col-sm-1" ng-if="argument.type == 'Choice'">
@@ -485,13 +486,17 @@
                     class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
                 </div>
                 <div class="col-sm-1"
-                     ng-hide="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))">
+                     ng-hide="true || ((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))">
+                  <p><span class="glyphicon glyphicon-alert" style="color:blue"></span></p>
+                </div>
+                <div class="col-sm-1"
+                     ng-show="argument.inputs.showWarningIcon">
                   <p><span class="glyphicon glyphicon-alert" style="color:red"></span></p>
                 </div>
               </div>
             </div>
           </div>
-          <div ng-show="false">
+          <div ng-show="measure.showWarningText">
             <p>Invalid variable settings for this algorithm<span class="glyphicon glyphicon-alert"
                                                                  style="color:red"></span></p>
           </div>
