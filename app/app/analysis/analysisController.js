@@ -469,7 +469,7 @@ export class AnalysisController {
         }
       }
     }
-    vm.$scope.$broadcast('uiGridEventEndCellEdit');
+    //vm.$scope.$broadcast('uiGridEventEndCellEdit'); Note: this causes page to jump to bottom, and is visually unacceptable (Evan)
   }
 
   optionCheckboxChanged() {
@@ -477,7 +477,7 @@ export class AnalysisController {
     vm.$log.debug('In optionCheckboxChanged in analysis');
     vm.setIsModified();
 
-    vm.$scope.$broadcast('uiGridEventEndCellEdit');
+    //vm.$scope.$broadcast('uiGridEventEndCellEdit'); Note: this causes page to jump to bottom, and is visually unacceptable (Evan)
   }
 
   allVariableCheckboxesChanged(row, col) {
@@ -510,7 +510,7 @@ export class AnalysisController {
         }
       }
     }
-    vm.$scope.$broadcast('uiGridEventEndCellEdit');
+    //vm.$scope.$broadcast('uiGridEventEndCellEdit'); Note: this causes page to jump to bottom, and is visually unacceptable (Evan)
   }
 
   // Toggle all variable checkboxes
