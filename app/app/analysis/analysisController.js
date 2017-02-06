@@ -784,8 +784,7 @@ export class AnalysisController {
       const seedModelPath = result[0];
       vm.$log.debug('Seed Model:', seedModelPath);
       const seedModelFilename = seedModelPath.replace(/^.*[\\\/]/, '');
-      // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
-      vm.jetpack.copy(seedModelPath, vm.Project.getProjectDir().path('seeds/' + seedModelFilename));
+      vm.jetpack.copy(seedModelPath, vm.Project.getProjectDir().path('seeds/' + seedModelFilename), { overwrite: true });
       vm.$log.debug('Seed Model name: ', seedModelFilename);
       // update seeds
       vm.Project.setSeeds();
