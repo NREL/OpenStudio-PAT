@@ -22,7 +22,8 @@ export class ModalOpenProjectController {
     vm.setProject.openProject().then(() => {
       vm.$uibModalInstance.close();
     }, () => {
-      vm.$uibModalInstance.close();
+      vm.$log.debug('ModalOpenProjectController::openProject rejected, allow user to try again');
+      //vm.$uibModalInstance.close();
     });
   }
 
