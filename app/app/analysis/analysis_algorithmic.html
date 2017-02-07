@@ -483,10 +483,6 @@
                     class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
                 </div>
                 <div class="col-sm-1"
-                     ng-hide="true || ((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))">
-                  <p><span class="glyphicon glyphicon-alert" style="color:blue"></span></p>
-                </div>
-                <div class="col-sm-1"
                      ng-show="argument.inputs.showWarningIcon">
                   <p><span class="glyphicon glyphicon-alert" style="color:red"></span></p>
                 </div>
@@ -494,7 +490,7 @@
             </div>
           </div>
           <div ng-show="measure.showWarningText">
-            <p>Invalid variable settings for this algorithm<span class="glyphicon glyphicon-alert"
+            <p>"{{'analysis.algorithmic.warning' | translate}}"<span class="glyphicon glyphicon-alert"
                                                                  style="color:red"></span></p>
           </div>
         </div>
@@ -832,15 +828,15 @@
                     class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
                 </div>
                 <div class="col-sm-1"
-                     ng-hide="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))">
+                     ng-show="argument.inputs.showWarningIcon">
                   <p><span class="glyphicon glyphicon-alert" style="color:red"></span></p>
                 </div>
               </div>
             </div>
           </div>
-          <div ng-show="false">
-            <p>Invalid variable settings for this algorithm<span class="glyphicon glyphicon-alert"
-                                                                 style="color:red"></span></p>
+          <div ng-show="measure.showWarningText">
+            <p>"{{'analysis.algorithmic.warning' | translate}}"<span class="glyphicon glyphicon-alert"
+                                                                     style="color:red"></span></p>
           </div>
         </div>
       </uib-accordion-group>
@@ -1177,15 +1173,15 @@
                     class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
                 </div>
                 <div class="col-sm-1"
-                     ng-hide="((analysis.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) || (analysis.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')))">
+                     ng-show="argument.inputs.showWarningIcon">
                   <p><span class="glyphicon glyphicon-alert" style="color:red"></span></p>
                 </div>
               </div>
             </div>
           </div>
-          <div ng-show="false">
-            <p>Invalid variable settings for this algorithm<span class="glyphicon glyphicon-alert"
-                                                                 style="color:red"></span></p>
+          <div ng-show="measure.showWarningText">
+            <p>"{{'analysis.algorithmic.warning' | translate}}"<span class="glyphicon glyphicon-alert"
+                                                                     style="color:red"></span></p>
           </div>
         </div>
       </uib-accordion-group>
