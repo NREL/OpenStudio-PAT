@@ -784,7 +784,7 @@ export class AnalysisController {
       const seedModelPath = result[0];
       vm.$log.debug('Seed Model:', seedModelPath);
       const seedModelFilename = seedModelPath.replace(/^.*[\\\/]/, '');
-      vm.jetpack.copy(seedModelPath, vm.Project.getProjectDir().path('seeds/' + seedModelFilename), { overwrite: true });
+      vm.jetpack.copy(seedModelPath, vm.Project.getProjectDir().path('seeds/' + seedModelFilename), {overwrite: true});
       vm.$log.debug('Seed Model name: ', seedModelFilename);
       // update seeds
       vm.Project.setSeeds();
@@ -1094,17 +1094,21 @@ export class AnalysisController {
     vm.$log.debug('In initializeValues');
 
     _.forEach(vm.$scope.measures, (measure) => {
-
       measure.skip = _.isNil(measure.skip) ? false : measure.skip;
-
       _.forEach(measure.arguments, (arg) => {
-        if (_.isNil(arg.inputs)) {
-          let relationship = 'Standard';
-          let defaultValue = 0;
-          let choiceDisplayNames = _.isNil(arg.choice_display_names) ? '' : arg.choice_display_names;
-          let name = _.isNil(arg.name) ? [] : arg.name;
-          let displayName = _.isNil(arg.display_name) ? '' : arg.display_name;
-          if (_.isNil(arg.specialRowId)) {
+        if (_.isNil(arg.specialRowId)) {
+          arg.inputs = _.isNil(arg.inputs) ? {} : arg.inputs;
+
+          const relationship = _.isNil(arg.inputs.relationship) ? 'Standard' : arg.inputs.relationship;
+          const choiceDisplayNames = _.isNil(arg.choice_display_names) ? '' : arg.choice_display_names;
+          const name = _.isNil(arg.name) ? [] : arg.name;
+          const displayName = _.isNil(arg.display_name) ? '' : arg.display_name;
+          const distribution = _.isNil(arg.inputs.distribution) ? 'Uniform' : arg.inputs.distribution;
+          const variableSetting = _.isNil(arg.inputs.variableSetting) ? 'Argument' : arg.inputs.variableSetting;
+
+          let defaultValue = null;
+
+          if( _.isNil(arg.inputs.default_value)){
             if (_.isNil(arg.default_value)) {
               if (arg.type == 'Integer' || arg.type == 'Double') {
                 defaultValue = 0;
@@ -1122,63 +1126,65 @@ export class AnalysisController {
             } else {
               defaultValue = arg.default_value;
             }
-
-            let deltaX = 0.001;
-            let discreteMinimum = defaultValue;
-            let discreteMaximum = defaultValue;
-            let maximum = defaultValue;
-            let mean = defaultValue;
-            let minimum = defaultValue;
-            let stdDev = defaultValue;
-            if (arg.type == 'Double') {
-              stdDev = (maximum - minimum) / 6;
-            }
-
-            let distribution = 'Uniform';
-            let variableSetting = 'Argument';
-
-            let inputs = {
-              relationship: relationship,
-              choice_display_names: choiceDisplayNames,
-              default_value: defaultValue,
-              deltaX: deltaX,
-              discreteMinimum: discreteMinimum,
-              discreteMaximum: discreteMaximum,
-              discreteVariables: [
-                {
-                  value: "",
-                  weight: "",
-                  $$hashKey: ""
-                }
-              ],
-              display_name: displayName,
-              distribution: distribution,
-              distributions: [
-                "Uniform",
-                "Triangle",
-                "Normal",
-                "LogNormal"
-              ],
-              maximum: maximum,
-              mean: mean,
-              minimum: minimum,
-              name: name,
-              stdDev: stdDev,
-              variableSetting: variableSetting,
-              variableSettings: [
-                "Argument",
-                "Discrete",
-                "Continuous",
-                "Pivot"
-              ]
-            };
-            arg.inputs = inputs;
+          } else {
+            defaultValue = arg.inputs.default_value;
           }
-        }
 
+          const discreteMinimum = _.isNil(arg.inputs.discreteMinimum) ? defaultValue : arg.inputs.discreteMinimum;
+          const discreteMaximum = _.isNil(arg.inputs.discreteMaximum) ? defaultValue : arg.inputs.discreteMaximum;
+          const maximum = _.isNil(arg.inputs.maximum) ? defaultValue : arg.inputs.maximum;
+          const minimum = _.isNil(arg.inputs.minimum) ? defaultValue : arg.inputs.minimum;
+          const mean = _.isNil(arg.inputs.mean) ? defaultValue : arg.inputs.mean;
+          let deltaX = _.isNil(arg.inputs.deltaX) ? defaultValue : arg.inputs.deltaX;
+          let stdDev = _.isNil(arg.inputs.stdDev) ? defaultValue : arg.inputs.stdDev;
+
+          if (_.isNil(arg.inputs.deltaX) && arg.type == 'Double') {
+            deltaX = 0.0016;
+          }
+
+          if (_.isNil(arg.inputs.stdDev) && arg.type == 'Double') {
+            stdDev = (maximum - minimum) / 6;
+          }
+
+          let inputs = {
+            relationship: relationship,
+            choice_display_names: choiceDisplayNames,
+            default_value: defaultValue,
+            deltaX: deltaX,
+            discreteMinimum: discreteMinimum,
+            discreteMaximum: discreteMaximum,
+            discreteVariables: [
+              {
+                value: "",
+                weight: "",
+                $$hashKey: ""
+              }
+            ],
+            display_name: displayName,
+            distribution: distribution,
+            distributions: [
+              "Uniform",
+              "Triangle",
+              "Normal",
+              "LogNormal"
+            ],
+            maximum: maximum,
+            mean: mean,
+            minimum: minimum,
+            name: name,
+            stdDev: stdDev,
+            variableSetting: variableSetting,
+            variableSettings: [
+              "Argument",
+              "Discrete",
+              "Continuous",
+              "Pivot"
+            ]
+          };
+          arg.inputs = inputs;
+        }
       });
     });
   }
-
 }
 
