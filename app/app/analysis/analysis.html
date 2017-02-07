@@ -11,7 +11,7 @@
     <div class="col-sm-5 pad-bot-20 pad-top-5">
       <div class="input-group">
         <select class="form-control inline form-control-smaller-width" ng-options="type | translate for type in analysis.analysisTypes" ng-model="selectedAnalysisType" ng-change="analysis.setType()"></select>
-        <span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>
+        <span class="input-group-addon"><span class="badge badge-info" title="{{'analysis.helpAnalysis' | translate}}">&nbsp;?&nbsp;</span></span>
       </div>
     </div>
   </div>

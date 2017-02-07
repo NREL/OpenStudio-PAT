@@ -23,12 +23,12 @@
     "type": "mongo"
   }],
   "openstudioServer": [{
-    "name": "OpenStudio-server-0fce20f28f-win32.tar.gz",
+    "name": "OpenStudio-server-15a136465a-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-0fce20f28f-darwin.tar.gz",
+    "name": "OpenStudio-server-15a136465a-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"

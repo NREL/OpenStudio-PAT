@@ -99,7 +99,8 @@ export default {
       args: 'Script Arguments',
       addArg: 'Add Argument',
       serverScripts: 'Server Scripts',
-      serverScriptsMessage: 'If your analysis requires server and worker initialization or finalization scripts, add them here.  Note that these scripts will not run on a local server; they can only be run on a cloud server.'
+      serverScriptsMessage: 'If your analysis requires server and worker initialization or finalization scripts, add them here.  Note that these scripts will not run on a local server; they can only be run on a cloud server.',
+      warning: 'The selected variable setting is invalid for this algorithm.  The variable will be treated as a static argument when running the simulation.'
     },
     manual: {
       projectMeasuresAndOptions: 'Project Measures and Options'
