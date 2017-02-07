@@ -423,15 +423,13 @@ export class Project {
       if (file.dirToInclude){
         if (!file.unpackDirName){
           // use same name if no name is provided
-          file.unpackDirName = dirToInclude.replace(/^.*[\\\/]/, '');
+          file.unpackDirName = file.dirToInclude.replace(/^.*[\\\/]/, '');
         }
         archive.bulk([
           {expand: true, cwd: file.dirToInclude, src: ['**'], dest: 'lib/' + file.unpackDirName}
         ]);
       }
     });
-
-
 
     archive.finalize();
   }
@@ -534,33 +532,11 @@ export class Project {
         const m = {};
         m.name = measure.name;
         m.display_name = measure.display_name;
-        // measure types: ModelMeasure, EnergyPlusMeasure, ReportingMeasure
-        // OSA wants: Ruby, EnergyPlus, Reporting
-        if (measure.type === 'ModelMeasure') {
-          //m.measure_type = 'Ruby';
-          m.measure_type = 'RubyMeasure';
-        } else if (measure.type === 'EnergyPlusMeasure') {
-          //m.measure_type = 'EnergyPlus';
-          m.measure_type = 'EnergyPlusMeasure';
-        } else if (measure.type === 'ReportingMeasure') {
-          //m.measure_type = 'Reporting';
-          m.measure_type = 'ReportingMeasure';
-        } else {
-          m.measure_type = 'unknown';
-        }
+        m.measure_type = vm.getMeasureType(measure);
         m.measure_definition_class_name = measure.className;
         //m.measure_definition_measureUID = measure.colDef.measureUID;
 
-        // windows path vs. mac
-        let mdir = '';
-        if (measure.measure_dir.indexOf('/') != -1) {
-          // correct paths
-          mdir = _.last(_.split(measure.measure_dir, '/'));
-        } else {
-          // assume windows paths '\\'
-          mdir = _.last(_.split(measure.measure_dir, '\\'));
-        }
-        vm.$log.debug("***MEASURE DIR NAME: ", mdir);
+        let mdir = vm.getMeasureBaseDir(measure);
         m.measure_definition_directory = './measures/' + mdir;
         m.measure_definition_directory_local = measure.measure_dir;
         m.measure_definition_class_name = measure.class_name;
@@ -594,13 +570,7 @@ export class Project {
             (_.isUndefined(arg.variable) || arg.variable === false)
           ) {
             vm.$log.debug('ARGUMENT, not variable!');
-            const argument = {};
-            argument.display_name = arg.display_name;
-            argument.display_name_short = arg.display_name_short ? arg.display_name_short : arg.display_name;
-            argument.name = arg.name;
-            argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
-            argument.default_value = arg.default_value;
-            argument.value = arg.option_1 ? arg.option_1 : arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
+            const argument = vm.makeArgument(arg);
             // Make sure that argument is "complete"
             if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
               var_count += 1;
@@ -618,29 +588,7 @@ export class Project {
 
         // need a __SKIP__ argument
         if (_.includes(vars, true)) {
-          const v = {
-            argument: {
-              display_name: 'Skip ' + measure.display_name,
-              display_name_short: 'Skip entire measure',
-              name: '__SKIP__',
-              value_type: 'bool',
-              default_value: false,
-              value: false
-            },
-            display_name: 'Skip ' + measure.display_name,
-            display_name_short: 'Skip entire measure',
-            variable_type: 'variable',
-            units: null,
-            minimum: false,
-            maximum: true,
-            relation_to_output: null,
-            static_value: false,
-            variable: true,
-            uncertainty_description: {
-              attributes: [],
-              type: 'discrete'
-            }
-          };
+          const v = vm.makeSkip(measure);
 
           const valArr = [];
           _.forEach(vars, (skip) => {
@@ -648,15 +596,8 @@ export class Project {
           });
 
           v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
-          v.uncertainty_description.attributes.push({name: 'lower_bounds', value: false});
-          v.uncertainty_description.attributes.push({name: 'upper_bounds', value: false});
-          v.uncertainty_description.attributes.push({name: 'modes', value: false});
-          v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
-          v.uncertainty_description.attributes.push({name: 'stddev', value: null});
-
           v.workflow_index = var_count;
           var_count += 1;
-
           m.variables.push(v);
         }
 
@@ -727,15 +668,9 @@ export class Project {
 
             // VARIABLE ARGUMENT SECTION
             const v = {};
-            v.argument = {};
-            v.argument.display_name = arg.display_name;
-            v.argument.display_name_short = arg.display_name;
-            v.argument.name = arg.name;
-            v.argument.value_type = _.toLower(arg.type); // TODO: see above
-            v.argument.default_value = arg.default_value;
+            v.argument = vm.makeArgument(arg);
             vm.$log.info(arg.choice_display_names);
             v.argument.choice_display_names = arg.choice_display_names;
-            v.argument.value = arg.option_1;
 
             // VARIABLE DETAILS
             v.display_name = arg.display_name;  // same as arg
@@ -784,14 +719,21 @@ export class Project {
     const vm = this;
     vm.$log.debug('In Project::exportAlgorithmic');
 
+    // ALGORITHM SETTINGS
+    vm.osa.analysis.problem.analysis_type = vm.samplingMethod.id;
+    vm.osa.analysis.problem.algorithm = {};
+    _.forEach(vm.algorithmSettings, (setting) => {
+      vm.osa.analysis.problem.algorithm[setting.name] = setting.value;
+    });
+
+    // OUTPUTS
     let groupFlag = false;
-    let currentGroup = null;
     if (['NSGA2', 'SPEA2'].indexOf(vm.samplingMethod.id) != -1) {
       // this sampling method supports groups
       groupFlag = true;
     }
-    let index = 0;
-    // flatten outputs
+
+    // flatten outputs & order
     let tempOutputs = [];
     _.forEach(vm.measures, (measure) => {
       _.forEach(measure.analysisOutputs, (out) => {
@@ -800,14 +742,211 @@ export class Project {
         tempOutputs.push(out);
       });
     });
-
-    // order
     if (groupFlag) {
       tempOutputs = _.sortBy(tempOutputs, ['obj_function_group']);
     }
     vm.$log.debug("tempOutputs sorted: ", tempOutputs);
 
-    _.forEach(tempOutputs, (out) => {
+    // add objective function names to algorithm section
+    vm.osa.analysis.problem.algorithm.objective_functions = _.map(_.filter(tempOutputs, {objective_function: true}), 'name');
+    vm.osa.analysis.output_variables = vm.makeOutputs(tempOutputs, groupFlag);
+
+    // MEASURE DETAILS
+    let measure_count = 0;
+    _.forEach(vm.measures, (measure) => {
+      const m = {};
+      m.name = measure.name;
+      m.display_name = measure.display_name;
+
+      m.measure_type = vm.getMeasureType(measure);
+
+      m.measure_definition_class_name = measure.className;
+      //m.measure_definition_measureUID = measure.colDef.measureUID;
+
+      let mdir = vm.getMeasureBaseDir(measure);
+      m.measure_definition_directory = './measures/' + mdir;
+      m.measure_definition_directory_local = measure.measure_dir;
+      m.measure_definition_class_name = measure.class_name;
+      m.measure_definition_display_name = measure.display_name;
+      m.measure_definition_name = measure.name;
+      m.measure_definition_name_xml = null;
+      m.measure_definition_uuid = measure.uid;
+      m.measure_definition_version_uuid = measure.version_id;
+
+      // adding these to support EDAPT reporting
+      m.uuid = measure.uid;
+      m.version_uuid = measure.version_id;
+      m.description = measure.description;
+      m.taxonomy = measure.tags;
+
+      // ARGUMENTS
+      m.arguments = [];
+      // This portion only has arguments that don't have the variable box checked
+      _.forEach(measure.arguments, (arg) => {
+        // if argument is set to 'Argument' or if the variable setting is not supported by selected algorithm
+        if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
+          vm.$log.debug(arg.name, ' treated as ARGUMENT');
+          const argument = vm.makeArgument(arg);
+          // Make sure that argument is "complete"
+          if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
+            var_count += 1;
+            m.arguments.push(argument);
+          } else {
+            vm.$log.debug('Not pushing partial arg to m.arguments');
+            vm.$log.debug('partial arg: ', argument);
+          }
+        }
+      });
+
+      // VARIABLES
+      let var_count = 0;
+      m.variables = [];
+
+      // skip this measure?
+      if (measure.skip) {
+        const v =  vm.makeSkip(measure);
+        v.workflow_index = var_count;
+        var_count += 1;
+        m.variables.push(v);
+      }
+
+      // Variable arguments
+      _.forEach(measure.arguments, (arg) => {
+        if (arg.inputs && arg.inputs.variableSetting && arg.inputs.variableSetting != 'Argument' && !arg.inputs.showWarningIcon) {
+          vm.$log.debug('Project::exportAlgorithmic arg: ', arg);
+
+          // VARIABLE ARGUMENT SECTION
+          const v = {};
+          v.argument = vm.makeArgument(arg);
+
+          vm.$log.info(arg.choice_display_names);
+          v.argument.choice_display_names = arg.choice_display_names;  // TODO: not sure about this?
+
+          // VARIABLE DETAILS
+          v.display_name = arg.display_name;  // same as arg
+          v.display_name_short = arg.display_name_short;
+          v.variable_type = (arg.inputs.variableSetting == 'Pivot') ? 'pivot' : 'variable'; // this is 'variable' or 'pivot'
+          v.units = arg.units;
+          v.minimum = arg.inputs.minimum;
+          v.maximum = arg.inputs.maximum;
+          v.relation_to_output = null;
+          v.static_value = arg.default_value;
+          v.uuid = '';
+          v.version_uuid = '';
+          if (arg.inputs.variableSetting == 'Pivot') {
+            v.pivot = true;
+          } else {
+            v.variable = true;
+          }
+          v.uncertainty_description = {};
+          // pivots can be discrete or integer_sequence_uncertain (handled in analysis controller)
+          // options are triangle, uniform, discrete, and normal, integer_sequence_uncertain
+          v.uncertainty_description.type = arg.inputs.distribution;
+          v.uncertainty_description.attributes = [];
+
+          // if discrete or pivot, make values and weights array (unless pivot w/ integer_sequence)
+          if ((arg.inputs.variableSetting == 'Pivot' || arg.inputs.variableSetting == 'Discrete') && arg.inputs.distribution != 'Integer Sequence'){
+            const valArr = vm.makeDiscreteValuesArray(arg.inputs.discreteVariables);
+            v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
+          }
+
+          v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.inputs.minimum});  // minimum
+          v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.inputs.maximum});  // maximum
+          v.uncertainty_description.attributes.push({name: 'modes', value: arg.inputs.mean}); // mean
+          v.uncertainty_description.attributes.push({name: 'delta_x', value: arg.inputs.deltaX}); // delta x
+          v.uncertainty_description.attributes.push({name: 'stddev', value: arg.inputs.stdDev});  // std dev
+
+          v.workflow_index = var_count;
+          var_count += 1;
+          m.variables.push(v);
+        }
+      });
+
+      m.workflow_index = measure_count;
+      measure_count += 1;
+      // push measure to OSA
+      vm.osa.analysis.problem.workflow.push(m);
+    });
+  }
+
+  makeDiscreteValuesArray(discreteVariables){
+    const vm = this;
+    const valArr = [];
+    _.forEach(discreteVariables, (valueHash) => {
+      valArr.push({value: valueHash.value, weight: valueHash.weight});
+    });
+
+    // TODO: more complicated weighting scheme?
+    let weightSum = 0;
+    _.forEach(valArr, (valueHash) => {
+      vm.$log.debug('weight: ', parseFloat(valueHash.weight));
+
+      if (vm.isNumeric(valueHash.weight)){
+        vm.$log.debug('weight for ', valueHash.value);
+        valueHash.weight = parseFloat(valueHash.weight);
+        weightSum = weightSum + valueHash.weight;
+      }
+    });
+    vm.$log.debug('current weight sum: ', weightSum);
+
+    if (weightSum > 1){
+      vm.$log.debug('ERROR: weights do not add up to 1');
+      // TODO: what to do here?
+    }
+
+    let missingCount = 0;
+    _.forEach(valArr, (valueHash) => {
+      if (!vm.isNumeric(valueHash.weight)){
+        missingCount = missingCount + 1;
+      }
+    });
+    vm.$log.debug('missing count: ', missingCount);
+
+    if (missingCount > 0){
+      vm.$log.debug('calculating missing weights');
+      const weightVal = (1 - weightSum)/missingCount; // TODO: limit
+      vm.$log.debug('calculated weight Val: ', weightVal);
+      _.forEach(valArr, (valueHash) => {
+        if (!vm.isNumeric(valueHash.weight)){
+          valueHash.weight = weightVal;
+        }
+      });
+    }
+
+    vm.$log.debug('Final discrete values array: ', valArr);
+    return valArr;
+  }
+
+  isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
+
+  getMeasureType(measure) {
+    const vm = this;
+    // measure types: ModelMeasure, EnergyPlusMeasure, ReportingMeasure
+    // OSA wants: Ruby, EnergyPlus, Reporting
+    let type = null;
+    if (measure.type === 'ModelMeasure') {
+      //type = 'Ruby';
+       type = 'RubyMeasure';
+    } else if (measure.type === 'EnergyPlusMeasure') {
+      //type = 'EnergyPlus';
+      type = 'EnergyPlusMeasure';
+    } else if (measure.type === 'ReportingMeasure') {
+      //type = 'Reporting';
+      type = 'ReportingMeasure';
+    } else {
+      type = 'unknown';
+    }
+    return type;
+  }
+
+  makeOutputs(outputs, groupFlag){
+    const vm = this;
+    let index = 0;
+    let currentGroup = null;
+    const finalOutputs = [];
+    _.forEach(outputs, (out) => {
       vm.$log.debug('OUTPUT: ', out);
       const outHash = {};
       outHash.units = out.units;
@@ -868,8 +1007,76 @@ export class Project {
       outHash.visualize = out.visualize;
       outHash.export = true; // always true
       outHash.variable_type = out.type;  // options are: string, bool, double, integer?  TODO: find out what these can be. for now: use argument type
-      vm.osa.analysis.output_variables.push(outHash);
+      finalOutputs.push(outHash);
     });
+    return finalOutputs;
+  }
+
+  getMeasureBaseDir(measure) {
+    const vm = this;
+    let mdir = '';
+    // windows path vs. mac
+    if (measure.measure_dir.indexOf('/') != -1) {
+      // correct paths
+      mdir = _.last(_.split(measure.measure_dir, '/'));
+    } else {
+      // assume windows paths '\\'
+      mdir = _.last(_.split(measure.measure_dir, '\\'));
+    }
+    vm.$log.debug("***MEASURE DIR NAME: ", mdir);
+    return mdir;
+  }
+
+  makeArgument(arg){
+    const vm = this;
+    const argument = {};
+    argument.display_name = arg.display_name;
+    argument.display_name_short = arg.display_name_short ? arg.display_name_short : arg.display_name;
+    argument.name = arg.name;
+    argument.value_type = _.toLower(arg.type); // TODO: choice, double, integer, bool, string (convert from BCL types)
+    argument.default_value = arg.default_value;
+    if (vm.analysisType == 'Manual')
+      argument.value = arg.option_1 ? arg.option_1 : arg.default_value;
+    else
+      argument.value = (arg.inputs && !_.isNil(arg.inputs.default_value)) ? arg.inputs.default_value : arg.default_value;
+
+    return argument;
+  }
+
+  makeSkip(measure){
+    const vm = this;
+    const v = {
+      argument: {
+        display_name: 'Skip ' + measure.display_name,
+        display_name_short: 'Skip entire measure',
+        name: '__SKIP__',
+        value_type: 'bool',
+        default_value: false,
+        value: false
+      },
+      display_name: 'Skip ' + measure.display_name,
+      display_name_short: 'Skip entire measure',
+      variable_type: 'variable',
+      units: null,
+      minimum: false,
+      maximum: true,
+      relation_to_output: null,
+      static_value: false,
+      variable: true,
+      uncertainty_description: {
+        attributes: [],
+        type: 'discrete'
+      }
+    };
+
+    v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: []});
+    v.uncertainty_description.attributes.push({name: 'lower_bounds', value: false});
+    v.uncertainty_description.attributes.push({name: 'upper_bounds', value: false});
+    v.uncertainty_description.attributes.push({name: 'modes', value: false});
+    v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
+    v.uncertainty_description.attributes.push({name: 'stddev', value: null});
+
+    return v;
   }
 
   exportScripts() {
