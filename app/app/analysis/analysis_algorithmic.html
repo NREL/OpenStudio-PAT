@@ -142,7 +142,6 @@
           </div>
         </div>
 
-
       </uib-accordion-group>
     </uib-accordion>
   </div>
@@ -151,7 +150,8 @@
 <div class="row">
   <div class="col-sm-6">
     <h5 class="inline measure-type" translate>analysis.openstudioMeasures</h5>
-    <span class="badge badge-info margin-left-5 margin-right-5" title="{{'analysis.helpOpenStudioMeasures' | translate}}">&nbsp;?&nbsp;</span>
+    <span class="badge badge-info margin-left-5 margin-right-5"
+          title="{{'analysis.helpOpenStudioMeasures' | translate}}">&nbsp;?&nbsp;</span>
     <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ModelMeasure')"><span
       class="glyphicon glyphicon-plus" aria-hidden="true"></span>
       <translate>analysis.addMeasure</translate>
@@ -215,19 +215,19 @@
         <div class="container" style="width:100%">
           <div class="row">
             <div class="col-sm-1">
-              Name
+              <translate>analysis.algorithmic.grid.name</translate>
             </div>
             <div class="col-sm-1">
-              Short Name
+              <translate>analysis.algorithmic.grid.shortName</translate>
             </div>
             <div class="col-sm-1">
-              Variable Settings
+              <translate>analysis.algorithmic.grid.variableSettings</translate>
             </div>
             <div class="col-sm-1">
-              Static/Default
+              <translate>analysis.algorithmic.grid.staticDefault</translate>
             </div>
             <div class="col-sm-7">
-              Measure Inputs
+              <translate>analysis.algorithmic.grid.measureInputs</translate>
             </div>
           </div>
           <div class="row" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
@@ -267,19 +267,19 @@
                  ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation')">
               <div class="row">
                 <div class="col-sm-2">
-                  Minimum
+                  <translate>analysis.algorithmic.grid.minimum</translate>
                 </div>
                 <div class="col-sm-2">
-                  Maximum
+                  <translate>analysis.algorithmic.grid.maximum</translate>
                 </div>
                 <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  Mean
+                  <translate>analysis.algorithmic.grid.mean</translate>
                 </div>
                 <div class="col-sm-2">
-                  Std Dev
+                  <translate>analysis.algorithmic.grid.stdDev</translate>
                 </div>
                 <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  Distribution
+                  <translate>analysis.algorithmic.grid.distribution</translate>
                 </div>
               </div>
               <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
@@ -330,22 +330,22 @@
                  ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'&& ((analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation'))">
               <div class="row">
                 <div class="col-sm-2">
-                  Minimum
+                  <translate>analysis.algorithmic.grid.minimum</translate>
                 </div>
                 <div class="col-sm-2">
-                  Maximum
+                  <translate>analysis.algorithmic.grid.maximum</translate>
                 </div>
                 <div class="col-sm-2">
-                  Delta X
+                  <translate>analysis.algorithmic.grid.deltaX</translate>
                 </div>
                 <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  Mean
+                  <translate>analysis.algorithmic.grid.mean</translate>
                 </div>
                 <div class="col-sm-2">
-                  Std Dev
+                  <translate>analysis.algorithmic.grid.stdDev</translate>
                 </div>
                 <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  Distribution
+                  <translate>analysis.algorithmic.grid.distribution</translate>
                 </div>
               </div>
               <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
@@ -403,20 +403,20 @@
                  ng-init="analysis.showDiscreteVariables(argument)">
               <div class="row">
                 <div class="col-sm-2" ng-show="analysis.$scope.showMinAndMax">
-                  Relation to EUI
+                  <translate>analysis.algorithmic.grid.relationToEUI</translate>
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  Min
+                  <translate>analysis.algorithmic.grid.min</translate>
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  Max
+                  <translate>analysis.algorithmic.grid.max</translate>
                 </div>
                 <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
                   <div class="col-sm-1" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                    Value
+                    <translate>analysis.algorithmic.grid.value</translate>
                   </div>
                   <div class="col-sm-1">
-                    Weight
+                    <translate>analysis.algorithmic.grid.weight</translate>
                   </div>
                 </div>
               </div>
@@ -491,7 +491,7 @@
           </div>
           <div ng-show="measure.showWarningText">
             <p>"{{'analysis.algorithmic.warning' | translate}}"<span class="glyphicon glyphicon-alert"
-                                                                 style="color:red"></span></p>
+                                                                     style="color:red"></span></p>
           </div>
         </div>
       </uib-accordion-group>
@@ -503,7 +503,8 @@
 <div class="row">
   <div class="col-sm-12">
     <h5 class="inline measure-type" translate>analysis.energyplusMeasures</h5>
-    <span class="badge badge-info margin-left-5 margin-right-5" title="{{'analysis.helpEnergyPlusMeasures' | translate}}">&nbsp;?&nbsp;</span>
+    <span class="badge badge-info margin-left-5 margin-right-5"
+          title="{{'analysis.helpEnergyPlusMeasures' | translate}}">&nbsp;?&nbsp;</span>
     <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('EnergyPlusMeasure')"><span
       class="glyphicon glyphicon-plus" aria-hidden="true"></span>
       <translate>analysis.addMeasure</translate>
@@ -561,19 +562,19 @@
         <div class="container" style="width:100%">
           <div class="row">
             <div class="col-sm-1">
-              Name
+              <translate>analysis.algorithmic.grid.name</translate>
             </div>
             <div class="col-sm-1">
-              Short Name
+              <translate>analysis.algorithmic.grid.shortName</translate>
             </div>
             <div class="col-sm-1">
-              Variable Settings
+              <translate>analysis.algorithmic.grid.variableSettings</translate>
             </div>
             <div class="col-sm-1">
-              Static/Default
+              <translate>analysis.algorithmic.grid.staticDefault</translate>
             </div>
             <div class="col-sm-7">
-              Measure Inputs
+              <translate>analysis.algorithmic.grid.measureInputs</translate>
             </div>
           </div>
           <div class="row" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
@@ -612,19 +613,19 @@
                  ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && ((analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation'))">
               <div class="row">
                 <div class="col-sm-2">
-                  Minimum
+                  <translate>analysis.algorithmic.grid.minimum</translate>
                 </div>
                 <div class="col-sm-2">
-                  Maximum
+                  <translate>analysis.algorithmic.grid.maximum</translate>
                 </div>
                 <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  Mean
+                  <translate>analysis.algorithmic.grid.mean</translate>
                 </div>
                 <div class="col-sm-2">
-                  Std Dev
+                  <translate>analysis.algorithmic.grid.stdDev</translate>
                 </div>
                 <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  Distribution
+                  <translate>analysis.algorithmic.grid.distribution</translate>
                 </div>
               </div>
               <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
@@ -675,22 +676,22 @@
                  ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'&& ((analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation'))">
               <div class="row">
                 <div class="col-sm-2">
-                  Minimum
+                  <translate>analysis.algorithmic.grid.minimum</translate>
                 </div>
                 <div class="col-sm-2">
-                  Maximum
+                  <translate>analysis.algorithmic.grid.maximum</translate>
                 </div>
                 <div class="col-sm-2">
-                  Delta X
+                  <translate>analysis.algorithmic.grid.deltaX</translate>
                 </div>
                 <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  Mean
+                  <translate>analysis.algorithmic.grid.mean</translate>
                 </div>
                 <div class="col-sm-2">
-                  Std Dev
+                  <translate>analysis.algorithmic.grid.stdDev</translate>
                 </div>
                 <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  Distribution
+                  <translate>analysis.algorithmic.grid.distribution</translate>
                 </div>
               </div>
               <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
@@ -748,20 +749,20 @@
                  ng-init="analysis.showDiscreteVariables(argument)">
               <div class="row">
                 <div class="col-sm-2" ng-show="analysis.$scope.showMinAndMax">
-                  Relation to EUI
+                  <translate>analysis.algorithmic.grid.relationToEUI</translate>
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  Min
+                  <translate>analysis.algorithmic.grid.min</translate>
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  Max
+                  <translate>analysis.algorithmic.grid.max</translate>
                 </div>
                 <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
                   <div class="col-sm-1" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                    Value
+                    <translate>analysis.algorithmic.grid.value</translate>
                   </div>
                   <div class="col-sm-1">
-                    Weight
+                    <translate>analysis.algorithmic.grid.weight</translate>
                   </div>
                 </div>
               </div>
@@ -848,7 +849,8 @@
 <div class="row">
   <div class="col-sm-12">
     <h5 class="inline measure-type" translate>analysis.reportingMeasures</h5>
-    <span class="badge badge-info margin-left-5 margin-right-5" title="{{'analysis.helpReportingMeasures' | translate}}">&nbsp;?&nbsp;</span>
+    <span class="badge badge-info margin-left-5 margin-right-5"
+          title="{{'analysis.helpReportingMeasures' | translate}}">&nbsp;?&nbsp;</span>
     <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ReportingMeasure')"><span
       class="glyphicon glyphicon-plus" aria-hidden="true"></span>
       <translate>analysis.addMeasure</translate>
@@ -906,19 +908,19 @@
         <div class="container" style="width:100%">
           <div class="row">
             <div class="col-sm-1">
-              Name
+              <translate>analysis.algorithmic.grid.name</translate>
             </div>
             <div class="col-sm-1">
-              Short Name
+              <translate>analysis.algorithmic.grid.shortName</translate>
             </div>
             <div class="col-sm-1">
-              Variable Settings
+              <translate>analysis.algorithmic.grid.variableSettings</translate>
             </div>
             <div class="col-sm-1">
-              Static/Default
+              <translate>analysis.algorithmic.grid.staticDefault</translate>
             </div>
             <div class="col-sm-7">
-              Measure Inputs
+              <translate>analysis.algorithmic.grid.measureInputs</translate>
             </div>
           </div>
           <div class="row" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
@@ -957,19 +959,19 @@
                  ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && ((analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation'))">
               <div class="row">
                 <div class="col-sm-2">
-                  Minimum
+                  <translate>analysis.algorithmic.grid.minimum</translate>
                 </div>
                 <div class="col-sm-2">
-                  Maximum
+                  <translate>analysis.algorithmic.grid.maximum</translate>
                 </div>
                 <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  Mean
+                  <translate>analysis.algorithmic.grid.mean</translate>
                 </div>
                 <div class="col-sm-2">
-                  Std Dev
+                  <translate>analysis.algorithmic.grid.stdDev</translate>
                 </div>
                 <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  Distribution
+                  <translate>analysis.algorithmic.grid.distribution</translate>
                 </div>
               </div>
               <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
@@ -1020,22 +1022,22 @@
                  ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'&& ((analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation'))">
               <div class="row">
                 <div class="col-sm-2">
-                  Minimum
+                  <translate>analysis.algorithmic.grid.minimum</translate>
                 </div>
                 <div class="col-sm-2">
-                  Maximum
+                  <translate>analysis.algorithmic.grid.maximum</translate>
                 </div>
                 <div class="col-sm-2">
-                  Delta X
+                  <translate>analysis.algorithmic.grid.deltaX</translate>
                 </div>
                 <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  Mean
+                  <translate>analysis.algorithmic.grid.mean</translate>
                 </div>
                 <div class="col-sm-2">
-                  Std Dev
+                  <translate>analysis.algorithmic.grid.stdDev</translate>
                 </div>
                 <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  Distribution
+                  <translate>analysis.algorithmic.grid.distribution</translate>
                 </div>
               </div>
               <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
@@ -1093,20 +1095,20 @@
                  ng-init="analysis.showDiscreteVariables(argument)">
               <div class="row">
                 <div class="col-sm-2" ng-show="analysis.$scope.showMinAndMax">
-                  Relation to EUI
+                  <translate>analysis.algorithmic.grid.relationToEUI</translate>
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  Min
+                  <translate>analysis.algorithmic.grid.min</translate>
                 </div>
                 <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  Max
+                  <translate>analysis.algorithmic.grid.max</translate>
                 </div>
                 <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
                   <div class="col-sm-1" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                    Value
+                    <translate>analysis.algorithmic.grid.value</translate>
                   </div>
                   <div class="col-sm-1">
-                    Weight
+                    <translate>analysis.algorithmic.grid.weight</translate>
                   </div>
                 </div>
               </div>
