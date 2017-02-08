@@ -100,7 +100,25 @@ export default {
       addArg: 'Add Argument',
       serverScripts: 'Server Scripts',
       serverScriptsMessage: 'If your analysis requires server and worker initialization or finalization scripts, add them here.  Note that these scripts will not run on a local server; they can only be run on a cloud server.',
-      warning: 'The selected variable setting is invalid for this algorithm.  The variable will be treated as a static argument when running the simulation.'
+      warning: 'The selected variable setting is invalid for this algorithm.  The variable will be treated as a static argument when running the simulation.',
+      grid: {
+        max: 'Max',
+        min: 'Min',
+        maximum: 'maximum',
+        measureInputs: 'Measure Inputs',
+        minimum: 'minimum',
+        mean: 'mean',
+        name: 'Name',
+        shortName: ' Short Name',
+        stdDev: 'stdDev',
+        deltaX: 'Delta X',
+        distribution: 'distribution',
+        relationToEUI: 'Relation to EUI',
+        staticDefault: 'Static/Default',
+        value: 'Value',
+        variableSettings: 'Variable Settings',
+        weight: 'Weight'
+      }
     },
     manual: {
       projectMeasuresAndOptions: 'Project Measures and Options'
