@@ -460,7 +460,9 @@ export class Project {
     // server scripts (will only work on the cloud, but always put in OSA?)
     vm.osa.analysis.server_scripts = {};
     _.forEach(vm.serverScripts, (script, type) => {
-      vm.osa.analysis.server_scripts[type] = './scripts/' + type + '/' + script.file;
+      if (script.file){
+        vm.osa.analysis.server_scripts[type] = './scripts/' + type + '/' + script.file;
+      }
     });
 
     // TODO: files to include ?

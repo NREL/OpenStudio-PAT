@@ -1253,7 +1253,7 @@ export class OsServer {
     vm.remoteSettings = vm.Project.getRemoteSettings();
     vm.runType = vm.Project.getRunType();
     // if connected to cloud
-    if (vm.remoteSettings.aws.connected && vm.runType.name == 'remote'){
+    if (vm.remoteSettings.aws && vm.remoteSettings.aws.connected && vm.runType.name == 'remote'){
       // local results exist
       const modalInstance = vm.$uibModal.open({
         backdrop: 'static',
