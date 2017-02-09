@@ -118,7 +118,8 @@
                 <translate>analysis.algorithmic.selectScript</translate>
               </button>
               <span class="normal-text pad-left-5 inline">{{scriptData.file}}</span>&nbsp;&nbsp;
-              <span ng-if="scriptData.file" class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25 inline"
+              <span ng-if="scriptData.file"
+                    class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25 inline"
                     ng-click="analysis.deleteScript(scriptType)" aria-hidden="true"
                     aria-label="Delete Script"></span>
             </div>
@@ -233,7 +234,8 @@
               <translate>analysis.algorithmic.grid.measureInputs</translate>
             </div>
           </div>
-          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
+          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length"
+               ng-repeat="argument in measure.arguments">
             <div class="col-sm-2 normal-text pad-top-25">
               {{argument.display_name}}
             </div>
@@ -252,7 +254,8 @@
                           ng-change="analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
                 </div>
                 <div class="col-sm-3 pad-top-5">
-                  <span ng-show="argument.inputs.showWarningIcon" class="glyphicon glyphicon-alert red-button normal-text"></span>
+                  <span ng-show="argument.inputs.showWarningIcon"
+                        class="glyphicon glyphicon-alert red-button normal-text"></span>
                 </div>
               </div>
             </div>
@@ -260,14 +263,16 @@
               <select class="form-control"
                       ng-options="name as name for name in argument.choice_display_names"
                       ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"></select>
-              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-if="argument.type == 'String'">
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value"
+                     ng-if="argument.type == 'String'">
 
-              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value"
+                     ng-if="argument.type == 'Double' || argument.type == 'Integer'">
               <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
             </div>
 
             <!-- continuous (double only)-->
-            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Continuous'">
+            <div class="col-sm-4" ng-if="argument.inputs.variableSetting == 'Continuous'">
               <div class="row pad-bot-10">
                 <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
@@ -301,19 +306,22 @@
             </div>
 
             <!-- discrete & pivot-->
-            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
-              <div class="row" ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"<!-- pivots only -->
+            <div class="col-sm-4"
+                 ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
+              <div class="row"
+                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"
+                <!-- pivots only -->
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
                           ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
                           ng-model="argument.inputs.distribution"></select>
                 </div>
-                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
-                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.maximum">
                 </div>
@@ -338,8 +346,10 @@
                           ng-init="relationship = 'Inverse'"></select>
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-if="argument.type == 'String'">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum"
+                         ng-if="argument.type == 'String'">
                   <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
@@ -347,8 +357,10 @@
 
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-if="argument.type == 'String'">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum"
+                         ng-if="argument.type == 'String'">
                   <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
@@ -357,7 +369,8 @@
               </div>
               <div class="row">
                 <div class="col-sm-12">
-                  <div class="row" ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
+                  <div class="row"
+                       ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
                     <div class="col-sm-6">
                       <label class="normal-text" translate>analysis.algorithmic.grid.value</label>
                     </div>
@@ -388,13 +401,16 @@
                                ng-model="discreteVariable.weight">
                       </div>
                       <div class="col-sm-2 pad-top-5">
-                        <span class="glyphicon glyphicon-remove-sign black-button header-text" ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true" aria-label="Delete Value"></span>
+                        <span class="glyphicon glyphicon-remove-sign black-button header-text"
+                              ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
+                              aria-label="Delete Value"></span>
                       </div>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
-                      <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span
+                      <button type="button" class="btn btn-success"
+                              ng-click="analysis.addDiscreteVariable(argument)"><span
                         class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
                     </div>
                   </div>
@@ -489,7 +505,8 @@
               <translate>analysis.algorithmic.grid.measureInputs</translate>
             </div>
           </div>
-          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
+          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length"
+               ng-repeat="argument in measure.arguments">
             <div class="col-sm-2 normal-text pad-top-25">
               {{argument.display_name}}
             </div>
@@ -508,7 +525,8 @@
                           ng-change="analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
                 </div>
                 <div class="col-sm-3 pad-top-5">
-                  <span ng-show="argument.inputs.showWarningIcon" class="glyphicon glyphicon-alert red-button normal-text"></span>
+                  <span ng-show="argument.inputs.showWarningIcon"
+                        class="glyphicon glyphicon-alert red-button normal-text"></span>
                 </div>
               </div>
             </div>
@@ -516,14 +534,16 @@
               <select class="form-control"
                       ng-options="name as name for name in argument.choice_display_names"
                       ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"></select>
-              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-if="argument.type == 'String'">
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value"
+                     ng-if="argument.type == 'String'">
 
-              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value"
+                     ng-if="argument.type == 'Double' || argument.type == 'Integer'">
               <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
             </div>
 
             <!-- continuous (double only)-->
-            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Continuous'">
+            <div class="col-sm-4" ng-if="argument.inputs.variableSetting == 'Continuous'">
               <div class="row pad-bot-10">
                 <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
@@ -557,19 +577,22 @@
             </div>
 
             <!-- discrete & pivot-->
-            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
-              <div class="row" ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"<!-- pivots only -->
+            <div class="col-sm-4"
+                 ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
+              <div class="row"
+                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"
+                <!-- pivots only -->
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
                           ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
                           ng-model="argument.inputs.distribution"></select>
                 </div>
-                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
-                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.maximum">
                 </div>
@@ -594,8 +617,10 @@
                           ng-init="relationship = 'Inverse'"></select>
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-if="argument.type == 'String'">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum"
+                         ng-if="argument.type == 'String'">
                   <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
@@ -603,8 +628,10 @@
 
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-if="argument.type == 'String'">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum"
+                         ng-if="argument.type == 'String'">
                   <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
@@ -613,7 +640,8 @@
               </div>
               <div class="row">
                 <div class="col-sm-12">
-                  <div class="row" ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
+                  <div class="row"
+                       ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
                     <div class="col-sm-6">
                       <label class="normal-text" translate>analysis.algorithmic.grid.value</label>
                     </div>
@@ -644,13 +672,16 @@
                                ng-model="discreteVariable.weight">
                       </div>
                       <div class="col-sm-2 pad-top-5">
-                        <span class="glyphicon glyphicon-remove-sign black-button header-text" ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true" aria-label="Delete Value"></span>
+                        <span class="glyphicon glyphicon-remove-sign black-button header-text"
+                              ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
+                              aria-label="Delete Value"></span>
                       </div>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
-                      <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span
+                      <button type="button" class="btn btn-success"
+                              ng-click="analysis.addDiscreteVariable(argument)"><span
                         class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
                     </div>
                   </div>
@@ -745,7 +776,8 @@
               <translate>analysis.algorithmic.grid.measureInputs</translate>
             </div>
           </div>
-          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
+          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length"
+               ng-repeat="argument in measure.arguments">
             <div class="col-sm-2 normal-text pad-top-25">
               {{argument.display_name}}
             </div>
@@ -764,7 +796,8 @@
                           ng-change="analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
                 </div>
                 <div class="col-sm-3 pad-top-5">
-                  <span ng-show="argument.inputs.showWarningIcon" class="glyphicon glyphicon-alert red-button normal-text"></span>
+                  <span ng-show="argument.inputs.showWarningIcon"
+                        class="glyphicon glyphicon-alert red-button normal-text"></span>
                 </div>
               </div>
             </div>
@@ -772,14 +805,16 @@
               <select class="form-control"
                       ng-options="name as name for name in argument.choice_display_names"
                       ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"></select>
-              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-if="argument.type == 'String'">
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value"
+                     ng-if="argument.type == 'String'">
 
-              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value"
+                     ng-if="argument.type == 'Double' || argument.type == 'Integer'">
               <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
             </div>
 
             <!-- continuous (double only)-->
-            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Continuous'">
+            <div class="col-sm-4" ng-if="argument.inputs.variableSetting == 'Continuous'">
               <div class="row pad-bot-10">
                 <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
@@ -813,19 +848,22 @@
             </div>
 
             <!-- discrete & pivot-->
-            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
-              <div class="row" ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"<!-- pivots only -->
+            <div class="col-sm-4"
+                 ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
+              <div class="row"
+                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"
+                <!-- pivots only -->
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
                           ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
                           ng-model="argument.inputs.distribution"></select>
                 </div>
-                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
-                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.maximum">
                 </div>
@@ -850,8 +888,10 @@
                           ng-init="relationship = 'Inverse'"></select>
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-if="argument.type == 'String'">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum"
+                         ng-if="argument.type == 'String'">
                   <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
@@ -859,8 +899,10 @@
 
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-if="argument.type == 'String'">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum"
+                         ng-if="argument.type == 'String'">
                   <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
@@ -869,7 +911,8 @@
               </div>
               <div class="row">
                 <div class="col-sm-12">
-                  <div class="row" ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
+                  <div class="row"
+                       ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
                     <div class="col-sm-6">
                       <label class="normal-text" translate>analysis.algorithmic.grid.value</label>
                     </div>
@@ -900,13 +943,16 @@
                                ng-model="discreteVariable.weight">
                       </div>
                       <div class="col-sm-2 pad-top-5">
-                        <span class="glyphicon glyphicon-remove-sign black-button header-text" ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true" aria-label="Delete Value"></span>
+                        <span class="glyphicon glyphicon-remove-sign black-button header-text"
+                              ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
+                              aria-label="Delete Value"></span>
                       </div>
                     </div>
                   </div>
                   <div class="row">
                     <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
-                      <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span
+                      <button type="button" class="btn btn-success"
+                              ng-click="analysis.addDiscreteVariable(argument)"><span
                         class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
                     </div>
                   </div>

@@ -62,7 +62,7 @@ export class AnalysisController {
     vm.initializeTab(); // replaces (and calls) initializeGrids
     //vm.initializeValues();
 
-    vm.$scope.getVariableSettings = function(argument) {
+    vm.$scope.getVariableSettings = function (argument) {
       //vm.$log.debug('In getVariableSettings');
       let settings = [];
       if (argument.type === 'Double') {
@@ -73,7 +73,7 @@ export class AnalysisController {
       return settings;
     };
 
-    vm.$scope.getDistributions = function(argument) {
+    vm.$scope.getDistributions = function (argument) {
       //vm.$log.debug('In getDistributions');
       let distributions = [];
       switch (vm.$scope.selectedSamplingMethod.id) {
@@ -94,7 +94,7 @@ export class AnalysisController {
       return distributions;
     };
 
-    vm.$scope.getDiscreteDistributions = function() {
+    vm.$scope.getDiscreteDistributions = function () {
       //vm.$log.debug('In get Discrete Distributions');
       let distributions = [];
       switch (vm.$scope.selectedSamplingMethod.id) {
@@ -809,7 +809,7 @@ export class AnalysisController {
       // ensure appropriate folders exist
       vm.jetpack.dir(vm.Project.getProjectDir().path('scripts', type));
       // copy/overwrite
-      vm.jetpack.copy(scriptPath, vm.Project.getProjectDir().path('scripts',  type, scriptFilename), {overwrite: true});
+      vm.jetpack.copy(scriptPath, vm.Project.getProjectDir().path('scripts', type, scriptFilename), {overwrite: true});
       vm.$log.debug('Script filename: ', scriptFilename);
       // update project
       vm.$scope.serverScripts[type].file = scriptFilename;
@@ -1165,7 +1165,7 @@ export class AnalysisController {
 
   deleteValue(argument, index) {
     const vm = this;
-    if (!_.isNil(index) && index > -1){
+    if (!_.isNil(index) && index > -1) {
       argument.inputs.discreteVariables.splice(index, 1);
       vm.setIsModified();
     }
@@ -1194,7 +1194,7 @@ export class AnalysisController {
 
         // calculate default value
         let defaultValue = null;
-        if( _.isNil(arg.inputs.default_value)){
+        if (_.isNil(arg.inputs.default_value)) {
           if (_.isNil(arg.default_value)) {
             if (arg.type == 'Integer' || arg.type == 'Double') {
               defaultValue = 0;
