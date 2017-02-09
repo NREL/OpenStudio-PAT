@@ -221,7 +221,7 @@ export class Project {
       const options = [];
       // first find out how many options there are (from the optionDelete special argument)
       let optionKeys = [];
-      if (measure.arguments.length > 0) {
+      if (!_.isNil(measure.arguments) && measure.arguments.length > 0) {
         const keys = Object.keys(measure.arguments[0]);
         optionKeys = _.filter(keys, function (k) {
           return k.indexOf('option_') !== -1;
