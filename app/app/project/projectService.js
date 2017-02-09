@@ -91,7 +91,8 @@ export class Project {
     const src = jetpack.cwd(app.getPath('userData'));
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
     // aws path
-    vm.awsDir = jetpack.dir(app.getAppPath() + '/.aws');
+    vm.awsDir = jetpack.dir(app.getPath('appData') + '/.aws');
+    vm.$log.debug('.aws dir location: ', vm.awsDir.path());
 
     // set my measures dir
     vm.MeasureManager.isReady().then(() => {
