@@ -235,7 +235,7 @@ export class AnalysisController {
           displayName: 'description',
           visible: false
         }, {
-          name: 'short_name',
+          name: 'display_name_short',
           displayName: 'analysis.columns.shortName',
           cellEditableCondition: $scope => {
             return angular.isDefined($scope.row.entity.display_name);
