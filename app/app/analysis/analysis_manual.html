@@ -18,7 +18,7 @@
   <div class="full-width margin-top-20">
 
     <uib-accordion close-others="false">
-      <uib-accordion-group ng-repeat="measure in osMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
+      <uib-accordion-group ng-repeat="measure in osMeasures" class="analysis-custom" id="{{measure.instanceId}}" is-open="measure.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
           {{measure.display_name}}
@@ -69,7 +69,7 @@
             </div>
           </div>
         </div>
-        <div ng-attr-id="{{'grid_' + measure.uid}}" ui-if="gridOptions[measure.uid].data.length>0" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid" ng-style="getTableHeight(measure.uid)"></div>
+        <div ng-attr-id="{{'grid_' + measure.instanceId}}" ui-if="gridOptions[measure.instanceId].data.length>0" ui-grid="gridOptions[measure.instanceId]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid" ng-style="getTableHeight(measure.instanceId)"></div>
       </uib-accordion-group>
     </uib-accordion>
   </div>
@@ -87,7 +87,7 @@
 <div class="analysis-custom">
   <div class="full-width margin-top-20">
     <uib-accordion close-others="false">
-      <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
+      <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.instanceId}}" is-open="measure.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
           {{measure.display_name}}
@@ -140,7 +140,7 @@
             </div>
           </div>
         </div>
-        <div ng-attr-id="{{ 'grid_' + measure.uid}}" ui-if="gridOptions[measure.uid].data.length>0"  ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid" ng-style="getTableHeight(measure.uid)"></div>
+        <div ng-attr-id="{{ 'grid_' + measure.instanceId}}" ui-if="gridOptions[measure.instanceId].data.length>0"  ui-grid="gridOptions[measure.instanceId]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid" ng-style="getTableHeight(measure.instanceId)"></div>
       </uib-accordion-group>
     </uib-accordion>
   </div>
@@ -158,7 +158,7 @@
 <div class="analysis-custom">
   <div class="full-width margin-top-20">
     <uib-accordion close-others="false">
-      <uib-accordion-group ng-repeat="measure in repMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
+      <uib-accordion-group ng-repeat="measure in repMeasures" class="analysis-custom" id="{{measure.instanceId}}" is-open="measure.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
           {{measure.display_name}}
@@ -211,7 +211,7 @@
             </div>
           </div>
         </div>
-        <div ng-attr-id="{{'grid_' + measure.uid}}" ui-if="gridOptions[measure.uid].data.length>0"  ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid" ng-style="getTableHeight(measure.uid)"></div>
+        <div ng-attr-id="{{'grid_' +measure.instanceId}}" ui-if="gridOptions[measure.instanceId].data.length>0"  ui-grid="gridOptions[measure.instanceId]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid" ng-style="getTableHeight(measure.instanceId)"></div>
       </uib-accordion-group>
     </uib-accordion>
   </div>

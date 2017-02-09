@@ -51,11 +51,11 @@ export class AnalysisController {
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
 
     // size grids according to data
-    vm.$scope.getTableHeight = function (uid) {
+    vm.$scope.getTableHeight = function (instanceId) {
       var rowHeight = 30; // your row height
       var headerHeight = 40; // your header height
       return {
-        height: (vm.$scope.gridOptions[uid].data.length * rowHeight + headerHeight + 10) + "px"
+        height: (vm.$scope.gridOptions[instanceId].data.length * rowHeight + headerHeight + 10) + "px"
       };
     };
 
@@ -209,7 +209,7 @@ export class AnalysisController {
         measure.arguments.splice(0, 0, row0, row1, row2);
       }
 
-      vm.$scope.gridOptions[measure.uid] = {
+      vm.$scope.gridOptions[measure.instanceId] = {
         data: measure.arguments,
         enableSorting: false,
         autoResize: true,
@@ -247,6 +247,7 @@ export class AnalysisController {
           name: 'variable',
           displayName: 'analysis.columns.variable',
           measureUID: measure.uid,
+          instanceId: measure.instanceId,
           cellTemplate: 'app/analysis/checkAllTemplate.html',
           headerCellFilter: 'translate',
           minWidth: 30,
@@ -254,10 +255,10 @@ export class AnalysisController {
           width: 70
         }],
         onRegisterApi: function (gridApi) {
-          vm.gridApis[measure.uid] = gridApi;
+          vm.gridApis[measure.instanceId] = gridApi;
           gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
             if (newValue != oldValue) {
-              vm.$log.debug('CELL has changed in: ', measure.uid, ' old val: ', oldValue, ' new val: ', newValue);
+              vm.$log.debug('CELL has changed in: ', measure.instanceId, ' old val: ', oldValue, ' new val: ', newValue);
               vm.$log.debug('rowEntity: ', rowEntity);
               vm.updateDASelectedName(measure, oldValue, newValue);
             }
@@ -327,12 +328,12 @@ export class AnalysisController {
   }
 
   // When an option is deleted, reset DAs that were using the option
-  unsetOptionInDA(measureUID, value) {
+  unsetOptionInDA(instanceId, value) {
     const vm = this;
     vm.$log.debug('In Analysis::unsetOptionInDA');
     vm.$log.debug('DAs: ', vm.designAlternatives);
-    vm.$log.debug('measureUID: ', measureUID, ' optionName: ', value);
-    const measure = _.find(vm.$scope.measures, {uid: measureUID});
+    vm.$log.debug('instanceId: ', instanceId, ' optionName: ', value);
+    const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
     vm.$log.debug('measure: ', measure);
     if (measure) {
       _.forEach(vm.designAlternatives, (alt) => {
@@ -362,10 +363,10 @@ export class AnalysisController {
 
     // line below also removes it from bclService 'getProjectMeasures', but not from disk
     // TODO: fix so BCL modal doesn't restore deleted panels
-    _.remove(vm.$scope.measures, {uid: measure.uid});
+    _.remove(vm.$scope.measures, {instanceId: measure.instanceId});
     vm.Project.setMeasuresAndOptions(vm.$scope.measures);
 
-    const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.uid + '"]'));
+    const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.instanceId + '"]'));
     measurePanel.remove();
 
     // Note: jetpack.remove() does not have any return
@@ -408,7 +409,7 @@ export class AnalysisController {
     const opt = vm.getDefaultOptionColDef();
     opt.display_name = 'Option ' + Number(max + 1);
     opt.field = 'option_' + Number(max + 1);
-    opt.measureUID = measure.uid;
+    opt.instanceId = measure.instanceId;
 
     // add default arguments to opt
     vm.addDefaultArguments(measure, opt);
@@ -431,7 +432,7 @@ export class AnalysisController {
       }
     });
 
-    vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
+    vm.$scope.gridOptions[measure.instanceId].columnDefs.push(opt);
     return opt;
   }
 
@@ -441,7 +442,7 @@ export class AnalysisController {
     vm.setIsModified();
     if (measure.numberOfOptions > 0) {
       measure.numberOfOptions -= 1;
-      vm.$scope.gridOptions[measure.uid].columnDefs.splice(vm.$scope.gridOptions[measure.uid].columnDefs.length - 1, 1);
+      vm.$scope.gridOptions[measure.instanceId].columnDefs.splice(vm.$scope.gridOptions[measure.instanceId].columnDefs.length - 1, 1);
     }
   }
 
@@ -453,28 +454,28 @@ export class AnalysisController {
 
     const optionCount = Number(col.field.split('_')[1]);
     vm.$log.debug('optionCount: ', optionCount);
-    const measureUID = col.colDef.measureUID;
-    vm.$log.debug('measureUID: ', measureUID);
+    const instanceId = col.colDef.instanceId;
+    vm.$log.debug('instanceId: ', instanceId);
 
     // get option name before deleting it
     vm.$log.debug('OPTION NAME? ', col.grid.options.data[1][col.name]);
     const optionName = col.grid.options.data[1][col.name];
 
     let columnIndex = 0;
-    _.forEach((vm.$scope.gridOptions[measureUID]).columnDefs, (columnDef) => {
+    _.forEach((vm.$scope.gridOptions[instanceId]).columnDefs, (columnDef) => {
       if (_.has(columnDef, 'field')) {
         const optionCount2 = Number(columnDef.field.split('_')[1]);
         vm.$log.debug('columnDef.field: ', columnDef.field);
         if (optionCount === optionCount2) {
           vm.$log.debug('SUCCESS');
           vm.$log.debug('columnIndex: ', columnIndex);
-          vm.$scope.gridOptions[measureUID].columnDefs.splice(columnIndex, 1);
+          vm.$scope.gridOptions[instanceId].columnDefs.splice(columnIndex, 1);
         }
       }
       columnIndex++;
     });
     _.forEach(vm.$scope.measures, (measure) => {
-      if (measure.uid == measureUID) {
+      if (measure.instanceId == instanceId) {
         _.forEach(measure.arguments, (argument) => {
           delete argument[col.field];
         });
@@ -483,7 +484,7 @@ export class AnalysisController {
       }
     });
     // reset DAs that were using this option
-    vm.unsetOptionInDA(measureUID, optionName);
+    vm.unsetOptionInDA(instanceId, optionName);
   }
 
   variableCheckboxChanged(row, col) {
@@ -493,10 +494,10 @@ export class AnalysisController {
     //vm.$log.debug('col', col);
     vm.setIsModified();
 
-    const measureUID = col.colDef.measureUID;
-    //vm.$log.debug('measureUID: ', measureUID);
+    const instanceId = col.colDef.instanceId;
+    //vm.$log.debug('instanceId: ', instanceId);
 
-    const measure = _.find(vm.$scope.measures, {uid: measureUID});
+    const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
     //vm.$log.debug('measure: ', measure);
 
     const display_name = row.entity.display_name;
@@ -539,10 +540,10 @@ export class AnalysisController {
     //vm.$log.debug('col', col);
     vm.setIsModified();
 
-    const measureUID = col.colDef.measureUID;
-    //vm.$log.debug('measureUID: ', measureUID);
+    const instanceId = col.colDef.instanceId;
+    //vm.$log.debug('instanceId: ', instanceId);
 
-    const measure = _.find(vm.$scope.measures, {uid: measureUID});
+    const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
     //vm.$log.debug('measure: ', measure);
 
     const variable = row.entity.variable;
@@ -568,16 +569,16 @@ export class AnalysisController {
   // Toggle all variable checkboxes
   checkAllVariables(row, col) {
     const vm = this;
-    const measureUID = col.colDef.measureUID;
+    const instanceId = col.colDef.instanceId;
     // toggle checkbox
     if (row.entity.variable) {
       // set all to true
-      _.forEach(vm.$scope.gridOptions[measureUID].data, (row) => {
+      _.forEach(vm.$scope.gridOptions[instanceId].data, (row) => {
         row.variable = true;
       });
     } else {
       // set all to false
-      _.forEach(vm.$scope.gridOptions[measureUID].data, (row) => {
+      _.forEach(vm.$scope.gridOptions[instanceId].data, (row) => {
         row.variable = false;
       });
     }
@@ -610,10 +611,16 @@ export class AnalysisController {
     });
   }
 
-  duplicateMeasureAndOption() {
+  duplicateMeasureAndOption(measure) {
     const vm = this;
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
     vm.setIsModified();
+
+    let copiedMeasure = angular.copy(measure);
+    copiedMeasure.instanceId = Math.random();
+
+    vm.$scope.measures.push(copiedMeasure);
+    vm.Project.measures.push(copiedMeasure);
   }
 
   loadMeasureOptions() {
@@ -640,8 +647,8 @@ export class AnalysisController {
       const opt = vm.getDefaultOptionColDef();
       opt.display_name = _.startCase(option.id);
       opt.field = option.id;
-      opt.measureUID = measure.uid;  // explicitly set this just in case
-      vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
+      opt.instanceId = measure.instanceId;  // explicitly set this just in case
+      vm.$scope.gridOptions[measure.instanceId].columnDefs.push(opt);
     } else {
       vm.$log.error('option id does not match expected format (option_<ID>)');
     }
@@ -914,7 +921,7 @@ export class AnalysisController {
     vm.$log.debug('moving measure: ', direction);
     vm.setIsModified();
     // find current index of measure and new index to move to
-    const index = _.findIndex(vm.$scope.measures, {uid: measure.uid});
+    const index = _.findIndex(vm.$scope.measures, {instanceId: measure.instanceId});
     const new_index = (direction == 'up') ? index - 1 : index + 1;
     // find measure to swap with (with same type)
     const swapping_measure = vm.$scope.measures[new_index];
@@ -1175,6 +1182,7 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('Initializing variables for Algorithmic mode');
     _.forEach(vm.$scope.measures, (measure) => {
+      measure.instanceId = Math.random();
       // add SKIP
       measure.skip = _.isNil(measure.skip) ? false : measure.skip;
       _.forEach(measure.arguments, (arg) => {

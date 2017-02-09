@@ -1167,7 +1167,7 @@ export class Project {
     const newMeasures = [];
 
     _.forEach(updatedMeasures, (measure) => {
-      const match = _.find(vm.measures, {uid: measure.uid});
+      const match = _.find(vm.measures, {instanceId: measure.instanceId});
       if (angular.isDefined(match)) {
         // if there's a match, merge (update)
         _.merge(match, measure);
