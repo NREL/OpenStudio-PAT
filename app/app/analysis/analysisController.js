@@ -40,15 +40,15 @@ export class AnalysisController {
     vm.$scope.epMeasures = [];
     vm.$scope.repMeasures = [];
 
+    // Manual Mode
+    vm.designAlternatives = vm.Project.getDesignAlternatives();
+    vm.gridApis = [];
+    vm.$scope.gridOptions = [];
+
+    // Algorithmic Mode
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
-
-    vm.designAlternatives = vm.Project.getDesignAlternatives();
-
-    vm.gridApis = [];
-    vm.$scope.gridOptions = [];
-    vm.initializeGrids();
 
     // size grids according to data
     vm.$scope.getTableHeight = function (uid) {
@@ -59,32 +59,87 @@ export class AnalysisController {
       };
     };
 
-    vm.initializeValues();
-    vm.showDeltaX();
-    vm.showValueAndWeights();
-    vm.showMinAndMax();
-    vm.showDistributions();
-    vm.showDiscreteVariables();
-    vm.showPivotVariables();
+    vm.initializeTab(); // replaces (and calls) initializeGrids
+    //vm.initializeValues();
 
+    vm.$scope.getVariableSettings = function(argument) {
+      //vm.$log.debug('In getVariableSettings');
+      let settings = [];
+      if (argument.type === 'Double') {
+        settings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
+      } else {
+        settings = ['Argument', 'Discrete', 'Pivot'];
+      }
+      return settings;
+    };
+
+    vm.$scope.getDistributions = function(argument) {
+      //vm.$log.debug('In getDistributions');
+      let distributions = [];
+      switch (vm.$scope.selectedSamplingMethod.id) {
+        case 'SPEA2':
+        case 'RGENOUD':
+        case 'NSGA2':
+        case 'LHS':
+        case 'PreFlight':
+        case 'Morris':
+        case 'DOE':
+        case 'SingleRun':
+        case 'RepeatRun':
+          distributions = ['Uniform', 'Triangle', 'Normal', 'LogNormal'];
+          break;
+        default:
+          distributions = ['Uniform'];
+      }
+      return distributions;
+    };
+
+    vm.$scope.getDiscreteDistributions = function() {
+      //vm.$log.debug('In get Discrete Distributions');
+      let distributions = [];
+      switch (vm.$scope.selectedSamplingMethod.id) {
+        case 'Diagonal':
+          distributions = ['Discrete', 'Integer Sequence'];
+          break;
+        default:
+          distributions = ['Discrete'];
+      }
+      return distributions;
+    };
+
+  }
+
+  initializeTab() {
+    const vm = this;
+    vm.$log.debug('In initializeTab in analysis');
+    // group by type
+    vm.setMeasureTypes();
+    // sort measures by workflow_index
+    vm.$scope.measures = _.sortBy(vm.$scope.measures, ['workflow_index']);
+    if (vm.$scope.selectedAnalysisType == 'Manual') {
+      // initialize for Manual Mode
+      vm.initializeGrids();
+    } else {
+      // initialize for Alg Mode
+      vm.initializeVariablesAlgMode();
+      vm.showDeltaX();
+      //vm.showValueAndWeights();
+      vm.showMinAndMax();
+      vm.showDistributions();
+      vm.showDiscreteDistributions();
+      vm.showDiscreteVariables();
+      vm.showPivotVariables();
+      vm.showContinuousVariables();
+    }
   }
 
   initializeGrids() {
     const vm = this;
-    vm.$log.debug('In initializeGrids in analysis');
-    // sort measures by workflow_index
-    vm.$scope.measures = _.sortBy(vm.$scope.measures, ['workflow_index']);
-    // group by type
-    vm.setMeasureTypes();
-    if (vm.$scope.selectedAnalysisType === 'Manual') {
-      vm.setGridOptions();
-      // load saved measure options
-      vm.loadMeasureOptions();
-    }
-    else {
-      vm.setAlgorithmicGridOptions();
-    }
+    vm.setGridOptions();
+    // load saved measure options
+    vm.loadMeasureOptions();
   }
+
 
   getDefaultOptionColDef() {
     const vm = this;
@@ -212,9 +267,6 @@ export class AnalysisController {
     });
   }
 
-  setAlgorithmicGridOptions() {
-  }
-
   setMeasureTypes() {
     const vm = this;
     vm.$scope.osMeasures = [];
@@ -240,7 +292,7 @@ export class AnalysisController {
     vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
-      vm.initializeGrids();
+      vm.initializeTab();
     });
   }
 
@@ -250,7 +302,7 @@ export class AnalysisController {
     vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
-      vm.initializeGrids();
+      vm.initializeTab();
     });
   }
 
@@ -322,7 +374,7 @@ export class AnalysisController {
     // recalculate workflow indexes
     vm.Project.recalculateMeasureWorkflowIndexes();
 
-    vm.initializeGrids();
+    vm.initializeTab();
   }
 
   addMeasureOption(measure) {
@@ -639,7 +691,7 @@ export class AnalysisController {
       vm.$log.debug('computeAllMeasureArgs success!');
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
       vm.resetAllChoiceArgumentSelections();
-      vm.initializeGrids();
+      vm.initializeTab();
     }, error => {
       vm.$log.debug('Error in computeALLMeasureArguments: ', error);
     });
@@ -656,7 +708,8 @@ export class AnalysisController {
     vm.$log.debug('In setType in analysis');
     vm.setIsModified();
     vm.Project.setAnalysisType(vm.$scope.selectedAnalysisType);
-    vm.initializeGrids();
+
+    vm.initializeTab();
   }
 
   // setDirToInclude() {
@@ -680,13 +733,17 @@ export class AnalysisController {
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
+
     vm.showDeltaX();
-    vm.showValueAndWeights();
     vm.showMinAndMax();
+    //vm.showValueAndWeights();
     vm.showDistributions();
+    vm.showDiscreteDistributions();
     vm.showDiscreteVariables();
     vm.showPivotVariables();
+    vm.showContinuousVariables();
     vm.showWarningIcons();
+
   }
 
   // compute measure arguments when setting the seed
@@ -700,7 +757,7 @@ export class AnalysisController {
       measure = response;
       vm.$log.debug('Analysis Tab, new computed measure: ', angular.copy(measure));
       vm.$log.debug('Scope measures: ', vm.$scope.measures);
-      vm.initializeGrids();
+      vm.initializeTab();
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
     }, error => {
       vm.$log.debug("Error in Project::computeMeasureArguments: ", error);
@@ -815,7 +872,7 @@ export class AnalysisController {
         vm.$log.debug('computeAllMeasureArgs success!');
         vm.$scope.measures = vm.Project.getMeasuresAndOptions();
         vm.resetAllChoiceArgumentSelections();
-        vm.initializeGrids();
+        vm.initializeTab();
       }, error => {
         vm.$log.debug('ERROR in computeAllMeasureArguments');
       });
@@ -874,7 +931,7 @@ export class AnalysisController {
       vm.$log.debug('measures: ', vm.$scope.measures);
 
       // initialize grid to resort
-      vm.initializeGrids();
+      vm.initializeTab();
     }
   }
 
@@ -883,103 +940,87 @@ export class AnalysisController {
     vm.Project.setModified(true);
   }
 
-  getDistributions(argument) {
-    const vm = this;
-    vm.$log.debug('In getDistributions');
+  // getDistributions(argument) {
+  //   const vm = this;
+  //   vm.$log.debug('In getDistributions');
+  //
+  //   if (_.isNil(argument.inputs)) argument.inputs = {};
+  //
+  //   switch (vm.$scope.selectedSamplingMethod.id) {
+  //     case 'PSO':
+  //     case 'Optim':
+  //       argument.inputs.distributions = ['Uniform'];
+  //       break;
+  //     case 'SPEA2':
+  //     case 'RGENOUD':
+  //     case 'NSGA2':
+  //     case 'LHS':
+  //     case 'PreFlight':
+  //     case 'Morris':
+  //     case 'DOE':
+  //     case 'SingleRun':
+  //     case 'RepeatRun':
+  //       argument.inputs.distributions = ['Uniform', 'Triangle', 'Normal', 'LogNormal'];
+  //       break;
+  //     default:
+  //       argument.inputs.distributions = ['Unhandled Sampling Method'];
+  //   }
+  //   argument.inputs.distribution = argument.inputs.distributions[0];
+  // }
 
-    if (_.isNil(argument.inputs)) argument.inputs = {};
+  // getVariableSettings(argument) {
+  //   const vm = this;
+  //   vm.$log.debug('In getVariableSettings');
+  //
+  //   if (_.isNil(argument.inputs)) argument.inputs = {};
+  //
+  //   if (argument.type === 'Double') {
+  //     argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
+  //   } else {
+  //     argument.inputs.variableSettings = ['Argument', 'Discrete', 'Pivot'];
+  //   }
+  //
+  //   argument.inputs.variableSetting = _.isNil(argument.inputs.variableSetting) ? argument.inputs.variableSettings[0] : argument.inputs.variableSetting;
+  // }
 
-    switch (vm.$scope.selectedSamplingMethod.id) {
-      case 'PSO':
-      case 'Optim':
-        argument.inputs.distributions = ['Uniform'];
-        break;
-      case 'SPEA2':
-      case 'RGENOUD':
-      case 'NSGA2':
-      case 'LHS':
-      case 'PreFlight':
-      case 'Morris':
-      case 'DOE':
-      case 'SingleRun':
-      case 'RepeatRun':
-        argument.inputs.distributions = ['Uniform', 'Triangle', 'Normal', 'LogNormal'];
-        break;
-      default:
-        argument.inputs.distributions = ['Unhandled Sampling Method'];
-    }
-    argument.inputs.distribution = argument.inputs.distributions[0];
-  }
-
-  getVariableSettings(argument) {
-    const vm = this;
-    vm.$log.debug('In getVariableSettings');
-
-    if (_.isNil(argument.inputs)) argument.inputs = {};
-
-    switch (vm.$scope.selectedSamplingMethod.id) {
-      case 'SPEA2':
-      case 'PSO':
-      case 'RGENOUD':
-      case 'Optim':
-      case 'NSGA2':
-      case 'LHS':
-      case 'PreFlight':
-      case 'Morris':
-      case 'DOE':
-      case 'SingleRun':
-      case 'RepeatRun':
-        if (argument.type === 'Double') {
-          argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
-        } else {
-          argument.inputs.variableSettings = ['Argument', 'Discrete', 'Pivot'];
-        }
-        break;
-      default:
-        argument.inputs.variableSettings = ['Unhandled Sampling Method'];
-    }
-
-    argument.inputs.variableSetting = _.isNil(argument.inputs.variableSetting) ? argument.inputs.variableSettings[0] : argument.inputs.variableSetting;
-  }
-
-  checkVariableSettings(argument) {
-    const vm = this;
-    vm.$log.debug('In checkVariableSettings');
-
-    if (_.isNil(argument.inputs)) argument.inputs = {};
-
-    switch (vm.$scope.selectedSamplingMethod.id) {
-      case 'SPEA2':
-      case 'PSO':
-        if (argument.type === 'Double') {
-          argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
-        } else {
-          argument.inputs.variableSettings = ['Argument'];
-        }
-        break;
-      case 'RGENOUD':
-      case 'Optim':
-        if (argument.type === 'Double') {
-          argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
-        } else {
-          argument.inputs.variableSettings = ['Argument'];
-        }
-        break;
-      case 'NSGA2':
-      case 'PreFlight':
-      case 'SingleRun':
-      case 'RepeatRun':
-        argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
-        break;
-      case 'LHS':
-      case 'DOE':
-        argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
-        break;
-      default:
-        argument.inputs.variableSettings = ['Unhandled Sampling Method'];
-    }
-    argument.inputs.variableSetting = argument.inputs.variableSettings[0];
-  }
+  // checkVariableSettings(argument) {
+  //   const vm = this;
+  //   vm.$log.debug('In checkVariableSettings');
+  //
+  //   if (_.isNil(argument.inputs)) argument.inputs = {};
+  //
+  //   switch (vm.$scope.selectedSamplingMethod.id) {
+  //     case 'SPEA2':
+  //     case 'PSO':
+  //       if (argument.type === 'Double') {
+  //         argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
+  //       } else {
+  //         argument.inputs.variableSettings = ['Argument'];
+  //       }
+  //       break;
+  //     case 'RGENOUD':
+  //     case 'Optim':
+  //       if (argument.type === 'Double') {
+  //         argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
+  //       } else {
+  //         argument.inputs.variableSettings = ['Argument'];
+  //       }
+  //       break;
+  //     case 'NSGA2':
+  //     case 'PreFlight':
+  //     case 'SingleRun':
+  //     case 'RepeatRun':
+  //       argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
+  //       break;
+  //     case 'LHS':
+  //     case 'DOE':
+  //       argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
+  //       break;
+  //     default:
+  //       argument.inputs.variableSettings = ['Unhandled Sampling Method'];
+  //   }
+  //   argument.inputs.variableSetting = argument.inputs.variableSettings[0];
+  // }
 
   addDiscreteVariable(argument) {
     const vm = this;
@@ -999,15 +1040,16 @@ export class AnalysisController {
     argument.inputs.discreteVariables.push(discreteVariable);
   }
 
-  showValueAndWeights() {
-    const vm = this;
-    vm.$log.debug('In showValueAndWeights');
-    if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
-      vm.$scope.showValueAndWeights = true;
-    } else {
-      vm.$scope.showValueAndWeights = false;
-    }
-  }
+  // TODO: not needed?
+  // showValueAndWeights() {
+  //   const vm = this;
+  //   vm.$log.debug('In showValueAndWeights');
+  //   if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
+  //     vm.$scope.showValueAndWeights = true;
+  //   } else {
+  //     vm.$scope.showValueAndWeights = false;
+  //   }
+  // }
 
   showDeltaX() {
     const vm = this;
@@ -1031,7 +1073,7 @@ export class AnalysisController {
 
   showDistributions() {
     const vm = this;
-    vm.$log.debug('In showDistributions');
+    //vm.$log.debug('In showDistributions');
     if (!_.includes(['PSO', 'Optim'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDistributions = true;
     } else {
@@ -1039,9 +1081,18 @@ export class AnalysisController {
     }
   }
 
+  showDiscreteDistributions() {
+    const vm = this;
+    if (_.includes(['Diagonal'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showDiscreteDistributions = true;
+    } else {
+      vm.$scope.showDiscreteDistributions = false;
+    }
+  }
+
   showDiscreteVariables() {
     const vm = this;
-    vm.$log.debug('In showDiscreteVariables');
+    //vm.$log.debug('In showDiscreteVariables');
     if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE', 'Diagonal', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDiscreteVariables = true;
     } else {
@@ -1051,11 +1102,21 @@ export class AnalysisController {
 
   showPivotVariables() {
     const vm = this;
-    vm.$log.debug('In showPivotVariables');
-    if (_.includes(['LHS', 'Morris', 'DOE', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
+    //vm.$log.debug('In showPivotVariables');
+    if (_.includes(['LHS', 'Morris', 'DOE', 'BaselinePerturbation', 'Diagonal'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showPivotVariables = true;
     } else {
       vm.$scope.showPivotVariables = false;
+    }
+  }
+
+  showContinuousVariables() {
+    const vm = this;
+    //vm.$log.debug('In showContinuousVariables');
+    if (_.includes(['Diagonal', 'BaselinePerturbation', 'SingleRun', 'RepeatRun'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showContinuousVariables = false;
+    } else {
+      vm.$scope.showContinuousVariables = true;
     }
   }
 
@@ -1070,7 +1131,7 @@ export class AnalysisController {
 
     if ((vm.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')) ||
       (vm.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) ||
-      (argument.inputs.variableSetting == 'Continuous') ||
+      (vm.$scope.showContinuousVariables && argument.inputs.variableSetting == 'Continuous') ||
       (argument.inputs.variableSetting == 'Argument')) {
       argument.inputs.showWarningIcon = false;
     } else {
@@ -1102,99 +1163,73 @@ export class AnalysisController {
     });
   }
 
-  initializeValues() {
+  deleteValue(argument, index) {
     const vm = this;
-    vm.$log.debug('In initializeValues');
+    if (!_.isNil(index) && index > -1){
+      argument.inputs.discreteVariables.splice(index, 1);
+      vm.setIsModified();
+    }
+  }
 
+  initializeVariablesAlgMode() {
+    const vm = this;
+    vm.$log.debug('Initializing variables for Algorithmic mode');
     _.forEach(vm.$scope.measures, (measure) => {
+      // add SKIP
       measure.skip = _.isNil(measure.skip) ? false : measure.skip;
       _.forEach(measure.arguments, (arg) => {
-        if (_.isNil(arg.specialRowId)) {
-          arg.inputs = _.isNil(arg.inputs) ? {} : arg.inputs;
+        // short name
+        arg.display_name_short = arg.display_name_short ? arg.display_name_short : arg.name;
+        if (!arg.inputs) arg.inputs = {};
+        // name and displayName should be already defined
+        arg.inputs.relationship = _.isNil(arg.inputs.relationship) ? 'Standard' : arg.inputs.relationship; // TODO: what is this?
+        arg.inputs.choiceDisplayNames = _.isNil(arg.choice_display_names) ? [] : arg.choice_display_names;  // TODO: what is this?
+        arg.inputs.variableSetting = _.isNil(arg.inputs.variableSetting) ? 'Argument' : arg.inputs.variableSetting;
+        if (arg.inputs.variableSetting == 'Discrete' || arg.inputs.variableSetting == 'Pivot') {
+          arg.inputs.distribution = _.isNil(arg.inputs.distribution) ? 'Discrete' : arg.inputs.distribution;
+        } else {
+          arg.inputs.distribution = _.isNil(arg.inputs.distribution) ? 'Uniform' : arg.inputs.distribution;
+        }
+        arg.inputs.discreteVariables = _.isNil(arg.inputs.discreteVariables) ? [] : arg.inputs.discreteVariables;
 
-          const relationship = _.isNil(arg.inputs.relationship) ? 'Standard' : arg.inputs.relationship;
-          const choiceDisplayNames = _.isNil(arg.choice_display_names) ? '' : arg.choice_display_names;
-          const name = _.isNil(arg.name) ? [] : arg.name;
-          const displayName = _.isNil(arg.display_name) ? '' : arg.display_name;
-          const distribution = _.isNil(arg.inputs.distribution) ? 'Uniform' : arg.inputs.distribution;
-          const variableSetting = _.isNil(arg.inputs.variableSetting) ? 'Argument' : arg.inputs.variableSetting;
-
-          let defaultValue = null;
-
-          if( _.isNil(arg.inputs.default_value)){
-            if (_.isNil(arg.default_value)) {
-              if (arg.type == 'Integer' || arg.type == 'Double') {
-                defaultValue = 0;
-              } else if (arg.type == 'Boolean') {
-                defaultValue = true;
-              } else if (arg.type == 'String') {
+        // calculate default value
+        let defaultValue = null;
+        if( _.isNil(arg.inputs.default_value)){
+          if (_.isNil(arg.default_value)) {
+            if (arg.type == 'Integer' || arg.type == 'Double') {
+              defaultValue = 0;
+            } else if (arg.type == 'Boolean') {
+              defaultValue = true;
+            } else if (arg.type == 'String') {
+              defaultValue = '';
+            } else if (arg.type == 'Choice') {
+              if (!_.isNil(arg.choice_display_names && arg.choice_display_names.length)) {
+                defaultValue = arg.choice_display_names[0];
+              } else {
                 defaultValue = '';
-              } else if (arg.type == 'Choice') {
-                if (!_.isNil(arg.choice_display_names && arg.choice_display_names.length)) {
-                  defaultValue = arg.choice_display_names[0];
-                } else {
-                  defaultValue = '';
-                }
               }
-            } else {
-              defaultValue = arg.default_value;
             }
           } else {
-            defaultValue = arg.inputs.default_value;
+            defaultValue = arg.default_value;
           }
+        } else {
+          defaultValue = arg.inputs.default_value;
+        }
 
-          const discreteMinimum = _.isNil(arg.inputs.discreteMinimum) ? defaultValue : arg.inputs.discreteMinimum;
-          const discreteMaximum = _.isNil(arg.inputs.discreteMaximum) ? defaultValue : arg.inputs.discreteMaximum;
-          const maximum = _.isNil(arg.inputs.maximum) ? defaultValue : arg.inputs.maximum;
-          const minimum = _.isNil(arg.inputs.minimum) ? defaultValue : arg.inputs.minimum;
-          const mean = _.isNil(arg.inputs.mean) ? defaultValue : arg.inputs.mean;
-          let deltaX = _.isNil(arg.inputs.deltaX) ? defaultValue : arg.inputs.deltaX;
-          let stdDev = _.isNil(arg.inputs.stdDev) ? defaultValue : arg.inputs.stdDev;
+        // set other algorithmic attributes
+        arg.inputs.maximum = _.isNil(arg.inputs.maximum) ? defaultValue : arg.inputs.maximum;
+        arg.inputs.minimum = _.isNil(arg.inputs.minimum) ? defaultValue : arg.inputs.minimum;
+        arg.inputs.mean = _.isNil(arg.inputs.mean) ? defaultValue : arg.inputs.mean;
+        arg.inputs.deltaX = _.isNil(arg.inputs.deltaX) ? defaultValue : arg.inputs.deltaX;
+        arg.inputs.stdDev = _.isNil(arg.inputs.stdDev) ? defaultValue : arg.inputs.stdDev;
+        arg.inputs.default_value = defaultValue;
 
-          if (_.isNil(arg.inputs.deltaX) && arg.type == 'Double') {
-            deltaX = 0.0016;
-          }
-
-          if (_.isNil(arg.inputs.stdDev) && arg.type == 'Double') {
-            stdDev = (maximum - minimum) / 6;
-          }
-
-          let inputs = {
-            relationship: relationship,
-            choice_display_names: choiceDisplayNames,
-            default_value: defaultValue,
-            deltaX: deltaX,
-            discreteMinimum: discreteMinimum,
-            discreteMaximum: discreteMaximum,
-            discreteVariables: [
-              {
-                value: "",
-                weight: "",
-                $$hashKey: ""
-              }
-            ],
-            display_name: displayName,
-            distribution: distribution,
-            distributions: [
-              "Uniform",
-              "Triangle",
-              "Normal",
-              "LogNormal"
-            ],
-            maximum: maximum,
-            mean: mean,
-            minimum: minimum,
-            name: name,
-            stdDev: stdDev,
-            variableSetting: variableSetting,
-            variableSettings: [
-              "Argument",
-              "Discrete",
-              "Continuous",
-              "Pivot"
-            ]
-          };
-          arg.inputs = inputs;
+        // special cases
+        if (_.isNil(arg.inputs.deltaX) && arg.type == 'Double') {
+          arg.inputs.deltaX = 0.0016;
+        }
+        if (_.isNil(arg.inputs.stdDev) && arg.type == 'Double') {
+          arg.inputs.stdDev = (arg.inputs.maximum - arg.inputs.minimum) / 6;
         }
       });
     });

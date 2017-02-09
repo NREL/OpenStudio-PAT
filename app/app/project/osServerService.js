@@ -1110,6 +1110,11 @@ export class OsServer {
 
   }
 
+  testSleep() {
+    const vm = this;
+    vm.$log.debug("testing sleep");
+  }
+
   // download data_point.zip
   downloadResults(datapoint) {
     const vm = this;
@@ -1127,10 +1132,13 @@ export class OsServer {
       vm.$http.get(reportUrl, config).then( response => {
         // write file and set downloaded flag
         vm.$log.debug('RESPONSE!! ', response);
-        //extract dir and save to disk in local measures directory
+        // extract dir and save to disk in local measures directory
         // convert arraybuffer to node buffer
+        setTimeout(vm.testSleep(), 10000);
         const buf = new Buffer(new Uint8Array(response.data));
+        vm.$log.debug('buffer');
         const zip = new vm.AdmZip(buf);
+        vm.$log.debug('zip');
         // save
         zip.writeZip(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name));
 

@@ -465,8 +465,6 @@ export class Project {
       }
     });
 
-    // TODO: files to include ?
-
   }
 
   exportManual() {
@@ -843,7 +841,7 @@ export class Project {
           v.uncertainty_description = {};
           // pivots can be discrete or integer_sequence_uncertain (handled in analysis controller)
           // options are triangle, uniform, discrete, and normal, integer_sequence_uncertain
-          v.uncertainty_description.type = arg.inputs.distribution;
+          v.uncertainty_description.type = arg.inputs.distribution == 'Integer Sequence' ? 'integer_sequence_uncertain' : arg.inputs.distribution;
           v.uncertainty_description.attributes = [];
 
           // if discrete or pivot, make values and weights array (unless pivot w/ integer_sequence)
@@ -852,6 +850,7 @@ export class Project {
             v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
           }
 
+          // TODO: if any of these don't exist, set to inputs.default_value
           v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.inputs.minimum});  // minimum
           v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.inputs.maximum});  // maximum
           v.uncertainty_description.attributes.push({name: 'modes', value: arg.inputs.mean}); // mean
@@ -1033,7 +1032,7 @@ export class Project {
     const vm = this;
     const argument = {};
     argument.display_name = arg.display_name;
-    argument.display_name_short = arg.display_name_short ? arg.display_name_short : arg.display_name;
+    argument.display_name_short = arg.display_name_short ? arg.display_name_short : arg.name;
     argument.name = arg.name;
     argument.value_type = _.toLower(arg.type); // TODO: choice, double, integer, bool, string (convert from BCL types)
     argument.default_value = arg.default_value;
@@ -2031,9 +2030,6 @@ export class Project {
     const vm = this;
 
     return [{
-      id: 'Diagonal',
-      name: 'analysis.type.diagonal'
-    },{
       id: 'NSGA2',
       name: 'analysis.type.nsga2'
     }, {
@@ -2069,6 +2065,9 @@ export class Project {
     }, {
       id: 'BaselinePerturbation',
       name: 'analysis.type.baselinePerturbation'
+    },{
+      id: 'Diagonal',
+      name: 'analysis.type.diagonal'
     }];
   }
 

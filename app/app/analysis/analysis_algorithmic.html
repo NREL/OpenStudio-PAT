@@ -205,296 +205,205 @@
         <div class="button-div">
           <div class="row normal-text">
             <div class="col-sm-3 pad-bot-10">
-              <label translate>analysis.algorithmic.skipThisMeasure</label>
-            </div>
-            <div class="col-sm-5 pad-bot-20 pad-top-5">
               <div class="input-group">
-                <input type="checkbox" ng-model="measure.skip">
+                <label>
+                  <input id="{{measure.uid}}" type="checkbox" ng-model="measure.skip">&nbsp;
+                  <translate>analysis.algorithmic.skipThisMeasure</translate>
+                </label>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="container" style="width:100%">
-          <div class="row">
-            <div class="col-sm-1">
+        <div class="container full-width">
+          <div class="row pad-bot-10 normal-text">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.name</translate>
             </div>
-            <div class="col-sm-1">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.shortName</translate>
             </div>
-            <div class="col-sm-1">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.variableSettings</translate>
             </div>
-            <div class="col-sm-1">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.staticDefault</translate>
             </div>
-            <div class="col-sm-7">
+            <div class="col-sm-4 bold">
               <translate>analysis.algorithmic.grid.measureInputs</translate>
             </div>
           </div>
-          <div class="row" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
-            <div class="col-sm-1">
+          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
+            <div class="col-sm-2 normal-text pad-top-25">
               {{argument.display_name}}
             </div>
 
-            <div class="col-sm-1">
-              <input class="form-control" type="text" ng-model="argument.inputs.name"
-                     ng-mouseover="argument.inputs.name">
+            <div class="col-sm-2 pad-top-25">
+              <input class="form-control" type="text" ng-model="argument.display_name_short"
+                     ng-mouseover="argument.display_name_short">
             </div>
 
-            <div class="col-sm-1">
-              <select class="form-control"
-                      ng-options="variableSetting as variableSetting for variableSetting in argument.inputs.variableSettings"
-                      ng-init="analysis.getVariableSettings(argument)"
-                      ng-model="argument.inputs.variableSetting"
-                      ng-change="analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
-            </div>
-
-            <div class="col-sm-1" ng-if="argument.type == 'Choice'">
-              <select class="form-control"
-                      ng-options="default_value as default_value for default_value in argument.inputs.choice_display_names"
-                      ng-model="argument.inputs.default_value"></select>
-            </div>
-            <div class="col-sm-1" ng-if="argument.type == 'String'">
-              <input class="form-control" type="text" ng-model="argument.inputs.default_value">
-            </div>
-            <div class="col-sm-1" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-              <input class="form-control" type="number" ng-model="argument.inputs.default_value">
-            </div>
-            <div class="col-sm-1" ng-if="argument.type == 'Boolean'">
-              <input type="checkbox" ng-model="argument.inputs.default_value">
-            </div>
-
-            <div class="col-sm-7"
-                 ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && (analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation')">
+            <div class="col-sm-2 pad-top-25">
               <div class="row">
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.minimum</translate>
+                <div class="col-sm-9">
+                  <select class="form-control"
+                          ng-options="variableSetting as variableSetting for variableSetting in getVariableSettings(argument)"
+                          ng-model="argument.inputs.variableSetting"
+                          ng-change="analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
                 </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.maximum</translate>
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <translate>analysis.algorithmic.grid.mean</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.stdDev</translate>
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <translate>analysis.algorithmic.grid.distribution</translate>
+                <div class="col-sm-3 pad-top-5">
+                  <span ng-show="argument.inputs.showWarningIcon" class="glyphicon glyphicon-alert red-button normal-text"></span>
                 </div>
               </div>
-              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                <div class="col-sm-2">
+            </div>
+            <div class="col-sm-2 pad-top-25">
+              <select class="form-control"
+                      ng-options="name as name for name in argument.choice_display_names"
+                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"></select>
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-if="argument.type == 'String'">
+
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+              <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
+            </div>
+
+            <!-- continuous (double only)-->
+            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Continuous'">
+              <div class="row pad-bot-10">
+                <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDistributions(argument)"
+                          ng-model="argument.inputs.distribution"></select>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.minimum</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.maximum</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.maximum">
                 </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <input class="form-control" type="number" ng-model="argument.inputs.mean">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
               </div>
-
-              <div class="row" ng-if="argument.type == 'String'">
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
-              </div>
-
-            </div>
-
-            <div class="col-sm-7"
-                 ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'&& ((analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation'))">
               <div class="row">
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.minimum</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.maximum</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.deltaX</translate>
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <translate>analysis.algorithmic.grid.mean</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.stdDev</translate>
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <translate>analysis.algorithmic.grid.distribution</translate>
-                </div>
-              </div>
-              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.deltaX" step="0.01">
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
+                <div class="col-sm-4" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.mean</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.mean">
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.stdDev</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
                 </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
-              </div>
-
-              <div class="row" ng-if="argument.type == 'String'">
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
-                </div>
-                <div class="col-sm-2">
+                <div class="col-sm-4" ng-show="analysis.$scope.showDeltaX">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.deltaX</label>
                   <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01">
                 </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
               </div>
-
             </div>
 
-            <div class="col-sm-7"
-                 ng-show="(argument.inputs.variableSetting == 'Discrete' || argument.inputs.variableSetting == 'Pivot') && analysis.$scope.samplingMethods != 'SingleRun' && analysis.$scope.samplingMethods != 'RepeatRun'"
-                 ng-init="analysis.showDiscreteVariables(argument)">
-              <div class="row">
-                <div class="col-sm-2" ng-show="analysis.$scope.showMinAndMax">
-                  <translate>analysis.algorithmic.grid.relationToEUI</translate>
+            <!-- discrete & pivot-->
+            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
+              <div class="row" ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"<!-- pivots only -->
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
+                          ng-model="argument.inputs.distribution"></select>
                 </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  <translate>analysis.algorithmic.grid.min</translate>
+                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  <translate>analysis.algorithmic.grid.max</translate>
-                </div>
-                <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                  <div class="col-sm-1" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                    <translate>analysis.algorithmic.grid.value</translate>
-                  </div>
-                  <div class="col-sm-1">
-                    <translate>analysis.algorithmic.grid.weight</translate>
-                  </div>
+                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
                 </div>
               </div>
-              <div class="row">
-                <div class="col-sm-2" ng-show="analysis.$scope.showMinAndMax">
+
+              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.relationToEUI</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                </div>
+              </div>
+              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
                   <select class="form-control"
                           ng-options="relationship as relationship for relationship in relationships"
                           ng-model="argument.inputs.relationship" ng-init="relationships = ['Standard', 'Inverse']"
                           ng-init="relationship = 'Inverse'"></select>
                 </div>
-                <div class="col-sm-1"
-                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
-                </div>
-                <div class="col-sm-1"
-                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMinimum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMaximum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input type="checkbox" ng-model="argument.inputs.discreteMinimum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input type="checkbox" ng-model="argument.inputs.discreteMaximum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-if="argument.type == 'String'">
+                  <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
                   <select class="form-control"
-                          ng-options="discreteMinimum as discreteMinimum for discreteMinimum in argument.inputs.discreteMinimums"
-                          ng-model="argument.inputs.discreteMinimum"></select>
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
-                  <select class="form-control"
-                          ng-options="discreteMaximum as discreteMaximum for discreteMaximum in argument.inputs.discreteMaximums"
-                          ng-model="argument.inputs.discreteMaximum"></select>
-                </div>
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'"></select>
 
-                <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                  <div class="col-sm-1" ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
-                    <input class="form-control" type="number" ng-model="discreteVariable.value">
-                  </div>
-                  <div class="col-sm-1" ng-if="argument.type == 'String'">
-                    <input class="form-control" type="text" ng-model="discreteVariable.value">
-                  </div>
-                  <div class="col-sm-1" ng-if="argument.type == 'Boolean'">
-                    <input type="checkbox" ng-model="discreteVariable.value">
-                  </div>
-                  <div class="col-sm-1" ng-if="argument.type == 'Choice'">
-                    <select class="form-control"
-                            ng-options="value as value for value in argument.inputs.choice_display_names"
-                            ng-model="discreteVariable.value"></select>
-                  </div>
-                  <div class="col-sm-1" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                    <input class="form-control" type="number" min="0" max="1" step="0.1"
-                           ng-model="discreteVariable.weight">
-                  </div>
                 </div>
-                <div class="col-sm-1">
-                  <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span
-                    class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-if="argument.type == 'String'">
+                  <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
+                  <select class="form-control"
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'"></select>
                 </div>
-                <div class="col-sm-1"
-                     ng-show="argument.inputs.showWarningIcon">
-                  <p><span class="glyphicon glyphicon-alert" style="color:red"></span></p>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="row" ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
+                    <div class="col-sm-6">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.value</label>
+                    </div>
+                    <div class="col-sm-5" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
+                    </div>
+                  </div>
+                  <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                    <div class="row pad-bot-10">
+                      <div class="col-sm-6">
+                        <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                          <input class="form-control" type="number" ng-model="discreteVariable.value">
+                        </div>
+                        <div ng-if="argument.type == 'String'">
+                          <input class="form-control" type="text" ng-model="discreteVariable.value">
+                        </div>
+                        <div ng-if="argument.type == 'Boolean'">
+                          <input type="checkbox" ng-model="discreteVariable.value">
+                        </div>
+                        <div ng-if="argument.type == 'Choice'">
+                          <select class="form-control"
+                                  ng-options="value as value for value in argument.inputs.choice_display_names"
+                                  ng-model="discreteVariable.value"></select>
+                        </div>
+                      </div>
+                      <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                        <input class="form-control" type="number" min="0" max="1" step="0.1"
+                               ng-model="discreteVariable.weight">
+                      </div>
+                      <div class="col-sm-2 pad-top-5">
+                        <span class="glyphicon glyphicon-remove-sign black-button header-text" ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true" aria-label="Delete Value"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
+                      <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span
+                        class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div ng-show="measure.showWarningText">
-            <p>"{{'analysis.algorithmic.warning' | translate}}"<span class="glyphicon glyphicon-alert"
-                                                                     style="color:red"></span></p>
+          <div ng-show="measure.showWarningText" class="normal-text pad-top-10 pad-bot-10">
+            <span class="glyphicon glyphicon-alert red-button"></span>&nbsp;<span>{{'analysis.algorithmic.warning' | translate}}</span>
           </div>
         </div>
       </uib-accordion-group>
@@ -552,295 +461,205 @@
         <div class="button-div">
           <div class="row normal-text">
             <div class="col-sm-3 pad-bot-10">
-              <label translate>analysis.algorithmic.skipThisMeasure</label>
-            </div>
-            <div class="col-sm-5 pad-bot-20 pad-top-5">
               <div class="input-group">
-                <input type="checkbox" ng-model="measure.skip">
+                <label>
+                  <input id="{{measure.uid}}" type="checkbox" ng-model="measure.skip">&nbsp;
+                  <translate>analysis.algorithmic.skipThisMeasure</translate>
+                </label>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="container" style="width:100%">
-          <div class="row">
-            <div class="col-sm-1">
+        <div class="container full-width">
+          <div class="row pad-bot-10 normal-text">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.name</translate>
             </div>
-            <div class="col-sm-1">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.shortName</translate>
             </div>
-            <div class="col-sm-1">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.variableSettings</translate>
             </div>
-            <div class="col-sm-1">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.staticDefault</translate>
             </div>
-            <div class="col-sm-7">
+            <div class="col-sm-4 bold">
               <translate>analysis.algorithmic.grid.measureInputs</translate>
             </div>
           </div>
-          <div class="row" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
-            <div class="col-sm-1">
+          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
+            <div class="col-sm-2 normal-text pad-top-25">
               {{argument.display_name}}
             </div>
 
-            <div class="col-sm-1">
-              <input class="form-control" type="text" ng-model="argument.inputs.name"
-                     ng-mouseover="argument.inputs.name">
+            <div class="col-sm-2 pad-top-25">
+              <input class="form-control" type="text" ng-model="argument.display_name_short"
+                     ng-mouseover="argument.display_name_short">
             </div>
 
-            <div class="col-sm-1">
-              <select class="form-control"
-                      ng-options="variableSetting as variableSetting for variableSetting in argument.inputs.variableSettings"
-                      ng-init="analysis.getVariableSettings(argument)"
-                      ng-model="argument.inputs.variableSetting"></select>
-            </div>
-
-            <div class="col-sm-1" ng-if="argument.type == 'Choice'">
-              <select class="form-control"
-                      ng-options="default_value as default_value for default_value in argument.inputs.choice_display_names"
-                      ng-model="argument.inputs.default_value"></select>
-            </div>
-            <div class="col-sm-1" ng-if="argument.type == 'String'">
-              <input class="form-control" type="text" ng-model="argument.inputs.default_value">
-            </div>
-            <div class="col-sm-1" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-              <input class="form-control" type="number" ng-model="argument.inputs.default_value">
-            </div>
-            <div class="col-sm-1" ng-if="argument.type == 'Boolean'">
-              <input type="checkbox" ng-model="argument.inputs.default_value">
-            </div>
-
-            <div class="col-sm-7"
-                 ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && ((analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation'))">
+            <div class="col-sm-2 pad-top-25">
               <div class="row">
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.minimum</translate>
+                <div class="col-sm-9">
+                  <select class="form-control"
+                          ng-options="variableSetting as variableSetting for variableSetting in getVariableSettings(argument)"
+                          ng-model="argument.inputs.variableSetting"
+                          ng-change="analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
                 </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.maximum</translate>
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <translate>analysis.algorithmic.grid.mean</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.stdDev</translate>
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <translate>analysis.algorithmic.grid.distribution</translate>
+                <div class="col-sm-3 pad-top-5">
+                  <span ng-show="argument.inputs.showWarningIcon" class="glyphicon glyphicon-alert red-button normal-text"></span>
                 </div>
               </div>
-              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                <div class="col-sm-2">
+            </div>
+            <div class="col-sm-2 pad-top-25">
+              <select class="form-control"
+                      ng-options="name as name for name in argument.choice_display_names"
+                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"></select>
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-if="argument.type == 'String'">
+
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+              <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
+            </div>
+
+            <!-- continuous (double only)-->
+            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Continuous'">
+              <div class="row pad-bot-10">
+                <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDistributions(argument)"
+                          ng-model="argument.inputs.distribution"></select>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.minimum</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.maximum</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.maximum">
                 </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <input class="form-control" type="number" ng-model="argument.inputs.mean">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
               </div>
-
-              <div class="row" ng-if="argument.type == 'String'">
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
-              </div>
-
-            </div>
-
-            <div class="col-sm-7"
-                 ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'&& ((analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation'))">
               <div class="row">
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.minimum</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.maximum</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.deltaX</translate>
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <translate>analysis.algorithmic.grid.mean</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.stdDev</translate>
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <translate>analysis.algorithmic.grid.distribution</translate>
-                </div>
-              </div>
-              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.deltaX" step="0.01">
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
+                <div class="col-sm-4" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.mean</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.mean">
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.stdDev</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
                 </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
-              </div>
-
-              <div class="row" ng-if="argument.type == 'String'">
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
-                </div>
-                <div class="col-sm-2">
+                <div class="col-sm-4" ng-show="analysis.$scope.showDeltaX">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.deltaX</label>
                   <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01">
                 </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
               </div>
-
             </div>
 
-            <div class="col-sm-7"
-                 ng-show="(argument.inputs.variableSetting == 'Discrete' || argument.inputs.variableSetting == 'Pivot') && analysis.$scope.samplingMethods != 'SingleRun' && analysis.$scope.samplingMethods != 'RepeatRun'"
-                 ng-init="analysis.showDiscreteVariables(argument)">
-              <div class="row">
-                <div class="col-sm-2" ng-show="analysis.$scope.showMinAndMax">
-                  <translate>analysis.algorithmic.grid.relationToEUI</translate>
+            <!-- discrete & pivot-->
+            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
+              <div class="row" ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"<!-- pivots only -->
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
+                          ng-model="argument.inputs.distribution"></select>
                 </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  <translate>analysis.algorithmic.grid.min</translate>
+                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  <translate>analysis.algorithmic.grid.max</translate>
-                </div>
-                <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                  <div class="col-sm-1" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                    <translate>analysis.algorithmic.grid.value</translate>
-                  </div>
-                  <div class="col-sm-1">
-                    <translate>analysis.algorithmic.grid.weight</translate>
-                  </div>
+                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
                 </div>
               </div>
-              <div class="row">
-                <div class="col-sm-2" ng-show="analysis.$scope.showMinAndMax">
+
+              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.relationToEUI</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                </div>
+              </div>
+              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
                   <select class="form-control"
                           ng-options="relationship as relationship for relationship in relationships"
                           ng-model="argument.inputs.relationship" ng-init="relationships = ['Standard', 'Inverse']"
                           ng-init="relationship = 'Inverse'"></select>
                 </div>
-                <div class="col-sm-1"
-                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
-                </div>
-                <div class="col-sm-1"
-                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMinimum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMaximum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input type="checkbox" ng-model="argument.inputs.discreteMinimum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input type="checkbox" ng-model="argument.inputs.discreteMaximum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-if="argument.type == 'String'">
+                  <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
                   <select class="form-control"
-                          ng-options="discreteMinimum as discreteMinimum for discreteMinimum in argument.inputs.discreteMinimums"
-                          ng-model="argument.inputs.discreteMinimum"></select>
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
-                  <select class="form-control"
-                          ng-options="discreteMaximum as discreteMaximum for discreteMaximum in argument.inputs.discreteMaximums"
-                          ng-model="argument.inputs.discreteMaximum"></select>
-                </div>
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'"></select>
 
-                <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                  <div class="col-sm-1" ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
-                    <input class="form-control" type="number" ng-model="discreteVariable.value">
-                  </div>
-                  <div class="col-sm-1" ng-if="argument.type == 'String'">
-                    <input class="form-control" type="text" ng-model="discreteVariable.value">
-                  </div>
-                  <div class="col-sm-1" ng-if="argument.type == 'Boolean'">
-                    <input type="checkbox" ng-model="discreteVariable.value">
-                  </div>
-                  <div class="col-sm-1" ng-if="argument.type == 'Choice'">
-                    <select class="form-control"
-                            ng-options="value as value for value in argument.inputs.choice_display_names"
-                            ng-model="discreteVariable.value"></select>
-                  </div>
-                  <div class="col-sm-1" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                    <input class="form-control" type="number" min="0" max="1" step="0.1"
-                           ng-model="discreteVariable.weight">
-                  </div>
                 </div>
-                <div class="col-sm-1">
-                  <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span
-                    class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-if="argument.type == 'String'">
+                  <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
+                  <select class="form-control"
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'"></select>
                 </div>
-                <div class="col-sm-1"
-                     ng-show="argument.inputs.showWarningIcon">
-                  <p><span class="glyphicon glyphicon-alert" style="color:red"></span></p>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="row" ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
+                    <div class="col-sm-6">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.value</label>
+                    </div>
+                    <div class="col-sm-5" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
+                    </div>
+                  </div>
+                  <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                    <div class="row pad-bot-10">
+                      <div class="col-sm-6">
+                        <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                          <input class="form-control" type="number" ng-model="discreteVariable.value">
+                        </div>
+                        <div ng-if="argument.type == 'String'">
+                          <input class="form-control" type="text" ng-model="discreteVariable.value">
+                        </div>
+                        <div ng-if="argument.type == 'Boolean'">
+                          <input type="checkbox" ng-model="discreteVariable.value">
+                        </div>
+                        <div ng-if="argument.type == 'Choice'">
+                          <select class="form-control"
+                                  ng-options="value as value for value in argument.inputs.choice_display_names"
+                                  ng-model="discreteVariable.value"></select>
+                        </div>
+                      </div>
+                      <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                        <input class="form-control" type="number" min="0" max="1" step="0.1"
+                               ng-model="discreteVariable.weight">
+                      </div>
+                      <div class="col-sm-2 pad-top-5">
+                        <span class="glyphicon glyphicon-remove-sign black-button header-text" ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true" aria-label="Delete Value"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
+                      <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span
+                        class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div ng-show="measure.showWarningText">
-            <p>"{{'analysis.algorithmic.warning' | translate}}"<span class="glyphicon glyphicon-alert"
-                                                                     style="color:red"></span></p>
+          <div ng-show="measure.showWarningText" class="normal-text pad-top-10 pad-bot-10">
+            <span class="glyphicon glyphicon-alert red-button"></span>&nbsp;<span>{{'analysis.algorithmic.warning' | translate}}</span>
           </div>
         </div>
       </uib-accordion-group>
@@ -898,295 +717,205 @@
         <div class="button-div">
           <div class="row normal-text">
             <div class="col-sm-3 pad-bot-10">
-              <label translate>analysis.algorithmic.skipThisMeasure</label>
-            </div>
-            <div class="col-sm-5 pad-bot-20 pad-top-5">
               <div class="input-group">
-                <input type="checkbox" ng-model="measure.skip">
+                <label>
+                  <input id="{{measure.uid}}" type="checkbox" ng-model="measure.skip">&nbsp;
+                  <translate>analysis.algorithmic.skipThisMeasure</translate>
+                </label>
               </div>
             </div>
           </div>
         </div>
 
-        <div class="container" style="width:100%">
-          <div class="row">
-            <div class="col-sm-1">
+        <div class="container full-width">
+          <div class="row pad-bot-10 normal-text">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.name</translate>
             </div>
-            <div class="col-sm-1">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.shortName</translate>
             </div>
-            <div class="col-sm-1">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.variableSettings</translate>
             </div>
-            <div class="col-sm-1">
+            <div class="col-sm-2 bold">
               <translate>analysis.algorithmic.grid.staticDefault</translate>
             </div>
-            <div class="col-sm-7">
+            <div class="col-sm-4 bold">
               <translate>analysis.algorithmic.grid.measureInputs</translate>
             </div>
           </div>
-          <div class="row" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
-            <div class="col-sm-1">
+          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length" ng-repeat="argument in measure.arguments">
+            <div class="col-sm-2 normal-text pad-top-25">
               {{argument.display_name}}
             </div>
 
-            <div class="col-sm-1">
-              <input class="form-control" type="text" ng-model="argument.inputs.name"
-                     ng-mouseover="argument.inputs.name">
+            <div class="col-sm-2 pad-top-25">
+              <input class="form-control" type="text" ng-model="argument.display_name_short"
+                     ng-mouseover="argument.display_name_short">
             </div>
 
-            <div class="col-sm-1">
-              <select class="form-control"
-                      ng-options="variableSetting as variableSetting for variableSetting in argument.inputs.variableSettings"
-                      ng-init="analysis.getVariableSettings(argument)"
-                      ng-model="argument.inputs.variableSetting"></select>
-            </div>
-
-            <div class="col-sm-1" ng-if="argument.type == 'Choice'">
-              <select class="form-control"
-                      ng-options="default_value as default_value for default_value in argument.inputs.choice_display_names"
-                      ng-model="argument.inputs.default_value"></select>
-            </div>
-            <div class="col-sm-1" ng-if="argument.type == 'String'">
-              <input class="form-control" type="text" ng-model="argument.inputs.default_value">
-            </div>
-            <div class="col-sm-1" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-              <input class="form-control" type="number" ng-model="argument.inputs.default_value">
-            </div>
-            <div class="col-sm-1" ng-if="argument.type == 'Boolean'">
-              <input type="checkbox" ng-model="argument.inputs.default_value">
-            </div>
-
-            <div class="col-sm-7"
-                 ng-show="!analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous' && ((analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation'))">
+            <div class="col-sm-2 pad-top-25">
               <div class="row">
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.minimum</translate>
+                <div class="col-sm-9">
+                  <select class="form-control"
+                          ng-options="variableSetting as variableSetting for variableSetting in getVariableSettings(argument)"
+                          ng-model="argument.inputs.variableSetting"
+                          ng-change="analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
                 </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.maximum</translate>
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <translate>analysis.algorithmic.grid.mean</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.stdDev</translate>
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <translate>analysis.algorithmic.grid.distribution</translate>
+                <div class="col-sm-3 pad-top-5">
+                  <span ng-show="argument.inputs.showWarningIcon" class="glyphicon glyphicon-alert red-button normal-text"></span>
                 </div>
               </div>
-              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                <div class="col-sm-2">
+            </div>
+            <div class="col-sm-2 pad-top-25">
+              <select class="form-control"
+                      ng-options="name as name for name in argument.choice_display_names"
+                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"></select>
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-if="argument.type == 'String'">
+
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+              <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
+            </div>
+
+            <!-- continuous (double only)-->
+            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Continuous'">
+              <div class="row pad-bot-10">
+                <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDistributions(argument)"
+                          ng-model="argument.inputs.distribution"></select>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.minimum</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.maximum</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.maximum">
                 </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <input class="form-control" type="number" ng-model="argument.inputs.mean">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
               </div>
-
-              <div class="row" ng-if="argument.type == 'String'">
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
-              </div>
-
-            </div>
-
-            <div class="col-sm-7"
-                 ng-show="analysis.$scope.showDeltaX && argument.type == 'Double' && argument.inputs.variableSetting == 'Continuous'&& ((analysis.$scope.samplingMethods != 'SingleRun' || analysis.$scope.samplingMethods != 'RepeatRun'  || analysis.$scope.samplingMethods != 'BaselinePerturbation'))">
               <div class="row">
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.minimum</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.maximum</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.deltaX</translate>
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <translate>analysis.algorithmic.grid.mean</translate>
-                </div>
-                <div class="col-sm-2">
-                  <translate>analysis.algorithmic.grid.stdDev</translate>
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <translate>analysis.algorithmic.grid.distribution</translate>
-                </div>
-              </div>
-              <div class="row" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="number" ng-model="argument.inputs.deltaX" step="0.01">
-                </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
+                <div class="col-sm-4" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.mean</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.mean">
                 </div>
-                <div class="col-sm-2">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.stdDev</label>
                   <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
                 </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
-              </div>
-
-              <div class="row" ng-if="argument.type == 'String'">
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum">
-                </div>
-                <div class="col-sm-2">
+                <div class="col-sm-4" ng-show="analysis.$scope.showDeltaX">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.deltaX</label>
                   <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01">
                 </div>
-                <div class="col-sm-2" ng-show="argument.inputs.distribution != 'Uniform'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.mean">
-                </div>
-                <div class="col-sm-2">
-                  <input class="form-control" type="text" ng-model="argument.inputs.stdDev">
-                </div>
-                <div class="col-sm-2" ng-show="analysis.$scope.showDistributions">
-                  <select class="form-control"
-                          ng-options="distribution as distribution for distribution in argument.inputs.distributions"
-                          ng-init="analysis.getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
-                </div>
               </div>
-
             </div>
 
-            <div class="col-sm-7"
-                 ng-show="(argument.inputs.variableSetting == 'Discrete' || argument.inputs.variableSetting == 'Pivot') && analysis.$scope.samplingMethods != 'SingleRun' && analysis.$scope.samplingMethods != 'RepeatRun'"
-                 ng-init="analysis.showDiscreteVariables(argument)">
-              <div class="row">
-                <div class="col-sm-2" ng-show="analysis.$scope.showMinAndMax">
-                  <translate>analysis.algorithmic.grid.relationToEUI</translate>
+            <!-- discrete & pivot-->
+            <div class="col-sm-4" ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
+              <div class="row" ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"<!-- pivots only -->
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
+                          ng-model="argument.inputs.distribution"></select>
                 </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  <translate>analysis.algorithmic.grid.min</translate>
+                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
                 </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax">
-                  <translate>analysis.algorithmic.grid.max</translate>
-                </div>
-                <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                  <div class="col-sm-1" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                    <translate>analysis.algorithmic.grid.value</translate>
-                  </div>
-                  <div class="col-sm-1">
-                    <translate>analysis.algorithmic.grid.weight</translate>
-                  </div>
+                <div class="col-sm-4" ng-show="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
                 </div>
               </div>
-              <div class="row">
-                <div class="col-sm-2" ng-show="analysis.$scope.showMinAndMax">
+
+              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.relationToEUI</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                </div>
+              </div>
+              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
                   <select class="form-control"
                           ng-options="relationship as relationship for relationship in relationships"
                           ng-model="argument.inputs.relationship" ng-init="relationships = ['Standard', 'Inverse']"
                           ng-init="relationship = 'Inverse'"></select>
                 </div>
-                <div class="col-sm-1"
-                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMinimum">
-                </div>
-                <div class="col-sm-1"
-                     ng-if="analysis.$scope.showMinAndMax && (argument.type == 'Double' || argument.type == 'Integer')">
-                  <input class="form-control" type="number" ng-model="argument.inputs.discreteMaximum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMinimum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'String'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.discreteMaximum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input type="checkbox" ng-model="argument.inputs.discreteMinimum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Boolean'">
-                  <input type="checkbox" ng-model="argument.inputs.discreteMaximum">
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-if="argument.type == 'String'">
+                  <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
                   <select class="form-control"
-                          ng-options="discreteMinimum as discreteMinimum for discreteMinimum in argument.inputs.discreteMinimums"
-                          ng-model="argument.inputs.discreteMinimum"></select>
-                </div>
-                <div class="col-sm-1" ng-show="analysis.$scope.showMinAndMax && argument.type == 'Choice'">
-                  <select class="form-control"
-                          ng-options="discreteMaximum as discreteMaximum for discreteMaximum in argument.inputs.discreteMaximums"
-                          ng-model="argument.inputs.discreteMaximum"></select>
-                </div>
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'"></select>
 
-                <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                  <div class="col-sm-1" ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
-                    <input class="form-control" type="number" ng-model="discreteVariable.value">
-                  </div>
-                  <div class="col-sm-1" ng-if="argument.type == 'String'">
-                    <input class="form-control" type="text" ng-model="discreteVariable.value">
-                  </div>
-                  <div class="col-sm-1" ng-if="argument.type == 'Boolean'">
-                    <input type="checkbox" ng-model="discreteVariable.value">
-                  </div>
-                  <div class="col-sm-1" ng-if="argument.type == 'Choice'">
-                    <select class="form-control"
-                            ng-options="value as value for value in argument.inputs.choice_display_names"
-                            ng-model="discreteVariable.value"></select>
-                  </div>
-                  <div class="col-sm-1" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                    <input class="form-control" type="number" min="0" max="1" step="0.1"
-                           ng-model="discreteVariable.weight">
-                  </div>
                 </div>
-                <div class="col-sm-1">
-                  <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span
-                    class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-if="argument.type == 'String'">
+                  <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
+                  <select class="form-control"
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'"></select>
                 </div>
-                <div class="col-sm-1"
-                     ng-show="argument.inputs.showWarningIcon">
-                  <p><span class="glyphicon glyphicon-alert" style="color:red"></span></p>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="row" ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
+                    <div class="col-sm-6">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.value</label>
+                    </div>
+                    <div class="col-sm-5" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
+                    </div>
+                  </div>
+                  <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                    <div class="row pad-bot-10">
+                      <div class="col-sm-6">
+                        <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                          <input class="form-control" type="number" ng-model="discreteVariable.value">
+                        </div>
+                        <div ng-if="argument.type == 'String'">
+                          <input class="form-control" type="text" ng-model="discreteVariable.value">
+                        </div>
+                        <div ng-if="argument.type == 'Boolean'">
+                          <input type="checkbox" ng-model="discreteVariable.value">
+                        </div>
+                        <div ng-if="argument.type == 'Choice'">
+                          <select class="form-control"
+                                  ng-options="value as value for value in argument.inputs.choice_display_names"
+                                  ng-model="discreteVariable.value"></select>
+                        </div>
+                      </div>
+                      <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                        <input class="form-control" type="number" min="0" max="1" step="0.1"
+                               ng-model="discreteVariable.weight">
+                      </div>
+                      <div class="col-sm-2 pad-top-5">
+                        <span class="glyphicon glyphicon-remove-sign black-button header-text" ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true" aria-label="Delete Value"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
+                      <button type="button" class="btn btn-success" ng-click="analysis.addDiscreteVariable(argument)"><span
+                        class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                    </div>
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-          <div ng-show="measure.showWarningText">
-            <p>"{{'analysis.algorithmic.warning' | translate}}"<span class="glyphicon glyphicon-alert"
-                                                                     style="color:red"></span></p>
+          <div ng-show="measure.showWarningText" class="normal-text pad-top-10 pad-bot-10">
+            <span class="glyphicon glyphicon-alert red-button"></span>&nbsp;<span>{{'analysis.algorithmic.warning' | translate}}</span>
           </div>
         </div>
       </uib-accordion-group>
