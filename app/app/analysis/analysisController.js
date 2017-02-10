@@ -4,10 +4,11 @@ const {dialog} = remote;
 
 export class AnalysisController {
 
-  constructor($log, $q, BCL, Project, $scope, $document, $uibModal) {
+  constructor($log, $q, BCL, Project, $scope, $document, $uibModal, toastr) {
     'ngInject';
 
     const vm = this;
+    vm.toastr = toastr;
     vm.Project = Project;
     vm.$log = $log;
     vm.$q = $q;
@@ -623,8 +624,13 @@ export class AnalysisController {
     copiedMeasure.name += '_copy';
     copiedMeasure.display_name += ' Copy';
 
+    // Close the original measure's accordion
+    measure.open = false;
+
     vm.$scope.measures.push(copiedMeasure);
     vm.Project.measures.push(copiedMeasure);
+
+    vm.toastr.success('Measure Duplicated!');
 
     vm.initializeTab();
   }
