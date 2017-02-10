@@ -49,6 +49,7 @@ export class AnalysisController {
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
+    vm.$scope.relationships = ['Standard', 'Inverse'];
 
     // size grids according to data
     vm.$scope.getTableHeight = function (uid) {
