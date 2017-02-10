@@ -621,6 +621,8 @@ export class AnalysisController {
 
     vm.$scope.measures.push(copiedMeasure);
     vm.Project.measures.push(copiedMeasure);
+
+    vm.initializeTab();
   }
 
   loadMeasureOptions() {
