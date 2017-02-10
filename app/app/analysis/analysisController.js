@@ -49,6 +49,7 @@ export class AnalysisController {
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
+    vm.$scope.relationships = ['Standard', 'Inverse'];
 
     // size grids according to data
     vm.$scope.getTableHeight = function (uid) {
@@ -62,7 +63,7 @@ export class AnalysisController {
     vm.initializeTab(); // replaces (and calls) initializeGrids
     //vm.initializeValues();
 
-    vm.$scope.getVariableSettings = function(argument) {
+    vm.$scope.getVariableSettings = function (argument) {
       //vm.$log.debug('In getVariableSettings');
       let settings = [];
       if (argument.type === 'Double') {
@@ -73,7 +74,7 @@ export class AnalysisController {
       return settings;
     };
 
-    vm.$scope.getDistributions = function(argument) {
+    vm.$scope.getDistributions = function (argument) {
       //vm.$log.debug('In getDistributions');
       let distributions = [];
       switch (vm.$scope.selectedSamplingMethod.id) {
@@ -94,7 +95,7 @@ export class AnalysisController {
       return distributions;
     };
 
-    vm.$scope.getDiscreteDistributions = function() {
+    vm.$scope.getDiscreteDistributions = function () {
       //vm.$log.debug('In get Discrete Distributions');
       let distributions = [];
       switch (vm.$scope.selectedSamplingMethod.id) {
@@ -235,7 +236,7 @@ export class AnalysisController {
           displayName: 'description',
           visible: false
         }, {
-          name: 'short_name',
+          name: 'display_name_short',
           displayName: 'analysis.columns.shortName',
           cellEditableCondition: $scope => {
             return angular.isDefined($scope.row.entity.display_name);
@@ -809,7 +810,7 @@ export class AnalysisController {
       // ensure appropriate folders exist
       vm.jetpack.dir(vm.Project.getProjectDir().path('scripts', type));
       // copy/overwrite
-      vm.jetpack.copy(scriptPath, vm.Project.getProjectDir().path('scripts',  type, scriptFilename), {overwrite: true});
+      vm.jetpack.copy(scriptPath, vm.Project.getProjectDir().path('scripts', type, scriptFilename), {overwrite: true});
       vm.$log.debug('Script filename: ', scriptFilename);
       // update project
       vm.$scope.serverScripts[type].file = scriptFilename;
@@ -1093,7 +1094,7 @@ export class AnalysisController {
   showDiscreteVariables() {
     const vm = this;
     //vm.$log.debug('In showDiscreteVariables');
-    if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE', 'Diagonal', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['NSGA2', 'LHS', 'PreFlight', 'Morris', 'DOE', 'Diagonal', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDiscreteVariables = true;
     } else {
       vm.$scope.showDiscreteVariables = false;
@@ -1103,7 +1104,7 @@ export class AnalysisController {
   showPivotVariables() {
     const vm = this;
     //vm.$log.debug('In showPivotVariables');
-    if (_.includes(['LHS', 'Morris', 'DOE', 'BaselinePerturbation', 'Diagonal'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['LHS', 'Morris', 'DOE', 'BaselinePerturbation', 'Diagonal', 'PreFlight'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showPivotVariables = true;
     } else {
       vm.$scope.showPivotVariables = false;
@@ -1165,7 +1166,7 @@ export class AnalysisController {
 
   deleteValue(argument, index) {
     const vm = this;
-    if (!_.isNil(index) && index > -1){
+    if (!_.isNil(index) && index > -1) {
       argument.inputs.discreteVariables.splice(index, 1);
       vm.setIsModified();
     }
@@ -1182,7 +1183,7 @@ export class AnalysisController {
         arg.display_name_short = arg.display_name_short ? arg.display_name_short : arg.name;
         if (!arg.inputs) arg.inputs = {};
         // name and displayName should be already defined
-        arg.inputs.relationship = _.isNil(arg.inputs.relationship) ? 'Standard' : arg.inputs.relationship; // TODO: what is this?
+        arg.inputs.relationship = _.isNil(arg.inputs.relationship) ? null : arg.inputs.relationship; // TODO: what is this?
         arg.inputs.choiceDisplayNames = _.isNil(arg.choice_display_names) ? [] : arg.choice_display_names;  // TODO: what is this?
         arg.inputs.variableSetting = _.isNil(arg.inputs.variableSetting) ? 'Argument' : arg.inputs.variableSetting;
         if (arg.inputs.variableSetting == 'Discrete' || arg.inputs.variableSetting == 'Pivot') {
@@ -1194,7 +1195,7 @@ export class AnalysisController {
 
         // calculate default value
         let defaultValue = null;
-        if( _.isNil(arg.inputs.default_value)){
+        if (_.isNil(arg.inputs.default_value)) {
           if (_.isNil(arg.default_value)) {
             if (arg.type == 'Integer' || arg.type == 'Double') {
               defaultValue = 0;
