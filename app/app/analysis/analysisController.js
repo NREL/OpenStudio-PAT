@@ -619,6 +619,10 @@ export class AnalysisController {
     let copiedMeasure = angular.copy(measure);
     copiedMeasure.instanceId = Math.random();
 
+    // Make name and display_name unique
+    copiedMeasure.name += '_copy';
+    copiedMeasure.display_name += ' Copy';
+
     vm.$scope.measures.push(copiedMeasure);
     vm.Project.measures.push(copiedMeasure);
 
