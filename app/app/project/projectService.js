@@ -830,7 +830,7 @@ export class Project {
           v.units = arg.units;
           v.minimum = arg.inputs.minimum;
           v.maximum = arg.inputs.maximum;
-          v.relation_to_output = null;
+          v.relation_to_output = arg.relationship;
           v.static_value = arg.default_value;
           v.uuid = '';
           v.version_uuid = '';

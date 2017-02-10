@@ -207,8 +207,8 @@
           <div class="row normal-text">
             <div class="col-sm-3 pad-bot-10">
               <div class="input-group">
-                <label>
-                  <input id="{{measure.uid}}" type="checkbox" ng-model="measure.skip">&nbsp;
+                <checkbox ng-model="measure.skip" id="{{measure.$$hashKey}}" class="btn-success"></checkbox>&nbsp;
+                <label for="{{measure.$$hashKey}}">
                   <translate>analysis.algorithmic.skipThisMeasure</translate>
                 </label>
               </div>
@@ -268,7 +268,10 @@
 
               <input class="form-control" type="number" ng-model="argument.inputs.default_value"
                      ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-              <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
+              <span ng-if="argument.type == 'Boolean'">
+                <checkbox ng-model="argument.inputs.default_value"></checkbox>
+              </span>
+
             </div>
 
             <!-- continuous (double only)-->
@@ -338,7 +341,7 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
                 </div>
               </div>
-              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+              <div class="row pad-bot-10" ng-show="analysis.$scope.showMinAndMax">
                 <div class="col-sm-4">
                   <select class="form-control"
                           ng-options="relationship as relationship for relationship in relationships"
@@ -350,7 +353,9 @@
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                   <input class="form-control" type="text" ng-model="argument.inputs.minimum"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.minimum"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
                           ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'"></select>
@@ -361,7 +366,9 @@
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                   <input class="form-control" type="text" ng-model="argument.inputs.maximum"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.maximum"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
                           ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'"></select>
@@ -388,7 +395,7 @@
                           <input class="form-control" type="text" ng-model="discreteVariable.value">
                         </div>
                         <div ng-if="argument.type == 'Boolean'">
-                          <input type="checkbox" ng-model="discreteVariable.value">
+                          <checkbox ng-model="discreteVariable.value"></checkbox>
                         </div>
                         <div ng-if="argument.type == 'Choice'">
                           <select class="form-control"
@@ -478,8 +485,8 @@
           <div class="row normal-text">
             <div class="col-sm-3 pad-bot-10">
               <div class="input-group">
-                <label>
-                  <input id="{{measure.uid}}" type="checkbox" ng-model="measure.skip">&nbsp;
+                <checkbox id="{{measure.$$hashKey}}" class="btn-success" ng-model="measure.skip"></checkbox>&nbsp;
+                <label for="{{measure.$$hashKey}}">
                   <translate>analysis.algorithmic.skipThisMeasure</translate>
                 </label>
               </div>
@@ -539,7 +546,9 @@
 
               <input class="form-control" type="number" ng-model="argument.inputs.default_value"
                      ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-              <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
+              <span ng-if="argument.type == 'Boolean'">
+                <checkbox ng-model="argument.inputs.default_value"></checkbox>
+              </span>
             </div>
 
             <!-- continuous (double only)-->
@@ -609,7 +618,7 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
                 </div>
               </div>
-              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+              <div class="row pad-bot-10" ng-show="analysis.$scope.showMinAndMax">
                 <div class="col-sm-4">
                   <select class="form-control"
                           ng-options="relationship as relationship for relationship in relationships"
@@ -621,7 +630,9 @@
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                   <input class="form-control" type="text" ng-model="argument.inputs.minimum"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.minimum"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
                           ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'"></select>
@@ -632,7 +643,9 @@
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                   <input class="form-control" type="text" ng-model="argument.inputs.maximum"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.maximum"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
                           ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'"></select>
@@ -659,7 +672,7 @@
                           <input class="form-control" type="text" ng-model="discreteVariable.value">
                         </div>
                         <div ng-if="argument.type == 'Boolean'">
-                          <input type="checkbox" ng-model="discreteVariable.value">
+                          <checkbox ng-model="discreteVariable.value"></checkbox>
                         </div>
                         <div ng-if="argument.type == 'Choice'">
                           <select class="form-control"
@@ -749,8 +762,8 @@
           <div class="row normal-text">
             <div class="col-sm-3 pad-bot-10">
               <div class="input-group">
-                <label>
-                  <input id="{{measure.uid}}" type="checkbox" ng-model="measure.skip">&nbsp;
+                <checkbox ng-model="measure.skip" class="btn-success" id="{{measure.$$hashKey}}"></checkbox>&nbsp;
+                <label for="{{measure.$$hashKey}}">
                   <translate>analysis.algorithmic.skipThisMeasure</translate>
                 </label>
               </div>
@@ -810,7 +823,9 @@
 
               <input class="form-control" type="number" ng-model="argument.inputs.default_value"
                      ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-              <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
+              <span ng-if="argument.type == 'Boolean'">
+                <checkbox ng-model="argument.inputs.default_value"></checkbox>
+              </span>
             </div>
 
             <!-- continuous (double only)-->
@@ -880,7 +895,7 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
                 </div>
               </div>
-              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+              <div class="row pad-bot-10" ng-show="analysis.$scope.showMinAndMax">
                 <div class="col-sm-4">
                   <select class="form-control"
                           ng-options="relationship as relationship for relationship in relationships"
@@ -892,7 +907,9 @@
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                   <input class="form-control" type="text" ng-model="argument.inputs.minimum"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.minimum"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
                           ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'"></select>
@@ -903,7 +920,9 @@
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
                   <input class="form-control" type="text" ng-model="argument.inputs.maximum"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.maximum"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
                           ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'"></select>
@@ -930,7 +949,7 @@
                           <input class="form-control" type="text" ng-model="discreteVariable.value">
                         </div>
                         <div ng-if="argument.type == 'Boolean'">
-                          <input type="checkbox" ng-model="discreteVariable.value">
+                          <checkbox ng-model="discreteVariable.value"></checkbox>
                         </div>
                         <div ng-if="argument.type == 'Choice'">
                           <select class="form-control"

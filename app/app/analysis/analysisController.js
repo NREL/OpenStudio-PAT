@@ -1093,7 +1093,7 @@ export class AnalysisController {
   showDiscreteVariables() {
     const vm = this;
     //vm.$log.debug('In showDiscreteVariables');
-    if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE', 'Diagonal', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['NSGA2', 'LHS', 'PreFlight', 'Morris', 'DOE', 'Diagonal', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDiscreteVariables = true;
     } else {
       vm.$scope.showDiscreteVariables = false;
@@ -1103,7 +1103,7 @@ export class AnalysisController {
   showPivotVariables() {
     const vm = this;
     //vm.$log.debug('In showPivotVariables');
-    if (_.includes(['LHS', 'Morris', 'DOE', 'BaselinePerturbation', 'Diagonal'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['LHS', 'Morris', 'DOE', 'BaselinePerturbation', 'Diagonal', 'PreFlight'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showPivotVariables = true;
     } else {
       vm.$scope.showPivotVariables = false;
@@ -1182,7 +1182,7 @@ export class AnalysisController {
         arg.display_name_short = arg.display_name_short ? arg.display_name_short : arg.name;
         if (!arg.inputs) arg.inputs = {};
         // name and displayName should be already defined
-        arg.inputs.relationship = _.isNil(arg.inputs.relationship) ? 'Standard' : arg.inputs.relationship; // TODO: what is this?
+        arg.inputs.relationship = _.isNil(arg.inputs.relationship) ? null : arg.inputs.relationship; // TODO: what is this?
         arg.inputs.choiceDisplayNames = _.isNil(arg.choice_display_names) ? [] : arg.choice_display_names;  // TODO: what is this?
         arg.inputs.variableSetting = _.isNil(arg.inputs.variableSetting) ? 'Argument' : arg.inputs.variableSetting;
         if (arg.inputs.variableSetting == 'Discrete' || arg.inputs.variableSetting == 'Pivot') {
