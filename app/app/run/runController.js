@@ -126,6 +126,7 @@ export class RunController {
     vm.$log.debug('new run type: ', vm.$scope.selectedRunType);
     vm.Project.setRunType(vm.$scope.selectedRunType);
     vm.OsServer.resetSelectedServerURL();
+    vm.OsServer.setProgress(0, '');
 
     // if switching to remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
@@ -589,6 +590,11 @@ export class RunController {
 
   runEntireWorkflow() {
     const vm = this;
+
+    // set this to lock down runType
+    vm.OsServer.setAnalysisStatus('starting');
+    vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+
     vm.$log.debug('***** In runController::runEntireWorkflow() *****');
     vm.toggleButtons();
 

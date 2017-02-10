@@ -1132,9 +1132,9 @@ export class OsServer {
       vm.$http.get(reportUrl, config).then( response => {
         // write file and set downloaded flag
         vm.$log.debug('RESPONSE!! ', response);
+
         // extract dir and save to disk in local measures directory
         // convert arraybuffer to node buffer
-        setTimeout(vm.testSleep(), 10000);
         const buf = new Buffer(new Uint8Array(response.data));
         vm.$log.debug('buffer');
         const zip = new vm.AdmZip(buf);
@@ -1142,7 +1142,6 @@ export class OsServer {
         // save
         zip.writeZip(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name));
 
-        //vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
         file.downloaded = true;
         datapoint.downloaded_results = true;
         vm.Project.setModified(true);

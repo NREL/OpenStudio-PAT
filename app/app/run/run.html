@@ -3,7 +3,7 @@
     <h4 translate>run.title</h4>
   </div>
   <div class="col-sm-2 pad-bot-20 pad-top-5 align-middle">
-    <select id="runType" class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-change="run.warnCloudRunning('runtype', '{{selectedRunType}}')"></select>
+    <select id="runType" class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-disabled="analysisStatus == 'starting' || analysisStatus == 'in progress'" ng-change="run.warnCloudRunning('runtype', '{{selectedRunType}}')"></select>
   </div>
   <div ng-if="selectedRunType.name == 'local'" class="inline">
     <div class="col-sm-5 pad-bot-20 pad-top-10 align-middle">
@@ -28,7 +28,10 @@
 <div ng-if="selectedRunType.name == 'remote'" ng-include="'app/run/remote.html'"></div>
 
 <div ng-show="selectedRunType.name == 'local'" class="row pad-bot-20">
-  <div class="col-sm-12">
+  <div class="col-sm-12 normal-text pad-left-25" ng-if="selectedAnalysisType == 'Algorithmic'">
+    <span class="glyphicon glyphicon-warning-sign red-button big-text"></span>&nbsp;&nbsp;<translate>run.algorithmicOnCloud</translate>
+  </div>
+  <div class="col-sm-12" ng-if="selectedAnalysisType != 'Algorithmic'">
     <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
     <button type="button" class="btn btn-danger" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>

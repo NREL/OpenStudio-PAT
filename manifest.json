@@ -32,17 +32,6 @@
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"
-  }],
-  "openstudio": [{
-    "name": "OpenStudio2-1.13.4.86cc880399-win32.tar.gz",
-    "platform": "win32",
-    "arch": "x64",
-    "type": "OpenStudio"
-  }, {
-    "name": "OpenStudio2-1.13.4.ce96c3fbe1-Darwin.tar.gz",
-    "platform": "darwin",
-    "arch": "x64",
-    "type": "OpenStudio"
   }]
 }
 

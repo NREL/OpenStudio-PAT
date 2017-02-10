@@ -207,8 +207,8 @@
           <div class="row normal-text">
             <div class="col-sm-3 pad-bot-10">
               <div class="input-group">
-                <label>
-                  <input id="{{measure.uid}}" type="checkbox" ng-model="measure.skip">&nbsp;
+                <checkbox ng-model="measure.skip" id="{{measure.$$hashKey}}" class="btn-success" ng-change="analysis.setIsModified()"></checkbox>&nbsp;
+                <label for="{{measure.$$hashKey}}">
                   <translate>analysis.algorithmic.skipThisMeasure</translate>
                 </label>
               </div>
@@ -242,7 +242,7 @@
 
             <div class="col-sm-2 pad-top-25">
               <input class="form-control" type="text" ng-model="argument.display_name_short"
-                     ng-mouseover="argument.display_name_short">
+                     ng-mouseover="argument.display_name_short" ng-change="analysis.setIsModified()">
             </div>
 
             <div class="col-sm-2 pad-top-25">
@@ -251,7 +251,7 @@
                   <select class="form-control"
                           ng-options="variableSetting as variableSetting for variableSetting in getVariableSettings(argument)"
                           ng-model="argument.inputs.variableSetting"
-                          ng-change="analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
+                          ng-change="analysis.setIsModified(); analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
                 </div>
                 <div class="col-sm-3 pad-top-5">
                   <span ng-show="argument.inputs.showWarningIcon"
@@ -262,13 +262,16 @@
             <div class="col-sm-2 pad-top-25">
               <select class="form-control"
                       ng-options="name as name for name in argument.choice_display_names"
-                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"></select>
-              <input class="form-control" type="text" ng-model="argument.inputs.default_value"
+                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
                      ng-if="argument.type == 'String'">
 
-              <input class="form-control" type="number" ng-model="argument.inputs.default_value"
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
                      ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-              <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
+              <span ng-if="argument.type == 'Boolean'">
+                <checkbox ng-model="argument.inputs.default_value"></checkbox>
+              </span>
+
             </div>
 
             <!-- continuous (double only)-->
@@ -278,29 +281,29 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
                           ng-options="distribution as distribution for distribution in getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.minimum</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.maximum</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-4" ng-show="argument.inputs.distribution != 'Uniform'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.mean</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.mean">
+                  <input class="form-control" type="number" ng-model="argument.inputs.mean" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.stdDev</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
+                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4" ng-show="analysis.$scope.showDeltaX">
                   <label class="normal-text" translate>analysis.algorithmic.grid.deltaX</label>
-                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01">
+                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01" ng-change="analysis.setIsModified()">
                 </div>
               </div>
             </div>
@@ -315,15 +318,15 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
                           ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
-                          ng-model="argument.inputs.distribution"></select>
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
                 </div>
               </div>
 
@@ -338,33 +341,36 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
                 </div>
               </div>
-              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+              <div class="row pad-bot-10" ng-show="analysis.$scope.showMinAndMax">
                 <div class="col-sm-4">
                   <select class="form-control"
                           ng-options="relationship as relationship for relationship in relationships"
-                          ng-model="argument.inputs.relationship" ng-init="relationships = ['Standard', 'Inverse']"
-                          ng-init="relationship = 'Inverse'"></select>
+                          ng-model="argument.inputs.relationship" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum"
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum"
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
-                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'"></select>
+                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
 
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum"
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum"
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
-                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'"></select>
+                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
                 </div>
               </div>
               <div class="row">
@@ -382,22 +388,22 @@
                     <div class="row pad-bot-10">
                       <div class="col-sm-6">
                         <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
-                          <input class="form-control" type="number" ng-model="discreteVariable.value">
+                          <input class="form-control" type="number" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
                         </div>
                         <div ng-if="argument.type == 'String'">
-                          <input class="form-control" type="text" ng-model="discreteVariable.value">
+                          <input class="form-control" type="text" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
                         </div>
                         <div ng-if="argument.type == 'Boolean'">
-                          <input type="checkbox" ng-model="discreteVariable.value">
+                          <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
                         </div>
                         <div ng-if="argument.type == 'Choice'">
                           <select class="form-control"
                                   ng-options="value as value for value in argument.inputs.choice_display_names"
-                                  ng-model="discreteVariable.value"></select>
+                                  ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
                         </div>
                       </div>
                       <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                        <input class="form-control" type="number" min="0" max="1" step="0.1"
+                        <input class="form-control" type="number" min="0" max="1" step="0.1" ng-change="analysis.setIsModified()"
                                ng-model="discreteVariable.weight">
                       </div>
                       <div class="col-sm-2 pad-top-5">
@@ -478,8 +484,8 @@
           <div class="row normal-text">
             <div class="col-sm-3 pad-bot-10">
               <div class="input-group">
-                <label>
-                  <input id="{{measure.uid}}" type="checkbox" ng-model="measure.skip">&nbsp;
+                <checkbox ng-model="measure.skip" id="{{measure.$$hashKey}}" class="btn-success" ng-change="analysis.setIsModified()"></checkbox>&nbsp;
+                <label for="{{measure.$$hashKey}}">
                   <translate>analysis.algorithmic.skipThisMeasure</translate>
                 </label>
               </div>
@@ -513,7 +519,7 @@
 
             <div class="col-sm-2 pad-top-25">
               <input class="form-control" type="text" ng-model="argument.display_name_short"
-                     ng-mouseover="argument.display_name_short">
+                     ng-mouseover="argument.display_name_short" ng-change="analysis.setIsModified()">
             </div>
 
             <div class="col-sm-2 pad-top-25">
@@ -522,7 +528,7 @@
                   <select class="form-control"
                           ng-options="variableSetting as variableSetting for variableSetting in getVariableSettings(argument)"
                           ng-model="argument.inputs.variableSetting"
-                          ng-change="analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
+                          ng-change="analysis.setIsModified(); analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
                 </div>
                 <div class="col-sm-3 pad-top-5">
                   <span ng-show="argument.inputs.showWarningIcon"
@@ -533,13 +539,16 @@
             <div class="col-sm-2 pad-top-25">
               <select class="form-control"
                       ng-options="name as name for name in argument.choice_display_names"
-                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"></select>
-              <input class="form-control" type="text" ng-model="argument.inputs.default_value"
+                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
                      ng-if="argument.type == 'String'">
 
-              <input class="form-control" type="number" ng-model="argument.inputs.default_value"
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
                      ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-              <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
+              <span ng-if="argument.type == 'Boolean'">
+                <checkbox ng-model="argument.inputs.default_value"></checkbox>
+              </span>
+
             </div>
 
             <!-- continuous (double only)-->
@@ -549,29 +558,29 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
                           ng-options="distribution as distribution for distribution in getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.minimum</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.maximum</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-4" ng-show="argument.inputs.distribution != 'Uniform'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.mean</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.mean">
+                  <input class="form-control" type="number" ng-model="argument.inputs.mean" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.stdDev</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
+                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4" ng-show="analysis.$scope.showDeltaX">
                   <label class="normal-text" translate>analysis.algorithmic.grid.deltaX</label>
-                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01">
+                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01" ng-change="analysis.setIsModified()">
                 </div>
               </div>
             </div>
@@ -586,15 +595,15 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
                           ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
-                          ng-model="argument.inputs.distribution"></select>
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
                 </div>
               </div>
 
@@ -609,33 +618,36 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
                 </div>
               </div>
-              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+              <div class="row pad-bot-10" ng-show="analysis.$scope.showMinAndMax">
                 <div class="col-sm-4">
                   <select class="form-control"
                           ng-options="relationship as relationship for relationship in relationships"
-                          ng-model="argument.inputs.relationship" ng-init="relationships = ['Standard', 'Inverse']"
-                          ng-init="relationship = 'Inverse'"></select>
+                          ng-model="argument.inputs.relationship" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum"
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum"
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
-                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'"></select>
+                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
 
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum"
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum"
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
-                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'"></select>
+                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
                 </div>
               </div>
               <div class="row">
@@ -653,22 +665,22 @@
                     <div class="row pad-bot-10">
                       <div class="col-sm-6">
                         <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
-                          <input class="form-control" type="number" ng-model="discreteVariable.value">
+                          <input class="form-control" type="number" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
                         </div>
                         <div ng-if="argument.type == 'String'">
-                          <input class="form-control" type="text" ng-model="discreteVariable.value">
+                          <input class="form-control" type="text" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
                         </div>
                         <div ng-if="argument.type == 'Boolean'">
-                          <input type="checkbox" ng-model="discreteVariable.value">
+                          <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
                         </div>
                         <div ng-if="argument.type == 'Choice'">
                           <select class="form-control"
                                   ng-options="value as value for value in argument.inputs.choice_display_names"
-                                  ng-model="discreteVariable.value"></select>
+                                  ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
                         </div>
                       </div>
                       <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                        <input class="form-control" type="number" min="0" max="1" step="0.1"
+                        <input class="form-control" type="number" min="0" max="1" step="0.1" ng-change="analysis.setIsModified()"
                                ng-model="discreteVariable.weight">
                       </div>
                       <div class="col-sm-2 pad-top-5">
@@ -749,8 +761,8 @@
           <div class="row normal-text">
             <div class="col-sm-3 pad-bot-10">
               <div class="input-group">
-                <label>
-                  <input id="{{measure.uid}}" type="checkbox" ng-model="measure.skip">&nbsp;
+                <checkbox ng-model="measure.skip" id="{{measure.$$hashKey}}" class="btn-success" ng-change="analysis.setIsModified()"></checkbox>&nbsp;
+                <label for="{{measure.$$hashKey}}">
                   <translate>analysis.algorithmic.skipThisMeasure</translate>
                 </label>
               </div>
@@ -784,7 +796,7 @@
 
             <div class="col-sm-2 pad-top-25">
               <input class="form-control" type="text" ng-model="argument.display_name_short"
-                     ng-mouseover="argument.display_name_short">
+                     ng-mouseover="argument.display_name_short" ng-change="analysis.setIsModified()">
             </div>
 
             <div class="col-sm-2 pad-top-25">
@@ -793,7 +805,7 @@
                   <select class="form-control"
                           ng-options="variableSetting as variableSetting for variableSetting in getVariableSettings(argument)"
                           ng-model="argument.inputs.variableSetting"
-                          ng-change="analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
+                          ng-change="analysis.setIsModified(); analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
                 </div>
                 <div class="col-sm-3 pad-top-5">
                   <span ng-show="argument.inputs.showWarningIcon"
@@ -804,13 +816,16 @@
             <div class="col-sm-2 pad-top-25">
               <select class="form-control"
                       ng-options="name as name for name in argument.choice_display_names"
-                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"></select>
-              <input class="form-control" type="text" ng-model="argument.inputs.default_value"
+                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
                      ng-if="argument.type == 'String'">
 
-              <input class="form-control" type="number" ng-model="argument.inputs.default_value"
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
                      ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-              <input type="checkbox" ng-model="argument.inputs.default_value" ng-if="argument.type == 'Boolean'">
+              <span ng-if="argument.type == 'Boolean'">
+                <checkbox ng-model="argument.inputs.default_value"></checkbox>
+              </span>
+
             </div>
 
             <!-- continuous (double only)-->
@@ -820,29 +835,29 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
                           ng-options="distribution as distribution for distribution in getDistributions(argument)"
-                          ng-model="argument.inputs.distribution"></select>
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.minimum</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.maximum</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
                 </div>
               </div>
               <div class="row">
                 <div class="col-sm-4" ng-show="argument.inputs.distribution != 'Uniform'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.mean</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.mean">
+                  <input class="form-control" type="number" ng-model="argument.inputs.mean" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.stdDev</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev">
+                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4" ng-show="analysis.$scope.showDeltaX">
                   <label class="normal-text" translate>analysis.algorithmic.grid.deltaX</label>
-                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01">
+                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01" ng-change="analysis.setIsModified()">
                 </div>
               </div>
             </div>
@@ -857,15 +872,15 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
                           ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
-                          ng-model="argument.inputs.distribution"></select>
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
                 </div>
                 <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
                 </div>
               </div>
 
@@ -880,33 +895,36 @@
                   <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
                 </div>
               </div>
-              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+              <div class="row pad-bot-10" ng-show="analysis.$scope.showMinAndMax">
                 <div class="col-sm-4">
                   <select class="form-control"
                           ng-options="relationship as relationship for relationship in relationships"
-                          ng-model="argument.inputs.relationship" ng-init="relationships = ['Standard', 'Inverse']"
-                          ng-init="relationship = 'Inverse'"></select>
+                          ng-model="argument.inputs.relationship" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.minimum"
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.minimum"
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.minimum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
-                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'"></select>
+                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
 
                 </div>
                 <div class="col-sm-4">
-                  <input class="form-control" type="number" ng-model="argument.inputs.maximum"
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'Double' || argument.type == 'Integer'">
-                  <input class="form-control" type="text" ng-model="argument.inputs.maximum"
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
                          ng-if="argument.type == 'String'">
-                  <input type="checkbox" ng-model="argument.inputs.maximum" ng-if="argument.type == 'Boolean'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
                   <select class="form-control"
                           ng-options="choice for choice in argument.choice_display_names"
-                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'"></select>
+                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
                 </div>
               </div>
               <div class="row">
@@ -924,22 +942,22 @@
                     <div class="row pad-bot-10">
                       <div class="col-sm-6">
                         <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
-                          <input class="form-control" type="number" ng-model="discreteVariable.value">
+                          <input class="form-control" type="number" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
                         </div>
                         <div ng-if="argument.type == 'String'">
-                          <input class="form-control" type="text" ng-model="discreteVariable.value">
+                          <input class="form-control" type="text" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
                         </div>
                         <div ng-if="argument.type == 'Boolean'">
-                          <input type="checkbox" ng-model="discreteVariable.value">
+                          <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
                         </div>
                         <div ng-if="argument.type == 'Choice'">
                           <select class="form-control"
                                   ng-options="value as value for value in argument.inputs.choice_display_names"
-                                  ng-model="discreteVariable.value"></select>
+                                  ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
                         </div>
                       </div>
                       <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                        <input class="form-control" type="number" min="0" max="1" step="0.1"
+                        <input class="form-control" type="number" min="0" max="1" step="0.1" ng-change="analysis.setIsModified()"
                                ng-model="discreteVariable.weight">
                       </div>
                       <div class="col-sm-2 pad-top-5">

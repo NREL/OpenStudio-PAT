@@ -284,6 +284,7 @@ export default {
     stopServer: 'Stop Server',
     exportToOSA: 'Export to OSA',
     runEntireWorkflow: 'Run Entire Workflow',
+    algorithmicOnCloud: 'Algorithmic analyses cannot be run locally.  Select \'Run on Cloud\' from the dropdown above to run this analysis remotely.',
     viewServer: 'View Server',
     modalAnalysisRunning: {
       title: 'Analysis is Running',
