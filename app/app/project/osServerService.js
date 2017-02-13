@@ -343,7 +343,7 @@ export class OsServer {
     const deferred = vm.$q.defer();
 
     const serverType = vm.Project.getRunType().name;
-    vm.$log.debug('SERVER TYPE: ', serverType);
+    vm.$log.debug('START SERVER...SERVER TYPE: ', serverType);
     vm.$log.debug('SERVER STATUS: ', vm.getServerStatus(serverType));
 
     if ((vm.getServerStatus(serverType) != 'started') || force) {
@@ -384,6 +384,7 @@ export class OsServer {
       }
       else {
         // remote server
+        vm.$log.debug('Starting Remote Server');
         if (vm.remoteStartInProgress){
           vm.$log.debug('***Remote Server is already in the process of starting...waiting on serverStartDeferred to resolve');
           vm.isRemoteReady().then((response) => {
@@ -420,6 +421,7 @@ export class OsServer {
     const vm = this;
     vm.$log.debug('***** In osServerService::remoteServer() *****');
     const deferred = vm.$q.defer();
+    const serverType = vm.Project.getRunType().name;
 
     // check remote type
     if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server'){
@@ -435,6 +437,7 @@ export class OsServer {
     } else {
       // amazon cloud
       vm.remoteSettings = vm.Project.getRemoteSettings();
+      vm.$log.debug('Starting Amazon Cloud');
       vm.$log.debug('in OSServerService::remoteServer, remoteSettings: ', vm.remoteSettings);
 
       if (!vm.remoteSettings.credentials || !vm.remoteSettings.credentials.yamlFilename){
@@ -442,8 +445,8 @@ export class OsServer {
         deferred.reject('No Credentials');
       } else {
         // initialize potentially missing variables
-        vm.remoteSettings.aws.server = vm.remoteSettings.aws.server? vm.remoteSettings.aws.server : {};
-        vm.remoteSettings.aws.server.dns = vm.remoteSettings.aws.server.dns? vm.remoteSettings.aws.server.dns : null;
+        vm.remoteSettings.aws.server = vm.remoteSettings.aws.server ? vm.remoteSettings.aws.server : {};
+        vm.remoteSettings.aws.server.dns = vm.remoteSettings.aws.server.dns ? vm.remoteSettings.aws.server.dns : null;
 
         // see if cluster is running
         vm.Project.pingCluster(vm.remoteSettings.aws.cluster_name).then((dns) => {
@@ -464,8 +467,14 @@ export class OsServer {
                 // SUCCESS
                 vm.$log.debug('CLOUD SERVER CONNECTION SUCCESS');
 
-                //set vm.selectedServerURL
-                vm.setSelectedServerURL(vm.Project.fixURL(dns));
+                // set vm.selectedServerURL
+                // check what serverType is before setting selectedServerURL
+                vm.$log.debug('Current run type set to: ', vm.Project.getRunType().name);
+                if (vm.Project.getRunType().name == 'remote') {
+                  vm.$log.debug('Setting selectedServerURl to: ', vm.Project.fixURL(dns));
+                  vm.setSelectedServerURL(vm.Project.fixURL(dns));
+                }
+
                 vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
                 deferred.resolve(child);
 
@@ -492,7 +501,10 @@ export class OsServer {
             console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
             if (code == 0) {
               vm.$log.debug('Server connected');
-              vm.setSelectedServerURL(vm.Project.fixURL(dns));
+              if (vm.Project.getRunType().name == 'remote') {
+                vm.$log.debug("Setting selectedServerURL to: ", vm.Project.fixURL(dns));
+                vm.setSelectedServerURL(vm.Project.fixURL(dns));
+              }
               vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
               deferred.resolve('success');
             } else {
@@ -535,7 +547,10 @@ export class OsServer {
                 // get DNS and set server
                 const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
                 vm.connectCluster();
-                vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
+                if (vm.Project.getRunType().name == 'remote') {
+                  vm.$log.debug('Setting selectedServerURL to : ', vm.Project.fixURL(newDNS));
+                  vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
+                }
                 deferred.resolve(child);
 
               } else {
@@ -563,7 +578,10 @@ export class OsServer {
               vm.$log.debug('Server started');
               // get DNS and set server
               const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
-              vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
+              if (vm.Project.getRunType().name == 'remote') {
+                vm.$log.debug("Setting selectedServerURL to :", vm.Project.fixURL(newDNS));
+                vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
+              }
               vm.connectCluster();
               deferred.resolve('success');
             } else {
@@ -685,10 +703,14 @@ export class OsServer {
   getLocalServerUrlFromFile() {
     const vm = this;
     // get url from local_configuration.json
+    const serverType = vm.Project.getRunType().name;
     const obj = jetpack.read(vm.Project.projectDir.path() + '/local_configuration.json', 'json');
     if (obj) {
-      vm.setSelectedServerURL(obj.server_url);
       vm.localServerURL = obj.server_url;
+      if (serverType == 'Local') {
+        // if selected Server if local, set URL
+        vm.setSelectedServerURL(obj.server_url);
+      }
     } else {
       vm.$log.debug('local_configuration.json obj undefined');
     }

@@ -1132,7 +1132,11 @@ export class Project {
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
     vm.pat.dirToInclude = vm.dirToInclude;
     vm.pat.dirToUnpackTo = vm.dirToUnpackTo;
-    vm.pat.remoteSettings = vm.remoteSettings;
+    vm.pat.remoteSettings = angular.copy(vm.remoteSettings);
+    // clear out aws.connected
+    if (vm.pat.remoteSettings.aws && vm.pat.remoteSettings.aws.connected) {
+      vm.pat.remoteSettings.aws.connected = false;
+    }
     vm.pat.samplingMethod = vm.samplingMethod;
     vm.pat.algorithmSettings = vm.algorithmSettings;
     vm.pat.rubyMD5 = vm.rubyMD5;

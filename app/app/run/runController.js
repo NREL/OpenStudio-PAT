@@ -405,7 +405,7 @@ export class RunController {
     const vm = this;
 
     // disconnect if connected to remote existing server
-    if (vm.$scope.remoteSettings.remoteType == 'Existing Remote Server' && vm.$scope.selectedRunType.name == 'Remote' && vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]){
+    if (vm.$scope.remoteSettings.remoteType == 'Existing Remote Server' && vm.$scope.selectedRunType.name == 'remote' && vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]){
       vm.OsServer.stopServer().then(response => {
         vm.OsServer.resetSelectedServerURL();
       }, error => {
@@ -629,9 +629,10 @@ export class RunController {
       let analysis_param = '';
       if (vm.$scope.selectedAnalysisType == 'Manual')
         analysis_param = 'batch_datapoints';
-      else
-        analysis_param = vm.$scope.samplingMethod.id;
-
+      else {
+        vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod.id);
+        analysis_param = vm.$scope.selectedSamplingMethod.id;
+      }
       vm.OsServer.setAnalysisStatus('starting');
       vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
@@ -660,7 +661,7 @@ export class RunController {
             if(vm.$scope.selectedRunType.name == 'local') {
               vm.OsServer.updateDatapoints().then(response2 => {
                 // refresh datapoints
-                vm.$scope.datapoints = vm.Project.getDatapoints();
+                  vm.$scope.datapoints = vm.Project.getDatapoints();
                 // download reports
                 vm.OsServer.downloadReports().then(response3 => {
                   vm.$log.debug('downloaded all available reports');

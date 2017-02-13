@@ -117,10 +117,10 @@
                     </div>
                     <div class="row">
                       <div class="col-sm-8">
-                        <select id="awsCred" class="form-control" ng-options="option for option in awsYamlFiles" ng-model="remoteSettings.credentials.yamlFilename" ng-change="run.selectAwsCredentials()" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
+                        <select id="awsCred" class="form-control" ng-options="option for option in awsYamlFiles" ng-model="remoteSettings.credentials.yamlFilename" ng-change="run.selectAwsCredentials()" ng-disabled="remoteSettings.aws.connected"></select>
                       </div>
                       <div class="col-sm-3">
-                        <button type="button" class="btn btn-primary" ng-click="run.newAwsCredentialsModal()" ng-hide="remoteSettings.aws.cluster_status=='running'" translate>run.remote.newAwsCredentials</button>
+                        <button type="button" class="btn btn-primary" ng-click="run.newAwsCredentialsModal()" ng-hide="remoteSettings.aws.connected" translate>run.remote.newAwsCredentials</button>
                       </div>
                     </div>
                     <div class="row pad-top-10" ng-show="remoteSettings.credentials.yamlFilename" >
