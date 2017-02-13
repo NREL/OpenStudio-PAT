@@ -17,7 +17,8 @@ export class OutputsController {
 
     // all measures
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
-    vm.$scope.measureToAdd = null;
+    vm.$scope.addMeasure = {};
+    vm.$scope.addMeasure.measure = null;
 
     // (current) output measures
     vm.setOutputMeasures();
@@ -67,6 +68,7 @@ export class OutputsController {
 
     // user-added measures
     const others = _.filter(vm.$scope.measures, {outputMeasure: true} );
+    vm.$log.debug('All Output Measures: ', others);
     vm.$scope.outputMeasures = _.union(vm.$scope.outputMeasures, others);
 
     // ensure there's a key for user-defined outputs
@@ -280,14 +282,18 @@ export class OutputsController {
   addMeasure() {
     const vm = this;
     vm.$log.debug('in Outputs::addMeasure');
-    if (vm.$scope.measureToAdd){
-      vm.$log.debug('Adding this measure: ', vm.$scope.measureToAdd);
-      const measure = _.find(vm.$scope.measures, {uid: vm.$scope.measureToAdd.uid});
+    vm.$log.debug('measure to add: ', vm.$scope.addMeasure.measure);
+    if (vm.$scope.addMeasure.measure){
+      vm.$log.debug('Adding this measure: ', vm.$scope.addMeasure.measure);
+      const measure = _.find(vm.$scope.measures, {name: vm.$scope.addMeasure.measure.name});
       if (measure) {
         measure.outputMeasure = true;
         vm.setOutputMeasures();
         vm.initializeGrids();
       }
+      vm.$scope.addMeasure.measure = null;
+    } else {
+      vm.$log.debug("No Measure Selected");
     }
   }
 

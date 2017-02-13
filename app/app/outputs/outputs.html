@@ -31,7 +31,7 @@
       <div class="row pad-bot-10 normal-text">
         <div class="col-sm-12">
           <label class="inline" translate>outputs.addMeasure</label>
-          <select class="form-control inline form-control-smaller-width" ng-options="measure.display_name for measure in measures | filter:{outputMeasure:false}" ng-model="measureToAdd"></select>
+          <select class="form-control inline form-control-smaller-width" ng-options="measure.display_name for measure in measures | filter:{outputMeasure:false}" ng-model="addMeasure.measure"></select>
           <button class="btn btn-success" ng-click="outputs.addMeasure()"><span glyphicon glyphicon-plus aria-hidden="true"></span>Add Measure</button>
         </div>
       </div>

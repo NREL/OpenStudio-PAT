@@ -1514,20 +1514,21 @@ export class Project {
     const cluster = angular.copy(vm.remoteSettings.aws);
     cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : null;
     cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name : null;
-    // make sure worker number is a number
-    cluster.worker_node_number =
-
-      vm.jetpack.write(vm.getProjectDir().path(vm.remoteSettings.aws.cluster_name + '_cluster.json'), cluster);
+    cluster.openstudio_server_version = cluster.openstudio_server_version ? cluster.openstudio_server_version.name : null;
+    // TODO: make sure worker number is a number
+    // this is hard-coded
+    cluster.ami_lookup_version = 3;
+    vm.jetpack.write(vm.getProjectDir().path(vm.remoteSettings.aws.cluster_name + '_cluster.json'), cluster);
   }
 
   setOsServerVersions() {
     const vm = this;
     vm.osServerVersions = [];
-    const amiURL = 'http://s3.amazonaws.com/openstudio-resources/server/api/v2/amis.json';
+    const amiURL = 'http://s3.amazonaws.com/openstudio-resources/server/api/v3/amis.json';
     vm.$http.get(amiURL, {cache: false}).then(response => {
-      if (response.data && response.data.openstudio_server) {
-        vm.$log.debug('OPENSTUDIO SERVER AMIS: ', response.data.openstudio_server);
-        _.forEach(_.keys(response.data.openstudio_server), version => {
+      if (response.data && response.data.builds) {
+        vm.$log.debug('OPENSTUDIO SERVER AMIS: ', response.data.builds);
+        _.forEach(response.data.builds, version => {
           vm.osServerVersions.push(version);
         });
       }

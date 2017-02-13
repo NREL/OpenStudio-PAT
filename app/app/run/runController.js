@@ -286,6 +286,8 @@ export class RunController {
   connectAws(type) {
     // type = 'connect' or 'start' depending on whether cluster is already running or not
     const vm = this;
+    // always save cluster to file before connecting
+    vm.saveClusterToFile();
     if (type == 'connect') {
       // toastr
       vm.toastr.info('Connecting to the Cloud...this may take a few minutes.');

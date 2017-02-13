@@ -302,7 +302,9 @@ export default {
     viewReport: 'View Report',
     'for': 'for',
     remote: {
-      osServerVersion: 'OpenStudio Server Version',
+      osServerVersion: 'AMI Name',
+      osVersion: 'OpenStudio Version',
+      standardsRef: 'Standards Ref',
       connect: 'Connect',
       terminate: 'Terminate',
       disconnect: 'Disconnect',
