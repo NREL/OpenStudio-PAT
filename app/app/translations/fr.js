@@ -297,7 +297,9 @@ export default {
     },
     modalCloudRunning: {
       title: 'Cloud Cluster is Running',
-      message: 'You are still connected to AWS. Terminate the cluster?'
+      message: 'You are still connected to AWS. Terminate the cluster?',
+      terminate: 'Terminate',
+      keep: 'Keep Cluster Running'
     },
     viewReport: 'View Report',
     'for': 'for',

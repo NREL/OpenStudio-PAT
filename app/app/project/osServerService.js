@@ -411,7 +411,7 @@ export class OsServer {
     } else {
       // server already started
       vm.$log.debug('Server already started!');
-      deferred.resolve();
+      deferred.resolve('Server Already Started');
     }
 
     return deferred.promise;

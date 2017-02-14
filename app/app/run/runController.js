@@ -296,7 +296,7 @@ export class RunController {
       vm.toastr.info('Starting Cloud cluster...this may take up to 10 minutes', {closeButton: true, timeOut: 60000});
     }
     vm.OsServer.startServer().then( response => {
-      vm.$log.debug('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType]);
+      vm.$log.debug('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
       vm.toastr.clear();
       if (type == 'connect'){
         vm.toastr.success('Connected to AWS!');
@@ -852,6 +852,10 @@ export class RunController {
       vm.stopAnalysisStatus('canceled');
     }, response => {
       vm.$log.debug('ERROR attempting to stop analysis / cancel run');
+      vm.$log.debug('Resetting buttons anyway');
+      // reset anyway
+      vm.toggleButtons();
+      vm.OsServer.setProgress(0, '');
 
     });
   }
