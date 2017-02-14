@@ -245,12 +245,14 @@ export default {
   outputs: {
     title: 'Outputs',
     noOutputsInManual: 'There are no outputs to set in Manual mode.',
+    addAnotherMeasure: 'Add Measure',
     modalSelectOutputs: {
       title: 'Select Outputs',
       message: 'Select which outputs you would like to add to your analysis.',
       selectAll: 'Select All',
       deselectAll: 'Deselect All',
-      newOutputs: 'If the output you want is not listed above, you can enter additional outputs below.  Enter the \'unique name\' of the output.',
+      addOutput: 'Add Output',
+      newOutputs: 'If the output you want is not listed above, you can enter additional outputs below.  Enter the \'display name\' of the output.  The unique name will be created automatically from the measure name and the output display name.',
       helpOutputs: 'Outputs are pieces of information that are created for every Design Alternative.  In Manual mode, outputs are not set.  In Algorithmic mode, some Sampling Methods (such as optimization) require an objective function (for example, minimize annual energy consumption).  In this case, the outputs are used to describe the objective function.'
     },
     selectOutputs: 'Select Outputs',

@@ -31,21 +31,29 @@ export class ModalSelectOutputsController {
     const vm = this;
     // add/remote Outputs to analysisOutputs
     _.forEach(vm.$scope.measure.outputs, (output) => {
-      if (output.checked && !_.find(vm.$scope.measure.analysisOutputs, {name: output.name})){
+      if (output.checked && !_.find(vm.$scope.measure.analysisOutputs, {display_name: output.display_name})){
         // add
         vm.$scope.measure.analysisOutputs.push(output);
-      } else if (!output.checked && _.find(vm.$scope.measure.analysisOutputs, {name: output.name})) {
+      } else if (!output.checked && _.find(vm.$scope.measure.analysisOutputs, {display_name: output.display_name})) {
         // remove
-        _.remove(vm.$scope.measure.analysisOutputs, {name: output.name});
+        _.remove(vm.$scope.measure.analysisOutputs, {display_name: output.display_name});
       }
     });
     // check for userDefined Outputs
     _.forEach(vm.$scope.measure.userDefinedOutputs, (output) => {
-      if (!_.find(vm.$scope.measure.analysisOutputs, {name: output.name})) {
-        // add
-        output.display_name = output.display_name ? output.display_name : output.name;
-        output.short_name = output.short_name ? output.short_name : output.name;
+
+      if (output.new){
+        // create name and make sure output name includes measure name
+        let name = _.snakeCase(output.display_name);
+        if (name.indexOf(vm.$scope.measure.name + '.') == -1) {
+          output.name = vm.$scope.measure.name + '.' + name;
+        }
+        // TODO: Is this a unique name?
+        // add to analysisOutputs
+        output.display_name = output.display_name ? output.display_name : output.display_name;
+        output.short_name = output.short_name ? output.short_name : _.snakeCase(output.display_name);
         vm.$scope.measure.analysisOutputs.push(output);
+        output.new = false;
       }
     });
 
@@ -59,7 +67,8 @@ export class ModalSelectOutputsController {
 
   addOutput() {
     const vm = this;
-    vm.$scope.measure.userDefinedOutputs.push({name: '', userDefined: true});
+    // use epoch time as temporary unique name
+    vm.$scope.measure.userDefinedOutputs.push({name: (new Date).getTime(), userDefined: true, new: true});
   }
 
   deleteOutput(output) {

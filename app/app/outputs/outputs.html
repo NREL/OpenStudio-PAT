@@ -10,7 +10,7 @@
       <div class="analysis-custom">
         <div class="full-width margin-top-20">
           <uib-accordion close-others="false">
-            <uib-accordion-group ng-repeat="measure in outputMeasures" class="analysis-custom" id="{{measure.instanceId}}" is-open="measure.open">
+            <uib-accordion-group ng-repeat="measure in outputMeasures" class="analysis-custom" id="{{measure.name}}" is-open="measure.open">
               <uib-accordion-heading>
                 <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
                 {{measure.display_name}}
@@ -20,7 +20,7 @@
                   </span>
                 </span>
               </uib-accordion-heading>
-              <div ng-attr-id="{{'grid_' + measure.instanceId}}" ui-grid="gridOptions[measure.instanceId]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid" ng-style="getTableHeight(measure.instanceId)"></div>
+              <div ng-attr-id="{{'grid_' + measure.name}}" ui-grid="gridOptions[measure.instanceId]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid" ng-style="getTableHeight(measure.name)"></div>
               <div class="pad-top-10">
                 <button class="btn btn-success" ng-click="outputs.addOutputs(measure)"><translate>outputs.selectOutputs</translate></button>
               </div>
@@ -32,7 +32,7 @@
         <div class="col-sm-12">
           <label class="inline" translate>outputs.addMeasure</label>
           <select class="form-control inline form-control-smaller-width" ng-options="measure.display_name for measure in measures | filter:{outputMeasure:false}" ng-model="addMeasure.measure"></select>
-          <button class="btn btn-success" ng-click="outputs.addMeasure()"><span glyphicon glyphicon-plus aria-hidden="true"></span>Add Measure</button>
+          <button class="btn btn-success" ng-click="outputs.addMeasure()"><span glyphicon glyphicon-plus aria-hidden="true"></span><translate>outputs.addAnotherMeasure</translate></button>
         </div>
       </div>
       <!--<div class="row pad-bot-10 normal-text pad-left-25">-->

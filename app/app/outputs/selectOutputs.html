@@ -21,8 +21,8 @@
       <div ng-repeat="output in measure.outputs" ng-if="$odd">
         <div class="row">
           <div class="col-sm-12 normal-text pad-left-25">
-            <input type="checkbox" id="{{output.name}}" ng-model="output.checked">
-            <label for="{{output.name}}" class="normal-text"> {{output.name}}</label>
+            <input type="checkbox" id="{{output.display_name}}" ng-model="output.checked">
+            <label for="{{output.display_name}}" class="normal-text"> {{output.display_name}}</label>
           </div>
         </div>
       </div>
@@ -31,8 +31,8 @@
       <div ng-repeat="output in measure.outputs" ng-if="$even">
         <div class="row">
           <div class="col-sm-12 normal-text">
-            <input type="checkbox" id="{{output.name}}" ng-model="output.checked">
-            <label for="{{output.name}}" class="normal-text"> {{output.name}}</label>
+            <input type="checkbox" id="{{output.display_name}}" ng-model="output.checked">
+            <label for="{{output.display_name}}" class="normal-text"> {{output.display_name}}</label>
           </div>
         </div>
       </div>
@@ -47,13 +47,13 @@
     <div class="col-sm-12 bold ">
       <div class="row pad-bot-10" ng-repeat="output in measure.userDefinedOutputs">
         <div class="col-sm-8 pad-left-25 normal-text">
-          <input type="text" id="userDefinedOutput_{{$index}}" ng-model="output.name" class="form-control">
+          <input type="text" id="userDefinedOutput_{{$index}}" ng-model="output.display_name" class="form-control" ng-disabled="!output.new">
         </div>
         <div class="col-sm-1 pad-top-5">
           <span class="glyphicon glyphicon-remove-sign black-button header-text" ng-click="modal.deleteOutput(output)" aria-hidden="true" aria-label="Delete Output"></span>
         </div>
       </div>
-      <button type="button" class="btn btn-success" ng-click="modal.addOutput()"><span class="glyphicon glyphicon-plus" aria-hidden="true" aria-label="Add Output"></span> Add Output</button>
+      <button type="button" class="btn btn-success" ng-click="modal.addOutput()"><span class="glyphicon glyphicon-plus" aria-hidden="true" aria-label="Add Output"></span>&nbsp;<translate>outputs.modalSelectOutputs.addOutput</translate></button>
     </div>
   </div>
 </div>

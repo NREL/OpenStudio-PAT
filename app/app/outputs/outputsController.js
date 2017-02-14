@@ -32,10 +32,10 @@ export class OutputsController {
     vm.initializeGrids();
 
     // size grids according to data
-    vm.$scope.getTableHeight = function (uid) {
+    vm.$scope.getTableHeight = function (name) {
       let rowHeight = 30; // row height
       let headerHeight = 55; // header height
-      const m = _.find(vm.$scope.measures, {uid: uid});
+      const m = _.find(vm.$scope.measures, {name: name});
       const length = _.filter(m.analysisOutputs).length;
       vm.$log.debug('data length: ', length);
       return {
