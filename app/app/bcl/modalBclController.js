@@ -555,8 +555,9 @@ export class ModalBclController {
       // success
       // vm.$log.debug('New computed measure: ', newMeasure);
       // merge project measure in array to preserve prepareMeasure arguments and already-set arguments
-      const project_measure = _.find(vm.projectMeasures, {uid: measure.uid});
+      const project_measure = _.find(vm.projectMeasures, {instanceId: measure.instanceId});
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
+      // TODO project_measure can now be more than just 1 and must be iterated over (Evan)
       _.forEachRight(project_measure.arguments, (arg, index) => {
         if (_.isUndefined(arg.specialRowId)) {
           const match = _.find(measure.arguments, {name: arg.name});

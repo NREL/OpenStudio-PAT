@@ -171,7 +171,7 @@
 <div class="analysis-custom">
   <div class="full-width margin-top-20">
     <uib-accordion close-others="false">
-      <uib-accordion-group ng-repeat="measure in osMeasures" class="analysis-custom" id="{{measure.uid}}"
+      <uib-accordion-group ng-repeat="measure in osMeasures" class="analysis-custom" id="{{measure.instanceId}}"
                            is-open="measure.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button"
@@ -448,7 +448,7 @@
 <div class="analysis-custom">
   <div class="full-width margin-top-20">
     <uib-accordion close-others="false">
-      <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.uid}}"
+      <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.instanceId}}"
                            is-open="measure.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button"
@@ -725,7 +725,7 @@
 <div class="analysis-custom">
   <div class="full-width margin-top-20">
     <uib-accordion close-others="false">
-      <uib-accordion-group ng-repeat="measure in repMeasures" class="analysis-custom" id="{{measure.uid}}"
+      <uib-accordion-group ng-repeat="measure in repMeasures" class="analysis-custom" id="{{measure.instanceId}}"
                            is-open="measure.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button"

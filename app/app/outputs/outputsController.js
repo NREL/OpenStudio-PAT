@@ -110,7 +110,7 @@ export class OutputsController {
       if (measure.analysisOutputs == undefined) measure.analysisOutputs = [];
       vm.$log.debug('measure: ', measure);
 
-      vm.$scope.gridOptions[measure.uid] = {
+      vm.$scope.gridOptions[measure.instanceId] = {
         data: 'measure.analysisOutputs',
         enableSorting: false,
         autoResize: true,
@@ -199,7 +199,7 @@ export class OutputsController {
           minWidth: 50
         }],
         onRegisterApi: function (gridApi) {
-          vm.gridApis[measure.uid] = gridApi;
+          vm.gridApis[measure.instanceId] = gridApi;
           gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
             // set modified
             vm.setIsModified();
@@ -227,7 +227,7 @@ export class OutputsController {
           width: 100,
           minWidth: 40
         };
-        vm.$scope.gridOptions[measure.uid].columnDefs.push(ofg);
+        vm.$scope.gridOptions[measure.instanceId].columnDefs.push(ofg);
       }
 
     });
@@ -276,7 +276,7 @@ export class OutputsController {
   removeMeasure(measure) {
     const vm = this;
     measure.outputMeasure = false;
-    _.remove(vm.$scope.outputMeasures, {uid: measure.uid});
+    _.remove(vm.$scope.outputMeasures, {instanceId: measure.instanceId});
   }
 
   addMeasure() {
