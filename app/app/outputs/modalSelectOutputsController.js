@@ -42,7 +42,7 @@ export class ModalSelectOutputsController {
     // check for userDefined Outputs
     _.forEach(vm.$scope.measure.userDefinedOutputs, (output) => {
 
-      if (output.new){
+      if (output.newOut){
         // create name and make sure output name includes measure name
         let name = _.snakeCase(output.display_name);
         if (name.indexOf(vm.$scope.measure.name + '.') == -1) {
@@ -53,7 +53,7 @@ export class ModalSelectOutputsController {
         output.display_name = output.display_name ? output.display_name : output.display_name;
         output.short_name = output.short_name ? output.short_name : _.snakeCase(output.display_name);
         vm.$scope.measure.analysisOutputs.push(output);
-        output.new = false;
+        output.newOut = false;
       }
     });
 
@@ -68,7 +68,7 @@ export class ModalSelectOutputsController {
   addOutput() {
     const vm = this;
     // use epoch time as temporary unique name
-    vm.$scope.measure.userDefinedOutputs.push({name: (new Date).getTime(), userDefined: true, new: true});
+    vm.$scope.measure.userDefinedOutputs.push({name: (new Date).getTime(), userDefined: true, newOut: true});
   }
 
   deleteOutput(output) {
