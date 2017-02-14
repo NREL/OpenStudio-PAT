@@ -68,10 +68,15 @@
                   <div id="storage" class="normal-text">{{remoteSettings.aws.server_instance_type.storage}}</div>
                 </div>
               </div>
+              <div class="row pad-bot-10" ng-if="remoteSettings.aws.cluster_name">
+                <div class="col-sm-12">
+                  <p class="normal-text" translate>run.remote.serverInstanceNote</p>
+                </div>
+              </div>
               <div class="row pad-bot-20" ng-if="remoteSettings.aws.cluster_name">
                 <div class="col-sm-4">
                   <label for="workerInstanceType" class="run-label" translate>run.remote.workerInstanceType</label>
-                  <select id="workerInstanceType" class="form-control" ng-options="option.name for option in serverInstanceTypes track by option.name" ng-model="remoteSettings.aws.worker_instance_type" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
+                  <select id="workerInstanceType" class="form-control" ng-options="option.name for option in workerInstanceTypes track by option.name" ng-model="remoteSettings.aws.worker_instance_type" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
                 </div>
                 <div class="col-sm-3">
                   <label for="numWorkers" class="run-label" translate>run.remote.numberOfWorkers</label>

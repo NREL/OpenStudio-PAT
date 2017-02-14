@@ -53,6 +53,7 @@ export class Project {
     vm.resetRemoteSettings();
     vm.setOsServerVersions();
     vm.setServerInstanceTypes();
+    vm.setWorkerInstanceTypes();
     vm.setAwsRegions();
 
     vm.clusters = [];
@@ -1543,6 +1544,72 @@ export class Project {
     const vm = this;
     vm.serverInstanceTypes = [
       {
+        name: 'm3.xlarge',
+        cpus: '4',
+        memory: '15 GiB',
+        storage: '2 x 40 GB'
+      },
+      {
+        name: 'm3.2xlarge',
+        cpus: '8',
+        memory: '30 GiB',
+        storage: '2 x 80 GB'
+      },
+      {
+        name: 'c3.xlarge',
+        cpus: '4',
+        memory: '7.5 GiB',
+        storage: '2 x 40 GB'
+      },
+      {
+        name: 'c3.2xlarge',
+        cpus: '8',
+        memory: '15 GiB',
+        storage: '2 x 80 GB'
+      },
+      {
+        name: 'c3.4xlarge',
+        cpus: '16',
+        memory: '30 GiB',
+        storage: '2 x 160 GB'
+      },
+      {
+        name: 'c3.8xlarge',
+        cpus: '32',
+        memory: '60 GiB',
+        storage: '2 x 320 GB'
+      },
+      {
+        name: 'i2.xlarge',
+        cpus: '4',
+        memory: '30.5 GiB',
+        storage: '1 x 800 GB'
+      },
+      {
+        name: 'i2.2xlarge',
+        cpus: '8',
+        memory: '61 GiB',
+        storage: '2 x 800 GB'
+      },
+      {
+        name: 'i2.4xlarge',
+        cpus: '16',
+        memory: '122 GiB',
+        storage: '4 x 800 GB'
+      },
+      {
+        name: 'i2.8xlarge',
+        cpus: '32',
+        memory: '244 GiB',
+        storage: '8 x 800 GB'
+      }
+    ];
+  }
+
+  setWorkerInstanceTypes() {
+    const vm = this;
+    vm.workerInstanceTypes = [
+      {
         name: 'm3.medium',
         cpus: '1',
         memory: '3.75 GiB',
@@ -1603,28 +1670,28 @@ export class Project {
         storage: '1 x 32 GB'
       },
       {
-        name: 'r3.xlarge',
+        name: 'i2.xlarge',
         cpus: '4',
         memory: '30.5 GiB',
-        storage: '1 x 80 GB'
+        storage: '1 x 800 GB'
       },
       {
-        name: 'r3.2xlarge',
+        name: 'i2.2xlarge',
         cpus: '8',
         memory: '61 GiB',
-        storage: '1 x 160 GB'
+        storage: '2 x 800 GB'
       },
       {
-        name: 'r3.4xlarge',
+        name: 'i2.4xlarge',
         cpus: '16',
         memory: '122 GiB',
-        storage: '1 x 320 GB'
+        storage: '4 x 800 GB'
       },
       {
-        name: 'r3.8xlarge',
+        name: 'i2.8xlarge',
         cpus: '32',
         memory: '244 GiB',
-        storage: '2 x 320 GB'
+        storage: '8 x 800 GB'
       }
     ];
   }
@@ -1632,6 +1699,11 @@ export class Project {
   getServerInstanceTypes() {
     const vm = this;
     return vm.serverInstanceTypes;
+  }
+
+  getWorkerInstanceTypes() {
+    const vm = this;
+    return vm.workerInstanceTypes;
   }
 
   setAwsRegions() {

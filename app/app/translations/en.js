@@ -314,6 +314,7 @@ export default {
       serverURL: 'Existing Server URL',
       serverType: 'Remote Server Type',
       serverSettings: 'Remote Server Settings',
+      serverInstanceNote: 'Note: The server requires 4 nodes for non-worker processes',
       serverInstanceType: 'Server Instance Type',
       workerInstanceType: 'Worker Instance Type',
       awsCredentials: 'AWS Credentials',
