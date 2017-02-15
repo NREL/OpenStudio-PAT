@@ -121,7 +121,13 @@ export default {
       }
     },
     manual: {
-      projectMeasuresAndOptions: 'Project Measures and Options'
+      projectMeasuresAndOptions: 'Project Measures and Options',
+      modalSelectOptions: {
+        title: 'Select Options',
+        message: 'Select which options you would like to duplicate in this measure.',
+        selectAll: 'Select All',
+        deselectAll: 'Deselect All'
+      }
     }
   },
   bcl: {
