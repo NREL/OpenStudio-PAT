@@ -23,6 +23,7 @@ import { ModalUpdateMeasureController } from '../app/bcl/modalUpdateMeasureContr
 import { ModalViewReportController } from '../app/run/modalViewReportController';
 import { ModalClearResultsController } from '../app/run/modalClearResultsController';
 import { ModalSelectOutputsController } from '../app/outputs/modalSelectOutputsController';
+import { ModalSelectOptionsController } from '../app/analysis/modalSelectOptionsController';
 import { ModalNewClusterController } from '../app/run/modalNewClusterController';
 import { ModalNewAwsCredentialsController } from '../app/run/modalNewAwsCredentialsController';
 import { ModalCloudRunningController } from '../app/run/modalCloudRunningController';
@@ -57,6 +58,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalUpdateMeasureController', ModalUpdateMeasureController)
   .controller('ModalViewReportController', ModalViewReportController)
   .controller('ModalSelectOutputsController', ModalSelectOutputsController)
+  .controller('ModalSelectOptionsController', ModalSelectOptionsController)
   .controller('ModalClearResultsController', ModalClearResultsController)
   .controller('ModalNewClusterController', ModalNewClusterController)
   .controller('ModalNewAwsCredentialsController', ModalNewAwsCredentialsController)
