@@ -78,7 +78,7 @@
                   <label for="workerInstanceType" class="run-label" translate>run.remote.workerInstanceType</label>
                   <select id="workerInstanceType" class="form-control" ng-options="option.name for option in workerInstanceTypes track by option.name" ng-model="remoteSettings.aws.worker_instance_type" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   <label for="numWorkers" class="run-label" translate>run.remote.numberOfWorkers</label>
                   <input class="form-control" id="numWorkers" type="number" ng-model="remoteSettings.aws.worker_node_number" ng-disabled="remoteSettings.aws.cluster_status=='running'"/>
                 </div>

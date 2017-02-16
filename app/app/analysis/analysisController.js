@@ -138,10 +138,10 @@ export class AnalysisController {
 
   initializeInstanceID() {
     const vm = this;
-    _.forEach(vm.$scope.measures, (measure) =>{
+    _.forEach(vm.$scope.measures, (measure) => {
       measure.instanceId = Math.random();
     });
-
+  }
 
   initializeGrids() {
     const vm = this;
