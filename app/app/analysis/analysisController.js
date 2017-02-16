@@ -599,18 +599,25 @@ export class AnalysisController {
 
   duplicateOption(measure) {
     const vm = this;
-    vm.$log.debug('In duplicateOption in analysis');
-    vm.setIsModified();
-    // TODO: For now, we are grabbing whatever's in the first option column
-    // TODO  Eventually we will need to use the user-selected option column.
-    const opt = vm.addMeasureOption(measure);
+    vm.$log.debug('Analysis::duplicateOption');
 
-    // copy from 1st option
-    let count = 0;
-    _.forEach(measure.arguments, (arg) => {
-      // Dont change the first 3 rows regarding naming
-      if (count++ > 2) arg[opt.field] = arg.option_1;
-    });
+    let newOptions = false;
+    vm.addOptions(measure).then(() => {
+        _.forEach(measure.options, (option) => {
+          if (option.checked) {
+            newOptions = true;
+            const opt = vm.addMeasureOption(measure);
+            vm.$log.debug('Duplicate ', option.name);
+            let count = 0;
+            _.forEach(measure.arguments, (arg) => {
+              // Don't change the first 3 rows regarding naming
+              if (count++ > 2) arg[opt.field] = arg[option.id];
+            });
+          }
+        });
+        if(newOptions) vm.Project.savePrettyOptions();
+      }
+    );
   }
 
   duplicateMeasureAndOption(measure) {
@@ -1254,6 +1261,36 @@ export class AnalysisController {
         }
       });
     });
+  }
+
+  addOptions(measure) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('Analysis::addOptions');
+
+    // open modal for user to select options.
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalSelectOptionsController',
+      controllerAs: 'modal',
+      templateUrl: 'app/analysis/selectOptions.html',
+      windowClass: 'wide-modal',
+      resolve: {
+        params: function () {
+          return {
+            measure: measure
+          };
+        }
+      }
+    });
+
+    modalInstance.result.then(() => {
+      deferred.resolve();
+    }, () => {
+      // Modal canceled
+      deferred.reject();
+    });
+    return deferred.promise;
   }
 }
 
