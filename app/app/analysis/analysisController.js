@@ -489,6 +489,7 @@ export class AnalysisController {
     });
     // reset DAs that were using this option
     vm.unsetOptionInDA(instanceId, optionName);
+    vm.Project.savePrettyOptions();
   }
 
   variableCheckboxChanged(row, col) {
