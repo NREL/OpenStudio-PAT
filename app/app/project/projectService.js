@@ -1455,10 +1455,7 @@ export class Project {
       if (clusterData && clusterData.server && clusterData.server.dns) {
         dns = clusterData.server.dns;
       }
-    } else {
-      // clean-up aws object
-      vm.remoteSettings.aws = {};
-    }
+    } 
     return dns;
   }
 
