@@ -176,6 +176,8 @@ export class AnalysisController {
       cellEditableCondition: $scope => {
         if (!_.isNil($scope.row.entity.specialRowId)) {
           return true;
+        } else if ($scope.col.colDef.name == 'option_1') {
+          return true;
         } else {
           return $scope.row.entity.variable;
         }
@@ -615,7 +617,7 @@ export class AnalysisController {
             });
           }
         });
-        if(newOptions) vm.Project.savePrettyOptions();
+        if (newOptions) vm.Project.savePrettyOptions();
       }
     );
   }
