@@ -55,17 +55,25 @@
                   <label for="serverInstanceType" class="run-label" translate>run.remote.serverInstanceType</label>
                   <select id="serverInstanceType" class="form-control" ng-options="option.name for option in serverInstanceTypes track by option.name" ng-model="remoteSettings.aws.server_instance_type" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
                 </div>
-                <div class="col-sm-2">
-                  <label for="cpus" class="run-label" translate>run.remote.cpus</label>
-                  <div id="cpus" class="normal-text">{{remoteSettings.aws.server_instance_type.cpus}}</div>
-                </div>
-                <div class="col-sm-2">
-                  <label for="mem" class="run-label" translate>run.remote.memory</label>
-                  <div id="mem" class="normal-text">{{remoteSettings.aws.server_instance_type.memory}}</div>
-                </div>
-                <div class="col-sm-2">
-                  <label for="storage" class="run-label" translate>run.remote.storage</label>
-                  <div id="storage" class="normal-text">{{remoteSettings.aws.server_instance_type.storage}}</div>
+                <div class="col-sm-6">
+                  <div class="row">
+                    <div class="col-sm-2">
+                      <label for="cpus" class="run-label" translate>run.remote.cpus</label>
+                      <div id="cpus" class="normal-text">{{remoteSettings.aws.server_instance_type.cpus}}</div>
+                    </div>
+                    <div class="col-sm-3">
+                      <label for="cpus" class="run-label" translate>run.remote.cost</label>
+                      <div id="cpus" class="normal-text">{{remoteSettings.aws.server_instance_type.cost}}</div>
+                    </div>
+                    <div class="col-sm-3">
+                      <label for="mem" class="run-label" translate>run.remote.memory</label>
+                      <div id="mem" class="normal-text">{{remoteSettings.aws.server_instance_type.memory}}</div>
+                    </div>
+                    <div class="col-sm-4">
+                      <label for="storage" class="run-label" translate>run.remote.storage</label>
+                      <div id="storage" class="normal-text">{{remoteSettings.aws.server_instance_type.storage}}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="row pad-bot-10" ng-if="remoteSettings.aws.cluster_name">

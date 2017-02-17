@@ -331,6 +331,7 @@ export default {
       awsAccessKey: 'Access Key',
       awsRegion: 'Region',
       cpus: 'CPUs',
+      cost: 'Cost',
       memory: 'Memory',
       storage: 'Storage',
       numberOfWorkers: 'Number of Workers',

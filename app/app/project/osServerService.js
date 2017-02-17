@@ -730,7 +730,7 @@ export class OsServer {
       vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.selectedServerURL}"`;
     vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
 
-    const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param;
+    const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param.toLowerCase();
     vm.$log.debug('FULL run_analysis command: ', full_command);
     const child = vm.exec(full_command,
       (error, stdout, stderr) => {
