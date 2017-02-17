@@ -2091,25 +2091,31 @@ export class Project {
   setAlgorithmSettings(algorithm) {
     const vm = this;
     vm.$log.debug('In setAlgorithmSettings in Project');
-    _.forEach(vm.algorithmOptions[algorithm.id], (object) => {
-      let flag = 0;
-      _.forEach(vm.algorithmSettings, (setting) => {
-        if (object.name === setting.name) {
-          setting.description = object.description;
-          setting.defaultValue = object.defaultValue;
-          if (!setting.value) {
-            setting.value = object.value;
-          }
-          flag = 1;
-        }
-      });
-      if (!flag) {
-        object.value = object.defaultValue;
-        vm.algorithmSettings.push(object);
+
+    // remove non-applicable settings
+    _.forEachRight(vm.algorithmSettings, (setting, key) => {
+      const match = _.find(vm.algorithmOptions[algorithm.id], {name: setting.name});
+      if (!match) {
+        vm.algorithmSettings.splice(key, 0);
       }
     });
 
-    vm.algorithmSettings = vm.algorithmOptions[algorithm.id];
+    // add/update new settings
+    _.forEach(vm.algorithmOptions[algorithm.id], (object) => {
+      const match = _.find(vm.algorithmSettings, {name: object.name});
+      if (match) {
+        match.description = object.description;
+        match.defaultValue = object.defaultValue;
+        match.value = _.isNil(match.value) ? object.defaultValue : match.value;
+      }
+      else {
+        const temp = angular.copy(object);
+        temp.value = temp.defaultValue;
+        vm.algorithmSettings.push(temp);
+      }
+    });
+
+
   }
 
   getAlgorithmOptions() {
