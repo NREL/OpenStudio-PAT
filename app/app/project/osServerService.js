@@ -168,7 +168,19 @@ export class OsServer {
     vm.setAnalysisChangedFlag(false);
     // reset analysis ID
     vm.Project.setAnalysisID(null);
-    // vm.Project.setDatapoints([]);
+    if (vm.Project.getRunType().name == 'local'){
+      // reset certain fields on datapoint
+      _.forEach(vm.datapoints, (dp) => {
+        dp.modified = false;
+        dp.completed_status = null;
+        dp.status_message = null;
+        dp.started_at = null;
+        dp.completed_at = null;
+        dp.steps = [];
+      });
+    } else {
+      vm.Project.setDatapoints([]);
+    }
     vm.setDatapointsStatus([]);
 
     vm.Project.setModified(true);
