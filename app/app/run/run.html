@@ -95,8 +95,10 @@
                 <span ng-if="datapoint.deletedDA" class="glyphicon glyphicon-remove-circle red-button"></span>
               </div>
               <div class="col-sm-1 pad-top-10">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
-              <div class="col-sm-1 pad-top-10" ng-if="datapoint.completed_status" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</div>
-              <div class="col-sm-1 pad-top-10" ng-if="datapoint.status_message" ng-class="{'green-text': datapoint.status_message.includes('normal'), 'red-text': datapoint.status_message == 'datapoint failure'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</div>
+              <div class="col-sm-1 pad-top-10">
+                <span ng-if="datapoint.completed_status" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</span>
+                <span ng-if="datapoint.status_message" ng-class="{'green-text': datapoint.status_message.includes('normal'), 'red-text': datapoint.status_message == 'datapoint failure'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</span>
+              </div>
               <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
               <div class="col-sm-1 pad-top-10"><span class="badge orange-badge square-badge dp-badge">{{run.calculateWarnings(datapoint)}}</span></div>
               <div class="col-sm-1 pad-top-10"><span class="badge red-badge square-badge dp-badge">{{run.calculateErrors(datapoint)}}</span></div>

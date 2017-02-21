@@ -968,6 +968,7 @@ export class OsServer {
         datapoint.id = dp.id;
 
         let dp_match = _.findIndex(vm.datapoints, {name: dp.name});
+        vm.$log.debug('DP match results for: ', dp.name, ': ', dp_match);
         if (dp_match != -1) {
           // merge
           _.merge(vm.datapoints[dp_match], datapoint);
@@ -995,10 +996,12 @@ export class OsServer {
             datapoint.final_message = dp.final_message;
             datapoint.id = dp.id;
 
-            let dp_match = _.findIndex(vm.datapoints, {id: dp.id});
+            let dp_match = _.findIndex(vm.datapoints, {name: dp.name});
+            vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
             if (dp_match != -1) {
               // merge
               _.merge(vm.datapoints[dp_match], datapoint);
+              vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
             } else {
               // also load in datapoints array
               vm.datapoints.push(datapoint);
