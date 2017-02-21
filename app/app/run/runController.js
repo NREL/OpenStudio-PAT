@@ -28,9 +28,6 @@ export class RunController {
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
     vm.$scope.serverStatuses = vm.OsServer.getServerStatuses();
 
-    // MANUAL ONLY--set up datapoints
-    vm.setUpDatapoints();
-
     // remote settings
     vm.$scope.remoteSettings = vm.Project.getRemoteSettings();
     vm.$log.debug("REMOTE SETTINGS: ", vm.$scope.remoteSettings);
@@ -58,6 +55,8 @@ export class RunController {
 
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
+    // MANUAL ONLY--set up datapoints
+    vm.setUpDatapoints();
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
     vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
 
@@ -112,11 +111,23 @@ export class RunController {
   }
 
   setUpDatapoints() {
+    const vm = this;
     if (vm.$scope.selectedRunType.name == 'local') {
       // ensure there is one datapoint per DA
+      const alternatives = vm.Project.getDesignAlternatives();
 
-
-
+      _.forEach(alternatives, (alt) => {
+        if (!_.find(vm.$scope.datapoints, {name: alt.name})){
+          // add empty datapoint to array
+          vm.$scope.datapoints.push({name: alt.name, run: false, modified: false});
+        }
+      });
+      _.forEach(vm.$scope.datapoints, (dp) => {
+        if (!_.find(alternatives, {name: dp.name})){
+          // mark datapoint has no corresponding DA
+          dp.deletedDA = true;
+        }
+      });
     }
   }
 

@@ -168,7 +168,7 @@ export class OsServer {
     vm.setAnalysisChangedFlag(false);
     // reset analysis ID
     vm.Project.setAnalysisID(null);
-    vm.Project.setDatapoints([]);
+    // vm.Project.setDatapoints([]);
     vm.setDatapointsStatus([]);
 
     vm.Project.setModified(true);
@@ -707,7 +707,7 @@ export class OsServer {
     const obj = jetpack.read(vm.Project.projectDir.path() + '/local_configuration.json', 'json');
     if (obj) {
       vm.localServerURL = obj.server_url;
-      if (serverType == 'Local') {
+      if (serverType == 'local') {
         // if selected Server if local, set URL
         vm.setSelectedServerURL(obj.server_url);
       }
@@ -967,7 +967,7 @@ export class OsServer {
         datapoint.final_message = dp.final_message;
         datapoint.id = dp.id;
 
-        let dp_match = _.findIndex(vm.datapoints, {id: dp.id});
+        let dp_match = _.findIndex(vm.datapoints, {name: dp.name});
         if (dp_match != -1) {
           // merge
           _.merge(vm.datapoints[dp_match], datapoint);
