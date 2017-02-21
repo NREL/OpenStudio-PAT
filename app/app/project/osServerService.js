@@ -707,7 +707,7 @@ export class OsServer {
     const obj = jetpack.read(vm.Project.projectDir.path() + '/local_configuration.json', 'json');
     if (obj) {
       vm.localServerURL = obj.server_url;
-      if (serverType == 'Local') {
+      if (serverType == 'local') {
         // if selected Server if local, set URL
         vm.setSelectedServerURL(obj.server_url);
       }
