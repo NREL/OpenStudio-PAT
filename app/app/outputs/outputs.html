@@ -1,5 +1,5 @@
 <div class="row pad-bot-20">
-  <div class="col-md-6"><h4><translate>outputs.title</translate> <span class="badge badge-info margin-left-5">&nbsp;?&nbsp;</span></h4></div>
+  <div class="col-md-6"><h4><translate>outputs.title</translate> <span class="badge badge-info margin-left-5" title="{{'outputs.modalSelectOutputs.helpOutputs' | translate}}">&nbsp;?&nbsp;</span></h4></div>
 </div>
 <div class="row pad-bot-20">
   <div class="col-md-12" ng-switch="selectedAnalysisType">
@@ -7,7 +7,37 @@
       <div class="outputs-manual" translate>outputs.noOutputsInManual</div>
     </div>
     <div ng-switch-when="Algorithmic">
-
+      <div class="analysis-custom">
+        <div class="full-width margin-top-20">
+          <uib-accordion close-others="false">
+            <uib-accordion-group ng-repeat="measure in outputMeasures" class="analysis-custom" id="{{measure.name}}" is-open="measure.open">
+              <uib-accordion-heading>
+                <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
+                {{measure.display_name}}
+                <span class="pull-right">
+                  <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation(); outputs.removeMeasure(measure);">
+                    <span class="glyphicon glyphicon-remove"></span>
+                  </span>
+                </span>
+              </uib-accordion-heading>
+              <div ng-attr-id="{{'grid_' + measure.name}}" ui-grid="gridOptions[measure.instanceId]" ui-grid-edit ui-grid-cellnav ui-grid-auto-resize ui-grid-resize-columns ui-grid-pinning class="grid" ng-style="getTableHeight(measure.name)"></div>
+              <div class="pad-top-10">
+                <button class="btn btn-success" ng-click="outputs.addOutputs(measure)"><translate>outputs.selectOutputs</translate></button>
+              </div>
+            </uib-accordion-group>
+          </uib-accordion>
+        </div>
+      </div>
+      <div class="row pad-bot-10 normal-text">
+        <div class="col-sm-12">
+          <label class="inline" translate>outputs.addMeasure</label>
+          <select class="form-control inline form-control-smaller-width" ng-options="measure.display_name for measure in measures | filter:{outputMeasure:false}" ng-model="addMeasure.measure"></select>
+          <button class="btn btn-success" ng-click="outputs.addMeasure()"><span glyphicon glyphicon-plus aria-hidden="true"></span><translate>outputs.addAnotherMeasure</translate></button>
+        </div>
+      </div>
+      <!--<div class="row pad-bot-10 normal-text pad-left-25">-->
+      <!--TEMPORARY: <button class="btn btn-info" ng-click="outputs.exportOSA()">Export OSA</button>-->
+      <!--</div>-->
     </div>
   </div>
 </div>

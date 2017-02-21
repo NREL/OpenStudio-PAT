@@ -15,7 +15,7 @@ export class ModalServerToolsController {
     if (vm.$scope.projectDir){
       vm.$scope.projectDir = vm.$scope.projectDir.path();
     }
-    vm.$log.debug("Project dir: ", vm.$scope.projectDir);
+    vm.$log.debug('Project dir: ', vm.$scope.projectDir);
 
   }
 
@@ -23,7 +23,7 @@ export class ModalServerToolsController {
     const vm = this;
     vm.$log.debug('IN MODAL START LOCAL SERVER');
     vm.toastr.info('Starting Local Server...This make take a while.');
-    vm.OsServer.startServer('local').then(response => {
+    vm.OsServer.startServer('local').then(() => {
       vm.toastr.success('Connected to server!');
     }, response => {
       vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
@@ -35,7 +35,7 @@ export class ModalServerToolsController {
     const vm = this;
     vm.$log.debug('IN MODAL STOP LOCAL SERVER');
     vm.toastr.info('Stopping Local Server...This make take a while.');
-    vm.OsServer.stopServer('local').then(response => {
+    vm.OsServer.stopServer('local').then(() => {
       vm.$log.debug('*****  Local Server Stopped *****');
       vm.toastr.success('Server stopped successfully');
 
@@ -50,7 +50,7 @@ export class ModalServerToolsController {
   pingServer() {
     const vm = this;
     vm.$log.debug('IN MODAL PING SELECTED SERVER');
-    vm.OsServer.pingServer().then(response => {
+    vm.OsServer.pingServer().then(() => {
       vm.toastr.success('Server is Alive');
     }, error => {
       vm.$log.debug('Server is offline: ', error);

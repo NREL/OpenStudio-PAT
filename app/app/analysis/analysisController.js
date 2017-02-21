@@ -4,10 +4,11 @@ const {dialog} = remote;
 
 export class AnalysisController {
 
-  constructor($log, $q, BCL, Project, $scope, $document, $uibModal) {
+  constructor($log, $q, BCL, Project, $scope, $document, $uibModal, toastr) {
     'ngInject';
 
     const vm = this;
+    vm.toastr = toastr;
     vm.Project = Project;
     vm.$log = $log;
     vm.$q = $q;
@@ -25,6 +26,9 @@ export class AnalysisController {
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
+    vm.$scope.filesToInclude = vm.Project.getFilesToInclude();
+    vm.$scope.serverScripts = vm.Project.getServerScripts();
+    vm.$log.debug('ServerScripts: ', vm.$scope.serverScripts);
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
     _.forEach(vm.$scope.measures, (measure) => {
@@ -37,43 +41,115 @@ export class AnalysisController {
     vm.$scope.epMeasures = [];
     vm.$scope.repMeasures = [];
 
+    // Manual Mode
+    vm.designAlternatives = vm.Project.getDesignAlternatives();
+    vm.gridApis = [];
+    vm.$scope.gridOptions = [];
+
+    // Algorithmic Mode
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
-
-    vm.designAlternatives = vm.Project.getDesignAlternatives();
-
-    vm.gridApis = [];
-    vm.$scope.gridOptions = [];
-    vm.initializeGrids();
+    vm.$scope.relationships = ['Standard', 'Inverse'];
 
     // size grids according to data
-    vm.$scope.getTableHeight = function (uid) {
+    vm.$scope.getTableHeight = function (instanceId) {
       var rowHeight = 30; // your row height
-      var headerHeight = 30; // your header height
+      var headerHeight = 40; // your header height
       return {
-        height: (vm.$scope.gridOptions[uid].data.length * rowHeight + headerHeight + 10) + "px"
+        height: (vm.$scope.gridOptions[instanceId].data.length * rowHeight + headerHeight + 10) + "px"
       };
+    };
+
+    vm.initializeTab(); // replaces (and calls) initializeGrids
+    //vm.initializeValues();
+
+    vm.$scope.getVariableSettings = function (argument) {
+      //vm.$log.debug('In getVariableSettings');
+      let settings = [];
+      if (argument.type === 'Double') {
+        settings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
+      } else {
+        settings = ['Argument', 'Discrete', 'Pivot'];
+      }
+      return settings;
+    };
+
+    vm.$scope.getDistributions = function (argument) {
+      //vm.$log.debug('In getDistributions');
+      let distributions = [];
+      switch (vm.$scope.selectedSamplingMethod.id) {
+        case 'SPEA2':
+        case 'RGENOUD':
+        case 'NSGA2':
+        case 'LHS':
+        case 'PreFlight':
+        case 'Morris':
+        case 'DOE':
+        case 'SingleRun':
+        case 'RepeatRun':
+          distributions = ['Uniform', 'Triangle', 'Normal', 'LogNormal'];
+          break;
+        default:
+          distributions = ['Uniform'];
+      }
+      return distributions;
+    };
+
+    vm.$scope.getDiscreteDistributions = function () {
+      //vm.$log.debug('In get Discrete Distributions');
+      let distributions = [];
+      switch (vm.$scope.selectedSamplingMethod.id) {
+        case 'Diagonal':
+          distributions = ['Discrete', 'Integer Sequence'];
+          break;
+        default:
+          distributions = ['Discrete'];
+      }
+      return distributions;
     };
 
   }
 
-  initializeGrids() {
+  initializeTab() {
     const vm = this;
-    vm.$log.debug('In initializeGrids in analysis');
+    vm.$log.debug('In initializeTab in analysis');
+    // group by type
+    vm.initializeInstanceID();
+    vm.setMeasureTypes();
     // sort measures by workflow_index
     vm.$scope.measures = _.sortBy(vm.$scope.measures, ['workflow_index']);
-    // group by type
-    vm.setMeasureTypes();
-    if (vm.$scope.selectedAnalysisType === 'Manual') {
-      vm.setGridOptions();
-      // load saved measure options
-      vm.loadMeasureOptions();
-    }
-    else {
-      vm.setAlgorithmicGridOptions();
+    if (vm.$scope.selectedAnalysisType == 'Manual') {
+      // initialize for Manual Mode
+      vm.initializeGrids();
+    } else {
+      // initialize for Alg Mode
+      vm.initializeVariablesAlgMode();
+      vm.showDeltaX();
+      //vm.showValueAndWeights();
+      vm.showMinAndMax();
+      vm.showDistributions();
+      vm.showDiscreteDistributions();
+      vm.showDiscreteVariables();
+      vm.showPivotVariables();
+      vm.showContinuousVariables();
     }
   }
+
+  initializeInstanceID() {
+    const vm = this;
+    _.forEach(vm.$scope.measures, (measure) => {
+      measure.instanceId = Math.random();
+    });
+  }
+
+  initializeGrids() {
+    const vm = this;
+    vm.setGridOptions();
+    // load saved measure options
+    vm.loadMeasureOptions();
+  }
+
 
   getDefaultOptionColDef() {
     const vm = this;
@@ -107,6 +183,8 @@ export class AnalysisController {
       //enableCellEdit: true
       cellEditableCondition: $scope => {
         if (!_.isNil($scope.row.entity.specialRowId)) {
+          return true;
+        } else if ($scope.col.colDef.name == 'option_1') {
           return true;
         } else {
           return $scope.row.entity.variable;
@@ -143,7 +221,7 @@ export class AnalysisController {
         measure.arguments.splice(0, 0, row0, row1, row2);
       }
 
-      vm.$scope.gridOptions[measure.uid] = {
+      vm.$scope.gridOptions[measure.instanceId] = {
         data: measure.arguments,
         enableSorting: false,
         autoResize: true,
@@ -169,7 +247,7 @@ export class AnalysisController {
           displayName: 'description',
           visible: false
         }, {
-          name: 'short_name',
+          name: 'display_name_short',
           displayName: 'analysis.columns.shortName',
           cellEditableCondition: $scope => {
             return angular.isDefined($scope.row.entity.display_name);
@@ -181,6 +259,7 @@ export class AnalysisController {
           name: 'variable',
           displayName: 'analysis.columns.variable',
           measureUID: measure.uid,
+          instanceId: measure.instanceId,
           cellTemplate: 'app/analysis/checkAllTemplate.html',
           headerCellFilter: 'translate',
           minWidth: 30,
@@ -188,94 +267,14 @@ export class AnalysisController {
           width: 70
         }],
         onRegisterApi: function (gridApi) {
-          vm.gridApis[measure.uid] = gridApi;
+          vm.gridApis[measure.instanceId] = gridApi;
           gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
             if (newValue != oldValue) {
-              vm.$log.debug('CELL has changed in: ', measure.uid, ' old val: ', oldValue, ' new val: ', newValue);
+              vm.$log.debug('CELL has changed in: ', measure.instanceId, ' old val: ', oldValue, ' new val: ', newValue);
               vm.$log.debug('rowEntity: ', rowEntity);
               vm.updateDASelectedName(measure, oldValue, newValue);
             }
           });
-        }
-      };
-    });
-  }
-
-  setAlgorithmicGridOptions() {
-    const vm = this;
-
-    _.forEach(vm.$scope.measures, (measure) => {
-
-      // set number of options in measure
-      if ((!_.has(measure, 'numberOfOptions'))) {
-        measure.numberOfOptions = 0;
-      }
-
-      vm.$scope.gridOptions[measure.uid] = {
-        data: measure.arguments,
-        enableSorting: false,
-        autoResize: true,
-        enableRowSelection: false,
-        enableSelectAll: false,
-        enableColumnMenus: false,
-        enableRowHeaderSelection: false,
-        enableCellEditOnFocus: true,
-        enableHiding: false,
-        columnDefs: [{
-          name: 'display_name',
-          displayName: 'analysis.columns.argumentName',
-          enableCellEdit: false,
-          headerCellFilter: 'translate',
-          minWidth: 100,
-          width: 200
-        }, {
-          name: 'name',
-          displayName: 'analysis.columns.shortName',
-          headerCellFilter: 'translate',
-          minWidth: 100,
-          width: 200
-        }, {
-          name: 'variableSettings',
-          displayName: 'analysis.columns.variableSettings',
-          editType: 'dropdown',
-          enableCellEdit: true,
-          headerCellFilter: 'translate',
-          minWidth: 100,
-          width: 200,
-          editableCellTemplate: 'ui-grid/dropdownEditor',
-          editDropdownOptionsFunction: function (rowEntity, colDef) {
-            if (_.includes(['LHS', 'DOE'], vm.$scope.selectedSamplingMethod.id)) {
-              return [{
-                ID: 1,
-                type: 'Static'
-              }, {
-                ID: 2,
-                type: 'Discrete'
-              }, {
-                ID: 3,
-                type: 'Continuous'
-              }, {
-                ID: 4,
-                type: 'Pivot'
-              }];
-            } else {
-              return [{
-                ID: 1,
-                type: 'Static'
-              }, {
-                ID: 2,
-                type: 'Discrete'
-              }, {
-                ID: 3,
-                type: 'Continuous'
-              }];
-            }
-          },
-          editDropdownIdLabel: 'type',
-          editDropdownValueLabel: 'type'
-        }],
-        onRegisterApi: function (gridApi) {
-          vm.gridApis[measure.uid] = gridApi;
         }
       };
     });
@@ -306,7 +305,7 @@ export class AnalysisController {
     vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
-      vm.initializeGrids();
+      vm.initializeTab();
     });
   }
 
@@ -316,7 +315,7 @@ export class AnalysisController {
     vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
-      vm.initializeGrids();
+      vm.initializeTab();
     });
   }
 
@@ -341,12 +340,12 @@ export class AnalysisController {
   }
 
   // When an option is deleted, reset DAs that were using the option
-  unsetOptionInDA(measureUID, value) {
+  unsetOptionInDA(instanceId, value) {
     const vm = this;
     vm.$log.debug('In Analysis::unsetOptionInDA');
     vm.$log.debug('DAs: ', vm.designAlternatives);
-    vm.$log.debug('measureUID: ', measureUID, ' optionName: ', value);
-    const measure = _.find(vm.$scope.measures, {uid: measureUID});
+    vm.$log.debug('instanceId: ', instanceId, ' optionName: ', value);
+    const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
     vm.$log.debug('measure: ', measure);
     if (measure) {
       _.forEach(vm.designAlternatives, (alt) => {
@@ -376,10 +375,10 @@ export class AnalysisController {
 
     // line below also removes it from bclService 'getProjectMeasures', but not from disk
     // TODO: fix so BCL modal doesn't restore deleted panels
-    _.remove(vm.$scope.measures, {uid: measure.uid});
+    _.remove(vm.$scope.measures, {instanceId: measure.instanceId});
     vm.Project.setMeasuresAndOptions(vm.$scope.measures);
 
-    const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.uid + '"]'));
+    const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.instanceId + '"]'));
     measurePanel.remove();
 
     // Note: jetpack.remove() does not have any return
@@ -388,7 +387,7 @@ export class AnalysisController {
     // recalculate workflow indexes
     vm.Project.recalculateMeasureWorkflowIndexes();
 
-    vm.initializeGrids();
+    vm.initializeTab();
   }
 
   addMeasureOption(measure) {
@@ -422,7 +421,7 @@ export class AnalysisController {
     const opt = vm.getDefaultOptionColDef();
     opt.display_name = 'Option ' + Number(max + 1);
     opt.field = 'option_' + Number(max + 1);
-    opt.measureUID = measure.uid;
+    opt.instanceId = measure.instanceId;
 
     // add default arguments to opt
     vm.addDefaultArguments(measure, opt);
@@ -445,17 +444,17 @@ export class AnalysisController {
       }
     });
 
-    vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
+    vm.$scope.gridOptions[measure.instanceId].columnDefs.push(opt);
     return opt;
   }
 
-  deleteSelectedOption(measure) {
+  deleteSelectedOption(measure) { // TODO is this dead code? Evan
     const vm = this;
     vm.$log.debug('In deleteSelectedOption in analysis');
     vm.setIsModified();
     if (measure.numberOfOptions > 0) {
       measure.numberOfOptions -= 1;
-      vm.$scope.gridOptions[measure.uid].columnDefs.splice(vm.$scope.gridOptions[measure.uid].columnDefs.length - 1, 1);
+      vm.$scope.gridOptions[measure.instanceId].columnDefs.splice(vm.$scope.gridOptions[measure.instanceId].columnDefs.length - 1, 1);
     }
   }
 
@@ -467,28 +466,28 @@ export class AnalysisController {
 
     const optionCount = Number(col.field.split('_')[1]);
     vm.$log.debug('optionCount: ', optionCount);
-    const measureUID = col.colDef.measureUID;
-    vm.$log.debug('measureUID: ', measureUID);
+    const instanceId = col.colDef.instanceId;
+    vm.$log.debug('instanceId: ', instanceId);
 
     // get option name before deleting it
     vm.$log.debug('OPTION NAME? ', col.grid.options.data[1][col.name]);
     const optionName = col.grid.options.data[1][col.name];
 
     let columnIndex = 0;
-    _.forEach((vm.$scope.gridOptions[measureUID]).columnDefs, (columnDef) => {
+    _.forEach((vm.$scope.gridOptions[instanceId]).columnDefs, (columnDef) => {
       if (_.has(columnDef, 'field')) {
         const optionCount2 = Number(columnDef.field.split('_')[1]);
         vm.$log.debug('columnDef.field: ', columnDef.field);
         if (optionCount === optionCount2) {
           vm.$log.debug('SUCCESS');
           vm.$log.debug('columnIndex: ', columnIndex);
-          vm.$scope.gridOptions[measureUID].columnDefs.splice(columnIndex, 1);
+          vm.$scope.gridOptions[instanceId].columnDefs.splice(columnIndex, 1);
         }
       }
       columnIndex++;
     });
     _.forEach(vm.$scope.measures, (measure) => {
-      if (measure.uid == measureUID) {
+      if (measure.instanceId == instanceId) {
         _.forEach(measure.arguments, (argument) => {
           delete argument[col.field];
         });
@@ -497,7 +496,7 @@ export class AnalysisController {
       }
     });
     // reset DAs that were using this option
-    vm.unsetOptionInDA(measureUID, optionName);
+    vm.unsetOptionInDA(instanceId, optionName);
   }
 
   variableCheckboxChanged(row, col) {
@@ -507,10 +506,10 @@ export class AnalysisController {
     //vm.$log.debug('col', col);
     vm.setIsModified();
 
-    const measureUID = col.colDef.measureUID;
-    //vm.$log.debug('measureUID: ', measureUID);
+    const instanceId = col.colDef.instanceId;
+    //vm.$log.debug('instanceId: ', instanceId);
 
-    const measure = _.find(vm.$scope.measures, {uid: measureUID});
+    const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
     //vm.$log.debug('measure: ', measure);
 
     const display_name = row.entity.display_name;
@@ -535,7 +534,7 @@ export class AnalysisController {
         }
       }
     }
-    vm.$scope.$broadcast('uiGridEventEndCellEdit');
+    //vm.$scope.$broadcast('uiGridEventEndCellEdit'); Note: this causes page to jump to bottom, and is visually unacceptable (Evan)
   }
 
   optionCheckboxChanged() {
@@ -543,7 +542,7 @@ export class AnalysisController {
     vm.$log.debug('In optionCheckboxChanged in analysis');
     vm.setIsModified();
 
-    vm.$scope.$broadcast('uiGridEventEndCellEdit');
+    //vm.$scope.$broadcast('uiGridEventEndCellEdit'); Note: this causes page to jump to bottom, and is visually unacceptable (Evan)
   }
 
   allVariableCheckboxesChanged(row, col) {
@@ -553,10 +552,10 @@ export class AnalysisController {
     //vm.$log.debug('col', col);
     vm.setIsModified();
 
-    const measureUID = col.colDef.measureUID;
-    //vm.$log.debug('measureUID: ', measureUID);
+    const instanceId = col.colDef.instanceId;
+    //vm.$log.debug('instanceId: ', instanceId);
 
-    const measure = _.find(vm.$scope.measures, {uid: measureUID});
+    const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
     //vm.$log.debug('measure: ', measure);
 
     const variable = row.entity.variable;
@@ -576,22 +575,22 @@ export class AnalysisController {
         }
       }
     }
-    vm.$scope.$broadcast('uiGridEventEndCellEdit');
+    //vm.$scope.$broadcast('uiGridEventEndCellEdit'); Note: this causes page to jump to bottom, and is visually unacceptable (Evan)
   }
 
   // Toggle all variable checkboxes
   checkAllVariables(row, col) {
     const vm = this;
-    const measureUID = col.colDef.measureUID;
+    const instanceId = col.colDef.instanceId;
     // toggle checkbox
     if (row.entity.variable) {
       // set all to true
-      _.forEach(vm.$scope.gridOptions[measureUID].data, (row) => {
+      _.forEach(vm.$scope.gridOptions[instanceId].data, (row) => {
         row.variable = true;
       });
     } else {
       // set all to false
-      _.forEach(vm.$scope.gridOptions[measureUID].data, (row) => {
+      _.forEach(vm.$scope.gridOptions[instanceId].data, (row) => {
         row.variable = false;
       });
     }
@@ -610,24 +609,48 @@ export class AnalysisController {
 
   duplicateOption(measure) {
     const vm = this;
-    vm.$log.debug('In duplicateOption in analysis');
-    vm.setIsModified();
-    // TODO: For now, we are grabbing whatever's in the first option column
-    // TODO  Eventually we will need to use the user-selected option column.
-    const opt = vm.addMeasureOption(measure);
+    vm.$log.debug('Analysis::duplicateOption');
 
-    // copy from 1st option
-    let count = 0;
-    _.forEach(measure.arguments, (arg) => {
-      // Dont change the first 3 rows regarding naming
-      if (count++ > 2) arg[opt.field] = arg.option_1;
-    });
+    let newOptions = false;
+    vm.addOptions(measure).then(() => {
+        _.forEach(measure.options, (option) => {
+          if (option.checked) {
+            newOptions = true;
+            const opt = vm.addMeasureOption(measure);
+            vm.$log.debug('Duplicate ', option.name);
+            let count = 0;
+            _.forEach(measure.arguments, (arg) => {
+              // Don't change the first 3 rows regarding naming
+              if (count++ > 2) arg[opt.field] = arg[option.id];
+            });
+          }
+        });
+        if (newOptions) vm.Project.savePrettyOptions();
+      }
+    );
   }
 
-  duplicateMeasureAndOption() {
+  duplicateMeasureAndOption(measure) {
     const vm = this;
     vm.$log.debug('In duplicateMeasureAndOption in analysis');
     vm.setIsModified();
+
+    let copiedMeasure = angular.copy(measure);
+    copiedMeasure.instanceId = Math.random();
+
+    // Make name and display_name unique
+    copiedMeasure.name += '_copy';
+    copiedMeasure.display_name += ' Copy';
+
+    // Close the original measure's accordion
+    measure.open = false;
+
+    vm.$scope.measures.push(copiedMeasure);
+    vm.Project.measures.push(copiedMeasure);
+
+    vm.toastr.success('Measure Duplicated!');
+
+    vm.initializeTab();
   }
 
   loadMeasureOptions() {
@@ -654,8 +677,8 @@ export class AnalysisController {
       const opt = vm.getDefaultOptionColDef();
       opt.display_name = _.startCase(option.id);
       opt.field = option.id;
-      opt.measureUID = measure.uid;  // explicitly set this just in case
-      vm.$scope.gridOptions[measure.uid].columnDefs.push(opt);
+      opt.instanceId = measure.instanceId;  // explicitly set this just in case
+      vm.$scope.gridOptions[measure.instanceId].columnDefs.push(opt);
     } else {
       vm.$log.error('option id does not match expected format (option_<ID>)');
     }
@@ -705,7 +728,7 @@ export class AnalysisController {
       vm.$log.debug('computeAllMeasureArgs success!');
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
       vm.resetAllChoiceArgumentSelections();
-      vm.initializeGrids();
+      vm.initializeTab();
     }, error => {
       vm.$log.debug('Error in computeALLMeasureArguments: ', error);
     });
@@ -722,8 +745,23 @@ export class AnalysisController {
     vm.$log.debug('In setType in analysis');
     vm.setIsModified();
     vm.Project.setAnalysisType(vm.$scope.selectedAnalysisType);
-    vm.initializeGrids();
+
+    vm.initializeTab();
   }
+
+  // setDirToInclude() {
+  //   const vm = this;
+  //   vm.$log.debug('In setDirToInclude in analysis');
+  //   vm.setIsModified();
+  //   vm.Project.setDirToInclude(vm.$scope.dirToInclude);
+  // }
+
+  // setDirToUnpackTo() {
+  //   const vm = this;
+  //   vm.$log.debug('In setDirToUnpackTo in analysis');
+  //   vm.setIsModified();
+  //   vm.Project.setDirToUnpackTo(vm.$scope.dirToUnpackTo);
+  // }
 
   setSamplingMethod() {
     const vm = this;
@@ -732,6 +770,17 @@ export class AnalysisController {
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
+
+    vm.showDeltaX();
+    vm.showMinAndMax();
+    //vm.showValueAndWeights();
+    vm.showDistributions();
+    vm.showDiscreteDistributions();
+    vm.showDiscreteVariables();
+    vm.showPivotVariables();
+    vm.showContinuousVariables();
+    vm.showWarningIcons();
+
   }
 
   // compute measure arguments when setting the seed
@@ -745,11 +794,84 @@ export class AnalysisController {
       measure = response;
       vm.$log.debug('Analysis Tab, new computed measure: ', angular.copy(measure));
       vm.$log.debug('Scope measures: ', vm.$scope.measures);
-      vm.initializeGrids();
+      vm.initializeTab();
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
     }, error => {
       vm.$log.debug("Error in Project::computeMeasureArguments: ", error);
     });
+  }
+
+  selectDirToInclude(file) {
+    const vm = this;
+
+    const result = vm.dialog.showOpenDialog({
+      title: 'Select Directory To Include',
+      properties: ['openDirectory']
+    });
+
+    if (!_.isEmpty(result)) {
+      vm.$log.debug(' result[0]:', result[0]);
+      file.dirToInclude = result[0];
+      vm.setIsModified();
+    }
+  }
+
+  addDirToInclude() {
+    const vm = this;
+    vm.$log.debug('In analysis::addDirToInclude');
+    vm.$scope.filesToInclude.push({dirToInclude: null, unpackDirName: null});
+    vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
+  }
+
+  deleteDirToInclude(index) {
+    const vm = this;
+    vm.$log.debug('In analysis::deleteDirToInclude, remove at index: ', index);
+    if (!_.isNil(index)) {
+      vm.$scope.filesToInclude.splice(index, 1);
+    }
+    vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
+  }
+
+  selectScript(type) {
+    const vm = this;
+    const result = vm.dialog.showOpenDialog({
+      title: 'Select Script',
+      properties: ['openFile']
+    });
+
+    if (!_.isEmpty(result)) {
+      const scriptPath = result[0];
+      vm.$log.debug('script path:', scriptPath);
+      const scriptFilename = scriptPath.replace(/^.*[\\\/]/, '');
+      // ensure appropriate folders exist
+      vm.jetpack.dir(vm.Project.getProjectDir().path('scripts', type));
+      // copy/overwrite
+      vm.jetpack.copy(scriptPath, vm.Project.getProjectDir().path('scripts', type, scriptFilename), {overwrite: true});
+      vm.$log.debug('Script filename: ', scriptFilename);
+      // update project
+      vm.$scope.serverScripts[type].file = scriptFilename;
+      vm.setIsModified();
+    }
+  }
+
+  deleteScript(type) {
+    const vm = this;
+    vm.$scope.serverScripts[type].file = null;
+  }
+
+  addScriptArgument(type) {
+    const vm = this;
+    vm.$scope.serverScripts[type].arguments.push(null);
+  }
+
+  deleteScriptArgument(type, index) {
+    const vm = this;
+    vm.$log.debug("deleting at index: ", index);
+    vm.$log.debug('arguments: ', vm.$scope.serverScripts[type].arguments);
+    if (!_.isNil(index)) {
+      vm.$scope.serverScripts[type].arguments.splice(index, 1);
+    }
+    vm.$log.debug('New Arguments for type: ', type, ' are: ', vm.$scope.serverScripts[type].arguments);
   }
 
   selectSeedModel() {
@@ -769,8 +891,7 @@ export class AnalysisController {
       const seedModelPath = result[0];
       vm.$log.debug('Seed Model:', seedModelPath);
       const seedModelFilename = seedModelPath.replace(/^.*[\\\/]/, '');
-      // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
-      vm.jetpack.copy(seedModelPath, vm.Project.getProjectDir().path('seeds/' + seedModelFilename));
+      vm.jetpack.copy(seedModelPath, vm.Project.getProjectDir().path('seeds/' + seedModelFilename), {overwrite: true});
       vm.$log.debug('Seed Model name: ', seedModelFilename);
       // update seeds
       vm.Project.setSeeds();
@@ -788,7 +909,7 @@ export class AnalysisController {
         vm.$log.debug('computeAllMeasureArgs success!');
         vm.$scope.measures = vm.Project.getMeasuresAndOptions();
         vm.resetAllChoiceArgumentSelections();
-        vm.initializeGrids();
+        vm.initializeTab();
       }, error => {
         vm.$log.debug('ERROR in computeAllMeasureArguments');
       });
@@ -830,7 +951,7 @@ export class AnalysisController {
     vm.$log.debug('moving measure: ', direction);
     vm.setIsModified();
     // find current index of measure and new index to move to
-    const index = _.findIndex(vm.$scope.measures, {uid: measure.uid});
+    const index = _.findIndex(vm.$scope.measures, {instanceId: measure.instanceId});
     const new_index = (direction == 'up') ? index - 1 : index + 1;
     // find measure to swap with (with same type)
     const swapping_measure = vm.$scope.measures[new_index];
@@ -847,7 +968,7 @@ export class AnalysisController {
       vm.$log.debug('measures: ', vm.$scope.measures);
 
       // initialize grid to resort
-      vm.initializeGrids();
+      vm.initializeTab();
     }
   }
 
@@ -856,5 +977,329 @@ export class AnalysisController {
     vm.Project.setModified(true);
   }
 
+  // getDistributions(argument) {
+  //   const vm = this;
+  //   vm.$log.debug('In getDistributions');
+  //
+  //   if (_.isNil(argument.inputs)) argument.inputs = {};
+  //
+  //   switch (vm.$scope.selectedSamplingMethod.id) {
+  //     case 'PSO':
+  //     case 'Optim':
+  //       argument.inputs.distributions = ['Uniform'];
+  //       break;
+  //     case 'SPEA2':
+  //     case 'RGENOUD':
+  //     case 'NSGA2':
+  //     case 'LHS':
+  //     case 'PreFlight':
+  //     case 'Morris':
+  //     case 'DOE':
+  //     case 'SingleRun':
+  //     case 'RepeatRun':
+  //       argument.inputs.distributions = ['Uniform', 'Triangle', 'Normal', 'LogNormal'];
+  //       break;
+  //     default:
+  //       argument.inputs.distributions = ['Unhandled Sampling Method'];
+  //   }
+  //   argument.inputs.distribution = argument.inputs.distributions[0];
+  // }
+
+  // getVariableSettings(argument) {
+  //   const vm = this;
+  //   vm.$log.debug('In getVariableSettings');
+  //
+  //   if (_.isNil(argument.inputs)) argument.inputs = {};
+  //
+  //   if (argument.type === 'Double') {
+  //     argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
+  //   } else {
+  //     argument.inputs.variableSettings = ['Argument', 'Discrete', 'Pivot'];
+  //   }
+  //
+  //   argument.inputs.variableSetting = _.isNil(argument.inputs.variableSetting) ? argument.inputs.variableSettings[0] : argument.inputs.variableSetting;
+  // }
+
+  // checkVariableSettings(argument) {
+  //   const vm = this;
+  //   vm.$log.debug('In checkVariableSettings');
+  //
+  //   if (_.isNil(argument.inputs)) argument.inputs = {};
+  //
+  //   switch (vm.$scope.selectedSamplingMethod.id) {
+  //     case 'SPEA2':
+  //     case 'PSO':
+  //       if (argument.type === 'Double') {
+  //         argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
+  //       } else {
+  //         argument.inputs.variableSettings = ['Argument'];
+  //       }
+  //       break;
+  //     case 'RGENOUD':
+  //     case 'Optim':
+  //       if (argument.type === 'Double') {
+  //         argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
+  //       } else {
+  //         argument.inputs.variableSettings = ['Argument'];
+  //       }
+  //       break;
+  //     case 'NSGA2':
+  //     case 'PreFlight':
+  //     case 'SingleRun':
+  //     case 'RepeatRun':
+  //       argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
+  //       break;
+  //     case 'LHS':
+  //     case 'DOE':
+  //       argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
+  //       break;
+  //     default:
+  //       argument.inputs.variableSettings = ['Unhandled Sampling Method'];
+  //   }
+  //   argument.inputs.variableSetting = argument.inputs.variableSettings[0];
+  // }
+
+  addDiscreteVariable(argument) {
+    const vm = this;
+    vm.$log.debug('In addDiscreteVariable');
+    //vm.$log.debug('argument: ', argument);
+    //vm.$log.error('argument.type: ', argument.type);
+
+    // Add 'Value', add 'Weight'
+    const discreteVariable = {
+      value: '',
+      weight: ''
+    };
+
+    if (_.isNil(argument.inputs)) argument.inputs = {};
+    if (_.isNil(argument.inputs.discreteVariables)) argument.inputs.discreteVariables = [];
+
+    argument.inputs.discreteVariables.push(discreteVariable);
+  }
+
+  // TODO: not needed?
+  // showValueAndWeights() {
+  //   const vm = this;
+  //   vm.$log.debug('In showValueAndWeights');
+  //   if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
+  //     vm.$scope.showValueAndWeights = true;
+  //   } else {
+  //     vm.$scope.showValueAndWeights = false;
+  //   }
+  // }
+
+  showDeltaX() {
+    const vm = this;
+    vm.$log.debug('In showDeltaX');
+    if (_.includes(['RGENOUD', 'Optim'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showDeltaX = true;
+    } else {
+      vm.$scope.showDeltaX = false;
+    }
+  }
+
+  showMinAndMax() {
+    const vm = this;
+    vm.$log.debug('In showMinAndMax');
+    if (_.includes(['PreFlight'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showMinAndMax = true;
+    } else {
+      vm.$scope.showMinAndMax = false;
+    }
+  }
+
+  showDistributions() {
+    const vm = this;
+    //vm.$log.debug('In showDistributions');
+    if (!_.includes(['PSO', 'Optim'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showDistributions = true;
+    } else {
+      vm.$scope.showDistributions = false;
+    }
+  }
+
+  showDiscreteDistributions() {
+    const vm = this;
+    if (_.includes(['Diagonal'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showDiscreteDistributions = true;
+    } else {
+      vm.$scope.showDiscreteDistributions = false;
+    }
+  }
+
+  showDiscreteVariables() {
+    const vm = this;
+    //vm.$log.debug('In showDiscreteVariables');
+    if (_.includes(['NSGA2', 'LHS', 'PreFlight', 'Morris', 'DOE', 'Diagonal', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showDiscreteVariables = true;
+    } else {
+      vm.$scope.showDiscreteVariables = false;
+    }
+  }
+
+  showPivotVariables() {
+    const vm = this;
+    //vm.$log.debug('In showPivotVariables');
+    if (_.includes(['LHS', 'Morris', 'DOE', 'BaselinePerturbation', 'Diagonal', 'PreFlight'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showPivotVariables = true;
+    } else {
+      vm.$scope.showPivotVariables = false;
+    }
+  }
+
+  showContinuousVariables() {
+    const vm = this;
+    //vm.$log.debug('In showContinuousVariables');
+    if (_.includes(['Diagonal', 'BaselinePerturbation', 'SingleRun', 'RepeatRun'], vm.$scope.selectedSamplingMethod.id)) {
+      vm.$scope.showContinuousVariables = false;
+    } else {
+      vm.$scope.showContinuousVariables = true;
+    }
+  }
+
+  showWarningIcon(argument) {
+    const vm = this;
+    vm.$log.debug('In showWarningIcon');
+
+    // vm.$scope.showPivotVariables vm.$scope.showDiscreteVariables vm.$scope.showDistributions vm.$scope.showMinAndMax vm.$scope.showDeltaX vm.$scope.showValueAndWeights
+    if (_.isNil(argument) || _.isNil(argument.inputs) || _.isNil(argument.inputs.variableSetting)) {
+      return true;
+    }
+
+    if ((vm.$scope.showPivotVariables && (argument.inputs.variableSetting == 'Pivot')) ||
+      (vm.$scope.showDiscreteVariables && (argument.inputs.variableSetting == 'Discrete')) ||
+      (vm.$scope.showContinuousVariables && argument.inputs.variableSetting == 'Continuous') ||
+      (argument.inputs.variableSetting == 'Argument')) {
+      argument.inputs.showWarningIcon = false;
+    } else {
+      argument.inputs.showWarningIcon = true;
+    }
+  }
+
+  showWarningIcons() {
+    const vm = this;
+    vm.$log.debug('In showWarningIcons');
+    _.forEach(vm.$scope.measures, (measure) => {
+      _.forEach(measure.arguments, (argument) => {
+        vm.showWarningIcon(argument);
+      });
+      vm.showWarningText(measure);
+    });
+  }
+
+  showWarningText(measure) {
+    const vm = this;
+    vm.$log.debug('In showWarningText');
+    measure.showWarningText = false;
+    _.forEach(measure.arguments, (argument) => {
+      if (_.isNil(argument.inputs) == false && _.isNil(argument.inputs.showWarningIcon) == false) {
+        if (argument.inputs.showWarningIcon) {
+          measure.showWarningText = true;
+        }
+      }
+    });
+  }
+
+  deleteValue(argument, index) {
+    const vm = this;
+    if (!_.isNil(index) && index > -1) {
+      argument.inputs.discreteVariables.splice(index, 1);
+      vm.setIsModified();
+    }
+  }
+
+  initializeVariablesAlgMode() {
+    const vm = this;
+    vm.$log.debug('Initializing variables for Algorithmic mode');
+    _.forEach(vm.$scope.measures, (measure) => {
+      // add SKIP
+      measure.skip = _.isNil(measure.skip) ? false : measure.skip;
+      _.forEach(measure.arguments, (arg) => {
+        // short name
+        arg.display_name_short = arg.display_name_short ? arg.display_name_short : arg.name;
+        if (!arg.inputs) arg.inputs = {};
+        // name and displayName should be already defined
+        arg.inputs.relationship = _.isNil(arg.inputs.relationship) ? null : arg.inputs.relationship; // TODO: what is this?
+        arg.inputs.choiceDisplayNames = _.isNil(arg.choice_display_names) ? [] : arg.choice_display_names;  // TODO: what is this?
+        arg.inputs.variableSetting = _.isNil(arg.inputs.variableSetting) ? 'Argument' : arg.inputs.variableSetting;
+        if (arg.inputs.variableSetting == 'Discrete' || arg.inputs.variableSetting == 'Pivot') {
+          arg.inputs.distribution = _.isNil(arg.inputs.distribution) ? 'Discrete' : arg.inputs.distribution;
+        } else {
+          arg.inputs.distribution = _.isNil(arg.inputs.distribution) ? 'Uniform' : arg.inputs.distribution;
+        }
+        arg.inputs.discreteVariables = _.isNil(arg.inputs.discreteVariables) ? [] : arg.inputs.discreteVariables;
+
+        // calculate default value
+        let defaultValue = null;
+        if (_.isNil(arg.inputs.default_value)) {
+          if (_.isNil(arg.default_value)) {
+            if (arg.type == 'Integer' || arg.type == 'Double') {
+              defaultValue = 0;
+            } else if (arg.type == 'Boolean') {
+              defaultValue = true;
+            } else if (arg.type == 'String') {
+              defaultValue = '';
+            } else if (arg.type == 'Choice') {
+              if (!_.isNil(arg.choice_display_names && arg.choice_display_names.length)) {
+                defaultValue = arg.choice_display_names[0];
+              } else {
+                defaultValue = '';
+              }
+            }
+          } else {
+            defaultValue = arg.default_value;
+          }
+        } else {
+          defaultValue = arg.inputs.default_value;
+        }
+
+        // set other algorithmic attributes
+        arg.inputs.maximum = _.isNil(arg.inputs.maximum) ? defaultValue : arg.inputs.maximum;
+        arg.inputs.minimum = _.isNil(arg.inputs.minimum) ? defaultValue : arg.inputs.minimum;
+        arg.inputs.mean = _.isNil(arg.inputs.mean) ? defaultValue : arg.inputs.mean;
+        arg.inputs.deltaX = _.isNil(arg.inputs.deltaX) ? defaultValue : arg.inputs.deltaX;
+        arg.inputs.stdDev = _.isNil(arg.inputs.stdDev) ? defaultValue : arg.inputs.stdDev;
+        arg.inputs.default_value = defaultValue;
+
+        // special cases
+        if (_.isNil(arg.inputs.deltaX) && arg.type == 'Double') {
+          arg.inputs.deltaX = 0.0016;
+        }
+        if (_.isNil(arg.inputs.stdDev) && arg.type == 'Double') {
+          arg.inputs.stdDev = (arg.inputs.maximum - arg.inputs.minimum) / 6;
+        }
+      });
+    });
+  }
+
+  addOptions(measure) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('Analysis::addOptions');
+
+    // open modal for user to select options.
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalSelectOptionsController',
+      controllerAs: 'modal',
+      templateUrl: 'app/analysis/selectOptions.html',
+      windowClass: 'wide-modal',
+      resolve: {
+        params: function () {
+          return {
+            measure: measure
+          };
+        }
+      }
+    });
+
+    modalInstance.result.then(() => {
+      deferred.resolve();
+    }, () => {
+      // Modal canceled
+      deferred.reject();
+    });
+    return deferred.promise;
+  }
 }
 

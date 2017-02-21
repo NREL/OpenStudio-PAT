@@ -6,6 +6,9 @@ export class BCL {
   constructor($q, $http, $uibModal, $log, Project, MeasureManager) {
     'ngInject';
 
+    // ignore camelcase for this file
+    /* eslint camelcase: 0 */
+
     const vm = this;
     vm.$http = $http;
     vm.$uibModal = $uibModal;
@@ -168,11 +171,12 @@ export class BCL {
           }
 
           // is measure added to project?
-          const projectMatch = _.find(vm.projectMeasures, {uid: measure.uid});
+          const projectMatch = _.find(vm.projectMeasures, {instanceId: measure.instanceId});
           measure.status = '';
           let measureVersionModified = null;
           let projectVersionModified = null;
           // update from local to project or from bcl to local to project
+          // TODO projectMatch can now be more than just 1 and must be iterated over
           if (angular.isDefined(projectMatch)) {
             vm.$log.debug("ProjectMAtch: ", projectMatch);
             vm.$log.debug("MEasure: ", measure);

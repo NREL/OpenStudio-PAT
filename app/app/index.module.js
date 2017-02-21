@@ -22,6 +22,11 @@ import { ModalDuplicateMeasureController } from '../app/bcl/modalDuplicateMeasur
 import { ModalUpdateMeasureController } from '../app/bcl/modalUpdateMeasureController';
 import { ModalViewReportController } from '../app/run/modalViewReportController';
 import { ModalClearResultsController } from '../app/run/modalClearResultsController';
+import { ModalSelectOutputsController } from '../app/outputs/modalSelectOutputsController';
+import { ModalSelectOptionsController } from '../app/analysis/modalSelectOptionsController';
+import { ModalNewClusterController } from '../app/run/modalNewClusterController';
+import { ModalNewAwsCredentialsController } from '../app/run/modalNewAwsCredentialsController';
+import { ModalCloudRunningController } from '../app/run/modalCloudRunningController';
 import { NavController } from '../app/nav/navController';
 import { OsServer } from '../app/project/osServerService';
 import { OutputsController } from '../app/outputs/outputsController';
@@ -35,7 +40,7 @@ import { SetProject } from '../app/project/setProjectService';
 import { StatusBar } from '../app/status_bar/statusBarService';
 import { StatusBarController } from '../app/status_bar/statusBarController';
 
-angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'pascalprecht.translate', 'ui.router', 'ui.router.stateHelper', 'ui.bootstrap', 'toastr', 'ui.grid', 'ui.grid.autoResize', 'ui.grid.cellNav', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ui.grid.selection', 'ui.grid.pinning'])
+angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'pascalprecht.translate', 'ui.router', 'ui.router.stateHelper', 'ui.bootstrap', 'ui.checkbox', 'toastr', 'ui.grid', 'ui.grid.autoResize', 'ui.grid.cellNav', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ui.grid.selection', 'ui.grid.pinning'])
   .config(config)
   .config(routerConfig)
   .run(runBlock)
@@ -52,7 +57,12 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalDuplicateMeasureController', ModalDuplicateMeasureController)
   .controller('ModalUpdateMeasureController', ModalUpdateMeasureController)
   .controller('ModalViewReportController', ModalViewReportController)
+  .controller('ModalSelectOutputsController', ModalSelectOutputsController)
+  .controller('ModalSelectOptionsController', ModalSelectOptionsController)
   .controller('ModalClearResultsController', ModalClearResultsController)
+  .controller('ModalNewClusterController', ModalNewClusterController)
+  .controller('ModalNewAwsCredentialsController', ModalNewAwsCredentialsController)
+  .controller('ModalCloudRunningController', ModalCloudRunningController)
   .controller('AnalysisController', AnalysisController)
   .controller('DesignAlternativesController', DesignAlternativesController)
   .controller('OutputsController', OutputsController)

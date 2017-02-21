@@ -9,7 +9,7 @@ import archiver from 'archiver';
 const {app, dialog} = remote;
 
 export class Project {
-  constructor($q, $log, $uibModal, MeasureManager) {
+  constructor($q, $log, $http, $uibModal, MeasureManager, $sce) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -20,13 +20,14 @@ export class Project {
     vm.dialog = dialog;
     vm.archiver = archiver;
     vm.$q = $q;
+    vm.$http = $http;
     vm.$uibModal = $uibModal;
+    vm.$sce = $sce;
 
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
 
-    vm.analysisTypes = ['Manual'];
-    //vm.analysisTypes = ['Manual', 'Algorithmic']; // TODO implement this after initial release
+    vm.analysisTypes = ['Manual', 'Algorithmic'];
 
     vm.reportTypes = [{
       id: 'Calibration Report',
@@ -50,7 +51,12 @@ export class Project {
     vm.remoteTypes = vm.setRemoteTypes();
     vm.algorithmOptions = vm.setAlgorithmOptions();
     vm.resetRemoteSettings();
+    vm.setOsServerVersions();
+    vm.setServerInstanceTypes();
+    vm.setWorkerInstanceTypes();
+    vm.setAwsRegions();
 
+    vm.clusters = [];
     vm.modified = false;
     vm.analysisType = null;
     vm.reportType = null;
@@ -63,6 +69,7 @@ export class Project {
     vm.openstudioMD5 = null;
     vm.projectDir = null;  // this is a jetpack object (like all other *Dir variables)
     vm.projectLocalResultsDir = null;
+    vm.projectClustersDir = null;
     vm.projectName = null;
     vm.mongoDir = null;
     vm.logsDir = null;
@@ -76,12 +83,17 @@ export class Project {
     vm.algorithmSettings = [];
     vm.measures = [];
     vm.designAlternatives = [];
+    vm.filesToInclude = [];
+    vm.setServerScripts();
 
     vm.analysisID = '';
     vm.datapoints = [];
 
     const src = jetpack.cwd(app.getPath('userData'));
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
+    // aws path
+    vm.awsDir = jetpack.dir(app.getPath('appData') + '/.aws');
+    vm.$log.debug('.aws dir location: ', vm.awsDir.path());
 
     // set my measures dir
     vm.MeasureManager.isReady().then(() => {
@@ -117,6 +129,8 @@ export class Project {
     vm.weatherFilesDropdownArr = [];
     vm.setSeedsDropdownOptions();
     vm.setWeatherFilesDropdownOptions();
+    vm.filesToInclude = [];
+    vm.setServerScripts();
 
     vm.analysisType = 'Manual';
     vm.reportType = 'Calibration Report';
@@ -157,6 +171,8 @@ export class Project {
       if (vm.jetpack.exists(filename)) {
         // existing project
         vm.pat = vm.jetpack.read(filename, 'json');
+        vm.$log.debug('PAT.json: ', vm.pat);
+        vm.$log.debug('filename: ', filename);
 
         vm.measures = vm.pat.measures;
         if (!angular.isDefined(vm.measures)) {
@@ -183,10 +199,14 @@ export class Project {
         vm.analysisID = vm.pat.analysisID ? vm.pat.analysisID : vm.analysisID;
         vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
         vm.remoteSettings = vm.pat.remoteSettings ? vm.pat.remoteSettings : vm.remoteSettings;
+        vm.filesToInclude = vm.pat.filesToInclude ? vm.pat.filesToInclude : vm.filesToInclude;
+        vm.serverScripts = vm.pat.serverScripts ? vm.pat.serverScripts : vm.serverScripts;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
     }
+
+    vm.$log.debug("Server Scripts: ", vm.serverScripts);
 
   }
 
@@ -203,7 +223,7 @@ export class Project {
       const options = [];
       // first find out how many options there are (from the optionDelete special argument)
       let optionKeys = [];
-      if (measure.arguments.length > 0) {
+      if (!_.isNil(measure.arguments) && measure.arguments.length > 0) {
         const keys = Object.keys(measure.arguments[0]);
         optionKeys = _.filter(keys, function (k) {
           return k.indexOf('option_') !== -1;
@@ -346,12 +366,19 @@ export class Project {
     const vm = this;
     vm.$log.debug('In Project::exportOSA');
 
+    // first export common data
+    vm.exportCommon();
+
     // check what kind of analysis it is
     if (vm.analysisType == 'Manual') {
       vm.exportManual();
     } else {
       vm.exportAlgorithmic();
     }
+
+    // export serverScripts
+    vm.exportScripts();
+
 
     // write to file
     let filename = vm.projectDir.path(vm.projectName + '.json');
@@ -384,27 +411,70 @@ export class Project {
       {expand: true, cwd: vm.weatherDir.path(), src: ['**'], dest: 'weather/'}
     ]);
 
+    // add server scripts (if they exist)
+    _.forEach(vm.serverScripts, (script, type) => {
+      if (script.file){
+        archive.bulk([
+          {expand: true, cwd: vm.projectDir.path('scripts', type), src: ['**'], dest: 'scripts/' + type}
+        ]);
+      }
+    });
+
+    // add 'files to include
+    _.forEach(vm.filesToInclude, (file) => {
+      if (file.dirToInclude){
+        if (!file.unpackDirName){
+          // use same name if no name is provided
+          file.unpackDirName = file.dirToInclude.replace(/^.*[\\\/]/, '');
+        }
+        archive.bulk([
+          {expand: true, cwd: file.dirToInclude, src: ['**'], dest: 'lib/' + file.unpackDirName}
+        ]);
+      }
+    });
+
     archive.finalize();
+  }
+
+  // export data common to both manual and algorithmic workflows
+  exportCommon() {
+
+    const vm = this;
+    vm.osa = {};
+    vm.osa.analysis = {};
+    vm.osa.analysis.display_name = vm.projectName;
+    vm.osa.analysis.name = vm.projectName;
+
+    // these are all empty for manual / initialized for algorithmic
+    vm.osa.analysis.output_variables = [];
+    vm.osa.analysis.problem = {};
+    vm.osa.analysis.problem.workflow = [];
+    vm.osa.analysis.problem.algorithm = {objective_functions: []};
+
+    vm.osa.analysis.seed = {};
+    vm.osa.analysis.seed.file_type = 'OSM';
+    vm.osa.analysis.seed.path = './seeds/' + vm.defaultSeed;
+    vm.osa.analysis.weather_file = {};
+    vm.osa.analysis.weather_file.file_type = 'EPW';
+    vm.osa.analysis.weather_file.path = './weather/' + vm.defaultWeatherFile;
+    vm.osa.analysis.file_format_version = 1;
+
+    // server scripts (will only work on the cloud, but always put in OSA?)
+    vm.osa.analysis.server_scripts = {};
+    _.forEach(vm.serverScripts, (script, type) => {
+      if (script.file){
+        vm.osa.analysis.server_scripts[type] = './scripts/' + type + '/' + script.file;
+      }
+    });
+
   }
 
   exportManual() {
     const vm = this;
     vm.$log.debug('In Project::exportManual');
 
-    vm.osa = {};
-    vm.osa.analysis = {};
-    vm.osa.analysis.display_name = vm.projectName;
-    vm.osa.analysis.name = vm.projectName;
-
-    // empty for manual
-    vm.osa.analysis.output_variables = [];
-
-    vm.osa.analysis.problem = {};
     //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO which is correct?
     vm.osa.analysis.problem.analysis_type = null;
-    // empty for manual
-    vm.osa.analysis.problem.algorithm = {objective_functions: []};
-    vm.osa.analysis.problem.workflow = [];
 
     // DESIGN ALTERNATIVES ARRAY
     vm.osa.analysis.problem.design_alternatives = [];
@@ -464,33 +534,11 @@ export class Project {
         const m = {};
         m.name = measure.name;
         m.display_name = measure.display_name;
-        // measure types: ModelMeasure, EnergyPlusMeasure, ReportingMeasure
-        // OSA wants: Ruby, EnergyPlus, Reporting
-        if (measure.type === 'ModelMeasure') {
-          //m.measure_type = 'Ruby';
-          m.measure_type = 'RubyMeasure';
-        } else if (measure.type === 'EnergyPlusMeasure') {
-          //m.measure_type = 'EnergyPlus';
-          m.measure_type = 'EnergyPlusMeasure';
-        } else if (measure.type === 'ReportingMeasure') {
-          //m.measure_type = 'Reporting';
-          m.measure_type = 'ReportingMeasure';
-        } else {
-          m.measure_type = 'unknown';
-        }
+        m.measure_type = vm.getMeasureType(measure);
         m.measure_definition_class_name = measure.className;
         //m.measure_definition_measureUID = measure.colDef.measureUID;
 
-        // windows path vs. mac
-        let mdir = '';
-        if (measure.measure_dir.indexOf('/') != -1) {
-          // correct paths
-          mdir = _.last(_.split(measure.measure_dir, '/'));
-        } else {
-          // assume windows paths '\\'
-          mdir = _.last(_.split(measure.measure_dir, '\\'));
-        }
-        vm.$log.debug("***MEASURE DIR NAME: ", mdir);
+        let mdir = vm.getMeasureBaseDir(measure);
         m.measure_definition_directory = './measures/' + mdir;
         m.measure_definition_directory_local = measure.measure_dir;
         m.measure_definition_class_name = measure.class_name;
@@ -524,13 +572,7 @@ export class Project {
             (_.isUndefined(arg.variable) || arg.variable === false)
           ) {
             vm.$log.debug('ARGUMENT, not variable!');
-            const argument = {};
-            argument.display_name = arg.display_name;
-            argument.display_name_short = arg.display_name_short ? arg.display_name_short : arg.display_name;
-            argument.name = arg.name;
-            argument.value_type = _.toLower(arg.type); // TODO: do this: downcase: choice, double, integer, bool, string (convert from BCL types)
-            argument.default_value = arg.default_value;
-            argument.value = arg.option_1 ? arg.option_1 : arg.default_value; // TODO: do this: if 'variable' isn't checked, use option1 value.  if it is checked, the argument is a variable and shouldn't be in the top-level arguments hash.s
+            const argument = vm.makeArgument(arg);
             // Make sure that argument is "complete"
             if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
               var_count += 1;
@@ -548,29 +590,7 @@ export class Project {
 
         // need a __SKIP__ argument
         if (_.includes(vars, true)) {
-          const v = {
-            argument: {
-              display_name: 'Skip ' + measure.display_name,
-              display_name_short: 'Skip entire measure',
-              name: '__SKIP__',
-              value_type: 'bool',
-              default_value: false,
-              value: false
-            },
-            display_name: 'Skip ' + measure.display_name,
-            display_name_short: 'Skip entire measure',
-            variable_type: 'variable',
-            units: null,
-            minimum: false,
-            maximum: true,
-            relation_to_output: null,
-            static_value: false,
-            variable: true,
-            uncertainty_description: {
-              attributes: [],
-              type: 'discrete'
-            }
-          };
+          const v = vm.makeSkip(measure);
 
           const valArr = [];
           _.forEach(vars, (skip) => {
@@ -578,15 +598,8 @@ export class Project {
           });
 
           v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
-          v.uncertainty_description.attributes.push({name: 'lower_bounds', value: false});
-          v.uncertainty_description.attributes.push({name: 'upper_bounds', value: false});
-          v.uncertainty_description.attributes.push({name: 'modes', value: false});
-          v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
-          v.uncertainty_description.attributes.push({name: 'stddev', value: null});
-
           v.workflow_index = var_count;
           var_count += 1;
-
           m.variables.push(v);
         }
 
@@ -657,15 +670,9 @@ export class Project {
 
             // VARIABLE ARGUMENT SECTION
             const v = {};
-            v.argument = {};
-            v.argument.display_name = arg.display_name;
-            v.argument.display_name_short = arg.display_name;
-            v.argument.name = arg.name;
-            v.argument.value_type = _.toLower(arg.type); // TODO: see above
-            v.argument.default_value = arg.default_value;
+            v.argument = vm.makeArgument(arg);
             vm.$log.info(arg.choice_display_names);
             v.argument.choice_display_names = arg.choice_display_names;
-            v.argument.value = arg.option_1;
 
             // VARIABLE DETAILS
             v.display_name = arg.display_name;  // same as arg
@@ -708,20 +715,411 @@ export class Project {
         vm.osa.analysis.problem.workflow.push(m);
       } // end if measure has options or is used
     });
-
-    vm.osa.analysis.seed = {};
-    vm.osa.analysis.seed.file_type = 'OSM';
-    vm.osa.analysis.seed.path = './seeds/' + vm.defaultSeed;
-    vm.osa.analysis.weather_file = {};
-    vm.osa.analysis.weather_file.file_type = 'EPW';
-    vm.osa.analysis.weather_file.path = './weather/' + vm.defaultWeatherFile;
-    vm.osa.analysis.file_format_version = 1;
   }
 
   exportAlgorithmic() {
     const vm = this;
     vm.$log.debug('In Project::exportAlgorithmic');
-    // TODO
+
+    // ALGORITHM SETTINGS
+    vm.osa.analysis.problem.analysis_type = vm.samplingMethod.id.toLowerCase();
+    vm.osa.analysis.problem.algorithm = {};
+    _.forEach(vm.algorithmSettings, (setting) => {
+      vm.osa.analysis.problem.algorithm[_.snakeCase(setting.name)] = setting.value;
+    });
+
+    // OUTPUTS
+    let groupFlag = false;
+    if (['NSGA2', 'SPEA2'].indexOf(vm.samplingMethod.id) != -1) {
+      // this sampling method supports groups
+      groupFlag = true;
+    }
+
+    // flatten outputs & order
+    let tempOutputs = [];
+    _.forEach(vm.measures, (measure) => {
+      _.forEach(measure.analysisOutputs, (out) => {
+        out.measure_name = measure.name;
+        out.measure_uid = measure.uid;
+        tempOutputs.push(out);
+      });
+    });
+    if (groupFlag) {
+      tempOutputs = _.sortBy(tempOutputs, ['obj_function_group']);
+    }
+    vm.$log.debug("tempOutputs sorted: ", tempOutputs);
+
+    // add objective function names to algorithm section
+    vm.osa.analysis.problem.algorithm.objective_functions = _.map(_.filter(tempOutputs, {objective_function: true}), 'name');
+    if (!vm.osa.analysis.problem.algorithm.objective_functions) {
+      vm.osa.analysis.problem.algorithm.objective_functions = [];
+    }
+    vm.osa.analysis.output_variables = vm.makeOutputs(tempOutputs, groupFlag);
+
+    // MEASURE DETAILS
+    let measure_count = 0;
+    _.forEach(vm.measures, (measure) => {
+      const m = {};
+      m.name = measure.name;
+      m.display_name = measure.display_name;
+
+      m.measure_type = vm.getMeasureType(measure);
+
+      m.measure_definition_class_name = measure.className;
+      //m.measure_definition_measureUID = measure.colDef.measureUID;
+
+      let mdir = vm.getMeasureBaseDir(measure);
+      m.measure_definition_directory = './measures/' + mdir;
+      m.measure_definition_directory_local = measure.measure_dir;
+      m.measure_definition_class_name = measure.class_name;
+      m.measure_definition_display_name = measure.display_name;
+      m.measure_definition_name = measure.name;
+      m.measure_definition_name_xml = null;
+      m.measure_definition_uuid = measure.uid;
+      m.measure_definition_version_uuid = measure.version_id;
+
+      // adding these to support EDAPT reporting
+      m.uuid = measure.uid;
+      m.version_uuid = measure.version_id;
+      m.description = measure.description;
+      m.taxonomy = measure.tags;
+
+      // ARGUMENTS
+      m.arguments = [];
+      // This portion only has arguments that don't have the variable box checked
+      _.forEach(measure.arguments, (arg) => {
+        // if argument is set to 'Argument' or if the variable setting is not supported by selected algorithm
+        if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
+          vm.$log.debug(arg.name, ' treated as ARGUMENT');
+          const argument = vm.makeArgument(arg);
+          // Make sure that argument is "complete"
+          if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
+            var_count += 1;
+            m.arguments.push(argument);
+          } else {
+            vm.$log.debug('Not pushing partial arg to m.arguments');
+            vm.$log.debug('partial arg: ', argument);
+          }
+        }
+      });
+
+      // VARIABLES
+      let var_count = 0;
+      m.variables = [];
+
+      // skip this measure?
+      if (measure.skip) {
+        const v =  vm.makeSkip(measure);
+        v.workflow_index = var_count;
+        var_count += 1;
+        m.variables.push(v);
+      }
+
+      // Variable arguments
+      _.forEach(measure.arguments, (arg) => {
+        if (arg.inputs && arg.inputs.variableSetting && arg.inputs.variableSetting != 'Argument' && !arg.inputs.showWarningIcon) {
+          vm.$log.debug('Project::exportAlgorithmic arg: ', arg);
+
+          // VARIABLE ARGUMENT SECTION
+          const v = {};
+          v.argument = vm.makeArgument(arg);
+
+          vm.$log.info(arg.choice_display_names);
+          v.argument.choice_display_names = arg.choice_display_names;  // TODO: not sure about this?
+
+          // VARIABLE DETAILS
+          v.display_name = arg.display_name;  // same as arg
+          v.display_name_short = arg.display_name_short;
+          v.variable_type = (arg.inputs.variableSetting == 'Pivot') ? 'pivot' : 'variable'; // this is 'variable' or 'pivot'
+          v.units = arg.units;
+          v.minimum = arg.inputs.minimum;
+          v.maximum = arg.inputs.maximum;
+          v.relation_to_output = arg.relationship;
+          v.static_value = arg.default_value;
+          v.uuid = '';
+          v.version_uuid = '';
+          if (arg.inputs.variableSetting == 'Pivot') {
+            v.pivot = true;
+          } else {
+            v.variable = true;
+          }
+          v.uncertainty_description = {};
+          // pivots can be discrete or integer_sequence_uncertain (handled in analysis controller)
+          // options are triangle, uniform, discrete, and normal, integer_sequence_uncertain
+          v.uncertainty_description.type = arg.inputs.distribution == 'Integer Sequence' ? 'integer_sequence' : arg.inputs.distribution.toLowerCase();
+          v.uncertainty_description.attributes = [];
+
+          // if discrete or pivot, make values and weights array (unless pivot w/ integer_sequence)
+          if ((arg.inputs.variableSetting == 'Pivot' || arg.inputs.variableSetting == 'Discrete') && arg.inputs.distribution != 'Integer Sequence'){
+            const valArr = vm.makeDiscreteValuesArray(arg.inputs.discreteVariables);
+            v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
+          }
+
+          // TODO: if any of these don't exist, set to inputs.default_value
+          v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.inputs.minimum});  // minimum
+          v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.inputs.maximum});  // maximum
+          v.uncertainty_description.attributes.push({name: 'modes', value: arg.inputs.mean}); // mean
+          v.uncertainty_description.attributes.push({name: 'delta_x', value: arg.inputs.deltaX}); // delta x
+          v.uncertainty_description.attributes.push({name: 'stddev', value: arg.inputs.stdDev});  // std dev
+
+          v.workflow_index = var_count;
+          var_count += 1;
+          m.variables.push(v);
+        }
+      });
+
+      m.workflow_index = measure_count;
+      measure_count += 1;
+      // push measure to OSA
+      vm.osa.analysis.problem.workflow.push(m);
+    });
+  }
+
+  makeDiscreteValuesArray(discreteVariables){
+    const vm = this;
+    const valArr = [];
+    _.forEach(discreteVariables, (valueHash) => {
+      valArr.push({value: valueHash.value, weight: valueHash.weight});
+    });
+
+    // TODO: more complicated weighting scheme?
+    let weightSum = 0;
+    _.forEach(valArr, (valueHash) => {
+      vm.$log.debug('weight: ', parseFloat(valueHash.weight));
+
+      if (vm.isNumeric(valueHash.weight)){
+        vm.$log.debug('weight for ', valueHash.value);
+        valueHash.weight = parseFloat(valueHash.weight);
+        weightSum = weightSum + valueHash.weight;
+      }
+    });
+    vm.$log.debug('current weight sum: ', weightSum);
+
+    if (weightSum > 1){
+      vm.$log.debug('ERROR: weights do not add up to 1');
+      // TODO: what to do here?
+    }
+
+    let missingCount = 0;
+    _.forEach(valArr, (valueHash) => {
+      if (!vm.isNumeric(valueHash.weight)){
+        missingCount = missingCount + 1;
+      }
+    });
+    vm.$log.debug('missing count: ', missingCount);
+
+    if (missingCount > 0){
+      vm.$log.debug('calculating missing weights');
+      const weightVal = (1 - weightSum)/missingCount; // TODO: limit
+      vm.$log.debug('calculated weight Val: ', weightVal);
+      _.forEach(valArr, (valueHash) => {
+        if (!vm.isNumeric(valueHash.weight)){
+          valueHash.weight = weightVal;
+        }
+      });
+    }
+
+    vm.$log.debug('Final discrete values array: ', valArr);
+    return valArr;
+  }
+
+  isNumeric(n) {
+    return !isNaN(parseFloat(n)) && isFinite(n);
+  }
+
+  getMeasureType(measure) {
+    const vm = this;
+    // measure types: ModelMeasure, EnergyPlusMeasure, ReportingMeasure
+    // OSA wants: Ruby, EnergyPlus, Reporting
+    let type = null;
+    if (measure.type === 'ModelMeasure') {
+      //type = 'Ruby';
+       type = 'RubyMeasure';
+    } else if (measure.type === 'EnergyPlusMeasure') {
+      //type = 'EnergyPlus';
+      type = 'EnergyPlusMeasure';
+    } else if (measure.type === 'ReportingMeasure') {
+      //type = 'Reporting';
+      type = 'ReportingMeasure';
+    } else {
+      type = 'unknown';
+    }
+    return type;
+  }
+
+  makeOutputs(outputs, groupFlag){
+    const vm = this;
+    let index = 0;
+    let currentGroup = null;
+    const finalOutputs = [];
+    _.forEach(outputs, (out) => {
+      vm.$log.debug('OUTPUT: ', out);
+      const outHash = {};
+      outHash.units = out.units;
+      outHash.objective_function = out.objective_function == 'true';  // true or false
+      // only set following fields if object_function is true, otherwise null
+      if (outHash.objective_function) {
+
+        if (outHash.objective_function) {
+          if (groupFlag) {
+            if (out.obj_function_group == null) {
+              if (currentGroup) {
+                // get out of group and increment
+                currentGroup = null;
+                index = index + 1;
+              }
+              outHash.objective_function_index = index;
+              index = index + 1;
+            } else {
+              // group defined
+              if (currentGroup == out.obj_function_group) {
+                // same group, don't increment
+                outHash.objective_function_index = index;
+
+              } else if (currentGroup == null) {
+                // no group, assign, don't increment
+                currentGroup = out.obj_function_group;
+                outHash.objective_function_index = index;
+
+              } else {
+                // currentGroup != obj_function_group
+                // change group, increment
+                currentGroup = out.obj_function_group;
+                index = index + 1;
+                outHash.objective_function_index = index;
+              }
+            }
+          } else {
+            outHash.objective_function_index = index;
+            // increment
+            index = index + 1;
+          }
+        } else {
+          outHash.objective_function_index = null;
+        }
+        outHash.objective_function_target = vm.typeTargetValue(out.target_value, out.type);
+        outHash.objective_function_group = out.obj_function_group ? out.obj_function_group : null;
+        outHash.scaling_factor = out.weighting_factor ? out.weighting_factor : null;
+      } else {
+        outHash.objective_function_index = null;
+        outHash.objective_function_target = null;
+        outHash.objective_function_group = null;
+        outHash.scaling_factor = null;
+      }
+      outHash.display_name = out.display_name;
+      outHash.display_name_short = out.short_name;
+      outHash.metadata_id = null; // always null for now.  This is related to DEnCity?
+      outHash.name = out.name; // always measure.name . measure.argument.name
+      outHash.visualize = out.visualize == 'true';
+      outHash.export = true; // always true
+      outHash.variable_type = out.type;  // options are: string, bool, double, integer?  TODO: find out what these can be. for now: use argument type
+      finalOutputs.push(outHash);
+    });
+    return finalOutputs;
+  }
+
+  getMeasureBaseDir(measure) {
+    const vm = this;
+    let mdir = '';
+    // windows path vs. mac
+    if (measure.measure_dir.indexOf('/') != -1) {
+      // correct paths
+      mdir = _.last(_.split(measure.measure_dir, '/'));
+    } else {
+      // assume windows paths '\\'
+      mdir = _.last(_.split(measure.measure_dir, '\\'));
+    }
+    vm.$log.debug("***MEASURE DIR NAME: ", mdir);
+    return mdir;
+  }
+
+  makeArgument(arg){
+    const vm = this;
+    const argument = {};
+    argument.display_name = arg.display_name;
+    argument.display_name_short = arg.display_name_short ? arg.display_name_short : arg.name;
+    argument.name = arg.name;
+    argument.value_type = _.toLower(arg.type); // TODO: choice, double, integer, bool, string (convert from BCL types)
+    argument.default_value = arg.default_value;
+    if (vm.analysisType == 'Manual')
+      argument.value = arg.option_1 ? arg.option_1 : arg.default_value;
+    else
+      argument.value = (arg.inputs && !_.isNil(arg.inputs.default_value)) ? arg.inputs.default_value : arg.default_value;
+
+    return argument;
+  }
+
+  makeSkip(measure){
+    const vm = this;
+    const v = {
+      argument: {
+        display_name: 'Skip ' + measure.display_name,
+        display_name_short: 'Skip entire measure',
+        name: '__SKIP__',
+        value_type: 'bool',
+        default_value: false,
+        value: false
+      },
+      display_name: 'Skip ' + measure.display_name,
+      display_name_short: 'Skip entire measure',
+      variable_type: 'variable',
+      units: null,
+      minimum: false,
+      maximum: true,
+      relation_to_output: null,
+      static_value: false,
+      variable: true,
+      uncertainty_description: {
+        attributes: [],
+        type: 'discrete'
+      }
+    };
+
+    v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: []});
+    v.uncertainty_description.attributes.push({name: 'lower_bounds', value: false});
+    v.uncertainty_description.attributes.push({name: 'upper_bounds', value: false});
+    v.uncertainty_description.attributes.push({name: 'modes', value: false});
+    v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
+    v.uncertainty_description.attributes.push({name: 'stddev', value: null});
+
+    return v;
+  }
+
+  exportScripts() {
+    const vm = this;
+    vm.$log.debug('exporting server scripts');
+    _.forEach(vm.serverScripts, (script, type) => {
+      // vm.$log.debug('type: ', type, 'scriptdata: ', script);
+      if (script.file) {
+        // create argument file
+        let argFilename = script.file.substr(0, script.file.lastIndexOf('.')) || script.file;
+        argFilename = argFilename + '.args';
+        vm.jetpack.write(vm.projectDir.path('scripts', type, argFilename), script.arguments);
+      }
+    });
+  }
+
+  typeTargetValue(value, type) {
+    const vm = this;
+    let newVal;
+    if (value == null) {
+      newVal = value;
+    } else if (type == 'Double' || type == 'Integer') {
+      // this might be NAN if value cannot be converted
+      newVal = Number(value);
+    } else if (type == 'Bool') {
+      if (value == 'true' || value == '1') {
+        newVal = true;
+      } else if (value == 'false' || value == '0') {
+        newVal = false;
+      } else {
+        // this will cause an error
+        newVal = value;
+      }
+    } else {
+      newVal = value;
+    }
+    return newVal;
   }
 
   // export variables to pat.json
@@ -736,7 +1134,13 @@ export class Project {
     vm.pat.seed = vm.defaultSeed;
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
-    vm.pat.remoteSettings = vm.remoteSettings;
+    vm.pat.dirToInclude = vm.dirToInclude;
+    vm.pat.dirToUnpackTo = vm.dirToUnpackTo;
+    vm.pat.remoteSettings = angular.copy(vm.remoteSettings);
+    // clear out aws.connected
+    if (vm.pat.remoteSettings.aws && vm.pat.remoteSettings.aws.connected) {
+      vm.pat.remoteSettings.aws.connected = false;
+    }
     vm.pat.samplingMethod = vm.samplingMethod;
     vm.pat.algorithmSettings = vm.algorithmSettings;
     vm.pat.rubyMD5 = vm.rubyMD5;
@@ -747,6 +1151,10 @@ export class Project {
 
     // measures and options
     vm.pat.measures = vm.measures;
+
+    // files to include
+    vm.pat.filesToInclude = vm.filesToInclude;
+    vm.pat.serverScripts = vm.serverScripts;
 
     // design alternatives
     vm.pat.designAlternatives = vm.designAlternatives;
@@ -767,7 +1175,7 @@ export class Project {
     const newMeasures = [];
 
     _.forEach(updatedMeasures, (measure) => {
-      const match = _.find(vm.measures, {uid: measure.uid});
+      const match = _.find(vm.measures, {instanceId: measure.instanceId});
       if (angular.isDefined(match)) {
         // if there's a match, merge (update)
         _.merge(match, measure);
@@ -828,6 +1236,7 @@ export class Project {
     // this should be a jetpack object (not a string)
     vm.projectDir = dir;
     vm.setProjectLocalResultsDir(dir);
+    vm.setProjectClustersDir(dir);
   }
 
   setProjectLocalResultsDir(projectDir) {
@@ -838,6 +1247,21 @@ export class Project {
   getProjectLocalResultsDir() {
     const vm = this;
     return vm.projectLocalResultsDir;
+  }
+
+  setProjectClustersDir(projectDir) {
+    const vm = this;
+    return vm.projectClustersDir = vm.jetpack.dir(projectDir.path('clusters'));
+  }
+
+  getProjectClustersDir() {
+    const vm = this;
+    return vm.projectClustersDir;
+  }
+
+  getAwsDir() {
+    const vm = this;
+    return vm.awsDir;
   }
 
   // projectDir is a jetpack object (not a string)
@@ -964,13 +1388,19 @@ export class Project {
   }
 
   setRemoteTypes() {
-    //return ['Existing Remote Server', 'Amazon Cloud'];
-    return ['Existing Remote Server'];
+    return ['Existing Remote Server', 'Amazon Cloud'];
+    //return ['Existing Remote Server'];
   }
 
   resetRemoteSettings() {
     const vm = this;
-    vm.setRemoteSettings({open: false, remoteType: vm.remoteTypes[0], remoteServerURL: null, cloudServerURL: null});
+    vm.setRemoteSettings({
+      open: true,
+      remoteType: vm.remoteTypes[1],
+      remoteServerURL: null,
+      aws: {},
+      credentials: {yamlFilename: null, accessKey: null, region: 'us-east-1'}
+    });
     vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
@@ -984,6 +1414,323 @@ export class Project {
     return vm.remoteSettings;
   }
 
+  // always get from disk and extract unique name
+  getAwsYamlFiles() {
+    const vm = this;
+    vm.awsYamlFiles = [];
+    const files = vm.jetpack.find(vm.awsDir.path(), {matching: '*.yml'});
+    _.forEach(files, file => {
+      vm.awsYamlFiles.push(_.replace(_.last(_.split(file, '/')), '.yml', ''));
+    });
+    return vm.awsYamlFiles;
+  }
+
+  // always get from disk and extract unique name
+  getClusters() {
+    const vm = this;
+    vm.clusters = {running: [], all: []};
+    const tempClusters = vm.jetpack.find(vm.projectDir.path(), {matching: '*_cluster.json'});
+    _.forEach(tempClusters, cluster => {
+      vm.$log.debug('CLUSTER: ', cluster);
+      const clusterFile = vm.jetpack.read(cluster);
+      let clusterName = _.last(_.split(cluster, '/'));
+      clusterName = _.replace(clusterName, '_cluster.json', '');
+      vm.clusters.all.push(clusterName);
+      // PING (by name)
+      vm.pingCluster(clusterName).then((dns) => {
+        // running
+        vm.clusters.running.push(clusterName);
+      }, () => {
+        // terminated
+      });
+    });
+
+    vm.$log.debug('Cluster files found: ', vm.clusters);
+    return vm.clusters;
+  }
+
+  getDNSFromFile(clusterName) {
+    const vm = this;
+    let dns = null;
+    if (clusterName && vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
+      const clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName, clusterName + '.json'), 'json');
+      vm.$log.debug('Cluster File Data: ', clusterData);
+      if (clusterData && clusterData.server && clusterData.server.dns) {
+        dns = clusterData.server.dns;
+      }
+    }
+    return dns;
+  }
+
+  readClusterFile(clusterName) {
+    const vm = this;
+    let clusterData = {};
+    if (clusterName && vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
+      clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName, clusterName + '.json'), 'json');
+    }
+    return clusterData;
+  }
+
+  pingCluster(clusterName) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('Locating config file for cluster: ', clusterName);
+
+    const dns = vm.getDNSFromFile(clusterName);
+
+    if (dns) {
+      vm.$log.debug('PING: ', dns);
+      vm.$http.get(vm.fixURL(dns)).then(response => {
+        // send json to run controller
+        vm.$log.debug('Cluster RUNNING at: ', dns);
+        vm.$log.debug('JSON response: ', response);
+        deferred.resolve(dns);
+      }, () => {
+        vm.$log.debug('Cluster TERMINATED at: ', dns);
+        deferred.reject();
+      });
+    } else {
+      // nothing to ping
+      vm.$log.debug("Nothing to ping");
+      deferred.reject();
+    }
+
+    return deferred.promise;
+  }
+
+  fixURL(url) {
+    // if http:// is missing from URL, $http actions won't work
+    if (url.indexOf('http://') == -1 && url.indexOf('https://') == -1) {
+      url = 'http://' + url;
+    }
+    return url;
+  }
+
+  getOsServerVersions() {
+    const vm = this;
+    return vm.osServerVersions;
+  }
+
+  saveClusterToFile() {
+    const vm = this;
+    vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
+    // copy and clean up what you don't need
+    const cluster = angular.copy(vm.remoteSettings.aws);
+    cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : null;
+    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name : null;
+    cluster.openstudio_server_version = cluster.openstudio_server_version ? cluster.openstudio_server_version.name : null;
+    // TODO: make sure worker number is a number
+    // this is hard-coded
+    cluster.ami_lookup_version = 3;
+    vm.jetpack.write(vm.getProjectDir().path(vm.remoteSettings.aws.cluster_name + '_cluster.json'), cluster);
+  }
+
+  setOsServerVersions() {
+    const vm = this;
+    vm.osServerVersions = [];
+    const amiURL = 'http://s3.amazonaws.com/openstudio-resources/server/api/v3/amis.json';
+    vm.$http.get(amiURL, {cache: false}).then(response => {
+      if (response.data && response.data.builds) {
+        vm.$log.debug('OPENSTUDIO SERVER AMIS: ', response.data.builds);
+        _.forEach(response.data.builds, version => {
+          vm.osServerVersions.push(version);
+        });
+      }
+      vm.$log.debug('OS Server Versions: ', vm.osServerVersions);
+
+    }, error => {
+      vm.$log.debug('Error retrieving the OsServerVersions: ', error);
+    });
+  }
+
+  setServerInstanceTypes() {
+    const vm = this;
+    vm.serverInstanceTypes = [
+      {
+        name: 'm3.xlarge',
+        cpus: '4',
+        memory: '15 GiB',
+        storage: '2 x 40 GB',
+        cost: '$0.28/hr'
+      },
+      {
+        name: 'm3.2xlarge',
+        cpus: '8',
+        memory: '30 GiB',
+        storage: '2 x 80 GB',
+        cost: '$0.56/hr'
+      },
+      {
+        name: 'c3.xlarge',
+        cpus: '4',
+        memory: '7.5 GiB',
+        storage: '2 x 40 GB',
+        cost: '$0.21/hr'
+      },
+      {
+        name: 'c3.2xlarge',
+        cpus: '8',
+        memory: '15 GiB',
+        storage: '2 x 80 GB',
+        cost: '	$0.42/hr'
+      },
+      {
+        name: 'c3.4xlarge',
+        cpus: '16',
+        memory: '30 GiB',
+        storage: '2 x 160 GB',
+        cost: '$0.84/hr'
+      },
+      {
+        name: 'c3.8xlarge',
+        cpus: '32',
+        memory: '60 GiB',
+        storage: '2 x 320 GB',
+        cost: '$1.68/hr'
+      },
+      {
+        name: 'i2.xlarge',
+        cpus: '4',
+        memory: '30.5 GiB',
+        storage: '1 x 800 GB',
+        cost: '$0.85/hr'
+      },
+      {
+        name: 'i2.2xlarge',
+        cpus: '8',
+        memory: '61 GiB',
+        storage: '2 x 800 GB',
+        cost: '$1.71/hr'
+      },
+      {
+        name: 'i2.4xlarge',
+        cpus: '16',
+        memory: '122 GiB',
+        storage: '4 x 800 GB',
+        cost: '$3.41/hr'
+      }
+    ];
+  }
+
+  setWorkerInstanceTypes() {
+    const vm = this;
+    vm.workerInstanceTypes = [
+      {
+        name: 'm3.medium',
+        cpus: '1',
+        memory: '3.75 GiB',
+        storage: '1 x 4 GB',
+        cost: '$0.07/hr'
+      },
+      {
+        name: 'm3.large',
+        cpus: '2',
+        memory: '7.5 GiB',
+        storage: '1 x 32 GB',
+        cost: '$0.14/hr'
+      },
+      {
+        name: 'm3.xlarge',
+        cpus: '4',
+        memory: '15 GiB',
+        storage: '2 x 40 GB',
+        cost: '$0.28/hr'
+      },
+      {
+        name: 'm3.2xlarge',
+        cpus: '8',
+        memory: '30 GiB',
+        storage: '2 x 80 GB',
+        cost: '$0.56/hr'
+      },
+      {
+        name: 'c3.large',
+        cpus: '2',
+        memory: '3.75 GiB',
+        storage: '2 x 16 GB',
+        cost: '$0.11/hr'
+      },
+      {
+        name: 'c3.xlarge',
+        cpus: '4',
+        memory: '7.5 GiB',
+        storage: '2 x 40 GB',
+        cost: '$0.21/hr'
+      },
+      {
+        name: 'c3.2xlarge',
+        cpus: '8',
+        memory: '15 GiB',
+        storage: '2 x 80 GB',
+        cost: '$0.42/hr'
+      },
+      {
+        name: 'c3.4xlarge',
+        cpus: '16',
+        memory: '30 GiB',
+        storage: '2 x 160 GB',
+        cost: '$0.84/hr'
+      },
+      {
+        name: 'c3.8xlarge',
+        cpus: '32',
+        memory: '60 GiB',
+        storage: '2 x 320 GB',
+        cost: '$1.68/hr'
+      },
+      {
+        name: 'r3.large',
+        cpus: '2',
+        memory: '15.25 GiB',
+        storage: '1 x 32 GB',
+        cost: '$0.85/hr'
+      },
+      {
+        name: 'i2.xlarge',
+        cpus: '4',
+        memory: '30.5 GiB',
+        storage: '1 x 800 GB',
+        cost: '$1.71/hr'
+      },
+      {
+        name: 'i2.2xlarge',
+        cpus: '8',
+        memory: '61 GiB',
+        storage: '2 x 800 GB',
+        cost: '$1.71/hr'
+      },
+      {
+        name: 'i2.4xlarge',
+        cpus: '16',
+        memory: '122 GiB',
+        storage: '4 x 800 GB',
+        cost: '$3.41/hr'
+      }
+    ];
+  }
+
+  getServerInstanceTypes() {
+    const vm = this;
+    return vm.serverInstanceTypes;
+  }
+
+  getWorkerInstanceTypes() {
+    const vm = this;
+    return vm.workerInstanceTypes;
+  }
+
+  setAwsRegions() {
+    const vm = this;
+    vm.awsRegions = [
+      'us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 'eu-central-1', 'eu-west-1'
+    ];
+  }
+
+  getAwsRegions() {
+    const vm = this;
+    return vm.awsRegions;
+  }
+
   setAnalysisType(name) {
     const vm = this;
     vm.analysisType = name;
@@ -992,6 +1739,27 @@ export class Project {
   getAnalysisType() {
     const vm = this;
     return vm.analysisType;
+  }
+
+  getFilesToInclude() {
+    const vm = this;
+    return vm.filesToInclude;
+  }
+
+  setServerScripts() {
+    const vm = this;
+    vm.serverScripts = {
+      server_initialization: {file: null, arguments: []},
+      server_finalization: {file: null, arguments: []},
+      worker_initialization: {file: null, arguments: []},
+      worker_finalization: {file: null, arguments: []}
+    };
+    vm.$log.debug('setServerScripts: ', vm.serverScripts);
+  }
+
+  getServerScripts() {
+    const vm = this;
+    return vm.serverScripts;
   }
 
   setSamplingMethod(method) {
@@ -1011,8 +1779,20 @@ export class Project {
 
   setAlgorithmOptions() {
     const at = {};
-
-    at.BatchRun = [];
+    at.BaselinePerturbation =[{
+      name: 'in_measure_combinations',
+      description: '(TRUE/FALSE) Run full factorial search over in-measure variable combinations',
+      defaultValue: 'TRUE'
+    }];
+    at.Diagonal = [{
+      name: 'Number of Samples',
+      description: 'positive integer (this discretizes a continuous variable)',
+      defaultValue: 2
+    }, {
+      name: 'Run_Baseline',
+      description: '(1/0) Run static values',
+      defaultValue: 1
+    }];
     at.Morris = [{
       name: 'r',
       description: 'integer giving the number of repetitions of the design',
@@ -1311,25 +2091,31 @@ export class Project {
   setAlgorithmSettings(algorithm) {
     const vm = this;
     vm.$log.debug('In setAlgorithmSettings in Project');
-    _.forEach(vm.algorithmOptions[algorithm.id], (object) => {
-      let flag = 0;
-      _.forEach(vm.algorithmSettings, (setting) => {
-        if (object.name === setting.name) {
-          setting.description = object.description;
-          setting.defaultValue = object.defaultValue;
-          if (!setting.value) {
-            setting.value = object.value;
-          }
-          flag = 1;
-        }
-      });
-      if (!flag) {
-        object.value = object.defaultValue;
-        vm.algorithmSettings.push(object);
+
+    // remove non-applicable settings
+    _.forEachRight(vm.algorithmSettings, (setting, key) => {
+      const match = _.find(vm.algorithmOptions[algorithm.id], {name: setting.name});
+      if (!match) {
+        vm.algorithmSettings.splice(key, 0);
       }
     });
 
-    vm.algorithmSettings = vm.algorithmOptions[algorithm.id];
+    // add/update new settings
+    _.forEach(vm.algorithmOptions[algorithm.id], (object) => {
+      const match = _.find(vm.algorithmSettings, {name: object.name});
+      if (match) {
+        match.description = object.description;
+        match.defaultValue = object.defaultValue;
+        match.value = _.isNil(match.value) ? object.defaultValue : match.value;
+      }
+      else {
+        const temp = angular.copy(object);
+        temp.value = temp.defaultValue;
+        vm.algorithmSettings.push(temp);
+      }
+    });
+
+
   }
 
   getAlgorithmOptions() {
@@ -1341,9 +2127,6 @@ export class Project {
     const vm = this;
 
     return [{
-      id: 'BatchRun',
-      name: 'analysis.type.batchRun'
-    }, {
       id: 'NSGA2',
       name: 'analysis.type.nsga2'
     }, {
@@ -1379,6 +2162,9 @@ export class Project {
     }, {
       id: 'BaselinePerturbation',
       name: 'analysis.type.baselinePerturbation'
+    },{
+      id: 'Diagonal',
+      name: 'analysis.type.diagonal'
     }];
   }
 
@@ -1564,6 +2350,11 @@ export class Project {
     }
 
     return deferred.promise;
+  }
+
+  html(input) {
+    const vm = this;
+    return vm.$sce.trustAsHtml(input);
   }
 
 }

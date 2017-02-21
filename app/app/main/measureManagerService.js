@@ -212,7 +212,6 @@ export class MeasureManager {
         deferred.reject([]);
       });
 
-
     return deferred.promise;
   }
 

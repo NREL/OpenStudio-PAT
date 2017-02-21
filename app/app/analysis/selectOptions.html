@@ -1,0 +1,46 @@
+<div class="modal-header">
+  <h3 class="modal-title" translate>analysis.manual.modalSelectOptions.title</h3>
+</div>
+
+<div class="modal-body">
+  <div class="row pad-bot-20">
+    <div class="col-sm-12 modal-text">
+      <translate>analysis.manual.modalSelectOptions.message</translate>
+    </div>
+  </div>
+  <div class="row pad-bot-20">
+    <div class="col-sm-12">
+      <button class="btn btn-primary" ng-click="toggleSelected()">
+        <span ng-if="!allSelected" translate>analysis.manual.modalSelectOptions.selectAll</span>
+        <span ng-if="allSelected" translate>analysis.manual.modalSelectOptions.deselectAll</span>
+      </button>
+    </div>
+  </div>
+  <div class="row pad-bot-10">
+    <div class="col-sm-6">
+      <div ng-repeat="option in measure.options" ng-if="$odd">
+        <div class="row">
+          <div class="col-sm-12 normal-text pad-left-25">
+            <input type="checkbox" id="{{option.name}}" ng-model="option.checked">
+            <label for="{{option.name}}" class="normal-text"> {{option.name}}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <div ng-repeat="option in measure.options" ng-if="$even">
+        <div class="row">
+          <div class="col-sm-12 normal-text">
+            <input type="checkbox" id="{{option.name}}" ng-model="option.checked">
+            <label for="{{option.name}}" class="normal-text"> {{option.name}}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
+  <button type="button" class="btn btn-warning" ng-click="modal.cancel()">Cancel</button>
+</div>

@@ -1,19 +1,151 @@
 <div class="row">
-  <div class="col-sm-6">
+  <div class="col-sm-12">
     <uib-accordion close-others="false">
       <uib-accordion-group class="algorithm-custom" is-open="settings.open">
         <uib-accordion-heading>
-          <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': settings.open, 'glyphicon-chevron-right': !settings.open}"></i>
+          <i class="pull-left glyphicon pad-right-5 black-button"
+             ng-class="{'glyphicon-chevron-down': settings.open, 'glyphicon-chevron-right': !settings.open}"></i>
           <translate>analysis.algorithmic.algorithmSetting</translate>
         </uib-accordion-heading>
-        <div ng-repeat="option in algorithmSettings">
-          <div class="row">
-            <div class="col-sm-10">
-              <label for="{{option.name}}">{{option.name}}</label>
-              <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}" ng-model="option.value">
+
+        <div class="row pad-bot-10">
+          <div class="col-sm-6">
+            <div ng-repeat="option in algorithmSettings" ng-if="$odd">
+              <div class="row pad-bot-10">
+                <div class="col-sm-12">
+                  <label class="medium-label" for="{{option.name}}">{{option.name}}</label>
+                  <span ng-if="option.description" class="small-text inline">&mdash; {{option.description}}</span>
+                  <input type="text" class="form-control" id="{{option.name}}" placeholder="{{option.defaultValue}}"
+                         ng-model="option.value">
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-sm-6">
+            <div ng-repeat="option in algorithmSettings" ng-if="$even">
+              <div class="row pad-bot-10">
+                <div class="col-sm-12">
+                  <label class="medium-label" for="{{option.name}}">{{option.name}}</label>
+                  <span class="small-text inline">{{option.description}}</span>
+                  <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}"
+                         ng-model="option.value">
+                </div>
+              </div>
             </div>
           </div>
         </div>
+
+      </uib-accordion-group>
+    </uib-accordion>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <uib-accordion close-others="false">
+      <uib-accordion-group class="algorithm-custom" is-open="filesToInclude.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button"
+             ng-class="{'glyphicon-chevron-down': filesToInclude.open, 'glyphicon-chevron-right': !filesToInclude.open}"></i>
+          <translate>analysis.algorithmic.filesToInclude</translate>
+        </uib-accordion-heading>
+
+        <div class="row pad-bot-10">
+          <div class="col-sm-12 normal-text" translate>analysis.algorithmic.filesToIncludeMessage</div>
+        </div>
+
+        <div ng-repeat="file in filesToInclude">
+          <div class="row pad-bot-20">
+            <div class="col-sm-6">
+              <label class="medium-label display-block" translate>analysis.algorithmic.dirToInclude</label>
+              <button class="btn btn-default inline" type="button" ng-click="analysis.selectDirToInclude(file)"><span
+                class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;
+                <translate>analysis.algorithmic.selectDir</translate>
+              </button>
+              <span class="normal-text pad-left-5 inline">{{file.dirToInclude}}</span>
+            </div>
+            <div class="col-sm-5">
+              <label class="medium-label inline" for="{{name}}_{{$index}}"
+                     translate>analysis.algorithmic.dirToUnpackTo</label>
+              <div class="input-group">
+                <input class="form-control" id="{{name}}_{{$index}}" type="text" ng-model="file.unpackDirName"
+                       size="60">
+              </div>
+            </div>
+            <div class="col-sm-1">
+              <span class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25"
+                    ng-click="analysis.deleteDirToInclude($index)" aria-hidden="true"
+                    aria-label="Delete Directory"></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="row">
+          <div class="col-sm-3">
+            <button class="btn btn-success" type="button" ng-click="analysis.addDirToInclude()"><span
+              class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;
+              <translate>analysis.algorithmic.addDir</translate>
+            </button>
+          </div>
+        </div>
+
+      </uib-accordion-group>
+    </uib-accordion>
+  </div>
+</div>
+
+<div class="row pad-bot-20">
+  <div class="col-sm-12">
+    <uib-accordion close-others="false">
+      <uib-accordion-group class="algorithm-custom" is-open="serverScriptsAccordionOpen">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button"
+             ng-class="{'glyphicon-chevron-down': serverScriptsAccordionOpen, 'glyphicon-chevron-right': !serverScriptAccordionOpen}"></i>
+          <translate>analysis.algorithmic.serverScripts</translate>
+        </uib-accordion-heading>
+
+        <div class="row pad-bot-10">
+          <div class="col-sm-12 normal-text" translate>analysis.algorithmic.serverScriptsMessage</div>
+        </div>
+
+        <div ng-repeat="(scriptType, scriptData) in serverScripts">
+          <div class="row pad-top-10 pad-bot-20 border-bot">
+            <div class="col-sm-6">
+              <label class="medium-label display-block"><span
+                translate='analysis.algorithmic.{{scriptType}}'></span></label>
+              <button class="btn btn-default inline" type="button" ng-click="analysis.selectScript(scriptType)"><span
+                class="glyphicon glyphicon-folder-open" aria-hidden="true"></span>&nbsp;&nbsp;
+                <translate>analysis.algorithmic.selectScript</translate>
+              </button>
+              <span class="normal-text pad-left-5 inline">{{scriptData.file}}</span>&nbsp;&nbsp;
+              <span ng-if="scriptData.file"
+                    class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25 inline"
+                    ng-click="analysis.deleteScript(scriptType)" aria-hidden="true"
+                    aria-label="Delete Script"></span>
+            </div>
+            <div class="col-sm-6">
+              <!-- todo: list of arguments -->
+              <label class="medium-label" translate>analysis.algorithmic.args</label>
+              <div class="row">
+                <div class="col-sm-10">
+                  <div ng-repeat="arg in scriptData.arguments track by $index">
+                    <input type="text" class="form-control margin-bot-5 width-80 inline" name="arg_{{$index}}"
+                           ng-model="scriptData.arguments[$index]">
+                    &nbsp;<span class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25 inline"
+                                ng-click="analysis.deleteScriptArgument(scriptType, $index)" aria-hidden="true"
+                                aria-label="Delete Argument"></span>
+                  </div>
+                  <button class="btn btn-success" type="button" ng-click="analysis.addScriptArgument(scriptType)"><span
+                    class="glyphicon glyphicon-plus" aria-hidden="true"></span>&nbsp;
+                    <translate>analysis.algorithmic.addArg</translate>
+                  </button>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+
       </uib-accordion-group>
     </uib-accordion>
   </div>
@@ -22,59 +154,559 @@
 <div class="row">
   <div class="col-sm-6">
     <h5 class="inline measure-type" translate>analysis.openstudioMeasures</h5>
-    <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ModelMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <translate>analysis.addMeasure</translate></button>
+    <span class="badge badge-info margin-left-5 margin-right-5"
+          title="{{'analysis.helpOpenStudioMeasures' | translate}}">&nbsp;?&nbsp;</span>
+    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ModelMeasure')"><span
+      class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+      <translate>analysis.addMeasure</translate>
+    </button>
   </div>
   <div class="col-sm-6">
-    <button type="button" class="btn btn-primary" ng-click="analysis.checkUpdates()"><span class="glyphicon glyphicon-repeat" aria-hidden="true"></span> <translate>analysis.checkForUpdates</translate></button>
+    <button type="button" class="btn btn-primary" ng-click="analysis.checkUpdates()"><span
+      class="glyphicon glyphicon-repeat" aria-hidden="true"></span>
+      <translate>analysis.checkForUpdates</translate>
+    </button>
   </div>
 </div>
 <div class="analysis-custom">
-  <div class="panel panel-default full-width margin-top-20">
-    <div class="analysis-custom panel-body">
-      <uib-accordion close-others="false">
-        <uib-accordion-group ng-repeat="measure in osMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
-          <uib-accordion-heading>
-            <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
-            {{measure.display_name}}
-            <span class="pull-right">
-              <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
-                <span class="glyphicon glyphicon-remove"></span>
-              </span>
+  <div class="full-width margin-top-20">
+    <uib-accordion close-others="false">
+      <uib-accordion-group ng-repeat="measure in osMeasures" class="analysis-custom" id="{{measure.instanceId}}"
+                           is-open="measure.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button"
+             ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
+          {{measure.display_name}}
+          <span class="pull-right">
+            <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button"
+                  ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
+            <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button"
+                  ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
+            <span class="badge black-button margin-left-5 margin-right-5"
+                  ng-click="$event.preventDefault(); $event.stopPropagation(); analysis.removeMeasure(measure);">
+              <span class="glyphicon glyphicon-remove"></span>
             </span>
-          </uib-accordion-heading>
-          <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
-        </uib-accordion-group>
-      </uib-accordion>
-    </div>
+          </span>
+        </uib-accordion-heading>
+        <div class="button-div">
+          <div class="row pad-top-10 normal-text">
+            <div class="col-sm-3 pad-bot-10">
+              <label translate>analysis.modelToBaseInputsOn</label>
+            </div>
+            <div class="col-sm-5 pad-bot-10 pad-top-5">
+              <div class="input-group">
+                <select class="form-control inline form-control-smaller-width"
+                        ng-options="seed as seed for seed in seeds" ng-model="measure.seed"
+                        ng-change="analysis.computeMeasureArguments(measure)"></select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-div">
+          <div class="row normal-text">
+            <div class="col-sm-3 pad-bot-10">
+              <div class="input-group">
+                <checkbox ng-model="measure.skip" id="{{measure.$$hashKey}}" class="btn-success" ng-change="analysis.setIsModified()"></checkbox>&nbsp;
+                <label for="{{measure.$$hashKey}}">
+                  <translate>analysis.algorithmic.skipThisMeasure</translate>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="container full-width">
+          <div class="row pad-bot-10 normal-text">
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.name</translate>
+            </div>
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.shortName</translate>
+            </div>
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.variableSettings</translate>
+            </div>
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.staticDefault</translate>
+            </div>
+            <div class="col-sm-4 bold">
+              <translate>analysis.algorithmic.grid.measureInputs</translate>
+            </div>
+          </div>
+          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length"
+               ng-repeat="argument in measure.arguments">
+            <div class="col-sm-2 normal-text pad-top-25">
+              {{argument.display_name}}
+            </div>
+
+            <div class="col-sm-2 pad-top-25">
+              <input class="form-control" type="text" ng-model="argument.display_name_short"
+                     ng-mouseover="argument.display_name_short" ng-change="analysis.setIsModified()">
+            </div>
+
+            <div class="col-sm-2 pad-top-25">
+              <div class="row">
+                <div class="col-sm-9">
+                  <select class="form-control"
+                          ng-options="variableSetting as variableSetting for variableSetting in getVariableSettings(argument)"
+                          ng-model="argument.inputs.variableSetting"
+                          ng-change="analysis.setIsModified(); analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
+                </div>
+                <div class="col-sm-3 pad-top-5">
+                  <span ng-show="argument.inputs.showWarningIcon"
+                        class="glyphicon glyphicon-alert red-button normal-text"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-2 pad-top-25">
+              <select class="form-control"
+                      ng-options="name as name for name in argument.choice_display_names"
+                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
+                     ng-if="argument.type == 'String'">
+
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
+                     ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+              <span ng-if="argument.type == 'Boolean'">
+                <checkbox ng-model="argument.inputs.default_value"></checkbox>
+              </span>
+
+            </div>
+
+            <!-- continuous (double only)-->
+            <div class="col-sm-4" ng-if="argument.inputs.variableSetting == 'Continuous'">
+              <div class="row pad-bot-10">
+                <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDistributions(argument)"
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.minimum</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.maximum</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.mean</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.mean" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.stdDev</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showDeltaX">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.deltaX</label>
+                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01" ng-change="analysis.setIsModified()">
+                </div>
+              </div>
+            </div>
+
+            <!-- discrete & pivot-->
+            <div class="col-sm-4"
+                 ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
+              <div class="row"
+                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"
+                <!-- pivots only -->
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
+                </div>
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
+                </div>
+              </div>
+
+              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.relationToEUI</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                </div>
+              </div>
+              <div class="row pad-bot-10" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
+                  <select class="form-control"
+                          ng-options="relationship as relationship for relationship in relationships"
+                          ng-model="argument.inputs.relationship" ng-change="analysis.setIsModified()"></select>
+                </div>
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'String'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
+                  <select class="form-control"
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+
+                </div>
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'String'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
+                  <select class="form-control"
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="row"
+                       ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
+                    <div class="col-sm-6">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.value</label>
+                    </div>
+                    <div class="col-sm-5" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
+                    </div>
+                  </div>
+                  <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                    <div class="row pad-bot-10">
+                      <div class="col-sm-6">
+                        <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                          <input class="form-control" type="number" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
+                        </div>
+                        <div ng-if="argument.type == 'String'">
+                          <input class="form-control" type="text" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
+                        </div>
+                        <div ng-if="argument.type == 'Boolean'">
+                          <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
+                        </div>
+                        <div ng-if="argument.type == 'Choice'">
+                          <select class="form-control"
+                                  ng-options="value as value for value in argument.inputs.choice_display_names"
+                                  ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
+                        </div>
+                      </div>
+                      <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                        <input class="form-control" type="number" min="0" max="1" step="0.1" ng-change="analysis.setIsModified()"
+                               ng-model="discreteVariable.weight">
+                      </div>
+                      <div class="col-sm-2 pad-top-5">
+                        <span class="glyphicon glyphicon-remove-sign black-button header-text"
+                              ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
+                              aria-label="Delete Value"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
+                      <button type="button" class="btn btn-success"
+                              ng-click="analysis.addDiscreteVariable(argument)"><span
+                        class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div ng-show="measure.showWarningText" class="normal-text pad-top-10 pad-bot-10">
+            <span class="glyphicon glyphicon-alert red-button"></span>&nbsp;<span>{{'analysis.algorithmic.warning' | translate}}</span>
+          </div>
+        </div>
+      </uib-accordion-group>
+    </uib-accordion>
   </div>
 </div>
+
 <hr class="black-line">
 <div class="row">
   <div class="col-sm-12">
     <h5 class="inline measure-type" translate>analysis.energyplusMeasures</h5>
-    <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('EnergyPlusMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <translate>analysis.addMeasure</translate></button>
+    <span class="badge badge-info margin-left-5 margin-right-5"
+          title="{{'analysis.helpEnergyPlusMeasures' | translate}}">&nbsp;?&nbsp;</span>
+    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('EnergyPlusMeasure')"><span
+      class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+      <translate>analysis.addMeasure</translate>
+    </button>
   </div>
 </div>
 <div class="analysis-custom">
-  <div class="panel panel-default full-width margin-top-20">
-    <div class="analysis-custom panel-body">
-      <uib-accordion close-others="false">
-        <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
-          <uib-accordion-heading>
-            <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
-            {{measure.display_name}}
-            <span class="pull-right">
-              <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation(); analysis.removeMeasure(measure);">
-                <span class="glyphicon glyphicon-remove"></span>
-              </span>
+  <div class="full-width margin-top-20">
+    <uib-accordion close-others="false">
+      <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.instanceId}}"
+                           is-open="measure.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button"
+             ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
+          {{measure.display_name}}
+          <span class="pull-right">
+            <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button"
+                  ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
+            <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button"
+                  ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
+            <span class="badge black-button margin-left-5 margin-right-5"
+                  ng-click="$event.preventDefault(); $event.stopPropagation(); analysis.removeMeasure(measure);">
+              <span class="glyphicon glyphicon-remove"></span>
             </span>
-          </uib-accordion-heading>
-          <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
-        </uib-accordion-group>
-      </uib-accordion>
-    </div>
+          </span>
+        </uib-accordion-heading>
+        <div class="button-div">
+          <div class="row pad-top-10 normal-text">
+            <div class="col-sm-3 pad-bot-10">
+              <label translate>analysis.modelToBaseInputsOn</label>
+            </div>
+            <div class="col-sm-5 pad-bot-10 pad-top-5">
+              <div class="input-group">
+                <select class="form-control inline form-control-smaller-width"
+                        ng-options="seed as seed for seed in seeds" ng-model="measure.seed"
+                        ng-change="analysis.computeMeasureArguments(measure)"></select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-div">
+          <div class="row normal-text">
+            <div class="col-sm-3 pad-bot-10">
+              <div class="input-group">
+                <checkbox ng-model="measure.skip" id="{{measure.$$hashKey}}" class="btn-success" ng-change="analysis.setIsModified()"></checkbox>&nbsp;
+                <label for="{{measure.$$hashKey}}">
+                  <translate>analysis.algorithmic.skipThisMeasure</translate>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="container full-width">
+          <div class="row pad-bot-10 normal-text">
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.name</translate>
+            </div>
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.shortName</translate>
+            </div>
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.variableSettings</translate>
+            </div>
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.staticDefault</translate>
+            </div>
+            <div class="col-sm-4 bold">
+              <translate>analysis.algorithmic.grid.measureInputs</translate>
+            </div>
+          </div>
+          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length"
+               ng-repeat="argument in measure.arguments">
+            <div class="col-sm-2 normal-text pad-top-25">
+              {{argument.display_name}}
+            </div>
+
+            <div class="col-sm-2 pad-top-25">
+              <input class="form-control" type="text" ng-model="argument.display_name_short"
+                     ng-mouseover="argument.display_name_short" ng-change="analysis.setIsModified()">
+            </div>
+
+            <div class="col-sm-2 pad-top-25">
+              <div class="row">
+                <div class="col-sm-9">
+                  <select class="form-control"
+                          ng-options="variableSetting as variableSetting for variableSetting in getVariableSettings(argument)"
+                          ng-model="argument.inputs.variableSetting"
+                          ng-change="analysis.setIsModified(); analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
+                </div>
+                <div class="col-sm-3 pad-top-5">
+                  <span ng-show="argument.inputs.showWarningIcon"
+                        class="glyphicon glyphicon-alert red-button normal-text"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-2 pad-top-25">
+              <select class="form-control"
+                      ng-options="name as name for name in argument.choice_display_names"
+                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
+                     ng-if="argument.type == 'String'">
+
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
+                     ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+              <span ng-if="argument.type == 'Boolean'">
+                <checkbox ng-model="argument.inputs.default_value"></checkbox>
+              </span>
+
+            </div>
+
+            <!-- continuous (double only)-->
+            <div class="col-sm-4" ng-if="argument.inputs.variableSetting == 'Continuous'">
+              <div class="row pad-bot-10">
+                <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDistributions(argument)"
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.minimum</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.maximum</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.mean</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.mean" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.stdDev</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showDeltaX">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.deltaX</label>
+                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01" ng-change="analysis.setIsModified()">
+                </div>
+              </div>
+            </div>
+
+            <!-- discrete & pivot-->
+            <div class="col-sm-4"
+                 ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
+              <div class="row"
+                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"
+                <!-- pivots only -->
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
+                </div>
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
+                </div>
+              </div>
+
+              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.relationToEUI</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                </div>
+              </div>
+              <div class="row pad-bot-10" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
+                  <select class="form-control"
+                          ng-options="relationship as relationship for relationship in relationships"
+                          ng-model="argument.inputs.relationship" ng-change="analysis.setIsModified()"></select>
+                </div>
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'String'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
+                  <select class="form-control"
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+
+                </div>
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'String'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
+                  <select class="form-control"
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="row"
+                       ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
+                    <div class="col-sm-6">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.value</label>
+                    </div>
+                    <div class="col-sm-5" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
+                    </div>
+                  </div>
+                  <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                    <div class="row pad-bot-10">
+                      <div class="col-sm-6">
+                        <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                          <input class="form-control" type="number" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
+                        </div>
+                        <div ng-if="argument.type == 'String'">
+                          <input class="form-control" type="text" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
+                        </div>
+                        <div ng-if="argument.type == 'Boolean'">
+                          <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
+                        </div>
+                        <div ng-if="argument.type == 'Choice'">
+                          <select class="form-control"
+                                  ng-options="value as value for value in argument.inputs.choice_display_names"
+                                  ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
+                        </div>
+                      </div>
+                      <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                        <input class="form-control" type="number" min="0" max="1" step="0.1" ng-change="analysis.setIsModified()"
+                               ng-model="discreteVariable.weight">
+                      </div>
+                      <div class="col-sm-2 pad-top-5">
+                        <span class="glyphicon glyphicon-remove-sign black-button header-text"
+                              ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
+                              aria-label="Delete Value"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
+                      <button type="button" class="btn btn-success"
+                              ng-click="analysis.addDiscreteVariable(argument)"><span
+                        class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div ng-show="measure.showWarningText" class="normal-text pad-top-10 pad-bot-10">
+            <span class="glyphicon glyphicon-alert red-button"></span>&nbsp;<span>{{'analysis.algorithmic.warning' | translate}}</span>
+          </div>
+        </div>
+      </uib-accordion-group>
+    </uib-accordion>
   </div>
 </div>
 
@@ -82,27 +714,275 @@
 <div class="row">
   <div class="col-sm-12">
     <h5 class="inline measure-type" translate>analysis.reportingMeasures</h5>
-    <span class="badge badge-info margin-left-5 margin-right-5">&nbsp;?&nbsp;</span>
-    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ReportingMeasure')"><span class="glyphicon glyphicon-plus" aria-hidden="true"></span> <translate>analysis.addMeasure</translate></button>
+    <span class="badge badge-info margin-left-5 margin-right-5"
+          title="{{'analysis.helpReportingMeasures' | translate}}">&nbsp;?&nbsp;</span>
+    <button type="button" class="btn btn-success" ng-click="analysis.addMeasure('ReportingMeasure')"><span
+      class="glyphicon glyphicon-plus" aria-hidden="true"></span>
+      <translate>analysis.addMeasure</translate>
+    </button>
   </div>
 </div>
 <div class="analysis-custom">
-  <div class="panel panel-default full-width margin-top-20">
-    <div class="analysis-custom panel-body">
-      <uib-accordion close-others="false">
-        <uib-accordion-group ng-repeat="measure in repMeasures" class="analysis-custom" id="{{measure.uid}}" is-open="measure.open">
-          <uib-accordion-heading>
-            <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
-            {{measure.display_name}}
-            <span class="pull-right">
-              <span class="badge black-button margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();analysis.removeMeasure(measure);">
-                <span class="glyphicon glyphicon-remove"></span>
-              </span>
+  <div class="full-width margin-top-20">
+    <uib-accordion close-others="false">
+      <uib-accordion-group ng-repeat="measure in repMeasures" class="analysis-custom" id="{{measure.instanceId}}"
+                           is-open="measure.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button"
+             ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
+          {{measure.display_name}}
+          <span class="pull-right">
+            <span ng-if="!$first" class="glyphicon glyphicon-arrow-up black-button"
+                  ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'up');"></span>
+            <span ng-if="!$last" class="glyphicon glyphicon-arrow-down black-button"
+                  ng-click="$event.preventDefault(); $event.stopPropagation();analysis.reorderMeasure(measure, 'down');"></span>
+            <span class="badge black-button margin-left-5 margin-right-5"
+                  ng-click="$event.preventDefault(); $event.stopPropagation(); analysis.removeMeasure(measure);">
+              <span class="glyphicon glyphicon-remove"></span>
             </span>
-          </uib-accordion-heading>
-          <div ng-attr-id="{{'grid_' + measure.uid}}" ui-grid="gridOptions[measure.uid]" ui-grid-edit ui-grid-cellnav class="grid"></div>
-        </uib-accordion-group>
-      </uib-accordion>
-    </div>
+          </span>
+        </uib-accordion-heading>
+        <div class="button-div">
+          <div class="row pad-top-10 normal-text">
+            <div class="col-sm-3 pad-bot-10">
+              <label translate>analysis.modelToBaseInputsOn</label>
+            </div>
+            <div class="col-sm-5 pad-bot-10 pad-top-5">
+              <div class="input-group">
+                <select class="form-control inline form-control-smaller-width"
+                        ng-options="seed as seed for seed in seeds" ng-model="measure.seed"
+                        ng-change="analysis.computeMeasureArguments(measure)"></select>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-div">
+          <div class="row normal-text">
+            <div class="col-sm-3 pad-bot-10">
+              <div class="input-group">
+                <checkbox ng-model="measure.skip" id="{{measure.$$hashKey}}" class="btn-success" ng-change="analysis.setIsModified()"></checkbox>&nbsp;
+                <label for="{{measure.$$hashKey}}">
+                  <translate>analysis.algorithmic.skipThisMeasure</translate>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="container full-width">
+          <div class="row pad-bot-10 normal-text">
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.name</translate>
+            </div>
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.shortName</translate>
+            </div>
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.variableSettings</translate>
+            </div>
+            <div class="col-sm-2 bold">
+              <translate>analysis.algorithmic.grid.staticDefault</translate>
+            </div>
+            <div class="col-sm-4 bold">
+              <translate>analysis.algorithmic.grid.measureInputs</translate>
+            </div>
+          </div>
+          <div class="row border-bot pad-top-10 pad-bot-10" ng-if="argument.display_name.length"
+               ng-repeat="argument in measure.arguments">
+            <div class="col-sm-2 normal-text pad-top-25">
+              {{argument.display_name}}
+            </div>
+
+            <div class="col-sm-2 pad-top-25">
+              <input class="form-control" type="text" ng-model="argument.display_name_short"
+                     ng-mouseover="argument.display_name_short" ng-change="analysis.setIsModified()">
+            </div>
+
+            <div class="col-sm-2 pad-top-25">
+              <div class="row">
+                <div class="col-sm-9">
+                  <select class="form-control"
+                          ng-options="variableSetting as variableSetting for variableSetting in getVariableSettings(argument)"
+                          ng-model="argument.inputs.variableSetting"
+                          ng-change="analysis.setIsModified(); analysis.showWarningIcon(argument); analysis.showWarningText(measure)"></select>
+                </div>
+                <div class="col-sm-3 pad-top-5">
+                  <span ng-show="argument.inputs.showWarningIcon"
+                        class="glyphicon glyphicon-alert red-button normal-text"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-2 pad-top-25">
+              <select class="form-control"
+                      ng-options="name as name for name in argument.choice_display_names"
+                      ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+              <input class="form-control" type="text" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
+                     ng-if="argument.type == 'String'">
+
+              <input class="form-control" type="number" ng-model="argument.inputs.default_value" ng-change="analysis.setIsModified()"
+                     ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+              <span ng-if="argument.type == 'Boolean'">
+                <checkbox ng-model="argument.inputs.default_value"></checkbox>
+              </span>
+
+            </div>
+
+            <!-- continuous (double only)-->
+            <div class="col-sm-4" ng-if="argument.inputs.variableSetting == 'Continuous'">
+              <div class="row pad-bot-10">
+                <div class="col-sm-4" ng-show="analysis.$scope.showDistributions">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDistributions(argument)"
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.minimum</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.maximum</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-4" ng-show="argument.inputs.distribution != 'Uniform'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.mean</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.mean" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.stdDev</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.stdDev" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4" ng-show="analysis.$scope.showDeltaX">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.deltaX</label>
+                  <input class="form-control" type="text" ng-model="argument.inputs.deltaX" step="0.01" ng-change="analysis.setIsModified()">
+                </div>
+              </div>
+            </div>
+
+            <!-- discrete & pivot-->
+            <div class="col-sm-4"
+                 ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
+              <div class="row"
+                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"
+                <!-- pivots only -->
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
+                  <select class="form-control"
+                          ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
+                          ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
+                </div>
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()">
+                </div>
+                <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()">
+                </div>
+              </div>
+
+              <div class="row" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.relationToEUI</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.min</label>
+                </div>
+                <div class="col-sm-4">
+                  <label class="normal-text" translate>analysis.algorithmic.grid.max</label>
+                </div>
+              </div>
+              <div class="row pad-bot-10" ng-show="analysis.$scope.showMinAndMax">
+                <div class="col-sm-4">
+                  <select class="form-control"
+                          ng-options="relationship as relationship for relationship in relationships"
+                          ng-model="argument.inputs.relationship" ng-change="analysis.setIsModified()"></select>
+                </div>
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'String'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.minimum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
+                  <select class="form-control"
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+
+                </div>
+                <div class="col-sm-4">
+                  <input class="form-control" type="number" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'Double' || argument.type == 'Integer'">
+                  <input class="form-control" type="text" ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"
+                         ng-if="argument.type == 'String'">
+                  <span ng-if="argument.type == 'Boolean'">
+                    <checkbox ng-model="argument.inputs.maximum" ng-change="analysis.setIsModified()"></checkbox>
+                  </span>
+                  <select class="form-control"
+                          ng-options="choice for choice in argument.choice_display_names"
+                          ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'" ng-change="analysis.setIsModified()"></select>
+                </div>
+              </div>
+              <div class="row">
+                <div class="col-sm-12">
+                  <div class="row"
+                       ng-if="argument.inputs.discreteVariables.length > 0 && argument.inputs.distribution != 'Integer Sequence'">
+                    <div class="col-sm-6">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.value</label>
+                    </div>
+                    <div class="col-sm-5" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                      <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
+                    </div>
+                  </div>
+                  <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                    <div class="row pad-bot-10">
+                      <div class="col-sm-6">
+                        <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                          <input class="form-control" type="number" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
+                        </div>
+                        <div ng-if="argument.type == 'String'">
+                          <input class="form-control" type="text" ng-model="discreteVariable.value" ng-change="analysis.setIsModified()">
+                        </div>
+                        <div ng-if="argument.type == 'Boolean'">
+                          <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
+                        </div>
+                        <div ng-if="argument.type == 'Choice'">
+                          <select class="form-control"
+                                  ng-options="value as value for value in argument.inputs.choice_display_names"
+                                  ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
+                        </div>
+                      </div>
+                      <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                        <input class="form-control" type="number" min="0" max="1" step="0.1" ng-change="analysis.setIsModified()"
+                               ng-model="discreteVariable.weight">
+                      </div>
+                      <div class="col-sm-2 pad-top-5">
+                        <span class="glyphicon glyphicon-remove-sign black-button header-text"
+                              ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
+                              aria-label="Delete Value"></span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="row">
+                    <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
+                      <button type="button" class="btn btn-success"
+                              ng-click="analysis.addDiscreteVariable(argument)"><span
+                        class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div ng-show="measure.showWarningText" class="normal-text pad-top-10 pad-bot-10">
+            <span class="glyphicon glyphicon-alert red-button"></span>&nbsp;<span>{{'analysis.algorithmic.warning' | translate}}</span>
+          </div>
+        </div>
+      </uib-accordion-group>
+    </uib-accordion>
   </div>
 </div>

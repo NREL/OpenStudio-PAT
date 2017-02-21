@@ -201,6 +201,10 @@ select {
   font-weight: bold;
 }
 
+.margin-bot-5 {
+  margin-bottom: 5px;
+}
+
 .pad-bot-20 {
   padding-bottom: 20px;
 }
@@ -211,6 +215,9 @@ select {
 
 .pad-top-20 {
   padding-top: 20px;
+}
+.pad-top-25 {
+  padding-top: 25px;
 }
 
 .pad-top-5 {
@@ -318,13 +325,12 @@ select {
 }
 
 .bcl-p {
-  font-size: 1.3em;
+  font-size: 14px;
 }
 
 .lib-grid {
-  /*font-size: 0.8em;*/
   height:940px;
-  font-size:1.4em;
+  font-size:13px;
 }
 
 .lib-details {
@@ -345,6 +351,17 @@ select {
   height: 700px;
   font-size: 12px;
 }
+
+/* this wraps text on ui-grid headers. */
+.ui-grid-header-cell-label {
+  display:inline-block;
+  white-space:initial;
+}
+
+.ui-grid-category {
+  text-align: center;border-right: 0px;box-shadow: -1px 1px #d4d4d4
+}
+
 /* TODO: Something is wrong, fix this later */
 .input-group > select + .input-group-btn > button {
   height: 34px;
@@ -383,6 +400,10 @@ select {
   font-size: 14px;
 }
 
+.header-text {
+  font-size: 18px;
+}
+
 .icon-cell {
   text-align: center;
   padding: 3px 5px;
@@ -416,6 +437,10 @@ select {
   color: #D6D6D6;
 }
 
+.status-text {
+  font-size: 16px;
+}
+
 .view-report-button {
   color: #333;
   background-color: #e6e6e6;
@@ -424,14 +449,27 @@ select {
 
 }
 
+.credentials {
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
 .small-text {
-  font-size:0.8em;
+  font-size:12px;
   font-weight:normal;
 }
 
 .normal-text {
   font-size:14px;
   font-weight:normal;
+}
+
+.big-text {
+  font-size:18px;
+}
+
+.toastr-text {
+  font-size: 14px;
 }
 
 .black-button {
@@ -485,6 +523,12 @@ select {
 
 .library-grid-pencil {
   padding-right: 6px;
+}
+
+.wrap-text {
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  word-break: break-all;
 }
 
 
@@ -552,13 +596,13 @@ select {
 }
 
 .big-label {
-  font-size: 2em;
+  font-size: 20px;
   display: inline;
   padding-right: 20px;
 }
 
 .medium-label {
-  font-size: 1.4em;
+  font-size: 14px;
 }
 
 .run-label {
@@ -581,6 +625,10 @@ select {
 
 .inline {
   display: inline;
+}
+
+.display-block {
+  display: block;
 }
 
 h5.measure-type {
@@ -621,6 +669,18 @@ h5.measure-type {
   border-top: 1px solid #e9e9e9;
   margin-bottom:10px;
   padding:10px 0px;
+}
+
+.border-bot {
+  border-bottom: 1px solid #e9e9e9;
+}
+
+.width-80 {
+  width:80%;
+}
+
+.width-95 {
+  width:95%;
 }
 
 .run-datapoints {

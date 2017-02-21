@@ -25,9 +25,9 @@ export default {
   },
   serverTools: {
     title: 'Server Troubleshooting Tools',
-    start: 'Force Start Local Server',
-    stop: 'Force Stop Local Server',
-    ping: 'Ping Current Server and Set Status',
+    start: 'Start Local Server',
+    stop: 'Stop Local Server',
+    ping: 'Ping Server and Set Status',
     noProject: 'You must open a project first'
   },
   setMeasuresDir: {
@@ -40,11 +40,11 @@ export default {
     blurb: 'This will be the name of the directory containing your project. In the next step, you will choose the location for your new project folder.'
   },
   analysis: {
-    title: 'Contr�leur d\'Analyse',
+    title: 'Analysis',
     projectName: 'Project Name',
     addMeasure: 'Add Measure',
     addMeasureOption: 'Add Measure Option',
-    checkAll: 'Check All',
+    checkAll: 'Check to make all arguments variable',
     checkForUpdates: 'Check for Updates',
     columns: {
       argumentName: 'Argument Name',
@@ -62,8 +62,13 @@ export default {
     openstudioMeasures: 'OpenStudio Measures',
     reportingMeasures: 'Reporting Measures',
     samplingMethod: 'Sampling Method',
+    helpAnalysis: 'In Manual mode, users create Measure Options and set up different Design Alternatives by hand.  In Algorithmic mode, users specify ranges for each Measure Argument.  The Sampling Method that is selected will automatically create a series of Design Alternatives for the user.  Manual mode is most useful for  targeted analysis.  Algorithmic mode is most useful when the user wants to explore a large number of designs or wants to optimize for a certain outcome.',
+    helpProjectyMeasuresAndOptions: 'A Measure is a script that is used to modify an energy model or create a report about the model.  Measures can be downloaded from the Building Component Library (BCL) or written by the user.',
+    helpOpenStudioMeasures: 'An OpenStudio Measure is a script that modifies the OpenStudio model (.osm file).',
+    helpEnergyPlusMeasures: 'An EnergyPlus Measure is a script that modifies the EnergyPlus model (.idf file).  This happens after the OpenStudio model (.osm) is translated to EnergyPlus format (.idf).  EnergyPlus Measures are typically used to add objects that are not yet supported by OpenStudio to the input file.',
+    helpReportingMeasures: 'A Reporting Measure is a script that creates a report describing some aspect of the or the simulation results.  These Measures have access to the OpenStudio model, the EnergyPlus IDF, and the simulation results.',
     type: {
-      batchRun: 'BatchRun',
+      diagonal: 'Diagonal',
       nsga2: 'Nondominated Sorting Genetic Algorithm 2',
       spea2: 'Strength Pareto Evolutionary Algorithm 2',
       pso: 'Particle Swarm',
@@ -78,10 +83,51 @@ export default {
       baselinePerturbation: 'BaselinePerturbation'
     },
     algorithmic: {
-      algorithmSetting: 'Algorithm Setting'
+      algorithmSetting: 'Algorithm Settings',
+      skipThisMeasure: 'Skip this measure',
+      filesToIncludeMessage: 'If your analysis requires additional files to be uploaded to the server, list each directory to include along with the name of the folder to extract to on the server, below.',
+      filesToInclude: 'Additional Analysis Files',
+      dirToInclude: 'Directory to Include',
+      selectDir: 'Select Directory',
+      addDir: 'Add Directory',
+      dirToUnpackTo: 'Directory Name to Unpack to on Server',
+      server_initialization: 'Server Initialization Script',
+      server_finalization: 'Server Finalization Script',
+      worker_initialization: 'Worker Initialization Script',
+      worker_finalization: 'Worker Finalization Script',
+      selectScript: 'Select Script File',
+      args: 'Script Arguments',
+      addArg: 'Add Argument',
+      serverScripts: 'Server Scripts',
+      serverScriptsMessage: 'If your analysis requires server and worker initialization or finalization scripts, add them here.  Note that these scripts will not run on a local server; they can only be run on a cloud server.',
+      warning: 'The selected variable setting is invalid for this algorithm.  The variable will be treated as a static argument when running the simulation.',
+      grid: {
+        max: 'Max',
+        min: 'Min',
+        maximum: 'maximum',
+        measureInputs: 'Measure Inputs',
+        minimum: 'minimum',
+        mean: 'mean',
+        name: 'Name',
+        shortName: ' Short Name',
+        stdDev: 'stdDev',
+        deltaX: 'Delta X',
+        distribution: 'distribution',
+        relationToEUI: 'Relation to EUI',
+        staticDefault: 'Static/Default',
+        value: 'Value',
+        variableSettings: 'Variable Settings',
+        weight: 'Weight'
+      }
     },
     manual: {
-      projectMeasuresAndOptions: 'Project Measures and Options'
+      projectMeasuresAndOptions: 'Project Measures and Options',
+      modalSelectOptions: {
+        title: 'Select Options',
+        message: 'Select which options you would like to duplicate in this measure.',
+        selectAll: 'Select All',
+        deselectAll: 'Deselect All'
+      }
     }
   },
   bcl: {
@@ -199,11 +245,35 @@ export default {
     },
     createOneDesignAlternative: 'Create One Design Alternative with Each Measure Option',
     duplicateAlternative: 'Duplicate Alternative',
-    noAlternativesInAlgorithmic: 'There are no design alternatives to set for an Algorithmic Analysis.'
+    noAlternativesInAlgorithmic: 'For an Algorithmic Analysis, Design Alternatives are created automatically.',
+    helpDesignAlternatives: 'A Design Alternative is a single simulation run.  Each Design Altenative can have one or more Measure Options applied to it.  In Manual mode, Design Alternatives are created by the user.   In Algorithmic mode, the Sampling Method creates the Design Alternatives automatically.'
   },
   outputs: {
     title: 'Outputs',
-    noOutputsInManual: 'There are no outputs to set in Manual mode.'
+    noOutputsInManual: 'There are no outputs to set in Manual mode.',
+    addAnotherMeasure: 'Add Measure',
+    modalSelectOutputs: {
+      title: 'Select Outputs',
+      message: 'Select which outputs you would like to add to your analysis.',
+      selectAll: 'Select All',
+      deselectAll: 'Deselect All',
+      addOutput: 'Add Output',
+      newOutputs: 'If the output you want is not listed above, you can enter additional outputs below.  Enter the \'display name\' of the output.  The unique name will be created automatically from the measure name and the output display name.',
+      helpOutputs: 'Outputs are pieces of information that are created for every Design Alternative.  In Manual mode, outputs are not set.  In Algorithmic mode, some Sampling Methods (such as optimization) require an objective function (for example, minimize annual energy consumption).  In this case, the outputs are used to describe the objective function.'
+    },
+    selectOutputs: 'Select Outputs',
+    addMeasure: 'Select measure to add more outputs',
+    columns: {
+      displayName: 'Display Name',
+      shortName: 'Short Name',
+      variableType: 'Variable Type',
+      visualize: 'Visualize',
+      objectiveFunction: 'Objective Function',
+      targetValue: 'Target Value',
+      units: 'Units',
+      weightingFactor: 'Weighting Factor',
+      objectiveFunctionGroup: 'Objective Function Group'
+    }
   },
   reports: {
     title: 'Reports',
@@ -213,7 +283,8 @@ export default {
       radarChart: 'Radar Chart',
       radianceReport: 'Radiance Report',
       edaptExport: 'EDAPT Export'
-    }
+    },
+    helpReports: 'Reports present information from the Design Alternatives.  Some reports make more sense in Manual mode, while others make more sense in Algorithmic model.  Some reports require the user to include specific Reporting Measures (on the Project Measures and Options tab) to function correctly.'
   },
   run: {
     title: 'Run',
@@ -221,6 +292,8 @@ export default {
     stopServer: 'Stop Server',
     exportToOSA: 'Export to OSA',
     runEntireWorkflow: 'Run Entire Workflow',
+    algorithmicOnCloud: 'Algorithmic analyses cannot be run locally.  Select \'Run on Cloud\' from the dropdown above to run this analysis remotely.',
+    viewServer: 'View Server',
     modalAnalysisRunning: {
       title: 'Analysis is Running',
       message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'
@@ -230,8 +303,64 @@ export default {
       rerunAnalysisMessage: 'Running a new analysis will delete your local results. Are you sure you want to continue?',
       setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?'
     },
+    modalCloudRunning: {
+      title: 'Cloud Cluster is Running',
+      message: 'You are still connected to AWS. Terminate the cluster?',
+      terminate: 'Terminate',
+      keep: 'Keep Cluster Running'
+    },
     viewReport: 'View Report',
-    'for': 'for'
+    'for': 'for',
+    remote: {
+      osServerVersion: 'AMI Name',
+      osVersion: 'OpenStudio Version',
+      standardsRef: 'Standards Ref',
+      connect: 'Connect',
+      terminate: 'Terminate',
+      disconnect: 'Disconnect',
+      start: 'Start',
+      serverURL: 'Existing Server URL',
+      serverType: 'Remote Server Type',
+      serverSettings: 'Remote Server Settings',
+      serverInstanceNote: 'Note: The server requires 4 nodes for non-worker processes',
+      serverInstanceType: 'Server Instance Type',
+      workerInstanceType: 'Worker Instance Type',
+      awsCredentials: 'AWS Credentials',
+      selectAws: 'Select AWS credentials to use',
+      newAwsCredentials: 'New',
+      awsAccessKey: 'Access Key',
+      awsRegion: 'Region',
+      cpus: 'CPUs',
+      cost: 'Cost',
+      memory: 'Memory',
+      storage: 'Storage',
+      numberOfWorkers: 'Number of Workers',
+      clusterText: 'Select a cluster or make a new one',
+      selectCluster: 'Clusters',
+      runningClusters: 'Running clusters',
+      or: 'or',
+      newCluster: 'New Cluster',
+      newClusterName: 'New Cluster Name',
+      awsUserID: 'AWS UserID',
+      saveCluster: 'Save Cluster Settings',
+      status: 'Cluster Status',
+      viewAws: 'View AWS Console',
+      awsServerDetails: 'AWS Server Details',
+      serverPrivateKey: 'Server Private Key File',
+      workerPrivateKey: 'Workers Private Key File',
+      serverDNS: 'Server DNS',
+      workerDNS: 'Workers DNS'
+    },
+    modalNewCluster: {
+      title: 'New Cluster',
+      name: 'Cluster Name'
+    },
+    modalNewAwsCredentials: {
+      title: 'New AWS Credentials',
+      name: 'Name',
+      accessKey: 'Access Key',
+      secretKey: 'Secret Key'
+    }
   },
   statusBar: {
     Downloading: 'Downloading',
@@ -242,7 +371,7 @@ export default {
     Extracting: 'Extracting'
   },
   Algorithmic: 'Algorithmic',
-  Cancel: 'Annuler',
+  Cancel: 'Cancel',
   Continue: 'Continue',
   Manual: 'Manual',
   OK: 'OK',

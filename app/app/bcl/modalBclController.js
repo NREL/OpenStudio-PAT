@@ -5,7 +5,7 @@ const {shell} = remote;
 
 export class ModalBclController {
 
-  constructor($log, $q, $uibModalInstance, $uibModal, uiGridConstants, $scope, toastr, BCL, params, Project, MeasureManager) {
+  constructor($log, $q, $uibModalInstance, $timeout, $uibModal, uiGridConstants, $scope, toastr, BCL, params, Project, MeasureManager) {
     'ngInject';
 
     const vm = this;
@@ -14,6 +14,7 @@ export class ModalBclController {
     vm.$log = $log;
     vm.$q = $q;
     vm.$uibModal = $uibModal;
+    vm.$timeout = $timeout;
     vm.$scope = $scope;
     vm.BCL = BCL;
     vm.Project = Project;
@@ -27,6 +28,7 @@ export class ModalBclController {
     vm.keyword = '';
 
     vm.$scope.addingInProgress = false;
+    vm.$scope.downloadInProgress = false;
 
     vm.projectDir = vm.Project.getProjectMeasuresDir();
 
@@ -461,6 +463,9 @@ export class ModalBclController {
   download(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
+    // prevent user from closing modal
+    vm.$scope.downloadInProgress = true;
+    vm.toastr.info('Downloading measure from the BCL...');
     vm.BCL.downloadBCLMeasure(measure).then(newMeasure => {
       vm.$log.debug('In modal download()');
       vm.$log.debug('Local Measures: ', vm.libMeasures.local);
@@ -468,8 +473,13 @@ export class ModalBclController {
       vm.resetFilters();
       // select newly added row
       vm.selectARow(measure.uid);
+      vm.$scope.downloadInProgress = false;
+      vm.toastr.success('Measure Downloaded!');
       deferred.resolve();
+
     }, () => {
+      vm.$scope.downloadInProgress = false;
+      vm.toastr.error('Measure Download Error');
       deferred.reject();
     });
 
@@ -482,6 +492,10 @@ export class ModalBclController {
     const index = _.findIndex(vm.$scope.displayMeasures, {uid: uid});
     vm.gridApi.grid.modifyRows(vm.$scope.displayMeasures);
     vm.gridApi.selection.selectRow(vm.$scope.displayMeasures[index]);
+    // scroll to row
+    vm.$timeout(function() {
+      vm.gridApi.cellNav.scrollToFocus(vm.$scope.displayMeasures[index], vm.libraryGridOptions.columnDefs[0]);
+    });
   }
 
   // edit My measure
@@ -555,8 +569,9 @@ export class ModalBclController {
       // success
       // vm.$log.debug('New computed measure: ', newMeasure);
       // merge project measure in array to preserve prepareMeasure arguments and already-set arguments
-      const project_measure = _.find(vm.projectMeasures, {uid: measure.uid});
+      const project_measure = _.find(vm.projectMeasures, {instanceId: measure.instanceId});
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
+      // TODO project_measure can now be more than just 1 and must be iterated over (Evan)
       _.forEachRight(project_measure.arguments, (arg, index) => {
         if (_.isUndefined(arg.specialRowId)) {
           const match = _.find(measure.arguments, {name: arg.name});

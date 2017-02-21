@@ -2,58 +2,36 @@
   <div class="col-sm-1 pad-bot-10">
     <h4 translate>run.title</h4>
   </div>
-  <div class="col-sm-2 pad-bot-20 pad-top-5">
-    <div class="input-group">
-      <select class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-change="run.warnBeforeDelete('runtype')"></select>
+  <div class="col-sm-2 pad-bot-20 pad-top-5 align-middle">
+    <select id="runType" class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-disabled="analysisStatus == 'starting' || analysisStatus == 'in progress'" ng-change="run.warnCloudRunning('runtype', '{{selectedRunType}}')"></select>
+  </div>
+  <div ng-if="selectedRunType.name == 'local'" class="inline">
+    <div class="col-sm-5 pad-bot-20 pad-top-10 align-middle">
+      <div class="tab-text">Server Status&nbsp;
+        <span ng-show="serverStatuses[selectedRunType.name]=='started'" class="glyphicon glyphicon-ok green-button" aria-label="started"></span>
+        <span ng-show="serverStatuses[selectedRunType.name]!='started'" class="glyphicon glyphicon-remove red-button" aria-label="stopped"></span>
+      </div>
     </div>
   </div>
-  <div class="col-sm-5 pad-bot-20 pad-top-10">
-    <div class="tab-text">Server Status&nbsp;
-      <span ng-show="serverStatuses[selectedRunType.name]=='started'" class="glyphicon glyphicon-ok green-button" aria-label="started"></span>
-      <span ng-show="serverStatuses[selectedRunType.name]!='started'" class="glyphicon glyphicon-remove red-button" aria-label="stopped"></span>
+    <div ng-if="selectedRunType.name == 'remote'" class="inline">
+      <div class="col-sm-5 pad-bot-20 pad-top-5 align-middle">
+        <div class="tab-text">Server Status&nbsp;
+          <img ng-src="assets/images/cloudConnected.png" ng-show="serverStatuses[selectedRunType.name]=='started'" alt="started" />
+          <img ng-src="assets/images/cloudDisconnected.png" ng-show="serverStatuses[selectedRunType.name]!='started' && !run.OsServer.getRemoteStartInProgress()" alt="stopped" />
+          <img ng-src="assets/images/cloudConnecting.png" ng-show="run.OsServer.getRemoteStartInProgress()" alt="connecting" />
+        </div>
+      </div>
+    </div>
    </div>
   </div>
 </div>
-<div ng-show="selectedRunType.name == 'remote'" class="row">
-  <div class="col-sm-12">
-    <uib-accordion>
-      <uib-accordion-group is-open="remoteSettings.open">
-        <uib-accordion-heading>
-          <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': remoteSettings.open, 'glyphicon-chevron-right': !remoteSettings.open}"></i>
-          Remote Server Settings
-        </uib-accordion-heading>
-        <div class="row pad-bot-20">
-        <label for="remoteType" class="col-sm-3 run-label">Remote Server Type</label>
-          <div class="col-sm-6">
-            <select id="remoteType" class="form-control" ng-options="remoteType for remoteType in remoteTypes" ng-model="remoteSettings.remoteType" ng-change="run.OsServer.resetSelectedServerURL()"></select>
-          </div>
-        </div>
-        <div class="row" ng-if="remoteSettings.remoteType == 'Existing Remote Server'">
-          <label for="externalURL" class="col-sm-3 run-label">Remote Server URL</label>
-          <div class="col-sm-7">
-            <input class="form-control" id="externalURL" type="text" ng-model="remoteSettings.remoteServerURL" ng-change="run.resetRemoteServerURL()">
-          </div>
-          <div class="col-sm-1">
-            <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] != 'started'" ng-click="run.startServer()">Connect</button>
-            <button type="button" class="btn btn-danger" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()">Disconnect</button>
-          </div>
-        </div>
-
-      </uib-accordion-group>
-    </uib-accordion>
-  </div>
-</div>
-
-<div ng-show="selectedRunType.name == 'remote'" class="row pad-bot-20">
-  <div class="col-sm-8">
-    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
-    <button type="button" class="btn btn-danger" ng-show="disabledButtons && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.cancelRun()" translate>run.cancelRun</button>
-    <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()">View Server</button>
-  </div>
-</div>
+<div ng-if="selectedRunType.name == 'remote'" ng-include="'app/run/remote.html'"></div>
 
 <div ng-show="selectedRunType.name == 'local'" class="row pad-bot-20">
-  <div class="col-sm-12">
+  <div class="col-sm-12 normal-text pad-left-25" ng-if="selectedAnalysisType == 'Algorithmic'">
+    <span class="glyphicon glyphicon-warning-sign red-button big-text"></span>&nbsp;&nbsp;<translate>run.algorithmicOnCloud</translate>
+  </div>
+  <div class="col-sm-12" ng-if="selectedAnalysisType != 'Algorithmic'">
     <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
     <button type="button" class="btn btn-danger" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>
@@ -110,11 +88,12 @@
             <div class="row datapoint-header">
               <div class="col-sm-2 pad-top-10">
                 <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
-                {{datapoint.name}}
+                <span ng-if="datapoint.name">{{datapoint.name}}</span><span ng-if="datapoint.name == undefined && datapoint.id">{{datapoint.id}}</span>
               </div>
               <div class="col-sm-1 pad-top-10">{{run.Project.formatDate(datapoint.updated_at)}}</div>
               <div class="col-sm-1 pad-top-10">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
-              <div class="col-sm-1 pad-top-10" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</div>
+              <div class="col-sm-1 pad-top-10" ng-if="datapoint.completed_status" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</div>
+              <div class="col-sm-1 pad-top-10" ng-if="datapoint.status_message" ng-class="{'green-text': datapoint.status_message.includes('normal'), 'red-text': datapoint.status_message == 'datapoint failure'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</div>
               <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
               <div class="col-sm-1 pad-top-10"><span class="badge orange-badge square-badge dp-badge">{{run.calculateWarnings(datapoint)}}</span></div>
               <div class="col-sm-1 pad-top-10"><span class="badge red-badge square-badge dp-badge">{{run.calculateErrors(datapoint)}}</span></div>
