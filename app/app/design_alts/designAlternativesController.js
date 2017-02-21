@@ -1,6 +1,6 @@
 export class DesignAlternativesController {
 
-  constructor($log, Project, $scope) {
+  constructor($log, Project, $scope, toastr) {
     'ngInject';
 
     const vm = this;
@@ -8,6 +8,7 @@ export class DesignAlternativesController {
     vm.$log = $log;
     vm.$scope = $scope;
     vm.Project = Project;
+    vm.toastr = toastr;
 
     vm.selected = null;
     vm.measures = vm.Project.getMeasuresAndOptions();
@@ -103,6 +104,18 @@ export class DesignAlternativesController {
           } else {
             // No rows selected
             vm.selected = null;
+          }
+        });
+        gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
+          if (newValue != oldValue && colDef.name == 'name') {
+            const rowIndex = _.findIndex(vm.$scope.alternatives, {$$hashKey: rowEntity.$$hashKey});
+            const isUnique = vm.checkUnique(vm.$scope.alternatives, newValue, rowIndex);
+            if (!isUnique){
+              // not unique, restore old value and add toastr
+              vm.$log.debug('DA name must be unique');
+              rowEntity.name = oldValue;
+              vm.toastr.error('Cannot change design alternative name.  Selected name is not unique.');
+            }
           }
         });
         gridApi.cellNav.on.navigate(null, (newRowCol) => {

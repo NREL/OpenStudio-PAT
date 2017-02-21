@@ -23,12 +23,13 @@ export class RunController {
     vm.jetpack = jetpack;
 
     vm.runTypes = vm.Project.getRunTypes();
-    // TEMPORARY:  only show local server
-    //vm.runTypes = _.filter(vm.runTypes, {name: 'local'});
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
     vm.$scope.serverStatuses = vm.OsServer.getServerStatuses();
+
+    // MANUAL ONLY--set up datapoints
+    vm.setUpDatapoints();
 
     // remote settings
     vm.$scope.remoteSettings = vm.Project.getRemoteSettings();
@@ -40,7 +41,6 @@ export class RunController {
       vm.resetClusterSettings();
       vm.checkIfClusterIsRunning();
       vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
-
     }
 
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
@@ -109,6 +109,15 @@ export class RunController {
       return !isSkipped;
     };
 
+  }
+
+  setUpDatapoints() {
+    if (vm.$scope.selectedRunType.name == 'local') {
+      // ensure there is one datapoint per DA
+
+
+
+    }
   }
 
 

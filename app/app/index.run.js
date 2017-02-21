@@ -109,6 +109,7 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
     if (fromState.name == 'analysis') {
       Project.savePrettyOptions();
     }
+
     // warn user that they need to cancel their run before moving from this state
     if (fromState.name == 'run' && OsServer.getAnalysisRunningFlag()) {
       event.preventDefault();

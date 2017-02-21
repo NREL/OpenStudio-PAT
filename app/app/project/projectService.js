@@ -2114,8 +2114,6 @@ export class Project {
         vm.algorithmSettings.push(temp);
       }
     });
-
-
   }
 
   getAlgorithmOptions() {
