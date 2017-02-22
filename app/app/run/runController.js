@@ -390,14 +390,23 @@ export class RunController {
       const start = vm.Project.makeDate(startStr);
       const end = vm.Project.makeDate(endStr);
 
-      const diff = end - start;
-      let sec = parseInt((end - start) / 1000);
-      sec = (sec < 10) ? '0' + sec : sec;
-      let min = parseInt(sec / 60);
-      min = (min < 10) ? '0' + min : min;
-      let hours = parseInt(min / 60);
+      var delta = Math.abs(end - start) / 1000;
+
+      // calculate (and subtract) whole hours
+      let hours = Math.floor(delta / 3600) % 24;
+      delta -= hours * 3600;
       hours = (hours < 10) ? '0' + hours : hours;
-      result = hours + ":" + min + ":" + sec;
+
+      // calculate (and subtract) whole minutes
+      let minutes = Math.floor(delta / 60) % 60;
+      delta -= minutes * 60;
+      minutes = (minutes < 10) ? '0' + minutes : minutes;
+
+      // what's left is seconds
+      let seconds = delta % 60;  // in theory the modulus is not required
+
+      result = hours + ":" + minutes + ":" + seconds;
+
     }
     return result;
   }
