@@ -59,14 +59,18 @@
 <div ng-if="datapoints.length > 0" class="run-datapoints">
   <div class="row datapoint-header">
     <div class="col-sm-2">Name</div>
-    <div class="col-sm-1">Last Run</div>
-    <div class="col-sm-1">Run Time</div>
-    <div class="col-sm-1">Status</div>
+    <div class="col-sm-4">
+      <div class="row">
+        <div class="col-sm-5">Last Run</div>
+        <div class="col-sm-3">Run Time</div>
+        <div class="col-sm-4">Status</div>
+      </div>
+    </div>
     <div class="col-sm-1">NAs</div>
     <div class="col-sm-1">Warnings</div>
     <div class="col-sm-1">Errors</div>
     <div class="col-sm-1"><span class="badge white-badge dp-badge" ng-click="$event.preventDefault(); $event.stopPropagation();run.clearAllDatapoints()">C</span> All</div>
-    <div class="col-sm-3">
+    <div class="col-sm-2">
       <div class="row">
         <div class="col-sm-4">
         </div>
@@ -85,27 +89,33 @@
       <uib-accordion close-others="false">
         <uib-accordion-group ng-repeat="datapoint in datapoints" id="{{datapoint.id}}" is-open="datapoint.open">
           <uib-accordion-heading>
-            <div class="row datapoint-header">
-              <div class="col-sm-2 pad-top-10">
+            <div class="row datapoint-header pad-top-10">
+              <div class="col-sm-2">
                 <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
                 <span ng-if="datapoint.name">{{datapoint.name}}</span><span ng-if="datapoint.name == undefined && datapoint.id">{{datapoint.id}}</span>
               </div>
-              <div class="col-sm-1 pad-top-10">{{run.Project.formatDate(datapoint.updated_at)}}
-                <span ng-if="datapoint.modified" class="glyphicon glyphicon-exclamation-sign orange-button"></span>
-                <span ng-if="datapoint.deletedDA" class="glyphicon glyphicon-remove-circle red-button"></span>
+              <div class="col-sm-4">
+                <div class="row">
+                  <div class="col-sm-5"><span class="middle">{{run.Project.formatDate(datapoint.updated_at)}}</span>
+                    <span ng-if="datapoint.modified" class="glyphicon glyphicon-exclamation-sign orange-button big-icon middle" aria-label="datapoint modified and must be rerun"></span>
+                    <span ng-if="datapoint.deletedDA" class="glyphicon glyphicon-remove-circle red-button big-icon middle" aria-label="design alternative for this datapoint no longer exists"></span>
+                  </div>
+                  <div class="col-sm-3 middle pad-top-5">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
+                  <div class="col-sm-4">
+                    <span ng-if="datapoint.completed_status" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</span>
+                    <span ng-if="datapoint.status_message" ng-class="{'green-text': datapoint.status_message.includes('normal'), 'red-text': datapoint.status_message == 'datapoint failure'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</span>
+                  </div>
+                </div>
               </div>
-              <div class="col-sm-1 pad-top-10">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
-              <div class="col-sm-1 pad-top-10">
-                <span ng-if="datapoint.completed_status" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</span>
-                <span ng-if="datapoint.status_message" ng-class="{'green-text': datapoint.status_message.includes('normal'), 'red-text': datapoint.status_message == 'datapoint failure'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</span>
-              </div>
+
               <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
               <div class="col-sm-1 pad-top-10"><span class="badge orange-badge square-badge dp-badge">{{run.calculateWarnings(datapoint)}}</span></div>
               <div class="col-sm-1 pad-top-10"><span class="badge red-badge square-badge dp-badge">{{run.calculateErrors(datapoint)}}</span></div>
               <div class="col-sm-1 pad-top-10">&nbsp;&nbsp;<span class="badge orange-badge dp-badge" ng-click="$event.preventDefault(); $event.stopPropagation();run.clearDatapoint(datapoint)">&nbsp;C&nbsp;</span></div>
-              <div class="col-sm-3">
+
+              <div class="col-sm-2">
                 <div class="row">
-                  <div class="col-sm-4">
+                        <div class="col-sm-4">
                     <img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.downloaded_reports != true" />
 
                     <div class="btn-group" uib-dropdown auto-close="always" ng-show="datapoint.downloaded_reports">

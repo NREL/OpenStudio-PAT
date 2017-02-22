@@ -23,6 +23,7 @@ export class DesignAlternativesController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
     vm.$scope.alternatives = vm.Project.getDesignAlternatives();
+    vm.datapoints = vm.Project.getDatapoints();
 
     vm.$scope.gridOptions = [];
     vm.setGridOptions();
@@ -115,6 +116,15 @@ export class DesignAlternativesController {
               vm.$log.debug('DA name must be unique');
               rowEntity.name = oldValue;
               vm.toastr.error('Cannot change design alternative name.  Selected name is not unique.');
+            }
+          }
+
+          // figure out if there are datapoints to update
+          if (newValue != oldValue) {
+            // find datapoint and mark as modified (if already run)
+            const match = _.find(vm.datapoints, {name: rowEntity.name});
+            if (match && match.updated_at) {
+              match.modified = true;
             }
           }
         });

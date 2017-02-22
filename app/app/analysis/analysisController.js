@@ -273,6 +273,9 @@ export class AnalysisController {
               vm.$log.debug('CELL has changed in: ', measure.instanceId, ' old val: ', oldValue, ' new val: ', newValue);
               vm.$log.debug('rowEntity: ', rowEntity);
               vm.updateDASelectedName(measure, oldValue, newValue);
+
+              // TODO: figure out if there are datapoints to mark as modified
+
             }
           });
         }

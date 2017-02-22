@@ -176,6 +176,7 @@ export class OsServer {
         dp.status_message = null;
         dp.started_at = null;
         dp.completed_at = null;
+        dp.updated_at = null;
         dp.steps = [];
       });
     } else {

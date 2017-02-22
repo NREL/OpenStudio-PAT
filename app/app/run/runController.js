@@ -730,6 +730,7 @@ export class RunController {
             if (response.data.analysis.status == 'completed') {
               // cancel loop
               vm.stopAnalysisStatus('completed');
+
             }
           }, response => {
             vm.$log.debug('analysis status retrieval error: ', response);
