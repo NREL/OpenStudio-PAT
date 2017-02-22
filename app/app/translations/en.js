@@ -294,6 +294,8 @@ export default {
     runEntireWorkflow: 'Run Entire Workflow',
     algorithmicOnCloud: 'Algorithmic analyses cannot be run locally.  Select \'Run on Cloud\' from the dropdown above to run this analysis remotely.',
     viewServer: 'View Server',
+    modifiedDP: 'The design alternative data associated with this datapoint has changed since it was last run',
+    deletedDA: 'The design alternative associated with this datapoint has been deleted from the project',
     modalAnalysisRunning: {
       title: 'Analysis is Running',
       message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'
