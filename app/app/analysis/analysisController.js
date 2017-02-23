@@ -445,6 +445,9 @@ export class AnalysisController {
     });
 
     vm.$scope.gridOptions[measure.instanceId].columnDefs.push(opt);
+
+    vm.Project.savePrettyOptions();
+
     return opt;
   }
 
@@ -707,7 +710,7 @@ export class AnalysisController {
 
   resetAllChoiceArgumentSelections() {
     const vm = this;
-    vm.$log.debug('in resetAllChoiceArgumentSelections in anaysis');
+    vm.$log.debug('in resetAllChoiceArgumentSelections in analysis');
     _.forEach(vm.$scope.measures, (measure) => {
       vm.resetChoiceArgumentSelections(measure);
     });
