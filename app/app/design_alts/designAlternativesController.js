@@ -1,6 +1,8 @@
+import jetpack from 'fs-jetpack';
+
 export class DesignAlternativesController {
 
-  constructor($log, Project, $scope, toastr) {
+  constructor($log, Project, $scope, toastr, $q, $uibModal) {
     'ngInject';
 
     const vm = this;
@@ -9,6 +11,9 @@ export class DesignAlternativesController {
     vm.$scope = $scope;
     vm.Project = Project;
     vm.toastr = toastr;
+    vm.$q = $q;
+    vm.$uibModal = $uibModal;
+    vm.jetpack = jetpack;
 
     vm.selected = null;
     vm.measures = vm.Project.getMeasuresAndOptions();
@@ -174,6 +179,57 @@ export class DesignAlternativesController {
     vm.setIsModified();
     const index = vm.$scope.alternatives.indexOf(alternative);
     vm.$scope.alternatives.splice(index, 1);
+
+    // delete Associated Datapoint
+    vm.deleteAssociatedDatapoint(alternative);
+  }
+
+  deleteAssociatedDatapoint(alternative){
+    const vm = this;
+    const matchIndex = _.findIndex(vm.datapoints, {name: alternative.name});
+    if (matchIndex > -1) {
+      const dp = vm.datapoints[matchIndex];
+      // remove localResults and delete datapoint
+      vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(dp.id));
+      vm.datapoints.splice(matchIndex, 1);
+    }
+  }
+
+  warnBeforeDelete(alternative) {
+
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    vm.$log.debug('**** In DAController::WarnBeforeDeleting ****');
+
+    const match = _.find(vm.datapoints, {name: alternative.name});
+
+    if (match && match.updated_at) {
+      // dp with results exists
+      const modalInstance = vm.$uibModal.open({
+        backdrop: 'static',
+        controller: 'ModalClearDatapointController',
+        controllerAs: 'modal',
+        templateUrl: 'app/design_alts/clearDatapoint.html'
+      });
+
+      modalInstance.result.then(() => {
+        // go on to run workflow
+        deferred.resolve();
+        // DELETE BOTH
+        vm.deleteAlternative(alternative);
+
+      }, () => {
+        // Modal canceled
+        deferred.reject();
+      });
+    } else {
+      // no dp
+      deferred.resolve();
+      // delete
+      vm.deleteAlternative(alternative);
+    }
+    return deferred.promise;
   }
 
   moveUp(alternative) {

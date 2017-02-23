@@ -98,7 +98,6 @@
                 <div class="row">
                   <div class="col-sm-5"><span class="middle">{{run.Project.formatDate(datapoint.updated_at)}}</span>
                     <span ng-if="datapoint.modified" class="glyphicon glyphicon-exclamation-sign orange-button big-icon middle" aria-label="datapoint modified and must be rerun"></span>
-                    <span ng-if="datapoint.deletedDA" class="glyphicon glyphicon-remove-circle red-button big-icon middle" aria-label="design alternative for this datapoint no longer exists"></span>
                   </div>
                   <div class="col-sm-3 middle pad-top-5">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
                   <div class="col-sm-4">

@@ -243,6 +243,10 @@ export default {
       name: 'Name',
       seedModel: 'Seed Model'
     },
+    modalClearDatapoint: {
+      title: 'Clear Datapoint Results',
+      message: 'Deleting this alternative will delete its associated datapoint and results.  Proceed with the deletion?'
+    },
     createOneDesignAlternative: 'Create One Design Alternative with Each Measure Option',
     duplicateAlternative: 'Duplicate Alternative',
     noAlternativesInAlgorithmic: 'For an Algorithmic Analysis, Design Alternatives are created automatically.',

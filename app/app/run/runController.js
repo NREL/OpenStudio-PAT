@@ -122,12 +122,6 @@ export class RunController {
           vm.$scope.datapoints.push({name: alt.name, run: false, modified: false});
         }
       });
-      _.forEach(vm.$scope.datapoints, (dp) => {
-        if (!_.find(alternatives, {name: dp.name})){
-          // mark datapoint has no corresponding DA
-          dp.deletedDA = true;
-        }
-      });
     }
   }
 
