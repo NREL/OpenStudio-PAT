@@ -278,7 +278,7 @@ export class AnalysisController {
 
               // TODO: figure out if there are datapoints to mark as modified
               vm.$log.debug('colDef: ', colDef);
-              vm.updateDatapoints(measure, colDef.name, rowEntity)
+              vm.updateDatapoints(measure, colDef.name, rowEntity);
 
             }
           });

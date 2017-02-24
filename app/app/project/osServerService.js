@@ -623,8 +623,8 @@ export class OsServer {
     vm.remoteSettings = vm.Project.getRemoteSettings();
     // need aws credentials as ENV vars
     vm.$log.debug('PROCESS.ENV: ', process.env);
-    // TODO: need to set all other vars from process.env?
-    const envCopy = {};
+    // need to set all other vars from process.env
+    const envCopy = angular.copy(process.env);
 
     // open file, set truncatedAccessKey
     const yamlStr = vm.jetpack.read(vm.Project.getAwsDir().path(vm.remoteSettings.credentials.yamlFilename + '.yml'));
