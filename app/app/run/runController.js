@@ -565,8 +565,20 @@ export class RunController {
 
     vm.$log.debug('**** In RunController::WarnBeforeDeleting ****');
 
-    const contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
-    vm.$log.debug('Local results size:', contents.length);
+    let contents = [];
+    if (type == 'selected'){
+      let matchingArr = [];
+      _.forEach(vm.$scope.datapoints, (dp) => {
+        if (datapoint.selected) {
+          matchingArr.push(dp.id);
+        }
+        contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: matchingArr});
+        vm.$log.debug('local results matching selected datapoints: ', contents.length);
+      });
+    } else {
+      contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
+      vm.$log.debug('Local results size:', contents.length);
+    }
 
     if (contents.length > 0) {
       // local results exist
@@ -588,9 +600,11 @@ export class RunController {
         // go on to run workflow
         deferred.resolve();
         if (type == 'run') {
-          vm.runEntireWorkflow();
+          vm.runWorkflow();
         } else if (type == 'runtype') {
           vm.setRunType();
+        } else if (type == 'selected'){
+          vm.runWorkflow(true);
         }
 
       }, () => {
@@ -605,9 +619,11 @@ export class RunController {
       // no local results
       deferred.resolve();
       if (type == 'run') {
-        vm.runEntireWorkflow();
+        vm.runWorkflow();
       } else if (type == 'runtype') {
         vm.setRunType();
+      } else if (type == 'selected') {
+        vm.runWorkflow(true);
       }
 
     }
@@ -615,10 +631,19 @@ export class RunController {
     return deferred.promise;
   }
 
-  deleteResults() {
+  deleteResults(selectedOnly=false) {
     const vm = this;
-    // remove localResults contents
-    vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
+
+    if (selectedOnly){
+      _.forEach(vm.$scope.datapoints, (dp) => {
+        if(dp.selected){
+          vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(dp.id));
+        }
+      });
+    } else {
+      // remove localResults contents
+      vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
+    }
 
     // reset analysis
     vm.OsServer.resetAnalysis();
@@ -627,31 +652,31 @@ export class RunController {
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
   }
 
-  runEntireWorkflow() {
+  runWorkflow(selectedOnly=false) {
     const vm = this;
 
     // set this to lock down runType
     vm.OsServer.setAnalysisStatus('starting');
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
-    vm.$log.debug('***** In runController::runEntireWorkflow() *****');
+    vm.$log.debug('***** In runController::runWorkflow() *****');
     vm.toggleButtons();
 
     // 1: delete old results (this sets modified flag)
-    vm.deleteResults();
+    vm.deleteResults(selectedOnly);
 
     // 2: make OSA and zip file
-    vm.exportOSA();
+    vm.exportOSA(selectedOnly);
 
     // 3: hit PAT CLI to start server (local or remote)
     vm.OsServer.setProgress(15, 'Starting server');
 
-    vm.$log.debug('***** In runController::runEntireWorkflow() ready to start server *****');
+    vm.$log.debug('***** In runController::runWorkflow() ready to start server *****');
 
     vm.OsServer.startServer().then(response => {
 
       vm.OsServer.setAnalysisRunningFlag(true);
-      vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
+      vm.$log.debug('***** In runController::runWorkflow() server started *****');
       vm.$log.debug('Start Server response: ', response);
 
       vm.OsServer.setProgress(30, 'Server started');
@@ -662,7 +687,7 @@ export class RunController {
       // 4: hit PAT CLI to start run
       vm.OsServer.setProgress(40, 'Starting analysis run');
 
-      vm.$log.debug('***** In runController::runEntireWorkflow() ready to run analysis *****');
+      vm.$log.debug('***** In runController::runWorkflow() ready to run analysis *****');
 
       // set analysis type (sampling method).  batch_datapoints is for manual runs only
       let analysis_param = '';
@@ -676,7 +701,7 @@ export class RunController {
       vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
       vm.OsServer.runAnalysis(analysis_param).then(response => {
-        vm.$log.debug('***** In runController::runEntireWorkflow() analysis running *****');
+        vm.$log.debug('***** In runController::runWorkflow() analysis running *****');
         vm.$log.debug('Run Analysis response: ', response);
         vm.OsServer.setAnalysisStatus('in progress');
         vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
@@ -692,17 +717,17 @@ export class RunController {
             vm.OsServer.setAnalysisStatus(response.data.analysis.status);
             vm.$scope.analysisStatus = response.data.analysis.status;
             vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
-            vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
+            vm.OsServer.setDatapointsStatus(response.data.analysis.data_points); // TODO: one by one
             vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
             vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
 
             // download/replace out.osw (local only)
             if(vm.$scope.selectedRunType.name == 'local') {
-              vm.OsServer.updateDatapoints().then(response2 => {
+              vm.OsServer.updateDatapoints().then(response2 => {  // TODO: one by one
                 // refresh datapoints
                   vm.$scope.datapoints = vm.Project.getDatapoints();
                 // download reports
-                vm.OsServer.downloadReports().then(response3 => {
+                vm.OsServer.downloadReports().then(response3 => {  // TODO: one by one
                   vm.$log.debug('downloaded all available reports');
                   // refresh datapoints again
                   vm.$scope.datapoints = vm.Project.getDatapoints();
@@ -719,7 +744,7 @@ export class RunController {
               });
             } else {
               // set datapointsStatus as datapoints
-              vm.$scope.datapoints = vm.$scope.datapointsStatus;
+              vm.$scope.datapoints = vm.$scope.datapointsStatus;  // TODO: one by one
             }
             if (response.data.analysis.status == 'completed') {
               // cancel loop
