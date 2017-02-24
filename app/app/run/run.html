@@ -92,6 +92,7 @@
             <div class="row datapoint-header pad-top-10">
               <div class="col-sm-2">
                 <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
+                <checkbox ng-model="datapoint.selected" id="{{datapoint.name}}" class="btn-default" ng-if="selectedRunType.name == 'local'" ng-click="$event.preventDefault(); $event.stopPropagation();"></checkbox>
                 <span ng-if="datapoint.name">{{datapoint.name}}</span><span ng-if="datapoint.name == undefined && datapoint.id">{{datapoint.id}}</span>
               </div>
               <div class="col-sm-4">
@@ -110,7 +111,7 @@
               <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
               <div class="col-sm-1 pad-top-10"><span class="badge orange-badge square-badge dp-badge">{{run.calculateWarnings(datapoint)}}</span></div>
               <div class="col-sm-1 pad-top-10"><span class="badge red-badge square-badge dp-badge">{{run.calculateErrors(datapoint)}}</span></div>
-              <div class="col-sm-1 pad-top-10">&nbsp;&nbsp;<span class="badge orange-badge dp-badge" ng-click="$event.preventDefault(); $event.stopPropagation();run.clearDatapoint(datapoint)">&nbsp;C&nbsp;</span></div>
+              <div class="col-sm-1 pad-top-10">&nbsp;&nbsp;<span class="badge orange-badge dp-badge" ng-click="$event.preventDefault();$event.stopPropagation();run.clearDatapoint(datapoint)">&nbsp;C&nbsp;</span></div>
 
               <div class="col-sm-2">
                 <div class="row">
