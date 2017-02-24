@@ -93,7 +93,7 @@ export class ModalBclController {
         enableCellEdit: false,
         headerCellFilter: 'translate',
         width: '35%',
-        cellTooltip: function(row) {
+        cellTooltip: function (row) {
           return row.entity.display_name;
         }
       }, {
@@ -113,45 +113,45 @@ export class ModalBclController {
         headerCellFilter: 'translate',
         width: '14%'
       }, /*{
-        name: 'author',
-        displayName: 'bcl.columns.author',
-        enableCellEdit: false,
-        headerCellFilter: 'translate',
-        visible: false
-      }, */
-      {
-        name: 'date',
-        displayName: 'bcl.columns.date',
-        cellFilter: 'date:"dd/MM/yyyy"',
-        enableCellEdit: false,
-        headerCellFilter: 'translate',
-        type: 'date',
-        width: '10%'
-      }, {
-        name: 'edit',
-        displayName: 'bcl.columns.edit',
-        cellClass: 'dropdown-button',
-        cellTemplate: 'app/bcl/editButtonTemplate.html',
-        enableCellEdit: false,
-        headerCellFilter: 'translate',
-        width: '13%'
-      }, {
-        name: 'status',
-        displayName: 'bcl.columns.status',
-        cellClass: 'icon-cell',
-        cellTemplate: 'app/bcl/updateButtonTemplate.html',
-        enableCellEdit: false,
-        headerCellFilter: 'translate',
-        width: '10%'
-      }, {
-        name: 'add',
-        displayName: 'bcl.columns.add',
-        cellClass: 'icon-cell',
-        cellTemplate: 'app/bcl/addButtonTemplate.html',
-        enableCellEdit: false,
-        headerCellFilter: 'translate',
-        width: '9%'
-      }],
+       name: 'author',
+       displayName: 'bcl.columns.author',
+       enableCellEdit: false,
+       headerCellFilter: 'translate',
+       visible: false
+       }, */
+        {
+          name: 'date',
+          displayName: 'bcl.columns.date',
+          cellFilter: 'date:"dd/MM/yyyy"',
+          enableCellEdit: false,
+          headerCellFilter: 'translate',
+          type: 'date',
+          width: '10%'
+        }, {
+          name: 'edit',
+          displayName: 'bcl.columns.edit',
+          cellClass: 'dropdown-button',
+          cellTemplate: 'app/bcl/editButtonTemplate.html',
+          enableCellEdit: false,
+          headerCellFilter: 'translate',
+          width: '13%'
+        }, {
+          name: 'status',
+          displayName: 'bcl.columns.status',
+          cellClass: 'icon-cell',
+          cellTemplate: 'app/bcl/updateButtonTemplate.html',
+          enableCellEdit: false,
+          headerCellFilter: 'translate',
+          width: '10%'
+        }, {
+          name: 'add',
+          displayName: 'bcl.columns.add',
+          cellClass: 'icon-cell',
+          cellTemplate: 'app/bcl/addButtonTemplate.html',
+          enableCellEdit: false,
+          headerCellFilter: 'translate',
+          width: '9%'
+        }],
       data: 'displayMeasures',
       rowHeight: 45,
       /*enableCellEditOnFocus: true,*/
@@ -159,7 +159,7 @@ export class ModalBclController {
       enableColumnMenus: false,
       enableRowSelection: true,
       enableRowHeaderSelection: false,
-      enableVerticalScrollbar:uiGridConstants.scrollbars.ALWAYS,
+      enableVerticalScrollbar: uiGridConstants.scrollbars.ALWAYS,
       multiSelect: false,
       onRegisterApi: function (gridApi) {
         vm.gridApi = gridApi;
@@ -417,7 +417,7 @@ export class ModalBclController {
 
   }
 
-  setMeasureInExistingDAs(measure){
+  setMeasureInExistingDAs(measure) {
     const vm = this;
 
     _.forEach(vm.designAlternatives, (alt) => {
@@ -433,22 +433,22 @@ export class ModalBclController {
     // check type
     if (_.findIndex(vm.projectMeasures, {type: project_measure.type}) != -1) {
       // figure out where to put new measure in array
-      const index = _.findLastIndex(vm.projectMeasures, {type: project_measure.type });
+      const index = _.findLastIndex(vm.projectMeasures, {type: project_measure.type});
       // add to array at the end of the correct measure type section
       vm.projectMeasures.splice(index + 1, 0, project_measure);
     } else {
       // first measure of this type
       if (project_measure.type == 'ModelMeasure') {
         // append to front
-        vm.projectMeasures.splice(0,0, project_measure);
-      }  else if (project_measure.type == 'EnergyPlusMeasure') {
-        const index2 = _.findLastIndex(vm.projectMeasures, {type: 'ModelMeasure' });
+        vm.projectMeasures.splice(0, 0, project_measure);
+      } else if (project_measure.type == 'EnergyPlusMeasure') {
+        const index2 = _.findLastIndex(vm.projectMeasures, {type: 'ModelMeasure'});
         if (index2 != -1) {
           // add after model measures
           vm.projectMeasures.splice(index2 + 1, 0, project_measure);
         } else {
           // no model measures, append to front
-          vm.projectMeasures.splice(0,0, project_measure);
+          vm.projectMeasures.splice(0, 0, project_measure);
         }
       } else {
         // append to end
@@ -493,7 +493,7 @@ export class ModalBclController {
     vm.gridApi.grid.modifyRows(vm.$scope.displayMeasures);
     vm.gridApi.selection.selectRow(vm.$scope.displayMeasures[index]);
     // scroll to row
-    vm.$timeout(function() {
+    vm.$timeout(function () {
       vm.gridApi.cellNav.scrollToFocus(vm.$scope.displayMeasures[index], vm.libraryGridOptions.columnDefs[0]);
     });
   }
@@ -706,6 +706,51 @@ export class ModalBclController {
 
   search() {
     // TODO
+  }
+
+  createNewMeasure() {
+    const vm = this;
+    vm.$log.debug('ModalBCL::createNewMeasure');
+
+    const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalCreateNewMeasureController',
+      controllerAs: 'modal',
+      templateUrl: 'app/bcl/create_new_measure.html',
+      windowClass: 'modal',
+      resolve: {
+        measure: function () {
+          const bclCategories = vm.BCL.getBCLCategories();
+          vm.$log.debug('bclCategories: ', bclCategories);
+        }
+      }
+    });
+
+    modalInstance.result.then((params) => {
+      vm.MeasureManager.createNewMeasure(params).then((newMeasure) => {
+        // success
+        vm.$log.debug('ModalBclController::createNewMeasure succeeded');
+        // add and prepare new measure
+        newMeasure = vm.BCL.prepareMeasure(newMeasure, 'my');
+        vm.libMeasures.my.push(newMeasure);
+        vm.resetFilters();
+        // select newly added row
+        vm.selectARow(newMeasure.uid);
+        //vm.Project.savePrettyOptions();
+        deferred.resolve();
+      }, () => {
+        // failure
+        vm.$log.debug('ModalBclController::createNewMeasure failed');
+        deferred.reject();
+      });
+    }, () => {
+      // Modal canceled
+      vm.$log.debug('ModalBclController::createNewMeasure was canceled');
+      deferred.reject();
+    });
+
+    return deferred.promise;
   }
 
 }

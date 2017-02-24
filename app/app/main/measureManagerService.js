@@ -50,7 +50,7 @@ export class MeasureManager {
       }
       // TODO: THIS IS TEMPORARY (mac):
       else if (str.indexOf('Error: Address already in use') !== -1) {
-        vm.$log.debug ('WEBrick already running...assuming MeasureManager is already up');
+        vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
         vm.mmReadyDeferred.resolve();
       }
 
@@ -70,7 +70,7 @@ export class MeasureManager {
       }
       // TODO: THIS IS TEMPORARY (mac):
       else if (str.indexOf('Error: Address already in use') !== -1) {
-        vm.$log.debug ('WEBrick already running...using tempMeasureManager');
+        vm.$log.debug('WEBrick already running...using tempMeasureManager');
         vm.mmReadyDeferred.resolve();
       }
     });
@@ -84,6 +84,36 @@ export class MeasureManager {
 
     vm.$log.debug('Stop Measure Manager Server');
     vm.cli.kill('SIGINT');
+  }
+
+  // This function creates a new measure on the file system in folder 'Measures'
+  // params {
+  //   measure_dir:
+  //   display_name:
+  //   class_name:
+  //   taxonomy_tag:
+  //   measure_type:
+  //   description:
+  //   modeler_description:
+
+  // }
+  createNewMeasure(params) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    vm.$log.debug('MeasureManager::createNewMeasure');
+
+    vm.$log.debug('MeasureManager::createNewMeasure params: ', params);
+    vm.$http.post(vm.url + '/create_measure', params)
+      .success((data, status, headers, config) => {
+        vm.$log.debug('MeasureManager::createNewMeasure reply: ', data);
+        deferred.resolve(data);
+      })
+      .error((data, status, headers, config) => {
+        vm.$log.debug('MeasureManager::createNewMeasure error: ', data);
+        deferred.reject();
+      });
+
+    return deferred.promise;
   }
 
   // This function make a copy of a measure on the file system.
@@ -150,15 +180,16 @@ export class MeasureManager {
     const vm = this;
     const deferred = vm.$q.defer();
     vm.$http.get(vm.url, {
-      params: {}})
+      params: {}
+    })
       .success((data, status, headers, config) => {
         vm.$log.debug('Measure Manager getMyMeasuresDir Success!, status: ', status);
         deferred.resolve(data);
       })
-    .error((data, status, headers, config) => {
-      vm.$log.debug('Measure Manager getMyMeasuresDir Error: ', data);
-      deferred.reject([]);
-    });
+      .error((data, status, headers, config) => {
+        vm.$log.debug('Measure Manager getMyMeasuresDir Error: ', data);
+        deferred.reject([]);
+      });
     return deferred.promise;
   }
 
@@ -179,7 +210,7 @@ export class MeasureManager {
   }
 
   // Retrieve Local BCL measures
-  getLocalBCLMeasures(){
+  getLocalBCLMeasures() {
     const vm = this;
     const deferred = vm.$q.defer();
     const params = {};
@@ -223,10 +254,10 @@ export class MeasureManager {
     const vm = this;
 
     // TODO: is there a situation where we want to use an empty model even though we have a seed model defined?
-    if (!osmPath){
+    if (!osmPath) {
       osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
     }
-    const params =  {measure_dir: measurePath, osm_path: osmPath};
+    const params = {measure_dir: measurePath, osm_path: osmPath};
     vm.$log.debug('computeArguments params', params);
     const deferred = vm.$q.defer();
 
