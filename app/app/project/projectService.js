@@ -362,9 +362,10 @@ export class Project {
   }
 
   // export OSA
-  exportOSA(selectedOnly=false) {
+  exportOSA(selectedOnly = false) {
     const vm = this;
     vm.$log.debug('In Project::exportOSA');
+    vm.$log.debug('SelectedOnly? ', selectedOnly);
 
     // first export common data
     vm.exportCommon();
@@ -468,9 +469,10 @@ export class Project {
 
   }
 
-  exportManual(selectedOnly=false) {
+  exportManual(selectedOnly = false) {
     const vm = this;
     vm.$log.debug('In Project::exportManual');
+    vm.$log.debug('selectedONly? ', selectedOnly);
 
     //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO which is correct?
     vm.osa.analysis.problem.analysis_type = null;

@@ -163,7 +163,7 @@ export class OsServer {
 
   }
 
-  resetAnalysis() {
+  resetAnalysis(selectedOnly = false) {
     const vm = this;
     vm.setAnalysisChangedFlag(false);
     // reset analysis ID
@@ -171,13 +171,15 @@ export class OsServer {
     if (vm.Project.getRunType().name == 'local'){
       // reset certain fields on datapoint
       _.forEach(vm.datapoints, (dp) => {
-        dp.modified = false;
-        dp.completed_status = null;
-        dp.status_message = null;
-        dp.started_at = null;
-        dp.completed_at = null;
-        dp.updated_at = null;
-        dp.steps = [];
+        if (!selectedOnly || dp.selected){
+          dp.modified = false;
+          dp.completed_status = null;
+          dp.status_message = null;
+          dp.started_at = null;
+          dp.completed_at = null;
+          dp.updated_at = null;
+          dp.steps = [];
+        }
       });
     } else {
       vm.Project.setDatapoints([]);

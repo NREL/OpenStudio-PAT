@@ -83,6 +83,14 @@ export class RunController {
       return disable;
     };
 
+    vm.$scope.atLeastOneSelected = function () {
+      return _.filter(vm.$scope.datapoints, {selected: true}).length > 0;
+    };
+
+    vm.$scope.allSelected = function() {
+      return _.filter(vm.$scope.datapoints, {selected: true}).length == vm.$scope.datapoints.length;
+    };
+
     // TROUBLESHOOTING PANEL STATUS
     vm.$scope.dev = {open: true};
 
@@ -569,7 +577,7 @@ export class RunController {
     if (type == 'selected'){
       let matchingArr = [];
       _.forEach(vm.$scope.datapoints, (dp) => {
-        if (datapoint.selected) {
+        if (dp.selected) {
           matchingArr.push(dp.id);
         }
         contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: matchingArr});
@@ -623,6 +631,7 @@ export class RunController {
       } else if (type == 'runtype') {
         vm.setRunType();
       } else if (type == 'selected') {
+        vm.$log.debug('type == selected');
         vm.runWorkflow(true);
       }
 
@@ -646,13 +655,13 @@ export class RunController {
     }
 
     // reset analysis
-    vm.OsServer.resetAnalysis();
+    vm.OsServer.resetAnalysis(selectedOnly);
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
   }
 
-  runWorkflow(selectedOnly=false) {
+  runWorkflow(selectedOnly = false) {
     const vm = this;
 
     // set this to lock down runType
@@ -660,13 +669,14 @@ export class RunController {
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
     vm.$log.debug('***** In runController::runWorkflow() *****');
+    vm.$log.debug('selectedOnly? ', selectedOnly);
     vm.toggleButtons();
 
     // 1: delete old results (this sets modified flag)
     vm.deleteResults(selectedOnly);
 
     // 2: make OSA and zip file
-    vm.exportOSA(selectedOnly);
+    vm.Project.exportOSA(selectedOnly);
 
     // 3: hit PAT CLI to start server (local or remote)
     vm.OsServer.setProgress(15, 'Starting server');
@@ -870,39 +880,18 @@ export class RunController {
     vm.Project.exportPAT();
   }
 
-  exportOSA() {
-    const vm = this;
-    vm.Project.exportOSA();
-  }
-
-  runSelected() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
-  runUpdated() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
-  runEnergyPlus() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
-  runReportingMeasures() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
   toggleButtons() {
     const vm = this;
     vm.OsServer.setDisabledButtons(!vm.$scope.disabledButtons);
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
+  }
+
+  selectAll(toggle = true) {
+    // toggle is value to set 'selected' key
+    const vm = this;
+    _.forEach(vm.$scope.datapoints, (dp) => {
+      dp.selected = toggle;
+    });
   }
 
   cancelRun() {

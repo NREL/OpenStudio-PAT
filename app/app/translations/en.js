@@ -297,6 +297,8 @@ export default {
     exportToOSA: 'Export to OSA',
     runEntireWorkflow: 'Run Entire Workflow',
     runSelected: 'Run Selected',
+    selectAll: 'Select All',
+    clearSelections: 'Clear Selections',
     algorithmicOnCloud: 'Algorithmic analyses cannot be run locally.  Select \'Run on Cloud\' from the dropdown above to run this analysis remotely.',
     viewServer: 'View Server',
     modifiedDP: 'The design alternative data associated with this datapoint has changed since it was last run',

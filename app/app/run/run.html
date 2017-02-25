@@ -32,11 +32,11 @@
     <span class="glyphicon glyphicon-warning-sign red-button big-text"></span>&nbsp;&nbsp;<translate>run.algorithmicOnCloud</translate>
   </div>
   <div class="col-sm-12" ng-if="selectedAnalysisType != 'Algorithmic'">
-    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
-    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeDelete('selected')" translate>run.runSelected</button>
-    <button type="button" class="btn btn-danger" ng-show="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
-    <button type="button" class="btn btn-danger" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>
-    <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()">View Server</button>
+    <button type="button" class="btn btn-success" ng-if="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
+    <button type="button" class="btn btn-success" ng-if="!disabledButtons && atLeastOneSelected()" ng-click="run.warnBeforeDelete('selected')" translate>run.runSelected</button>
+    <button type="button" class="btn btn-danger" ng-if="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
+    <button type="button" class="btn btn-danger" ng-if="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>
+    <button type="button" class="btn btn-primary" ng-if="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()">View Server</button>
   </div>
 </div>
 
@@ -54,6 +54,13 @@
     <div class="col-sm-6 tab-text">
        <label>ID</label> {{analysisID}}
     </div>
+  </div>
+</div>
+
+<div class="row pad-bot-10" ng-if="!disabledButtons && selectedAnalysisType != 'Algorithmic'">
+  <div class="col-sm-12">
+    <button type="button" class="btn btn-primary" ng-if="!allSelected()" ng-click="run.selectAll(true)" translate>run.selectAll</button>
+    <button type="button" class="btn btn-primary" ng-if="allSelected()" ng-click="run.selectAll(false)" translate>run.clearSelections</button>
   </div>
 </div>
 
