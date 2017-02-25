@@ -29,6 +29,7 @@ export class ModalCreateNewMeasureController {
     vm.tags = '';
     vm.makeMeasureTags();
 
+    //TODO: which folder should receive the new measure?
     //vm.measureDir = vm.Project.getProjectMeasuresDir();
     vm.measureDir = vm.Project.getMeasuresDir();
   }
@@ -53,8 +54,20 @@ export class ModalCreateNewMeasureController {
 
   ok() {
     const vm = this;
+
+    if (vm.measureType == 'OpenStudio')
+      vm.measureType = 'ModelMeasure';
+    else if (vm.measureType == 'EnergyPlus')
+      vm.measureType = 'EnergyPlusMeasure';
+    else if (vm.measureType == 'Reporting')
+      vm.measureType = 'ReportingMeasure';
+    else
+      vm.$log.error('Unhandled measure type');
+
+    const path = vm.measureDir.path(vm.newDisplayName);
+
     const params = {
-      measure_dir: vm.measureDir.path(),
+      measure_dir: path,
       display_name: vm.newDisplayName,
       class_name: _.upperFirst(_.camelCase(vm.newDisplayName)),
       taxonomy_tag: vm.tags,

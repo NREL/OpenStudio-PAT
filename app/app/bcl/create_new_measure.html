@@ -5,19 +5,29 @@
 <div class="modal-body">
   <div class="row pad-bot-20">
     <div class="col-md-12">
-      <label class="full-width"><translate>bcl.createNewMeasure.name</translate></label>
+      <label class="full-width">
+        <translate>bcl.createNewMeasure.name</translate>
+      </label>
       <input class="full-width" type="text" ng-model="modal.newDisplayName">
-      <label class="full-width"><translate>bcl.createNewMeasure.description</translate></label>
+      <label class="full-width">
+        <translate>bcl.createNewMeasure.description</translate>
+      </label>
       <textarea class="full-width" ng-model="modal.newDescription"></textarea>
-      <label class="full-width"><translate>bcl.createNewMeasure.modelerDescription</translate></label>
+      <label class="full-width">
+        <translate>bcl.createNewMeasure.modelerDescription</translate>
+      </label>
       <textarea class="full-width" ng-model="modal.newModelerDescription"></textarea>
 
-      <label class="full-width"><translate>bcl.createNewMeasure.measureType</translate></label>
+      <label class="full-width">
+        <translate>bcl.createNewMeasure.measureType</translate>
+      </label>
       <select class="form-control"
               ng-options="type for type in modal.measureTypes"
               ng-model="modal.measureType"></select>
 
-      <label class="full-width"><translate>bcl.createNewMeasure.taxonomy</translate></label>
+      <label class="full-width">
+        <translate>bcl.createNewMeasure.taxonomy</translate>
+      </label>
       <select class="form-control"
               ng-options="taxonomy for taxonomy in modal.taxonomies"
               ng-click="modal.getTaxonomyChildren(taxonomy)"
@@ -32,6 +42,8 @@
 </div>
 
 <div class="modal-footer">
-  <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>bcl.createNewMeasure.createMeasure</button>
+  <button type="button" class="btn btn-primary" ng-click="modal.ok()" ng-disabled="modal.newDisplayName.length==0"
+          translate>bcl.createNewMeasure.createMeasure
+  </button>
   <button type="button" class="btn btn-warning" ng-click="modal.cancel()">Cancel</button>
 </div>
