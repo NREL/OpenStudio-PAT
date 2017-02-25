@@ -168,7 +168,7 @@ export class OsServer {
     vm.setAnalysisChangedFlag(false);
     // reset analysis ID
     vm.Project.setAnalysisID(null);
-    if (vm.Project.getRunType().name == 'local'){
+    if (vm.Project.getAnalysisType() == 'Manual'){
       // reset certain fields on datapoint
       _.forEach(vm.datapoints, (dp) => {
         if (!selectedOnly || dp.selected){

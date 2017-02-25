@@ -206,7 +206,8 @@
 
 <div class="row pad-bot-20">
   <div class="col-sm-8">
-    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
+    <button type="button" class="btn btn-success" ng-show="!disabledButtons && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
+    <button type="button" class="btn btn-success" ng-if="!disabledButtons && atLeastOneSelected() && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.warnBeforeDelete('selected')" translate>run.runSelected</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.cancelRun()" translate>run.cancelRun</button>
     <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()" translate>run.viewServer</button>
   </div>

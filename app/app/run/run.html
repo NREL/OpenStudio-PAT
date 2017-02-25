@@ -100,7 +100,7 @@
             <div class="row datapoint-header pad-top-10">
               <div class="col-sm-2">
                 <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
-                <checkbox ng-model="datapoint.selected" id="{{datapoint.name}}" class="btn-default" ng-if="selectedRunType.name == 'local'" ng-click="$event.preventDefault(); $event.stopPropagation();"></checkbox>
+                <checkbox ng-model="datapoint.selected" id="{{datapoint.name}}" class="btn-default" ng-if="selectedAnalysisType != 'Algorithmic'" ng-click="$event.preventDefault(); $event.stopPropagation();"></checkbox>
                 <span ng-if="datapoint.name">{{datapoint.name}}</span><span ng-if="datapoint.name == undefined && datapoint.id">{{datapoint.id}}</span>
               </div>
               <div class="col-sm-4">
