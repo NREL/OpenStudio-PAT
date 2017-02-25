@@ -86,7 +86,7 @@ export class MeasureManager {
     vm.cli.kill('SIGINT');
   }
 
-  // This function creates a new measure on the file system in folder 'Measures'
+  // This function creates a new measure on the file system in folder 'LocalBCL'
   // params {
   //   measure_dir:
   //   display_name:
