@@ -217,11 +217,11 @@ export default {
     createNewMeasure: {
       title: 'Create New Measure',
       name: 'Name',
-      className: 'Class Name:',
-      description: 'Description:',
-      modelerDescription: 'Modeler Description:',
+      className: 'Class Name',
+      description: 'Description',
+      modelerDescription: 'Modeler Description',
       measureType: 'Measure Type',
-      taxonomy: 'Taxonomy:',
+      taxonomy: 'Taxonomy',
       createNewMeasure: 'Create New Measure',
       createMeasure: 'Create Measure and Open for Editing'
     },

@@ -3,39 +3,50 @@
 </div>
 
 <div class="modal-body">
-  <div class="row pad-bot-20">
-    <div class="col-md-12">
-      <label class="full-width">
-        <translate>bcl.createNewMeasure.name</translate>
-      </label>
-      <input class="full-width" type="text" ng-model="modal.newDisplayName">
-      <label class="full-width">
-        <translate>bcl.createNewMeasure.description</translate>
-      </label>
-      <textarea class="full-width" ng-model="modal.newDescription"></textarea>
-      <label class="full-width">
-        <translate>bcl.createNewMeasure.modelerDescription</translate>
-      </label>
-      <textarea class="full-width" ng-model="modal.newModelerDescription"></textarea>
-
-      <label class="full-width">
-        <translate>bcl.createNewMeasure.measureType</translate>
-      </label>
-      <select class="form-control"
+  <div class="row pad-bot-10">
+    <div class="col-sm-12">
+      <label class="normal-text" for="displayName" translate>bcl.createNewMeasure.name</label>
+      <input class="form-control" type="text" id="displayName" ng-model="modal.newDisplayName">
+    </div>
+  </div>
+  <div class="row pad-bot-10">
+    <div class="col-sm-12">
+      <label class="normal-text" for="desc" translate>bcl.createNewMeasure.description</label>
+      <textarea class="form-control"  id="desc" ng-model="modal.newDescription"></textarea>
+    </div>
+  </div>
+  <div class="row pad-bot-10">
+    <div class="col-sm-12">
+      <label class="normal-text" id="modelerDesc" translate>bcl.createNewMeasure.modelerDescription</label>
+      <textarea class="form-control" id="modelerDesc" ng-model="modal.newModelerDescription"></textarea>
+    </div>
+  </div>
+  <div class="row pad-bot-10">
+    <div class="col-sm-12">
+      <label class="normal-text" for="measureType" translate>bcl.createNewMeasure.measureType</label>
+      <select id="measureType" class="form-control"
               ng-options="type for type in modal.measureTypes"
               ng-model="modal.measureType"></select>
-
-      <label class="full-width">
-        <translate>bcl.createNewMeasure.taxonomy</translate>
-      </label>
-      <select class="form-control"
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label class="normal-text" for="taxonomy" translate>bcl.createNewMeasure.taxonomy</label>
+    </div>
+  </div>
+  <div class="row pad-bot-20">
+    <div class="col-sm-6">
+      <select id="taxonomy" class="form-control"
               ng-options="taxonomy for taxonomy in modal.taxonomies"
               ng-click="modal.getTaxonomyChildren(taxonomy)"
               ng-model="modal.taxonomy"></select>
+      </div>
+    <div class="col-sm-6">
       <select class="form-control"
               ng-options="child for child in modal.children"
               ng-click="modal.makeMeasureTags()"
               ng-model="modal.child"></select>
+      </div>
 
     </div>
   </div>
