@@ -737,7 +737,7 @@ export class ModalBclController {
         vm.resetFilters();
         // select newly added row
         vm.selectARow(newMeasure.uid);
-        //TODO: open the measure file to edit
+        vm.editMeasure(newMeasure);
         deferred.resolve();
       }, () => {
         // failure
