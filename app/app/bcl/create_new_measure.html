@@ -38,15 +38,14 @@
     <div class="col-sm-6">
       <select id="taxonomy" class="form-control"
               ng-options="taxonomy for taxonomy in modal.taxonomies"
-              ng-click="modal.getTaxonomyChildren(taxonomy)"
+              ng-change="modal.getTaxonomyChildren(modal.taxonomy)"
               ng-model="modal.taxonomy"></select>
       </div>
     <div class="col-sm-6">
       <select class="form-control"
-              ng-options="child for child in modal.children"
-              ng-click="modal.makeMeasureTags()"
-              ng-model="modal.child"></select>
-      </div>
+              ng-options="child for child in modal.$scope.children"
+              ng-change="modal.makeMeasureTags()"
+              ng-model="modal.$scope.child"></select>
 
     </div>
   </div>
