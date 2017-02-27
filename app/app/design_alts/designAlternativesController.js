@@ -1,6 +1,8 @@
+import jetpack from 'fs-jetpack';
+
 export class DesignAlternativesController {
 
-  constructor($log, Project, $scope) {
+  constructor($log, Project, $scope, toastr, $q, $uibModal) {
     'ngInject';
 
     const vm = this;
@@ -8,6 +10,10 @@ export class DesignAlternativesController {
     vm.$log = $log;
     vm.$scope = $scope;
     vm.Project = Project;
+    vm.toastr = toastr;
+    vm.$q = $q;
+    vm.$uibModal = $uibModal;
+    vm.jetpack = jetpack;
 
     vm.selected = null;
     vm.measures = vm.Project.getMeasuresAndOptions();
@@ -22,6 +28,7 @@ export class DesignAlternativesController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
     vm.$scope.alternatives = vm.Project.getDesignAlternatives();
+    vm.datapoints = vm.Project.getDatapoints();
 
     vm.$scope.gridOptions = [];
     vm.setGridOptions();
@@ -105,6 +112,27 @@ export class DesignAlternativesController {
             vm.selected = null;
           }
         });
+        gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
+          if (newValue != oldValue && colDef.name == 'name') {
+            const rowIndex = _.findIndex(vm.$scope.alternatives, {$$hashKey: rowEntity.$$hashKey});
+            const isUnique = vm.checkUnique(vm.$scope.alternatives, newValue, rowIndex);
+            if (!isUnique){
+              // not unique, restore old value and add toastr
+              vm.$log.debug('DA name must be unique');
+              rowEntity.name = oldValue;
+              vm.toastr.error('Cannot change design alternative name.  Selected name is not unique.');
+            }
+          }
+
+          // figure out if there are datapoints to update
+          if (newValue != oldValue) {
+            // find datapoint and mark as modified (if already run)
+            const match = _.find(vm.datapoints, {name: rowEntity.name});
+            if (match && match.updated_at) {
+              match.modified = true;
+            }
+          }
+        });
         gridApi.cellNav.on.navigate(null, (newRowCol) => {
           vm.$scope.gridApi.selection.selectRow(newRowCol.row.entity);
         });
@@ -151,6 +179,57 @@ export class DesignAlternativesController {
     vm.setIsModified();
     const index = vm.$scope.alternatives.indexOf(alternative);
     vm.$scope.alternatives.splice(index, 1);
+
+    // delete Associated Datapoint
+    vm.deleteAssociatedDatapoint(alternative);
+  }
+
+  deleteAssociatedDatapoint(alternative){
+    const vm = this;
+    const matchIndex = _.findIndex(vm.datapoints, {name: alternative.name});
+    if (matchIndex > -1) {
+      const dp = vm.datapoints[matchIndex];
+      // remove localResults and delete datapoint
+      vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(dp.id));
+      vm.datapoints.splice(matchIndex, 1);
+    }
+  }
+
+  warnBeforeDelete(alternative) {
+
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    vm.$log.debug('**** In DAController::WarnBeforeDeleting ****');
+
+    const match = _.find(vm.datapoints, {name: alternative.name});
+
+    if (match && match.updated_at) {
+      // dp with results exists
+      const modalInstance = vm.$uibModal.open({
+        backdrop: 'static',
+        controller: 'ModalClearDatapointController',
+        controllerAs: 'modal',
+        templateUrl: 'app/design_alts/clearDatapoint.html'
+      });
+
+      modalInstance.result.then(() => {
+        // go on to run workflow
+        deferred.resolve();
+        // DELETE BOTH
+        vm.deleteAlternative(alternative);
+
+      }, () => {
+        // Modal canceled
+        deferred.reject();
+      });
+    } else {
+      // no dp
+      deferred.resolve();
+      // delete
+      vm.deleteAlternative(alternative);
+    }
+    return deferred.promise;
   }
 
   moveUp(alternative) {

@@ -254,6 +254,10 @@ export default {
       name: 'Name',
       seedModel: 'Seed Model'
     },
+    modalClearDatapoint: {
+      title: 'Clear Datapoint Results',
+      message: 'Deleting this alternative will delete its associated datapoint and results.  Proceed with the deletion?'
+    },
     createOneDesignAlternative: 'Create One Design Alternative with Each Measure Option',
     duplicateAlternative: 'Duplicate Alternative',
     noAlternativesInAlgorithmic: 'For an Algorithmic Analysis, Design Alternatives are created automatically.',
@@ -303,8 +307,13 @@ export default {
     stopServer: 'Stop Server',
     exportToOSA: 'Export to OSA',
     runEntireWorkflow: 'Run Entire Workflow',
+    runSelected: 'Run Selected',
+    selectAll: 'Select All',
+    clearSelections: 'Clear Selections',
     algorithmicOnCloud: 'Algorithmic analyses cannot be run locally.  Select \'Run on Cloud\' from the dropdown above to run this analysis remotely.',
     viewServer: 'View Server',
+    modifiedDP: 'The design alternative data associated with this datapoint has changed since it was last run',
+    deletedDA: 'The design alternative associated with this datapoint has been deleted from the project',
     modalAnalysisRunning: {
       title: 'Analysis is Running',
       message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'
