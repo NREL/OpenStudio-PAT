@@ -610,8 +610,8 @@ export class OsServer {
     vm.remoteSettings = vm.Project.getRemoteSettings();
     // need aws credentials as ENV vars
     vm.$log.debug('PROCESS.ENV: ', process.env);
-    // TODO: need to set all other vars from process.env?
-    const envCopy = {};
+    // need to set all other vars from process.env
+    const envCopy = angular.copy(process.env);
 
     // open file, set truncatedAccessKey
     const yamlStr = vm.jetpack.read(vm.Project.getAwsDir().path(vm.remoteSettings.credentials.yamlFilename + '.yml'));
@@ -707,7 +707,7 @@ export class OsServer {
     const obj = jetpack.read(vm.Project.projectDir.path() + '/local_configuration.json', 'json');
     if (obj) {
       vm.localServerURL = obj.server_url;
-      if (serverType == 'Local') {
+      if (serverType == 'local') {
         // if selected Server if local, set URL
         vm.setSelectedServerURL(obj.server_url);
       }
@@ -730,7 +730,7 @@ export class OsServer {
       vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getProjectName()}.json" "${vm.selectedServerURL}"`;
     vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
 
-    const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param;
+    const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param.toLowerCase();
     vm.$log.debug('FULL run_analysis command: ', full_command);
     const child = vm.exec(full_command,
       (error, stdout, stderr) => {

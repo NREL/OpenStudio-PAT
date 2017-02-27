@@ -115,6 +115,7 @@
 </div>
 
 <div class="modal-footer">
+  <button type="button" class="btn btn-primary" ng-click="modal.createNewMeasure()" translate>bcl.createNewMeasure.createNewMeasure</button>
   <button type="button" ng-if="!addInProgress && !downloadInProgress" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
   <button type="button" ng-if="addInProgress || downloadInProgress" class="btn btn-warning disabled" translate>bcl.wait</button>
 </div>

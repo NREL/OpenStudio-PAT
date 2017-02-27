@@ -19,6 +19,7 @@ import { ModalSetMeasuresDirController } from '../app/project/modalSetMeasuresDi
 import { ModalNestedProjectWarningController } from '../app/project/modalNestedProjectWarningController';
 import { ModalWhitespaceWarningController } from '../app/project/modalWhitespaceWarningController';
 import { ModalDuplicateMeasureController } from '../app/bcl/modalDuplicateMeasureController';
+import { ModalCreateNewMeasureController } from '../app/bcl/modalCreateNewMeasureController';
 import { ModalUpdateMeasureController } from '../app/bcl/modalUpdateMeasureController';
 import { ModalViewReportController } from '../app/run/modalViewReportController';
 import { ModalClearResultsController } from '../app/run/modalClearResultsController';
@@ -55,6 +56,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalServerToolsController', ModalServerToolsController)
   .controller('ModalSetMeasuresDirController', ModalSetMeasuresDirController)
   .controller('ModalDuplicateMeasureController', ModalDuplicateMeasureController)
+  .controller('ModalCreateNewMeasureController', ModalCreateNewMeasureController)
   .controller('ModalUpdateMeasureController', ModalUpdateMeasureController)
   .controller('ModalViewReportController', ModalViewReportController)
   .controller('ModalSelectOutputsController', ModalSelectOutputsController)

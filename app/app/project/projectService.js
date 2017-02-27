@@ -722,10 +722,10 @@ export class Project {
     vm.$log.debug('In Project::exportAlgorithmic');
 
     // ALGORITHM SETTINGS
-    vm.osa.analysis.problem.analysis_type = vm.samplingMethod.id;
+    vm.osa.analysis.problem.analysis_type = vm.samplingMethod.id.toLowerCase();
     vm.osa.analysis.problem.algorithm = {};
     _.forEach(vm.algorithmSettings, (setting) => {
-      vm.osa.analysis.problem.algorithm[setting.name] = setting.value;
+      vm.osa.analysis.problem.algorithm[_.snakeCase(setting.name)] = setting.value;
     });
 
     // OUTPUTS
@@ -751,6 +751,9 @@ export class Project {
 
     // add objective function names to algorithm section
     vm.osa.analysis.problem.algorithm.objective_functions = _.map(_.filter(tempOutputs, {objective_function: true}), 'name');
+    if (!vm.osa.analysis.problem.algorithm.objective_functions) {
+      vm.osa.analysis.problem.algorithm.objective_functions = [];
+    }
     vm.osa.analysis.output_variables = vm.makeOutputs(tempOutputs, groupFlag);
 
     // MEASURE DETAILS
@@ -843,7 +846,7 @@ export class Project {
           v.uncertainty_description = {};
           // pivots can be discrete or integer_sequence_uncertain (handled in analysis controller)
           // options are triangle, uniform, discrete, and normal, integer_sequence_uncertain
-          v.uncertainty_description.type = arg.inputs.distribution == 'Integer Sequence' ? 'integer_sequence_uncertain' : arg.inputs.distribution;
+          v.uncertainty_description.type = arg.inputs.distribution == 'Integer Sequence' ? 'integer_sequence' : arg.inputs.distribution.toLowerCase();
           v.uncertainty_description.attributes = [];
 
           // if discrete or pivot, make values and weights array (unless pivot w/ integer_sequence)
@@ -1547,61 +1550,64 @@ export class Project {
         name: 'm3.xlarge',
         cpus: '4',
         memory: '15 GiB',
-        storage: '2 x 40 GB'
+        storage: '2 x 40 GB',
+        cost: '$0.28/hr'
       },
       {
         name: 'm3.2xlarge',
         cpus: '8',
         memory: '30 GiB',
-        storage: '2 x 80 GB'
+        storage: '2 x 80 GB',
+        cost: '$0.56/hr'
       },
       {
         name: 'c3.xlarge',
         cpus: '4',
         memory: '7.5 GiB',
-        storage: '2 x 40 GB'
+        storage: '2 x 40 GB',
+        cost: '$0.21/hr'
       },
       {
         name: 'c3.2xlarge',
         cpus: '8',
         memory: '15 GiB',
-        storage: '2 x 80 GB'
+        storage: '2 x 80 GB',
+        cost: '	$0.42/hr'
       },
       {
         name: 'c3.4xlarge',
         cpus: '16',
         memory: '30 GiB',
-        storage: '2 x 160 GB'
+        storage: '2 x 160 GB',
+        cost: '$0.84/hr'
       },
       {
         name: 'c3.8xlarge',
         cpus: '32',
         memory: '60 GiB',
-        storage: '2 x 320 GB'
+        storage: '2 x 320 GB',
+        cost: '$1.68/hr'
       },
       {
         name: 'i2.xlarge',
         cpus: '4',
         memory: '30.5 GiB',
-        storage: '1 x 800 GB'
+        storage: '1 x 800 GB',
+        cost: '$0.85/hr'
       },
       {
         name: 'i2.2xlarge',
         cpus: '8',
         memory: '61 GiB',
-        storage: '2 x 800 GB'
+        storage: '2 x 800 GB',
+        cost: '$1.71/hr'
       },
       {
         name: 'i2.4xlarge',
         cpus: '16',
         memory: '122 GiB',
-        storage: '4 x 800 GB'
-      },
-      {
-        name: 'i2.8xlarge',
-        cpus: '32',
-        memory: '244 GiB',
-        storage: '8 x 800 GB'
+        storage: '4 x 800 GB',
+        cost: '$3.41/hr'
       }
     ];
   }
@@ -1613,85 +1619,92 @@ export class Project {
         name: 'm3.medium',
         cpus: '1',
         memory: '3.75 GiB',
-        storage: '1 x 4 GB'
+        storage: '1 x 4 GB',
+        cost: '$0.07/hr'
       },
       {
         name: 'm3.large',
         cpus: '2',
         memory: '7.5 GiB',
-        storage: '1 x 32 GB'
+        storage: '1 x 32 GB',
+        cost: '$0.14/hr'
       },
       {
         name: 'm3.xlarge',
         cpus: '4',
         memory: '15 GiB',
-        storage: '2 x 40 GB'
+        storage: '2 x 40 GB',
+        cost: '$0.28/hr'
       },
       {
         name: 'm3.2xlarge',
         cpus: '8',
         memory: '30 GiB',
-        storage: '2 x 80 GB'
+        storage: '2 x 80 GB',
+        cost: '$0.56/hr'
       },
       {
         name: 'c3.large',
         cpus: '2',
         memory: '3.75 GiB',
-        storage: '2 x 16 GB'
+        storage: '2 x 16 GB',
+        cost: '$0.11/hr'
       },
       {
         name: 'c3.xlarge',
         cpus: '4',
         memory: '7.5 GiB',
-        storage: '2 x 40 GB'
+        storage: '2 x 40 GB',
+        cost: '$0.21/hr'
       },
       {
         name: 'c3.2xlarge',
         cpus: '8',
         memory: '15 GiB',
-        storage: '2 x 80 GB'
+        storage: '2 x 80 GB',
+        cost: '$0.42/hr'
       },
       {
         name: 'c3.4xlarge',
         cpus: '16',
         memory: '30 GiB',
-        storage: '2 x 160 GB'
+        storage: '2 x 160 GB',
+        cost: '$0.84/hr'
       },
       {
         name: 'c3.8xlarge',
         cpus: '32',
         memory: '60 GiB',
-        storage: '2 x 320 GB'
+        storage: '2 x 320 GB',
+        cost: '$1.68/hr'
       },
       {
         name: 'r3.large',
         cpus: '2',
         memory: '15.25 GiB',
-        storage: '1 x 32 GB'
+        storage: '1 x 32 GB',
+        cost: '$0.85/hr'
       },
       {
         name: 'i2.xlarge',
         cpus: '4',
         memory: '30.5 GiB',
-        storage: '1 x 800 GB'
+        storage: '1 x 800 GB',
+        cost: '$1.71/hr'
       },
       {
         name: 'i2.2xlarge',
         cpus: '8',
         memory: '61 GiB',
-        storage: '2 x 800 GB'
+        storage: '2 x 800 GB',
+        cost: '$1.71/hr'
       },
       {
         name: 'i2.4xlarge',
         cpus: '16',
         memory: '122 GiB',
-        storage: '4 x 800 GB'
-      },
-      {
-        name: 'i2.8xlarge',
-        cpus: '32',
-        memory: '244 GiB',
-        storage: '8 x 800 GB'
+        storage: '4 x 800 GB',
+        cost: '$3.41/hr'
       }
     ];
   }
@@ -2078,25 +2091,31 @@ export class Project {
   setAlgorithmSettings(algorithm) {
     const vm = this;
     vm.$log.debug('In setAlgorithmSettings in Project');
-    _.forEach(vm.algorithmOptions[algorithm.id], (object) => {
-      let flag = 0;
-      _.forEach(vm.algorithmSettings, (setting) => {
-        if (object.name === setting.name) {
-          setting.description = object.description;
-          setting.defaultValue = object.defaultValue;
-          if (!setting.value) {
-            setting.value = object.value;
-          }
-          flag = 1;
-        }
-      });
-      if (!flag) {
-        object.value = object.defaultValue;
-        vm.algorithmSettings.push(object);
+
+    // remove non-applicable settings
+    _.forEachRight(vm.algorithmSettings, (setting, key) => {
+      const match = _.find(vm.algorithmOptions[algorithm.id], {name: setting.name});
+      if (!match) {
+        vm.algorithmSettings.splice(key, 0);
       }
     });
 
-    vm.algorithmSettings = vm.algorithmOptions[algorithm.id];
+    // add/update new settings
+    _.forEach(vm.algorithmOptions[algorithm.id], (object) => {
+      const match = _.find(vm.algorithmSettings, {name: object.name});
+      if (match) {
+        match.description = object.description;
+        match.defaultValue = object.defaultValue;
+        match.value = _.isNil(match.value) ? object.defaultValue : match.value;
+      }
+      else {
+        const temp = angular.copy(object);
+        temp.value = temp.defaultValue;
+        vm.algorithmSettings.push(temp);
+      }
+    });
+
+
   }
 
   getAlgorithmOptions() {

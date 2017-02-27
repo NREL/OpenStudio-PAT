@@ -115,6 +115,7 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('In initializeTab in analysis');
     // group by type
+    vm.initializeInstanceID();
     vm.setMeasureTypes();
     // sort measures by workflow_index
     vm.$scope.measures = _.sortBy(vm.$scope.measures, ['workflow_index']);
@@ -133,6 +134,13 @@ export class AnalysisController {
       vm.showPivotVariables();
       vm.showContinuousVariables();
     }
+  }
+
+  initializeInstanceID() {
+    const vm = this;
+    _.forEach(vm.$scope.measures, (measure) => {
+      measure.instanceId = Math.random();
+    });
   }
 
   initializeGrids() {
@@ -437,6 +445,9 @@ export class AnalysisController {
     });
 
     vm.$scope.gridOptions[measure.instanceId].columnDefs.push(opt);
+
+    vm.Project.savePrettyOptions();
+
     return opt;
   }
 
@@ -700,7 +711,7 @@ export class AnalysisController {
 
   resetAllChoiceArgumentSelections() {
     const vm = this;
-    vm.$log.debug('in resetAllChoiceArgumentSelections in anaysis');
+    vm.$log.debug('in resetAllChoiceArgumentSelections in analysis');
     _.forEach(vm.$scope.measures, (measure) => {
       vm.resetChoiceArgumentSelections(measure);
     });
@@ -1205,7 +1216,6 @@ export class AnalysisController {
     const vm = this;
     vm.$log.debug('Initializing variables for Algorithmic mode');
     _.forEach(vm.$scope.measures, (measure) => {
-      measure.instanceId = Math.random();
       // add SKIP
       measure.skip = _.isNil(measure.skip) ? false : measure.skip;
       _.forEach(measure.arguments, (arg) => {

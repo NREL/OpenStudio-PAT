@@ -47,7 +47,7 @@
     <div class="col-sm-12 bold ">
       <div class="row pad-bot-10" ng-repeat="output in measure.userDefinedOutputs">
         <div class="col-sm-8 pad-left-25 normal-text">
-          <input type="text" id="userDefinedOutput_{{$index}}" ng-model="output.display_name" class="form-control" ng-disabled="!output.new">
+          <input type="text" id="userDefinedOutput_{{$index}}" ng-model="output.display_name" class="form-control" ng-disabled="!output.newOut">
         </div>
         <div class="col-sm-1 pad-top-5">
           <span class="glyphicon glyphicon-remove-sign black-button header-text" ng-click="modal.deleteOutput(output)" aria-hidden="true" aria-label="Delete Output"></span>
