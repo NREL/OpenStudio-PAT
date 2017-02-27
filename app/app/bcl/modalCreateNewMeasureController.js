@@ -39,11 +39,13 @@ export class ModalCreateNewMeasureController {
     vm.$log.debug('ModalCreateNewMeasureController::getTaxonomyChildren');
     const index = vm.taxonomies.indexOf(taxonomy);
 
-    _.forEach(vm.bclCategories[index].children, (child) => {
-      vm.children.push(child.name);
-    });
-    vm.child = vm.children[0];
-    vm.makeMeasureTags();
+    if (vm.bclCategories && vm.bclCategories.length > 0 && index >= 0) {
+      _.forEach(vm.bclCategories[index].children, (child) => {
+        vm.children.push(child.name);
+      });
+      vm.child = vm.children[0];
+      vm.makeMeasureTags();
+    }
   }
 
   makeMeasureTags() {
