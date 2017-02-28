@@ -233,17 +233,19 @@ export class ModalBclController {
         _.forEach(vm.libMeasures[key], m => {
           // TODO: what if it's in the project but no longer in local/my folder? check for this?
           // add if not found (BCL online only)
-          if (key != 'my' && key != 'local'){
-            if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+          if (key  == 'bcl'){
+            // add if local measure of same UID isn't already added
+            if (!(_.find(measures, {uid: m.uid, location: 'local'}))) measures.push(m);
           } else {
-            // add if from a different location
-            if (!(_.find(measures, {uid: m.uid, location: key}))) measures.push(m);
+            // add if uid and location not found
+            if (!(_.find(measures, {uid: m.uid, location: m.location}))) measures.push(m);
           }
         });
       }
     });
 
     vm.$scope.displayMeasures = measures;
+    vm.$log.debug("***DisplayMeasures: ", vm.$scope.displayMeasures);
     return measures;
   }
 
@@ -471,14 +473,22 @@ export class ModalBclController {
     vm.toastr.info('Downloading measure from the BCL...');
     vm.BCL.downloadBCLMeasure(measure).then(newMeasure => {
       vm.$log.debug('In modal download()');
-      vm.$log.debug('Local Measures: ', vm.libMeasures.local);
       vm.$log.debug('new measure: ', newMeasure);
-      vm.resetFilters();
-      // select newly added row
-      vm.selectARow(measure.uid);
-      vm.$scope.downloadInProgress = false;
-      vm.toastr.success('Measure Downloaded!');
-      deferred.resolve();
+      // vm.$log.debug('Local Measures, update?: ', vm.libMeasures.local);
+      // check for updates in case this measure is somehow already added to project
+      vm.BCL.checkForUpdatesLocalBcl().then(() => {
+          vm.resetFilters();
+          // select newly added row
+          vm.selectARow(measure.uid);
+          vm.$scope.downloadInProgress = false;
+          vm.toastr.success('Measure Downloaded!');
+          deferred.resolve('success');
+      }, () => {
+        vm.$log.debug('Error checking for local BCL updates...');
+        vm.$scope.downloadInProgress = false;
+        vm.toastr.success('Measure Downloaded!');
+        deferred.resolve('measure downloaded successfully but not updated');
+      });
 
     }, () => {
       vm.$scope.downloadInProgress = false;
@@ -653,9 +663,7 @@ export class ModalBclController {
       } else {
         vm.$log.debug('Invalid action in modal');
       }
-
     });
-
   }
 
   // copy from local and edit (2X)
