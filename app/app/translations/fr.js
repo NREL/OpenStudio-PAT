@@ -128,7 +128,8 @@ export default {
         message: 'Select which options you would like to duplicate in this measure.',
         selectAll: 'Select All',
         deselectAll: 'Deselect All'
-      }
+      },
+      modalEditOptionDescription: 'Edit Option Description'
     }
   },
   bcl: {
