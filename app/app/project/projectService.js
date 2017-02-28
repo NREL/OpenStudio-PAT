@@ -495,11 +495,19 @@ export class Project {
         const da_hash = {};
         da_hash.name = da.name;
         da_hash.description = da.description;
+        // add if other seed
         if (da.seedModel != vm.defaultSeed) {
           const seed = {};
           seed.file_type = 'OSM';
           seed.path = './seeds/' + da.seedModel;
           da_hash.seed = seed;
+        }
+        // add if other weather
+        if (da.weatherFile != vm.defaultWeatherFile){
+          const weather = {};
+          weather.file_type = 'EPW';
+          weather.path = './weather/' + da.weatherFile;
+          da_hash.weather_file = weather;
         }
         // add option names and descriptions
         const options = [];
