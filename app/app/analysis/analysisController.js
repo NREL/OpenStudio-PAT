@@ -151,7 +151,6 @@ export class AnalysisController {
     vm.loadMeasureOptions();
   }
 
-
   getDefaultOptionColDef() {
     const vm = this;
     vm.$log.debug('AnalysisController getDefaultOptionColDef');
@@ -474,7 +473,7 @@ export class AnalysisController {
         argument[opt.field] = opt.display_name + ' Name';
       }
       else if (argument.specialRowId === 'optionDescription') {
-        argument[opt.field] = opt.display_name + ' Description';
+        argument[opt.field] = opt.display_name + ' Description: ' + measure.description;
       }
       else if (!argument.variable) {
         argument.variable = false;
@@ -540,6 +539,7 @@ export class AnalysisController {
     });
     // reset DAs that were using this option
     vm.unsetOptionInDA(instanceId, optionName);
+    vm.Project.savePrettyOptions();
   }
 
   variableCheckboxChanged(row, col) {
@@ -648,6 +648,65 @@ export class AnalysisController {
       // use default value, otherwise leave blank
       argument[option.field] = argument.default_value ? argument.default_value : '';
     });
+  }
+
+  editOptionDescription(col, row) {
+    const vm = this;
+    vm.$log.debug('Analysis::editOptionDescription');
+    //vm.$log.debug('col', col);
+    //vm.$log.debug('row', row);
+
+    const field = col.colDef.field;
+    //vm.$log.debug('field', field);
+
+    const instanceId = col.colDef.instanceId;
+    //vm.$log.debug('instanceId: ', instanceId);
+
+    const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
+    //vm.$log.debug('measure: ', measure);
+
+    let idx = -1;
+    for (let i = 0; i < measure.arguments.length; i++) {
+      if (!_.isNil(measure.arguments[i].specialRowId) && measure.arguments[i].specialRowId === 'optionDescription') {
+        idx = i;
+        break;
+      }
+    }
+
+    const argument = measure.arguments[idx];
+    //vm.$log.debug('argument: ', argument);
+
+    const optionDescription = argument[field];
+    //vm.$log.debug('optionDescription: ', optionDescription);
+
+    const deferred = vm.$q.defer();
+
+    // open modal for user to select options.
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalEditOptionDescriptionController',
+      controllerAs: 'modal',
+      templateUrl: 'app/analysis/edit_option_description.html',
+      //windowClass: 'wide-modal',
+      resolve: {
+        params: function () {
+          return {
+            optionDescription: optionDescription
+          };
+        }
+      }
+    });
+
+    modalInstance.result.then((optionDescription) => {
+      //vm.$log.debug('optionDescription: ', optionDescription);
+      argument[field] = optionDescription;
+      deferred.resolve();
+    }, () => {
+      // Modal canceled
+      deferred.reject();
+    });
+    //TODO close cell down from being edited?
+    return deferred.promise;
   }
 
   duplicateOption(measure) {

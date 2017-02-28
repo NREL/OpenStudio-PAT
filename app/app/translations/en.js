@@ -55,6 +55,7 @@ export default {
     defaultSeedModel: 'Default Seed Model',
     defaultWeatherFile: 'Default Weather File',
     deleteLastOption: 'Delete Last Option',
+    duplicateMeasure: 'Duplicate Measure',
     duplicateMeasureAndOption: 'Duplicate Measure & Option',
     duplicateOption: 'Duplicate Option',
     energyplusMeasures: 'EnergyPlus Measures',
@@ -127,7 +128,8 @@ export default {
         message: 'Select which options you would like to duplicate in this measure.',
         selectAll: 'Select All',
         deselectAll: 'Deselect All'
-      }
+      },
+      modalEditOptionDescription: 'Edit Option Description'
     }
   },
   bcl: {

@@ -1,9 +1,21 @@
 <div>
   <form name="inputForm">
-    <select ng-if="row.entity.type=='Choice'" ng-class="'colt' + col.uid" ui-grid-edit-dropdown ng-model="MODEL_COL_FIELD" ng-options="field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray"></select>
-    <input ng-if="row.entity.type=='Boolean'" type="checkbox" ng-class="'colt' + col.uid" ui-grid-checkbox ng-change="grid.appScope.analysis.optionCheckboxChanged()" ng-model="MODEL_COL_FIELD">
-    <input ng-if="row.entity.type=='Integer'" type="number" ng-class="'colt' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD">
-    <input ng-if="row.entity.type=='Double'" type="number" ng-class="'colt' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD">
-    <input ng-if="row.entity.type=='String'" type="text" ng-class="'colt' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD">
+    <select ng-if="row.entity.type=='Choice'" ng-class="'colt' + col.uid" ui-grid-edit-dropdown
+            ng-model="MODEL_COL_FIELD"
+            ng-options="field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray"></select>
+    <input ng-if="row.entity.type=='Boolean'" type="checkbox" ng-class="'colt' + col.uid" ui-grid-checkbox
+           ng-change="grid.appScope.analysis.optionCheckboxChanged()" ng-model="MODEL_COL_FIELD">
+    <input ng-if="row.entity.type=='Integer'" type="number" ng-class="'colt' + col.uid" ui-grid-editor
+           ng-model="MODEL_COL_FIELD">
+    <input ng-if="row.entity.type=='Double'" type="number" ng-class="'colt' + col.uid" ui-grid-editor
+           ng-model="MODEL_COL_FIELD">
+    <input ng-if="row.entity.type=='String' && !row.entity.specialRowId" type="text" ng-class="'colt' + col.uid"
+           ui-grid-editor ng-model="MODEL_COL_FIELD">
+    <input ng-if="row.entity.type=='String' && row.entity.specialRowId!='optionDescription'" type="text"
+           ng-class="'colt' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD">
+    <input ng-if="row.entity.type=='String' && row.entity.specialRowId=='optionDescription'" type="text"
+           ng-class="'colt' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD"
+           ng-init="grid.appScope.analysis.editOptionDescription(col,row)"
+           ng-click="grid.appScope.analysis.editOptionDescription(col,row)">
   </form>
 </div>
