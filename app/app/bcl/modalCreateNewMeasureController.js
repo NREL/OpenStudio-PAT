@@ -1,6 +1,6 @@
 export class ModalCreateNewMeasureController {
 
-  constructor($log, $uibModalInstance, $scope, BCL, Project) {
+  constructor($log, $uibModalInstance, $scope, BCL, Project, jetpack) {
     'ngInject';
 
     const vm = this;
@@ -34,6 +34,8 @@ export class ModalCreateNewMeasureController {
     //TODO: which folder should receive the new measure?
     //vm.measureDir = vm.Project.getProjectMeasuresDir();
     vm.measureDir = vm.Project.getMeasuresDir();
+
+    vm.jetpack = jetpack;
   }
 
   getTaxonomyChildren(taxonomy) {
@@ -69,12 +71,22 @@ export class ModalCreateNewMeasureController {
     else
       vm.$log.error('Unhandled measure type');
 
-    const path = vm.measureDir.path(vm.newDisplayName);
+    // Find a unique measure_dir
+    let count = 0;
+    let displayName = vm.newDisplayName;
+    let measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
+    vm.$log.debug('measureDir: ', measureDir);
+    while (vm.jetpack.exists(measureDir)) {
+      count++;
+      displayName = vm.newDisplayName + count.toString();
+      measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
+      vm.$log.debug('measureDir: ', measureDir);
+    }
 
     const params = {
-      measure_dir: path,
-      display_name: vm.newDisplayName,
-      class_name: _.upperFirst(_.camelCase(vm.newDisplayName)),
+      measure_dir: measureDir,
+      display_name: displayName,
+      class_name: _.upperFirst(_.camelCase(displayName)),
       taxonomy_tag: vm.tags,
       measure_type: vm.measureType,
       description: vm.newDescription,
