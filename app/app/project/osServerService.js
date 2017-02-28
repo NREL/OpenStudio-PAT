@@ -163,12 +163,27 @@ export class OsServer {
 
   }
 
-  resetAnalysis() {
+  resetAnalysis(selectedOnly = false) {
     const vm = this;
     vm.setAnalysisChangedFlag(false);
     // reset analysis ID
     vm.Project.setAnalysisID(null);
-    vm.Project.setDatapoints([]);
+    if (vm.Project.getAnalysisType() == 'Manual'){
+      // reset certain fields on datapoint
+      _.forEach(vm.datapoints, (dp) => {
+        if (!selectedOnly || dp.selected){
+          dp.modified = false;
+          dp.completed_status = null;
+          dp.status_message = null;
+          dp.started_at = null;
+          dp.completed_at = null;
+          dp.updated_at = null;
+          dp.steps = [];
+        }
+      });
+    } else {
+      vm.Project.setDatapoints([]);
+    }
     vm.setDatapointsStatus([]);
 
     vm.Project.setModified(true);
@@ -967,7 +982,8 @@ export class OsServer {
         datapoint.final_message = dp.final_message;
         datapoint.id = dp.id;
 
-        let dp_match = _.findIndex(vm.datapoints, {id: dp.id});
+        let dp_match = _.findIndex(vm.datapoints, {name: dp.name});
+        vm.$log.debug('DP match results for: ', dp.name, ': ', dp_match);
         if (dp_match != -1) {
           // merge
           _.merge(vm.datapoints[dp_match], datapoint);
@@ -995,10 +1011,12 @@ export class OsServer {
             datapoint.final_message = dp.final_message;
             datapoint.id = dp.id;
 
-            let dp_match = _.findIndex(vm.datapoints, {id: dp.id});
+            let dp_match = _.findIndex(vm.datapoints, {name: dp.name});
+            vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
             if (dp_match != -1) {
               // merge
               _.merge(vm.datapoints[dp_match], datapoint);
+              vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
             } else {
               // also load in datapoints array
               vm.datapoints.push(datapoint);

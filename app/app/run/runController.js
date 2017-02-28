@@ -23,8 +23,6 @@ export class RunController {
     vm.jetpack = jetpack;
 
     vm.runTypes = vm.Project.getRunTypes();
-    // TEMPORARY:  only show local server
-    //vm.runTypes = _.filter(vm.runTypes, {name: 'local'});
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
@@ -40,7 +38,6 @@ export class RunController {
       vm.resetClusterSettings();
       vm.checkIfClusterIsRunning();
       vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
-
     }
 
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
@@ -58,6 +55,8 @@ export class RunController {
 
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
+    // MANUAL ONLY--set up datapoints
+    vm.setUpDatapoints();
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
     vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
 
@@ -82,6 +81,14 @@ export class RunController {
     vm.$scope.disabledStopButtonClass = function() {
       const disable = vm.OsServer.getRemoteStopInProgress() ? 'disabled' : '';
       return disable;
+    };
+
+    vm.$scope.atLeastOneSelected = function () {
+      return _.filter(vm.$scope.datapoints, {selected: true}).length > 0;
+    };
+
+    vm.$scope.allSelected = function() {
+      return _.filter(vm.$scope.datapoints, {selected: true}).length == vm.$scope.datapoints.length;
     };
 
     // TROUBLESHOOTING PANEL STATUS
@@ -109,6 +116,21 @@ export class RunController {
       return !isSkipped;
     };
 
+  }
+
+  setUpDatapoints() {
+    const vm = this;
+    if (vm.$scope.selectedRunType.name == 'local') {
+      // ensure there is one datapoint per DA
+      const alternatives = vm.Project.getDesignAlternatives();
+
+      _.forEach(alternatives, (alt) => {
+        if (!_.find(vm.$scope.datapoints, {name: alt.name})){
+          // add empty datapoint to array
+          vm.$scope.datapoints.push({name: alt.name, run: false, modified: false});
+        }
+      });
+    }
   }
 
 
@@ -370,14 +392,23 @@ export class RunController {
       const start = vm.Project.makeDate(startStr);
       const end = vm.Project.makeDate(endStr);
 
-      const diff = end - start;
-      let sec = parseInt((end - start) / 1000);
-      sec = (sec < 10) ? '0' + sec : sec;
-      let min = parseInt(sec / 60);
-      min = (min < 10) ? '0' + min : min;
-      let hours = parseInt(min / 60);
+      var delta = Math.abs(end - start) / 1000;
+
+      // calculate (and subtract) whole hours
+      let hours = Math.floor(delta / 3600) % 24;
+      delta -= hours * 3600;
       hours = (hours < 10) ? '0' + hours : hours;
-      result = hours + ":" + min + ":" + sec;
+
+      // calculate (and subtract) whole minutes
+      let minutes = Math.floor(delta / 60) % 60;
+      delta -= minutes * 60;
+      minutes = (minutes < 10) ? '0' + minutes : minutes;
+
+      // what's left is seconds
+      let seconds = delta % 60;  // in theory the modulus is not required
+
+      result = hours + ":" + minutes + ":" + seconds;
+
     }
     return result;
   }
@@ -542,8 +573,20 @@ export class RunController {
 
     vm.$log.debug('**** In RunController::WarnBeforeDeleting ****');
 
-    const contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
-    vm.$log.debug('Local results size:', contents.length);
+    let contents = [];
+    if (type == 'selected'){
+      let matchingArr = [];
+      _.forEach(vm.$scope.datapoints, (dp) => {
+        if (dp.selected) {
+          matchingArr.push(dp.id);
+        }
+        contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: matchingArr});
+        vm.$log.debug('local results matching selected datapoints: ', contents.length);
+      });
+    } else {
+      contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
+      vm.$log.debug('Local results size:', contents.length);
+    }
 
     if (contents.length > 0) {
       // local results exist
@@ -565,9 +608,11 @@ export class RunController {
         // go on to run workflow
         deferred.resolve();
         if (type == 'run') {
-          vm.runEntireWorkflow();
+          vm.runWorkflow();
         } else if (type == 'runtype') {
           vm.setRunType();
+        } else if (type == 'selected'){
+          vm.runWorkflow(true);
         }
 
       }, () => {
@@ -582,9 +627,12 @@ export class RunController {
       // no local results
       deferred.resolve();
       if (type == 'run') {
-        vm.runEntireWorkflow();
+        vm.runWorkflow();
       } else if (type == 'runtype') {
         vm.setRunType();
+      } else if (type == 'selected') {
+        vm.$log.debug('type == selected');
+        vm.runWorkflow(true);
       }
 
     }
@@ -592,43 +640,53 @@ export class RunController {
     return deferred.promise;
   }
 
-  deleteResults() {
+  deleteResults(selectedOnly=false) {
     const vm = this;
-    // remove localResults contents
-    vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
+
+    if (selectedOnly){
+      _.forEach(vm.$scope.datapoints, (dp) => {
+        if(dp.selected){
+          vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(dp.id));
+        }
+      });
+    } else {
+      // remove localResults contents
+      vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
+    }
 
     // reset analysis
-    vm.OsServer.resetAnalysis();
+    vm.OsServer.resetAnalysis(selectedOnly);
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
   }
 
-  runEntireWorkflow() {
+  runWorkflow(selectedOnly = false) {
     const vm = this;
 
     // set this to lock down runType
     vm.OsServer.setAnalysisStatus('starting');
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
-    vm.$log.debug('***** In runController::runEntireWorkflow() *****');
+    vm.$log.debug('***** In runController::runWorkflow() *****');
+    vm.$log.debug('selectedOnly? ', selectedOnly);
     vm.toggleButtons();
 
     // 1: delete old results (this sets modified flag)
-    vm.deleteResults();
+    vm.deleteResults(selectedOnly);
 
     // 2: make OSA and zip file
-    vm.exportOSA();
+    vm.Project.exportOSA(selectedOnly);
 
     // 3: hit PAT CLI to start server (local or remote)
     vm.OsServer.setProgress(15, 'Starting server');
 
-    vm.$log.debug('***** In runController::runEntireWorkflow() ready to start server *****');
+    vm.$log.debug('***** In runController::runWorkflow() ready to start server *****');
 
     vm.OsServer.startServer().then(response => {
 
       vm.OsServer.setAnalysisRunningFlag(true);
-      vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
+      vm.$log.debug('***** In runController::runWorkflow() server started *****');
       vm.$log.debug('Start Server response: ', response);
 
       vm.OsServer.setProgress(30, 'Server started');
@@ -639,7 +697,7 @@ export class RunController {
       // 4: hit PAT CLI to start run
       vm.OsServer.setProgress(40, 'Starting analysis run');
 
-      vm.$log.debug('***** In runController::runEntireWorkflow() ready to run analysis *****');
+      vm.$log.debug('***** In runController::runWorkflow() ready to run analysis *****');
 
       // set analysis type (sampling method).  batch_datapoints is for manual runs only
       let analysis_param = '';
@@ -653,7 +711,7 @@ export class RunController {
       vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
       vm.OsServer.runAnalysis(analysis_param).then(response => {
-        vm.$log.debug('***** In runController::runEntireWorkflow() analysis running *****');
+        vm.$log.debug('***** In runController::runWorkflow() analysis running *****');
         vm.$log.debug('Run Analysis response: ', response);
         vm.OsServer.setAnalysisStatus('in progress');
         vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
@@ -669,17 +727,17 @@ export class RunController {
             vm.OsServer.setAnalysisStatus(response.data.analysis.status);
             vm.$scope.analysisStatus = response.data.analysis.status;
             vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
-            vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
+            vm.OsServer.setDatapointsStatus(response.data.analysis.data_points); // TODO: one by one
             vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
             vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
 
             // download/replace out.osw (local only)
             if(vm.$scope.selectedRunType.name == 'local') {
-              vm.OsServer.updateDatapoints().then(response2 => {
+              vm.OsServer.updateDatapoints().then(response2 => {  // TODO: one by one
                 // refresh datapoints
                   vm.$scope.datapoints = vm.Project.getDatapoints();
                 // download reports
-                vm.OsServer.downloadReports().then(response3 => {
+                vm.OsServer.downloadReports().then(response3 => {  // TODO: one by one
                   vm.$log.debug('downloaded all available reports');
                   // refresh datapoints again
                   vm.$scope.datapoints = vm.Project.getDatapoints();
@@ -696,11 +754,12 @@ export class RunController {
               });
             } else {
               // set datapointsStatus as datapoints
-              vm.$scope.datapoints = vm.$scope.datapointsStatus;
+              vm.$scope.datapoints = vm.$scope.datapointsStatus;  // TODO: one by one
             }
             if (response.data.analysis.status == 'completed') {
               // cancel loop
               vm.stopAnalysisStatus('completed');
+
             }
           }, response => {
             vm.$log.debug('analysis status retrieval error: ', response);
@@ -821,39 +880,18 @@ export class RunController {
     vm.Project.exportPAT();
   }
 
-  exportOSA() {
-    const vm = this;
-    vm.Project.exportOSA();
-  }
-
-  runSelected() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
-  runUpdated() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
-  runEnergyPlus() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
-  runReportingMeasures() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
   toggleButtons() {
     const vm = this;
     vm.OsServer.setDisabledButtons(!vm.$scope.disabledButtons);
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
+  }
+
+  selectAll(toggle = true) {
+    // toggle is value to set 'selected' key
+    const vm = this;
+    _.forEach(vm.$scope.datapoints, (dp) => {
+      dp.selected = toggle;
+    });
   }
 
   cancelRun() {

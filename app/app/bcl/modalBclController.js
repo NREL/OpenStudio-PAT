@@ -74,10 +74,6 @@ export class ModalBclController {
       // reload BCL measures
       vm.getBCLMeasures();
 
-      // _.forEach(vm.libMeasures.my, (m) => {
-      //   vm.$log.debug('Added to project: ', m.addedToProject, 'measure: ', m.name);
-      // });
-
       // apply filters
       vm.resetFilters();
 
@@ -218,29 +214,38 @@ export class ModalBclController {
       _.forEach(vm.libMeasures.my, m => {
         if (m.addedToProject) {
           // add if not found
-          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+          if (!(_.find(measures, {uid: m.uid, location: 'my'}))) measures.push(m);
         }
       });
       _.forEach(vm.libMeasures.local, m => {
         if (m.addedToProject) {
           // add if not found
-          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+          if (!(_.find(measures, {uid: m.uid, location: 'local'}))) measures.push(m);
         }
       });
     }
     // add other checked
     _.forEach(vm.filters, (val, key) => {
+
       if (val) {
         vm.$log.debug('key: ', key);
         vm.$log.debug('measures: ', vm.libMeasures[key]);
         _.forEach(vm.libMeasures[key], m => {
-          // add if not found
-          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+          // TODO: what if it's in the project but no longer in local/my folder? check for this?
+          // add if not found (BCL online only)
+          if (key  == 'bcl'){
+            // add if local measure of same UID isn't already added
+            if (!(_.find(measures, {uid: m.uid, location: 'local'}))) measures.push(m);
+          } else {
+            // add if uid and location not found
+            if (!(_.find(measures, {uid: m.uid, location: m.location}))) measures.push(m);
+          }
         });
       }
     });
 
     vm.$scope.displayMeasures = measures;
+    vm.$log.debug("***DisplayMeasures: ", vm.$scope.displayMeasures);
     return measures;
   }
 
@@ -468,14 +473,22 @@ export class ModalBclController {
     vm.toastr.info('Downloading measure from the BCL...');
     vm.BCL.downloadBCLMeasure(measure).then(newMeasure => {
       vm.$log.debug('In modal download()');
-      vm.$log.debug('Local Measures: ', vm.libMeasures.local);
       vm.$log.debug('new measure: ', newMeasure);
-      vm.resetFilters();
-      // select newly added row
-      vm.selectARow(measure.uid);
-      vm.$scope.downloadInProgress = false;
-      vm.toastr.success('Measure Downloaded!');
-      deferred.resolve();
+      // vm.$log.debug('Local Measures, update?: ', vm.libMeasures.local);
+      // check for updates in case this measure is somehow already added to project
+      vm.BCL.checkForUpdatesLocalBcl().then(() => {
+          vm.resetFilters();
+          // select newly added row
+          vm.selectARow(measure.uid);
+          vm.$scope.downloadInProgress = false;
+          vm.toastr.success('Measure Downloaded!');
+          deferred.resolve('success');
+      }, () => {
+        vm.$log.debug('Error checking for local BCL updates...');
+        vm.$scope.downloadInProgress = false;
+        vm.toastr.success('Measure Downloaded!');
+        deferred.resolve('measure downloaded successfully but not updated');
+      });
 
     }, () => {
       vm.$scope.downloadInProgress = false;
@@ -569,43 +582,45 @@ export class ModalBclController {
       // success
       // vm.$log.debug('New computed measure: ', newMeasure);
       // merge project measure in array to preserve prepareMeasure arguments and already-set arguments
-      const project_measure = _.find(vm.projectMeasures, {instanceId: measure.instanceId});
+      // get ALL project_measures that match the UID and the location (my vs local)
+      const project_measures = _.filter(vm.projectMeasures, {uid: measure.uid, location: measure.location});
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
-      // TODO project_measure can now be more than just 1 and must be iterated over (Evan)
-      _.forEachRight(project_measure.arguments, (arg, index) => {
-        if (_.isUndefined(arg.specialRowId)) {
-          const match = _.find(measure.arguments, {name: arg.name});
-          if (_.isUndefined(match)) {
-            project_measure.arguments.splice(index, 1);
-            // vm.$log.debug('removing argument: ', arg.name);
+      vm.$log.debug('Project Measures to Update: ', project_measures);
+      _.forEach(project_measures, (project_measure) => {
+        _.forEachRight(project_measure.arguments, (arg, index) => {
+          if (_.isUndefined(arg.specialRowId)) {
+            const match = _.find(measure.arguments, {name: arg.name});
+            if (_.isUndefined(match)) {
+              project_measure.arguments.splice(index, 1);
+              // vm.$log.debug('removing argument: ', arg.name);
+            }
           }
-        }
+        });
+        // then add/merge (at argument level)
+        _.forEach(newMeasure.arguments, (arg) => {
+          const match = _.find(project_measure.arguments, {name: arg.name});
+          if (_.isUndefined(match)) {
+            // vm.$log.debug('adding argument: ', arg.name);
+            project_measure.arguments.push(arg);
+          } else {
+            // vm.$log.debug('merging argument: ', arg.name);
+            _.merge(match, arg);
+            // vm.$log.debug('merged match: ', match);
+          }
+        });
+        // unset 'update' status on original measure
+        measure.status = '';
+        // remove arguments and merge rest with project_measure
+        let measure_copy = angular.copy(measure);
+        delete measure_copy.arguments;
+        delete measure_copy.open;
+        _.assignIn(project_measure, measure_copy);
+
+        const msg = 'Measure \'' + project_measure.display_name + '\' was successfully updated in your project.';
+        vm.$log.debug('updated project measure: ', project_measure);
+        vm.toastr.success(msg);
       });
-      // then add/merge (at argument level)
-      _.forEach(newMeasure.arguments, (arg) => {
-        const match = _.find(project_measure.arguments, {name: arg.name});
-        if (_.isUndefined(match)) {
-          // vm.$log.debug('adding argument: ', arg.name);
-          project_measure.arguments.push(arg);
-        } else {
-          // vm.$log.debug('merging argument: ', arg.name);
-          _.merge(match, arg);
-          // vm.$log.debug('merged match: ', match);
-        }
-      });
 
-      // unset 'update' status on original measure
-      measure.status = '';
-
-      // remove arguments and merge rest with project_measure
-      let measure_copy = angular.copy(measure);
-      delete measure_copy.arguments;
-      delete measure_copy.open;
-      _.assignIn(project_measure, measure_copy);
-
-      const msg = 'Measure \'' + project_measure.display_name + '\' was successfully updated in your project.';
-      vm.$log.debug('updated project measure: ', project_measure);
-      vm.toastr.success(msg);
       deferred.resolve();
 
     }, () => {
@@ -648,9 +663,7 @@ export class ModalBclController {
       } else {
         vm.$log.debug('Invalid action in modal');
       }
-
     });
-
   }
 
   // copy from local and edit (2X)
@@ -737,7 +750,7 @@ export class ModalBclController {
         vm.resetFilters();
         // select newly added row
         vm.selectARow(newMeasure.uid);
-        //TODO: open the measure file to edit
+        vm.editMeasure(newMeasure);
         deferred.resolve();
       }, () => {
         // failure

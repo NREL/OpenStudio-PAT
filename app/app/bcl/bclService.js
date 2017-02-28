@@ -54,9 +54,13 @@ export class BCL {
     vm.libMeasures.my = [];
     vm.libMeasures.local = [];
 
+    // my measures
+    vm.checkForUpdates();
+
+    // local and online BCL
     vm.getBCLMeasures().then( () => {
       vm.checkForUpdatesLocalBcl();
-      vm.$log.debug('BCL SERVICE CONSTRUCTOR.  LIBMEASURES: ', vm.libMeasures);
+      vm.$log.debug('LIBMEASURES: ', vm.libMeasures);
     });
   }
 
@@ -86,7 +90,7 @@ export class BCL {
     vm.$log.debug('in BCLService checkForUpdates method');
     vm.$log.debug('MyMeasures dir? ', vm.Project.getMeasuresDir().path());
 
-    //refresh project measures
+    // refresh project measures
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
 
     vm.MeasureManager.isReady().then( () => {
@@ -100,7 +104,7 @@ export class BCL {
           measure = vm.prepareMeasure(measure, 'my');
 
           // is measure added to project?
-          const projectMatch = _.find(vm.projectMeasures, {uid: measure.uid});
+          const projectMatch = _.find(vm.projectMeasures, {uid: measure.uid, location: 'my'});
 
           if (angular.isDefined(projectMatch)) {
             // compare version_id and date:
@@ -171,7 +175,7 @@ export class BCL {
           }
 
           // is measure added to project?
-          const projectMatch = _.find(vm.projectMeasures, {instanceId: measure.instanceId});
+          const projectMatch = _.find(vm.projectMeasures, {uid: measure.uid, location: 'local'});
           measure.status = '';
           let measureVersionModified = null;
           let projectVersionModified = null;
@@ -421,8 +425,8 @@ export class BCL {
 
     // measure accordion
     measure.open = false;
-    // is measure added to project?
-    measure.addedToProject = !!angular.isDefined(_.find(vm.projectMeasures, {uid: measure.uid}));
+    // is measure added to project (include type -- My or Local to this)
+    measure.addedToProject = !!angular.isDefined(_.find(vm.projectMeasures, {uid: measure.uid, location: type}));
 
     if (measure.version_modified) {
       measure.date = vm.Project.formatDate(measure.version_modified);

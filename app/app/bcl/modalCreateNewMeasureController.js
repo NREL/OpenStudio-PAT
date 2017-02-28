@@ -1,11 +1,12 @@
 export class ModalCreateNewMeasureController {
 
-  constructor($log, $uibModalInstance, BCL, Project) {
+  constructor($log, $uibModalInstance, $scope, BCL, Project) {
     'ngInject';
 
     const vm = this;
     vm.$log = $log;
     vm.$uibModalInstance = $uibModalInstance;
+    vm.$scope = $scope;
     vm.BCL = BCL;
     vm.Project = Project;
     vm.measure = '';
@@ -23,7 +24,8 @@ export class ModalCreateNewMeasureController {
     });
     vm.taxonomy = vm.taxonomies[0];
 
-    vm.children = [];
+    vm.$scope.child = '';
+    vm.$scope.children = [];
     vm.getTaxonomyChildren(vm.taxonomy);
 
     vm.tags = '';
@@ -39,17 +41,20 @@ export class ModalCreateNewMeasureController {
     vm.$log.debug('ModalCreateNewMeasureController::getTaxonomyChildren');
     const index = vm.taxonomies.indexOf(taxonomy);
 
-    _.forEach(vm.bclCategories[index].children, (child) => {
-      vm.children.push(child.name);
-    });
-    vm.child = vm.children[0];
-    vm.makeMeasureTags();
+    vm.$scope.children = [];
+    if (vm.bclCategories && vm.bclCategories.length > 0 && index >= 0) {
+      _.forEach(vm.bclCategories[index].children, (child) => {
+        vm.$scope.children.push(child.name);
+      });
+      vm.$scope.child = vm.$scope.children[0];
+      vm.makeMeasureTags();
+    }
   }
 
   makeMeasureTags() {
     const vm = this;
     vm.$log.debug('ModalCreateNewMeasureController::makeMeasueTag');
-    vm.tags = vm.taxonomy + '.' + vm.child;
+    vm.tags = vm.taxonomy + '.' + vm.$scope.child;
   }
 
   ok() {

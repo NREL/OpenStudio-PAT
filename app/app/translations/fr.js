@@ -219,11 +219,11 @@ export default {
     createNewMeasure: {
       title: 'Create New Measure',
       name: 'Name',
-      className: 'Class Name:',
-      description: 'Description:',
-      modelerDescription: 'Modeler Description:',
+      className: 'Class Name',
+      description: 'Description',
+      modelerDescription: 'Modeler Description',
       measureType: 'Measure Type',
-      taxonomy: 'Taxonomy:',
+      taxonomy: 'Taxonomy',
       createNewMeasure: 'Create New Measure',
       createMeasure: 'Create Measure and Open for Editing'
     },
@@ -255,6 +255,10 @@ export default {
       locationOrWeatherFile: 'Location or Weather File',
       name: 'Name',
       seedModel: 'Seed Model'
+    },
+    modalClearDatapoint: {
+      title: 'Clear Datapoint Results',
+      message: 'Deleting this alternative will delete its associated datapoint and results.  Proceed with the deletion?'
     },
     createOneDesignAlternative: 'Create One Design Alternative with Each Measure Option',
     duplicateAlternative: 'Duplicate Alternative',
@@ -305,8 +309,13 @@ export default {
     stopServer: 'Stop Server',
     exportToOSA: 'Export to OSA',
     runEntireWorkflow: 'Run Entire Workflow',
+    runSelected: 'Run Selected',
+    selectAll: 'Select All',
+    clearSelections: 'Clear Selections',
     algorithmicOnCloud: 'Algorithmic analyses cannot be run locally.  Select \'Run on Cloud\' from the dropdown above to run this analysis remotely.',
     viewServer: 'View Server',
+    modifiedDP: 'The data associated with this datapoint has changed since it was last run',
+    deletedDA: 'The Design Alternative associated with this datapoint has been deleted from the project',
     modalAnalysisRunning: {
       title: 'Analysis is Running',
       message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'

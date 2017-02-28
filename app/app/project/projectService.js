@@ -179,6 +179,15 @@ export class Project {
           vm.measures = [];
         }
 
+        // recalculate measure_dir to point to this location (in case project moved/copied)
+        _.forEach(vm.measures, (measure) => {
+          const path_parts = _.split(measure.measure_dir, '/');
+          measure.measure_dir = vm.projectDir.path('measures', _.last(path_parts));
+          measure.directory = measure.measure_dir;
+        });
+
+        vm.$log.debug('InitializeProject-measures with updated dir paths: ', vm.measures);
+
         vm.designAlternatives = vm.pat.designAlternatives;
         if (!angular.isDefined(vm.designAlternatives)) {
           vm.designAlternatives = [];
@@ -362,23 +371,23 @@ export class Project {
   }
 
   // export OSA
-  exportOSA() {
+  exportOSA(selectedOnly = false) {
     const vm = this;
     vm.$log.debug('In Project::exportOSA');
+    vm.$log.debug('SelectedOnly? ', selectedOnly);
 
     // first export common data
     vm.exportCommon();
 
     // check what kind of analysis it is
     if (vm.analysisType == 'Manual') {
-      vm.exportManual();
+      vm.exportManual(selectedOnly);
     } else {
       vm.exportAlgorithmic();
     }
 
     // export serverScripts
     vm.exportScripts();
-
 
     // write to file
     let filename = vm.projectDir.path(vm.projectName + '.json');
@@ -469,9 +478,10 @@ export class Project {
 
   }
 
-  exportManual() {
+  exportManual(selectedOnly = false) {
     const vm = this;
     vm.$log.debug('In Project::exportManual');
+    vm.$log.debug('selectedONly? ', selectedOnly);
 
     //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO which is correct?
     vm.osa.analysis.problem.analysis_type = null;
@@ -479,38 +489,42 @@ export class Project {
     // DESIGN ALTERNATIVES ARRAY
     vm.osa.analysis.problem.design_alternatives = [];
     _.forEach(vm.designAlternatives, (da) => {
-      const da_hash = {};
-      da_hash.name = da.name;
-      da_hash.description = da.description;
-      if (da.seedModel != vm.defaultSeed) {
-        const seed = {};
-        seed.file_type = 'OSM';
-        seed.path = './seeds/' + da.seedModel;
-        da_hash.seed = seed;
-      }
-      // add option names and descriptions
-      const options = [];
-      _.forEach(vm.measures, (measure) => {
-        const option = {};
-        option.measure_name = measure.name;
-        option.workflow_index = measure.workflow_index;
-        option.name = da[measure.name];
-        if (option.name == 'None' || !option.name) {
-          // use measure name/desc if no option
-          option.name = measure.name;
-          option.description = measure.description;
+      const dpMatch = _.find(vm.datapoints, {name: da.name});
+      // do this for entire workflow or if matching datapoint is selected
+      if (!selectedOnly || (dpMatch && dpMatch.selected)){
+        const da_hash = {};
+        da_hash.name = da.name;
+        da_hash.description = da.description;
+        if (da.seedModel != vm.defaultSeed) {
+          const seed = {};
+          seed.file_type = 'OSM';
+          seed.path = './seeds/' + da.seedModel;
+          da_hash.seed = seed;
         }
-        else {
-          const opt = _.find(measure.options, {name: option.name});
-          if (opt)
-            option.description = opt.description;
-          else
+        // add option names and descriptions
+        const options = [];
+        _.forEach(vm.measures, (measure) => {
+          const option = {};
+          option.measure_name = measure.name;
+          option.workflow_index = measure.workflow_index;
+          option.name = da[measure.name];
+          if (option.name == 'None' || !option.name) {
+            // use measure name/desc if no option
+            option.name = measure.name;
             option.description = measure.description;
-        }
-        options.push(option);
-      });
-      da_hash.options = options;
-      vm.osa.analysis.problem.design_alternatives.push(da_hash);
+          }
+          else {
+            const opt = _.find(measure.options, {name: option.name});
+            if (opt)
+              option.description = opt.description;
+            else
+              option.description = measure.description;
+          }
+          options.push(option);
+        });
+        da_hash.options = options;
+        vm.osa.analysis.problem.design_alternatives.push(da_hash);
+      }
     });
 
     // MEASURE DETAILS
@@ -521,16 +535,19 @@ export class Project {
       // go through alternatives, also see if need skip
       const vars = [];
       _.forEach(vm.designAlternatives, (da) => {
-        if (da[measure.name] == 'None' || _.isUndefined(da[measure.name])) {
-          vars.push(true);
-        } else {
-          vars.push(false);
-          measureAdded = true; // measure option is added to at least 1 DA
+        const dpMatch = _.find(vm.datapoints, {name: da.name});
+        // do this for entire workflow or if matching datapoint is selected
+        if (!selectedOnly || (dpMatch && dpMatch.selected)){
+          if (da[measure.name] == 'None' || _.isUndefined(da[measure.name])) {
+            vars.push(true);
+          } else {
+            vars.push(false);
+            measureAdded = true; // measure option is added to at least 1 DA
+          }
         }
       });
       vm.$log.debug('Measure: ', measure.name, ', numOfOptions: ', measure.numberOfOptions, ' measure added to at least 1 DA? ', measureAdded);
       if (measure.numberOfOptions > 0 && measureAdded) {
-
         const m = {};
         m.name = measure.name;
         m.display_name = measure.display_name;
@@ -603,6 +620,12 @@ export class Project {
           m.variables.push(v);
         }
 
+        let DAlength = null;
+        if (selectedOnly){
+          DAlength = _.filter(vm.datapoints, {selected: true}).length;
+        } else {
+          DAlength = vm.designAlternatives.length;
+        }
         // Variable arguments
         _.forEach(measure.arguments, (arg) => {
           if (((_.isUndefined(arg.specialRowId)) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) && (arg.variable === true)) {
@@ -610,40 +633,44 @@ export class Project {
             // see what arg is set to in each design alternative
             const valArr = [];
             let option_id;
-            _.forEach(vm.designAlternatives, (da) => {
-              vm.$log.debug('Project::exportManual da: ', da);
-              if (da[measure.name] == 'None') {
-                vm.$log.debug('value: None');
-                // when set to 'None', sub a value of the right type
-                let the_value = arg.default_value;
-                if (!the_value) {
-                  // if no default value, use first option value, otherwise set to None
-                  the_value = (arg.option_1) ? arg.option_1 : 'None';
-                }
-                valArr.push({value: the_value, weight: 1 / vm.designAlternatives.length});
 
-              } else {
-                const option_name = da[measure.name];
-                vm.$log.debug('arg: ', arg);
-                vm.$log.debug('option_name: ', option_name);
-                vm.$log.debug('MEASURE', measure);
-                // retrieve the option ID from the option_name in measure.options
-                _.forEach(measure.options, (option) => {
-                  if (option.name == option_name) {
-                    option_id = option.id;
+            _.forEach(vm.designAlternatives, (da) => {
+              const dpMatch = _.find(vm.datapoints, {name: da.name});
+              // do this for entire workflow or if matching datapoint is selected
+              if (!selectedOnly || (dpMatch && dpMatch.selected)){
+                vm.$log.debug('Project::exportManual da: ', da);
+                if (da[measure.name] == 'None') {
+                  vm.$log.debug('value: None');
+                  // when set to 'None', sub a value of the right type
+                  let the_value = arg.default_value;
+                  if (!the_value) {
+                    // if no default value, use first option value, otherwise set to None
+                    the_value = (arg.option_1) ? arg.option_1 : 'None';
                   }
-                });
-                vm.$log.debug('arg[option_id]: ', arg[option_id]);
-                // check that you have a value here...if not error
-                if (!arg[option_id]) {
-                  vm.$log.error('Option: ', option_name, 'for measure \'', measure.display_name, '\' does not have a value. Analysis will error.');
+                  valArr.push({value: the_value, weight: 1 / DAlength});
+
+                } else {
+                  const option_name = da[measure.name];
+                  vm.$log.debug('arg: ', arg);
+                  vm.$log.debug('option_name: ', option_name);
+                  vm.$log.debug('MEASURE', measure);
+                  // retrieve the option ID from the option_name in measure.options
+                  _.forEach(measure.options, (option) => {
+                    if (option.name == option_name) {
+                      option_id = option.id;
+                    }
+                  });
+                  vm.$log.debug('arg[option_id]: ', arg[option_id]);
+                  // check that you have a value here...if not error
+                  if (!arg[option_id]) {
+                    vm.$log.error('Option: ', option_name, 'for measure \'', measure.display_name, '\' does not have a value. Analysis will error.');
+                  }
+                  valArr.push({value: arg[option_id], weight: 1 / DAlength});
                 }
-                valArr.push({value: arg[option_id], weight: 1 / vm.designAlternatives.length});
               }
             });
 
             const values = _.values(_.pick(arg, optionKeys));
-
 
             const min = _.min(values),
               max = _.max(values);
@@ -730,7 +757,7 @@ export class Project {
 
     // OUTPUTS
     let groupFlag = false;
-    if (['NSGA2', 'SPEA2'].indexOf(vm.samplingMethod.id) != -1) {
+    if (['NSGA2', 'SPEA2', 'Morris'].indexOf(vm.samplingMethod.id) != -1) {
       // this sampling method supports groups
       groupFlag = true;
     }
@@ -2114,8 +2141,6 @@ export class Project {
         vm.algorithmSettings.push(temp);
       }
     });
-
-
   }
 
   getAlgorithmOptions() {

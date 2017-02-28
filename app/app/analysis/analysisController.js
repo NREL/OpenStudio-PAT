@@ -43,6 +43,7 @@ export class AnalysisController {
 
     // Manual Mode
     vm.designAlternatives = vm.Project.getDesignAlternatives();
+    vm.datapoints = vm.Project.getDatapoints();
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
 
@@ -268,15 +269,50 @@ export class AnalysisController {
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.instanceId] = gridApi;
           gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
+            vm.$log.debug('HI!');
             if (newValue != oldValue) {
-              vm.$log.debug('CELL has changed in: ', measure.instanceId, ' old val: ', oldValue, ' new val: ', newValue);
+              // vm.$log.debug('CELL has changed in: ', measure.instanceId, ' old val: ', oldValue, ' new val: ', newValue);
               vm.$log.debug('rowEntity: ', rowEntity);
               vm.updateDASelectedName(measure, oldValue, newValue);
+
+              // TODO: figure out if there are datapoints to mark as modified
+              vm.$log.debug('colDef: ', colDef);
+              vm.updateDatapoints(measure, colDef.name, rowEntity);
+
             }
           });
         }
       };
     });
+  }
+
+  updateDatapoints(measure, colName, rowEntity) {
+    const vm = this;
+    vm.$log.debug('in update datapoints...colname: ', colName, ' measure name: ', measure.name);
+    if (colName == 'display_name_short') {
+      vm.$log.debug('display name short has changed, update all DAs that use this measure');
+      _.forEach(vm.designAlternatives, (alt) => {
+        if (alt[measure.name]  || alt[measure.name] != 'None'){
+          // DA has this measure selected, mark datapoint
+          const match = _.find(vm.datapoints, {name: alt.name});
+          if (match) {
+            match.modified = true;
+          }
+        }
+      });
+    } else {
+      const optionKey = measure.arguments[1][colName];
+      vm.$log.debug('optionKey: ', optionKey);
+      _.forEach(vm.designAlternatives, (alt) => {
+        vm.$log.debug('alt[measure.name]: ', alt[measure.name]);
+        if (alt[measure.name] == optionKey){
+          const match = _.find(vm.datapoints, {name: alt.name});
+          if (match) {
+            match.modified = true;
+          }
+        }
+      });
+    }
   }
 
   setMeasureTypes() {
@@ -372,8 +408,7 @@ export class AnalysisController {
 
     vm.$log.debug('Deleting measure: ', measure);
 
-    // line below also removes it from bclService 'getProjectMeasures', but not from disk
-    // TODO: fix so BCL modal doesn't restore deleted panels
+    // line below also removes it from bclService 'getProjectMeasures'
     _.remove(vm.$scope.measures, {instanceId: measure.instanceId});
     vm.Project.setMeasuresAndOptions(vm.$scope.measures);
 
@@ -381,7 +416,12 @@ export class AnalysisController {
     measurePanel.remove();
 
     // Note: jetpack.remove() does not have any return
-    vm.jetpack.remove(measure.measure_dir);
+    // only remove if there are no other measures pointing to this location
+    const copies = _.find(vm.$scope.measures, {measure_dir: measure.measure_dir});
+    if (!copies){
+      // can delete from disk
+      vm.jetpack.remove(measure.measure_dir);
+    }
 
     // recalculate workflow indexes
     vm.Project.recalculateMeasureWorkflowIndexes();
