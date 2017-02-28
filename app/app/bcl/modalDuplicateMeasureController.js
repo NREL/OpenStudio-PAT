@@ -21,12 +21,24 @@ export class ModalDuplicateMeasureController {
     const vm = this;
     vm.$log.debug('Duplicate Measure measure: ', vm.measure);
     const oldMeasureDir = vm.measure.measure_dir;
-    // store duplicated measures in 'Measures'
+
+    // Find a unique measure_dir
+    let count = 0;
+    let displayName = vm.newDisplayName;
+    let measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
+    vm.$log.debug('measureDir: ', measureDir);
+    while (vm.jetpack.exists(measureDir)) {
+      count++;
+      displayName = vm.newDisplayName + count.toString();
+      measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
+      vm.$log.debug('measureDir: ', measureDir);
+    }
+
     const params = {
       old_measure_dir: vm.measure.measure_dir,
-      measure_dir: vm.Project.getMeasuresDir().path(_.snakeCase(vm.newDisplayName)),
-      display_name: vm.newDisplayName,
-      class_name: _.upperFirst(_.camelCase(vm.newDisplayName)),
+      measure_dir: measureDir,
+      display_name: displayName,
+      class_name: _.upperFirst(_.camelCase(displayName)),
       taxonomy_tag: vm.measure.tags,
       measure_type: vm.measure.type,
       description: vm.newDescription,

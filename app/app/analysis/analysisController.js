@@ -705,7 +705,7 @@ export class AnalysisController {
       // Modal canceled
       deferred.reject();
     });
-    //TODO close cell down from being edited?
+
     return deferred.promise;
   }
 
