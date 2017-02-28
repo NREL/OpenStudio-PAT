@@ -74,10 +74,6 @@ export class ModalBclController {
       // reload BCL measures
       vm.getBCLMeasures();
 
-      // _.forEach(vm.libMeasures.my, (m) => {
-      //   vm.$log.debug('Added to project: ', m.addedToProject, 'measure: ', m.name);
-      // });
-
       // apply filters
       vm.resetFilters();
 
@@ -218,24 +214,31 @@ export class ModalBclController {
       _.forEach(vm.libMeasures.my, m => {
         if (m.addedToProject) {
           // add if not found
-          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+          if (!(_.find(measures, {uid: m.uid, location: 'my'}))) measures.push(m);
         }
       });
       _.forEach(vm.libMeasures.local, m => {
         if (m.addedToProject) {
           // add if not found
-          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+          if (!(_.find(measures, {uid: m.uid, location: 'local'}))) measures.push(m);
         }
       });
     }
     // add other checked
     _.forEach(vm.filters, (val, key) => {
+
       if (val) {
         vm.$log.debug('key: ', key);
         vm.$log.debug('measures: ', vm.libMeasures[key]);
         _.forEach(vm.libMeasures[key], m => {
-          // add if not found
-          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+          // TODO: what if it's in the project but no longer in local/my folder? check for this?
+          // add if not found (BCL online only)
+          if (key != 'my' && key != 'local'){
+            if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+          } else {
+            // add if from a different location
+            if (!(_.find(measures, {uid: m.uid, location: key}))) measures.push(m);
+          }
         });
       }
     });
@@ -569,43 +572,45 @@ export class ModalBclController {
       // success
       // vm.$log.debug('New computed measure: ', newMeasure);
       // merge project measure in array to preserve prepareMeasure arguments and already-set arguments
-      const project_measure = _.find(vm.projectMeasures, {instanceId: measure.instanceId});
+      // get ALL project_measures that match the UID and the location (my vs local)
+      const project_measures = _.filter(vm.projectMeasures, {uid: measure.uid, location: measure.location});
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
-      // TODO project_measure can now be more than just 1 and must be iterated over (Evan)
-      _.forEachRight(project_measure.arguments, (arg, index) => {
-        if (_.isUndefined(arg.specialRowId)) {
-          const match = _.find(measure.arguments, {name: arg.name});
-          if (_.isUndefined(match)) {
-            project_measure.arguments.splice(index, 1);
-            // vm.$log.debug('removing argument: ', arg.name);
+      vm.$log.debug('Project Measures to Update: ', project_measures);
+      _.forEach(project_measures, (project_measure) => {
+        _.forEachRight(project_measure.arguments, (arg, index) => {
+          if (_.isUndefined(arg.specialRowId)) {
+            const match = _.find(measure.arguments, {name: arg.name});
+            if (_.isUndefined(match)) {
+              project_measure.arguments.splice(index, 1);
+              // vm.$log.debug('removing argument: ', arg.name);
+            }
           }
-        }
+        });
+        // then add/merge (at argument level)
+        _.forEach(newMeasure.arguments, (arg) => {
+          const match = _.find(project_measure.arguments, {name: arg.name});
+          if (_.isUndefined(match)) {
+            // vm.$log.debug('adding argument: ', arg.name);
+            project_measure.arguments.push(arg);
+          } else {
+            // vm.$log.debug('merging argument: ', arg.name);
+            _.merge(match, arg);
+            // vm.$log.debug('merged match: ', match);
+          }
+        });
+        // unset 'update' status on original measure
+        measure.status = '';
+        // remove arguments and merge rest with project_measure
+        let measure_copy = angular.copy(measure);
+        delete measure_copy.arguments;
+        delete measure_copy.open;
+        _.assignIn(project_measure, measure_copy);
+
+        const msg = 'Measure \'' + project_measure.display_name + '\' was successfully updated in your project.';
+        vm.$log.debug('updated project measure: ', project_measure);
+        vm.toastr.success(msg);
       });
-      // then add/merge (at argument level)
-      _.forEach(newMeasure.arguments, (arg) => {
-        const match = _.find(project_measure.arguments, {name: arg.name});
-        if (_.isUndefined(match)) {
-          // vm.$log.debug('adding argument: ', arg.name);
-          project_measure.arguments.push(arg);
-        } else {
-          // vm.$log.debug('merging argument: ', arg.name);
-          _.merge(match, arg);
-          // vm.$log.debug('merged match: ', match);
-        }
-      });
 
-      // unset 'update' status on original measure
-      measure.status = '';
-
-      // remove arguments and merge rest with project_measure
-      let measure_copy = angular.copy(measure);
-      delete measure_copy.arguments;
-      delete measure_copy.open;
-      _.assignIn(project_measure, measure_copy);
-
-      const msg = 'Measure \'' + project_measure.display_name + '\' was successfully updated in your project.';
-      vm.$log.debug('updated project measure: ', project_measure);
-      vm.toastr.success(msg);
       deferred.resolve();
 
     }, () => {

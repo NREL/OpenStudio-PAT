@@ -409,8 +409,7 @@ export class AnalysisController {
 
     vm.$log.debug('Deleting measure: ', measure);
 
-    // line below also removes it from bclService 'getProjectMeasures', but not from disk
-    // TODO: fix so BCL modal doesn't restore deleted panels
+    // line below also removes it from bclService 'getProjectMeasures'
     _.remove(vm.$scope.measures, {instanceId: measure.instanceId});
     vm.Project.setMeasuresAndOptions(vm.$scope.measures);
 
@@ -418,7 +417,12 @@ export class AnalysisController {
     measurePanel.remove();
 
     // Note: jetpack.remove() does not have any return
-    vm.jetpack.remove(measure.measure_dir);
+    // only remove if there are no other measures pointing to this location
+    const copies = _.find(vm.$scope.measures, {measure_dir: measure.measure_dir});
+    if (!copies){
+      // can delete from disk
+      vm.jetpack.remove(measure.measure_dir);
+    }
 
     // recalculate workflow indexes
     vm.Project.recalculateMeasureWorkflowIndexes();

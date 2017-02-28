@@ -179,6 +179,15 @@ export class Project {
           vm.measures = [];
         }
 
+        // recalculate measure_dir to point to this location (in case project moved/copied)
+        _.forEach(vm.measures, (measure) => {
+          const path_parts = _.split(measure.measure_dir, '/');
+          measure.measure_dir = vm.projectDir.path('measures', _.last(path_parts));
+          measure.directory = measure.measure_dir;
+        });
+
+        vm.$log.debug('InitializeProject-measures with updated dir paths: ', vm.measures);
+
         vm.designAlternatives = vm.pat.designAlternatives;
         if (!angular.isDefined(vm.designAlternatives)) {
           vm.designAlternatives = [];
