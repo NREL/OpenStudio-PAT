@@ -1,5 +1,9 @@
-<div ng-if="(row.entity.status == 'update') && row.entity.location != 'bcl' "  class="library-grid-button-container">
+<div ng-if="row.entity.status == 'update' && row.entity.location != 'bcl' && !row.entity.error"  class="library-grid-button-container">
   <!-- open update modal -->
   <span class="glyphicon glyphicon-refresh library-grid-button blue-button" aria-hidden="true" aria-label="Update Measure" ng-click="grid.appScope.modal.updateAMeasure(row.entity); $event.stopPropagation();">
    </span>
+</div>
+
+<div ng-if="row.entity.status == 'update' && row.entity.location != 'bcl' && row.entity.error"  class="library-grid-button-container" tooltip="Error in measure.  Cannot update project" title="Error in measure. Cannot update project" >
+  <img ng-src="assets/images/broken_script_update.png" alt="Error in Measure. Can't update project.">
 </div>
