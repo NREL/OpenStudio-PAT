@@ -1,6 +1,8 @@
+import jetpack from 'fs-jetpack';
+
 export class ModalCreateNewMeasureController {
 
-  constructor($log, $uibModalInstance, $scope, BCL, Project, jetpack) {
+  constructor($log, $uibModalInstance, $scope, BCL, Project) {
     'ngInject';
 
     const vm = this;
