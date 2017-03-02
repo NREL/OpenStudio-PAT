@@ -1497,6 +1497,7 @@ export class Project {
     return dns;
   }
 
+  // todo: used?
   readClusterFile(clusterName) {
     const vm = this;
     let clusterData = {};
@@ -1551,9 +1552,9 @@ export class Project {
     vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
     // copy and clean up what you don't need
     const cluster = angular.copy(vm.remoteSettings.aws);
-    cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : null;
-    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name : null;
-    cluster.openstudio_server_version = cluster.openstudio_server_version ? cluster.openstudio_server_version.name : null;
+    cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : "";
+    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name :"";
+    cluster.openstudio_server_version = cluster.openstudio_server_version ? cluster.openstudio_server_version.name : "";
     // TODO: make sure worker number is a number
     // this is hard-coded
     cluster.ami_lookup_version = 3;
