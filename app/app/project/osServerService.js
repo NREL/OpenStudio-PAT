@@ -168,7 +168,6 @@ export class OsServer {
     vm.setAnalysisChangedFlag(false);
     // reset analysis ID
     vm.Project.setAnalysisID(null);
-    vm.$log.debug('HI!!  selectedOnly: ', selectedOnly, 'analysis type:', vm.Project.getAnalysisType());
 
     if (vm.Project.getAnalysisType() == 'Manual'){
       // reset certain fields on datapoint
@@ -176,7 +175,6 @@ export class OsServer {
       _.forEach(datapoints, (dp, index) => {
         if (!selectedOnly || dp.selected){
           const newDP = {name: dp.name, run: false, modified: false, selected: dp.selected};
-          vm.$log.debug('***NEW DP: ', newDP);
           datapoints[index] = newDP;
         }
       });
