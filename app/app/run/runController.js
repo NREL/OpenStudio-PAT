@@ -658,6 +658,7 @@ export class RunController {
     vm.OsServer.resetAnalysis(selectedOnly);
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.datapoints = vm.Project.getDatapoints();
+    vm.$log.debug('DATAPOINTS AFTER DELETE: ', vm.$scope.datapoints);
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
   }
 

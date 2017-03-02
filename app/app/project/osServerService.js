@@ -168,19 +168,19 @@ export class OsServer {
     vm.setAnalysisChangedFlag(false);
     // reset analysis ID
     vm.Project.setAnalysisID(null);
+    vm.$log.debug('HI!!  selectedOnly: ', selectedOnly, 'analysis type:', vm.Project.getAnalysisType());
+
     if (vm.Project.getAnalysisType() == 'Manual'){
       // reset certain fields on datapoint
-      _.forEach(vm.datapoints, (dp) => {
+      const datapoints = vm.Project.getDatapoints();
+      _.forEach(datapoints, (dp, index) => {
         if (!selectedOnly || dp.selected){
-          dp.modified = false;
-          dp.completed_status = null;
-          dp.status_message = null;
-          dp.started_at = null;
-          dp.completed_at = null;
-          dp.updated_at = null;
-          dp.steps = [];
+          const newDP = {name: dp.name, run: false, modified: false, selected: dp.selected};
+          vm.$log.debug('***NEW DP: ', newDP);
+          datapoints[index] = newDP;
         }
       });
+      vm.Project.setDatapoints(datapoints);
     } else {
       vm.Project.setDatapoints([]);
     }
