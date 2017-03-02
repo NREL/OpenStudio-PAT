@@ -456,6 +456,7 @@ export class RunController {
 
       // what's left is seconds
       let seconds = delta % 60;  // in theory the modulus is not required
+      seconds = (seconds < 10) ? '0' + seconds : seconds;
 
       result = hours + ":" + minutes + ":" + seconds;
 
