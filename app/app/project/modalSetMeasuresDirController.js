@@ -14,6 +14,8 @@ export class ModalSetMeasuresDirController {
     vm.MeasureManager = MeasureManager;
     vm.Project = Project;
     vm.dialog = dialog;
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
 
     vm.$scope.currentDir = vm.Project.getMeasuresDir().path();
 
@@ -29,7 +31,7 @@ export class ModalSetMeasuresDirController {
     if (!_.isEmpty(result)) {
       // copy and select the file
       vm.$scope.currentDir = result[0];
-      vm.$log.debug('New Dir:', vm.$scope.currentDir);
+      if (vm.showDebug) vm.$log.debug('New Dir:', vm.$scope.currentDir);
 
     }
   }
@@ -39,12 +41,12 @@ export class ModalSetMeasuresDirController {
     const vm = this;
     // set new My Measures Dir
     vm.MeasureManager.setMyMeasuresDir(vm.$scope.currentDir).then(response => {
-      vm.$log.debug('Successfully set MyMeasures Directory! ',  response);
+      if (vm.showDebug) vm.$log.debug('Successfully set MyMeasures Directory! ',  response);
       // set measureDir in Project
       vm.Project.setMeasuresDir(vm.$scope.currentDir);
       vm.$uibModalInstance.close();
     }, () => {
-      vm.$log.debug('Could not set MyMeasures Directory');
+      if (vm.showDebug) vm.$log.debug('Could not set MyMeasures Directory');
       vm.$uibModalInstance.close();
     });
 

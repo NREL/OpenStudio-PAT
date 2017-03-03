@@ -28,11 +28,13 @@ export class DependencyManager {
     vm.$q = $q;
     vm.$uibModal = $uibModal;
     vm.downloadStatus = 'N/A';
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
 
     vm.tempDir = jetpack.cwd(app.getPath('temp'));
-    vm.$log.debug('TEMPDIR HERE: ', app.getPath('temp'));
+    if (vm.showDebug) vm.$log.debug('TEMPDIR HERE: ', app.getPath('temp'));
     vm.src = jetpack.cwd(app.getAppPath() + "/Resources/");
-    vm.$log.debug('src:', vm.src.path());
+    if (vm.showDebug) vm.$log.debug('src:', vm.src.path());
 
   }
 
@@ -92,7 +94,7 @@ export class DependencyManager {
 
     if (env[name]) {
       // Look in the env.json file
-      vm.$log.debug('*** DEPENDENCY found in json file: ', env[name], ' ', name);
+      if (vm.showDebug) vm.$log.debug('*** DEPENDENCY found in json file: ', env[name], ' ', name);
       return env[name];
     } else if (process.env[name]) {
       // Look for a system environment variable

@@ -10,38 +10,40 @@ export class ModalServerToolsController {
     vm.Project = Project;
     vm.$scope = $scope;
     vm.toastr = toastr;
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
 
     vm.$scope.projectDir = vm.Project.getProjectDir();
     if (vm.$scope.projectDir){
       vm.$scope.projectDir = vm.$scope.projectDir.path();
     }
-    vm.$log.debug('Project dir: ', vm.$scope.projectDir);
+    if (vm.showDebug) vm.$log.debug('Project dir: ', vm.$scope.projectDir);
 
   }
 
   startLocalServer() {
     const vm = this;
-    vm.$log.debug('IN MODAL START LOCAL SERVER');
+    if (vm.showDebug) vm.$log.debug('IN MODAL START LOCAL SERVER');
     vm.toastr.info('Starting Local Server...This make take a while.');
     vm.OsServer.startServer('local').then(() => {
       vm.toastr.success('Connected to server!');
     }, response => {
-      vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
+      if (vm.showDebug) vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
       vm.toastr.error('Error: server did not start');
     });
   }
 
   stopLocalServer() {
     const vm = this;
-    vm.$log.debug('IN MODAL STOP LOCAL SERVER');
+    if (vm.showDebug) vm.$log.debug('IN MODAL STOP LOCAL SERVER');
     vm.toastr.info('Stopping Local Server...This make take a while.');
     vm.OsServer.stopServer('local').then(() => {
-      vm.$log.debug('*****  Local Server Stopped *****');
+      if (vm.showDebug) vm.$log.debug('*****  Local Server Stopped *****');
       vm.toastr.success('Server stopped successfully');
 
     }, error => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
-      vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', error);
+      if (vm.showDebug) vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', error);
       vm.toastr.error('Error: server could not be stopped');
     });
   }
@@ -49,11 +51,11 @@ export class ModalServerToolsController {
   // check if selected server is alive, if so set its status to 'started', otherwise set status to 'stopped'
   pingServer() {
     const vm = this;
-    vm.$log.debug('IN MODAL PING SELECTED SERVER');
+    if (vm.showDebug) vm.$log.debug('IN MODAL PING SELECTED SERVER');
     vm.OsServer.pingServer().then(() => {
       vm.toastr.success('Server is Alive');
     }, error => {
-      vm.$log.debug('Server is offline: ', error);
+      if (vm.showDebug) vm.$log.debug('Server is offline: ', error);
       vm.toastr.error('Server is Offline');
     });
   }

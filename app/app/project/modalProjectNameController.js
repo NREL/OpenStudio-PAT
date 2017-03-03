@@ -8,11 +8,13 @@ export class ModalProjectNameController {
     vm.$scope = $scope;
     vm.$uibModalInstance = $uibModalInstance;
     vm.SetProject = SetProject;
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
   }
 
   ok() {
     const vm = this;
-    vm.$log.debug('ModalProjectNameController ok');
+    if (vm.showDebug) vm.$log.debug('ModalProjectNameController ok');
     let noWhitespace = vm.$scope.name;
     // if (vm.$scope.name.indexOf(' ') >= 0) {
     //   noWhitespace = vm.$scope.name.replace(/\s/g, '');
@@ -23,7 +25,7 @@ export class ModalProjectNameController {
 
   cancel() {
     const vm = this;
-    vm.$log.debug('ModalProjectNameController cancel');
+    if (vm.showDebug) vm.$log.debug('ModalProjectNameController cancel');
     vm.$uibModalInstance.dismiss('cancel');
   }
 }

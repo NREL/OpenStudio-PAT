@@ -23,6 +23,8 @@ export class Project {
     vm.$http = $http;
     vm.$uibModal = $uibModal;
     vm.$sce = $sce;
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
 
     // ignore camelcase for this file
     /* eslint camelcase: 0 */
@@ -93,7 +95,7 @@ export class Project {
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
     // aws path
     vm.awsDir = jetpack.dir(app.getPath('appData') + '/.aws');
-    vm.$log.debug('.aws dir location: ', vm.awsDir.path());
+    if (vm.showDebug) vm.$log.debug('.aws dir location: ', vm.awsDir.path());
 
     // set my measures dir
     vm.MeasureManager.isReady().then(() => {
@@ -104,12 +106,12 @@ export class Project {
         if (response.my_measures_dir) {
           vm.setMeasuresDir(response.my_measures_dir);
         }
-        vm.$log.debug('My measures Dir: ', vm.myMeasuresDir.path());
+        if (vm.showDebug) vm.$log.debug('My measures Dir: ', vm.myMeasuresDir.path());
       }, error => {
-        vm.$log.debug('Error in Measure Manager getMyMeasuresDir');
+        vm.$log.error('Error in Measure Manager getMyMeasuresDir');
       });
     }, error => {
-      vm.$log.debug('Error in Measure Manager isReady function ', error);
+      vm.$log.error('Error in Measure Manager isReady function ', error);
     });
 
     // json objects
@@ -161,18 +163,18 @@ export class Project {
   // TODO: if measure is in pat dir, not in json, and user tries to add it, overwrite existing measure in dir? (currently it doesn't overwrite)
   initializeProject() {
     const vm = this;
-    vm.$log.debug('Project initializeProject');
+    if (vm.showDebug) vm.$log.debug('Project initializeProject');
     if (angular.isDefined(vm.projectName)) {
       const filename = vm.projectDir.path('pat.json');
-      vm.$log.debug('filename: ', filename);
+      if (vm.showDebug) vm.$log.debug('filename: ', filename);
       // for new and existing projects
       vm.setDefaults();
 
       if (vm.jetpack.exists(filename)) {
         // existing project
         vm.pat = vm.jetpack.read(filename, 'json');
-        vm.$log.debug('PAT.json: ', vm.pat);
-        vm.$log.debug('filename: ', filename);
+        if (vm.showDebug) vm.$log.debug('PAT.json: ', vm.pat);
+        if (vm.showDebug) vm.$log.debug('filename: ', filename);
 
         vm.measures = vm.pat.measures;
         if (!angular.isDefined(vm.measures)) {
@@ -186,7 +188,7 @@ export class Project {
           measure.directory = measure.measure_dir;
         });
 
-        vm.$log.debug('InitializeProject-measures with updated dir paths: ', vm.measures);
+        if (vm.showDebug) vm.$log.debug('InitializeProject-measures with updated dir paths: ', vm.measures);
 
         vm.designAlternatives = vm.pat.designAlternatives;
         if (!angular.isDefined(vm.designAlternatives)) {
@@ -197,8 +199,8 @@ export class Project {
         vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
         vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
         vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
-        vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
-        vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
+        if (vm.showDebug) vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
+        if (vm.showDebug) vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
         vm.algorithmSettings = vm.pat.algorithmSettings ? vm.pat.algorithmSettings : vm.algorithmSettings;
         vm.rubyMD5 = vm.pat.rubyMD5 ? vm.pat.rubyMD5 : vm.rubyMD5;
         vm.mongoMD5 = vm.pat.mongoMD5 ? vm.pat.mongoMD5 : vm.mongoMD5;
@@ -215,7 +217,7 @@ export class Project {
       vm.$log.error('No project selected...cannot initialize project');
     }
 
-    vm.$log.debug("Server Scripts: ", vm.serverScripts);
+    if (vm.showDebug) vm.$log.debug('Server Scripts: ', vm.serverScripts);
 
   }
 
@@ -225,7 +227,7 @@ export class Project {
 
   savePrettyOptions() {
     const vm = this;
-    vm.$log.debug('Parse arguments and save Options hash to each measure');
+    if (vm.showDebug) vm.$log.debug('Parse arguments and save Options hash to each measure');
 
     _.forEach(vm.measures, (measure) => {
 
@@ -266,7 +268,7 @@ export class Project {
               // check if argument is required
               if (argument.required) {
                 // TODO: throw an error here: need a value for this argument in this option
-                vm.$log.debug('ARG: ', argument.name, ' value left blank in option: ', theOption.name);
+                if (vm.showDebug) vm.$log.debug('ARG: ', argument.name, ' value left blank in option: ', theOption.name);
               }
             }
           }
@@ -279,7 +281,7 @@ export class Project {
 
     });
 
-    vm.$log.debug('Measures with pretty options: ', vm.measures);
+    if (vm.showDebug) vm.$log.debug('Measures with pretty options: ', vm.measures);
 
   }
 
@@ -290,12 +292,12 @@ export class Project {
     const deferred = vm.$q.defer();
     const promises = [];
 
-    vm.$log.debug('in Project computeAllMeasureArguments()');
+    if (vm.showDebug) vm.$log.debug('in Project computeAllMeasureArguments()');
     let osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
 
     _.forEach(vm.measures, (measure) => {
       if (!_.isNil(measure.seed)) {
-        vm.$log.debug(`computeAllMeasureArguments using unique seed for measure: ${measure}`);
+        if (vm.showDebug) vm.$log.debug(`computeAllMeasureArguments using unique seed for measure: ${measure}`);
       }
       // todo: ensure that this modifies the vm.measures directly
       const promise = vm.computeMeasureArguments(measure);
@@ -303,11 +305,11 @@ export class Project {
     });
 
     vm.$q.all(promises).then(response => {
-      vm.$log.debug('ComputeAllMeasures resolved');
+      if (vm.showDebug) vm.$log.debug('ComputeAllMeasures resolved');
       deferred.resolve();
       vm.setModified(true);
     }, error => {
-      vm.$log.debug('ERROR in ComputeAllMeasures: ', error);
+      vm.$log.error('ERROR in ComputeAllMeasures: ', error);
       deferred.reject(error);
     });
 
@@ -321,7 +323,7 @@ export class Project {
   computeMeasureArguments(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('in Project computeMeasureArguments()');
+    if (vm.showDebug) vm.$log.debug('in Project computeMeasureArguments()');
     let osmPath;
     if (_.isNil(vm.seedDir)) {
       vm.$log.error('vm.seedDir is undefined. Unable to compute measure arguments.');
@@ -337,7 +339,7 @@ export class Project {
 
     vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
       // merge with existing project measure
-      vm.$log.debug('New computed measure: ', newMeasure);
+      if (vm.showDebug) vm.$log.debug('New computed measure: ', newMeasure);
 
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
       _.forEachRight(measure.arguments, (arg, index) => {
@@ -361,7 +363,7 @@ export class Project {
       deferred.resolve(measure);
 
     }, error => {
-      vm.$log.debug('Error in MM computerArguments: ', error);
+      vm.$log.error('Error in MM computerArguments: ', error);
       deferred.reject();
 
     });
@@ -373,8 +375,8 @@ export class Project {
   // export OSA
   exportOSA(selectedOnly = false) {
     const vm = this;
-    vm.$log.debug('In Project::exportOSA');
-    vm.$log.debug('SelectedOnly? ', selectedOnly);
+    if (vm.showDebug) vm.$log.debug('In Project::exportOSA');
+    if (vm.showDebug) vm.$log.debug('SelectedOnly? ', selectedOnly);
 
     // first export common data
     vm.exportCommon();
@@ -392,7 +394,7 @@ export class Project {
     // write to file
     let filename = vm.projectDir.path(vm.projectName + '.json');
     vm.jetpack.write(filename, vm.osa);
-    vm.$log.debug('Project OSA file exported to ' + filename);
+    if (vm.showDebug) vm.$log.debug('Project OSA file exported to ' + filename);
 
     var output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
     var archive = archiver('zip');
@@ -422,7 +424,7 @@ export class Project {
 
     // add server scripts (if they exist)
     _.forEach(vm.serverScripts, (script, type) => {
-      if (script.file){
+      if (script.file) {
         archive.bulk([
           {expand: true, cwd: vm.projectDir.path('scripts', type), src: ['**'], dest: 'scripts/' + type}
         ]);
@@ -431,8 +433,8 @@ export class Project {
 
     // add 'files to include
     _.forEach(vm.filesToInclude, (file) => {
-      if (file.dirToInclude){
-        if (!file.unpackDirName){
+      if (file.dirToInclude) {
+        if (!file.unpackDirName) {
           // use same name if no name is provided
           file.unpackDirName = file.dirToInclude.replace(/^.*[\\\/]/, '');
         }
@@ -471,7 +473,7 @@ export class Project {
     // server scripts (will only work on the cloud, but always put in OSA?)
     vm.osa.analysis.server_scripts = {};
     _.forEach(vm.serverScripts, (script, type) => {
-      if (script.file){
+      if (script.file) {
         vm.osa.analysis.server_scripts[type] = './scripts/' + type + '/' + script.file;
       }
     });
@@ -480,8 +482,8 @@ export class Project {
 
   exportManual(selectedOnly = false) {
     const vm = this;
-    vm.$log.debug('In Project::exportManual');
-    vm.$log.debug('selectedONly? ', selectedOnly);
+    if (vm.showDebug) vm.$log.debug('In Project::exportManual');
+    if (vm.showDebug) vm.$log.debug('selectedONly? ', selectedOnly);
 
     //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO which is correct?
     vm.osa.analysis.problem.analysis_type = null;
@@ -491,7 +493,7 @@ export class Project {
     _.forEach(vm.designAlternatives, (da) => {
       const dpMatch = _.find(vm.datapoints, {name: da.name});
       // do this for entire workflow or if matching datapoint is selected
-      if (!selectedOnly || (dpMatch && dpMatch.selected)){
+      if (!selectedOnly || (dpMatch && dpMatch.selected)) {
         const da_hash = {};
         da_hash.name = da.name;
         da_hash.description = da.description;
@@ -503,7 +505,7 @@ export class Project {
           da_hash.seed = seed;
         }
         // add if other weather
-        if (da.weatherFile != vm.defaultWeatherFile){
+        if (da.weatherFile != vm.defaultWeatherFile) {
           const weather = {};
           weather.file_type = 'EPW';
           weather.path = './weather/' + da.weatherFile;
@@ -545,7 +547,7 @@ export class Project {
       _.forEach(vm.designAlternatives, (da) => {
         const dpMatch = _.find(vm.datapoints, {name: da.name});
         // do this for entire workflow or if matching datapoint is selected
-        if (!selectedOnly || (dpMatch && dpMatch.selected)){
+        if (!selectedOnly || (dpMatch && dpMatch.selected)) {
           if (da[measure.name] == 'None' || _.isUndefined(da[measure.name])) {
             vars.push(true);
           } else {
@@ -554,7 +556,7 @@ export class Project {
           }
         }
       });
-      vm.$log.debug('Measure: ', measure.name, ', numOfOptions: ', measure.numberOfOptions, ' measure added to at least 1 DA? ', measureAdded);
+      if (vm.showDebug) vm.$log.debug('Measure: ', measure.name, ', numOfOptions: ', measure.numberOfOptions, ' measure added to at least 1 DA? ', measureAdded);
       if (measure.numberOfOptions > 0 && measureAdded) {
         const m = {};
         m.name = measure.name;
@@ -596,15 +598,15 @@ export class Project {
             (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) &&
             (_.isUndefined(arg.variable) || arg.variable === false)
           ) {
-            vm.$log.debug('ARGUMENT, not variable!');
+            if (vm.showDebug) vm.$log.debug('ARGUMENT, not variable!');
             const argument = vm.makeArgument(arg);
             // Make sure that argument is "complete"
             if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
               var_count += 1;
               m.arguments.push(argument);
             } else {
-              vm.$log.debug('Not pushing partial arg to m.arguments');
-              vm.$log.debug('partial arg: ', argument);
+              if (vm.showDebug) vm.$log.debug('Not pushing partial arg to m.arguments');
+              if (vm.showDebug) vm.$log.debug('partial arg: ', argument);
             }
           }
         });
@@ -629,7 +631,7 @@ export class Project {
         }
 
         let DAlength = null;
-        if (selectedOnly){
+        if (selectedOnly) {
           DAlength = _.filter(vm.datapoints, {selected: true}).length;
         } else {
           DAlength = vm.designAlternatives.length;
@@ -637,7 +639,7 @@ export class Project {
         // Variable arguments
         _.forEach(measure.arguments, (arg) => {
           if (((_.isUndefined(arg.specialRowId)) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) && (arg.variable === true)) {
-            vm.$log.debug('Project::exportManual arg: ', arg);
+            if (vm.showDebug) vm.$log.debug('Project::exportManual arg: ', arg);
             // see what arg is set to in each design alternative
             const valArr = [];
             let option_id;
@@ -645,10 +647,10 @@ export class Project {
             _.forEach(vm.designAlternatives, (da) => {
               const dpMatch = _.find(vm.datapoints, {name: da.name});
               // do this for entire workflow or if matching datapoint is selected
-              if (!selectedOnly || (dpMatch && dpMatch.selected)){
-                vm.$log.debug('Project::exportManual da: ', da);
+              if (!selectedOnly || (dpMatch && dpMatch.selected)) {
+                if (vm.showDebug) vm.$log.debug('Project::exportManual da: ', da);
                 if (da[measure.name] == 'None') {
-                  vm.$log.debug('value: None');
+                  if (vm.showDebug) vm.$log.debug('value: None');
                   // when set to 'None', sub a value of the right type
                   let the_value = arg.default_value;
                   if (!the_value) {
@@ -659,16 +661,16 @@ export class Project {
 
                 } else {
                   const option_name = da[measure.name];
-                  vm.$log.debug('arg: ', arg);
-                  vm.$log.debug('option_name: ', option_name);
-                  vm.$log.debug('MEASURE', measure);
+                  if (vm.showDebug) vm.$log.debug('arg: ', arg);
+                  if (vm.showDebug) vm.$log.debug('option_name: ', option_name);
+                  if (vm.showDebug) vm.$log.debug('MEASURE', measure);
                   // retrieve the option ID from the option_name in measure.options
                   _.forEach(measure.options, (option) => {
                     if (option.name == option_name) {
                       option_id = option.id;
                     }
                   });
-                  vm.$log.debug('arg[option_id]: ', arg[option_id]);
+                  if (vm.showDebug) vm.$log.debug('arg[option_id]: ', arg[option_id]);
                   // check that you have a value here...if not error
                   if (!arg[option_id]) {
                     vm.$log.error('Option: ', option_name, 'for measure \'', measure.display_name, '\' does not have a value. Analysis will error.');
@@ -729,10 +731,10 @@ export class Project {
             v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.minimum});  // minimum
             v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.maximum});  // maximum
             if (valArr.length > 0) {
-              vm.$log.debug('Setting attribute');
+              if (vm.showDebug) vm.$log.debug('Setting attribute');
               v.uncertainty_description.attributes.push({name: 'modes', value: arg.mode}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
             } else {
-              vm.$log.debug('Skipping attribute');
+              if (vm.showDebug) vm.$log.debug('Skipping attribute');
             }
             v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
             v.uncertainty_description.attributes.push({name: 'stddev', value: null});
@@ -754,7 +756,7 @@ export class Project {
 
   exportAlgorithmic() {
     const vm = this;
-    vm.$log.debug('In Project::exportAlgorithmic');
+    if (vm.showDebug) vm.$log.debug('In Project::exportAlgorithmic');
 
     // ALGORITHM SETTINGS
     vm.osa.analysis.problem.analysis_type = vm.samplingMethod.id.toLowerCase();
@@ -782,7 +784,7 @@ export class Project {
     if (groupFlag) {
       tempOutputs = _.sortBy(tempOutputs, ['obj_function_group']);
     }
-    vm.$log.debug("tempOutputs sorted: ", tempOutputs);
+    if (vm.showDebug) vm.$log.debug('tempOutputs sorted: ', tempOutputs);
 
     // add objective function names to algorithm section
     vm.osa.analysis.problem.algorithm.objective_functions = _.map(_.filter(tempOutputs, {objective_function: true}), 'name');
@@ -832,8 +834,8 @@ export class Project {
             var_count += 1;
             m.arguments.push(argument);
           } else {
-            vm.$log.debug('Not pushing partial arg to m.arguments');
-            vm.$log.debug('partial arg: ', argument);
+            if (vm.showDebug) vm.$log.debug('Not pushing partial arg to m.arguments');
+            if (vm.showDebug) vm.$log.debug('partial arg: ', argument);
           }
         }
       });
@@ -844,7 +846,7 @@ export class Project {
 
       // skip this measure?
       if (measure.skip) {
-        const v =  vm.makeSkip(measure);
+        const v = vm.makeSkip(measure);
         v.workflow_index = var_count;
         var_count += 1;
         m.variables.push(v);
@@ -853,7 +855,7 @@ export class Project {
       // Variable arguments
       _.forEach(measure.arguments, (arg) => {
         if (arg.inputs && arg.inputs.variableSetting && arg.inputs.variableSetting != 'Argument' && !arg.inputs.showWarningIcon) {
-          vm.$log.debug('Project::exportAlgorithmic arg: ', arg);
+          if (vm.showDebug) vm.$log.debug('Project::exportAlgorithmic arg: ', arg);
 
           // VARIABLE ARGUMENT SECTION
           const v = {};
@@ -885,7 +887,7 @@ export class Project {
           v.uncertainty_description.attributes = [];
 
           // if discrete or pivot, make values and weights array (unless pivot w/ integer_sequence)
-          if ((arg.inputs.variableSetting == 'Pivot' || arg.inputs.variableSetting == 'Discrete') && arg.inputs.distribution != 'Integer Sequence'){
+          if ((arg.inputs.variableSetting == 'Pivot' || arg.inputs.variableSetting == 'Discrete') && arg.inputs.distribution != 'Integer Sequence') {
             const valArr = vm.makeDiscreteValuesArray(arg.inputs.discreteVariables);
             v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
           }
@@ -910,7 +912,7 @@ export class Project {
     });
   }
 
-  makeDiscreteValuesArray(discreteVariables){
+  makeDiscreteValuesArray(discreteVariables) {
     const vm = this;
     const valArr = [];
     _.forEach(discreteVariables, (valueHash) => {
@@ -920,41 +922,41 @@ export class Project {
     // TODO: more complicated weighting scheme?
     let weightSum = 0;
     _.forEach(valArr, (valueHash) => {
-      vm.$log.debug('weight: ', parseFloat(valueHash.weight));
+      if (vm.showDebug) vm.$log.debug('weight: ', parseFloat(valueHash.weight));
 
-      if (vm.isNumeric(valueHash.weight)){
-        vm.$log.debug('weight for ', valueHash.value);
+      if (vm.isNumeric(valueHash.weight)) {
+        if (vm.showDebug) vm.$log.debug('weight for ', valueHash.value);
         valueHash.weight = parseFloat(valueHash.weight);
         weightSum = weightSum + valueHash.weight;
       }
     });
-    vm.$log.debug('current weight sum: ', weightSum);
+    if (vm.showDebug) vm.$log.debug('current weight sum: ', weightSum);
 
-    if (weightSum > 1){
-      vm.$log.debug('ERROR: weights do not add up to 1');
+    if (weightSum > 1) {
+      vm.$log.error('ERROR: weights do not add up to 1');
       // TODO: what to do here?
     }
 
     let missingCount = 0;
     _.forEach(valArr, (valueHash) => {
-      if (!vm.isNumeric(valueHash.weight)){
+      if (!vm.isNumeric(valueHash.weight)) {
         missingCount = missingCount + 1;
       }
     });
-    vm.$log.debug('missing count: ', missingCount);
+    if (vm.showDebug) vm.$log.debug('missing count: ', missingCount);
 
-    if (missingCount > 0){
-      vm.$log.debug('calculating missing weights');
-      const weightVal = (1 - weightSum)/missingCount; // TODO: limit
-      vm.$log.debug('calculated weight Val: ', weightVal);
+    if (missingCount > 0) {
+      if (vm.showDebug) vm.$log.debug('calculating missing weights');
+      const weightVal = (1 - weightSum) / missingCount; // TODO: limit
+      if (vm.showDebug) vm.$log.debug('calculated weight Val: ', weightVal);
       _.forEach(valArr, (valueHash) => {
-        if (!vm.isNumeric(valueHash.weight)){
+        if (!vm.isNumeric(valueHash.weight)) {
           valueHash.weight = weightVal;
         }
       });
     }
 
-    vm.$log.debug('Final discrete values array: ', valArr);
+    if (vm.showDebug) vm.$log.debug('Final discrete values array: ', valArr);
     return valArr;
   }
 
@@ -969,7 +971,7 @@ export class Project {
     let type = null;
     if (measure.type === 'ModelMeasure') {
       //type = 'Ruby';
-       type = 'RubyMeasure';
+      type = 'RubyMeasure';
     } else if (measure.type === 'EnergyPlusMeasure') {
       //type = 'EnergyPlus';
       type = 'EnergyPlusMeasure';
@@ -982,13 +984,13 @@ export class Project {
     return type;
   }
 
-  makeOutputs(outputs, groupFlag){
+  makeOutputs(outputs, groupFlag) {
     const vm = this;
     let index = 0;
     let currentGroup = null;
     const finalOutputs = [];
     _.forEach(outputs, (out) => {
-      vm.$log.debug('OUTPUT: ', out);
+      if (vm.showDebug) vm.$log.debug('OUTPUT: ', out);
       const outHash = {};
       outHash.units = out.units;
       outHash.objective_function = out.objective_function == 'true';  // true or false
@@ -1064,11 +1066,11 @@ export class Project {
       // assume windows paths '\\'
       mdir = _.last(_.split(measure.measure_dir, '\\'));
     }
-    vm.$log.debug("***MEASURE DIR NAME: ", mdir);
+    if (vm.showDebug) vm.$log.debug('***MEASURE DIR NAME: ', mdir);
     return mdir;
   }
 
-  makeArgument(arg){
+  makeArgument(arg) {
     const vm = this;
     const argument = {};
     argument.display_name = arg.display_name;
@@ -1084,7 +1086,7 @@ export class Project {
     return argument;
   }
 
-  makeSkip(measure){
+  makeSkip(measure) {
     const vm = this;
     const v = {
       argument: {
@@ -1122,9 +1124,9 @@ export class Project {
 
   exportScripts() {
     const vm = this;
-    vm.$log.debug('exporting server scripts');
+    if (vm.showDebug) vm.$log.debug('exporting server scripts');
     _.forEach(vm.serverScripts, (script, type) => {
-      // vm.$log.debug('type: ', type, 'scriptdata: ', script);
+      // if (vm.showDebug) vm.$log.debug('type: ', type, 'scriptdata: ', script);
       if (script.file) {
         // create argument file
         let argFilename = script.file.substr(0, script.file.lastIndexOf('.')) || script.file;
@@ -1199,7 +1201,7 @@ export class Project {
     vm.pat.datapoints = vm.datapoints;
 
     vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
-    vm.$log.debug('Project exported to pat.json');
+    if (vm.showDebug) vm.$log.debug('Project exported to pat.json');
     vm.setModified(false);
   }
 
@@ -1229,18 +1231,18 @@ export class Project {
     // measures should already be in correct order
     // make sure workflowIndex's are consecutive and match measure index in array
     const vm = this;
-    vm.$log.debug('ProjectService::RecalculateMeasureWorkflowIndexes');
+    if (vm.showDebug) vm.$log.debug('ProjectService::RecalculateMeasureWorkflowIndexes');
     _.forEach(vm.measures, (measure, key) => {
       measure.workflow_index = key;
-      vm.$log.debug('key: ', key);
+      if (vm.showDebug) vm.$log.debug('key: ', key);
     });
 
-    vm.$log.debug('***REORDERED PROJECT MEASURES: ', vm.measures);
+    if (vm.showDebug) vm.$log.debug('***REORDERED PROJECT MEASURES: ', vm.measures);
   }
 
   openSetMyMeasuresDirModal() {
     const vm = this;
-    vm.$log.debug('in SetMyMeasures Modal function');
+    if (vm.showDebug) vm.$log.debug('in SetMyMeasures Modal function');
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
       controller: 'ModalSetMeasuresDirController',
@@ -1257,7 +1259,7 @@ export class Project {
 
   setProjectName(name) {
     const vm = this;
-    vm.$log.debug('Project setProjectName name:', name);
+    if (vm.showDebug) vm.$log.debug('Project setProjectName name:', name);
     vm.projectName = name;
   }
 
@@ -1302,12 +1304,12 @@ export class Project {
   // projectDir is a jetpack object (not a string)
   setProject(projectDir) {
     const vm = this;
-    vm.$log.debug('Project setProject');
+    if (vm.showDebug) vm.$log.debug('Project setProject');
 
     vm.setProjectDir(projectDir);
-    vm.$log.debug('in set project: projectDir: ', vm.projectDir.path());
+    if (vm.showDebug) vm.$log.debug('in set project: projectDir: ', vm.projectDir.path());
     vm.setProjectName(projectDir.path().replace(/^.*[\\\/]/, ''));
-    vm.$log.debug('project name: ', vm.projectName);
+    if (vm.showDebug) vm.$log.debug('project name: ', vm.projectName);
 
     vm.mongoDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/data/db'));
     vm.logsDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/logs'));
@@ -1358,7 +1360,7 @@ export class Project {
 
   getMeasuresAndOptions() {
     const vm = this;
-    vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
+    if (vm.showDebug) vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
     return vm.measures;
   }
 
@@ -1436,7 +1438,7 @@ export class Project {
       aws: {},
       credentials: {yamlFilename: null, accessKey: null, region: 'us-east-1'}
     });
-    vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
+    if (vm.showDebug) vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
   setRemoteSettings(settings) {
@@ -1466,7 +1468,7 @@ export class Project {
     vm.clusters = {running: [], all: []};
     const tempClusters = vm.jetpack.find(vm.projectDir.path(), {matching: '*_cluster.json'});
     _.forEach(tempClusters, cluster => {
-      vm.$log.debug('CLUSTER: ', cluster);
+      if (vm.showDebug) vm.$log.debug('CLUSTER: ', cluster);
       const clusterFile = vm.jetpack.read(cluster);
       let clusterName = _.last(_.split(cluster, '/'));
       clusterName = _.replace(clusterName, '_cluster.json', '');
@@ -1480,7 +1482,7 @@ export class Project {
       });
     });
 
-    vm.$log.debug('Cluster files found: ', vm.clusters);
+    vm.$log.info('Cluster files found: ', vm.clusters);
     return vm.clusters;
   }
 
@@ -1489,7 +1491,7 @@ export class Project {
     let dns = null;
     if (clusterName && vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
       const clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName, clusterName + '.json'), 'json');
-      vm.$log.debug('Cluster File Data: ', clusterData);
+      vm.$log.info('Cluster File Data: ', clusterData);
       if (clusterData && clusterData.server && clusterData.server.dns) {
         dns = clusterData.server.dns;
       }
@@ -1510,24 +1512,24 @@ export class Project {
   pingCluster(clusterName) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('Locating config file for cluster: ', clusterName);
+    if (vm.showDebug) vm.$log.debug('Locating config file for cluster: ', clusterName);
 
     const dns = vm.getDNSFromFile(clusterName);
 
     if (dns) {
-      vm.$log.debug('PING: ', dns);
+      vm.$log.info('PING: ', dns);
       vm.$http.get(vm.fixURL(dns)).then(response => {
         // send json to run controller
-        vm.$log.debug('Cluster RUNNING at: ', dns);
-        vm.$log.debug('JSON response: ', response);
+        vm.$log.info('Cluster RUNNING at: ', dns);
+        vm.$log.info('JSON response: ', response);
         deferred.resolve(dns);
       }, () => {
-        vm.$log.debug('Cluster TERMINATED at: ', dns);
+        vm.$log.info('Cluster TERMINATED at: ', dns);
         deferred.reject();
       });
     } else {
       // nothing to ping
-      vm.$log.debug("Nothing to ping");
+      vm.$log.error('Nothing to ping');
       deferred.reject();
     }
 
@@ -1549,11 +1551,11 @@ export class Project {
 
   saveClusterToFile() {
     const vm = this;
-    vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
+    if (vm.showDebug) vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
     // copy and clean up what you don't need
     const cluster = angular.copy(vm.remoteSettings.aws);
     cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : "";
-    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name :"";
+    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name : "";
     cluster.openstudio_server_version = cluster.openstudio_server_version ? cluster.openstudio_server_version.name : "";
     // TODO: make sure worker number is a number
     // this is hard-coded
@@ -1567,15 +1569,15 @@ export class Project {
     const amiURL = 'http://s3.amazonaws.com/openstudio-resources/server/api/v3/amis.json';
     vm.$http.get(amiURL, {cache: false}).then(response => {
       if (response.data && response.data.builds) {
-        vm.$log.debug('OPENSTUDIO SERVER AMIS: ', response.data.builds);
+        vm.$log.info('OPENSTUDIO SERVER AMIS: ', response.data.builds);
         _.forEach(response.data.builds, version => {
           vm.osServerVersions.push(version);
         });
       }
-      vm.$log.debug('OS Server Versions: ', vm.osServerVersions);
+      vm.$log.info('OS Server Versions: ', vm.osServerVersions);
 
     }, error => {
-      vm.$log.debug('Error retrieving the OsServerVersions: ', error);
+      vm.$log.error('Error retrieving the OsServerVersions: ', error);
     });
   }
 
@@ -1790,7 +1792,7 @@ export class Project {
       worker_initialization: {file: null, arguments: []},
       worker_finalization: {file: null, arguments: []}
     };
-    vm.$log.debug('setServerScripts: ', vm.serverScripts);
+    if (vm.showDebug) vm.$log.debug('setServerScripts: ', vm.serverScripts);
   }
 
   getServerScripts() {
@@ -1815,7 +1817,7 @@ export class Project {
 
   setAlgorithmOptions() {
     const at = {};
-    at.BaselinePerturbation =[{
+    at.BaselinePerturbation = [{
       name: 'in_measure_combinations',
       description: '(TRUE/FALSE) Run full factorial search over in-measure variable combinations',
       defaultValue: 'TRUE'
@@ -2113,7 +2115,7 @@ export class Project {
 
   getAlgorithmSettingsForMethod() {
     const vm = this;
-    vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
+    if (vm.showDebug) vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
 
     const settings = [];
     _.forEach(vm.algorithmOptions[vm.samplingMethod.id], object => {
@@ -2126,7 +2128,7 @@ export class Project {
 
   setAlgorithmSettings(algorithm) {
     const vm = this;
-    vm.$log.debug('In setAlgorithmSettings in Project');
+    if (vm.showDebug) vm.$log.debug('In setAlgorithmSettings in Project');
 
     // remove non-applicable settings
     _.forEachRight(vm.algorithmSettings, (setting, key) => {
@@ -2196,7 +2198,7 @@ export class Project {
     }, {
       id: 'BaselinePerturbation',
       name: 'analysis.type.baselinePerturbation'
-    },{
+    }, {
       id: 'Diagonal',
       name: 'analysis.type.diagonal'
     }];
@@ -2264,7 +2266,7 @@ export class Project {
       }
       else vm.$log.error('The seeds directory (%s) does not exist', vm.seedDir.cwd());
     } else {
-      vm.$log.debug('There is no seed directory defined (project not selected?)');
+      if (vm.showDebug) vm.$log.debug('There is no seed directory defined (project not selected?)');
     }
 
   }
@@ -2280,7 +2282,7 @@ export class Project {
       }
       else vm.$log.error('The weather file directory (%s) does not exist', vm.weatherDir.cwd());
     } else {
-      vm.$log.debug('There is no weather directory defined (project not selected?)');
+      if (vm.showDebug) vm.$log.debug('There is no weather directory defined (project not selected?)');
     }
 
   }
@@ -2316,7 +2318,7 @@ export class Project {
 
   setModified(isModified) {
     const vm = this;
-    vm.$log.debug('Project::setModified isModified: ', isModified);
+    if (vm.showDebug) vm.$log.debug('Project::setModified isModified: ', isModified);
     vm.modified = isModified;
   }
 
@@ -2334,7 +2336,7 @@ export class Project {
         theDate = new Date(dateString);
       }
 
-      // vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
+      // if (vm.showDebug) vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
     }
 
     return theDate;
@@ -2362,7 +2364,7 @@ export class Project {
   modifiedModal() {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('Project::modifiedModal');
+    if (vm.showDebug) vm.$log.debug('Project::modifiedModal');
 
     if (vm.getModified()) {
       const modalInstance = vm.$uibModal.open({
@@ -2373,7 +2375,7 @@ export class Project {
       });
 
       modalInstance.result.then(() => {
-        vm.$log.debug('Resolving openModal()');
+        if (vm.showDebug) vm.$log.debug('Resolving openModal()');
         deferred.resolve('resolved');
       }, () => {
         // Modal canceled
