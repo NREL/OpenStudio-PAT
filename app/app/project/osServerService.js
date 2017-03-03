@@ -496,6 +496,8 @@ export class OsServer {
                 if (error !== null) {
                   console.log('exec error:', error);
                 }
+                // delete cluster file
+                vm.jetpack.remove(vm.Project.getProjectClustersDir().path(vm.remoteSettings.aws.cluster_name));
                 deferred.reject(error);
               }
             });
@@ -571,6 +573,7 @@ export class OsServer {
                 if (error !== null) {
                   console.log('exec error:', error);
                 }
+                vm.jetpack.remove(vm.Project.getProjectClustersDir().path(vm.remoteSettings.aws.cluster_name));
                 deferred.reject(error);
               }
             });
@@ -883,6 +886,7 @@ export class OsServer {
                   console.log('exec error: ', error);
                 }
                 vm.setRemoteStopInProgress(false);
+                vm.jetpack.remove(vm.Project.getProjectClustersDir().path(vm.remoteSettings.aws.cluster_name));
                 deferred.reject(error);
               }
             });

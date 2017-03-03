@@ -113,10 +113,10 @@ export class RunController {
       let firstArg = undefined;
       const skipArg = '__SKIP__';
       if (item.arguments){
-        if (_.find(_.keys(item.arguments)), skipArg){
+        if (_.find(_.keys(item.arguments), skipArg)){
           // found a skip..is it TRUE?
           if (item.arguments['__SKIP__'] == true){
-            vm.$log.debug('Found SKIP=true in item: ', item);
+            //vm.$log.debug('Found SKIP=true in item: ', item);
             isSkipped = true;
           }
         }
@@ -211,12 +211,12 @@ export class RunController {
       templateUrl: 'app/run/newAwsCredentials.html'
     });
 
-    modalInstance.result.then((name, truncatedAccessKey) => {
-      vm.$log.debug('In modal new credentials result function, name: ', name);
+    modalInstance.result.then((data) => {
+      vm.$log.debug('In modal new credentials result function, name: ', data[0], ' key: ', data[1]);
       vm.$scope.awsYamlFiles = vm.Project.getAwsYamlFiles();
       // set selected file to new file
-      vm.$scope.remoteSettings.credentials.yamlFilename = name;
-      vm.$scope.remoteSettings.credentials.accessKey = truncatedAccessKey;
+      vm.$scope.remoteSettings.credentials.yamlFilename = data[0];
+      vm.$scope.remoteSettings.credentials.accessKey = data[1];
       vm.$scope.remoteSettings.credentials.region = vm.awsRegions;
       deferred.resolve();
     }, () => {
