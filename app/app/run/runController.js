@@ -35,8 +35,8 @@ export class RunController {
     vm.$scope.clusterData = {};
     // if remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
-      vm.resetClusterSettings();
       vm.checkIfClusterIsRunning();
+      vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
     }
 
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
@@ -51,6 +51,10 @@ export class RunController {
 
     // clear out aws settings if can't find file
     vm.resetAwsCredentials();
+    // set region if missing
+    if (vm.$scope.remoteSettings.credentials) {
+      vm.$scope.remoteSettings.credentials.region = vm.$scope.awsRegions;
+    }
 
     vm.$scope.datapoints = vm.Project.getDatapoints();
     vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
@@ -80,6 +84,11 @@ export class RunController {
     vm.$scope.disabledStopButtonClass = function() {
       const disable = vm.OsServer.getRemoteStopInProgress() ? 'disabled' : '';
       return disable;
+    };
+
+    // disabled fields
+    vm.$scope.disabledFields = function() {
+      return vm.OsServer.getRemoteStartInProgress() || vm.$scope.remoteSettings.aws.cluster_status=='running';
     };
 
     vm.$scope.atLeastOneSelected = function () {
@@ -177,6 +186,7 @@ export class RunController {
     const yamlStr = vm.jetpack.read(vm.Project.getAwsDir().path(vm.$scope.remoteSettings.credentials.yamlFilename + '.yml'));
     let yamlData = YAML.parse(yamlStr);
     vm.$scope.remoteSettings.credentials.accessKey = yamlData.accessKey.substr(0,4) + '****';
+    vm.$scope.remoteSettings.credentials.region = vm.$scope.awsRegions;
     yamlData = null;
   }
 
@@ -186,6 +196,7 @@ export class RunController {
       if (_.find(vm.$scope.awsYamlFiles, vm.$scope.remoteSettings.credentials.yamlFilename) == undefined) {
         vm.$scope.remoteSettings.credentials.accessKey = null;
         vm.$scope.remoteSettings.credentials.awsYamlFile = null;
+        vm.$scope.remoteSettings.credentials.region = vm.$scope.awsRegions;
       }
     }
   }
@@ -206,6 +217,7 @@ export class RunController {
       // set selected file to new file
       vm.$scope.remoteSettings.credentials.yamlFilename = name;
       vm.$scope.remoteSettings.credentials.accessKey = truncatedAccessKey;
+      vm.$scope.remoteSettings.credentials.region = vm.awsRegions;
       deferred.resolve();
     }, () => {
       // Modal canceled
@@ -252,7 +264,10 @@ export class RunController {
       }, () => {
         // terminated
         vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
+        vm.$scope.remoteSettings.aws.connected = false;
+        vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] == 'stopped';
         vm.$log.debug("Run::checkIfClusterIsRunning Current cluster TERMINATED");
+
       });
     } else {
       vm.$scope.remoteSettings.aws = {};
@@ -276,6 +291,12 @@ export class RunController {
         // terminated
         vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
       });
+
+      if (vm.$scope.remoteSettings.aws.cluster_name){
+        vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
+      } else {
+        vm.$scope.clusterData = {};
+      }
 
       // set variables
       vm.$scope.remoteSettings.aws.server_instance_type = "";
@@ -388,7 +409,7 @@ export class RunController {
         vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
         vm.$log.debug('clusterData: ', vm.$scope.clusterData);
       }
-      else{
+      else {
         vm.toastr.success('AWS server started!');
         vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
       }
@@ -742,9 +763,6 @@ export class RunController {
       vm.$log.debug('Start Server response: ', response);
 
       vm.OsServer.setProgress(30, 'Server started');
-
-      //vm.$scope.serverStatuses = vm.OsServer.getServerStatuses();
-      //vm.$log.debug('Server Statuses: ', vm.$scope.serverStatuses);
 
       // 4: hit PAT CLI to start run
       vm.OsServer.setProgress(40, 'Starting analysis run');
