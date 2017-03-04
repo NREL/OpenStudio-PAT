@@ -10,10 +10,10 @@
 
         <div class="row pad-bot-10">
           <div class="col-sm-6">
-            <div ng-repeat="option in algorithmSettings" ng-if="$odd">
+            <div ng-repeat="option in algorithmSettings" ng-if="$even">
               <div class="row pad-bot-10">
                 <div class="col-sm-12">
-                  <label class="medium-label" for="{{option.name}}">{{option.name}}</label>
+                  <label class="medium-label" for="{{option.name}}">{{option.displayName}}</label>
                   <span ng-if="option.description" class="small-text inline">&mdash; {{option.description}}</span>
                   <input type="text" class="form-control" id="{{option.name}}" placeholder="{{option.defaultValue}}"
                          ng-model="option.value">
@@ -22,11 +22,11 @@
             </div>
           </div>
           <div class="col-sm-6">
-            <div ng-repeat="option in algorithmSettings" ng-if="$even">
+            <div ng-repeat="option in algorithmSettings" ng-if="$odd">
               <div class="row pad-bot-10">
                 <div class="col-sm-12">
-                  <label class="medium-label" for="{{option.name}}">{{option.name}}</label>
-                  <span class="small-text inline">{{option.description}}</span>
+                  <label class="medium-label" for="{{option.name}}">{{option.displayName}}</label>
+                  <span ng-if="option.description" class="small-text inline">&mdash; {{option.description}}</span>
                   <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}"
                          ng-model="option.value">
                 </div>

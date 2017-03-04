@@ -1814,6 +1814,559 @@ export class Project {
   }
 
   setAlgorithmOptions() {
+    const opts = {};
+    opts.diag = [{
+      name: 'experiment_type',
+      displayName: 'Experiment Type',
+      description: 'Options: diagonal',
+      defaultValue: 'diagonal'
+    }, {
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Positive integer (if individual, total simulations is this times each variable)',
+      defaultValue: 2
+    }, {
+      name: 'run_baseline',
+      displayName: 'Run Baseline?',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 1
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    opts.doe = [{
+      name: 'experiment_type',
+      displayName: 'Experiment Type',
+      description: 'Options: full_factorial',
+      defaultValue: 'full_factorial'
+    }, {
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Positive integer (this discretizes a continous variable)',
+      defaultValue: 2
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    opts.lhs = [{
+      name: 'sample_method',
+      displayName: 'Sample Method',
+      description: 'Options: individual_variables or all_variables',
+      defaultValue: 'individual_variables'
+    }, {
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Positive integer (if individual, total simulations is this times each variable)',
+      defaultValue: 5
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    opts.morris = [{
+      name: 'r',
+      displayName: 'r',
+      description: 'Integer giving the number of repetitions of the design',
+      defaultValue: 2
+    }, {
+      name: 'levels',
+      displayName: 'Levels',
+      description: 'Positive integer (if individual, total simulations is this times each variable)',
+      defaultValue: 2
+    }, {
+      name: 'grid_jump',
+      displayName: 'Levels',
+      description: 'Integer specifying the number of levels that are increased/decreased for computing the elementary effects',
+      defaultValue: 1
+    }, {
+      name: 'type',
+      displayName: 'Type',
+      description: 'Options: oat (One at a Time)',
+      defaultValue: 'oat'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski'
+    }, {
+      name: 'pPower',
+      displayName: 'pPower',
+      description: 'Options: Lp norm power (must be non-negative)',
+      defaultValue: 2
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1000000000000000000
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    opts.nsga_nrel = [{
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Size of initial population',
+      defaultValue: 30
+    }, {
+      name: 'generations',
+      displayName: 'Generations',
+      description: 'Number of generations',
+      defaultValue: 3
+    }, {
+      name: 'tournament_size',
+      displayName: 'Tournament Size',
+      description: 'Tournament Size',
+      defaultValue: 2
+    }, {
+      name: 'cprob',
+      displayName: 'C Prob',
+      description: 'Crossover probability [0,1]',
+      defaultValue: 0.85
+    }, {
+      name: 'xover_dist_idx',
+      displayName: 'XoverDistIdx',
+      description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5
+    }, {
+      name: 'mu_dist_idx',
+      displayName: 'MuDistIdx',
+      description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5
+    }, {
+      name: 'mprob',
+      displayName: 'M Prob',
+      description: 'Mutation probability [0,1]',
+      defaultValue: 0.8
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2
+    }, {
+      name: 'exit_on_guideline14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    opts.optim = [{
+      name: 'epsilon_gradient',
+      displayName: 'Epsilon Gradient',
+      description: 'Epsilon in gradient calculation',
+      defaultValue: 1e-4
+    }, {
+      name: 'pgtol',
+      displayName: 'PG Tol',
+      description: 'Tolerance on the projected gradient',
+      defaultValue: 1e-2
+    }, {
+      name: 'factr',
+      displayName: 'Factr',
+      description: 'Tolerance on delta_F',
+      defaultValue: 4.5036e13
+    }, {
+      name: 'maxit',
+      displayName: 'Max iterations',
+      description: 'Maximum number of iterations',
+      defaultValue: 10
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2
+    }, {
+      name: 'exit_on_guideline14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    opts.pso = [{
+      name: 'npart',
+      displayName: 'Number of Particles',
+      description: 'Number of particles in the swarm',
+      defaultValue: 4
+    }, {
+      name: 'maxit',
+      displayName: 'Max Iterations',
+      description: 'Maximum number of iterations',
+      defaultValue: 20
+    }, {
+      name: 'maxfn',
+      displayName: 'Max Function Evaluations',
+      description: 'Maximum number of function evaluations',
+      defaultValue: 1000
+    }, {
+      name: 'lambda',
+      displayName: 'Lambda',
+      description: '[0,1] a percentage to limit the maximum velocity (Vmax) for each dimension',
+      defaultValue: 0.9
+    }, {
+      name: 'c2',
+      displayName: 'C2',
+      description: 'Social acceleration coefficient',
+      defaultValue: 1.193147
+    }, {
+      name: 'c1',
+      displayName: 'C1',
+      description: 'Cognitive acceleration coefficient',
+      defaultValue: 1.193147
+    }, {
+      name: 'boundary',
+      displayName: 'Boundary',
+      description: 'Options: invisible, damping, reflecting, absorbing2007, default',
+      defaultValue: 'reflecting'
+    }, {
+      name: 'topology',
+      displayName: 'Topology',
+      description: 'Options: gbest, lbest, vonneumann, random',
+      defaultValue: 'random'
+    }, {
+      name: 'xini',
+      displayName: 'xini',
+      description: 'Options: lhs, random',
+      defaultValue: 'lhs'
+    }, {
+      name: 'vini',
+      displayName: 'vini',
+      description: 'Options: zero, lhs2011, random2011, lhs2007, random2007, default',
+      defaultValue: 'lhs2011'
+    }, {
+      name: 'abstol',
+      displayName: 'Abs Tol',
+      description: 'Absolute convergence tolerance',
+      defaultValue: 0.01
+    }, {
+      name: 'reltol',
+      displayName: 'Rel Tol',
+      description: 'Relative convergence tolerance',
+      defaultValue: 0.01
+    }, {
+      name: 'method',
+      displayName: 'Method',
+      description: 'Options: spso2007, spso2011, ipso, fips, wfips',
+      defaultValue: 'spso2011'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2
+    }, {
+      name: 'exit_on_guideline14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    opts.repeat_run = [{
+      name: 'number_of_runs',
+      displayName: 'Number of Runs',
+      description: 'Positive integer (if individual, total simulations is this times each variable)',
+      defaultValue: 30
+    },{
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    opts.rgenoud = [{
+      name: 'popsize',
+      displayName: 'Population Size',
+      description: 'Size of initial population',
+      defaultValue: 30
+    },{
+      name: 'generations',
+      displayName: 'Generations',
+      description: 'Number of generations',
+      defaultValue: 2
+    },{
+      name: 'wait_generations',
+      displayName: 'Generations to Wait',
+      description: 'If no improvement in waitGenerations of generations, then exit',
+      defaultValue: 2
+    },{
+      name: 'bfgsburnin',
+      displayName: 'BFGS burn in',
+      description: 'The number of generations which are run before the BFGS is ﬁrst used',
+      defaultValue: 6
+    },{
+      name: 'solution_tolerance',
+      displayName: 'Solution Tolerance',
+      description: 'Numbers within solutionTolerance are considered equal',
+      defaultValue: 0.01
+    },{
+      name: 'epsilon_gradient',
+      displayName: 'Epsilon Gradient',
+      description: 'epsilon in gradient calculation',
+      defaultValue: 0.01
+    },{
+      name: 'pgtol',
+      displayName: 'Projected Gradient Tolerance',
+      description: 'Tolerance on the projected gradient',
+      defaultValue: 0.01
+    },{
+      name: 'factr',
+      displayName: 'Failed F Value',
+      description: 'Tolerance on delta_F',
+      defaultValue: 450360000000000
+    },{
+      name: 'maxit',
+      displayName: 'Maximum Iterations',
+      description: 'Maximum number of iterations',
+      defaultValue: 3
+    },{
+      name: 'r_genoud_debug_flag',
+      displayName: 'Failed F Value',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 1
+    },{
+      name: 'print_level',
+      displayName: 'Print Level',
+      description: 'Options: 0 (minimal printing), 1 (normal), 2 (detailed), and 3 (debug)',
+      defaultValue: 2
+    },{
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski'
+    },{
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2
+    },{
+      name: 'exit_on_guideline14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    },{
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18
+    },{
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    opts.single_run = [{
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18
+    },{
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    opts.sobol = [{
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Positive integer',
+      defaultValue: 30
+    },{
+      name: 'random_seed',
+      displayName: 'Random Seed',
+      description: 'The first random seed',
+      defaultValue: 1979
+    },{
+      name: 'random_seed2',
+      displayName: 'Random Seed 2',
+      description: 'the second random seed',
+      defaultValue: 1973
+    },{
+      name: 'order',
+      displayName: 'Order',
+      description: 'Integer, the maximum order in the ANOVA decomposition (all indices up to this order will be computed)',
+      defaultValue: 1
+    },{
+      name: 'nboot',
+      displayName: 'Num Boot',
+      description: 'The number of bootstrap replicates',
+      defaultValue: 0
+    },{
+      name: 'conf',
+      displayName: 'Confidence',
+      description: 'the confidence level for bootstrap confidence intervals',
+      defaultValue: 0.95
+    },{
+      name: 'type',
+      displayName: 'Type',
+      description: 'Options: sobol, sobol2002, sobol2007, jansen, mara, martinez',
+      defaultValue: 'sobol'
+    },{
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski'
+    },{
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2
+    },{
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18
+    },{
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    opts.spea_nrel = [{
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Size of Initial Population',
+      defaultValue: 30
+    },{
+      name: 'generations',
+      displayName: 'Generations',
+      description: 'Number of generations',
+      defaultValue: 2
+    },{
+      name: 'tournament_size',
+      displayName: 'Tournament Size',
+      description: 'Tournament Size',
+      defaultValue: 2
+    },{
+      name: 'cprob',
+      displayName: 'C Prob',
+      description: 'Crossover probability [0,1]',
+      defaultValue: 0.85
+    },{
+      name: 'cidx',
+      displayName: 'C Idx',
+      description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5
+    },{
+      name: 'midx',
+      displayName: 'M Idx',
+      description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5
+    },{
+      name: 'mprob',
+      displayName: 'M Prob',
+      description: 'Mutation probability [0,1]',
+      defaultValue: 0.8
+    },{
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2
+    }, {
+      name: 'exit_on_guideline14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    },{
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18
+    },{
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
+    // opts.preflight = [];
+    // baseline perturbation?
+
+    return opts;
+
+  }
+
+  setAlgorithmOptionsOld() {
     const at = {};
     at.BaselinePerturbation =[{
       name: 'in_measure_combinations',
@@ -2161,44 +2714,47 @@ export class Project {
     const vm = this;
 
     return [{
-      id: 'NSGA2',
-      name: 'analysis.type.nsga2'
-    }, {
-      id: 'SPEA2',
-      name: 'analysis.type.spea2'
-    }, {
-      id: 'PSO',
-      name: 'analysis.type.pso'
-    }, {
-      id: 'RGENOUD',
-      name: 'analysis.type.rgenoud'
-    }, {
-      id: 'Optim',
-      name: 'analysis.type.optim'
-    }, {
-      id: 'LHS',
-      name: 'analysis.type.lhs'
-    }, {
-      id: 'Morris',
-      name: 'analysis.type.morris'
-    }, {
-      id: 'DOE',
-      name: 'analysis.type.doe'
-    }, {
-      id: 'PreFlight',
-      name: 'analysis.type.preFlight'
-    }, {
-      id: 'SingleRun',
-      name: 'analysis.type.singleRun'
-    }, {
-      id: 'RepeatRun',
-      name: 'analysis.type.repeatRun'
-    }, {
       id: 'BaselinePerturbation',
       name: 'analysis.type.baselinePerturbation'
     },{
-      id: 'Diagonal',
+      id: 'diag',
       name: 'analysis.type.diagonal'
+    },{
+      id: 'doe',
+      name: 'analysis.type.doe'
+    },{
+      id: 'lhs',
+      name: 'analysis.type.lhs'
+    },{
+      id: 'morris',
+      name: 'analysis.type.morris'
+    },{
+      id: 'nsga_nrel',
+      name: 'analysis.type.nsga2'
+    },{
+      id: 'optim',
+      name: 'analysis.type.optim'
+    },{
+      id: 'pre_flight',
+      name: 'analysis.type.preFlight'
+    },{
+      id: 'pso',
+      name: 'analysis.type.pso'
+    },{
+      id: 'repeat_run',
+      name: 'analysis.type.repeatRun'
+    },{
+      id: 'rgenoud',
+      name: 'analysis.type.rgenoud'
+    }, {
+      id: 'single_run',
+      name: 'analysis.type.singleRun'
+    }, {
+      id: 'sobol',
+      name: 'analysis.type.sobol'
+    },{
+      id: 'spea_nrel',
+      name: 'analysis.type.spea2'
     }];
   }
 
