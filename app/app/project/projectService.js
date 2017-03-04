@@ -2679,13 +2679,13 @@ export class Project {
 
   setAlgorithmSettings(algorithm) {
     const vm = this;
-    vm.$log.debug('In setAlgorithmSettings in Project');
+    vm.$log.debug('In setAlgorithmSettings in Project.  Algorithm: ', algorithm);
 
     // remove non-applicable settings
     _.forEachRight(vm.algorithmSettings, (setting, key) => {
       const match = _.find(vm.algorithmOptions[algorithm.id], {name: setting.name});
       if (!match) {
-        vm.algorithmSettings.splice(key, 0);
+        vm.algorithmSettings.splice(key, 1);
       }
     });
 
@@ -2703,6 +2703,8 @@ export class Project {
         vm.algorithmSettings.push(temp);
       }
     });
+
+    vm.$log.debug('new algorithmSettings: ', vm.algorithmSettings);
   }
 
   getAlgorithmOptions() {
