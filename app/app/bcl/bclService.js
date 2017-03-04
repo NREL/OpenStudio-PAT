@@ -265,39 +265,52 @@ export class BCL {
     vm.bclMeasures = [];
     const numResults = 100;
     const promises = [];
-    const numPages = 2; // TODO: use metadata URL to find out how many pages to retrieve
+    const numPages = 0;
     const baseUrl = vm.bclUrl + 'search/?fq[]=bundle:nrel_measure&api_version=2&show_rows=' + numResults;
     let url = '';
 
-    for (let page = 0; page < numPages; page++) {
-      url = baseUrl + '&page=' + page;
-      const promise = vm.$http.get(url).then(response => {
-        const measures = [];
-        //if (vm.showDebug) vm.$log.debug('RESPONSE: ', response);
-        // parse response
-        _.forEach(response.data.result, input => {
-          let measure = vm.parseMeasure(input);
-          measure = vm.prepareMeasure(measure, 'bcl');
-          measures.push(measure);
+    // use metasearch to find total number of measures on BCL
+    const metaURL = vm.bclUrl + 'metasearch/?fq[]=bundle:nrel_measure&api_version=2';
+    vm.$http.get(metaURL).then(response => {
+      const numMeasures = response.data.result_count;
+      const numPages = Math.ceil(numMeasures / numResults);
+      vm.$log.debug('Number of pages to retrieve from BCL: ', numPages);
+      // get measures
+      for (let page = 0; page < numPages; page++) {
+        url = baseUrl + '&page=' + page;
+        const promise = vm.$http.get(url).then(response => {
+          const measures = [];
+          //if (vm.showDebug) vm.$log.debug('RESPONSE: ', response);
+          // parse response
+          _.forEach(response.data.result, input => {
+            let measure = vm.parseMeasure(input);
+            measure = vm.prepareMeasure(measure, 'bcl');
+            measures.push(measure);
+          });
+          return measures;
+
+        }, error => {
+          vm.$log.error('ERROR:');
+          vm.$log.error(error);
         });
-        return measures;
+        promises.push(promise);
+      }
+      vm.$q.all(promises).then(measuresArrays => {
+        _.forEach(measuresArrays, measures => {
+          vm.bclMeasures = _.concat(vm.bclMeasures, measures);
+        });
+        deferred.resolve(vm.bclMeasures);
 
-      }, error => {
-        vm.$log.error('ERROR:');
-        vm.$log.error(error);
+      }, response => {
+        vm.$log.error('ERROR retrieving BCL online measures: ', response);
+        deferred.reject(response);
       });
-      promises.push(promise);
-    }
-    vm.$q.all(promises).then(measuresArrays => {
-      _.forEach(measuresArrays, measures => {
-        vm.bclMeasures = _.concat(vm.bclMeasures, measures);
-      });
-      deferred.resolve(vm.bclMeasures);
 
-    }, response => {
-      vm.$log.error('ERROR retrieving BCL online measures: ', response);
-      deferred.reject(response);
+    }, error => {
+      vm.$log.debug('Metasearch Query error...cannot retrieve BCL online measures');
+      deferred.reject(error);
     });
+
     return deferred.promise;
 
   }
