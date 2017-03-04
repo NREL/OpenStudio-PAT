@@ -11,6 +11,8 @@ export class OutputsController {
     vm.$uibModal = $uibModal;
     vm.$q = $q;
     vm.$window = $window;
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
@@ -25,7 +27,7 @@ export class OutputsController {
 
     // initialize grid dropdowns
     vm.booleanDropdownArr = [{id: 'true', name: 'true'}, {id: 'false', name: 'false'}];
-    vm.variableTypeDropdownArr = [{id: 'Double'}, {id: 'Integer'}, {id:'Bool'}, {id:'String'}];
+    vm.variableTypeDropdownArr = [{id: 'Double'}, {id: 'Integer'}, {id: 'Bool'}, {id: 'String'}];
 
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
@@ -37,7 +39,7 @@ export class OutputsController {
       let headerHeight = 55; // header height
       const m = _.find(vm.$scope.measures, {name: name});
       const length = _.filter(m.analysisOutputs).length;
-      vm.$log.debug('data length: ', length);
+      if (vm.showDebug) vm.$log.debug('data length: ', length);
       return {
         height: (length * rowHeight + headerHeight + 15) + 'px'
       };
@@ -47,7 +49,7 @@ export class OutputsController {
 
   setOutputMeasures() {
     const vm = this;
-    if (!vm.$scope.outputMeasures){
+    if (!vm.$scope.outputMeasures) {
       vm.$scope.outputMeasures = [];
     }
 
@@ -67,31 +69,31 @@ export class OutputsController {
     }
 
     // user-added measures
-    const others = _.filter(vm.$scope.measures, {outputMeasure: true} );
-    vm.$log.debug('All Output Measures: ', others);
+    const others = _.filter(vm.$scope.measures, {outputMeasure: true});
+    if (vm.showDebug) vm.$log.debug('All Output Measures: ', others);
     vm.$scope.outputMeasures = _.union(vm.$scope.outputMeasures, others);
 
     // ensure there's a key for user-defined outputs
     _.forEach(vm.$scope.outputMeasures, (measure) => {
-      if (!measure.userDefinedOutputs){
+      if (!measure.userDefinedOutputs) {
         measure.userDefinedOutputs = [];
       }
     });
 
     // make sure all measures have a outputMeasure key
     _.forEach(vm.$scope.measures, (measure) => {
-      if (!measure.outputMeasure){
+      if (!measure.outputMeasure) {
         measure.outputMeasure = false;
       }
     });
 
-    vm.$log.debug('Output Measures: ', vm.$scope.outputMeasures);
+    if (vm.showDebug) vm.$log.debug('Output Measures: ', vm.$scope.outputMeasures);
 
   }
 
   initializeGrids() {
     const vm = this;
-    vm.$log.debug('Output::initializeGrids');
+    if (vm.showDebug) vm.$log.debug('Output::initializeGrids');
     vm.$scope.measures = _.sortBy(vm.$scope.measures, ['workflow_index']);
     vm.setGridOptions();
 
@@ -108,7 +110,7 @@ export class OutputsController {
     _.forEach(vm.$scope.outputMeasures, (measure) => {
 
       if (measure.analysisOutputs == undefined) measure.analysisOutputs = [];
-      vm.$log.debug('measure: ', measure);
+      if (vm.showDebug) vm.$log.debug('measure: ', measure);
 
       vm.$scope.gridOptions[measure.instanceId] = {
         data: 'measure.analysisOutputs',
@@ -162,7 +164,7 @@ export class OutputsController {
           editDropdownOptionsArray: vm.booleanDropdownArr,
           headerCellFilter: 'translate',
           category: 'Output Selection',
-          width:100,
+          width: 100,
           minWidth: 70
         }, {
           name: 'objective_function',
@@ -187,7 +189,7 @@ export class OutputsController {
           displayName: 'outputs.columns.units',
           headerCellFilter: 'translate',
           category: 'Objective Function Settings',
-          width:70,
+          width: 70,
           minWidth: 40
         }, {
           name: 'weighting_factor',
@@ -204,7 +206,7 @@ export class OutputsController {
             // set modified
             vm.setIsModified();
             // check if obj function is selected on an invalid variable type (only when editing objective_function or type
-            if ((['objective_function', 'type'].indexOf(colDef.name) != -1) && oldValue != newValue && rowEntity.objective_function == 'true' && ['Double', 'Integer', 'Bool'].indexOf(rowEntity.type) == -1 ){
+            if ((['objective_function', 'type'].indexOf(colDef.name) != -1) && oldValue != newValue && rowEntity.objective_function == 'true' && ['Double', 'Integer', 'Bool'].indexOf(rowEntity.type) == -1) {
               // invalid choice for objective function
               vm.$window.alert('Objective Functions can only be used with outputs of type Double, Integer, or Bool.');
             }
@@ -213,13 +215,13 @@ export class OutputsController {
       };
 
       // add objective function groups for SPEA, NSGA, and Morris only
-      vm.$log.debug('sampling method: ', vm.$scope.selectedSamplingMethod);
+      if (vm.showDebug) vm.$log.debug('sampling method: ', vm.$scope.selectedSamplingMethod);
 
       if (['NSGA2', 'SPEA2', 'Morris'].indexOf(vm.$scope.selectedSamplingMethod.id) != -1) {
-        vm.$log.debug('adding objective function group column');
+        if (vm.showDebug) vm.$log.debug('adding objective function group column');
         const ofg = {
           name: 'obj_function_group',
-            displayName: 'outputs.columns.objectiveFunctionGroup',
+          displayName: 'outputs.columns.objectiveFunctionGroup',
           category: 'Objective Function Settings',
           editDropdownIdLabel: 'name',
           type: 'number',
@@ -242,7 +244,7 @@ export class OutputsController {
   addOutputs(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('Output::addOutputs');
+    if (vm.showDebug) vm.$log.debug('Output::addOutputs');
 
     // open modal for user to select outputs. Already selected outputs are shown as checked ?
     const modalInstance = vm.$uibModal.open({
@@ -261,7 +263,7 @@ export class OutputsController {
     });
 
     modalInstance.result.then(() => {
-      vm.$log.debug('NEW Analysis OUTPUTS: ', measure.analysisOutputs);
+      if (vm.showDebug) vm.$log.debug('NEW Analysis OUTPUTS: ', measure.analysisOutputs);
       vm.setIsModified();
       deferred.resolve();
 
@@ -281,10 +283,10 @@ export class OutputsController {
 
   addMeasure() {
     const vm = this;
-    vm.$log.debug('in Outputs::addMeasure');
-    vm.$log.debug('measure to add: ', vm.$scope.addMeasure.measure);
-    if (vm.$scope.addMeasure.measure){
-      vm.$log.debug('Adding this measure: ', vm.$scope.addMeasure.measure);
+    if (vm.showDebug) vm.$log.debug('in Outputs::addMeasure');
+    if (vm.showDebug) vm.$log.debug('measure to add: ', vm.$scope.addMeasure.measure);
+    if (vm.$scope.addMeasure.measure) {
+      if (vm.showDebug) vm.$log.debug('Adding this measure: ', vm.$scope.addMeasure.measure);
       const measure = _.find(vm.$scope.measures, {name: vm.$scope.addMeasure.measure.name});
       if (measure) {
         measure.outputMeasure = true;
@@ -293,7 +295,7 @@ export class OutputsController {
       }
       vm.$scope.addMeasure.measure = null;
     } else {
-      vm.$log.debug("No Measure Selected");
+      if (vm.showDebug) vm.$log.debug('No Measure Selected');
     }
   }
 

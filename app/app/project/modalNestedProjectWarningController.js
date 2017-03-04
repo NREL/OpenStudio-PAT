@@ -6,11 +6,13 @@ export class ModalNestedProjectWarningController {
     const vm = this;
     vm.$log = $log;
     vm.$uibModalInstance = $uibModalInstance;
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
   }
 
   ok() {
     const vm = this;
-    vm.$log.debug('ModalNestedProjectWarningController ok');
+    if (vm.showDebug) vm.$log.debug('ModalNestedProjectWarningController ok');
     vm.$uibModalInstance.close();
   }
 }

@@ -10,12 +10,14 @@ export class OpenProject {
     vm.$log = $log;
     vm.$uibModal = $uibModal;
     vm.dialog = dialog;
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
   }
 
   openModal() {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('OpenProject::openModal');
+    if (vm.showDebug) vm.$log.debug('OpenProject::openModal');
 
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
@@ -25,7 +27,7 @@ export class OpenProject {
     });
 
     modalInstance.result.then(() => {
-      vm.$log.debug('in open modal result function, project should be set');
+      if (vm.showDebug) vm.$log.debug('in open modal result function, project should be set');
       deferred.resolve('resolved');
     }, () => {
       // Modal canceled

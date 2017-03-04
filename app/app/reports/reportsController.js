@@ -20,16 +20,18 @@ export class ReportsController {
     vm.preloadPath = 'file://';
     vm.reportDir = Project.getProjectDir();
     vm.reportDirPath = path.resolve(vm.reportDir.path());
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
 
     // data to pass to preloader script
     vm.$scope.datapoints = vm.Project.getDatapoints();
-    vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
+    if (vm.showDebug) vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
     vm.testResults = vm.$scope.datapoints;
 
     // preload.js path depends on environment.  we need full path to file
     vm.$scope.preloadPath = `file://${app.getAppPath()}/scripts/preload.js`;
 
-    vm.$log.debug("PRELOAD PATH: ", vm.$scope.preloadPath);
+    if (vm.showDebug) vm.$log.debug('PRELOAD PATH: ', vm.$scope.preloadPath);
 
     // Find all possible reports
     var html_reports = [];
@@ -50,8 +52,8 @@ export class ReportsController {
       } else {
         report.name = html_report.split('/').pop().replace('.html', '');
         report.url = html_report.replace('app/app/', 'app/');//).replace("\\","/");
-        vm.$log.debug('REPORT name: ', report.name);
-        vm.$log.debug('REPORT url: ', report.url);
+        if (vm.showDebug) vm.$log.debug('REPORT name: ', report.name);
+        if (vm.showDebug) vm.$log.debug('REPORT url: ', report.url);
       }
 
       vm.$scope.projectReports.push(report);

@@ -9,6 +9,8 @@ export class MeasureManager {
     vm.$log = $log;
     vm.$http = $http;
     vm.$q = $q;
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
 
     let exeExt = '';
     if (process.platform == 'win32') {
@@ -33,56 +35,56 @@ export class MeasureManager {
 
   startMeasureManager() {
     const vm = this;
-    vm.$log.debug('Start Measure Manager Server: ', vm.cliPath);
+    vm.$log.info('Start Measure Manager Server: ', vm.cliPath);
     vm.cli = vm.spawn(vm.cliPath, ['measure', '-s']);
     vm.cli.stdout.on('data', (data) => {
-      vm.$log.debug(`MeasureManager: ${data}`);
+      if (vm.showDebug) vm.$log.debug(`MeasureManager: ${data}`);
       // check that the mm was started correctly: resolve readyDeferred
       const str = data.toString();
       if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
-        vm.$log.debug('Found WEBrick Start!, resolve promise');
+        if (vm.showDebug) vm.$log.debug('Found WEBrick Start!, resolve promise');
         vm.mmReadyDeferred.resolve();
       }
       // TODO: THIS IS TEMPORARY (windows):
       else if (str.indexOf('Only one usage of each socket address') !== -1) {
-        vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
+        if (vm.showDebug) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
         vm.mmReadyDeferred.resolve();
       }
       // TODO: THIS IS TEMPORARY (mac):
       else if (str.indexOf('Error: Address already in use') !== -1) {
-        vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
+        if (vm.showDebug) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
         vm.mmReadyDeferred.resolve();
       }
 
     });
     vm.cli.stderr.on('data', (data) => {
-      vm.$log.debug(`MeasureManager: ${data}`);
+      vm.$log.error(`MeasureManager: ${data}`);
       // check that the mm was started correctly: resolve readyDeferred
       const str = data.toString();
       if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
-        vm.$log.debug('Found WEBrick Start!, resolve promise');
+        if (vm.showDebug) vm.$log.debug('Found WEBrick Start!, resolve promise');
         vm.mmReadyDeferred.resolve();
       }
       // TODO: THIS IS TEMPORARY (windows):
       else if (str.indexOf('Only one usage of each socket address') !== -1) {
-        vm.$log.debug('WEBrick already running...using tempMeasureManager');
+        if (vm.showDebug) vm.$log.debug('WEBrick already running...using tempMeasureManager');
         vm.mmReadyDeferred.resolve();
       }
       // TODO: THIS IS TEMPORARY (mac):
       else if (str.indexOf('Error: Address already in use') !== -1) {
-        vm.$log.debug('WEBrick already running...using tempMeasureManager');
+        if (vm.showDebug) vm.$log.debug('WEBrick already running...using tempMeasureManager');
         vm.mmReadyDeferred.resolve();
       }
     });
     vm.cli.on('close', (code) => {
-      vm.$log.debug(`Measure Manager exited with code ${code}`);
+      vm.$log.info(`Measure Manager exited with code ${code}`);
     });
   }
 
   stopMeasureManager() {
     const vm = this;
 
-    vm.$log.debug('Stop Measure Manager Server');
+    vm.$log.info('Stop Measure Manager Server');
     vm.cli.kill('SIGINT');
   }
 
@@ -100,16 +102,16 @@ export class MeasureManager {
   createNewMeasure(params) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('MeasureManager::createNewMeasure');
+    if (vm.showDebug) vm.$log.debug('MeasureManager::createNewMeasure');
 
-    vm.$log.debug('MeasureManager::createNewMeasure params: ', params);
+    if (vm.showDebug) vm.$log.debug('MeasureManager::createNewMeasure params: ', params);
     vm.$http.post(vm.url + '/create_measure', params)
       .success((data, status, headers, config) => {
-        vm.$log.debug('MeasureManager::createNewMeasure reply: ', data);
+        vm.$log.info('MeasureManager::createNewMeasure reply: ', data);
         deferred.resolve(data);
       })
       .error((data, status, headers, config) => {
-        vm.$log.debug('MeasureManager::createNewMeasure error: ', data);
+        vm.$log.error('MeasureManager::createNewMeasure error: ', data);
         deferred.reject();
       });
 
@@ -134,14 +136,14 @@ export class MeasureManager {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    vm.$log.debug('params one more time: ', params);
+    if (vm.showDebug) vm.$log.debug('params one more time: ', params);
     vm.$http.post(vm.url + '/duplicate_measure', params)
       .success((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager reply: ', data);
+        vm.$log.info('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
       .error((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager DuplicateMeasure error: ', data);
+        vm.$log.error('Measure Manager DuplicateMeasure error: ', data);
         deferred.reject();
       });
 
@@ -157,18 +159,18 @@ export class MeasureManager {
     // fix path for windows
     const newMeasurePath = measurePath.replace(/\\/g, '/'); // Evan: how to normalize the path
     const params = {measures_dir: newMeasurePath};
-    vm.$log.debug('PARAMS: ', params);
+    if (vm.showDebug) vm.$log.debug('PARAMS: ', params);
 
     const deferred = vm.$q.defer();
 
     vm.$http.post(vm.url + '/update_measures', params)
       .success((data, status, headers, config) => {
-        vm.$log.debug('updateMeasures Success!, status: ', status);
-        // vm.$log.debug('Measure Manager reply: ', data);
+        vm.$log.info('updateMeasures Success!, status: ', status);
+        // if (vm.showDebug) vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
       .error((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager UpdateMeasures error: ', data);
+        vm.$log.error('Measure Manager UpdateMeasures error: ', data);
         deferred.reject([]);
       });
 
@@ -183,11 +185,11 @@ export class MeasureManager {
       params: {}
     })
       .success((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager getMyMeasuresDir Success!, status: ', status);
+        vm.$log.info('Measure Manager getMyMeasuresDir Success!, status: ', status);
         deferred.resolve(data);
       })
       .error((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager getMyMeasuresDir Error: ', data);
+        vm.$log.error('Measure Manager getMyMeasuresDir Error: ', data);
         deferred.reject([]);
       });
     return deferred.promise;
@@ -199,11 +201,11 @@ export class MeasureManager {
     const params = {my_measures_dir: path};
     vm.$http.post(vm.url + '/set', params)
       .success((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager setMyMeasuresDir Success!, status: ', status);
+        vm.$log.info('Measure Manager setMyMeasuresDir Success!, status: ', status);
         deferred.resolve(data);
       })
       .error((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager SetMyMeasuresDir Error: ', data);
+        vm.$log.error('Measure Manager SetMyMeasuresDir Error: ', data);
         deferred.reject([]);
       });
     return deferred.promise;
@@ -216,11 +218,11 @@ export class MeasureManager {
     const params = {};
     vm.$http.post(vm.url + '/bcl_measures', params)
       .success((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager bcl_measures Success!, status: ', status);
+        vm.$log.info('Measure Manager bcl_measures Success!, status: ', status);
         deferred.resolve(data);
       })
       .error((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager bcl_measures Error: ', data);
+        vm.$log.error('Measure Manager bcl_measures Error: ', data);
         deferred.reject([]);
       });
     return deferred.promise;
@@ -234,12 +236,12 @@ export class MeasureManager {
 
     vm.$http.post(vm.url + '/download_bcl_measure', params)
       .success((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager download_bcl_measure Success!, status: ', status);
-        vm.$log.debug('Data: ', data);
+        vm.$log.info('Measure Manager download_bcl_measure Success!, status: ', status);
+        vm.$log.info('Data: ', data);
         deferred.resolve(data[0]);
       })
       .error((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager download_bcl_measure Error: ', data);
+        vm.$log.error('Measure Manager download_bcl_measure Error: ', data);
         deferred.reject([]);
       });
 
@@ -258,17 +260,17 @@ export class MeasureManager {
       osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
     }
     const params = {measure_dir: measurePath, osm_path: osmPath};
-    vm.$log.debug('computeArguments params', params);
+    if (vm.showDebug) vm.$log.debug('computeArguments params', params);
     const deferred = vm.$q.defer();
 
     vm.$http.post(vm.url + '/compute_arguments', params)
       .success((data, status, headers, config) => {
-        vm.$log.debug('computeArguments Success!, status: ', status);
-        // vm.$log.debug('Measure Manager reply: ', data);
+        vm.$log.info('computeArguments Success!, status: ', status);
+        // if (vm.showDebug) vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
       .error((data, status, headers, config) => {
-        vm.$log.debug('Measure Manager ComputeArguments error: ', data);
+        vm.$log.error('Measure Manager ComputeArguments error: ', data);
         deferred.reject([]);
       });
 

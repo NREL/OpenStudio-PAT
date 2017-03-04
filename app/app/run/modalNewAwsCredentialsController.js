@@ -12,7 +12,9 @@ export class ModalNewAwsCredentialsController {
     vm.Project = Project;
     vm.YAML = YAML;
     vm.$scope = $scope;
-    vm.$log.debug('in Modal New Aws Credentials Controller');
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
+    if (vm.showDebug) vm.$log.debug('in Modal New Aws Credentials Controller');
 
     vm.$scope.name = null;
     vm.$scope.accessKey = null;
@@ -22,7 +24,7 @@ export class ModalNewAwsCredentialsController {
 
   ok() {
     const vm = this;
-    vm.$log.debug('in OK function');
+    if (vm.showDebug) vm.$log.debug('in OK function');
     // make a new yaml file
     let filename = vm.$scope.name;
     if (filename.substr(-4, 4) != '.yml') {

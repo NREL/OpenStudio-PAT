@@ -11,9 +11,11 @@ export class ModalSelectOutputsController {
     vm.$log = $log;
     vm.params = params;
     vm.$scope = $scope;
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
 
     vm.$scope.measure = vm.params.measure;
-    vm.$log.debug('Measure: ', vm.$scope.measure);
+    if (vm.showDebug) vm.$log.debug('Measure: ', vm.$scope.measure);
 
     vm.$scope.allSelected = false;
 

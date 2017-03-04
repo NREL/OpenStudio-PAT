@@ -14,10 +14,12 @@ export class DesignAlternativesController {
     vm.$q = $q;
     vm.$uibModal = $uibModal;
     vm.jetpack = jetpack;
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
 
     vm.selected = null;
     vm.measures = vm.Project.getMeasuresAndOptions();
-    vm.$log.debug('DA MEASURE RETRIEVED: ', vm.measures);
+    if (vm.showDebug) vm.$log.debug('DA MEASURE RETRIEVED: ', vm.measures);
 
     // get seed and weather defaults and dropdown options
     vm.seedsDropdownArr = vm.Project.getSeedsDropdownArr();
@@ -116,9 +118,9 @@ export class DesignAlternativesController {
           if (newValue != oldValue && colDef.name == 'name') {
             const rowIndex = _.findIndex(vm.$scope.alternatives, {$$hashKey: rowEntity.$$hashKey});
             const isUnique = vm.checkUnique(vm.$scope.alternatives, newValue, rowIndex);
-            if (!isUnique){
+            if (!isUnique) {
               // not unique, restore old value and add toastr
-              vm.$log.debug('DA name must be unique');
+              if (vm.showDebug) vm.$log.debug('DA name must be unique');
               rowEntity.name = oldValue;
               vm.toastr.error('Cannot change design alternative name.  Selected name is not unique.');
             }
@@ -143,7 +145,7 @@ export class DesignAlternativesController {
     //vm.$log.info('DesignAlternativesController constructor measures: ', vm.measures);
     _.forEach(vm.measures, (measure) => {
       const optionsArr = vm.setOptionsArray(measure);
-      vm.$log.debug(optionsArr);
+      if (vm.showDebug) vm.$log.debug(optionsArr);
       vm.$scope.gridOptions.columnDefs.push({
         name: measure.name,
         displayName: measure.displayName,
@@ -156,7 +158,7 @@ export class DesignAlternativesController {
 
       // also ensure that options have this measure's key in it (to fix blanks on older projects)
       _.forEach(vm.$scope.alternatives, (alt) => {
-        if (!alt[measure.name] || alt[measure.name] == ''){
+        if (!alt[measure.name] || alt[measure.name] == '') {
           alt[measure.name] = 'None';
         }
       });
@@ -184,7 +186,7 @@ export class DesignAlternativesController {
     vm.deleteAssociatedDatapoint(alternative);
   }
 
-  deleteAssociatedDatapoint(alternative){
+  deleteAssociatedDatapoint(alternative) {
     const vm = this;
     const matchIndex = _.findIndex(vm.datapoints, {name: alternative.name});
     if (matchIndex > -1) {
@@ -200,7 +202,7 @@ export class DesignAlternativesController {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    vm.$log.debug('**** In DAController::WarnBeforeDeleting ****');
+    if (vm.showDebug) vm.$log.debug('**** In DAController::WarnBeforeDeleting ****');
 
     const match = _.find(vm.datapoints, {name: alternative.name});
 
@@ -277,8 +279,8 @@ export class DesignAlternativesController {
 
   duplicateAlternative() {
     const vm = this;
-    vm.$log.debug('In DesignAlternatives::duplicateAlternative');
-    if (vm.selected){
+    if (vm.showDebug) vm.$log.debug('In DesignAlternatives::duplicateAlternative');
+    if (vm.selected) {
       vm.setIsModified();
       const dupAlt = angular.copy(vm.selected);
       delete dupAlt.$$hashKey;
@@ -291,12 +293,12 @@ export class DesignAlternativesController {
 
   }
 
-  findNextName(name){
+  findNextName(name) {
     const vm = this;
     let newName = name + ' Duplicate';
     const matchArr = [];
     _.forEach(vm.$scope.alternatives, (alt) => {
-      if (_.includes(alt.name, newName)){
+      if (_.includes(alt.name, newName)) {
         matchArr.push(alt.name);
       }
     });
@@ -305,14 +307,14 @@ export class DesignAlternativesController {
       const newMatchArr = [];
       _.forEach(matchArr, (match) => {
         let newMatch = _.trim(match.replace(newName, ''));
-        //vm.$log.debug('match after: ', newMatch);
-        if (_.isNumber(_.toNumber(newMatch))){
-          //vm.$log.debug('match is a number');
+        //if (vm.showDebug) vm.$log.debug('match after: ', newMatch);
+        if (_.isNumber(_.toNumber(newMatch))) {
+          //if (vm.showDebug) vm.$log.debug('match is a number');
           newMatchArr.push(_.toNumber(newMatch));
         }
       });
-      vm.$log.debug('New matchArr: ', newMatchArr);
-      if (newMatchArr.length > 0){
+      if (vm.showDebug) vm.$log.debug('New matchArr: ', newMatchArr);
+      if (newMatchArr.length > 0) {
         // find max and add 1
         newName = newName + ' ' + (_.max(newMatchArr) + 1);
       } else {
@@ -321,7 +323,7 @@ export class DesignAlternativesController {
     } else {
       newName = newName + ' 1';
     }
-    vm.$log.debug("newName: ", newName);
+    if (vm.showDebug) vm.$log.debug('newName: ', newName);
     return newName;
   }
 

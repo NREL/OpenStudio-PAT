@@ -14,22 +14,24 @@ export class ModalOpenProjectController {
     vm.app = app;
     vm.setProject = SetProject;
     vm.Project = Project;
+    // This bool is used to reduce the number of debug messages given the typical, non-developer user
+    vm.showDebug = false;
   }
 
   openProject() {
     const vm = this;
-    vm.$log.debug('ModalOpenProjectController::openProject');
+    if (vm.showDebug) vm.$log.debug('ModalOpenProjectController::openProject');
     vm.setProject.openProject().then(() => {
       vm.$uibModalInstance.close();
     }, () => {
-      vm.$log.debug('ModalOpenProjectController::openProject rejected, allow user to try again');
+      if (vm.showDebug) vm.$log.debug('ModalOpenProjectController::openProject rejected, allow user to try again');
       //vm.$uibModalInstance.close();
     });
   }
 
   newProject() {
     const vm = this;
-    vm.$log.debug('ModalOpenProjectController::newProject');
+    if (vm.showDebug) vm.$log.debug('ModalOpenProjectController::newProject');
     vm.setProject.newProject().then(() => {
       vm.$uibModalInstance.close();
     }, () => {
@@ -39,7 +41,7 @@ export class ModalOpenProjectController {
 
   cancel() {
     const vm = this;
-    vm.$log.debug('ModalOpenProjectController::cancel');
+    if (vm.showDebug) vm.$log.debug('ModalOpenProjectController::cancel');
     vm.app.quit();
     vm.$uibModalInstance.dismiss('cancel');
   }
