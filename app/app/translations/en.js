@@ -46,6 +46,7 @@ export default {
     addMeasureOption: 'Add Measure Option',
     checkAll: 'Check to make all arguments variable',
     checkForUpdates: 'Check for Updates',
+    viewAlgorithmReference: 'View Algorithm Documentation',
     columns: {
       argumentName: 'Argument Name',
       shortName: 'Short Name',

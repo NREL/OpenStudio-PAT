@@ -1,5 +1,6 @@
 import jetpack from 'fs-jetpack';
 import {remote} from 'electron';
+import {shell} from 'electron';
 const {dialog} = remote;
 
 export class AnalysisController {
@@ -18,6 +19,7 @@ export class AnalysisController {
     vm.$document = $document;
     vm.BCL = BCL;
     vm.dialog = dialog;
+    vm.shell = shell;
     // This bool is used to reduce the number of debug messages given the typical, non-developer user
     vm.showDebug = false;
 
@@ -885,6 +887,13 @@ export class AnalysisController {
     vm.showContinuousVariables();
     vm.showWarningIcons();
 
+  }
+
+  viewAlgorithmLink() {
+    const vm = this;
+    if (vm.$scope.selectedSamplingMethod.link) {
+      vm.shell.openExternal(vm.$scope.selectedSamplingMethod.link);
+    }
   }
 
   // compute measure arguments when setting the seed

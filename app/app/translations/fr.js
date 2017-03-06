@@ -44,6 +44,7 @@ export default {
     projectName: 'Project Name',
     addMeasure: 'Add Measure',
     addMeasureOption: 'Add Measure Option',
+    viewAlgorithmReference: 'View Algorithm Documentation',
     checkAll: 'Check to make all arguments variable',
     checkForUpdates: 'Check for Updates',
     columns: {

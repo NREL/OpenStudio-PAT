@@ -1817,6 +1817,18 @@ export class Project {
 
   setAlgorithmOptions() {
     const opts = {};
+    opts.baseline_perturbation = [{
+      name: 'in_measure_combinations',
+      displayName: 'In Measure Combinations',
+      description: 'Options: \'true\' or \'false\'',
+      defaultValue: 'true'
+    }, {
+      name: 'include_baseline_in_combinations',
+      displayName: 'Include Baseline in Combinations?',
+      description: 'Options: \'true\' or \'false\'',
+      defaultValue: 'true'
+    }];
+
     opts.diag = [{
       name: 'experiment_type',
       displayName: 'Experiment Type',
@@ -2039,6 +2051,43 @@ export class Project {
       defaultValue: 0
     }];
 
+    opts.preflight = [{
+      name: 'sample_method',
+      displayName: 'Sample Method',
+      description: 'Options: individual_variables or all_variables',
+      defaultValue: 'individual_variables'
+    }, {
+      name: 'run_max',
+      displayName: 'Run Max?',
+      description: 'Options: true or false',
+      defaultValue: 'true'
+    }, {
+      name: 'run_min',
+      displayName: 'Run Min?',
+      description: 'Options: true or false',
+      defaultValue: 'true'
+    }, {
+        name: 'run_mode',
+        displayName: 'Run Mode?',
+        description: 'Options: true or false',
+        defaultValue: 'true'
+    }, {
+      name: 'run_all_samples_for_pivots',
+      displayName: 'Run all Samples for Pivots?',
+      description: 'Options: true or false',
+      defaultValue: 'true'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e19
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0
+    }];
+
     opts.pso = [{
       name: 'npart',
       displayName: 'Number of Particles',
@@ -2072,7 +2121,7 @@ export class Project {
     }, {
       name: 'boundary',
       displayName: 'Boundary',
-      description: 'Options: invisible, damping, reflecting, absorbing2007, default',
+      description: 'Options: invisible, damping, reflecting, absorbing2007, absorbing2011, default',
       defaultValue: 'reflecting'
     }, {
       name: 'topology',
@@ -2081,12 +2130,12 @@ export class Project {
       defaultValue: 'random'
     }, {
       name: 'xini',
-      displayName: 'xini',
+      displayName: 'Xini',
       description: 'Options: lhs, random',
       defaultValue: 'lhs'
     }, {
       name: 'vini',
-      displayName: 'vini',
+      displayName: 'Vini',
       description: 'Options: zero, lhs2011, random2011, lhs2007, random2007, default',
       defaultValue: 'lhs2011'
     }, {
@@ -2718,47 +2767,61 @@ export class Project {
     const vm = this;
 
     return [{
-      id: 'BaselinePerturbation',
-      name: 'analysis.type.baselinePerturbation'
+      id: 'baseline_perturbation',
+      name: 'analysis.type.baselinePerturbation',
+      link: null
     },{
       id: 'diag',
-      name: 'analysis.type.diagonal'
+      name: 'analysis.type.diagonal',
+      link: null
     },{
       id: 'doe',
-      name: 'analysis.type.doe'
+      name: 'analysis.type.doe',
+      link: 'https://cran.r-project.org/web/packages/DoE.base/DoE.base.pdf'
     },{
       id: 'lhs',
-      name: 'analysis.type.lhs'
+      name: 'analysis.type.lhs',
+      link: 'https://cran.r-project.org/web/packages/lhs/lhs.pdf'
     },{
       id: 'morris',
-      name: 'analysis.type.morris'
+      name: 'analysis.type.morris',
+      link: 'https://cran.r-project.org/web/packages/sensitivity/sensitivity.pdf'
     },{
       id: 'nsga_nrel',
-      name: 'analysis.type.nsga2'
+      name: 'analysis.type.nsga2',
+      link: 'https://cran.r-project.org/web/packages/nsga2R/nsga2R.pdf'
     },{
       id: 'optim',
-      name: 'analysis.type.optim'
+      name: 'analysis.type.optim',
+      link: 'http://stat.ethz.ch/R-manual/R-devel/library/stats/html/optim.html'
     },{
-      id: 'pre_flight',
-      name: 'analysis.type.preFlight'
+      id: 'preflight',
+      name: 'analysis.type.preFlight',
+      link: null
     },{
       id: 'pso',
-      name: 'analysis.type.pso'
+      name: 'analysis.type.pso',
+      link: 'https://cran.r-project.org/web/packages/hydroPSO/hydroPSO.pdf'
     },{
       id: 'repeat_run',
-      name: 'analysis.type.repeatRun'
+      name: 'analysis.type.repeatRun',
+      link: null
     },{
       id: 'rgenoud',
-      name: 'analysis.type.rgenoud'
+      name: 'analysis.type.rgenoud',
+      link: 'https://cran.r-project.org/web/packages/rgenoud/rgenoud.pdf'
     }, {
       id: 'single_run',
-      name: 'analysis.type.singleRun'
+      name: 'analysis.type.singleRun',
+      link: null
     }, {
       id: 'sobol',
-      name: 'analysis.type.sobol'
+      name: 'analysis.type.sobol',
+      link: 'https://cran.r-project.org/web/packages/sensitivity/sensitivity.pdf'
     },{
       id: 'spea_nrel',
-      name: 'analysis.type.spea2'
+      name: 'analysis.type.spea2',
+      link: 'https://cran.r-project.org/web/packages/nsga2R/nsga2R.pdf'
     }];
   }
 

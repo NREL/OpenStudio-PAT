@@ -36,7 +36,7 @@
     <button type="button" class="btn btn-success" ng-if="!disabledButtons && atLeastOneSelected()" ng-click="run.warnBeforeDelete('selected')" translate>run.runSelected</button>
     <button type="button" class="btn btn-danger" ng-if="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
     <button type="button" class="btn btn-danger" ng-if="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>
-    <button type="button" class="btn btn-primary" ng-if="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()">View Server</button>
+    <button type="button" class="btn btn-primary" ng-if="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()" translate>run.viewServer</button>
   </div>
 </div>
 

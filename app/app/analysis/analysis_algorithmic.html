@@ -8,6 +8,12 @@
           <translate>analysis.algorithmic.algorithmSetting</translate>
         </uib-accordion-heading>
 
+        <div ng-if="selectedSamplingMethod.link" class="row pad-bot-10">
+          <div class="col-sm-12">
+            <button type="button" class="btn btn-info"  ng-click="analysis.viewAlgorithmLink()" translate>analysis.viewAlgorithmReference</button>
+          </div>
+        </div>
+
         <div class="row pad-bot-10">
           <div class="col-sm-6">
             <div ng-repeat="option in algorithmSettings" ng-if="$even">
