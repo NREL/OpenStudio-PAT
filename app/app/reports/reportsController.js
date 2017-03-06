@@ -7,7 +7,7 @@ import env from '../../env';
 const {app} = remote;
 export class ReportsController {
 
-  constructor($log, Project, $scope) {
+  constructor($log, Project, $scope, Message) {
     'ngInject';
 
     const vm = this;
@@ -20,18 +20,17 @@ export class ReportsController {
     vm.preloadPath = 'file://';
     vm.reportDir = Project.getProjectDir();
     vm.reportDirPath = path.resolve(vm.reportDir.path());
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
 
     // data to pass to preloader script
     vm.$scope.datapoints = vm.Project.getDatapoints();
-    if (vm.showDebug) vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
+    if (vm.Message.showDebug()) vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
     vm.testResults = vm.$scope.datapoints;
 
     // preload.js path depends on environment.  we need full path to file
     vm.$scope.preloadPath = `file://${app.getAppPath()}/scripts/preload.js`;
 
-    if (vm.showDebug) vm.$log.debug('PRELOAD PATH: ', vm.$scope.preloadPath);
+    if (vm.Message.showDebug()) vm.$log.debug('PRELOAD PATH: ', vm.$scope.preloadPath);
 
     // Find all possible reports
     var html_reports = [];
@@ -52,8 +51,8 @@ export class ReportsController {
       } else {
         report.name = html_report.split('/').pop().replace('.html', '');
         report.url = html_report.replace('app/app/', 'app/');//).replace("\\","/");
-        if (vm.showDebug) vm.$log.debug('REPORT name: ', report.name);
-        if (vm.showDebug) vm.$log.debug('REPORT url: ', report.url);
+        if (vm.Message.showDebug()) vm.$log.debug('REPORT name: ', report.name);
+        if (vm.Message.showDebug()) vm.$log.debug('REPORT url: ', report.url);
       }
 
       vm.$scope.projectReports.push(report);

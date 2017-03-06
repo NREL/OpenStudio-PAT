@@ -2,7 +2,7 @@ import jetpack from 'fs-jetpack';
 import YAML from 'yamljs';
 export class ModalNewAwsCredentialsController {
 
-  constructor($log, $uibModalInstance, $scope, Project) {
+  constructor($log, $uibModalInstance, $scope, Project, Message) {
     'ngInject';
 
     const vm = this;
@@ -12,9 +12,9 @@ export class ModalNewAwsCredentialsController {
     vm.Project = Project;
     vm.YAML = YAML;
     vm.$scope = $scope;
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
-    if (vm.showDebug) vm.$log.debug('in Modal New Aws Credentials Controller');
+    vm.Message = Message;
+
+    if (vm.Message.showDebug()) vm.$log.debug('in Modal New Aws Credentials Controller');
 
     vm.$scope.name = null;
     vm.$scope.accessKey = null;
@@ -24,7 +24,7 @@ export class ModalNewAwsCredentialsController {
 
   ok() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in OK function');
+    if (vm.Message.showDebug()) vm.$log.debug('in OK function');
     // make a new yaml file
     let filename = vm.$scope.name;
     if (filename.substr(-4, 4) != '.yml') {

@@ -2,15 +2,14 @@ import {remote} from 'electron';
 const {app} = remote;
 
 export class MeasureManager {
-  constructor($log, $http, $q, DependencyManager) {
+  constructor($log, $http, $q, DependencyManager, Message) {
     'ngInject';
 
     const vm = this;
     vm.$log = $log;
     vm.$http = $http;
     vm.$q = $q;
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
 
     let exeExt = '';
     if (process.platform == 'win32') {
@@ -38,41 +37,41 @@ export class MeasureManager {
     vm.$log.info('Start Measure Manager Server: ', vm.cliPath);
     vm.cli = vm.spawn(vm.cliPath, ['measure', '-s']);
     vm.cli.stdout.on('data', (data) => {
-      if (vm.showDebug) vm.$log.debug(`MeasureManager: ${data}`);
+      if (vm.Message.showDebug()) vm.$log.debug(`MeasureManager: ${data}`);
       // check that the mm was started correctly: resolve readyDeferred
       const str = data.toString();
       if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
-        if (vm.showDebug) vm.$log.debug('Found WEBrick Start!, resolve promise');
+        if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
         vm.mmReadyDeferred.resolve();
       }
       // TODO: THIS IS TEMPORARY (windows):
       else if (str.indexOf('Only one usage of each socket address') !== -1) {
-        if (vm.showDebug) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
+        if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
         vm.mmReadyDeferred.resolve();
       }
       // TODO: THIS IS TEMPORARY (mac):
       else if (str.indexOf('Error: Address already in use') !== -1) {
-        if (vm.showDebug) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
+        if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
         vm.mmReadyDeferred.resolve();
       }
 
     });
     vm.cli.stderr.on('data', (data) => {
-      vm.$log.error(`MeasureManager: ${data}`);
+      vm.$log.info(`MeasureManager: ${data}`);
       // check that the mm was started correctly: resolve readyDeferred
       const str = data.toString();
       if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
-        if (vm.showDebug) vm.$log.debug('Found WEBrick Start!, resolve promise');
+        if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
         vm.mmReadyDeferred.resolve();
       }
       // TODO: THIS IS TEMPORARY (windows):
       else if (str.indexOf('Only one usage of each socket address') !== -1) {
-        if (vm.showDebug) vm.$log.debug('WEBrick already running...using tempMeasureManager');
+        if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
         vm.mmReadyDeferred.resolve();
       }
       // TODO: THIS IS TEMPORARY (mac):
       else if (str.indexOf('Error: Address already in use') !== -1) {
-        if (vm.showDebug) vm.$log.debug('WEBrick already running...using tempMeasureManager');
+        if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
         vm.mmReadyDeferred.resolve();
       }
     });
@@ -102,9 +101,9 @@ export class MeasureManager {
   createNewMeasure(params) {
     const vm = this;
     const deferred = vm.$q.defer();
-    if (vm.showDebug) vm.$log.debug('MeasureManager::createNewMeasure');
+    if (vm.Message.showDebug()) vm.$log.debug('MeasureManager::createNewMeasure');
 
-    if (vm.showDebug) vm.$log.debug('MeasureManager::createNewMeasure params: ', params);
+    if (vm.Message.showDebug()) vm.$log.debug('MeasureManager::createNewMeasure params: ', params);
     vm.$http.post(vm.url + '/create_measure', params)
       .success((data, status, headers, config) => {
         vm.$log.info('MeasureManager::createNewMeasure reply: ', data);
@@ -136,7 +135,7 @@ export class MeasureManager {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    if (vm.showDebug) vm.$log.debug('params one more time: ', params);
+    if (vm.Message.showDebug()) vm.$log.debug('params one more time: ', params);
     vm.$http.post(vm.url + '/duplicate_measure', params)
       .success((data, status, headers, config) => {
         vm.$log.info('Measure Manager reply: ', data);
@@ -159,14 +158,14 @@ export class MeasureManager {
     // fix path for windows
     const newMeasurePath = measurePath.replace(/\\/g, '/'); // Evan: how to normalize the path
     const params = {measures_dir: newMeasurePath};
-    if (vm.showDebug) vm.$log.debug('PARAMS: ', params);
+    if (vm.Message.showDebug()) vm.$log.debug('PARAMS: ', params);
 
     const deferred = vm.$q.defer();
 
     vm.$http.post(vm.url + '/update_measures', params)
       .success((data, status, headers, config) => {
         vm.$log.info('updateMeasures Success!, status: ', status);
-        // if (vm.showDebug) vm.$log.debug('Measure Manager reply: ', data);
+        // if (vm.Message.showDebug()) vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
       .error((data, status, headers, config) => {
@@ -260,13 +259,13 @@ export class MeasureManager {
       osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
     }
     const params = {measure_dir: measurePath, osm_path: osmPath};
-    if (vm.showDebug) vm.$log.debug('computeArguments params', params);
+    if (vm.Message.showDebug()) vm.$log.debug('computeArguments params', params);
     const deferred = vm.$q.defer();
 
     vm.$http.post(vm.url + '/compute_arguments', params)
       .success((data, status, headers, config) => {
         vm.$log.info('computeArguments Success!, status: ', status);
-        // if (vm.showDebug) vm.$log.debug('Measure Manager reply: ', data);
+        // if (vm.Message.showDebug()) vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
       .error((data, status, headers, config) => {

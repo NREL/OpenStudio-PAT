@@ -2,7 +2,7 @@ import jetpack from 'fs-jetpack';
 
 export class ModalCreateNewMeasureController {
 
-  constructor($log, $uibModalInstance, $scope, BCL, Project) {
+  constructor($log, $uibModalInstance, $scope, BCL, Project, Message) {
     'ngInject';
 
     const vm = this;
@@ -17,8 +17,7 @@ export class ModalCreateNewMeasureController {
     vm.newModelerDescription = '';
     vm.measureTypes = ['OpenStudio', 'EnergyPlus', 'Reporting'];
     vm.measureType = vm.measureTypes[0];
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
 
     vm.bclCategories = vm.BCL.getBCLCategories();
 
@@ -44,7 +43,7 @@ export class ModalCreateNewMeasureController {
 
   getTaxonomyChildren(taxonomy) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('ModalCreateNewMeasureController::getTaxonomyChildren');
+    if (vm.Message.showDebug()) vm.$log.debug('ModalCreateNewMeasureController::getTaxonomyChildren');
     const index = vm.taxonomies.indexOf(taxonomy);
 
     vm.$scope.children = [];
@@ -59,7 +58,7 @@ export class ModalCreateNewMeasureController {
 
   makeMeasureTags() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('ModalCreateNewMeasureController::makeMeasueTag');
+    if (vm.Message.showDebug()) vm.$log.debug('ModalCreateNewMeasureController::makeMeasueTag');
     vm.tags = vm.taxonomy + '.' + vm.$scope.child;
   }
 
@@ -79,12 +78,12 @@ export class ModalCreateNewMeasureController {
     let count = 0;
     let displayName = vm.newDisplayName;
     let measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
-    if (vm.showDebug) vm.$log.debug('measureDir: ', measureDir);
+    if (vm.Message.showDebug()) vm.$log.debug('measureDir: ', measureDir);
     while (vm.jetpack.exists(measureDir)) {
       count++;
       displayName = vm.newDisplayName + count.toString();
       measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
-      if (vm.showDebug) vm.$log.debug('measureDir: ', measureDir);
+      if (vm.Message.showDebug()) vm.$log.debug('measureDir: ', measureDir);
     }
 
     const params = {
@@ -97,7 +96,7 @@ export class ModalCreateNewMeasureController {
       modeler_description: vm.newModelerDescription
     };
 
-    if (vm.showDebug) vm.$log.debug('ModalCreateNewMeasureController::ok params: ', params);
+    if (vm.Message.showDebug()) vm.$log.debug('ModalCreateNewMeasureController::ok params: ', params);
     vm.$uibModalInstance.close(params);
   }
 

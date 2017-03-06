@@ -1,6 +1,6 @@
 export class ModalSelectOutputsController {
 
-  constructor($log, $uibModalInstance, params, $scope) {
+  constructor($log, $uibModalInstance, params, $scope, Message) {
     'ngInject';
 
     const vm = this;
@@ -8,11 +8,10 @@ export class ModalSelectOutputsController {
     vm.$log = $log;
     vm.params = params;
     vm.$scope = $scope;
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
 
     vm.$scope.measure = vm.params.measure;
-    if (vm.showDebug) vm.$log.debug('Measure: ', vm.$scope.measure);
+    if (vm.Message.showDebug()) vm.$log.debug('Measure: ', vm.$scope.measure);
 
     vm.$scope.allSelected = false;
 

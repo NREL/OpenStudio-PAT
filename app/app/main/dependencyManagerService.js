@@ -11,7 +11,7 @@ const manifest = jetpack.cwd(app.getAppPath()).read('manifest.json', 'json');
 
 export class DependencyManager {
 
-  constructor($q, $http, $log, $translate, $uibModal, StatusBar) {
+  constructor($q, $http, $log, $translate, $uibModal, StatusBar, Message) {
     'ngInject';
 
     const vm = this;
@@ -28,14 +28,12 @@ export class DependencyManager {
     vm.$q = $q;
     vm.$uibModal = $uibModal;
     vm.downloadStatus = 'N/A';
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
 
     vm.tempDir = jetpack.cwd(app.getPath('temp'));
-    if (vm.showDebug) vm.$log.debug('TEMPDIR HERE: ', app.getPath('temp'));
+    if (vm.Message.showDebug()) vm.$log.debug('TEMPDIR HERE: ', app.getPath('temp'));
     vm.src = jetpack.cwd(app.getAppPath() + "/Resources/");
-    if (vm.showDebug) vm.$log.debug('src:', vm.src.path());
-
+    if (vm.Message.showDebug()) vm.$log.debug('src:', vm.src.path());
   }
 
   // The following are valid names to ask for
@@ -94,7 +92,7 @@ export class DependencyManager {
 
     if (env[name]) {
       // Look in the env.json file
-      if (vm.showDebug) vm.$log.debug('*** DEPENDENCY found in json file: ', env[name], ' ', name);
+      if (vm.Message.showDebug()) vm.$log.debug('*** DEPENDENCY found in json file: ', env[name], ' ', name);
       return env[name];
     } else if (process.env[name]) {
       // Look for a system environment variable

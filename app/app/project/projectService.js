@@ -9,7 +9,7 @@ import archiver from 'archiver';
 const {app, dialog} = remote;
 
 export class Project {
-  constructor($q, $log, $http, $uibModal, MeasureManager, $sce) {
+  constructor($q, $log, $http, $uibModal, MeasureManager, $sce, Message) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -23,8 +23,7 @@ export class Project {
     vm.$http = $http;
     vm.$uibModal = $uibModal;
     vm.$sce = $sce;
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
 
     vm.analysisTypes = ['Manual', 'Algorithmic'];
 
@@ -92,7 +91,7 @@ export class Project {
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
     // aws path
     vm.awsDir = jetpack.dir(app.getPath('appData') + '/.aws');
-    if (vm.showDebug) vm.$log.debug('.aws dir location: ', vm.awsDir.path());
+    if (vm.Message.showDebug()) vm.$log.debug('.aws dir location: ', vm.awsDir.path());
 
     // set my measures dir
     vm.MeasureManager.isReady().then(() => {
@@ -103,7 +102,7 @@ export class Project {
         if (response.my_measures_dir) {
           vm.setMeasuresDir(response.my_measures_dir);
         }
-        if (vm.showDebug) vm.$log.debug('My measures Dir: ', vm.myMeasuresDir.path());
+        if (vm.Message.showDebug()) vm.$log.debug('My measures Dir: ', vm.myMeasuresDir.path());
       }, error => {
         vm.$log.error('Error in Measure Manager getMyMeasuresDir');
       });
@@ -160,18 +159,18 @@ export class Project {
   // TODO: if measure is in pat dir, not in json, and user tries to add it, overwrite existing measure in dir? (currently it doesn't overwrite)
   initializeProject() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('Project initializeProject');
+    if (vm.Message.showDebug()) vm.$log.debug('Project initializeProject');
     if (angular.isDefined(vm.projectName)) {
       const filename = vm.projectDir.path('pat.json');
-      if (vm.showDebug) vm.$log.debug('filename: ', filename);
+      if (vm.Message.showDebug()) vm.$log.debug('filename: ', filename);
       // for new and existing projects
       vm.setDefaults();
 
       if (vm.jetpack.exists(filename)) {
         // existing project
         vm.pat = vm.jetpack.read(filename, 'json');
-        if (vm.showDebug) vm.$log.debug('PAT.json: ', vm.pat);
-        if (vm.showDebug) vm.$log.debug('filename: ', filename);
+        if (vm.Message.showDebug()) vm.$log.debug('PAT.json: ', vm.pat);
+        if (vm.Message.showDebug()) vm.$log.debug('filename: ', filename);
 
         vm.measures = vm.pat.measures;
         if (!angular.isDefined(vm.measures)) {
@@ -185,7 +184,7 @@ export class Project {
           measure.directory = measure.measure_dir;
         });
 
-        if (vm.showDebug) vm.$log.debug('InitializeProject-measures with updated dir paths: ', vm.measures);
+        if (vm.Message.showDebug()) vm.$log.debug('InitializeProject-measures with updated dir paths: ', vm.measures);
 
         vm.designAlternatives = vm.pat.designAlternatives;
         if (!angular.isDefined(vm.designAlternatives)) {
@@ -196,8 +195,8 @@ export class Project {
         vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
         vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
         vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
-        if (vm.showDebug) vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
-        if (vm.showDebug) vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
+        if (vm.Message.showDebug()) vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
+        if (vm.Message.showDebug()) vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
         vm.algorithmSettings = vm.pat.algorithmSettings ? vm.pat.algorithmSettings : vm.algorithmSettings;
         vm.rubyMD5 = vm.pat.rubyMD5 ? vm.pat.rubyMD5 : vm.rubyMD5;
         vm.mongoMD5 = vm.pat.mongoMD5 ? vm.pat.mongoMD5 : vm.mongoMD5;
@@ -214,7 +213,7 @@ export class Project {
       vm.$log.error('No project selected...cannot initialize project');
     }
 
-    if (vm.showDebug) vm.$log.debug('Server Scripts: ', vm.serverScripts);
+    if (vm.Message.showDebug()) vm.$log.debug('Server Scripts: ', vm.serverScripts);
 
   }
 
@@ -224,7 +223,7 @@ export class Project {
 
   savePrettyOptions() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('Parse arguments and save Options hash to each measure');
+    if (vm.Message.showDebug()) vm.$log.debug('Parse arguments and save Options hash to each measure');
 
     _.forEach(vm.measures, (measure) => {
 
@@ -265,7 +264,7 @@ export class Project {
               // check if argument is required
               if (argument.required) {
                 // TODO: throw an error here: need a value for this argument in this option
-                if (vm.showDebug) vm.$log.debug('ARG: ', argument.name, ' value left blank in option: ', theOption.name);
+                if (vm.Message.showDebug()) vm.$log.debug('ARG: ', argument.name, ' value left blank in option: ', theOption.name);
               }
             }
           }
@@ -278,7 +277,7 @@ export class Project {
 
     });
 
-    if (vm.showDebug) vm.$log.debug('Measures with pretty options: ', vm.measures);
+    if (vm.Message.showDebug()) vm.$log.debug('Measures with pretty options: ', vm.measures);
 
   }
 
@@ -289,12 +288,12 @@ export class Project {
     const deferred = vm.$q.defer();
     const promises = [];
 
-    if (vm.showDebug) vm.$log.debug('in Project computeAllMeasureArguments()');
+    if (vm.Message.showDebug()) vm.$log.debug('in Project computeAllMeasureArguments()');
     let osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
 
     _.forEach(vm.measures, (measure) => {
       if (!_.isNil(measure.seed)) {
-        if (vm.showDebug) vm.$log.debug(`computeAllMeasureArguments using unique seed for measure: ${measure}`);
+        if (vm.Message.showDebug()) vm.$log.debug(`computeAllMeasureArguments using unique seed for measure: ${measure}`);
       }
       // todo: ensure that this modifies the vm.measures directly
       const promise = vm.computeMeasureArguments(measure);
@@ -302,7 +301,7 @@ export class Project {
     });
 
     vm.$q.all(promises).then(response => {
-      if (vm.showDebug) vm.$log.debug('ComputeAllMeasures resolved');
+      if (vm.Message.showDebug()) vm.$log.debug('ComputeAllMeasures resolved');
       deferred.resolve();
       vm.setModified(true);
     }, error => {
@@ -320,7 +319,7 @@ export class Project {
   computeMeasureArguments(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    if (vm.showDebug) vm.$log.debug('in Project computeMeasureArguments()');
+    if (vm.Message.showDebug()) vm.$log.debug('in Project computeMeasureArguments()');
     let osmPath;
     if (_.isNil(vm.seedDir)) {
       vm.$log.error('vm.seedDir is undefined. Unable to compute measure arguments.');
@@ -336,7 +335,7 @@ export class Project {
 
     vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
       // merge with existing project measure
-      if (vm.showDebug) vm.$log.debug('New computed measure: ', newMeasure);
+      if (vm.Message.showDebug()) vm.$log.debug('New computed measure: ', newMeasure);
 
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
       _.forEachRight(measure.arguments, (arg, index) => {
@@ -372,8 +371,8 @@ export class Project {
   // export OSA
   exportOSA(selectedOnly = false) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In Project::exportOSA');
-    if (vm.showDebug) vm.$log.debug('SelectedOnly? ', selectedOnly);
+    if (vm.Message.showDebug()) vm.$log.debug('In Project::exportOSA');
+    if (vm.Message.showDebug()) vm.$log.debug('SelectedOnly? ', selectedOnly);
 
     // first export common data
     vm.exportCommon();
@@ -391,7 +390,7 @@ export class Project {
     // write to file
     let filename = vm.projectDir.path(vm.projectName + '.json');
     vm.jetpack.write(filename, vm.osa);
-    if (vm.showDebug) vm.$log.debug('Project OSA file exported to ' + filename);
+    if (vm.Message.showDebug()) vm.$log.debug('Project OSA file exported to ' + filename);
 
     var output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
     var archive = archiver('zip');
@@ -479,8 +478,8 @@ export class Project {
 
   exportManual(selectedOnly = false) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In Project::exportManual');
-    if (vm.showDebug) vm.$log.debug('selectedONly? ', selectedOnly);
+    if (vm.Message.showDebug()) vm.$log.debug('In Project::exportManual');
+    if (vm.Message.showDebug()) vm.$log.debug('selectedONly? ', selectedOnly);
 
     //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO which is correct?
     vm.osa.analysis.problem.analysis_type = null;
@@ -553,7 +552,7 @@ export class Project {
           }
         }
       });
-      if (vm.showDebug) vm.$log.debug('Measure: ', measure.name, ', numOfOptions: ', measure.numberOfOptions, ' measure added to at least 1 DA? ', measureAdded);
+      if (vm.Message.showDebug()) vm.$log.debug('Measure: ', measure.name, ', numOfOptions: ', measure.numberOfOptions, ' measure added to at least 1 DA? ', measureAdded);
       if (measure.numberOfOptions > 0 && measureAdded) {
         const m = {};
         m.name = measure.name;
@@ -595,15 +594,15 @@ export class Project {
             (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) &&
             (_.isUndefined(arg.variable) || arg.variable === false)
           ) {
-            if (vm.showDebug) vm.$log.debug('ARGUMENT, not variable!');
+            if (vm.Message.showDebug()) vm.$log.debug('ARGUMENT, not variable!');
             const argument = vm.makeArgument(arg);
             // Make sure that argument is "complete"
             if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
               var_count += 1;
               m.arguments.push(argument);
             } else {
-              if (vm.showDebug) vm.$log.debug('Not pushing partial arg to m.arguments');
-              if (vm.showDebug) vm.$log.debug('partial arg: ', argument);
+              if (vm.Message.showDebug()) vm.$log.debug('Not pushing partial arg to m.arguments');
+              if (vm.Message.showDebug()) vm.$log.debug('partial arg: ', argument);
             }
           }
         });
@@ -636,7 +635,7 @@ export class Project {
         // Variable arguments
         _.forEach(measure.arguments, (arg) => {
           if (((_.isUndefined(arg.specialRowId)) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) && (arg.variable === true)) {
-            if (vm.showDebug) vm.$log.debug('Project::exportManual arg: ', arg);
+            if (vm.Message.showDebug()) vm.$log.debug('Project::exportManual arg: ', arg);
             // see what arg is set to in each design alternative
             const valArr = [];
             let option_id;
@@ -645,9 +644,9 @@ export class Project {
               const dpMatch = _.find(vm.datapoints, {name: da.name});
               // do this for entire workflow or if matching datapoint is selected
               if (!selectedOnly || (dpMatch && dpMatch.selected)) {
-                if (vm.showDebug) vm.$log.debug('Project::exportManual da: ', da);
+                if (vm.Message.showDebug()) vm.$log.debug('Project::exportManual da: ', da);
                 if (da[measure.name] == 'None') {
-                  if (vm.showDebug) vm.$log.debug('value: None');
+                  if (vm.Message.showDebug()) vm.$log.debug('value: None');
                   // when set to 'None', sub a value of the right type
                   let the_value = arg.default_value;
                   if (!the_value) {
@@ -658,16 +657,16 @@ export class Project {
 
                 } else {
                   const option_name = da[measure.name];
-                  if (vm.showDebug) vm.$log.debug('arg: ', arg);
-                  if (vm.showDebug) vm.$log.debug('option_name: ', option_name);
-                  if (vm.showDebug) vm.$log.debug('MEASURE', measure);
+                  if (vm.Message.showDebug()) vm.$log.debug('arg: ', arg);
+                  if (vm.Message.showDebug()) vm.$log.debug('option_name: ', option_name);
+                  if (vm.Message.showDebug()) vm.$log.debug('MEASURE', measure);
                   // retrieve the option ID from the option_name in measure.options
                   _.forEach(measure.options, (option) => {
                     if (option.name == option_name) {
                       option_id = option.id;
                     }
                   });
-                  if (vm.showDebug) vm.$log.debug('arg[option_id]: ', arg[option_id]);
+                  if (vm.Message.showDebug()) vm.$log.debug('arg[option_id]: ', arg[option_id]);
                   // check that you have a value here...if not error
                   if (!arg[option_id]) {
                     vm.$log.error('Option: ', option_name, 'for measure \'', measure.display_name, '\' does not have a value. Analysis will error.');
@@ -728,10 +727,10 @@ export class Project {
             v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.minimum});  // minimum
             v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.maximum});  // maximum
             if (valArr.length > 0) {
-              if (vm.showDebug) vm.$log.debug('Setting attribute');
+              if (vm.Message.showDebug()) vm.$log.debug('Setting attribute');
               v.uncertainty_description.attributes.push({name: 'modes', value: arg.mode}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
             } else {
-              if (vm.showDebug) vm.$log.debug('Skipping attribute');
+              if (vm.Message.showDebug()) vm.$log.debug('Skipping attribute');
             }
             v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
             v.uncertainty_description.attributes.push({name: 'stddev', value: null});
@@ -753,7 +752,7 @@ export class Project {
 
   exportAlgorithmic() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In Project::exportAlgorithmic');
+    if (vm.Message.showDebug()) vm.$log.debug('In Project::exportAlgorithmic');
 
     // ALGORITHM SETTINGS
     vm.osa.analysis.problem.analysis_type = vm.samplingMethod.id.toLowerCase();
@@ -781,7 +780,7 @@ export class Project {
     if (groupFlag) {
       tempOutputs = _.sortBy(tempOutputs, ['obj_function_group']);
     }
-    if (vm.showDebug) vm.$log.debug('tempOutputs sorted: ', tempOutputs);
+    if (vm.Message.showDebug()) vm.$log.debug('tempOutputs sorted: ', tempOutputs);
 
     // add objective function names to algorithm section
     vm.osa.analysis.problem.algorithm.objective_functions = _.map(_.filter(tempOutputs, {objective_function: true}), 'name');
@@ -831,8 +830,8 @@ export class Project {
             var_count += 1;
             m.arguments.push(argument);
           } else {
-            if (vm.showDebug) vm.$log.debug('Not pushing partial arg to m.arguments');
-            if (vm.showDebug) vm.$log.debug('partial arg: ', argument);
+            if (vm.Message.showDebug()) vm.$log.debug('Not pushing partial arg to m.arguments');
+            if (vm.Message.showDebug()) vm.$log.debug('partial arg: ', argument);
           }
         }
       });
@@ -852,7 +851,7 @@ export class Project {
       // Variable arguments
       _.forEach(measure.arguments, (arg) => {
         if (arg.inputs && arg.inputs.variableSetting && arg.inputs.variableSetting != 'Argument' && !arg.inputs.showWarningIcon) {
-          if (vm.showDebug) vm.$log.debug('Project::exportAlgorithmic arg: ', arg);
+          if (vm.Message.showDebug()) vm.$log.debug('Project::exportAlgorithmic arg: ', arg);
 
           // VARIABLE ARGUMENT SECTION
           const v = {};
@@ -919,15 +918,15 @@ export class Project {
     // TODO: more complicated weighting scheme?
     let weightSum = 0;
     _.forEach(valArr, (valueHash) => {
-      if (vm.showDebug) vm.$log.debug('weight: ', parseFloat(valueHash.weight));
+      if (vm.Message.showDebug()) vm.$log.debug('weight: ', parseFloat(valueHash.weight));
 
       if (vm.isNumeric(valueHash.weight)) {
-        if (vm.showDebug) vm.$log.debug('weight for ', valueHash.value);
+        if (vm.Message.showDebug()) vm.$log.debug('weight for ', valueHash.value);
         valueHash.weight = parseFloat(valueHash.weight);
         weightSum = weightSum + valueHash.weight;
       }
     });
-    if (vm.showDebug) vm.$log.debug('current weight sum: ', weightSum);
+    if (vm.Message.showDebug()) vm.$log.debug('current weight sum: ', weightSum);
 
     if (weightSum > 1) {
       vm.$log.error('ERROR: weights do not add up to 1');
@@ -940,12 +939,12 @@ export class Project {
         missingCount = missingCount + 1;
       }
     });
-    if (vm.showDebug) vm.$log.debug('missing count: ', missingCount);
+    if (vm.Message.showDebug()) vm.$log.debug('missing count: ', missingCount);
 
     if (missingCount > 0) {
-      if (vm.showDebug) vm.$log.debug('calculating missing weights');
+      if (vm.Message.showDebug()) vm.$log.debug('calculating missing weights');
       const weightVal = (1 - weightSum) / missingCount; // TODO: limit
-      if (vm.showDebug) vm.$log.debug('calculated weight Val: ', weightVal);
+      if (vm.Message.showDebug()) vm.$log.debug('calculated weight Val: ', weightVal);
       _.forEach(valArr, (valueHash) => {
         if (!vm.isNumeric(valueHash.weight)) {
           valueHash.weight = weightVal;
@@ -953,7 +952,7 @@ export class Project {
       });
     }
 
-    if (vm.showDebug) vm.$log.debug('Final discrete values array: ', valArr);
+    if (vm.Message.showDebug()) vm.$log.debug('Final discrete values array: ', valArr);
     return valArr;
   }
 
@@ -987,7 +986,7 @@ export class Project {
     let currentGroup = null;
     const finalOutputs = [];
     _.forEach(outputs, (out) => {
-      if (vm.showDebug) vm.$log.debug('OUTPUT: ', out);
+      if (vm.Message.showDebug()) vm.$log.debug('OUTPUT: ', out);
       const outHash = {};
       outHash.units = out.units;
       outHash.objective_function = out.objective_function == 'true';  // true or false
@@ -1063,7 +1062,7 @@ export class Project {
       // assume windows paths '\\'
       mdir = _.last(_.split(measure.measure_dir, '\\'));
     }
-    if (vm.showDebug) vm.$log.debug('***MEASURE DIR NAME: ', mdir);
+    if (vm.Message.showDebug()) vm.$log.debug('***MEASURE DIR NAME: ', mdir);
     return mdir;
   }
 
@@ -1121,9 +1120,9 @@ export class Project {
 
   exportScripts() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('exporting server scripts');
+    if (vm.Message.showDebug()) vm.$log.debug('exporting server scripts');
     _.forEach(vm.serverScripts, (script, type) => {
-      // if (vm.showDebug) vm.$log.debug('type: ', type, 'scriptdata: ', script);
+      // if (vm.Message.showDebug()) vm.$log.debug('type: ', type, 'scriptdata: ', script);
       if (script.file) {
         // create argument file
         let argFilename = script.file.substr(0, script.file.lastIndexOf('.')) || script.file;
@@ -1198,7 +1197,7 @@ export class Project {
     vm.pat.datapoints = vm.datapoints;
 
     vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
-    if (vm.showDebug) vm.$log.debug('Project exported to pat.json');
+    if (vm.Message.showDebug()) vm.$log.debug('Project exported to pat.json');
     vm.setModified(false);
   }
 
@@ -1228,18 +1227,18 @@ export class Project {
     // measures should already be in correct order
     // make sure workflowIndex's are consecutive and match measure index in array
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('ProjectService::RecalculateMeasureWorkflowIndexes');
+    if (vm.Message.showDebug()) vm.$log.debug('ProjectService::RecalculateMeasureWorkflowIndexes');
     _.forEach(vm.measures, (measure, key) => {
       measure.workflow_index = key;
-      if (vm.showDebug) vm.$log.debug('key: ', key);
+      if (vm.Message.showDebug()) vm.$log.debug('key: ', key);
     });
 
-    if (vm.showDebug) vm.$log.debug('***REORDERED PROJECT MEASURES: ', vm.measures);
+    if (vm.Message.showDebug()) vm.$log.debug('***REORDERED PROJECT MEASURES: ', vm.measures);
   }
 
   openSetMyMeasuresDirModal() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in SetMyMeasures Modal function');
+    if (vm.Message.showDebug()) vm.$log.debug('in SetMyMeasures Modal function');
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
       controller: 'ModalSetMeasuresDirController',
@@ -1256,7 +1255,7 @@ export class Project {
 
   setProjectName(name) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('Project setProjectName name:', name);
+    if (vm.Message.showDebug()) vm.$log.debug('Project setProjectName name:', name);
     vm.projectName = name;
   }
 
@@ -1301,12 +1300,12 @@ export class Project {
   // projectDir is a jetpack object (not a string)
   setProject(projectDir) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('Project setProject');
+    if (vm.Message.showDebug()) vm.$log.debug('Project setProject');
 
     vm.setProjectDir(projectDir);
-    if (vm.showDebug) vm.$log.debug('in set project: projectDir: ', vm.projectDir.path());
+    if (vm.Message.showDebug()) vm.$log.debug('in set project: projectDir: ', vm.projectDir.path());
     vm.setProjectName(projectDir.path().replace(/^.*[\\\/]/, ''));
-    if (vm.showDebug) vm.$log.debug('project name: ', vm.projectName);
+    if (vm.Message.showDebug()) vm.$log.debug('project name: ', vm.projectName);
 
     vm.mongoDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/data/db'));
     vm.logsDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/logs'));
@@ -1357,7 +1356,7 @@ export class Project {
 
   getMeasuresAndOptions() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
+    if (vm.Message.showDebug()) vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
     return vm.measures;
   }
 
@@ -1435,7 +1434,7 @@ export class Project {
       aws: {},
       credentials: {yamlFilename: null, accessKey: null, region: 'us-east-1'}
     });
-    if (vm.showDebug) vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
+    if (vm.Message.showDebug()) vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
   setRemoteSettings(settings) {
@@ -1465,7 +1464,7 @@ export class Project {
     vm.clusters = {running: [], all: []};
     const tempClusters = vm.jetpack.find(vm.projectDir.path(), {matching: '*_cluster.json'});
     _.forEach(tempClusters, cluster => {
-      if (vm.showDebug) vm.$log.debug('CLUSTER: ', cluster);
+      if (vm.Message.showDebug()) vm.$log.debug('CLUSTER: ', cluster);
       const clusterFile = vm.jetpack.read(cluster);
       let clusterName = _.last(_.split(cluster, '/'));
       clusterName = _.replace(clusterName, '_cluster.json', '');
@@ -1509,7 +1508,7 @@ export class Project {
   pingCluster(clusterName) {
     const vm = this;
     const deferred = vm.$q.defer();
-    if (vm.showDebug) vm.$log.debug('Locating config file for cluster: ', clusterName);
+    if (vm.Message.showDebug()) vm.$log.debug('Locating config file for cluster: ', clusterName);
 
     const dns = vm.getDNSFromFile(clusterName);
 
@@ -1548,7 +1547,7 @@ export class Project {
 
   saveClusterToFile() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
+    if (vm.Message.showDebug()) vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
     // copy and clean up what you don't need
     const cluster = angular.copy(vm.remoteSettings.aws);
     cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : "";
@@ -1789,7 +1788,7 @@ export class Project {
       worker_initialization: {file: null, arguments: []},
       worker_finalization: {file: null, arguments: []}
     };
-    if (vm.showDebug) vm.$log.debug('setServerScripts: ', vm.serverScripts);
+    if (vm.Message.showDebug()) vm.$log.debug('setServerScripts: ', vm.serverScripts);
   }
 
   getServerScripts() {
@@ -2064,10 +2063,10 @@ export class Project {
       description: 'Options: true or false',
       defaultValue: 'true'
     }, {
-        name: 'run_mode',
-        displayName: 'Run Mode?',
-        description: 'Options: true or false',
-        defaultValue: 'true'
+      name: 'run_mode',
+      displayName: 'Run Mode?',
+      description: 'Options: true or false',
+      defaultValue: 'true'
     }, {
       name: 'run_all_samples_for_pivots',
       displayName: 'Run all Samples for Pivots?',
@@ -2182,7 +2181,7 @@ export class Project {
       displayName: 'Number of Runs',
       description: 'Positive integer (if individual, total simulations is this times each variable)',
       defaultValue: 30
-    },{
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
@@ -2199,77 +2198,77 @@ export class Project {
       displayName: 'Population Size',
       description: 'Size of initial population',
       defaultValue: 30
-    },{
+    }, {
       name: 'generations',
       displayName: 'Generations',
       description: 'Number of generations',
       defaultValue: 2
-    },{
+    }, {
       name: 'wait_generations',
       displayName: 'Generations to Wait',
       description: 'If no improvement in waitGenerations of generations, then exit',
       defaultValue: 2
-    },{
+    }, {
       name: 'bfgsburnin',
       displayName: 'BFGS burn in',
       description: 'The number of generations which are run before the BFGS is ﬁrst used',
       defaultValue: 6
-    },{
+    }, {
       name: 'solution_tolerance',
       displayName: 'Solution Tolerance',
       description: 'Numbers within solutionTolerance are considered equal',
       defaultValue: 0.01
-    },{
+    }, {
       name: 'epsilon_gradient',
       displayName: 'Epsilon Gradient',
       description: 'epsilon in gradient calculation',
       defaultValue: 0.01
-    },{
+    }, {
       name: 'pgtol',
       displayName: 'Projected Gradient Tolerance',
       description: 'Tolerance on the projected gradient',
       defaultValue: 0.01
-    },{
+    }, {
       name: 'factr',
       displayName: 'Failed F Value',
       description: 'Tolerance on delta_F',
       defaultValue: 450360000000000
-    },{
+    }, {
       name: 'maxit',
       displayName: 'Maximum Iterations',
       description: 'Maximum number of iterations',
       defaultValue: 3
-    },{
+    }, {
       name: 'r_genoud_debug_flag',
       displayName: 'Failed F Value',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 1
-    },{
+    }, {
       name: 'print_level',
       displayName: 'Print Level',
       description: 'Options: 0 (minimal printing), 1 (normal), 2 (detailed), and 3 (debug)',
       defaultValue: 2
-    },{
+    }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
       defaultValue: 'minkowski'
-    },{
+    }, {
       name: 'p_power',
       displayName: 'P Power',
       description: 'Lp norm power (must be non-negative)',
       defaultValue: 2
-    },{
+    }, {
       name: 'exit_on_guideline14',
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0
-    },{
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
       defaultValue: 1e18
-    },{
+    }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
@@ -2281,7 +2280,7 @@ export class Project {
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
       defaultValue: 1e18
-    },{
+    }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
@@ -2293,52 +2292,52 @@ export class Project {
       displayName: 'Number of Samples',
       description: 'Positive integer',
       defaultValue: 30
-    },{
+    }, {
       name: 'random_seed',
       displayName: 'Random Seed',
       description: 'The first random seed',
       defaultValue: 1979
-    },{
+    }, {
       name: 'random_seed2',
       displayName: 'Random Seed 2',
       description: 'the second random seed',
       defaultValue: 1973
-    },{
+    }, {
       name: 'order',
       displayName: 'Order',
       description: 'Integer, the maximum order in the ANOVA decomposition (all indices up to this order will be computed)',
       defaultValue: 1
-    },{
+    }, {
       name: 'nboot',
       displayName: 'Num Boot',
       description: 'The number of bootstrap replicates',
       defaultValue: 0
-    },{
+    }, {
       name: 'conf',
       displayName: 'Confidence',
       description: 'the confidence level for bootstrap confidence intervals',
       defaultValue: 0.95
-    },{
+    }, {
       name: 'type',
       displayName: 'Type',
       description: 'Options: sobol, sobol2002, sobol2007, jansen, mara, martinez',
       defaultValue: 'sobol'
-    },{
+    }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
       defaultValue: 'minkowski'
-    },{
+    }, {
       name: 'p_power',
       displayName: 'P Power',
       description: 'Lp norm power (must be non-negative)',
       defaultValue: 2
-    },{
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
       defaultValue: 1e18
-    },{
+    }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
@@ -2350,37 +2349,37 @@ export class Project {
       displayName: 'Number of Samples',
       description: 'Size of Initial Population',
       defaultValue: 30
-    },{
+    }, {
       name: 'generations',
       displayName: 'Generations',
       description: 'Number of generations',
       defaultValue: 2
-    },{
+    }, {
       name: 'tournament_size',
       displayName: 'Tournament Size',
       description: 'Tournament Size',
       defaultValue: 2
-    },{
+    }, {
       name: 'cprob',
       displayName: 'C Prob',
       description: 'Crossover probability [0,1]',
       defaultValue: 0.85
-    },{
+    }, {
       name: 'cidx',
       displayName: 'C Idx',
       description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
       defaultValue: 5
-    },{
+    }, {
       name: 'midx',
       displayName: 'M Idx',
       description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
       defaultValue: 5
-    },{
+    }, {
       name: 'mprob',
       displayName: 'M Prob',
       description: 'Mutation probability [0,1]',
       defaultValue: 0.8
-    },{
+    }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
@@ -2395,12 +2394,12 @@ export class Project {
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0
-    },{
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
       defaultValue: 1e18
-    },{
+    }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
@@ -2714,7 +2713,7 @@ export class Project {
 
   getAlgorithmSettingsForMethod() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
+    if (vm.Message.showDebug()) vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
 
     const settings = [];
     _.forEach(vm.algorithmOptions[vm.samplingMethod.id], object => {
@@ -2727,7 +2726,7 @@ export class Project {
 
   setAlgorithmSettings(algorithm) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In setAlgorithmSettings in Project');
+    if (vm.Message.showDebug()) vm.$log.debug('In setAlgorithmSettings in Project');
 
     // remove non-applicable settings
     _.forEachRight(vm.algorithmSettings, (setting, key) => {
@@ -2767,43 +2766,43 @@ export class Project {
       id: 'baseline_perturbation',
       name: 'analysis.type.baselinePerturbation',
       link: null
-    },{
+    }, {
       id: 'diag',
       name: 'analysis.type.diagonal',
       link: null
-    },{
+    }, {
       id: 'doe',
       name: 'analysis.type.doe',
       link: 'https://cran.r-project.org/web/packages/DoE.base/DoE.base.pdf'
-    },{
+    }, {
       id: 'lhs',
       name: 'analysis.type.lhs',
       link: 'https://cran.r-project.org/web/packages/lhs/lhs.pdf'
-    },{
+    }, {
       id: 'morris',
       name: 'analysis.type.morris',
       link: 'https://cran.r-project.org/web/packages/sensitivity/sensitivity.pdf'
-    },{
+    }, {
       id: 'nsga_nrel',
       name: 'analysis.type.nsga2',
       link: 'https://cran.r-project.org/web/packages/nsga2R/nsga2R.pdf'
-    },{
+    }, {
       id: 'optim',
       name: 'analysis.type.optim',
       link: 'http://stat.ethz.ch/R-manual/R-devel/library/stats/html/optim.html'
-    },{
+    }, {
       id: 'preflight',
       name: 'analysis.type.preFlight',
       link: null
-    },{
+    }, {
       id: 'pso',
       name: 'analysis.type.pso',
       link: 'https://cran.r-project.org/web/packages/hydroPSO/hydroPSO.pdf'
-    },{
+    }, {
       id: 'repeat_run',
       name: 'analysis.type.repeatRun',
       link: null
-    },{
+    }, {
       id: 'rgenoud',
       name: 'analysis.type.rgenoud',
       link: 'https://cran.r-project.org/web/packages/rgenoud/rgenoud.pdf'
@@ -2815,7 +2814,7 @@ export class Project {
       id: 'sobol',
       name: 'analysis.type.sobol',
       link: 'https://cran.r-project.org/web/packages/sensitivity/sensitivity.pdf'
-    },{
+    }, {
       id: 'spea_nrel',
       name: 'analysis.type.spea2',
       link: 'https://cran.r-project.org/web/packages/nsga2R/nsga2R.pdf'
@@ -2884,7 +2883,7 @@ export class Project {
       }
       else vm.$log.error('The seeds directory (%s) does not exist', vm.seedDir.cwd());
     } else {
-      if (vm.showDebug) vm.$log.debug('There is no seed directory defined (project not selected?)');
+      if (vm.Message.showDebug()) vm.$log.debug('There is no seed directory defined (project not selected?)');
     }
 
   }
@@ -2900,7 +2899,7 @@ export class Project {
       }
       else vm.$log.error('The weather file directory (%s) does not exist', vm.weatherDir.cwd());
     } else {
-      if (vm.showDebug) vm.$log.debug('There is no weather directory defined (project not selected?)');
+      if (vm.Message.showDebug()) vm.$log.debug('There is no weather directory defined (project not selected?)');
     }
 
   }
@@ -2936,7 +2935,7 @@ export class Project {
 
   setModified(isModified) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('Project::setModified isModified: ', isModified);
+    if (vm.Message.showDebug()) vm.$log.debug('Project::setModified isModified: ', isModified);
     vm.modified = isModified;
   }
 
@@ -2954,7 +2953,7 @@ export class Project {
         theDate = new Date(dateString);
       }
 
-      // if (vm.showDebug) vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
+      // if (vm.Message.showDebug()) vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
     }
 
     return theDate;
@@ -2982,7 +2981,7 @@ export class Project {
   modifiedModal() {
     const vm = this;
     const deferred = vm.$q.defer();
-    if (vm.showDebug) vm.$log.debug('Project::modifiedModal');
+    if (vm.Message.showDebug()) vm.$log.debug('Project::modifiedModal');
 
     if (vm.getModified()) {
       const modalInstance = vm.$uibModal.open({
@@ -2993,7 +2992,7 @@ export class Project {
       });
 
       modalInstance.result.then(() => {
-        if (vm.showDebug) vm.$log.debug('Resolving openModal()');
+        if (vm.Message.showDebug()) vm.$log.debug('Resolving openModal()');
         deferred.resolve('resolved');
       }, () => {
         // Modal canceled
