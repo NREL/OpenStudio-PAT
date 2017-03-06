@@ -14,6 +14,11 @@
       {{projectDir}}
     </div>
   </div>
+  <div class="row pad-bot-20">
+    <div class="col-sm-12 modal-text" ng-if="projectDir != null">
+      <button ng-if="modal.getLocalServer()" type="button" class="btn btn-info" ng-click="modal.viewLocalServer()" translate>serverTools.viewServer</button>
+    </div>
+  </div>
 
   <div class="modal-footer">
     <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>

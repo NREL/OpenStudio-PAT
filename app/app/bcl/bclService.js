@@ -271,7 +271,7 @@ export class BCL {
     vm.$http.get(metaURL).then(response => {
       const numMeasures = response.data.result_count;
       const numPages = Math.ceil(numMeasures / numResults);
-      vm.$log.debug('Number of pages to retrieve from BCL: ', numPages);
+      if (vm.showDebug) vm.$log.debug('Number of pages to retrieve from BCL: ', numPages);
       // get measures
       for (let page = 0; page < numPages; page++) {
         url = baseUrl + '&page=' + page;

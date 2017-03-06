@@ -1,3 +1,5 @@
+import {shell} from 'electron';
+
 export class ModalServerToolsController {
 
   constructor($log, $scope, $uibModalInstance, OsServer, Project, toastr) {
@@ -10,6 +12,7 @@ export class ModalServerToolsController {
     vm.Project = Project;
     vm.$scope = $scope;
     vm.toastr = toastr;
+    vm.shell = shell;
     // This bool is used to reduce the number of debug messages given the typical, non-developer user
     vm.showDebug = false;
 
@@ -19,6 +22,11 @@ export class ModalServerToolsController {
     }
     if (vm.showDebug) vm.$log.debug('Project dir: ', vm.$scope.projectDir);
 
+  }
+
+  getLocalServer() {
+    const vm = this;
+    return vm.OsServer.getLocalServerUrl();
   }
 
   startLocalServer() {
@@ -58,6 +66,11 @@ export class ModalServerToolsController {
       if (vm.showDebug) vm.$log.debug('Server is offline: ', error);
       vm.toastr.error('Server is Offline');
     });
+  }
+
+  viewLocalServer() {
+    const vm = this;
+    vm.shell.openExternal(vm.OsServer.getLocalServerUrl());
   }
 
   ok() {

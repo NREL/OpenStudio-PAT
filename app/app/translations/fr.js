@@ -28,6 +28,7 @@ export default {
     start: 'Start Local Server',
     stop: 'Stop Local Server',
     ping: 'Ping Server and Set Status',
+    viewServer: 'View Local Server',
     noProject: 'You must open a project first'
   },
   setMeasuresDir: {

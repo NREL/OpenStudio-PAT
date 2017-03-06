@@ -731,6 +731,11 @@ export class OsServer {
     }
   }
 
+  getLocalServerUrl() {
+    const vm = this;
+    return vm.localServerURL;
+  }
+
   runAnalysis(analysis_param) {
     const vm = this;
     if (vm.showDebug) vm.$log.debug('***** In osServerService::runAnalysis() *****');
@@ -1149,11 +1154,6 @@ export class OsServer {
     });
     return deferred.promise;
 
-  }
-
-  testSleep() {
-    const vm = this;
-    if (vm.showDebug) vm.$log.debug('testing sleep');
   }
 
   // download data_point.zip

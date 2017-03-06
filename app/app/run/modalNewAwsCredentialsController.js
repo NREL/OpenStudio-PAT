@@ -33,7 +33,7 @@ export class ModalNewAwsCredentialsController {
     const data = {accessKey: vm.$scope.accessKey, secretKey: vm.$scope.secretKey};
     const yamlString = vm.YAML.stringify(data, 4);
     vm.jetpack.write(vm.Project.getAwsDir().path(filename), yamlString);
-    const truncatedAccessKey = vm.$scope.accessKey.substr(0,4) + '****';
+    const truncatedAccessKey = vm.$scope.accessKey.substr(0, 4) + '****';
     // reset variables
     vm.$scope.accessKey = null;
     vm.$scope.secretKey = null;

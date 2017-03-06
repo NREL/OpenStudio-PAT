@@ -35,8 +35,6 @@
     <button type="button" class="btn btn-success" ng-if="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
     <button type="button" class="btn btn-success" ng-if="!disabledButtons && atLeastOneSelected()" ng-click="run.warnBeforeDelete('selected')" translate>run.runSelected</button>
     <button type="button" class="btn btn-danger" ng-if="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
-    <button type="button" class="btn btn-danger" ng-if="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()" translate>run.stopServer</button>
-    <button type="button" class="btn btn-primary" ng-if="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()" translate>run.viewServer</button>
   </div>
 </div>
 
@@ -112,6 +110,7 @@
                   <div class="col-sm-4">
                     <span ng-if="datapoint.completed_status" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</span>
                     <span ng-if="datapoint.status_message" ng-class="{'green-text': datapoint.status_message.includes('normal'), 'red-text': datapoint.status_message == 'datapoint failure'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</span>
+                    <span ng-if="!datapoint.completed_status">{{datapoint.status}}</span>
                   </div>
                 </div>
               </div>

@@ -110,12 +110,11 @@ export class RunController {
     // don't show skipped measures in datapoint accordion
     vm.$scope.filterSkipped = function (item) {
       let isSkipped = false;
-      let firstArg = undefined;
       const skipArg = '__SKIP__';
       if (item.arguments) {
         if (_.find(_.keys(item.arguments), skipArg)) {
           // found a skip..is it TRUE?
-          if (item.arguments['__SKIP__'] == true) {
+          if (item.arguments.__SKIP__ == true) {
             //if (vm.showDebug) vm.$log.debug('Found SKIP=true in item: ', item);
             isSkipped = true;
           }
@@ -128,7 +127,11 @@ export class RunController {
 
   formatEplusErr(errorText) {
     const vm = this;
-    const errorArr = errorText.split('\n');
+    let errorArr = [];
+    if (errorText){
+      errorArr = errorText.split('\n');
+    }
+
     let htmlText = '';
     _.forEach(errorArr, (elem) => {
       elem = _.replace(elem, '** Warning **', '<span class="orange-button">** Warning **</span>');
@@ -137,7 +140,7 @@ export class RunController {
       if (_.startsWith(elem, '  **   ~~~   **')){
         elem = '<span class="pad-left-5">' + elem + '</span>';
       }
-      htmlText = htmlText  + elem + '<br/>';
+      htmlText = htmlText + elem + '<br/>';
     });
 
     return vm.$sce.trustAsHtml(htmlText);
@@ -277,7 +280,7 @@ export class RunController {
       vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
         // running
         vm.$scope.remoteSettings.aws.cluster_status = 'running';
-        if (vm.showDebug) vm.$log.debug('Run::checkIfClusterIsRunning Current Cluster RUNNING!');
+        if (vm.showDebug) vm.$log.debug('Run::checkIfClusterIsRunning Current Cluster RUNNING! DNS: ', dns);
       }, () => {
         // terminated
         vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
@@ -301,7 +304,7 @@ export class RunController {
       vm.$scope.remoteSettings.aws.connected = false;
 
       // see if cluster is running; if so, set status
-      vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
+      vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then(() => {
         // running
         vm.$scope.remoteSettings.aws.cluster_status = 'running';
       }, () => {
@@ -316,7 +319,7 @@ export class RunController {
       }
 
       // set variables
-      vm.$scope.remoteSettings.aws.server_instance_type = "";
+      vm.$scope.remoteSettings.aws.server_instance_type = '';
       if (vm.showDebug) vm.$log.debug('serverinstancetypes: ', vm.$scope.serverInstanceTypes);
       if (clusterFile.server_instance_type) {
         const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.server_instance_type});
@@ -325,7 +328,7 @@ export class RunController {
           vm.$scope.remoteSettings.aws.server_instance_type = match;
         }
       }
-      vm.$scope.remoteSettings.aws.worker_instance_type = "";
+      vm.$scope.remoteSettings.aws.worker_instance_type = '';
       if (vm.showDebug) vm.$log.debug('workerinstancetypes: ', vm.$scope.workerInstanceTypes);
       if (clusterFile.worker_instance_type) {
         const match = _.find(vm.$scope.workerInstanceTypes, {name: clusterFile.worker_instance_type});
@@ -334,11 +337,11 @@ export class RunController {
           vm.$scope.remoteSettings.aws.worker_instance_type = match;
         }
       }
-      vm.$scope.remoteSettings.aws.user_id = clusterFile.user_id ? clusterFile.user_id : "";
+      vm.$scope.remoteSettings.aws.user_id = clusterFile.user_id ? clusterFile.user_id : '';
       vm.$scope.remoteSettings.aws.worker_node_number = clusterFile.worker_node_number ? clusterFile.worker_node_number : 0;
       vm.$scope.remoteSettings.aws.aws_tags = []; // leave empty for now
       if (vm.showDebug) vm.$log.debug('server versions: ', vm.$scope.osServerVersions);
-      vm.$scope.remoteSettings.openstudio_server_version = "";
+      vm.$scope.remoteSettings.openstudio_server_version = '';
       if (clusterFile.openstudio_server_version) {
         const match = _.find(vm.$scope.osServerVersions, {name: clusterFile.openstudio_server_version});
         if (vm.showDebug) vm.$log.debug('AMI match: ', match);
@@ -351,13 +354,13 @@ export class RunController {
       // clear out
       vm.$scope.remoteSettings.aws = {
         connected: false,
-        cluster_name: "",
-        server_instance_type: "",
-        worker_instance_type: "",
-        user_id: "",
+        cluster_name: '',
+        server_instance_type:'',
+        worker_instance_type: '',
+        user_id: '',
         worker_node_number: 0,
         aws_tags: [],
-        opnestudio_server_version: ""
+        opnestudio_server_version: ''
       };
 
     }
@@ -427,7 +430,7 @@ export class RunController {
       // toastr
       vm.toastr.info('Starting Cloud cluster...this may take up to 10 minutes', {closeButton: true, timeOut: 60000});
     }
-    vm.OsServer.startServer().then(response => {
+    vm.OsServer.startServer().then(() => {
       vm.$log.info('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
       vm.toastr.clear();
       if (type == 'connect') {
@@ -489,7 +492,7 @@ export class RunController {
       const start = vm.Project.makeDate(startStr);
       const end = vm.Project.makeDate(endStr);
 
-      var delta = Math.abs(end - start) / 1000;
+      let delta = Math.abs(end - start) / 1000;
 
       // calculate (and subtract) whole hours
       let hours = Math.floor(delta / 3600) % 24;
@@ -505,7 +508,7 @@ export class RunController {
       let seconds = delta % 60;  // in theory the modulus is not required
       seconds = (seconds < 10) ? '0' + seconds : seconds;
 
-      result = hours + ":" + minutes + ":" + seconds;
+      result = hours + ':' + minutes + ':' + seconds;
 
     }
     return result;
@@ -513,9 +516,9 @@ export class RunController {
 
   calculateWarnings(dp) {
     let warn = 0;
-    if (dp && dp.steps) {
+    if (_.get(dp, 'steps')) {
       _.forEach(dp.steps, step => {
-        if (step.result && step.result.step_warnings)
+        if (_.get(step, 'result.step_warnings'))
           warn = warn + step.result.step_warnings.length;
       });
     }
@@ -524,9 +527,9 @@ export class RunController {
 
   calculateErrors(dp) {
     let err = 0;
-    if (dp && dp.steps) {
+    if (_.get(dp, 'steps')) {
       _.forEach(dp.steps, step => {
-        if (step.result && step.result.step_errors)
+        if (_.get(step, 'result.step_errors'))
           err = err + step.result.step_errors.length;
       });
     }
@@ -535,7 +538,7 @@ export class RunController {
 
   calculateNAs(dp) {
     let nas = 0;
-    if (dp && dp.steps) {
+    if (_.get(dp, 'steps')) {
       _.forEach(dp.steps, step => {
         if (step.step_result == 'NotApplicable') {
           nas = nas + 1;
@@ -550,7 +553,7 @@ export class RunController {
 
     // disconnect if connected to remote existing server
     if (vm.$scope.remoteSettings.remoteType == 'Existing Remote Server' && vm.$scope.selectedRunType.name == 'remote' && vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]) {
-      vm.OsServer.stopServer().then(response => {
+      vm.OsServer.stopServer().then(() => {
         vm.OsServer.resetSelectedServerURL();
       }, error => {
         if (vm.showDebug) vm.$log.debug('Couldn\'t disconnect from server: ', error);
@@ -672,7 +675,7 @@ export class RunController {
 
     let contents = [];
     if (type == 'selected') {
-      let matchingArr = [];
+      const matchingArr = [];
       _.forEach(vm.$scope.datapoints, (dp) => {
         if (dp.selected) {
           matchingArr.push(dp.id);
@@ -815,7 +818,7 @@ export class RunController {
         vm.$scope.analysisID = vm.Project.getAnalysisID();
 
         // 5: until complete, hit serverAPI for updates (errors, warnings, status)
-        vm.getStatus = vm.$interval(function () {
+        vm.getStatus = vm.$interval(() => {
 
           vm.OsServer.retrieveAnalysisStatus().then(response => {
             if (vm.showDebug) vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
@@ -832,7 +835,7 @@ export class RunController {
                 // refresh datapoints
                 vm.$scope.datapoints = vm.Project.getDatapoints();
                 // download reports
-                vm.OsServer.downloadReports().then(response3 => {  // TODO: one by one
+                vm.OsServer.downloadReports().then(() => {  // TODO: one by one
                   if (vm.showDebug) vm.$log.debug('downloaded all available reports');
                   // refresh datapoints again
                   vm.$scope.datapoints = vm.Project.getDatapoints();
@@ -991,13 +994,13 @@ export class RunController {
 
   cancelRun() {
     const vm = this;
-    vm.OsServer.stopAnalysis().then(response => {
+    vm.OsServer.stopAnalysis().then(() => {
       //vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
       vm.toggleButtons();
       vm.OsServer.setProgress(0, '');
 
       vm.stopAnalysisStatus('canceled');
-    }, response => {
+    }, () => {
       vm.$log.error('ERROR attempting to stop analysis / cancel run');
       vm.$log.info('Resetting buttons anyway');
       // reset anyway

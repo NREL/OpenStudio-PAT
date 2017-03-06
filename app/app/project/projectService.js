@@ -2182,7 +2182,7 @@ export class Project {
       displayName: 'Number of Runs',
       description: 'Positive integer (if individual, total simulations is this times each variable)',
       defaultValue: 30
-    },{
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
@@ -2199,62 +2199,62 @@ export class Project {
       displayName: 'Population Size',
       description: 'Size of initial population',
       defaultValue: 30
-    },{
+    }, {
       name: 'generations',
       displayName: 'Generations',
       description: 'Number of generations',
       defaultValue: 2
-    },{
+    }, {
       name: 'wait_generations',
       displayName: 'Generations to Wait',
       description: 'If no improvement in waitGenerations of generations, then exit',
       defaultValue: 2
-    },{
+    }, {
       name: 'bfgsburnin',
       displayName: 'BFGS burn in',
       description: 'The number of generations which are run before the BFGS is ﬁrst used',
       defaultValue: 6
-    },{
+    }, {
       name: 'solution_tolerance',
       displayName: 'Solution Tolerance',
       description: 'Numbers within solutionTolerance are considered equal',
       defaultValue: 0.01
-    },{
+    }, {
       name: 'epsilon_gradient',
       displayName: 'Epsilon Gradient',
       description: 'epsilon in gradient calculation',
       defaultValue: 0.01
-    },{
+    }, {
       name: 'pgtol',
       displayName: 'Projected Gradient Tolerance',
       description: 'Tolerance on the projected gradient',
       defaultValue: 0.01
-    },{
+    }, {
       name: 'factr',
       displayName: 'Failed F Value',
       description: 'Tolerance on delta_F',
       defaultValue: 450360000000000
-    },{
+    }, {
       name: 'maxit',
       displayName: 'Maximum Iterations',
       description: 'Maximum number of iterations',
       defaultValue: 3
-    },{
+    }, {
       name: 'r_genoud_debug_flag',
       displayName: 'Failed F Value',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 1
-    },{
+    }, {
       name: 'print_level',
       displayName: 'Print Level',
       description: 'Options: 0 (minimal printing), 1 (normal), 2 (detailed), and 3 (debug)',
       defaultValue: 2
-    },{
+    }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
       defaultValue: 'minkowski'
-    },{
+    }, {
       name: 'p_power',
       displayName: 'P Power',
       description: 'Lp norm power (must be non-negative)',
@@ -2264,12 +2264,12 @@ export class Project {
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0
-    },{
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
       defaultValue: 1e18
-    },{
+    }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
@@ -2281,7 +2281,7 @@ export class Project {
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
       defaultValue: 1e18
-    },{
+    }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
@@ -2293,52 +2293,52 @@ export class Project {
       displayName: 'Number of Samples',
       description: 'Positive integer',
       defaultValue: 30
-    },{
+    }, {
       name: 'random_seed',
       displayName: 'Random Seed',
       description: 'The first random seed',
       defaultValue: 1979
-    },{
+    }, {
       name: 'random_seed2',
       displayName: 'Random Seed 2',
       description: 'the second random seed',
       defaultValue: 1973
-    },{
+    }, {
       name: 'order',
       displayName: 'Order',
       description: 'Integer, the maximum order in the ANOVA decomposition (all indices up to this order will be computed)',
       defaultValue: 1
-    },{
+    }, {
       name: 'nboot',
       displayName: 'Num Boot',
       description: 'The number of bootstrap replicates',
       defaultValue: 0
-    },{
+    }, {
       name: 'conf',
       displayName: 'Confidence',
       description: 'the confidence level for bootstrap confidence intervals',
       defaultValue: 0.95
-    },{
+    }, {
       name: 'type',
       displayName: 'Type',
       description: 'Options: sobol, sobol2002, sobol2007, jansen, mara, martinez',
       defaultValue: 'sobol'
-    },{
+    }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
       defaultValue: 'minkowski'
-    },{
+    }, {
       name: 'p_power',
       displayName: 'P Power',
       description: 'Lp norm power (must be non-negative)',
       defaultValue: 2
-    },{
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
       defaultValue: 1e18
-    },{
+    }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
@@ -2350,37 +2350,37 @@ export class Project {
       displayName: 'Number of Samples',
       description: 'Size of Initial Population',
       defaultValue: 30
-    },{
+    }, {
       name: 'generations',
       displayName: 'Generations',
       description: 'Number of generations',
       defaultValue: 2
-    },{
+    }, {
       name: 'tournament_size',
       displayName: 'Tournament Size',
       description: 'Tournament Size',
       defaultValue: 2
-    },{
+    }, {
       name: 'cprob',
       displayName: 'C Prob',
       description: 'Crossover probability [0,1]',
       defaultValue: 0.85
-    },{
+    }, {
       name: 'cidx',
       displayName: 'C Idx',
       description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
       defaultValue: 5
-    },{
+    }, {
       name: 'midx',
       displayName: 'M Idx',
       description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
       defaultValue: 5
-    },{
+    }, {
       name: 'mprob',
       displayName: 'M Prob',
       description: 'Mutation probability [0,1]',
       defaultValue: 0.8
-    },{
+    }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
@@ -2395,265 +2395,20 @@ export class Project {
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0
-    },{
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
       defaultValue: 1e18
-    },{
+    }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0
     }];
 
-    // opts.preflight = [];
-    // baseline perturbation?
-
     return opts;
 
-  }
-
-  setAlgorithmOptionsOld() {
-    const at = {};
-    at.BaselinePerturbation = [{
-      name: 'in_measure_combinations',
-      description: '(TRUE/FALSE) Run full factorial search over in-measure variable combinations',
-      defaultValue: 'TRUE'
-    }];
-    at.Diagonal = [{
-      name: 'Number of Samples',
-      description: 'positive integer (this discretizes a continuous variable)',
-      defaultValue: 2
-    }, {
-      name: 'Run_Baseline',
-      description: '(1/0) Run static values',
-      defaultValue: 1
-    }];
-    at.Morris = [{
-      name: 'r',
-      description: 'integer giving the number of repetitions of the design',
-      defaultValue: 10
-    }, {
-      name: 'levels',
-      description: '',
-      defaultValue: 10
-    }, {
-      name: 'grid_jump',
-      description: '',
-      defaultValue: 1
-    }, {
-      name: 'type',
-      description: 'oat',
-      defaultValue: 'oat'
-    }];
-    at.LHS = [{
-      name: 'Sample Method',
-      description: 'individual_variables / all_variables',
-      defaultValue: 'individual_variables'
-    }, {
-      name: 'Number of Samples',
-      description: 'positive integer (if individual, total simulations is this times each variable)',
-      defaultValue: 30
-    }];
-    at.Optim = [{
-      name: 'epsilonGradient',
-      description: 'epsilon in gradient calculation',
-      defaultValue: 0.01
-    }, {
-      name: 'pgtol',
-      description: 'tolerance on the projected gradient',
-      defaultValue: 0.01
-    }, {
-      name: 'factr',
-      description: 'Tolerance on delta_F',
-      defaultValue: 45036000000000
-    }, {
-      name: 'maxit',
-      description: 'Maximum number of iterations',
-      defaultValue: 100
-    }, {
-      name: 'normType',
-      description: '',
-      defaultValue: 'minkowski'
-    }, {
-      name: 'pPower',
-      description: 'Lp norm power',
-      defaultValue: 2
-    }, {
-      name: 'Exit On Guideline14',
-      description: '0 false / 1 true (for use with calibration report)',
-      defaultValue: 0
-    }];
-    at.RGENOUD = [{
-      name: 'popSize',
-      description: 'Size of initial population',
-      defaultValue: 30
-    }, {
-      name: 'Generations',
-      description: 'Number of generations',
-      defaultValue: 5
-    }, {
-      name: 'waitGenerations',
-      description: 'If no improvement in waitGenerations of generations, then exit',
-      defaultValue: 2
-    }, {
-      name: 'bfgsburnin',
-      description: 'The number of generations which are run before the BFGS is ﬁrst used',
-      defaultValue: 2
-    }, {
-      name: 'gradientcheck',
-      description: '0 false / 1 true',
-      defaultValue: 1
-    }, {
-      name: 'solutionTolerance',
-      description: '',
-      defaultValue: 0.01
-    }, {
-      name: 'epsilonGradient',
-      description: 'epsilon in gradient calculation',
-      defaultValue: 0.01
-    }, {
-      name: 'pgtol',
-      description: 'tolerance on the projected gradient',
-      defaultValue: 0.01
-    }, {
-      name: 'factr',
-      description: 'Tolerance on delta_F',
-      defaultValue: 45036000000000
-    }, {
-      name: 'maxit',
-      description: 'Maximum number of iterations',
-      defaultValue: 100
-    }, {
-      name: 'normType',
-      description: '',
-      defaultValue: 'minkowski'
-    }, {
-      name: 'pPower',
-      description: 'Lp norm power',
-      defaultValue: 2
-    }, {
-      name: 'Exit On Guideline14',
-      description: '0 false / 1 true (for use with calibration report)',
-      defaultValue: 0
-    }, {
-      name: 'balance',
-      description: '0 false / 1 true (load balancing)',
-      defaultValue: 1
-    }];
-    at.NSGA2 = [{
-      name: 'Number of Samples',
-      description: 'Size of initial population',
-      defaultValue: 30
-    }, {
-      name: 'Generations',
-      description: 'Number of generations',
-      defaultValue: 30
-    }, {
-      name: 'cprob',
-      description: 'Crossover probability [0,1]',
-      defaultValue: 0.85
-    }, {
-      name: 'XoverDistIdx',
-      description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
-    }, {
-      name: 'MuDistIdx',
-      description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
-    }, {
-      name: 'mprob',
-      description: 'Mutation probability [0,1]',
-      defaultValue: 0.8
-    }, {
-      name: 'toursize',
-      description: 'Tournament Size',
-      defaultValue: 2
-    }, {
-      name: 'normType',
-      description: '',
-      defaultValue: 'minkowski'
-    }, {
-      name: 'pPower',
-      description: 'Lp norm power',
-      defaultValue: 2
-    }, {
-      name: 'Exit On Guideline14',
-      description: '0 false / 1 true (for use with calibration report)',
-      defaultValue: 0
-    }];
-    at.SPEA2 = [{
-      name: 'Number of Samples',
-      description: 'Size of initial population',
-      defaultValue: 30
-    }, {
-      name: 'Generations',
-      description: 'Number of generations',
-      defaultValue: 30
-    }, {
-      name: 'cprob',
-      description: 'Crossover probability [0,1]',
-      defaultValue: 0.85
-    }, {
-      name: 'XoverDistIdx',
-      description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
-    }, {
-      name: 'MuDistIdx',
-      description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
-    }, {
-      name: 'mprob',
-      description: 'Mutation probability [0,1]',
-      defaultValue: 0.8
-    }, {
-      name: 'toursize',
-      description: 'Tournament Size',
-      defaultValue: 2
-    }, {
-      name: 'normType',
-      description: '',
-      defaultValue: 'minkowski'
-    }, {
-      name: 'pPower',
-      description: 'Lp norm power',
-      defaultValue: 2
-    }, {
-      name: 'Exit On Guideline14',
-      description: '0 false / 1 true (for use with calibration report)',
-      defaultValue: 0
-    }];
-    at.PreFlight = [];
-    at.DOE = [{
-      name: 'Experiment Type',
-      description: 'full_factorial',
-      defaultValue: 'full_factorial'
-    }, {
-      name: 'Number of Samples',
-      description: 'positive integer (this discretizes a continuous variable)',
-      defaultValue: 2
-    }];
-    at.SingleRun = [{
-      name: '',
-      description: '',
-      defaultValue: ''
-    }];
-    at.RepeatRun = [{
-      name: 'Number of Runs',
-      description: 'positive integer (if individual, total simulations is this times each variable)',
-      defaultValue: 30
-    }];
-    at.PSO = [{
-      name: 'in_measure_combinations',
-      description: '(TRUE/FALSE) Run full factorial search over in-measure variable combinations',
-      defaultValue: 'TRUE'
-    }, {
-      name: 'include_baseline_in_combinations',
-      description: '(TRUE/FALSE) If in_measure_combinations are TRUE, sets if static values be included in combinations',
-      defaultValue: 'TRUE'
-    }];
-    return at;
   }
 
   getRubyMD5() {

@@ -20,8 +20,8 @@ export class ServerController {
   }
 
   openWebViewDevTools() {
-    var wv = document.getElementById('wv');
-    wv.addEventListener('dom-ready', function () {
+    const wv = document.getElementById('wv');
+    wv.addEventListener('dom-ready', () => {
       console.log('Opening the dev tools for the webview.');
       wv.openDevTools();
     });
