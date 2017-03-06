@@ -978,7 +978,7 @@ export class AnalysisController {
 
   deleteScriptArgument(type, index) {
     const vm = this;
-    vm.$log.debug('deleting at index: ', index);
+    if (vm.Message.showDebug()) vm.$log.debug('deleting at index: ', index);
     if (vm.Message.showDebug()) vm.$log.debug('arguments: ', vm.$scope.serverScripts[type].arguments);
     if (!_.isNil(index)) {
       vm.$scope.serverScripts[type].arguments.splice(index, 1);

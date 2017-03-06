@@ -823,7 +823,7 @@ export class Project {
       _.forEach(measure.arguments, (arg) => {
         // if argument is set to 'Argument' or if the variable setting is not supported by selected algorithm
         if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
-          vm.$log.debug(arg.name, ' treated as ARGUMENT');
+          if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' treated as ARGUMENT');
           const argument = vm.makeArgument(arg);
           // Make sure that argument is "complete"
           if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
@@ -2506,7 +2506,7 @@ export class Project {
       }
     });
 
-    vm.$log.debug('new algorithmSettings: ', vm.algorithmSettings);
+    if (vm.Message.showDebug()) vm.$log.debug('new algorithmSettings: ', vm.algorithmSettings);
   }
 
   getAlgorithmOptions() {

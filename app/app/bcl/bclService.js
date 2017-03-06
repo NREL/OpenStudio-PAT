@@ -309,7 +309,7 @@ export class BCL {
       });
 
     }, error => {
-      vm.$log.debug('Metasearch Query error...cannot retrieve BCL online measures');
+      if (vm.Message.showError()) vm.$log.error('Metasearch Query error...cannot retrieve BCL online measures');
       deferred.reject(error);
     });
 
