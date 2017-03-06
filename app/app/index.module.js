@@ -40,6 +40,7 @@ import { ModalAnalysisRunningController} from '../app/run/modalAnalysisRunningCo
 import { ServerController } from '../app/server/serverController';
 import { OpenProject } from '../app/project/openProjectService';
 import { SetProject } from '../app/project/setProjectService';
+import { Message } from '../app/project/messageService';
 import { StatusBar } from '../app/status_bar/statusBarService';
 import { StatusBarController } from '../app/status_bar/statusBarController';
 
@@ -84,4 +85,5 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .service('Project', Project)
   .service('OpenProject', OpenProject)
   .service('SetProject', SetProject)
+  .service('Message', Message)
   .service('StatusBar', StatusBar);

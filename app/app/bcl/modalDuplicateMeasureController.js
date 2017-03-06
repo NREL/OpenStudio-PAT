@@ -2,7 +2,7 @@ import jetpack from 'fs-jetpack';
 
 export class ModalDuplicateMeasureController {
 
-  constructor($log, $uibModalInstance, measure, Project) {
+  constructor($log, $uibModalInstance, measure, Project, Message) {
     'ngInject';
 
     const vm = this;
@@ -15,25 +15,24 @@ export class ModalDuplicateMeasureController {
     vm.newModelerDescription = measure.modeler_description;
     //vm.MeasureManager = MeasureManager;
     vm.jetpack = jetpack;
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
   }
 
   ok() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('Duplicate Measure measure: ', vm.measure);
+    if (vm.Message.showDebug()) vm.$log.debug('Duplicate Measure measure: ', vm.measure);
     const oldMeasureDir = vm.measure.measure_dir;
 
     // Find a unique measure_dir
     let count = 0;
     let displayName = vm.newDisplayName;
     let measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
-    if (vm.showDebug) vm.$log.debug('measureDir: ', measureDir);
+    if (vm.Message.showDebug()) vm.$log.debug('measureDir: ', measureDir);
     while (vm.jetpack.exists(measureDir)) {
       count++;
       displayName = vm.newDisplayName + count.toString();
       measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
-      if (vm.showDebug) vm.$log.debug('measureDir: ', measureDir);
+      if (vm.Message.showDebug()) vm.$log.debug('measureDir: ', measureDir);
     }
 
     const params = {
@@ -48,7 +47,7 @@ export class ModalDuplicateMeasureController {
       force_reload: 0
     };
 
-    if (vm.showDebug) vm.$log.debug('Duplicate Measure params: ', params);
+    if (vm.Message.showDebug()) vm.$log.debug('Duplicate Measure params: ', params);
     vm.$uibModalInstance.close(params);
   }
 

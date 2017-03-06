@@ -4,7 +4,8 @@ import YAML from 'yamljs';
 
 export class RunController {
 
-  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, toastr, $sce) {
+  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, toastr, $sce, Message) {
+
     'ngInject';
 
     const vm = this;
@@ -19,8 +20,7 @@ export class RunController {
     vm.shell = shell;
     vm.jetpack = jetpack;
     vm.$sce = $sce;
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
 
     vm.runTypes = vm.Project.getRunTypes();
     vm.$scope.selectedRunType = vm.Project.getRunType();
@@ -30,7 +30,7 @@ export class RunController {
 
     // remote settings
     vm.$scope.remoteSettings = vm.Project.getRemoteSettings();
-    if (vm.showDebug) vm.$log.debug('REMOTE SETTINGS: ', vm.$scope.remoteSettings);
+    if (vm.Message.showDebug()) vm.$log.debug('REMOTE SETTINGS: ', vm.$scope.remoteSettings);
 
     vm.$scope.clusterData = {};
     // if remote and amazon is selected, ping cluster
@@ -40,7 +40,7 @@ export class RunController {
     }
 
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
-    if (vm.showDebug) vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
+    if (vm.Message.showDebug()) vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
     vm.$scope.serverInstanceTypes = vm.Project.getServerInstanceTypes();
     vm.$scope.workerInstanceTypes = vm.Project.getWorkerInstanceTypes();
@@ -57,22 +57,22 @@ export class RunController {
     }
 
     vm.$scope.datapoints = vm.Project.getDatapoints();
-    if (vm.showDebug) vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
+    if (vm.Message.showDebug()) vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
     // MANUAL ONLY--set up datapoints
     vm.setUpDatapoints();
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-    if (vm.showDebug) vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
+    if (vm.Message.showDebug()) vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
-    if (vm.showDebug) vm.$log.debug('DISABLED BUTTONS? ', vm.$scope.disabledButtons);
+    if (vm.Message.showDebug()) vm.$log.debug('DISABLED BUTTONS? ', vm.$scope.disabledButtons);
     vm.$scope.progress = vm.OsServer.getProgress();
 
     // DEBUG
-    if (vm.showDebug) vm.$log.debug('Run Type: ', vm.$scope.selectedRunType);
-    if (vm.showDebug) vm.$log.debug('Analysis Type: ', vm.$scope.selectedAnalysisType);
-    if (vm.showDebug) vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod);
+    if (vm.Message.showDebug()) vm.$log.debug('Run Type: ', vm.$scope.selectedRunType);
+    if (vm.Message.showDebug()) vm.$log.debug('Analysis Type: ', vm.$scope.selectedAnalysisType);
+    if (vm.Message.showDebug()) vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod);
 
     // disabled button class
     vm.$scope.disabledButtonClass = function () {
@@ -115,7 +115,7 @@ export class RunController {
         if (_.find(_.keys(item.arguments), skipArg)) {
           // found a skip..is it TRUE?
           if (item.arguments.__SKIP__ == true) {
-            //if (vm.showDebug) vm.$log.debug('Found SKIP=true in item: ', item);
+            //if (vm.Message.showDebug()) vm.$log.debug('Found SKIP=true in item: ', item);
             isSkipped = true;
           }
         }
@@ -175,8 +175,8 @@ export class RunController {
   setRunType() {
     const vm = this;
     vm.deleteResults();
-    if (vm.showDebug) vm.$log.debug('old run type: ', vm.Project.getRunType());
-    if (vm.showDebug) vm.$log.debug('new run type: ', vm.$scope.selectedRunType);
+    if (vm.Message.showDebug()) vm.$log.debug('old run type: ', vm.Project.getRunType());
+    if (vm.Message.showDebug()) vm.$log.debug('new run type: ', vm.$scope.selectedRunType);
     vm.Project.setRunType(vm.$scope.selectedRunType);
     vm.OsServer.resetSelectedServerURL();
     vm.OsServer.setProgress(0, '');
@@ -190,8 +190,8 @@ export class RunController {
 
   viewServer() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in Run::viewServer');
-    if (vm.showDebug) vm.$log.debug('selected Server URL: ', vm.OsServer.getSelectedServerURL());
+    if (vm.Message.showDebug()) vm.$log.debug('in Run::viewServer');
+    if (vm.Message.showDebug()) vm.$log.debug('selected Server URL: ', vm.OsServer.getSelectedServerURL());
     vm.shell.openExternal(vm.OsServer.getSelectedServerURL());
   }
 
@@ -232,7 +232,7 @@ export class RunController {
     });
 
     modalInstance.result.then((data) => {
-      if (vm.showDebug) vm.$log.debug('In modal new credentials result function, name: ', data[0], ' key: ', data[1]);
+      if (vm.Message.showDebug()) vm.$log.debug('In modal new credentials result function, name: ', data[0], ' key: ', data[1]);
       vm.$scope.awsYamlFiles = vm.Project.getAwsYamlFiles();
       // set selected file to new file
       vm.$scope.remoteSettings.credentials.yamlFilename = data[0];
@@ -257,7 +257,7 @@ export class RunController {
     });
 
     modalInstance.result.then((name) => {
-      if (vm.showDebug) vm.$log.debug('In modal new cluster result function, name: ', name);
+      if (vm.Message.showDebug()) vm.$log.debug('In modal new cluster result function, name: ', name);
       // get cluster files
       vm.$scope.clusters = vm.Project.getClusters();
       // select new one
@@ -280,7 +280,7 @@ export class RunController {
       vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
         // running
         vm.$scope.remoteSettings.aws.cluster_status = 'running';
-        if (vm.showDebug) vm.$log.debug('Run::checkIfClusterIsRunning Current Cluster RUNNING! DNS: ', dns);
+        if (vm.Message.showDebug()) vm.$log.debug('Run::checkIfClusterIsRunning Current Cluster RUNNING!');
       }, () => {
         // terminated
         vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
@@ -300,7 +300,7 @@ export class RunController {
     // read in json file
     if (vm.jetpack.exists(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json')) {
       const clusterFile = vm.jetpack.read(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json');
-      if (vm.showDebug) vm.$log.debug('clusterFile data: ', clusterFile);
+      if (vm.Message.showDebug()) vm.$log.debug('clusterFile data: ', clusterFile);
       vm.$scope.remoteSettings.aws.connected = false;
 
       // see if cluster is running; if so, set status
@@ -319,20 +319,20 @@ export class RunController {
       }
 
       // set variables
-      vm.$scope.remoteSettings.aws.server_instance_type = '';
-      if (vm.showDebug) vm.$log.debug('serverinstancetypes: ', vm.$scope.serverInstanceTypes);
+      vm.$scope.remoteSettings.aws.server_instance_type = "";
+      if (vm.Message.showDebug()) vm.$log.debug('serverinstancetypes: ', vm.$scope.serverInstanceTypes);
       if (clusterFile.server_instance_type) {
         const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.server_instance_type});
-        if (vm.showDebug) vm.$log.debug('Server match: ', match);
+        if (vm.Message.showDebug()) vm.$log.debug('Server match: ', match);
         if (match) {
           vm.$scope.remoteSettings.aws.server_instance_type = match;
         }
       }
-      vm.$scope.remoteSettings.aws.worker_instance_type = '';
-      if (vm.showDebug) vm.$log.debug('workerinstancetypes: ', vm.$scope.workerInstanceTypes);
+      vm.$scope.remoteSettings.aws.worker_instance_type = "";
+      if (vm.Message.showDebug()) vm.$log.debug('workerinstancetypes: ', vm.$scope.workerInstanceTypes);
       if (clusterFile.worker_instance_type) {
         const match = _.find(vm.$scope.workerInstanceTypes, {name: clusterFile.worker_instance_type});
-        if (vm.showDebug) vm.$log.debug('Worker match: ', match);
+        if (vm.Message.showDebug()) vm.$log.debug('Worker match: ', match);
         if (match) {
           vm.$scope.remoteSettings.aws.worker_instance_type = match;
         }
@@ -340,11 +340,11 @@ export class RunController {
       vm.$scope.remoteSettings.aws.user_id = clusterFile.user_id ? clusterFile.user_id : '';
       vm.$scope.remoteSettings.aws.worker_node_number = clusterFile.worker_node_number ? clusterFile.worker_node_number : 0;
       vm.$scope.remoteSettings.aws.aws_tags = []; // leave empty for now
-      if (vm.showDebug) vm.$log.debug('server versions: ', vm.$scope.osServerVersions);
-      vm.$scope.remoteSettings.openstudio_server_version = '';
+      if (vm.Message.showDebug()) vm.$log.debug('server versions: ', vm.$scope.osServerVersions);
+      vm.$scope.remoteSettings.openstudio_server_version = "";
       if (clusterFile.openstudio_server_version) {
         const match = _.find(vm.$scope.osServerVersions, {name: clusterFile.openstudio_server_version});
-        if (vm.showDebug) vm.$log.debug('AMI match: ', match);
+        if (vm.Message.showDebug()) vm.$log.debug('AMI match: ', match);
         if (match) {
           vm.$scope.remoteSettings.aws.openstudio_server_version = match;
         }
@@ -387,7 +387,7 @@ export class RunController {
     //   vm.$scope.remoteSettings.aws.server_instance_type = null;
     //   if (clusterFile.server_instance_type) {
     //     const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.server_instance_type});
-    //     if (vm.showDebug) vm.$log.debug('Server match: ', match);
+    //     if (vm.Message.showDebug()) vm.$log.debug('Server match: ', match);
     //     if (match) {
     //       vm.$scope.remoteSettings.aws.server_instance_type = match;
     //     }
@@ -395,7 +395,7 @@ export class RunController {
     //   vm.$scope.remoteSettings.aws.worker_instance_type = null;
     //   if (clusterFile.worker_instance_type) {
     //     const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.worker_instance_type});
-    //     if (vm.showDebug) vm.$log.debug('Worker match: ', match);
+    //     if (vm.Message.showDebug()) vm.$log.debug('Worker match: ', match);
     //     if (match) {
     //       vm.$scope.remoteSettings.aws.worker_instance_type = match;
     //     }
@@ -409,7 +409,7 @@ export class RunController {
     //
     // }
 
-    if (vm.showDebug) vm.$log.debug('remote settings.aws reset: ', vm.$scope.remoteSettings.aws);
+    if (vm.Message.showDebug()) vm.$log.debug('remote settings.aws reset: ', vm.$scope.remoteSettings.aws);
   }
 
   saveClusterToFile() {
@@ -436,7 +436,7 @@ export class RunController {
       if (type == 'connect') {
         vm.toastr.success('Connected to AWS!');
         vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
-        if (vm.showDebug) vm.$log.debug('clusterData: ', vm.$scope.clusterData);
+        if (vm.Message.showDebug()) vm.$log.debug('clusterData: ', vm.$scope.clusterData);
       }
       else {
         vm.toastr.success('AWS server started!');
@@ -458,7 +458,7 @@ export class RunController {
 
   viewReportModal(datapoint, report) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In viewReport- ', report);
+    if (vm.Message.showDebug()) vm.$log.debug('In viewReport- ', report);
     const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
@@ -556,7 +556,7 @@ export class RunController {
       vm.OsServer.stopServer().then(() => {
         vm.OsServer.resetSelectedServerURL();
       }, error => {
-        if (vm.showDebug) vm.$log.debug('Couldn\'t disconnect from server: ', error);
+        if (vm.Message.showDebug()) vm.$log.debug('Couldn\'t disconnect from server: ', error);
         // reset anyway
         vm.OsServer.resetSelectedServerURL();
       });
@@ -575,8 +575,8 @@ export class RunController {
     }
 
     vm.OsServer.stopServer(force).then(response => {
-      if (vm.showDebug) vm.$log.debug('Run::stopServer response: ', response);
-      if (vm.showDebug) vm.$log.debug('***** ', vm.$scope.selectedRunType.name, ' Server Stopped *****');
+      if (vm.Message.showDebug()) vm.$log.debug('Run::stopServer response: ', response);
+      if (vm.Message.showDebug()) vm.$log.debug('***** ', vm.$scope.selectedRunType.name, ' Server Stopped *****');
       vm.OsServer.setProgress(0, '');
       vm.toastr.clear();
       if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
@@ -612,7 +612,7 @@ export class RunController {
 
     // type = runtype, remotetype, or null (when called from PAT exit)
 
-    if (vm.showDebug) vm.$log.debug('**** In RunController::WarnCloudRunning ****');
+    if (vm.Message.showDebug()) vm.$log.debug('**** In RunController::WarnCloudRunning ****');
     // if connected to cloud
     if (((type == 'runtype' && oldValue.includes('"remote"')) || (type == 'remotetype' && oldValue.includes('Amazon Cloud')) || (type == null && oldValue == null)) && vm.$scope.remoteSettings.aws && vm.$scope.remoteSettings.aws.connected) {
       // local results exist
@@ -671,7 +671,7 @@ export class RunController {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    if (vm.showDebug) vm.$log.debug('**** In RunController::WarnBeforeDeleting ****');
+    if (vm.Message.showDebug()) vm.$log.debug('**** In RunController::WarnBeforeDeleting ****');
 
     let contents = [];
     if (type == 'selected') {
@@ -681,11 +681,11 @@ export class RunController {
           matchingArr.push(dp.id);
         }
         contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: matchingArr});
-        if (vm.showDebug) vm.$log.debug('local results matching selected datapoints: ', contents.length);
+        if (vm.Message.showDebug()) vm.$log.debug('local results matching selected datapoints: ', contents.length);
       });
     } else {
       contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
-      if (vm.showDebug) vm.$log.debug('Local results size:', contents.length);
+      if (vm.Message.showDebug()) vm.$log.debug('Local results size:', contents.length);
     }
 
     if (contents.length > 0) {
@@ -731,7 +731,7 @@ export class RunController {
       } else if (type == 'runtype') {
         vm.setRunType();
       } else if (type == 'selected') {
-        if (vm.showDebug) vm.$log.debug('type == selected');
+        if (vm.Message.showDebug()) vm.$log.debug('type == selected');
         vm.runWorkflow(true);
       }
 
@@ -758,7 +758,7 @@ export class RunController {
     vm.OsServer.resetAnalysis(selectedOnly);
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.datapoints = vm.Project.getDatapoints();
-    if (vm.showDebug) vm.$log.debug('DATAPOINTS AFTER DELETE: ', vm.$scope.datapoints);
+    if (vm.Message.showDebug()) vm.$log.debug('DATAPOINTS AFTER DELETE: ', vm.$scope.datapoints);
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
   }
 
@@ -769,8 +769,8 @@ export class RunController {
     vm.OsServer.setAnalysisStatus('starting');
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
-    if (vm.showDebug) vm.$log.debug('***** In runController::runWorkflow() *****');
-    if (vm.showDebug) vm.$log.debug('selectedOnly? ', selectedOnly);
+    if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() *****');
+    if (vm.Message.showDebug()) vm.$log.debug('selectedOnly? ', selectedOnly);
     vm.toggleButtons();
 
     // 1: delete old results (this sets modified flag)
@@ -782,12 +782,12 @@ export class RunController {
     // 3: hit PAT CLI to start server (local or remote)
     vm.OsServer.setProgress(15, 'Starting server');
 
-    if (vm.showDebug) vm.$log.debug('***** In runController::runWorkflow() ready to start server *****');
+    if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() ready to start server *****');
 
     vm.OsServer.startServer().then(response => {
 
       vm.OsServer.setAnalysisRunningFlag(true);
-      if (vm.showDebug) vm.$log.debug('***** In runController::runWorkflow() server started *****');
+      if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() server started *****');
       vm.$log.info('Start Server response: ', response);
 
       vm.OsServer.setProgress(30, 'Server started');
@@ -795,21 +795,21 @@ export class RunController {
       // 4: hit PAT CLI to start run
       vm.OsServer.setProgress(40, 'Starting analysis run');
 
-      if (vm.showDebug) vm.$log.debug('***** In runController::runWorkflow() ready to run analysis *****');
+      if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() ready to run analysis *****');
 
       // set analysis type (sampling method).  batch_datapoints is for manual runs only
       let analysis_param = '';
       if (vm.$scope.selectedAnalysisType == 'Manual')
         analysis_param = 'batch_datapoints';
       else {
-        if (vm.showDebug) vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod.id);
+        if (vm.Message.showDebug()) vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod.id);
         analysis_param = vm.$scope.selectedSamplingMethod.id;
       }
       vm.OsServer.setAnalysisStatus('starting');
       vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
       vm.OsServer.runAnalysis(analysis_param).then(response => {
-        if (vm.showDebug) vm.$log.debug('***** In runController::runWorkflow() analysis running *****');
+        if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() analysis running *****');
         vm.$log.info('Run Analysis response: ', response);
         vm.OsServer.setAnalysisStatus('in progress');
         vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
@@ -821,13 +821,13 @@ export class RunController {
         vm.getStatus = vm.$interval(() => {
 
           vm.OsServer.retrieveAnalysisStatus().then(response => {
-            if (vm.showDebug) vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
+            if (vm.Message.showDebug()) vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
             vm.OsServer.setAnalysisStatus(response.data.analysis.status);
             vm.$scope.analysisStatus = response.data.analysis.status;
-            if (vm.showDebug) vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
+            if (vm.Message.showDebug()) vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
             vm.OsServer.setDatapointsStatus(response.data.analysis.data_points); // TODO: one by one
             vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-            if (vm.showDebug) vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
+            if (vm.Message.showDebug()) vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
 
             // download/replace out.osw (local only)
             if (vm.$scope.selectedRunType.name == 'local') {
@@ -835,8 +835,8 @@ export class RunController {
                 // refresh datapoints
                 vm.$scope.datapoints = vm.Project.getDatapoints();
                 // download reports
-                vm.OsServer.downloadReports().then(() => {  // TODO: one by one
-                  if (vm.showDebug) vm.$log.debug('downloaded all available reports');
+                vm.OsServer.downloadReports().then(response3 => {  // TODO: one by one
+                  if (vm.Message.showDebug()) vm.$log.debug('downloaded all available reports');
                   // refresh datapoints again
                   vm.$scope.datapoints = vm.Project.getDatapoints();
                   vm.$log.info('datapoints after download: ', vm.$scope.datapoints);
@@ -890,7 +890,7 @@ export class RunController {
 
   stopAnalysisStatus(status = 'completed') {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('***** In runController::stopAnalysisStatus() *****');
+    if (vm.Message.showDebug()) vm.$log.debug('***** In runController::stopAnalysisStatus() *****');
     if (angular.isDefined(vm.getStatus)) {
       vm.$interval.cancel(vm.getStatus);
       vm.getStatus = undefined;
@@ -947,7 +947,7 @@ export class RunController {
 
   clearDatapoint(datapoint) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In clear datapoint');
+    if (vm.Message.showDebug()) vm.$log.debug('In clear datapoint');
     // clear from disk
     vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(datapoint.id));
     // clear from PAT
@@ -963,7 +963,7 @@ export class RunController {
 
   clearAllDatapoints() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In clear ALL Datapoints');
+    if (vm.Message.showDebug()) vm.$log.debug('In clear ALL Datapoints');
     // force delete everything in localResults folder in case there is leftover junk not associated with current datapoints
     vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
 

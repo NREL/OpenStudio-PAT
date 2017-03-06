@@ -5,7 +5,7 @@ const {shell} = remote;
 
 export class ModalBclController {
 
-  constructor($log, $q, $uibModalInstance, $timeout, $uibModal, uiGridConstants, $scope, toastr, BCL, params, Project, MeasureManager) {
+  constructor($log, $q, $uibModalInstance, $timeout, $uibModal, uiGridConstants, $scope, toastr, BCL, params, Project, MeasureManager, Message) {
     'ngInject';
 
     const vm = this;
@@ -23,8 +23,7 @@ export class ModalBclController {
     vm.shell = shell;
     vm.params = params;
     vm.MeasureManager = MeasureManager;
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
 
     vm.selected = null;
     vm.keyword = '';
@@ -57,7 +56,7 @@ export class ModalBclController {
     // get project measures
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
     vm.designAlternatives = vm.Project.getDesignAlternatives();
-    if (vm.showDebug) vm.$log.debug('Project Measures(): ', vm.projectMeasures);
+    if (vm.Message.showDebug()) vm.$log.debug('Project Measures(): ', vm.projectMeasures);
 
     // get measures array for Library display
     vm.$scope.displayMeasures = [];
@@ -72,14 +71,14 @@ export class ModalBclController {
     // get all measures (this also checks for updates)
     vm.BCL.getMeasures().then((measures) => {
       vm.libMeasures = measures;
-      if (vm.showDebug) vm.$log.debug('***LibMeasures retrieved from BCL.getMeasures(): ', vm.libMeasures);
+      if (vm.Message.showDebug()) vm.$log.debug('***LibMeasures retrieved from BCL.getMeasures(): ', vm.libMeasures);
       // reload BCL measures
       vm.getBCLMeasures();
 
       // apply filters
       vm.resetFilters();
 
-      if (vm.showDebug) vm.$log.debug('DISPLAY MEASURES', vm.$scope.displayMeasures);
+      if (vm.Message.showDebug()) vm.$log.debug('DISPLAY MEASURES', vm.$scope.displayMeasures);
 
     });
 
@@ -206,8 +205,8 @@ export class ModalBclController {
   // get measures for display based on filter values
   setDisplayMeasures() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in setDisplayMeasures');
-    if (vm.showDebug) vm.$log.debug('FILTERS: ', vm.filters);
+    if (vm.Message.showDebug()) vm.$log.debug('in setDisplayMeasures');
+    if (vm.Message.showDebug()) vm.$log.debug('FILTERS: ', vm.filters);
     const measures = [];
 
     // special case: show only project measures
@@ -230,8 +229,8 @@ export class ModalBclController {
     _.forEach(vm.filters, (val, key) => {
 
       if (val) {
-        if (vm.showDebug) vm.$log.debug('key: ', key);
-        if (vm.showDebug) vm.$log.debug('measures: ', vm.libMeasures[key]);
+        if (vm.Message.showDebug()) vm.$log.debug('key: ', key);
+        if (vm.Message.showDebug()) vm.$log.debug('measures: ', vm.libMeasures[key]);
         _.forEach(vm.libMeasures[key], m => {
           // TODO: what if it's in the project but no longer in local/my folder? check for this?
           // add if not found (BCL online only)
@@ -247,7 +246,7 @@ export class ModalBclController {
     });
 
     vm.$scope.displayMeasures = measures;
-    if (vm.showDebug) vm.$log.debug('***DisplayMeasures: ', vm.$scope.displayMeasures);
+    if (vm.Message.showDebug()) vm.$log.debug('***DisplayMeasures: ', vm.$scope.displayMeasures);
     return measures;
   }
 
@@ -284,7 +283,7 @@ export class ModalBclController {
     const vm = this;
     const catsArr = [];
 
-    if (vm.showDebug) vm.$log.debug('level: ', level, ' namesArr: ', namesArr);
+    if (vm.Message.showDebug()) vm.$log.debug('level: ', level, ' namesArr: ', namesArr);
 
     // first check/uncheck sub categories (if a filter change just happened)
     if (level != null) {
@@ -384,13 +383,13 @@ export class ModalBclController {
 
     vm.addToProject(measure);
     vm.setMeasureInExistingDAs(measure);
-    if (vm.showDebug) vm.$log.debug('Adding the following measure to project: ', measure);
-    if (vm.showDebug) vm.$log.debug('New project measures array: ', vm.projectMeasures);
+    if (vm.Message.showDebug()) vm.$log.debug('Adding the following measure to project: ', measure);
+    if (vm.Message.showDebug()) vm.$log.debug('New project measures array: ', vm.projectMeasures);
   }
 
   addToProject(measure) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('ModalBCL::addToProject');
+    if (vm.Message.showDebug()) vm.$log.debug('ModalBCL::addToProject');
 
     // prevent user from closing modal until measure is done getting added
     vm.$scope.addInProgress = true;
@@ -407,14 +406,14 @@ export class ModalBclController {
     measure.seed = vm.Project.getDefaultSeed();
     vm.Project.computeMeasureArguments(measure).then(response => {
       measure = response;
-      if (vm.showDebug) vm.$log.debug('New Measure with computed args: ', measure);
+      if (vm.Message.showDebug()) vm.$log.debug('New Measure with computed args: ', measure);
       const project_measure = angular.copy(measure);
       project_measure.measure_dir = vm.projectDir.path(dirName);
       vm.insertIntoProjectMeasuresArray(project_measure);
       vm.toastr.success('Measure Added to Project!');
       vm.$scope.addInProgress = false;
     }, error => {
-      if (vm.showDebug) vm.$log.debug('Error in MM compute args.  Will add measure as is: ', error);
+      if (vm.Message.showDebug()) vm.$log.debug('Error in MM compute args.  Will add measure as is: ', error);
       const project_measure = angular.copy(measure);
       project_measure.measure_dir = vm.projectDir.path(dirName);
       vm.insertIntoProjectMeasuresArray(project_measure);
@@ -435,7 +434,7 @@ export class ModalBclController {
 
   insertIntoProjectMeasuresArray(project_measure) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('ModalBCL::insertIntoProjectMeasuresArray');
+    if (vm.Message.showDebug()) vm.$log.debug('ModalBCL::insertIntoProjectMeasuresArray');
     // order = model, energyplus, reporting
     // check type
     if (_.findIndex(vm.projectMeasures, {type: project_measure.type}) != -1) {
@@ -474,9 +473,9 @@ export class ModalBclController {
     vm.$scope.downloadInProgress = true;
     vm.toastr.info('Downloading measure from the BCL...');
     vm.BCL.downloadBCLMeasure(measure).then(newMeasure => {
-      if (vm.showDebug) vm.$log.debug('In modal download()');
-      if (vm.showDebug) vm.$log.debug('new measure: ', newMeasure);
-      // if (vm.showDebug) vm.$log.debug('Local Measures, update?: ', vm.libMeasures.local);
+      if (vm.Message.showDebug()) vm.$log.debug('In modal download()');
+      if (vm.Message.showDebug()) vm.$log.debug('new measure: ', newMeasure);
+      // if (vm.Message.showDebug()) vm.$log.debug('Local Measures, update?: ', vm.libMeasures.local);
       // check for updates in case this measure is somehow already added to project
       vm.BCL.checkForUpdatesLocalBcl().then(() => {
         vm.resetFilters();
@@ -486,7 +485,7 @@ export class ModalBclController {
         vm.toastr.success('Measure Downloaded!');
         deferred.resolve('success');
       }, () => {
-        if (vm.showDebug) vm.$log.debug('Error checking for local BCL updates...');
+        if (vm.Message.showDebug()) vm.$log.debug('Error checking for local BCL updates...');
         vm.$scope.downloadInProgress = false;
         vm.toastr.success('Measure Downloaded!');
         deferred.resolve('measure downloaded successfully but not updated');
@@ -516,13 +515,13 @@ export class ModalBclController {
   // edit My measure
   editMeasure(measure) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in EDIT MEASURE function');
+    if (vm.Message.showDebug()) vm.$log.debug('in EDIT MEASURE function');
     console.log(measure.measure_dir + '/measure.rb');
     // show toastr for 2 seconds then open file
     const msg = 'Measure \'' + measure.name + '\' will open in a text editor for editing.';
     vm.toastr.info(msg, {
       timeOut: 3000, onHidden: function () {
-        //if (vm.showDebug) vm.$log.debug('Opening measure file');
+        //if (vm.Message.showDebug()) vm.$log.debug('Opening measure file');
         vm.shell.openItem(measure.measure_dir + '/measure.rb');
       }
     });
@@ -533,7 +532,7 @@ export class ModalBclController {
     const vm = this;
     const deferred = vm.$q.defer();
     const originalStatus = angular.copy(measure.status);
-    if (vm.showDebug) vm.$log.debug('in UPDATE LOCAL BCL MEASURE function');
+    if (vm.Message.showDebug()) vm.$log.debug('in UPDATE LOCAL BCL MEASURE function');
 
     // delete from disk first
     vm.jetpack.remove(measure.measure_dir);
@@ -564,7 +563,7 @@ export class ModalBclController {
   updateProjectMeasure(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    if (vm.showDebug) vm.$log.debug('in UPDATE PROJECT MEASURE function');
+    if (vm.Message.showDebug()) vm.$log.debug('in UPDATE PROJECT MEASURE function');
 
     // delete old directory first (in projectMeasures)
     const dirNames = _.split(measure.measure_dir, '/');
@@ -582,19 +581,19 @@ export class ModalBclController {
     // retrieve newly copied measure data (with calculated arguments)
     vm.MeasureManager.computeArguments(vm.projectDir.path(dirName), osmPath).then((newMeasure) => {
       // success
-      // if (vm.showDebug) vm.$log.debug('New computed measure: ', newMeasure);
+      // if (vm.Message.showDebug()) vm.$log.debug('New computed measure: ', newMeasure);
       // merge project measure in array to preserve prepareMeasure arguments and already-set arguments
       // get ALL project_measures that match the UID and the location (my vs local)
       const project_measures = _.filter(vm.projectMeasures, {uid: measure.uid, location: measure.location});
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
-      if (vm.showDebug) vm.$log.debug('Project Measures to Update: ', project_measures);
+      if (vm.Message.showDebug()) vm.$log.debug('Project Measures to Update: ', project_measures);
       _.forEach(project_measures, (project_measure) => {
         _.forEachRight(project_measure.arguments, (arg, index) => {
           if (_.isUndefined(arg.specialRowId)) {
             const match = _.find(measure.arguments, {name: arg.name});
             if (_.isUndefined(match)) {
               project_measure.arguments.splice(index, 1);
-              // if (vm.showDebug) vm.$log.debug('removing argument: ', arg.name);
+              // if (vm.Message.showDebug()) vm.$log.debug('removing argument: ', arg.name);
             }
           }
         });
@@ -602,12 +601,12 @@ export class ModalBclController {
         _.forEach(newMeasure.arguments, (arg) => {
           const match = _.find(project_measure.arguments, {name: arg.name});
           if (_.isUndefined(match)) {
-            // if (vm.showDebug) vm.$log.debug('adding argument: ', arg.name);
+            // if (vm.Message.showDebug()) vm.$log.debug('adding argument: ', arg.name);
             project_measure.arguments.push(arg);
           } else {
-            // if (vm.showDebug) vm.$log.debug('merging argument: ', arg.name);
+            // if (vm.Message.showDebug()) vm.$log.debug('merging argument: ', arg.name);
             _.merge(match, arg);
-            // if (vm.showDebug) vm.$log.debug('merged match: ', match);
+            // if (vm.Message.showDebug()) vm.$log.debug('merged match: ', match);
           }
         });
         // unset 'update' status on original measure
@@ -619,7 +618,7 @@ export class ModalBclController {
         _.assignIn(project_measure, measure_copy);
 
         const msg = 'Measure \'' + project_measure.display_name + '\' was successfully updated in your project.';
-        if (vm.showDebug) vm.$log.debug('updated project measure: ', project_measure);
+        if (vm.Message.showDebug()) vm.$log.debug('updated project measure: ', project_measure);
         vm.toastr.success(msg);
       });
 
@@ -627,7 +626,7 @@ export class ModalBclController {
 
     }, () => {
       // failure
-      //if (vm.showDebug) vm.$log.debug('Measure Manager computeArguments failed');
+      //if (vm.Message.showDebug()) vm.$log.debug('Measure Manager computeArguments failed');
       deferred.reject();
     });
 
@@ -637,7 +636,7 @@ export class ModalBclController {
   // update button
   updateAMeasure(measure) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in Update A Measure function');
+    if (vm.Message.showDebug()) vm.$log.debug('in Update A Measure function');
     //const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
@@ -663,7 +662,7 @@ export class ModalBclController {
         vm.updateLocalBCLMeasure(measure, true);
 
       } else {
-        if (vm.showDebug) vm.$log.debug('Invalid action in modal');
+        if (vm.Message.showDebug()) vm.$log.debug('Invalid action in modal');
       }
     });
   }
@@ -671,7 +670,7 @@ export class ModalBclController {
   // copy from local and edit (2X)
   copyAndEditMeasure(measure) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in COPY AND EDIT function');
+    if (vm.Message.showDebug()) vm.$log.debug('in COPY AND EDIT function');
     const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
@@ -689,7 +688,7 @@ export class ModalBclController {
     modalInstance.result.then((params) => {
       vm.MeasureManager.duplicateMeasure(params).then((newMeasure) => {
         // success
-        if (vm.showDebug) vm.$log.debug('Measure Manager duplicateMeasure succeeded');
+        if (vm.Message.showDebug()) vm.$log.debug('Measure Manager duplicateMeasure succeeded');
         // add and prepare new measure
         newMeasure = vm.BCL.prepareMeasure(newMeasure, 'my');
         vm.libMeasures.my.push(newMeasure);
@@ -699,12 +698,12 @@ export class ModalBclController {
         deferred.resolve();
       }, () => {
         // failure
-        if (vm.showDebug) vm.$log.debug('Measure Manager duplicateMeasure failed');
+        if (vm.Message.showDebug()) vm.$log.debug('Measure Manager duplicateMeasure failed');
         deferred.reject();
       });
     }, () => {
       // Modal canceled
-      if (vm.showDebug) vm.$log.debug('DuplicateMeasure Modal was canceled');
+      if (vm.Message.showDebug()) vm.$log.debug('DuplicateMeasure Modal was canceled');
       deferred.reject();
     });
 
@@ -715,7 +714,7 @@ export class ModalBclController {
     const vm = this;
     // save pretty options in case changes were made to project measures
     vm.Project.savePrettyOptions();
-    if (vm.showDebug) vm.$log.debug('Project Measures: ', vm.projectMeasures);
+    if (vm.Message.showDebug()) vm.$log.debug('Project Measures: ', vm.projectMeasures);
     vm.$uibModalInstance.close();
   }
 
@@ -725,7 +724,7 @@ export class ModalBclController {
 
   createNewMeasure() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('ModalBCL::createNewMeasure');
+    if (vm.Message.showDebug()) vm.$log.debug('ModalBCL::createNewMeasure');
 
     const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({
@@ -737,7 +736,7 @@ export class ModalBclController {
       resolve: {
         measure: function () {
           const bclCategories = vm.BCL.getBCLCategories();
-          if (vm.showDebug) vm.$log.debug('bclCategories: ', bclCategories);
+          if (vm.Message.showDebug()) vm.$log.debug('bclCategories: ', bclCategories);
         }
       }
     });
@@ -745,7 +744,7 @@ export class ModalBclController {
     modalInstance.result.then((params) => {
       vm.MeasureManager.createNewMeasure(params).then((newMeasure) => {
         // success
-        if (vm.showDebug) vm.$log.debug('ModalBclController::createNewMeasure succeeded');
+        if (vm.Message.showDebug()) vm.$log.debug('ModalBclController::createNewMeasure succeeded');
         // add and prepare new measure
         newMeasure = vm.BCL.prepareMeasure(newMeasure, 'my');
         vm.libMeasures.my.push(newMeasure);
@@ -756,12 +755,12 @@ export class ModalBclController {
         deferred.resolve();
       }, () => {
         // failure
-        if (vm.showDebug) vm.$log.debug('ModalBclController::createNewMeasure failed');
+        if (vm.Message.showDebug()) vm.$log.debug('ModalBclController::createNewMeasure failed');
         deferred.reject();
       });
     }, () => {
       // Modal canceled
-      if (vm.showDebug) vm.$log.debug('ModalBclController::createNewMeasure was canceled');
+      if (vm.Message.showDebug()) vm.$log.debug('ModalBclController::createNewMeasure was canceled');
       deferred.reject();
     });
 

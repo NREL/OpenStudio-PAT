@@ -6,7 +6,7 @@ import path from 'path';
 const {dialog} = remote;
 
 export class SetProject {
-  constructor($q, $log, $state, $uibModal, Project, OsServer, BCL, toastr) {
+  constructor($q, $log, $state, $uibModal, Project, OsServer, BCL, toastr, Message) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
@@ -21,13 +21,15 @@ export class SetProject {
     vm.$state = $state;
     vm.newProjectName = null;
     vm.toastr = toastr;
+    vm.Message = Message;
+
     // This bool is used to reduce the number of debug messages given the typical, non-developer user
     vm.showDebug = false;
   }
 
   saveProject() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('saveProject');
+    if (vm.Message.showDebug()) vm.$log.debug('saveProject');
     if (vm.Project.projectDir != undefined) {
       vm.Project.exportPAT();
       vm.toastr.success('Project Saved!');
@@ -38,14 +40,14 @@ export class SetProject {
 
   saveAsProject() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('saveAsProject');
+    if (vm.Message.showDebug()) vm.$log.debug('saveAsProject');
     const deferred = vm.$q.defer();
 
     const oldProjectName = vm.Project.projectName;
 
     // pop modal to get new project name
     vm.openModal().then(response => {
-      if (vm.showDebug) vm.$log.debug('response:', response);
+      if (vm.Message.showDebug()) vm.$log.debug('response:', response);
 
       // pop modal to allow user to navigate to project parent folder
       const result = vm.dialog.showOpenDialog({
@@ -63,7 +65,7 @@ export class SetProject {
         let currentDir = projectDir;
         while (!fileExists && !atRoot && count < maxDirectoriesToCheck) {
           const fullFilename = currentDir.path('pat.json');
-          if (vm.showDebug) vm.$log.debug('checking for ', fullFilename);
+          if (vm.Message.showDebug()) vm.$log.debug('checking for ', fullFilename);
           const file = vm.jetpack.read(fullFilename);
           if (typeof file !== 'undefined') {
             fileExists = true;
@@ -116,9 +118,9 @@ export class SetProject {
             // start server at new location
             vm.toastr.info('Starting Local Server...This make take a while.');
             vm.OsServer.startServer().then(response => {
-              if (vm.showDebug) vm.$log.debug('setProjectService::start server: server started');
-              if (vm.showDebug) vm.$log.debug('response: ', response);
-              if (vm.showDebug) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+              if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
+              if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
+              if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
             });
 
           }, (error) => {
@@ -144,9 +146,9 @@ export class SetProject {
             // start server at new location
             vm.toastr.info('Starting Local Server...This make take a while.');
             vm.OsServer.startServer().then(response => {
-              if (vm.showDebug) vm.$log.debug('setProjectService::start server: server started');
-              if (vm.showDebug) vm.$log.debug('response: ', response);
-              if (vm.showDebug) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+              if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
+              if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
+              if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
             });
 
             deferred.resolve('resolve');
@@ -161,12 +163,12 @@ export class SetProject {
 
   newProject() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('newProject');
+    if (vm.Message.showDebug()) vm.$log.debug('newProject');
     const deferred = vm.$q.defer();
 
     // pop modal to get new project name
     vm.openModal().then(response => {
-      if (vm.showDebug) vm.$log.debug('newProject response:', response);
+      if (vm.Message.showDebug()) vm.$log.debug('newProject response:', response);
 
       // pop modal to allow user to navigate to project parent folder
       const result = vm.dialog.showOpenDialog({
@@ -184,7 +186,7 @@ export class SetProject {
         let currentDir = projectDir;
         while (!fileExists && !atRoot && count < maxDirectoriesToCheck) {
           const fullFilename = currentDir.path('pat.json');
-          if (vm.showDebug) vm.$log.debug('checking for ', fullFilename);
+          if (vm.Message.showDebug()) vm.$log.debug('checking for ', fullFilename);
           const file = vm.jetpack.read(fullFilename);
           if (typeof file !== 'undefined') {
             fileExists = true;
@@ -232,9 +234,9 @@ export class SetProject {
             // start local server at new location
             vm.toastr.info('Starting Local Server...This make take a while.');
             vm.OsServer.startServer().then(response => {
-              if (vm.showDebug) vm.$log.debug('setProjectService::start server: server started');
-              if (vm.showDebug) vm.$log.debug('response: ', response);
-              if (vm.showDebug) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+              if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
+              if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
+              if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
             });
 
           }, (error) => {
@@ -258,7 +260,7 @@ export class SetProject {
 
   openProject() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('openProject');
+    if (vm.Message.showDebug()) vm.$log.debug('openProject');
     const deferred = vm.$q.defer();
 
     const result = vm.dialog.showOpenDialog({
@@ -268,7 +270,7 @@ export class SetProject {
 
     if (!_.isEmpty(result)) {
       const projectDir = jetpack.cwd(result[0]);
-      if (vm.showDebug) vm.$log.debug('PAT Project dir path:', projectDir.path());
+      if (vm.Message.showDebug()) vm.$log.debug('PAT Project dir path:', projectDir.path());
 
       // if (projectDir.path().indexOf(' ') >= 0) {
       //   // tell user to expect trouble
@@ -280,9 +282,9 @@ export class SetProject {
 
       // projectDir must contain "pat.json"
       let fileExists = false;
-      if (vm.showDebug) vm.$log.debug('checking for ', fullFilename);
+      if (vm.Message.showDebug()) vm.$log.debug('checking for ', fullFilename);
       const file = vm.jetpack.read(fullFilename);
-      //if (vm.showDebug) vm.$log.debug('file: ', file);
+      //if (vm.Message.showDebug()) vm.$log.debug('file: ', file);
       if (typeof file !== 'undefined') {
         vm.$log.debug(fullFilename, ' found');
         fileExists = true;
@@ -290,8 +292,8 @@ export class SetProject {
         vm.$log.debug(fullFilename, ' not found');
         const allOSPs = vm.jetpack.find(projectDir.path(), {matching: '*.osp', recursive: false});
         if (allOSPs.length > 0) {
-          if (vm.showDebug) vm.$log.debug('found osp in openProject');
-          if (vm.showDebug) vm.$log.debug('path: ', projectDir.path());
+          if (vm.Message.showDebug()) vm.$log.debug('found osp in openProject');
+          if (vm.Message.showDebug()) vm.$log.debug('path: ', projectDir.path());
           vm.dialog.showMessageBox({
             type: 'info',
             buttons: ['OK'],
@@ -311,7 +313,7 @@ export class SetProject {
 
       if (fileExists) {
         // wait until server is stopped and new project set before closing modal
-        if (vm.showDebug) vm.$log.debug('fileExists!');
+        if (vm.Message.showDebug()) vm.$log.debug('fileExists!');
         vm.OsServer.stopServer('local').then(response => {
           vm.$log.info('SetProjectService::stop server: server stopped');
           vm.$log.info('response: ', response);
@@ -330,9 +332,9 @@ export class SetProject {
           // start local server at new location
           vm.toastr.info('Starting Local Server...This make take a while.');
           vm.OsServer.startServer().then(response => {
-            if (vm.showDebug) vm.$log.debug('setProjectService::start server: server started');
-            if (vm.showDebug) vm.$log.debug('response: ', response);
-            if (vm.showDebug) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+            if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
+            if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
+            if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
           });
 
         }, (error) => {
@@ -354,7 +356,7 @@ export class SetProject {
   openModal() {
     const vm = this;
     const deferred = vm.$q.defer();
-    if (vm.showDebug) vm.$log.debug('setProject::openModal');
+    if (vm.Message.showDebug()) vm.$log.debug('setProject::openModal');
 
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
@@ -364,7 +366,7 @@ export class SetProject {
     });
 
     modalInstance.result.then(() => {
-      if (vm.showDebug) vm.$log.debug('Resolving openModal()');
+      if (vm.Message.showDebug()) vm.$log.debug('Resolving openModal()');
       deferred.resolve('resolved');
     }, () => {
       // Modal canceled
@@ -376,7 +378,7 @@ export class SetProject {
   nestedProjectModal() {
     const vm = this;
     const deferred = vm.$q.defer();
-    if (vm.showDebug) vm.$log.debug('setProject::nestedProjectModal');
+    if (vm.Message.showDebug()) vm.$log.debug('setProject::nestedProjectModal');
 
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
@@ -386,7 +388,7 @@ export class SetProject {
     });
 
     modalInstance.result.then(() => {
-      if (vm.showDebug) vm.$log.debug('Resolving whitespaceModal()');
+      if (vm.Message.showDebug()) vm.$log.debug('Resolving whitespaceModal()');
       deferred.resolve('resolved');
     }, () => {
       // Modal canceled
@@ -398,7 +400,7 @@ export class SetProject {
   whitespaceModal() {
     const vm = this;
     const deferred = vm.$q.defer();
-    if (vm.showDebug) vm.$log.debug('setProject::whitespaceModal');
+    if (vm.Message.showDebug()) vm.$log.debug('setProject::whitespaceModal');
 
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
@@ -408,7 +410,7 @@ export class SetProject {
     });
 
     modalInstance.result.then(() => {
-      if (vm.showDebug) vm.$log.debug('Resolving whitespaceModal()');
+      if (vm.Message.showDebug()) vm.$log.debug('Resolving whitespaceModal()');
       deferred.resolve('resolved');
     }, () => {
       // Modal canceled

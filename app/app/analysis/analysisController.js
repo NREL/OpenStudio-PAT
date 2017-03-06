@@ -5,7 +5,7 @@ const {dialog} = remote;
 
 export class AnalysisController {
 
-  constructor($log, $q, BCL, Project, $scope, $document, $uibModal, toastr) {
+  constructor($log, $q, BCL, Project, $scope, $document, $uibModal, toastr, Message) {
     'ngInject';
 
     const vm = this;
@@ -20,8 +20,7 @@ export class AnalysisController {
     vm.BCL = BCL;
     vm.dialog = dialog;
     vm.shell = shell;
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
 
     vm.analysisTypes = vm.Project.getAnalysisTypes();
     vm.$scope.seeds = vm.Project.getSeeds();
@@ -32,14 +31,14 @@ export class AnalysisController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.filesToInclude = vm.Project.getFilesToInclude();
     vm.$scope.serverScripts = vm.Project.getServerScripts();
-    if (vm.showDebug) vm.$log.debug('ServerScripts: ', vm.$scope.serverScripts);
+    if (vm.Message.showDebug()) vm.$log.debug('ServerScripts: ', vm.$scope.serverScripts);
 
     vm.$scope.measures = vm.Project.getMeasuresAndOptions();
     _.forEach(vm.$scope.measures, (measure) => {
       if (_.isNil(measure.seed)) measure.seed = vm.$scope.defaultSeed;
     });
-    if (vm.showDebug) if (vm.showDebug) vm.$log.debug('****ANALYSIS TAB****');
-    if (vm.showDebug) vm.$log.debug('ANALYSIS MEASURES RETRIEVED: ', vm.$scope.measures);
+    if (vm.Message.showDebug()) if (vm.Message.showDebug()) vm.$log.debug('****ANALYSIS TAB****');
+    if (vm.Message.showDebug()) vm.$log.debug('ANALYSIS MEASURES RETRIEVED: ', vm.$scope.measures);
 
     vm.$scope.osMeasures = [];
     vm.$scope.epMeasures = [];
@@ -70,7 +69,7 @@ export class AnalysisController {
     //vm.initializeValues();
 
     vm.$scope.getVariableSettings = function (argument) {
-      //if (vm.showDebug) vm.$log.debug('In getVariableSettings');
+      //if (vm.Message.showDebug()) vm.$log.debug('In getVariableSettings');
       let settings = [];
       if (argument.type === 'Double') {
         settings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
@@ -81,7 +80,7 @@ export class AnalysisController {
     };
 
     vm.$scope.getDistributions = function (argument) {
-      //if (vm.showDebug) vm.$log.debug('In getDistributions');
+      //if (vm.Message.showDebug()) vm.$log.debug('In getDistributions');
       let distributions = [];
       switch (vm.$scope.selectedSamplingMethod.id) {
         case 'SPEA2':
@@ -102,7 +101,7 @@ export class AnalysisController {
     };
 
     vm.$scope.getDiscreteDistributions = function () {
-      //if (vm.showDebug) vm.$log.debug('In get Discrete Distributions');
+      //if (vm.Message.showDebug()) vm.$log.debug('In get Discrete Distributions');
       let distributions = [];
       switch (vm.$scope.selectedSamplingMethod.id) {
         case 'Diagonal':
@@ -118,7 +117,7 @@ export class AnalysisController {
 
   initializeTab() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In initializeTab in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('In initializeTab in analysis');
     // group by type
     vm.initializeInstanceID();
     vm.setMeasureTypes();
@@ -157,24 +156,24 @@ export class AnalysisController {
 
   getDefaultOptionColDef() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('AnalysisController getDefaultOptionColDef');
+    if (vm.Message.showDebug()) vm.$log.debug('AnalysisController getDefaultOptionColDef');
     return {
       display_name: 'Option 1',
       field: 'option_1',
       editDropdownOptionsFunction: function (rowEntity, colDef) {
         if (rowEntity.type === 'Choice') {
-          //if (vm.showDebug) vm.$log.debug('rowEntity: ', rowEntity);
-          //if (vm.showDebug) vm.$log.debug('colDef: ', colDef);
+          //if (vm.Message.showDebug()) vm.$log.debug('rowEntity: ', rowEntity);
+          //if (vm.Message.showDebug()) vm.$log.debug('colDef: ', colDef);
           vm.choices = [];
           _.forEach(rowEntity.choice_display_names
             , (choice) => {
-              if (vm.showDebug) vm.$log.debug('choice: ', choice);
+              if (vm.Message.showDebug()) vm.$log.debug('choice: ', choice);
               vm.choices.push({
                 id: choice,
                 value: choice
               });
             });
-          if (vm.showDebug) vm.$log.debug('vm.choices: ', vm.choices);
+          if (vm.Message.showDebug()) vm.$log.debug('vm.choices: ', vm.choices);
           return vm.choices;
         }
       },
@@ -199,10 +198,10 @@ export class AnalysisController {
 
   setGridOptions() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in setGridOptions');
+    if (vm.Message.showDebug()) vm.$log.debug('in setGridOptions');
 
     _.forEach(vm.$scope.measures, (measure) => {
-      if (vm.showDebug) vm.$log.debug('measure: ', measure);
+      if (vm.Message.showDebug()) vm.$log.debug('measure: ', measure);
 
       // set number of options in measure
 
@@ -273,14 +272,14 @@ export class AnalysisController {
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.instanceId] = gridApi;
           gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
-            if (vm.showDebug) vm.$log.debug('HI!');
+            if (vm.Message.showDebug()) vm.$log.debug('HI!');
             if (newValue != oldValue) {
-              // if (vm.showDebug) vm.$log.debug('CELL has changed in: ', measure.instanceId, ' old val: ', oldValue, ' new val: ', newValue);
-              if (vm.showDebug) vm.$log.debug('rowEntity: ', rowEntity);
+              // if (vm.Message.showDebug()) vm.$log.debug('CELL has changed in: ', measure.instanceId, ' old val: ', oldValue, ' new val: ', newValue);
+              if (vm.Message.showDebug()) vm.$log.debug('rowEntity: ', rowEntity);
               vm.updateDASelectedName(measure, oldValue, newValue);
 
               // TODO: figure out if there are datapoints to mark as modified
-              if (vm.showDebug) vm.$log.debug('colDef: ', colDef);
+              if (vm.Message.showDebug()) vm.$log.debug('colDef: ', colDef);
               vm.updateDatapoints(measure, colDef.name, rowEntity);
 
             }
@@ -292,9 +291,9 @@ export class AnalysisController {
 
   updateDatapoints(measure, colName, rowEntity) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in update datapoints...colname: ', colName, ' measure name: ', measure.name);
+    if (vm.Message.showDebug()) vm.$log.debug('in update datapoints...colname: ', colName, ' measure name: ', measure.name);
     if (colName == 'display_name_short') {
-      if (vm.showDebug) vm.$log.debug('display name short has changed, update all DAs that use this measure');
+      if (vm.Message.showDebug()) vm.$log.debug('display name short has changed, update all DAs that use this measure');
       _.forEach(vm.designAlternatives, (alt) => {
         if (alt[measure.name] || alt[measure.name] != 'None') {
           // DA has this measure selected, mark datapoint
@@ -306,9 +305,9 @@ export class AnalysisController {
       });
     } else {
       const optionKey = measure.arguments[1][colName];
-      if (vm.showDebug) vm.$log.debug('optionKey: ', optionKey);
+      if (vm.Message.showDebug()) vm.$log.debug('optionKey: ', optionKey);
       _.forEach(vm.designAlternatives, (alt) => {
-        if (vm.showDebug) vm.$log.debug('alt[measure.name]: ', alt[measure.name]);
+        if (vm.Message.showDebug()) vm.$log.debug('alt[measure.name]: ', alt[measure.name]);
         if (alt[measure.name] == optionKey) {
           const match = _.find(vm.datapoints, {name: alt.name});
           if (match) {
@@ -381,11 +380,11 @@ export class AnalysisController {
   // When an option is deleted, reset DAs that were using the option
   unsetOptionInDA(instanceId, value) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In Analysis::unsetOptionInDA');
-    if (vm.showDebug) vm.$log.debug('DAs: ', vm.designAlternatives);
-    if (vm.showDebug) vm.$log.debug('instanceId: ', instanceId, ' optionName: ', value);
+    if (vm.Message.showDebug()) vm.$log.debug('In Analysis::unsetOptionInDA');
+    if (vm.Message.showDebug()) vm.$log.debug('DAs: ', vm.designAlternatives);
+    if (vm.Message.showDebug()) vm.$log.debug('instanceId: ', instanceId, ' optionName: ', value);
     const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
-    if (vm.showDebug) vm.$log.debug('measure: ', measure);
+    if (vm.Message.showDebug()) vm.$log.debug('measure: ', measure);
     if (measure) {
       _.forEach(vm.designAlternatives, (alt) => {
         if (alt[measure.name] && alt[measure.name] == value) {
@@ -410,7 +409,7 @@ export class AnalysisController {
     vm.setIsModified();
     vm.updateAlternatives(measure.name);
 
-    if (vm.showDebug) vm.$log.debug('Deleting measure: ', measure);
+    if (vm.Message.showDebug()) vm.$log.debug('Deleting measure: ', measure);
 
     // line below also removes it from bclService 'getProjectMeasures'
     _.remove(vm.$scope.measures, {instanceId: measure.instanceId});
@@ -436,29 +435,29 @@ export class AnalysisController {
   addMeasureOption(measure) {
     const vm = this;
     vm.setIsModified();
-    if (vm.showDebug) vm.$log.debug('In addMeasureOption in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('In addMeasureOption in analysis');
 
     if (measure.arguments.length === 0) return; // Nothing to see here
 
     const keys = Object.keys(measure.arguments[0]);
-    if (vm.showDebug) vm.$log.debug('keys: ', keys);
+    if (vm.Message.showDebug()) vm.$log.debug('keys: ', keys);
 
     measure.numberOfOptions++;
 
     const optionKeys = _.filter(keys, function (k) {
       return k.indexOf('option_') !== -1;
     });
-    //if (vm.showDebug) vm.$log.debug('option keys: ', optionKeys);
+    //if (vm.Message.showDebug()) vm.$log.debug('option keys: ', optionKeys);
 
     let max = 0;
     _.forEach(optionKeys, (key) => {
-      //if (vm.showDebug) vm.$log.debug('key: ', key);
+      //if (vm.Message.showDebug()) vm.$log.debug('key: ', key);
       const num = Number(key.split('_')[1]);
       if (num > max) {
         max = num;
       }
     });
-    if (vm.showDebug) vm.$log.debug('max: ', max);
+    if (vm.Message.showDebug()) vm.$log.debug('max: ', max);
 
     // start from first option
     const opt = vm.getDefaultOptionColDef();
@@ -496,7 +495,7 @@ export class AnalysisController {
 
   deleteSelectedOption(measure) { // TODO is this dead code? Evan
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In deleteSelectedOption in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('In deleteSelectedOption in analysis');
     vm.setIsModified();
     if (measure.numberOfOptions > 0) {
       measure.numberOfOptions -= 1;
@@ -506,27 +505,27 @@ export class AnalysisController {
 
   deleteOption(col) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In deleteOption in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('In deleteOption in analysis');
     vm.setIsModified();
-    if (vm.showDebug) vm.$log.debug('col: ', col);
+    if (vm.Message.showDebug()) vm.$log.debug('col: ', col);
 
     const optionCount = Number(col.field.split('_')[1]);
-    if (vm.showDebug) vm.$log.debug('optionCount: ', optionCount);
+    if (vm.Message.showDebug()) vm.$log.debug('optionCount: ', optionCount);
     const instanceId = col.colDef.instanceId;
-    if (vm.showDebug) vm.$log.debug('instanceId: ', instanceId);
+    if (vm.Message.showDebug()) vm.$log.debug('instanceId: ', instanceId);
 
     // get option name before deleting it
-    if (vm.showDebug) vm.$log.debug('OPTION NAME? ', col.grid.options.data[1][col.name]);
+    if (vm.Message.showDebug()) vm.$log.debug('OPTION NAME? ', col.grid.options.data[1][col.name]);
     const optionName = col.grid.options.data[1][col.name];
 
     let columnIndex = 0;
     _.forEach((vm.$scope.gridOptions[instanceId]).columnDefs, (columnDef) => {
       if (_.has(columnDef, 'field')) {
         const optionCount2 = Number(columnDef.field.split('_')[1]);
-        if (vm.showDebug) vm.$log.debug('columnDef.field: ', columnDef.field);
+        if (vm.Message.showDebug()) vm.$log.debug('columnDef.field: ', columnDef.field);
         if (optionCount === optionCount2) {
-          if (vm.showDebug) vm.$log.debug('SUCCESS');
-          if (vm.showDebug) vm.$log.debug('columnIndex: ', columnIndex);
+          if (vm.Message.showDebug()) vm.$log.debug('SUCCESS');
+          if (vm.Message.showDebug()) vm.$log.debug('columnIndex: ', columnIndex);
           vm.$scope.gridOptions[instanceId].columnDefs.splice(columnIndex, 1);
         }
       }
@@ -548,22 +547,22 @@ export class AnalysisController {
 
   variableCheckboxChanged(row, col) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In variableCheckboxChanged in analysis');
-    //if (vm.showDebug) vm.$log.debug('row', row);
-    //if (vm.showDebug) vm.$log.debug('col', col);
+    if (vm.Message.showDebug()) vm.$log.debug('In variableCheckboxChanged in analysis');
+    //if (vm.Message.showDebug()) vm.$log.debug('row', row);
+    //if (vm.Message.showDebug()) vm.$log.debug('col', col);
     vm.setIsModified();
 
     const instanceId = col.colDef.instanceId;
-    //if (vm.showDebug) vm.$log.debug('instanceId: ', instanceId);
+    //if (vm.Message.showDebug()) vm.$log.debug('instanceId: ', instanceId);
 
     const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
-    //if (vm.showDebug) vm.$log.debug('measure: ', measure);
+    //if (vm.Message.showDebug()) vm.$log.debug('measure: ', measure);
 
     const display_name = row.entity.display_name;
-    //if (vm.showDebug) vm.$log.debug('display_name: ', display_name);
+    //if (vm.Message.showDebug()) vm.$log.debug('display_name: ', display_name);
 
     const variable = row.entity.variable;
-    //if (vm.showDebug) vm.$log.debug('variable: ', variable);
+    //if (vm.Message.showDebug()) vm.$log.debug('variable: ', variable);
 
     if (!variable) {
       for (let i = 0; i < measure.arguments.length; i++) {
@@ -573,8 +572,8 @@ export class AnalysisController {
             return k.indexOf('option_') !== -1;
           });
           for (let j = 1; j < optionKeys.length; j++) {
-            //if (vm.showDebug) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[j]]);
-            //if (vm.showDebug) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[0]]);
+            //if (vm.Message.showDebug()) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[j]]);
+            //if (vm.Message.showDebug()) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[0]]);
             measure.arguments[i][optionKeys[j]] = measure.arguments[i][optionKeys[0]];
           }
           break;
@@ -586,7 +585,7 @@ export class AnalysisController {
 
   optionCheckboxChanged() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In optionCheckboxChanged in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('In optionCheckboxChanged in analysis');
     vm.setIsModified();
 
     //vm.$scope.$broadcast('uiGridEventEndCellEdit'); Note: this causes page to jump to bottom, and is visually unacceptable (Evan)
@@ -594,19 +593,19 @@ export class AnalysisController {
 
   allVariableCheckboxesChanged(row, col) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In allVariableCheckboxesChanged in analysis');
-    //if (vm.showDebug) vm.$log.debug('row', row);
-    //if (vm.showDebug) vm.$log.debug('col', col);
+    if (vm.Message.showDebug()) vm.$log.debug('In allVariableCheckboxesChanged in analysis');
+    //if (vm.Message.showDebug()) vm.$log.debug('row', row);
+    //if (vm.Message.showDebug()) vm.$log.debug('col', col);
     vm.setIsModified();
 
     const instanceId = col.colDef.instanceId;
-    //if (vm.showDebug) vm.$log.debug('instanceId: ', instanceId);
+    //if (vm.Message.showDebug()) vm.$log.debug('instanceId: ', instanceId);
 
     const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
-    //if (vm.showDebug) vm.$log.debug('measure: ', measure);
+    //if (vm.Message.showDebug()) vm.$log.debug('measure: ', measure);
 
     const variable = row.entity.variable;
-    //if (vm.showDebug) vm.$log.debug('variable: ', variable);
+    //if (vm.Message.showDebug()) vm.$log.debug('variable: ', variable);
 
     if (!variable) {
       // Dont change the first 3 rows regarding naming
@@ -616,8 +615,8 @@ export class AnalysisController {
           return k.indexOf('option_') !== -1;
         });
         for (let j = 1; j < optionKeys.length; j++) {
-          //if (vm.showDebug) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[j]]);
-          //if (vm.showDebug) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[0]]);
+          //if (vm.Message.showDebug()) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[j]]);
+          //if (vm.Message.showDebug()) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[0]]);
           measure.arguments[i][optionKeys[j]] = measure.arguments[i][optionKeys[0]];
         }
       }
@@ -656,18 +655,18 @@ export class AnalysisController {
 
   editOptionDescription(col, row) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('Analysis::editOptionDescription');
-    //if (vm.showDebug) vm.$log.debug('col', col);
-    //if (vm.showDebug) vm.$log.debug('row', row);
+    if (vm.Message.showDebug()) vm.$log.debug('Analysis::editOptionDescription');
+    //if (vm.Message.showDebug()) vm.$log.debug('col', col);
+    //if (vm.Message.showDebug()) vm.$log.debug('row', row);
 
     const field = col.colDef.field;
-    //if (vm.showDebug) vm.$log.debug('field', field);
+    //if (vm.Message.showDebug()) vm.$log.debug('field', field);
 
     const instanceId = col.colDef.instanceId;
-    //if (vm.showDebug) vm.$log.debug('instanceId: ', instanceId);
+    //if (vm.Message.showDebug()) vm.$log.debug('instanceId: ', instanceId);
 
     const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
-    //if (vm.showDebug) vm.$log.debug('measure: ', measure);
+    //if (vm.Message.showDebug()) vm.$log.debug('measure: ', measure);
 
     let idx = -1;
     for (let i = 0; i < measure.arguments.length; i++) {
@@ -678,10 +677,10 @@ export class AnalysisController {
     }
 
     const argument = measure.arguments[idx];
-    //if (vm.showDebug) vm.$log.debug('argument: ', argument);
+    //if (vm.Message.showDebug()) vm.$log.debug('argument: ', argument);
 
     const optionDescription = argument[field];
-    //if (vm.showDebug) vm.$log.debug('optionDescription: ', optionDescription);
+    //if (vm.Message.showDebug()) vm.$log.debug('optionDescription: ', optionDescription);
 
     const deferred = vm.$q.defer();
 
@@ -702,7 +701,7 @@ export class AnalysisController {
     });
 
     modalInstance.result.then((optionDescription) => {
-      //if (vm.showDebug) vm.$log.debug('optionDescription: ', optionDescription);
+      //if (vm.Message.showDebug()) vm.$log.debug('optionDescription: ', optionDescription);
       argument[field] = optionDescription;
       deferred.resolve();
     }, () => {
@@ -715,7 +714,7 @@ export class AnalysisController {
 
   duplicateOption(measure) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('Analysis::duplicateOption');
+    if (vm.Message.showDebug()) vm.$log.debug('Analysis::duplicateOption');
 
     let newOptions = false;
     vm.addOptions(measure).then(() => {
@@ -723,7 +722,7 @@ export class AnalysisController {
           if (option.checked) {
             newOptions = true;
             const opt = vm.addMeasureOption(measure);
-            if (vm.showDebug) vm.$log.debug('Duplicate ', option.name);
+            if (vm.Message.showDebug()) vm.$log.debug('Duplicate ', option.name);
             let count = 0;
             _.forEach(measure.arguments, (arg) => {
               // Don't change the first 3 rows regarding naming
@@ -738,7 +737,7 @@ export class AnalysisController {
 
   duplicateMeasureAndOption(measure) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In duplicateMeasureAndOption in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('In duplicateMeasureAndOption in analysis');
     vm.setIsModified();
 
     let copiedMeasure = angular.copy(measure);
@@ -761,9 +760,9 @@ export class AnalysisController {
 
   loadMeasureOptions() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In loadMeasureOptions in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('In loadMeasureOptions in analysis');
     _.forEach(vm.$scope.measures, (measure) => {
-      if (vm.showDebug) vm.$log.debug('measure: ', measure);
+      if (vm.Message.showDebug()) vm.$log.debug('measure: ', measure);
       // check choice arg selected values in case seed was reset
       // Note from Evan: do not uncomment the line below as it clobbers the selected dropdown values
       //vm.resetChoiceArgumentSelections(measure);
@@ -775,9 +774,9 @@ export class AnalysisController {
 
   loadOption(measure, option) {
     const vm = this;
-    //if (vm.showDebug) vm.$log.debug('In loadOption in analysis');
-    //if (vm.showDebug) vm.$log.debug('measure: ', measure);
-    //if (vm.showDebug) vm.$log.debug('option: ', option);
+    //if (vm.Message.showDebug()) vm.$log.debug('In loadOption in analysis');
+    //if (vm.Message.showDebug()) vm.$log.debug('measure: ', measure);
+    //if (vm.Message.showDebug()) vm.$log.debug('option: ', option);
     const re = /^option_(\d+)$/;
     if (re.test(option.id)) {
       const opt = vm.getDefaultOptionColDef();
@@ -793,17 +792,17 @@ export class AnalysisController {
   // reset selections (to default) when choice argument is no longer in list
   resetChoiceArgumentSelections(measure) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in resetChoiceArgumentSelections in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('in resetChoiceArgumentSelections in analysis');
     _.forEach(measure.arguments, (arg) => {
       if (arg.type == 'Choice') {
-        if (vm.showDebug) vm.$log.debug('Choice Arg: ', arg.name);
+        if (vm.Message.showDebug()) vm.$log.debug('Choice Arg: ', arg.name);
         const keys = _.keys(arg);
         const optionKeys = _.filter(keys, function (k) {
           return k.indexOf('option_') !== -1;
         });
         _.forEach(optionKeys, (key) => {
           if (_.isUndefined(_.find(arg.choice_display_names, arg[key]))) {
-            if (vm.showDebug) vm.$log.debug('Argument value ', arg[key], ' was not found in choice list...resetting to default_value');
+            if (vm.Message.showDebug()) vm.$log.debug('Argument value ', arg[key], ' was not found in choice list...resetting to default_value');
             arg[key] = arg.default_value ? arg.default_value : '';
           }
         });
@@ -813,7 +812,7 @@ export class AnalysisController {
 
   resetAllChoiceArgumentSelections() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in resetAllChoiceArgumentSelections in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('in resetAllChoiceArgumentSelections in analysis');
     _.forEach(vm.$scope.measures, (measure) => {
       vm.resetChoiceArgumentSelections(measure);
     });
@@ -821,7 +820,7 @@ export class AnalysisController {
 
   setSeed() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In Analysis::setSeed');
+    if (vm.Message.showDebug()) vm.$log.debug('In Analysis::setSeed');
     vm.setIsModified();
     vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
     _.forEach(vm.$scope.measures, (measure) => {
@@ -831,12 +830,12 @@ export class AnalysisController {
     vm.Project.savePrettyOptions();
     // recompute model-dependent measure arguments & refresh grid
     vm.Project.computeAllMeasureArguments().then(() => {
-      if (vm.showDebug) vm.$log.debug('computeAllMeasureArgs success!');
+      if (vm.Message.showDebug()) vm.$log.debug('computeAllMeasureArgs success!');
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
       vm.resetAllChoiceArgumentSelections();
       vm.initializeTab();
     }, error => {
-      if (vm.showDebug) vm.$log.debug('Error in computeALLMeasureArguments: ', error);
+      if (vm.Message.showDebug()) vm.$log.debug('Error in computeALLMeasureArguments: ', error);
     });
   }
 
@@ -848,7 +847,7 @@ export class AnalysisController {
 
   setType() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In setType in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('In setType in analysis');
     vm.setIsModified();
     vm.Project.setAnalysisType(vm.$scope.selectedAnalysisType);
 
@@ -857,21 +856,21 @@ export class AnalysisController {
 
   // setDirToInclude() {
   //   const vm = this;
-  //   if (vm.showDebug) vm.$log.debug('In setDirToInclude in analysis');
+  //   if (vm.Message.showDebug()) vm.$log.debug('In setDirToInclude in analysis');
   //   vm.setIsModified();
   //   vm.Project.setDirToInclude(vm.$scope.dirToInclude);
   // }
 
   // setDirToUnpackTo() {
   //   const vm = this;
-  //   if (vm.showDebug) vm.$log.debug('In setDirToUnpackTo in analysis');
+  //   if (vm.Message.showDebug()) vm.$log.debug('In setDirToUnpackTo in analysis');
   //   vm.setIsModified();
   //   vm.Project.setDirToUnpackTo(vm.$scope.dirToUnpackTo);
   // }
 
   setSamplingMethod() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In setSamplingMethod in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('In setSamplingMethod in analysis');
     vm.setIsModified();
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
     vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
@@ -899,14 +898,14 @@ export class AnalysisController {
   // compute measure arguments when setting the seed
   computeMeasureArguments(measure) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In computeMeasureArguments in analysis');
+    if (vm.Message.showDebug()) vm.$log.debug('In computeMeasureArguments in analysis');
     vm.setIsModified();
     vm.Project.computeMeasureArguments(measure).then(response => {
       // get updated measure and set
-      if (vm.showDebug) vm.$log.debug('Success!');
+      if (vm.Message.showDebug()) vm.$log.debug('Success!');
       measure = response;
-      if (vm.showDebug) vm.$log.debug('Analysis Tab, new computed measure: ', angular.copy(measure));
-      if (vm.showDebug) vm.$log.debug('Scope measures: ', vm.$scope.measures);
+      if (vm.Message.showDebug()) vm.$log.debug('Analysis Tab, new computed measure: ', angular.copy(measure));
+      if (vm.Message.showDebug()) vm.$log.debug('Scope measures: ', vm.$scope.measures);
       vm.initializeTab();
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
     }, error => {
@@ -923,7 +922,7 @@ export class AnalysisController {
     });
 
     if (!_.isEmpty(result)) {
-      if (vm.showDebug) vm.$log.debug(' result[0]:', result[0]);
+      if (vm.Message.showDebug()) vm.$log.debug(' result[0]:', result[0]);
       file.dirToInclude = result[0];
       vm.setIsModified();
     }
@@ -931,18 +930,18 @@ export class AnalysisController {
 
   addDirToInclude() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In analysis::addDirToInclude');
+    if (vm.Message.showDebug()) vm.$log.debug('In analysis::addDirToInclude');
     vm.$scope.filesToInclude.push({dirToInclude: null, unpackDirName: null});
-    if (vm.showDebug) vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
+    if (vm.Message.showDebug()) vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
   }
 
   deleteDirToInclude(index) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In analysis::deleteDirToInclude, remove at index: ', index);
+    if (vm.Message.showDebug()) vm.$log.debug('In analysis::deleteDirToInclude, remove at index: ', index);
     if (!_.isNil(index)) {
       vm.$scope.filesToInclude.splice(index, 1);
     }
-    if (vm.showDebug) vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
+    if (vm.Message.showDebug()) vm.$log.debug('Files to Include Array: ', vm.$scope.filesToInclude);
   }
 
   selectScript(type) {
@@ -954,13 +953,13 @@ export class AnalysisController {
 
     if (!_.isEmpty(result)) {
       const scriptPath = result[0];
-      if (vm.showDebug) vm.$log.debug('script path:', scriptPath);
+      if (vm.Message.showDebug()) vm.$log.debug('script path:', scriptPath);
       const scriptFilename = scriptPath.replace(/^.*[\\\/]/, '');
       // ensure appropriate folders exist
       vm.jetpack.dir(vm.Project.getProjectDir().path('scripts', type));
       // copy/overwrite
       vm.jetpack.copy(scriptPath, vm.Project.getProjectDir().path('scripts', type, scriptFilename), {overwrite: true});
-      if (vm.showDebug) vm.$log.debug('Script filename: ', scriptFilename);
+      if (vm.Message.showDebug()) vm.$log.debug('Script filename: ', scriptFilename);
       // update project
       vm.$scope.serverScripts[type].file = scriptFilename;
       vm.setIsModified();
@@ -980,11 +979,11 @@ export class AnalysisController {
   deleteScriptArgument(type, index) {
     const vm = this;
     vm.$log.debug('deleting at index: ', index);
-    if (vm.showDebug) vm.$log.debug('arguments: ', vm.$scope.serverScripts[type].arguments);
+    if (vm.Message.showDebug()) vm.$log.debug('arguments: ', vm.$scope.serverScripts[type].arguments);
     if (!_.isNil(index)) {
       vm.$scope.serverScripts[type].arguments.splice(index, 1);
     }
-    if (vm.showDebug) vm.$log.debug('New Arguments for type: ', type, ' are: ', vm.$scope.serverScripts[type].arguments);
+    if (vm.Message.showDebug()) vm.$log.debug('New Arguments for type: ', type, ' are: ', vm.$scope.serverScripts[type].arguments);
   }
 
   selectSeedModel() {
@@ -1002,10 +1001,10 @@ export class AnalysisController {
     if (!_.isEmpty(result)) {
       // copy and select the file
       const seedModelPath = result[0];
-      if (vm.showDebug) vm.$log.debug('Seed Model:', seedModelPath);
+      if (vm.Message.showDebug()) vm.$log.debug('Seed Model:', seedModelPath);
       const seedModelFilename = seedModelPath.replace(/^.*[\\\/]/, '');
       vm.jetpack.copy(seedModelPath, vm.Project.getProjectDir().path('seeds/' + seedModelFilename), {overwrite: true});
-      if (vm.showDebug) vm.$log.debug('Seed Model name: ', seedModelFilename);
+      if (vm.Message.showDebug()) vm.$log.debug('Seed Model name: ', seedModelFilename);
       // update seeds
       vm.Project.setSeeds();
       vm.Project.setSeedsDropdownOptions();
@@ -1019,12 +1018,12 @@ export class AnalysisController {
       vm.Project.savePrettyOptions();
       // recompute model-dependent measure arguments when resetting seed
       vm.Project.computeAllMeasureArguments().then(() => {
-        if (vm.showDebug) vm.$log.debug('computeAllMeasureArgs success!');
+        if (vm.Message.showDebug()) vm.$log.debug('computeAllMeasureArgs success!');
         vm.$scope.measures = vm.Project.getMeasuresAndOptions();
         vm.resetAllChoiceArgumentSelections();
         vm.initializeTab();
       }, error => {
-        if (vm.showDebug) vm.$log.debug('ERROR in computeAllMeasureArguments');
+        if (vm.Message.showDebug()) vm.$log.debug('ERROR in computeAllMeasureArguments');
       });
     }
   }
@@ -1044,11 +1043,11 @@ export class AnalysisController {
     if (!_.isEmpty(result)) {
       // copy and select the file
       const weatherFilePath = result[0];
-      if (vm.showDebug) vm.$log.debug('Weather File:', weatherFilePath);
+      if (vm.Message.showDebug()) vm.$log.debug('Weather File:', weatherFilePath);
       const weatherFilename = weatherFilePath.replace(/^.*[\\\/]/, '');
       // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
       vm.jetpack.copy(weatherFilePath, vm.Project.getProjectDir().path('weather/' + weatherFilename));
-      if (vm.showDebug) vm.$log.debug('Weather file name: ', weatherFilename);
+      if (vm.Message.showDebug()) vm.$log.debug('Weather file name: ', weatherFilename);
       // update seeds
       vm.Project.setWeatherFiles();
       vm.Project.setWeatherFilesDropdownOptions();
@@ -1061,7 +1060,7 @@ export class AnalysisController {
   // move measure 'up' or 'down'
   reorderMeasure(measure, direction) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('moving measure: ', direction);
+    if (vm.Message.showDebug()) vm.$log.debug('moving measure: ', direction);
     vm.setIsModified();
     // find current index of measure and new index to move to
     const index = _.findIndex(vm.$scope.measures, {instanceId: measure.instanceId});
@@ -1070,7 +1069,7 @@ export class AnalysisController {
     const swapping_measure = vm.$scope.measures[new_index];
     // only move if you can
     if (swapping_measure) {
-      if (vm.showDebug) vm.$log.debug('moving measure');
+      if (vm.Message.showDebug()) vm.$log.debug('moving measure');
       vm.$scope.measures[new_index] = measure;
       vm.$scope.measures[index] = swapping_measure;
       vm.Project.setMeasuresAndOptions(vm.$scope.measures);
@@ -1078,7 +1077,7 @@ export class AnalysisController {
       // recalculate workflow indexes
       vm.Project.recalculateMeasureWorkflowIndexes();
 
-      if (vm.showDebug) vm.$log.debug('measures: ', vm.$scope.measures);
+      if (vm.Message.showDebug()) vm.$log.debug('measures: ', vm.$scope.measures);
 
       // initialize grid to resort
       vm.initializeTab();
@@ -1092,7 +1091,7 @@ export class AnalysisController {
 
   // getDistributions(argument) {
   //   const vm = this;
-  //   if (vm.showDebug) vm.$log.debug('In getDistributions');
+  //   if (vm.Message.showDebug()) vm.$log.debug('In getDistributions');
   //
   //   if (_.isNil(argument.inputs)) argument.inputs = {};
   //
@@ -1120,7 +1119,7 @@ export class AnalysisController {
 
   // getVariableSettings(argument) {
   //   const vm = this;
-  //   if (vm.showDebug) vm.$log.debug('In getVariableSettings');
+  //   if (vm.Message.showDebug()) vm.$log.debug('In getVariableSettings');
   //
   //   if (_.isNil(argument.inputs)) argument.inputs = {};
   //
@@ -1135,7 +1134,7 @@ export class AnalysisController {
 
   // checkVariableSettings(argument) {
   //   const vm = this;
-  //   if (vm.showDebug) vm.$log.debug('In checkVariableSettings');
+  //   if (vm.Message.showDebug()) vm.$log.debug('In checkVariableSettings');
   //
   //   if (_.isNil(argument.inputs)) argument.inputs = {};
   //
@@ -1174,8 +1173,8 @@ export class AnalysisController {
 
   addDiscreteVariable(argument) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In addDiscreteVariable');
-    //if (vm.showDebug) vm.$log.debug('argument: ', argument);
+    if (vm.Message.showDebug()) vm.$log.debug('In addDiscreteVariable');
+    //if (vm.Message.showDebug()) vm.$log.debug('argument: ', argument);
     //vm.$log.error('argument.type: ', argument.type);
 
     // Add 'Value', add 'Weight'
@@ -1193,7 +1192,7 @@ export class AnalysisController {
   // TODO: not needed?
   // showValueAndWeights() {
   //   const vm = this;
-  //   if (vm.showDebug) vm.$log.debug('In showValueAndWeights');
+  //   if (vm.Message.showDebug()) vm.$log.debug('In showValueAndWeights');
   //   if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
   //     vm.$scope.showValueAndWeights = true;
   //   } else {
@@ -1203,7 +1202,7 @@ export class AnalysisController {
 
   showDeltaX() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In showDeltaX');
+    if (vm.Message.showDebug()) vm.$log.debug('In showDeltaX');
     if (_.includes(['RGENOUD', 'Optim'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDeltaX = true;
     } else {
@@ -1213,7 +1212,7 @@ export class AnalysisController {
 
   showMinAndMax() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In showMinAndMax');
+    if (vm.Message.showDebug()) vm.$log.debug('In showMinAndMax');
     if (_.includes(['PreFlight'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showMinAndMax = true;
     } else {
@@ -1223,7 +1222,7 @@ export class AnalysisController {
 
   showDistributions() {
     const vm = this;
-    //if (vm.showDebug) vm.$log.debug('In showDistributions');
+    //if (vm.Message.showDebug()) vm.$log.debug('In showDistributions');
     if (!_.includes(['PSO', 'Optim'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDistributions = true;
     } else {
@@ -1242,7 +1241,7 @@ export class AnalysisController {
 
   showDiscreteVariables() {
     const vm = this;
-    //if (vm.showDebug) vm.$log.debug('In showDiscreteVariables');
+    //if (vm.Message.showDebug()) vm.$log.debug('In showDiscreteVariables');
     if (_.includes(['NSGA2', 'LHS', 'PreFlight', 'Morris', 'DOE', 'Diagonal', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDiscreteVariables = true;
     } else {
@@ -1252,7 +1251,7 @@ export class AnalysisController {
 
   showPivotVariables() {
     const vm = this;
-    //if (vm.showDebug) vm.$log.debug('In showPivotVariables');
+    //if (vm.Message.showDebug()) vm.$log.debug('In showPivotVariables');
     if (_.includes(['LHS', 'Morris', 'DOE', 'BaselinePerturbation', 'Diagonal', 'PreFlight'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showPivotVariables = true;
     } else {
@@ -1262,7 +1261,7 @@ export class AnalysisController {
 
   showContinuousVariables() {
     const vm = this;
-    //if (vm.showDebug) vm.$log.debug('In showContinuousVariables');
+    //if (vm.Message.showDebug()) vm.$log.debug('In showContinuousVariables');
     if (_.includes(['Diagonal', 'BaselinePerturbation', 'SingleRun', 'RepeatRun'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showContinuousVariables = false;
     } else {
@@ -1272,7 +1271,7 @@ export class AnalysisController {
 
   showWarningIcon(argument) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In showWarningIcon');
+    if (vm.Message.showDebug()) vm.$log.debug('In showWarningIcon');
 
     // vm.$scope.showPivotVariables vm.$scope.showDiscreteVariables vm.$scope.showDistributions vm.$scope.showMinAndMax vm.$scope.showDeltaX vm.$scope.showValueAndWeights
     if (_.isNil(argument) || _.isNil(argument.inputs) || _.isNil(argument.inputs.variableSetting)) {
@@ -1291,7 +1290,7 @@ export class AnalysisController {
 
   showWarningIcons() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In showWarningIcons');
+    if (vm.Message.showDebug()) vm.$log.debug('In showWarningIcons');
     _.forEach(vm.$scope.measures, (measure) => {
       _.forEach(measure.arguments, (argument) => {
         vm.showWarningIcon(argument);
@@ -1302,7 +1301,7 @@ export class AnalysisController {
 
   showWarningText(measure) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In showWarningText');
+    if (vm.Message.showDebug()) vm.$log.debug('In showWarningText');
     measure.showWarningText = false;
     _.forEach(measure.arguments, (argument) => {
       if (_.isNil(argument.inputs) == false && _.isNil(argument.inputs.showWarningIcon) == false) {
@@ -1323,7 +1322,7 @@ export class AnalysisController {
 
   initializeVariablesAlgMode() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('Initializing variables for Algorithmic mode');
+    if (vm.Message.showDebug()) vm.$log.debug('Initializing variables for Algorithmic mode');
     _.forEach(vm.$scope.measures, (measure) => {
       // add SKIP
       measure.skip = _.isNil(measure.skip) ? false : measure.skip;
@@ -1388,7 +1387,7 @@ export class AnalysisController {
   addOptions(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    if (vm.showDebug) vm.$log.debug('Analysis::addOptions');
+    if (vm.Message.showDebug()) vm.$log.debug('Analysis::addOptions');
 
     // open modal for user to select options.
     const modalInstance = vm.$uibModal.open({

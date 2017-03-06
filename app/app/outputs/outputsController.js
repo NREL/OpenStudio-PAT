@@ -1,6 +1,6 @@
 export class OutputsController {
 
-  constructor($log, Project, $scope, $uibModal, $q, $window) {
+  constructor($log, Project, $scope, $uibModal, $q, $window, Message) {
     'ngInject';
 
     const vm = this;
@@ -11,8 +11,7 @@ export class OutputsController {
     vm.$uibModal = $uibModal;
     vm.$q = $q;
     vm.$window = $window;
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
@@ -39,7 +38,7 @@ export class OutputsController {
       let headerHeight = 55; // header height
       const m = _.find(vm.$scope.measures, {name: name});
       const length = _.filter(m.analysisOutputs).length;
-      if (vm.showDebug) vm.$log.debug('data length: ', length);
+      if (vm.Message.showDebug()) vm.$log.debug('data length: ', length);
       return {
         height: (length * rowHeight + headerHeight + 15) + 'px'
       };
@@ -70,7 +69,7 @@ export class OutputsController {
 
     // user-added measures
     const others = _.filter(vm.$scope.measures, {outputMeasure: true});
-    if (vm.showDebug) vm.$log.debug('All Output Measures: ', others);
+    if (vm.Message.showDebug()) vm.$log.debug('All Output Measures: ', others);
     vm.$scope.outputMeasures = _.union(vm.$scope.outputMeasures, others);
 
     // ensure there's a key for user-defined outputs
@@ -87,13 +86,13 @@ export class OutputsController {
       }
     });
 
-    if (vm.showDebug) vm.$log.debug('Output Measures: ', vm.$scope.outputMeasures);
+    if (vm.Message.showDebug()) vm.$log.debug('Output Measures: ', vm.$scope.outputMeasures);
 
   }
 
   initializeGrids() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('Output::initializeGrids');
+    if (vm.Message.showDebug()) vm.$log.debug('Output::initializeGrids');
     vm.$scope.measures = _.sortBy(vm.$scope.measures, ['workflow_index']);
     vm.setGridOptions();
 
@@ -110,7 +109,7 @@ export class OutputsController {
     _.forEach(vm.$scope.outputMeasures, (measure) => {
 
       if (measure.analysisOutputs == undefined) measure.analysisOutputs = [];
-      if (vm.showDebug) vm.$log.debug('measure: ', measure);
+      if (vm.Message.showDebug()) vm.$log.debug('measure: ', measure);
 
       vm.$scope.gridOptions[measure.instanceId] = {
         data: 'measure.analysisOutputs',
@@ -215,10 +214,10 @@ export class OutputsController {
       };
 
       // add objective function groups for SPEA, NSGA, and Morris only
-      if (vm.showDebug) vm.$log.debug('sampling method: ', vm.$scope.selectedSamplingMethod);
+      if (vm.Message.showDebug()) vm.$log.debug('sampling method: ', vm.$scope.selectedSamplingMethod);
 
       if (['NSGA2', 'SPEA2', 'Morris'].indexOf(vm.$scope.selectedSamplingMethod.id) != -1) {
-        if (vm.showDebug) vm.$log.debug('adding objective function group column');
+        if (vm.Message.showDebug()) vm.$log.debug('adding objective function group column');
         const ofg = {
           name: 'obj_function_group',
           displayName: 'outputs.columns.objectiveFunctionGroup',
@@ -244,7 +243,7 @@ export class OutputsController {
   addOutputs(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    if (vm.showDebug) vm.$log.debug('Output::addOutputs');
+    if (vm.Message.showDebug()) vm.$log.debug('Output::addOutputs');
 
     // open modal for user to select outputs. Already selected outputs are shown as checked ?
     const modalInstance = vm.$uibModal.open({
@@ -263,7 +262,7 @@ export class OutputsController {
     });
 
     modalInstance.result.then(() => {
-      if (vm.showDebug) vm.$log.debug('NEW Analysis OUTPUTS: ', measure.analysisOutputs);
+      if (vm.Message.showDebug()) vm.$log.debug('NEW Analysis OUTPUTS: ', measure.analysisOutputs);
       vm.setIsModified();
       deferred.resolve();
 
@@ -283,10 +282,10 @@ export class OutputsController {
 
   addMeasure() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('in Outputs::addMeasure');
-    if (vm.showDebug) vm.$log.debug('measure to add: ', vm.$scope.addMeasure.measure);
+    if (vm.Message.showDebug()) vm.$log.debug('in Outputs::addMeasure');
+    if (vm.Message.showDebug()) vm.$log.debug('measure to add: ', vm.$scope.addMeasure.measure);
     if (vm.$scope.addMeasure.measure) {
-      if (vm.showDebug) vm.$log.debug('Adding this measure: ', vm.$scope.addMeasure.measure);
+      if (vm.Message.showDebug()) vm.$log.debug('Adding this measure: ', vm.$scope.addMeasure.measure);
       const measure = _.find(vm.$scope.measures, {name: vm.$scope.addMeasure.measure.name});
       if (measure) {
         measure.outputMeasure = true;
@@ -295,7 +294,7 @@ export class OutputsController {
       }
       vm.$scope.addMeasure.measure = null;
     } else {
-      if (vm.showDebug) vm.$log.debug('No Measure Selected');
+      if (vm.Message.showDebug()) vm.$log.debug('No Measure Selected');
     }
   }
 

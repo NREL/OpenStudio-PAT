@@ -7,7 +7,7 @@ import AdmZip from 'adm-zip';
 import YAML from 'yamljs';
 
 export class OsServer {
-  constructor($q, $http, $log, $uibModal, Project, DependencyManager) {
+  constructor($q, $http, $log, $uibModal, Project, DependencyManager, Message) {
     'ngInject';
 
     const vm = this;
@@ -18,8 +18,7 @@ export class OsServer {
     vm.$http = $http;
     vm.jetpack = jetpack;
     vm.AdmZip = AdmZip;
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
 
     // set number of workers
     vm.numCores = os.cpus().length;
@@ -51,7 +50,7 @@ export class OsServer {
     vm.selectedServerURL = vm.resetSelectedServerURL();
 
     const src = jetpack.cwd(app.getPath('userData'));
-    if (vm.showDebug) vm.$log.debug('src.path(): ', src.path());
+    if (vm.Message.showDebug()) vm.$log.debug('src.path(): ', src.path());
 
     vm.cliPath = DependencyManager.getPath("PAT_OS_CLI_PATH");
     vm.metaCLIPath = DependencyManager.getPath("PAT_OS_META_CLI_PATH");
@@ -334,8 +333,8 @@ export class OsServer {
     vm.$log.info('Ping Server URL: ', url);
     vm.$http.get(url).then(response => {
       // send json to run controller
-      if (vm.showDebug) vm.$log.debug('PING: Server is started');
-      if (vm.showDebug) vm.$log.debug('status JSON response: ', response);
+      if (vm.Message.showDebug()) vm.$log.debug('PING: Server is started');
+      if (vm.Message.showDebug()) vm.$log.debug('status JSON response: ', response);
       vm.setServerStatus(serverType, 'started');
       deferred.resolve(response);
 
@@ -351,7 +350,7 @@ export class OsServer {
   // start server (remote or local) if force != null, start the specified server (local only, remote can't be force-started unless 'Run on Cloud' is selected)
   startServer(force = null) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('***** In osServerService::startServer() *****');
+    if (vm.Message.showDebug()) vm.$log.debug('***** In osServerService::startServer() *****');
     const deferred = vm.$q.defer();
 
     const serverType = vm.Project.getRunType().name;
@@ -363,9 +362,9 @@ export class OsServer {
         // local server
         // check if server is currently starting
         if (vm.serverStartInProgress) {
-          if (vm.showDebug) vm.$log.debug('***Server is already in the process of starting...waiting on serverStartDeferred to resolve');
+          if (vm.Message.showDebug()) vm.$log.debug('***Server is already in the process of starting...waiting on serverStartDeferred to resolve');
           vm.isServerReady().then((response) => {
-            if (vm.showDebug) vm.$log.debug('Server is started!');
+            if (vm.Message.showDebug()) vm.$log.debug('Server is started!');
             deferred.resolve(response);
           }, (error) => {
             vm.$log.error('ERROR in start local server: ', error);
@@ -375,13 +374,13 @@ export class OsServer {
 
           // **always attempt to stop the server first in case local_config file or server.pid already exists**
           // stopServer always resolves
-          if (vm.showDebug) vm.$log.debug('force stopping server just in case...');
+          if (vm.Message.showDebug()) vm.$log.debug('force stopping server just in case...');
           vm.stopServer('local').then(() => {
             // start server (reset promise)
-            if (vm.showDebug) vm.$log.debug('***Server start not already in progress...start server');
+            if (vm.Message.showDebug()) vm.$log.debug('***Server start not already in progress...start server');
             vm.serverProgressStart();
             vm.localServer().then(response => {
-              if (vm.showDebug) vm.$log.debug('localServer promise resolved.  Server should have started');
+              if (vm.Message.showDebug()) vm.$log.debug('localServer promise resolved.  Server should have started');
               vm.setServerStatus(serverType, 'started');
               // server start no longer in progress
               vm.serverProgressStop('resolve', response);
@@ -398,9 +397,9 @@ export class OsServer {
         // remote server
         vm.$log.info('Starting Remote Server');
         if (vm.remoteStartInProgress) {
-          if (vm.showDebug) vm.$log.debug('***Remote Server is already in the process of starting...waiting on serverStartDeferred to resolve');
+          if (vm.Message.showDebug()) vm.$log.debug('***Remote Server is already in the process of starting...waiting on serverStartDeferred to resolve');
           vm.isRemoteReady().then((response) => {
-            if (vm.showDebug) vm.$log.debug('Server is started!');
+            if (vm.Message.showDebug()) vm.$log.debug('Server is started!');
             deferred.resolve(response);
           }, (error) => {
             vm.$log.error('ERROR in start local server: ', error);
@@ -409,7 +408,7 @@ export class OsServer {
         } else {
           vm.remoteProgressStart();
           vm.remoteServer().then(response => {
-            if (vm.showDebug) vm.$log.debug('OsServerService::StartServer: setting server to started');
+            if (vm.Message.showDebug()) vm.$log.debug('OsServerService::StartServer: setting server to started');
             vm.setServerStatus(serverType, 'started');
             vm.remoteProgressStop('resolve', response);
             deferred.resolve(response);
@@ -422,7 +421,7 @@ export class OsServer {
       }
     } else {
       // server already started
-      if (vm.showDebug) vm.$log.debug('Server already started!');
+      if (vm.Message.showDebug()) vm.$log.debug('Server already started!');
       deferred.resolve('Server Already Started');
     }
 
@@ -431,7 +430,7 @@ export class OsServer {
 
   remoteServer() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('***** In osServerService::remoteServer() *****');
+    if (vm.Message.showDebug()) vm.$log.debug('***** In osServerService::remoteServer() *****');
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType().name;
 
@@ -440,7 +439,7 @@ export class OsServer {
       // Existing Remote Server
       // ping URL to see if started
       vm.pingServer().then(response => {
-        if (vm.showDebug) vm.$log.debug('Existing Remote Server Connected');
+        if (vm.Message.showDebug()) vm.$log.debug('Existing Remote Server Connected');
         deferred.resolve(response);
       }, error => {
         vm.$log.error('Cannot connect to Existing Remote Server at specified URL: ', error);
@@ -470,14 +469,14 @@ export class OsServer {
 
           const child = vm.exec(vm.startServerCommand,
             (error, stdout, stderr) => {
-              if (vm.showDebug) vm.$log.debug('exit code: ', child.exitCode);
-              if (vm.showDebug) vm.$log.debug('child: ', child);
-              if (vm.showDebug) vm.$log.debug('stdout: ', stdout);
-              if (vm.showDebug) vm.$log.debug('stderr: ', stderr);
+              if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
+              if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+              if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
+              if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
 
               if (child.exitCode == 0) {
                 // SUCCESS
-                if (vm.showDebug) vm.$log.debug('CLOUD SERVER CONNECTION SUCCESS');
+                if (vm.Message.showDebug()) vm.$log.debug('CLOUD SERVER CONNECTION SUCCESS');
 
                 // set vm.selectedServerURL
                 // check what serverType is before setting selectedServerURL
@@ -541,7 +540,7 @@ export class OsServer {
 
           // make sure file is saved
           vm.Project.saveClusterToFile();
-          if (vm.showDebug) vm.$log.debug('Connecting to terminated/new cluster');
+          if (vm.Message.showDebug()) vm.$log.debug('Connecting to terminated/new cluster');
           vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" -s \"' + vm.Project.projectDir.path(vm.remoteSettings.aws.cluster_name + '_cluster.json') + '\" aws';
           vm.$log.info('Start Server Command: ', vm.startServerCommand);
 
@@ -549,20 +548,20 @@ export class OsServer {
 
           const child = vm.exec(vm.startServerCommand, {env: envCopy},
             (error, stdout, stderr) => {
-              if (vm.showDebug) vm.$log.debug('exit code: ', child.exitCode);
-              if (vm.showDebug) vm.$log.debug('child: ', child);
-              if (vm.showDebug) vm.$log.debug('stdout: ', stdout);
-              if (vm.showDebug) vm.$log.debug('stderr: ', stderr);
+              if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
+              if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+              if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
+              if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
 
               if (child.exitCode == 0) {
                 // SUCCESS
-                if (vm.showDebug) vm.$log.debug('CLOUD SERVER START SUCCESS');
+                if (vm.Message.showDebug()) vm.$log.debug('CLOUD SERVER START SUCCESS');
 
                 // get DNS and set server
                 const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
                 vm.connectCluster();
                 if (vm.Project.getRunType().name == 'remote') {
-                  if (vm.showDebug) vm.$log.debug('Setting selectedServerURL to : ', vm.Project.fixURL(newDNS));
+                  if (vm.Message.showDebug()) vm.$log.debug('Setting selectedServerURL to : ', vm.Project.fixURL(newDNS));
                   vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
                 }
                 deferred.resolve(child);
@@ -590,7 +589,7 @@ export class OsServer {
           child.on('exit', (code, signal) => {
             console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
             if (code == 0) {
-              if (vm.showDebug) vm.$log.debug('Server started');
+              if (vm.Message.showDebug()) vm.$log.debug('Server started');
               // get DNS and set server
               const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
               if (vm.Project.getRunType().name == 'remote') {
@@ -624,7 +623,7 @@ export class OsServer {
     const vm = this;
     vm.remoteSettings = vm.Project.getRemoteSettings();
     // need aws credentials as ENV vars
-    if (vm.showDebug) vm.$log.debug('PROCESS.ENV: ', process.env);
+    if (vm.Message.showDebug()) vm.$log.debug('PROCESS.ENV: ', process.env);
     // need to set all other vars from process.env
     const envCopy = angular.copy(process.env);
 
@@ -645,7 +644,7 @@ export class OsServer {
   localServer() {
 
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('***** In osServerService::localServer() *****');
+    if (vm.Message.showDebug()) vm.$log.debug('***** In osServerService::localServer() *****');
     // See "https://github.com/NREL/OpenStudio-server/tree/dockerize-osw/server/spec/files/batch_datapoints" for test files
     const deferred = vm.$q.defer();
 
@@ -659,14 +658,14 @@ export class OsServer {
 
     const child = vm.exec(vm.startServerCommand,
       (error, stdout, stderr) => {
-        if (vm.showDebug) vm.$log.debug('exit code: ', child.exitCode);
-        if (vm.showDebug) vm.$log.debug('child: ', child);
-        if (vm.showDebug) vm.$log.debug('stdout: ', stdout);
-        if (vm.showDebug) vm.$log.debug('stderr: ', stderr);
+        if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
+        if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+        if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
+        if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
 
         if (child.exitCode == 0) {
           // SUCCESS
-          if (vm.showDebug) vm.$log.debug('SERVER SUCCESS');
+          if (vm.Message.showDebug()) vm.$log.debug('SERVER SUCCESS');
           // get url from local_configuration.json
           vm.getLocalServerUrlFromFile();
           vm.$log.info('SERVER URL: ', vm.selectedServerURL);
@@ -693,7 +692,7 @@ export class OsServer {
     child.on('exit', (code, signal) => {
       console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
       if (code == 0) {
-        if (vm.showDebug) vm.$log.debug('Server started');
+        if (vm.Message.showDebug()) vm.$log.debug('Server started');
         vm.getLocalServerUrlFromFile();
         vm.$log.info('SERVER URL: ', vm.selectedServerURL);
         deferred.resolve();
@@ -738,7 +737,7 @@ export class OsServer {
 
   runAnalysis(analysis_param) {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('***** In osServerService::runAnalysis() *****');
+    if (vm.Message.showDebug()) vm.$log.debug('***** In osServerService::runAnalysis() *****');
     const deferred = vm.$q.defer();
 
     // run META CLI will return status code: 0 = success, 1 = failure
@@ -751,20 +750,20 @@ export class OsServer {
     vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
 
     const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param.toLowerCase();
-    if (vm.showDebug) vm.$log.debug('FULL run_analysis command: ', full_command);
+    if (vm.Message.showDebug()) vm.$log.debug('FULL run_analysis command: ', full_command);
     const child = vm.exec(full_command,
       (error, stdout, stderr) => {
-        if (vm.showDebug) vm.$log.debug('exit code: ', child.exitCode);
-        if (vm.showDebug) vm.$log.debug('child: ', child);
-        if (vm.showDebug) vm.$log.debug('stdout: ', stdout);
-        if (vm.showDebug) vm.$log.debug('stderr: ', stderr);
+        if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
+        if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+        if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
+        if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
 
         if (child.exitCode == 0) {
           // SUCCESS
           vm.$log.info('Analysis Started');
           const analysis_arr = stdout.toString().split('request to run analysis ');
           const analysis_id = _.trim(_.last(analysis_arr), '\n');
-          if (vm.showDebug) vm.$log.debug('ANALYSIS ID: ', analysis_id);
+          if (vm.Message.showDebug()) vm.$log.debug('ANALYSIS ID: ', analysis_id);
           deferred.resolve(analysis_id);
           vm.Project.setAnalysisID(analysis_id);
           vm.Project.setModified(true);
@@ -822,8 +821,8 @@ export class OsServer {
     if ((force || vm.getServerStatus(serverType) == 'started') && vm.Project.projectDir != null) {
 
       if (force == 'local' || serverType == 'local') {
-        if (vm.showDebug) vm.$log.debug('vm.Project:', vm.Project);
-        if (vm.showDebug) vm.$log.debug('vm.Project.projectDir:', vm.Project.projectDir.path());
+        if (vm.Message.showDebug()) vm.$log.debug('vm.Project:', vm.Project);
+        if (vm.Message.showDebug()) vm.$log.debug('vm.Project.projectDir:', vm.Project.projectDir.path());
 
         vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_local ' + '\"' + vm.Project.projectDir.path() + '\"';
         vm.$log.info('stop server command: ', vm.stopServerCommand);
@@ -831,14 +830,14 @@ export class OsServer {
         const child = vm.exec(vm.stopServerCommand,
           (error, stdout, stderr) => {
             console.log('THE PROCESS TERMINATED');
-            if (vm.showDebug) vm.$log.debug('exit code: ', child.exitCode);
-            if (vm.showDebug) vm.$log.debug('child: ', child);
-            if (vm.showDebug) vm.$log.debug('stdout: ', stdout);
-            if (vm.showDebug) vm.$log.debug('stderr: ', stderr);
+            if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
+            if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+            if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
+            if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
 
             if (child.exitCode == 0) {
               // SUCCESS
-              if (vm.showDebug) vm.$log.debug('Server Stopped');
+              if (vm.Message.showDebug()) vm.$log.debug('Server Stopped');
               vm.setServerStatus(serverType, 'stopped');
               vm.localServerCleanup();
               deferred.resolve(child);
@@ -872,10 +871,10 @@ export class OsServer {
           const child = vm.exec(vm.stopServerCommand, {env: envCopy},
             (error, stdout, stderr) => {
               console.log('THE PROCESS TERMINATED');
-              if (vm.showDebug) vm.$log.debug('exit code: ', child.exitCode);
-              if (vm.showDebug) vm.$log.debug('child: ', child);
-              if (vm.showDebug) vm.$log.debug('stdout: ', stdout);
-              if (vm.showDebug) vm.$log.debug('stderr: ', stderr);
+              if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
+              if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+              if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
+              if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
 
               if (child.exitCode == 0) {
                 // SUCCESS
@@ -926,7 +925,7 @@ export class OsServer {
 
   localServerCleanup() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('LOCAL SERVER CLEANUP');
+    if (vm.Message.showDebug()) vm.$log.debug('LOCAL SERVER CLEANUP');
     // delete local_configuration.json and .receipt
     vm.jetpack.remove(vm.Project.getProjectDir().path('local_configuration.json'));
     vm.jetpack.remove(vm.Project.getProjectDir().path('local_configuration.receipt'));
@@ -940,7 +939,7 @@ export class OsServer {
     vm.jetpack.remove(vm.Project.getProjectDir().path('.temp'));
     // delete logs
     vm.jetpack.remove(vm.Project.getProjectDir().path('logs/*'));
-    if (vm.showDebug) vm.$log.debug('SERVER CLEANUP COMPLETE');
+    if (vm.Message.showDebug()) vm.$log.debug('SERVER CLEANUP COMPLETE');
 
   }
 
@@ -948,14 +947,14 @@ export class OsServer {
     const vm = this;
     const deferred = vm.$q.defer();
     const url = vm.selectedServerURL + '/analyses/' + vm.Project.getAnalysisID() + '/status.json';
-    if (vm.showDebug) vm.$log.debug('Analysis Status URL: ', url);
+    if (vm.Message.showDebug()) vm.$log.debug('Analysis Status URL: ', url);
     vm.$http.get(url).then(response => {
       // send json to run controller
-      if (vm.showDebug) vm.$log.debug('status JSON response: ', response);
+      if (vm.Message.showDebug()) vm.$log.debug('status JSON response: ', response);
       deferred.resolve(response);
 
     }, response => {
-      if (vm.showDebug) vm.$log.debug('ERROR getting status for analysis ', vm.Project.getAnalysisID());
+      if (vm.Message.showDebug()) vm.$log.debug('ERROR getting status for analysis ', vm.Project.getAnalysisID());
       deferred.reject(response);
     });
 
@@ -972,14 +971,14 @@ export class OsServer {
     vm.datapoints = vm.Project.getDatapoints();
 
     _.forEach(vm.datapointsStatus, (dp) => {
-      if (vm.showDebug) vm.$log.debug('DATAPOINT STATUS: ', dp);
+      if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT STATUS: ', dp);
       const url = vm.selectedServerURL + '/data_points/' + dp.id + '/download_result_file';
       const params = {filename: 'out.osw'};
       const config = {params: params, headers: {Accept: 'application/json'}};
-      if (vm.showDebug) vm.$log.debug('****URL: ', url);
+      if (vm.Message.showDebug()) vm.$log.debug('****URL: ', url);
       const promise = vm.$http.get(url, config).then(response => {
         // save OSW to file
-        if (vm.showDebug) vm.$log.debug('DATAPOINT OUT.OSW response: ', response.data);
+        if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT OUT.OSW response: ', response.data);
         let datapoint = response.data;
         vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(dp.id, 'out.osw'), datapoint);
 
@@ -989,16 +988,16 @@ export class OsServer {
         datapoint.id = dp.id;
 
         let dp_match = _.findIndex(vm.datapoints, {name: dp.name});
-        if (vm.showDebug) vm.$log.debug('DP match results for: ', dp.name, ': ', dp_match);
+        if (vm.Message.showDebug()) vm.$log.debug('DP match results for: ', dp.name, ': ', dp_match);
         if (dp_match != -1) {
           // merge
           _.merge(vm.datapoints[dp_match], datapoint);
-          if (vm.showDebug) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
+          if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
         } else {
           // append datapoint to array
           vm.datapoints.push(datapoint);
         }
-        if (vm.showDebug) vm.$log.debug('PROJECT DATAPOINTS NOW: ', vm.Project.getDatapoints());
+        if (vm.Message.showDebug()) vm.$log.debug('PROJECT DATAPOINTS NOW: ', vm.Project.getDatapoints());
 
       }, error => {
         vm.$log.error('GET DATAPOINT OUT.OSW ERROR (file probably not created yet): ', error);
@@ -1006,11 +1005,11 @@ export class OsServer {
         if (error.status == 422 || error.status == 404) {
           vm.$log.error('422/404 Error...GETting datapoint json instead');
           const datapointUrl = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
-          if (vm.showDebug) vm.$log.debug('DATAPOINT URL: ', datapointUrl);
-          if (vm.showDebug) vm.$log.debug('DP: ', dp);
+          if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT URL: ', datapointUrl);
+          if (vm.Message.showDebug()) vm.$log.debug('DP: ', dp);
           const promise2 = vm.$http.get(datapointUrl).then(response2 => {
             // set datapoint array
-            if (vm.showDebug) vm.$log.debug('datapoint JSON raw response: ', response2);
+            if (vm.Message.showDebug()) vm.$log.debug('datapoint JSON raw response: ', response2);
             vm.$log.info('datapoint JSON response: ', response2.data.data_point);
             let datapoint = response2.data.data_point;
             datapoint.status = dp.status;
@@ -1018,11 +1017,11 @@ export class OsServer {
             datapoint.id = dp.id;
 
             let dp_match = _.findIndex(vm.datapoints, {name: dp.name});
-            if (vm.showDebug) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
+            if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
             if (dp_match != -1) {
               // merge
               _.merge(vm.datapoints[dp_match], datapoint);
-              if (vm.showDebug) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
+              if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
             } else {
               // also load in datapoints array
               vm.datapoints.push(datapoint);
@@ -1063,7 +1062,7 @@ export class OsServer {
         const url = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
         const promise = vm.$http.get(url).then(response => {
           // get result files from response
-          if (vm.showDebug) vm.$log.debug('datapoint.json: ', response);
+          if (vm.Message.showDebug()) vm.$log.debug('datapoint.json: ', response);
           const resultFiles = response.data.data_point.result_files;
           dp.result_files = dp.result_files ? _.merge(dp.result_files, resultFiles) : resultFiles;
           const reportPromises = [];
@@ -1073,7 +1072,7 @@ export class OsServer {
               const reportUrl = vm.selectedServerURL + '/data_points/' + dp.id + '/download_result_file';
               const params = {filename: file.attachment_file_name};
               const config = {params: params, headers: {Accept: 'application/json'}};
-              if (vm.showDebug) vm.$log.debug('****URL: ', reportUrl);
+              if (vm.Message.showDebug()) vm.$log.debug('****URL: ', reportUrl);
               const reportPromise = vm.$http.get(reportUrl, config).then(response => {
                 // write file and set downloaded flag
                 vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(dp.id, file.attachment_file_name), response.data);
@@ -1094,7 +1093,7 @@ export class OsServer {
 
             // if running locally, also download osm and results
             if (vm.Project.getRunType().name == 'local') {
-              if (vm.showDebug) vm.$log.debug('Run Type is set to Local');
+              if (vm.Message.showDebug()) vm.$log.debug('Run Type is set to Local');
               const osm_promise = vm.downloadOSM(dp).then(response => {
                 vm.$log.info('osm downloaded for ', dp.name);
               }, error => {
@@ -1169,17 +1168,17 @@ export class OsServer {
       const params = {filename: file.attachment_file_name};
       const config = {params: params, headers: {Accept: 'application/json'}, responseType: 'arraybuffer'};
       vm.$log.info('Download Results URL: ', reportUrl);
-      if (vm.showDebug) vm.$log.debug('params: ', params);
+      if (vm.Message.showDebug()) vm.$log.debug('params: ', params);
       vm.$http.get(reportUrl, config).then(response => {
         // write file and set downloaded flag
-        if (vm.showDebug) vm.$log.debug('RESPONSE!! ', response);
+        if (vm.Message.showDebug()) vm.$log.debug('RESPONSE!! ', response);
 
         // extract dir and save to disk in local measures directory
         // convert arraybuffer to node buffer
         const buf = new Buffer(new Uint8Array(response.data));
-        if (vm.showDebug) vm.$log.debug('buffer');
+        if (vm.Message.showDebug()) vm.$log.debug('buffer');
         const zip = new vm.AdmZip(buf);
-        if (vm.showDebug) vm.$log.debug('zip');
+        if (vm.Message.showDebug()) vm.$log.debug('zip');
         // save
         zip.writeZip(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name));
 
@@ -1262,7 +1261,7 @@ export class OsServer {
     const params = {analysis_action: 'stop'};
 
     if (vm.analysisStatus == 'completed') {
-      if (vm.showDebug) vm.$log.debug('Analysis is already completed');
+      if (vm.Message.showDebug()) vm.$log.debug('Analysis is already completed');
       deferred.resolve();
     } else {
       vm.$http.post(url, params)
@@ -1282,7 +1281,7 @@ export class OsServer {
   // analysis running dialog
   showAnalysisRunningDialog() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('In showAnalysisRunningDialog function');
+    if (vm.Message.showDebug()) vm.$log.debug('In showAnalysisRunningDialog function');
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
       controller: 'ModalAnalysisRunningController',

@@ -1,6 +1,6 @@
 export class ModalModifiedController {
 
-  constructor($log, $scope, $uibModalInstance, Project) {
+  constructor($log, $scope, $uibModalInstance, Project, Message) {
     'ngInject';
 
     const vm = this;
@@ -8,20 +8,19 @@ export class ModalModifiedController {
     vm.$scope = $scope;
     vm.$uibModalInstance = $uibModalInstance;
     vm.Project = Project;
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebug = false;
+    vm.Message = Message;
   }
 
   ok() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('ModalModifiedController ok');
+    if (vm.Message.showDebug()) vm.$log.debug('ModalModifiedController ok');
     vm.Project.exportPAT();
     vm.$uibModalInstance.close();
   }
 
   cancel() {
     const vm = this;
-    if (vm.showDebug) vm.$log.debug('ModalModifiedController cancel');
+    if (vm.Message.showDebug()) vm.$log.debug('ModalModifiedController cancel');
     vm.$uibModalInstance.dismiss('cancel');
   }
 }
