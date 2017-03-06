@@ -122,6 +122,12 @@ export class DesignAlternativesController {
               if (vm.Message.showDebug()) vm.$log.debug('DA name must be unique');
               rowEntity.name = oldValue;
               vm.toastr.error('Cannot change design alternative name.  Selected name is not unique.');
+            } else {
+              // change name on datapoint
+              const match = _.find(vm.datapoints, {name: oldValue});
+              if (match) {
+                match.name = newValue;
+              }
             }
           }
 
