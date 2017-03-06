@@ -86,6 +86,12 @@ export class BCL {
     const vm = this;
     const deferred = vm.$q.defer();
     if (vm.Message.showDebug()) vm.$log.debug('in BCLService checkForUpdates method');
+    if(_.isNil(vm.Project.getMeasuresDir())) {
+      if (vm.Message.showError()) {
+        vm.$log.error('BCLService::checkForUpdates vm.Project.getMeasuresDir() returned nil');
+      }
+      return;
+    }
     if (vm.Message.showDebug()) vm.$log.debug('MyMeasures dir? ', vm.Project.getMeasuresDir().path());
 
     // refresh project measures
