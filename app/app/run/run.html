@@ -189,8 +189,7 @@
                       </div>
                     </uib-accordion-heading>
                     <div class="measure-accordion-body">
-                      <div>
-                        {{datapoint.eplusout_err}}
+                      <div ng-bind-html="run.formatEplusErr(datapoint.eplusout_err)">
                       </div>
                     </div>
                   </uib-accordion-group>

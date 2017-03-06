@@ -4,7 +4,7 @@ import YAML from 'yamljs';
 
 export class RunController {
 
-  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, toastr) {
+  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, toastr, $sce) {
     'ngInject';
 
     // ignore camelcase for this file
@@ -21,6 +21,7 @@ export class RunController {
     vm.toastr = toastr;
     vm.shell = shell;
     vm.jetpack = jetpack;
+    vm.$sce = $sce;
     // This bool is used to reduce the number of debug messages given the typical, non-developer user
     vm.showDebug = false;
 
@@ -126,6 +127,23 @@ export class RunController {
       return !isSkipped;
     };
 
+  }
+
+  formatEplusErr(errorText) {
+    const vm = this;
+    const errorArr = errorText.split('\n');
+    let htmlText = '';
+    _.forEach(errorArr, (elem) => {
+      elem = _.replace(elem, '** Warning **', '<span class="orange-button">** Warning **</span>');
+      elem = _.replace(elem, '** Error **', '<span class="red-button">** Error **</span>');
+      elem = _.replace(elem, '** Info **', '<span class="green-button">** Info **</span>');
+      if (_.startsWith(elem, '  **   ~~~   **')){
+        elem = '<span class="pad-left-5">' + elem + '</span>';
+      }
+      htmlText = htmlText  + elem + '<br/>';
+    });
+
+    return vm.$sce.trustAsHtml(htmlText);
   }
 
   setUpDatapoints() {
