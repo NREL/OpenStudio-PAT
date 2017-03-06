@@ -18,20 +18,20 @@
   </div>
   <div class="row pad-bot-10">
     <div class="col-sm-6">
-      <div ng-repeat="option in measure.options" ng-if="$odd">
+      <div ng-repeat="option in measure.options" ng-if="$even">
         <div class="row">
           <div class="col-sm-12 normal-text pad-left-25">
-            <input type="checkbox" id="{{option.name}}" ng-model="option.checked">
+            <checkbox id="{{option.name}}" ng-model="option.checked"></checkbox>
             <label for="{{option.name}}" class="normal-text"> {{option.name}}</label>
           </div>
         </div>
       </div>
     </div>
     <div class="col-sm-6">
-      <div ng-repeat="option in measure.options" ng-if="$even">
+      <div ng-repeat="option in measure.options" ng-if="$odd">
         <div class="row">
           <div class="col-sm-12 normal-text">
-            <input type="checkbox" id="{{option.name}}" ng-model="option.checked">
+            <checkbox id="{{option.name}}" ng-model="option.checked"></checkbox>
             <label for="{{option.name}}" class="normal-text"> {{option.name}}</label>
           </div>
         </div>

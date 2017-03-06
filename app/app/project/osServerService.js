@@ -10,9 +10,6 @@ export class OsServer {
   constructor($q, $http, $log, $uibModal, Project, DependencyManager) {
     'ngInject';
 
-    // ignore camelcase for this file
-    /* eslint camelcase: 0 */
-
     const vm = this;
     vm.Project = Project;
     vm.$log = $log;

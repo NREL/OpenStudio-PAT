@@ -7,9 +7,6 @@ export class RunController {
   constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, toastr, $sce) {
     'ngInject';
 
-    // ignore camelcase for this file
-    /* eslint camelcase: 0 */
-
     const vm = this;
     vm.$log = $log;
     vm.$interval = $interval;

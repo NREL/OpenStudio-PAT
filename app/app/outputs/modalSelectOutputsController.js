@@ -3,9 +3,6 @@ export class ModalSelectOutputsController {
   constructor($log, $uibModalInstance, params, $scope) {
     'ngInject';
 
-    // ignore camelcase for this file
-    /* eslint camelcase: 0 */
-
     const vm = this;
     vm.$uibModalInstance = $uibModalInstance;
     vm.$log = $log;

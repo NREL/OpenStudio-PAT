@@ -3,9 +3,6 @@ export class ModalEditOptionDescriptionController {
   constructor($log, $uibModalInstance, params) {
     'ngInject';
 
-    // ignore camelcase for this file
-    /* eslint camelcase: 0 */
-
     const vm = this;
     vm.$uibModalInstance = $uibModalInstance;
     vm.$log = $log;

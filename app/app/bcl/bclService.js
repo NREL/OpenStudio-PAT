@@ -6,9 +6,6 @@ export class BCL {
   constructor($q, $http, $uibModal, $log, Project, MeasureManager) {
     'ngInject';
 
-    // ignore camelcase for this file
-    /* eslint camelcase: 0 */
-
     const vm = this;
     vm.$http = $http;
     vm.$uibModal = $uibModal;

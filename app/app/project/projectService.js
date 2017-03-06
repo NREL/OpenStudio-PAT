@@ -26,9 +26,6 @@ export class Project {
     // This bool is used to reduce the number of debug messages given the typical, non-developer user
     vm.showDebug = false;
 
-    // ignore camelcase for this file
-    /* eslint camelcase: 0 */
-
     vm.analysisTypes = ['Manual', 'Algorithmic'];
 
     vm.reportTypes = [{
