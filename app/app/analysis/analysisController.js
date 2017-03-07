@@ -744,8 +744,19 @@ export class AnalysisController {
     copiedMeasure.instanceId = Math.random();
 
     // Make name and display_name unique
-    copiedMeasure.name += '_copy';
-    copiedMeasure.display_name += ' Copy';
+    let count = 2;
+    let notUnique = false;
+    do {
+      notUnique = false;
+      copiedMeasure.name = measure.name + '_' + count.toString();
+      copiedMeasure.display_name = measure.display_name + ' ' + count.toString();
+      _.forEach(vm.$scope.measures, (m) => {
+        if (copiedMeasure.name == m.name || copiedMeasure.name == m.name) {
+          notUnique = true;
+        }
+      });
+      count++;
+    } while (notUnique);
 
     // Close the original measure's accordion
     measure.open = false;
@@ -978,7 +989,7 @@ export class AnalysisController {
 
   deleteScriptArgument(type, index) {
     const vm = this;
-    vm.$log.debug('deleting at index: ', index);
+    if (vm.Message.showDebug()) vm.$log.debug('deleting at index: ', index);
     if (vm.Message.showDebug()) vm.$log.debug('arguments: ', vm.$scope.serverScripts[type].arguments);
     if (!_.isNil(index)) {
       vm.$scope.serverScripts[type].arguments.splice(index, 1);

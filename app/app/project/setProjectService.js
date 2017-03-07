@@ -286,10 +286,10 @@ export class SetProject {
       const file = vm.jetpack.read(fullFilename);
       //if (vm.Message.showDebug()) vm.$log.debug('file: ', file);
       if (typeof file !== 'undefined') {
-        vm.$log.debug(fullFilename, ' found');
+        if (vm.Message.showDebug()) vm.$log.debug(fullFilename, ' found');
         fileExists = true;
       } else {
-        vm.$log.debug(fullFilename, ' not found');
+        if (vm.Message.showDebug()) vm.$log.debug(fullFilename, ' not found');
         const allOSPs = vm.jetpack.find(projectDir.path(), {matching: '*.osp', recursive: false});
         if (allOSPs.length > 0) {
           if (vm.Message.showDebug()) vm.$log.debug('found osp in openProject');
