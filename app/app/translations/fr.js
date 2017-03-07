@@ -327,6 +327,11 @@ export default {
       rerunAnalysisMessage: 'Running a new analysis will delete your local results. Are you sure you want to continue?',
       setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?'
     },
+    modalAwsWarning: {
+      title: 'PAT Cloud Support with Amazon EC2',
+      message: 'The user assumes all responsibility for orphaned EC2 processes.  It is strongly recommended that you monitor EC2 cloud usage in the Amazon AWS Console to avoid any unwanted charges.',
+      agree: 'I agree'
+    },
     modalCloudRunning: {
       title: 'Cloud Cluster is Running',
       message: 'You are still connected to AWS. Terminate the cluster?',

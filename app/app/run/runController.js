@@ -164,7 +164,6 @@ export class RunController {
     }
   }
 
-
   remoteTypeChange() {
     const vm = this;
     // reset connection setting for remote type
@@ -581,6 +580,32 @@ export class RunController {
         vm.toastr.error('Error: server could not be stopped');
       }
       deferred.reject();
+    });
+
+    return deferred.promise;
+  }
+
+  // display warning message when Starting a Cloud connection
+  warnAws() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    if (vm.Message.showDebug()) vm.$log.debug('**** In RunController::WarnAws ****');
+
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalAwsWarningController',
+      controllerAs: 'modal',
+      templateUrl: 'app/run/awsWarning.html'
+    });
+
+    modalInstance.result.then(() => {
+      vm.connectAws('start');
+      deferred.resolve();
+    }, () => {
+
+      deferred.reject();
+
     });
 
     return deferred.promise;

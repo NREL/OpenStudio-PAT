@@ -114,7 +114,7 @@
                   <div class="inline pad-left-5">
                     <button type="button" ng-show="remoteSettings.aws.connected" class="btn btn-danger" ng-class="disabledStopButtonClass()" ng-click="run.stopServer()" translate>run.remote.terminate</button>
                     <button type="button" ng-show="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == 'running' && !run.OsServerService.getRemoteStartInProgress()" class="btn btn-primary" ng-class="disabledButtonClass()" ng-click="run.connectAws('connect')" translate>run.remote.connect</button>
-                    <button type="button" ng-show="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == 'terminated'" class="btn btn-success" ng-click="run.connectAws('start')" ng-class="disabledButtonClass()" translate>run.remote.start</button>
+                    <button type="button" ng-show="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == 'terminated'" class="btn btn-success" ng-click="run.warnAws()" ng-class="disabledButtonClass()" translate>run.remote.start</button>
                   </div>
                 </div>
               </div>
