@@ -309,7 +309,7 @@ export default {
     stopServer: "Arrêter le serveur",
     exportToOSA: "Exporter vers OSA",
     runEntireWorkflow: "Exécuter tout le workflow",
-    runSelected: Exécuter sélectionné",
+    runSelected: "Exécuter sélectionné",
     selectAll: "Tout sélectionner",
     clearSelections: "Effacer les sélections",
     algorithmicOnCloud: "Algorithmic analyses cannot be run locally.  Select \"Run on Cloud\" from the dropdown above to run this analysis remotely.",
@@ -326,9 +326,9 @@ export default {
       setRunTypeMessage: "La sélection d'un nouveau type d'exécution supprimera vos résultats locaux. êtes-vous sûr de vouloir continuer?"
     },
     modalAwsWarning: {
-      title: 'PAT Cloud Support with Amazon EC2',
-      message: 'The user assumes all responsibility for orphaned EC2 processes.  It is strongly recommended that you monitor EC2 cloud usage in the Amazon AWS Console to avoid any unwanted charges.',
-      agree: 'I agree'
+      title: "PAT Cloud Support with Amazon EC2",
+      message: "The user assumes all responsibility for orphaned EC2 processes.  It is strongly recommended that you monitor EC2 cloud usage in the Amazon AWS Console to avoid any unwanted charges.",
+      agree: "I agree"
     },
     modalCloudRunning: {
       title: "Cloud cluster est en cours d'exécution",
