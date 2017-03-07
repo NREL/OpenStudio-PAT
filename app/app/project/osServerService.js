@@ -317,14 +317,18 @@ export class OsServer {
     vm.serverType = type;
   }
 
-  // ping server
+  // ping server (this isn't used for the cloud
   pingServer() {
     const vm = this;
     const serverType = vm.Project.getRunType().name;
+    const remoteSettings = vm.Project.getRemoteSettings();
 
     if (serverType == 'local') {
       // in case server didn't shut down correctly before
       vm.getLocalServerUrlFromFile();
+    } else if (remoteSettings.remoteType == 'Existing Remote Server') {
+      // remote
+      vm.resetSelectedServerURL();
     }
 
     vm.$log.info('Pinging ', serverType, ' server to see if it is alive: ', vm.selectedServerURL);

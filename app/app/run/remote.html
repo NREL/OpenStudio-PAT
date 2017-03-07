@@ -18,7 +18,7 @@
             <input class="form-control" id="externalURL" type="text" ng-model="remoteSettings.remoteServerURL" ng-change="run.resetRemoteServerURL()">
           </div>
           <div class="col-sm-1">
-            <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] != 'started'" ng-click="run.startServer()" translate>run.remote.connect</button>
+            <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] != 'started'" ng-click="run.connectRemoteServer()" translate>run.remote.connect</button>
             <button type="button" class="btn btn-danger" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()" translate>run.remote.disconnect</button>
           </div>
         </div>

@@ -456,6 +456,24 @@ export class RunController {
     });
   }
 
+  connectRemoteServer(){
+    const vm = this;
+
+    vm.OsServer.startServer().then(response => {
+      if (vm.Message.showDebug()) vm.$log.debug('Run::connectRemoteServer response: ', response);
+      vm.OsServer.setProgress(0, '');
+      vm.toastr.clear();
+      if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
+        vm.toastr.success('PAT successfully connected to remote server');
+      }
+    }, error => {
+      vm.toastr.clear();
+      vm.toastr.error('Error connecting to existing remote server');
+      if (vm.Message.showDebug()) vm.$log.debug('Connection error: ', error);
+    });
+  }
+
+
   viewReportModal(datapoint, report) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In viewReport- ', report);
