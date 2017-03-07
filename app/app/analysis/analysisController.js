@@ -751,7 +751,7 @@ export class AnalysisController {
       copiedMeasure.name = measure.name + '_' + count.toString();
       copiedMeasure.display_name = measure.display_name + ' ' + count.toString();
       _.forEach(vm.$scope.measures, (m) => {
-        if (copiedMeasure.name == m.name || copiedMeasure.name == m.name) {
+        if (copiedMeasure.name == m.name || copiedMeasure.display_name == m.display_name) {
           notUnique = true;
         }
       });
