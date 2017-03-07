@@ -33,6 +33,10 @@ export class RunController {
     if (vm.Message.showDebug()) vm.$log.debug('REMOTE SETTINGS: ', vm.$scope.remoteSettings);
 
     vm.$scope.clusterData = {};
+    vm.$scope.clusters = [];
+    if (vm.$scope.selectedRunType.name == 'remote'){
+      vm.$scope.clusters = vm.Project.getClusters();
+    }
     // if remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
       vm.checkIfClusterIsRunning();
@@ -46,7 +50,6 @@ export class RunController {
     vm.$scope.workerInstanceTypes = vm.Project.getWorkerInstanceTypes();
     // only valid region is us-east-1 for now
     vm.$scope.awsRegions = vm.Project.getAwsRegions()[0];
-    vm.$scope.clusters = vm.Project.getClusters();
     vm.$scope.awsYamlFiles = vm.Project.getAwsYamlFiles();
 
     // clear out aws settings if can't find file
@@ -164,6 +167,8 @@ export class RunController {
 
   remoteTypeChange() {
     const vm = this;
+    // reset connection setting for remote type
+    vm.$scope.serverStatuses.remote = 'stopped';
     vm.OsServer.resetSelectedServerURL();
     // if switching to remote and amazon is selected, ping cluster
     if (vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
@@ -183,6 +188,7 @@ export class RunController {
 
     // if switching to remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+      vm.$scope.clusters = vm.Project.getClusters();
       vm.resetClusterSettings();
       vm.checkIfClusterIsRunning();
     }
@@ -277,7 +283,7 @@ export class RunController {
     const vm = this;
     // see if cluster is running; if so, set status
     if (vm.$scope.remoteSettings.aws && vm.$scope.remoteSettings.aws.cluster_name) {
-      vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
+      vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then(() => {
         // running
         vm.$scope.remoteSettings.aws.cluster_status = 'running';
         if (vm.Message.showDebug()) vm.$log.debug('Run::checkIfClusterIsRunning Current Cluster RUNNING!');
@@ -319,7 +325,7 @@ export class RunController {
       }
 
       // set variables
-      vm.$scope.remoteSettings.aws.server_instance_type = "";
+      vm.$scope.remoteSettings.aws.server_instance_type = '';
       if (vm.Message.showDebug()) vm.$log.debug('serverinstancetypes: ', vm.$scope.serverInstanceTypes);
       if (clusterFile.server_instance_type) {
         const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.server_instance_type});
@@ -328,7 +334,7 @@ export class RunController {
           vm.$scope.remoteSettings.aws.server_instance_type = match;
         }
       }
-      vm.$scope.remoteSettings.aws.worker_instance_type = "";
+      vm.$scope.remoteSettings.aws.worker_instance_type = '';
       if (vm.Message.showDebug()) vm.$log.debug('workerinstancetypes: ', vm.$scope.workerInstanceTypes);
       if (clusterFile.worker_instance_type) {
         const match = _.find(vm.$scope.workerInstanceTypes, {name: clusterFile.worker_instance_type});
@@ -341,7 +347,7 @@ export class RunController {
       vm.$scope.remoteSettings.aws.worker_node_number = clusterFile.worker_node_number ? clusterFile.worker_node_number : 0;
       vm.$scope.remoteSettings.aws.aws_tags = []; // leave empty for now
       if (vm.Message.showDebug()) vm.$log.debug('server versions: ', vm.$scope.osServerVersions);
-      vm.$scope.remoteSettings.openstudio_server_version = "";
+      vm.$scope.remoteSettings.openstudio_server_version = '';
       if (clusterFile.openstudio_server_version) {
         const match = _.find(vm.$scope.osServerVersions, {name: clusterFile.openstudio_server_version});
         if (vm.Message.showDebug()) vm.$log.debug('AMI match: ', match);
@@ -360,54 +366,10 @@ export class RunController {
         user_id: '',
         worker_node_number: 0,
         aws_tags: [],
-        opnestudio_server_version: ''
+        openstudio_server_version: ''
       };
 
     }
-
-
-    // const clusterFile = vm.jetpack.read(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json');
-    // if (!clusterFile) {
-    //   // clear out
-    //   vm.$scope.remoteSettings.aws = {connected: false, cluster_name: null, server_instance_type: null, worker_instance_type: null, user_id: null, worker_node_number: null, aws_tags: [], opnestudio_server_version:null};
-    // }
-    // else {
-    //   vm.$scope.remoteSettings.aws.connected = false;
-    //
-    //   // see if cluster is running; if so, set status
-    //   vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
-    //     // running
-    //     vm.$scope.remoteSettings.aws.cluster_status = 'running';
-    //   }, () => {
-    //     // terminated
-    //     vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
-    //   });
-    //
-    //   // set variables
-    //   vm.$scope.remoteSettings.aws.server_instance_type = null;
-    //   if (clusterFile.server_instance_type) {
-    //     const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.server_instance_type});
-    //     if (vm.Message.showDebug()) vm.$log.debug('Server match: ', match);
-    //     if (match) {
-    //       vm.$scope.remoteSettings.aws.server_instance_type = match;
-    //     }
-    //   }
-    //   vm.$scope.remoteSettings.aws.worker_instance_type = null;
-    //   if (clusterFile.worker_instance_type) {
-    //     const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.worker_instance_type});
-    //     if (vm.Message.showDebug()) vm.$log.debug('Worker match: ', match);
-    //     if (match) {
-    //       vm.$scope.remoteSettings.aws.worker_instance_type = match;
-    //     }
-    //   }
-    //   vm.$scope.remoteSettings.aws.user_id = clusterFile.user_id ? clusterFile.user_id : null;
-    //   vm.$scope.remoteSettings.aws.worker_node_number = clusterFile.worker_node_number ? clusterFile.worker_node_number: null;
-    //   vm.$scope.remoteSettings.aws.aws_tags = []; // leave empty for now
-    //   vm.$scope.remoteSettings.aws.openstudio_server_version = clusterFile.openstudio_server_version ? clusterFile.openstudio_server_version: null;
-    //
-    //   vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
-    //
-    // }
 
     if (vm.Message.showDebug()) vm.$log.debug('remote settings.aws reset: ', vm.$scope.remoteSettings.aws);
   }
@@ -853,7 +815,7 @@ export class RunController {
                 // refresh datapoints
                 vm.$scope.datapoints = vm.Project.getDatapoints();
                 // download reports
-                vm.OsServer.downloadReports().then(response3 => {  // TODO: one by one
+                vm.OsServer.downloadReports().then(() => {  // TODO: one by one
                   if (vm.Message.showDebug()) vm.$log.debug('downloaded all available reports');
                   // refresh datapoints again
                   vm.$scope.datapoints = vm.Project.getDatapoints();

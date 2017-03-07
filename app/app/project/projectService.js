@@ -1525,7 +1525,7 @@ export class Project {
       });
     } else {
       // nothing to ping
-      vm.$log.error('Nothing to ping');
+      vm.$log.info('No DNS to ping for this cluster');
       deferred.reject();
     }
 
