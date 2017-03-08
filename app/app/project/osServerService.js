@@ -60,6 +60,8 @@ export class OsServer {
     vm.openstudioBindingsDirPath = path.dirname(vm.openstudioBindingsPath);
     vm.rubyPath = DependencyManager.getPath("PAT_RUBY_PATH");
     vm.energyplusEXEPath = DependencyManager.getPath("ENERGYPLUS_EXE_PATH");
+    vm.perlEXEPath = DependencyManager.getPath("PERL_EXE_PATH");
+    vm.osrayPath = DependencyManager.getPath("OS_RAYPATH");
 
     // server start in progress?
     // local
