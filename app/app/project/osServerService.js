@@ -58,8 +58,10 @@ export class OsServer {
     vm.mongoDirPath = path.dirname(vm.mongoPath);
     vm.openstudioBindingsPath = DependencyManager.getPath('PAT_OS_BINDING_PATH');
     vm.openstudioBindingsDirPath = path.dirname(vm.openstudioBindingsPath);
-    vm.rubyPath = DependencyManager.getPath('PAT_RUBY_PATH');
-    vm.energyplusEXEPath = DependencyManager.getPath('ENERGYPLUS_EXE_PATH');
+    vm.rubyPath = DependencyManager.getPath("PAT_RUBY_PATH");
+    vm.energyplusEXEPath = DependencyManager.getPath("ENERGYPLUS_EXE_PATH");
+    vm.perlEXEPath = DependencyManager.getPath("PERL_EXE_PATH");
+    vm.osrayPath = DependencyManager.getPath("OS_RAYPATH");
 
     // server start in progress?
     // local
