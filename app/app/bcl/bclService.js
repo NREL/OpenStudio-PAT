@@ -118,8 +118,8 @@ export class BCL {
             // if (vm.Message.showDebug()) vm.$log.debug('version_ids: ', project_match.version_id, measure.version_id);
 
             // TODO: also compare date (match.version_modified > measure.version_modified)
-            let projectVersionModified = vm.Project.makeDate(projectMatch.version_modified);
-            let measureVersionModified = vm.Project.makeDate(measure.version_modified);
+            const projectVersionModified = vm.Project.makeDate(projectMatch.version_modified);
+            const measureVersionModified = vm.Project.makeDate(measure.version_modified);
 
             if (vm.Message.showDebug()) vm.$log.debug('My Measure: ', measure.name, ' projectMatch.version_id: ', projectMatch.version_id, ' measure version id: ', measure.version_id, ' project version_modified: ', projectVersionModified, ' measure version_modified: ', measureVersionModified);
 
@@ -267,7 +267,7 @@ export class BCL {
     vm.bclMeasures = [];
     const numResults = 100;
     const promises = [];
-    const numPages = 0;
+    let numPages = 0;
     const baseUrl = vm.bclUrl + 'search/?fq[]=bundle:nrel_measure&api_version=2&show_rows=' + numResults;
     let url = '';
 
@@ -275,7 +275,7 @@ export class BCL {
     const metaURL = vm.bclUrl + 'metasearch/?fq[]=bundle:nrel_measure&api_version=2';
     vm.$http.get(metaURL).then(response => {
       const numMeasures = response.data.result_count;
-      const numPages = Math.ceil(numMeasures / numResults);
+      numPages = Math.ceil(numMeasures / numResults);
       if (vm.showDebug) vm.$log.debug('Number of pages to retrieve from BCL: ', numPages);
       // get measures
       for (let page = 0; page < numPages; page++) {

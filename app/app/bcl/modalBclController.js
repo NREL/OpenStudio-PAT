@@ -612,7 +612,7 @@ export class ModalBclController {
         // unset 'update' status on original measure
         measure.status = '';
         // remove arguments and merge rest with project_measure
-        let measure_copy = angular.copy(measure);
+        const measure_copy = angular.copy(measure);
         delete measure_copy.arguments;
         delete measure_copy.open;
         _.assignIn(project_measure, measure_copy);

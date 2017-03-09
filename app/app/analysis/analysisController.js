@@ -58,10 +58,10 @@ export class AnalysisController {
 
     // size grids according to data
     vm.$scope.getTableHeight = function (instanceId) {
-      var rowHeight = 30; // your row height
-      var headerHeight = 40; // your header height
+      const rowHeight = 30; // your row height
+      const headerHeight = 40; // your header height
       return {
-        height: (vm.$scope.gridOptions[instanceId].data.length * rowHeight + headerHeight + 10) + "px"
+        height: (vm.$scope.gridOptions[instanceId].data.length * rowHeight + headerHeight + 10) + 'px'
       };
     };
 
@@ -79,7 +79,7 @@ export class AnalysisController {
       return settings;
     };
 
-    vm.$scope.getDistributions = function (argument) {
+    vm.$scope.getDistributions = function () {
       //if (vm.Message.showDebug()) vm.$log.debug('In getDistributions');
       let distributions = [];
       switch (vm.$scope.selectedSamplingMethod.id) {
@@ -444,7 +444,7 @@ export class AnalysisController {
 
     measure.numberOfOptions++;
 
-    const optionKeys = _.filter(keys, function (k) {
+    const optionKeys = _.filter(keys, (k) => {
       return k.indexOf('option_') !== -1;
     });
     //if (vm.Message.showDebug()) vm.$log.debug('option keys: ', optionKeys);
@@ -568,7 +568,7 @@ export class AnalysisController {
       for (let i = 0; i < measure.arguments.length; i++) {
         if (measure.arguments[i].display_name === display_name) {
           const keys = _.keys(measure.arguments[i]);
-          const optionKeys = _.filter(keys, function (k) {
+          const optionKeys = _.filter(keys, (k) => {
             return k.indexOf('option_') !== -1;
           });
           for (let j = 1; j < optionKeys.length; j++) {
@@ -611,7 +611,7 @@ export class AnalysisController {
       // Dont change the first 3 rows regarding naming
       for (let i = 3; i < measure.arguments.length; i++) {
         const keys = _.keys(measure.arguments[i]);
-        const optionKeys = _.filter(keys, function (k) {
+        const optionKeys = _.filter(keys, (k) => {
           return k.indexOf('option_') !== -1;
         });
         for (let j = 1; j < optionKeys.length; j++) {
@@ -740,7 +740,7 @@ export class AnalysisController {
     if (vm.Message.showDebug()) vm.$log.debug('In duplicateMeasureAndOption in analysis');
     vm.setIsModified();
 
-    let copiedMeasure = angular.copy(measure);
+    const copiedMeasure = angular.copy(measure);
     copiedMeasure.instanceId = Math.random();
 
     // Make name and display_name unique
@@ -808,7 +808,7 @@ export class AnalysisController {
       if (arg.type == 'Choice') {
         if (vm.Message.showDebug()) vm.$log.debug('Choice Arg: ', arg.name);
         const keys = _.keys(arg);
-        const optionKeys = _.filter(keys, function (k) {
+        const optionKeys = _.filter(keys, (k) => {
           return k.indexOf('option_') !== -1;
         });
         _.forEach(optionKeys, (key) => {
@@ -1034,7 +1034,7 @@ export class AnalysisController {
         vm.resetAllChoiceArgumentSelections();
         vm.initializeTab();
       }, error => {
-        if (vm.Message.showDebug()) vm.$log.debug('ERROR in computeAllMeasureArguments');
+        if (vm.Message.showDebug()) vm.$log.debug('ERROR in computeAllMeasureArguments: ', error);
       });
     }
   }

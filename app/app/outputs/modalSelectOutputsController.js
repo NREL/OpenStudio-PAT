@@ -42,7 +42,7 @@ export class ModalSelectOutputsController {
 
       if (output.newOut){
         // create name and make sure output name includes measure name
-        let name = _.snakeCase(output.display_name);
+        const name = _.snakeCase(output.display_name);
         if (name.indexOf(vm.$scope.measure.name + '.') == -1) {
           output.name = vm.$scope.measure.name + '.' + name;
         }

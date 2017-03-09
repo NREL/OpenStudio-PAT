@@ -52,11 +52,11 @@ export class OsServer {
     const src = jetpack.cwd(app.getPath('userData'));
     if (vm.Message.showDebug()) vm.$log.debug('src.path(): ', src.path());
 
-    vm.cliPath = DependencyManager.getPath("PAT_OS_CLI_PATH");
-    vm.metaCLIPath = DependencyManager.getPath("PAT_OS_META_CLI_PATH");
-    vm.mongoPath = DependencyManager.getPath("PAT_MONGO_PATH");
+    vm.cliPath = DependencyManager.getPath('PAT_OS_CLI_PATH');
+    vm.metaCLIPath = DependencyManager.getPath('PAT_OS_META_CLI_PATH');
+    vm.mongoPath = DependencyManager.getPath('PAT_MONGO_PATH');
     vm.mongoDirPath = path.dirname(vm.mongoPath);
-    vm.openstudioBindingsPath = DependencyManager.getPath("PAT_OS_BINDING_PATH");
+    vm.openstudioBindingsPath = DependencyManager.getPath('PAT_OS_BINDING_PATH');
     vm.openstudioBindingsDirPath = path.dirname(vm.openstudioBindingsPath);
     vm.rubyPath = DependencyManager.getPath("PAT_RUBY_PATH");
     vm.energyplusEXEPath = DependencyManager.getPath("ENERGYPLUS_EXE_PATH");
@@ -985,7 +985,7 @@ export class OsServer {
       const promise = vm.$http.get(url, config).then(response => {
         // save OSW to file
         if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT OUT.OSW response: ', response.data);
-        let datapoint = response.data;
+        const datapoint = response.data;
         vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(dp.id, 'out.osw'), datapoint);
 
         // also load in datapoints array
@@ -993,7 +993,7 @@ export class OsServer {
         datapoint.final_message = dp.final_message;
         datapoint.id = dp.id;
 
-        let dp_match = _.findIndex(vm.datapoints, {name: dp.name});
+        const dp_match = _.findIndex(vm.datapoints, {name: dp.name});
         if (vm.Message.showDebug()) vm.$log.debug('DP match results for: ', dp.name, ': ', dp_match);
         if (dp_match != -1) {
           // merge
@@ -1017,12 +1017,12 @@ export class OsServer {
             // set datapoint array
             if (vm.Message.showDebug()) vm.$log.debug('datapoint JSON raw response: ', response2);
             vm.$log.info('datapoint JSON response: ', response2.data.data_point);
-            let datapoint = response2.data.data_point;
+            const datapoint = response2.data.data_point;
             datapoint.status = dp.status;
             datapoint.final_message = dp.final_message;
             datapoint.id = dp.id;
 
-            let dp_match = _.findIndex(vm.datapoints, {name: dp.name});
+            const dp_match = _.findIndex(vm.datapoints, {name: dp.name});
             if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
             if (dp_match != -1) {
               // merge
@@ -1044,7 +1044,7 @@ export class OsServer {
       promises.push(promise);
     });
 
-    vm.$q.all(promises).then(response => {
+    vm.$q.all(promises).then(() => {
       deferred.resolve(vm.datapoints);
       vm.Project.setModified(true);
     }, error => {
@@ -1092,7 +1092,7 @@ export class OsServer {
             }
           });
           // when all reports are downloaded for a single datapoint
-          vm.$q.all(reportPromises).then(response => {
+          vm.$q.all(reportPromises).then(() => {
             // set downloaded_reports flag
             dp.downloaded_reports = true;
             vm.Project.setModified(true);
@@ -1100,16 +1100,16 @@ export class OsServer {
             // if running locally, also download osm and results
             if (vm.Project.getRunType().name == 'local') {
               if (vm.Message.showDebug()) vm.$log.debug('Run Type is set to Local');
-              const osm_promise = vm.downloadOSM(dp).then(response => {
+              const osm_promise = vm.downloadOSM(dp).then(() => {
                 vm.$log.info('osm downloaded for ', dp.name);
               }, error => {
-                vm.$log.error('OSM download failed for ', dp.name);
+                vm.$log.error('OSM download failed for ', dp.name, ', error: ', error);
               });
               //promises.push(osm_promise);
-              const result_promise = vm.downloadResults(dp).then(response => {
+              const result_promise = vm.downloadResults(dp).then(() => {
                 vm.$log.info('results downloaded for ', dp.name);
               }, error => {
-                vm.$log.error('RESULTS download failed for ', dp.name);
+                vm.$log.error('RESULTS download failed for ', dp.name, ', error: ', error);
               });
               //promises.push(result_promise);
             }
@@ -1126,7 +1126,7 @@ export class OsServer {
       }
     });
 
-    vm.$q.all(promises).then(response => {
+    vm.$q.all(promises).then(() => {
       vm.$log.info('Updated Datapoints with Reports: ', vm.datapoints);
       deferred.resolve(vm.datapoints);
       vm.Project.setModified(true);
@@ -1150,7 +1150,7 @@ export class OsServer {
       promises.push(promise);
     });
 
-    vm.$q.all(promises).then(response => {
+    vm.$q.all(promises).then(() => {
       vm.$log.info('All Datapoint results zip files downloaded');
       deferred.resolve();
     }, error => {
@@ -1218,7 +1218,7 @@ export class OsServer {
       promises.push(promise);
     });
 
-    vm.$q.all(promises).then(response => {
+    vm.$q.all(promises).then(() => {
       vm.$log.info('All OSMs downloaded');
       deferred.resolve();
     }, error => {

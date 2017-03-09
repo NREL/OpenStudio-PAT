@@ -14,7 +14,7 @@ export class ModalProjectNameController {
   ok() {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('ModalProjectNameController ok');
-    let noWhitespace = vm.$scope.name;
+    const noWhitespace = vm.$scope.name;
     // if (vm.$scope.name.indexOf(' ') >= 0) {
     //   noWhitespace = vm.$scope.name.replace(/\s/g, '');
     // }
