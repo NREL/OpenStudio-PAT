@@ -59,7 +59,7 @@ export class SetProject {
         let projectDir = jetpack.cwd(result[0]);
         // Check that path is not in a PAT project subdirectory
         let count = 0;
-        let maxDirectoriesToCheck = 5;
+        const maxDirectoriesToCheck = 5;
         let fileExists = false;
         let atRoot = false;
         let currentDir = projectDir;
@@ -69,7 +69,7 @@ export class SetProject {
           const file = vm.jetpack.read(fullFilename);
           if (typeof file !== 'undefined') {
             fileExists = true;
-            vm.nestedProjectModal().then(response => {
+            vm.nestedProjectModal().then(() => {
             });
             vm.$log.info('Found what appears to be a PAT project at ', currentDir.path());
             deferred.reject('rejected');
@@ -123,7 +123,7 @@ export class SetProject {
               if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
             });
 
-          }, (error) => {
+          }, () => {
             vm.$log.info('stop server errored, but setting project anyway and starting new local server');
 
             // for saveAs: copy old project's folder structure to new location (from, to)
@@ -180,7 +180,7 @@ export class SetProject {
         let projectDir = jetpack.cwd(result[0]);
         // Check that path is not in a PAT project subdirectory
         let count = 0;
-        let maxDirectoriesToCheck = 5;
+        const maxDirectoriesToCheck = 5;
         let fileExists = false;
         let atRoot = false;
         let currentDir = projectDir;
@@ -190,7 +190,7 @@ export class SetProject {
           const file = vm.jetpack.read(fullFilename);
           if (typeof file !== 'undefined') {
             fileExists = true;
-            vm.nestedProjectModal().then(response => {
+            vm.nestedProjectModal().then(() => {
             });
             vm.$log.info('Found what appears to be a PAT project at ', currentDir.path());
             deferred.reject('rejected');
@@ -239,7 +239,7 @@ export class SetProject {
               if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
             });
 
-          }, (error) => {
+          }, () => {
             vm.$log.info('stop server errored, but setting project anyway');
             // set project Variables anyway
             vm.setProjectVariables(projectDir);
@@ -337,7 +337,7 @@ export class SetProject {
             if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
           });
 
-        }, (error) => {
+        }, () => {
           vm.$log.info('stop server errored, but setting project anyway');
           // set project Variables anyway
           vm.setProjectVariables(projectDir);

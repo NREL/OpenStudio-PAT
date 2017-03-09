@@ -7,13 +7,13 @@ export class Message {
 
     // This bool is used to reduce the number of debug messages given the typical, non-developer user
     vm.showDebugMessages = false;
-    vm.$log.info('showDebugMessages = ',vm. showDebugMessages);
+    vm.$log.info('showDebugMessages = ', vm.showDebugMessages);
 
     vm.showInfoMessages = true;
-    vm.$log.info('showInfoMessages = ',vm. showInfoMessages);
+    vm.$log.info('showInfoMessages = ', vm.showInfoMessages);
 
     vm.showErrorMessages = true;
-    vm.$log.info('showErrorMessages = ',vm. showErrorMessages);
+    vm.$log.info('showErrorMessages = ', vm.showErrorMessages);
   }
 
   showDebug() {

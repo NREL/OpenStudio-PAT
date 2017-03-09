@@ -135,7 +135,7 @@ export class DesignAlternativesController {
           if (newValue != oldValue) {
             // find datapoint and mark as modified (if already run)
             const match = _.find(vm.datapoints, {name: rowEntity.name});
-            if (match && match.updated_at) {
+            if (_.get(match,'updated_at')) {
               match.modified = true;
             }
           }
@@ -211,7 +211,7 @@ export class DesignAlternativesController {
 
     const match = _.find(vm.datapoints, {name: alternative.name});
 
-    if (match && match.updated_at) {
+    if (_.get(match, 'updated_at')) {
       // dp with results exists
       const modalInstance = vm.$uibModal.open({
         backdrop: 'static',
@@ -265,7 +265,6 @@ export class DesignAlternativesController {
   createAlternatives() {
     const vm = this;
     vm.setIsModified();
-    let alternatives = vm.Project.getDesignAlternatives();
 
     _.forEach(vm.measures, (measure) => {
       _.forEach(measure.options, (option) => {
@@ -311,7 +310,7 @@ export class DesignAlternativesController {
       // found at least a match.  find next available number
       const newMatchArr = [];
       _.forEach(matchArr, (match) => {
-        let newMatch = _.trim(match.replace(newName, ''));
+        const newMatch = _.trim(match.replace(newName, ''));
         //if (vm.Message.showDebug()) vm.$log.debug('match after: ', newMatch);
         if (_.isNumber(_.toNumber(newMatch))) {
           //if (vm.Message.showDebug()) vm.$log.debug('match is a number');

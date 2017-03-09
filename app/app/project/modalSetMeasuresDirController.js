@@ -38,7 +38,7 @@ export class ModalSetMeasuresDirController {
     const vm = this;
     // set new My Measures Dir
     vm.MeasureManager.setMyMeasuresDir(vm.$scope.currentDir).then(response => {
-      if (vm.Message.showDebug()) vm.$log.debug('Successfully set MyMeasures Directory! ',  response);
+      if (vm.Message.showDebug()) vm.$log.debug('Successfully set MyMeasures Directory! ', response);
       // set measureDir in Project
       vm.Project.setMeasuresDir(vm.$scope.currentDir);
       vm.$uibModalInstance.close();

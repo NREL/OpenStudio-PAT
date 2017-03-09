@@ -21,7 +21,7 @@ export class ModalDuplicateMeasureController {
   ok() {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('Duplicate Measure measure: ', vm.measure);
-    const oldMeasureDir = vm.measure.measure_dir;
+    //const oldMeasureDir = vm.measure.measure_dir;
 
     // Find a unique measure_dir
     let count = 0;

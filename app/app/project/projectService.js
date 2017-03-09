@@ -1,5 +1,5 @@
 import jetpack from 'fs-jetpack';
-import os from 'os';
+//import os from 'os';
 import path from 'path';
 import {remote} from 'electron';
 import jsZip from 'jszip';
@@ -104,7 +104,7 @@ export class Project {
         }
         if (vm.Message.showDebug()) vm.$log.debug('My measures Dir: ', vm.myMeasuresDir.path());
       }, error => {
-        vm.$log.error('Error in Measure Manager getMyMeasuresDir');
+        vm.$log.error('Error in Measure Manager getMyMeasuresDir: ', error);
       });
     }, error => {
       vm.$log.error('Error in Measure Manager isReady function ', error);
@@ -232,7 +232,7 @@ export class Project {
       let optionKeys = [];
       if (!_.isNil(measure.arguments) && measure.arguments.length > 0) {
         const keys = Object.keys(measure.arguments[0]);
-        optionKeys = _.filter(keys, function (k) {
+        optionKeys = _.filter(keys, (k) => {
           return k.indexOf('option_') !== -1;
         });
       }
@@ -289,7 +289,7 @@ export class Project {
     const promises = [];
 
     if (vm.Message.showDebug()) vm.$log.debug('in Project computeAllMeasureArguments()');
-    let osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
+    // const osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
 
     _.forEach(vm.measures, (measure) => {
       if (!_.isNil(measure.seed)) {
@@ -300,7 +300,7 @@ export class Project {
       promises.push(promise);
     });
 
-    vm.$q.all(promises).then(response => {
+    vm.$q.all(promises).then(() => {
       if (vm.Message.showDebug()) vm.$log.debug('ComputeAllMeasures resolved');
       deferred.resolve();
       vm.setModified(true);
@@ -388,12 +388,12 @@ export class Project {
     vm.exportScripts();
 
     // write to file
-    let filename = vm.projectDir.path(vm.projectName + '.json');
+    const filename = vm.projectDir.path(vm.projectName + '.json');
     vm.jetpack.write(filename, vm.osa);
     if (vm.Message.showDebug()) vm.$log.debug('Project OSA file exported to ' + filename);
 
-    var output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
-    var archive = archiver('zip');
+    const output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
+    const archive = archiver('zip');
 
     output.on('close', function () {
       console.log(archive.pointer() + ' total bytes');
@@ -489,7 +489,7 @@ export class Project {
     _.forEach(vm.designAlternatives, (da) => {
       const dpMatch = _.find(vm.datapoints, {name: da.name});
       // do this for entire workflow or if matching datapoint is selected
-      if (!selectedOnly || (dpMatch && dpMatch.selected)) {
+      if (!selectedOnly || (_.get(dpMatch, 'selected'))) {
         const da_hash = {};
         da_hash.name = da.name;
         da_hash.description = da.description;
@@ -543,7 +543,7 @@ export class Project {
       _.forEach(vm.designAlternatives, (da) => {
         const dpMatch = _.find(vm.datapoints, {name: da.name});
         // do this for entire workflow or if matching datapoint is selected
-        if (!selectedOnly || (dpMatch && dpMatch.selected)) {
+        if (!selectedOnly || (_.get(dpMatch, 'selected'))) {
           if (da[measure.name] == 'None' || _.isUndefined(da[measure.name])) {
             vars.push(true);
           } else {
@@ -561,7 +561,7 @@ export class Project {
         m.measure_definition_class_name = measure.className;
         //m.measure_definition_measureUID = measure.colDef.measureUID;
 
-        let mdir = vm.getMeasureBaseDir(measure);
+        const mdir = vm.getMeasureBaseDir(measure);
         m.measure_definition_directory = './measures/' + mdir;
         m.measure_definition_directory_local = measure.measure_dir;
         m.measure_definition_class_name = measure.class_name;
@@ -581,7 +581,7 @@ export class Project {
         let optionKeys = [];
         //if (measure.arguments.length > 0) {
         const keys = Object.keys(measure.arguments[0]);
-        optionKeys = _.filter(keys, function (k) {
+        optionKeys = _.filter(keys, (k) => {
           return k.indexOf('option_') !== -1;
         });
         //}
@@ -682,7 +682,7 @@ export class Project {
               max = _.max(values);
 
             const mode = function mode(ar) {
-              let numMapping = {};
+              const numMapping = {};
               let greatestFreq = 0;
               let currentMode = 0;
               ar.forEach(function findMode(number) {
@@ -801,7 +801,7 @@ export class Project {
       m.measure_definition_class_name = measure.className;
       //m.measure_definition_measureUID = measure.colDef.measureUID;
 
-      let mdir = vm.getMeasureBaseDir(measure);
+      const mdir = vm.getMeasureBaseDir(measure);
       m.measure_definition_directory = './measures/' + mdir;
       m.measure_definition_directory_local = measure.measure_dir;
       m.measure_definition_class_name = measure.class_name;
@@ -961,7 +961,6 @@ export class Project {
   }
 
   getMeasureType(measure) {
-    const vm = this;
     // measure types: ModelMeasure, EnergyPlusMeasure, ReportingMeasure
     // OSA wants: Ruby, EnergyPlus, Reporting
     let type = null;
@@ -1083,7 +1082,6 @@ export class Project {
   }
 
   makeSkip(measure) {
-    const vm = this;
     const v = {
       argument: {
         display_name: 'Skip ' + measure.display_name,
@@ -1133,7 +1131,6 @@ export class Project {
   }
 
   typeTargetValue(value, type) {
-    const vm = this;
     let newVal;
     if (value == null) {
       newVal = value;
@@ -1465,12 +1462,12 @@ export class Project {
     const tempClusters = vm.jetpack.find(vm.projectDir.path(), {matching: '*_cluster.json'});
     _.forEach(tempClusters, cluster => {
       if (vm.Message.showDebug()) vm.$log.debug('CLUSTER: ', cluster);
-      const clusterFile = vm.jetpack.read(cluster);
+      //const clusterFile = vm.jetpack.read(cluster);
       let clusterName = _.last(_.split(cluster, '/'));
       clusterName = _.replace(clusterName, '_cluster.json', '');
       vm.clusters.all.push(clusterName);
       // PING (by name)
-      vm.pingCluster(clusterName).then((dns) => {
+      vm.pingCluster(clusterName).then(() => {
         // running
         vm.clusters.running.push(clusterName);
       }, () => {
@@ -1550,9 +1547,9 @@ export class Project {
     if (vm.Message.showDebug()) vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
     // copy and clean up what you don't need
     const cluster = angular.copy(vm.remoteSettings.aws);
-    cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : "";
-    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name : "";
-    cluster.openstudio_server_version = cluster.openstudio_server_version ? cluster.openstudio_server_version.name : "";
+    cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : '';
+    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name : '';
+    cluster.openstudio_server_version = cluster.openstudio_server_version ? cluster.openstudio_server_version.name : '';
     // TODO: make sure worker number is a number
     // this is hard-coded
     cluster.ami_lookup_version = 3;
@@ -2515,7 +2512,6 @@ export class Project {
   }
 
   setSamplingMethods() {
-    const vm = this;
 
     return [{
       id: 'baseline_perturbation',
@@ -2696,10 +2692,9 @@ export class Project {
 
   // takes datestrings like these: 20161110T212644Z, 2016-11-22 11:10:50 -0700, 2016-11-22 04:32:23 UTC, or 2016-11-22T04:32:13.626Z
   makeDate(dateString) {
-    const vm = this;
+
     let theDate = '';
     if (dateString) {
-
       if (dateString.slice(8, 9) == 'T') {
         // YYYYMMDDTHHMMSSZ: add punctuation to convert to valid datetime format and parse normally
         const tmp = dateString.slice(0, 4) + '-' + dateString.slice(4, 6) + '-' + dateString.slice(6, 11) + ':' + dateString.slice(11, 13) + ':' + dateString.slice(13, 16);
@@ -2707,12 +2702,9 @@ export class Project {
       } else {
         theDate = new Date(dateString);
       }
-
       // if (vm.Message.showDebug()) vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
     }
-
     return theDate;
-
   }
 
   formatDate(dateString) {
@@ -2722,7 +2714,7 @@ export class Project {
     if (dateString) {
       theDate = vm.makeDate(dateString);
       // format
-      theDate = theDate.getMonth() + 1 + "/" + theDate.getDate() + "/" + theDate.getFullYear();
+      theDate = theDate.getMonth() + 1 + '/' + theDate.getDate() + '/' + theDate.getFullYear();
     }
 
     return theDate;
