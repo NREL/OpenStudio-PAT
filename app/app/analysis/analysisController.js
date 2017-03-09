@@ -5,7 +5,7 @@ const {dialog} = remote;
 
 export class AnalysisController {
 
-  constructor($log, $q, BCL, Project, $scope, $document, $uibModal, toastr, Message) {
+  constructor($log, $q, BCL, Project, $scope, $document, $uibModal, toastr, Message, $translate) {
     'ngInject';
 
     const vm = this;
@@ -20,6 +20,7 @@ export class AnalysisController {
     vm.BCL = BCL;
     vm.dialog = dialog;
     vm.shell = shell;
+    vm.$translate = $translate;
     vm.Message = Message;
 
     vm.analysisTypes = vm.Project.getAnalysisTypes();
@@ -764,7 +765,9 @@ export class AnalysisController {
     vm.$scope.measures.push(copiedMeasure);
     vm.Project.measures.push(copiedMeasure);
 
-    vm.toastr.success('Measure Duplicated!');
+    vm.$translate('toastr.measureDuplicated').then(translation => {
+      vm.toastr.success(translation);
+    });
 
     vm.initializeTab();
   }

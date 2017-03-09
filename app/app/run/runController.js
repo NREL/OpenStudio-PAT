@@ -4,7 +4,7 @@ import YAML from 'yamljs';
 
 export class RunController {
 
-  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, toastr, $sce, Message) {
+  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, $translate, toastr, $sce, Message) {
 
     'ngInject';
 
@@ -17,6 +17,7 @@ export class RunController {
     vm.Project = Project;
     vm.OsServer = OsServer;
     vm.toastr = toastr;
+    vm.$translate = $translate;
     vm.shell = shell;
     vm.jetpack = jetpack;
     vm.$sce = $sce;
@@ -376,7 +377,9 @@ export class RunController {
   saveClusterToFile() {
     const vm = this;
     vm.Project.saveClusterToFile();
-    vm.toastr.success('Cluster saved!');
+    vm.$translate('toastr.clusterSaved').then(translation => {
+      vm.toastr.success(translation);
+    });
   }
 
   connectAws(type) {
@@ -386,34 +389,57 @@ export class RunController {
     vm.saveClusterToFile();
     if (type == 'connect') {
       // toastr
-      vm.toastr.info('Connecting to the Cloud...this may take a few minutes.');
+      vm.$translate('toastr.connectingCloud').then(translation => {
+        vm.toastr.info(translation);
+      });
     } else {
       // toastr
-      vm.toastr.info('Starting Cloud cluster...this may take up to 10 minutes', {closeButton: true, timeOut: 60000});
+      vm.$translate('toastr.startingCloud').then(translation => {
+        vm.toastr.info(translation, {closeButton: true, timeOut: 60000});
+      });
     }
     vm.OsServer.startServer().then(() => {
       vm.$log.info('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
       vm.toastr.clear();
       if (type == 'connect') {
-        vm.toastr.success('Connected to AWS!');
+        vm.$translate('toastr.connectedCloud').then(translation => {
+          vm.toastr.success(translation);
+        });
         vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
         if (vm.Message.showDebug()) vm.$log.debug('clusterData: ', vm.$scope.clusterData);
       }
       else {
-        vm.toastr.success('AWS server started!');
+        vm.$translate('toastr.startedCloud').then(translation => {
+          vm.toastr.success(translation);
+        });
         vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
       }
     }, error => {
-      // error toastr
-      let msg = '';
-      if (error == 'No Credentials') {
-        msg = ': No AWS Credentials Selected';
-      }
+      // error toastrs
       vm.toastr.clear();
-      if (type == 'connect')
-        vm.toastr.error('Error connecting to AWS' + msg);
-      else
-        vm.toastr.error('Error starting AWS server' + msg);
+      if (error == 'No Credentials') {
+        if (type == 'connect'){
+          vm.$translate('toastr.connectCredentialsError').then(translation => {
+            vm.toastr.error(translation);
+          });
+        } else {
+          vm.$translate('toastr.startCredentialsError').then(translation => {
+            vm.toastr.error(translation);
+          });
+        }
+      }
+      else {
+        if (type == 'connect')
+          vm.$translate('toastr.connectedCloudError').then(translation => {
+            vm.toastr.error(translation);
+          });
+        else {
+          vm.$translate('toastr.startedCloudError').then(translation => {
+            vm.toastr.error(translation);
+          });
+        }
+      }
+
     });
   }
 
@@ -425,11 +451,15 @@ export class RunController {
       vm.OsServer.setProgress(0, '');
       vm.toastr.clear();
       if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
-        vm.toastr.success('PAT successfully connected to remote server');
+        vm.$translate('toastr.connectedRemote').then(translation => {
+          vm.toastr.success(translation);
+        });
       }
     }, error => {
       vm.toastr.clear();
-      vm.toastr.error('Error connecting to existing remote server');
+      vm.$translate('toastr.connectedRemoteError').then(translation => {
+        vm.toastr.error(translation);
+      });
       if (vm.Message.showDebug()) vm.$log.debug('Connection error: ', error);
     });
   }
@@ -550,7 +580,9 @@ export class RunController {
     const deferred = vm.$q.defer();
 
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
-      vm.toastr.info('Terminating Cloud Clusters...', {closeButton: true, timeOut: 30000});
+      vm.$translate('toastr.terminatingCluster').then(translation => {
+        vm.toastr.info(translation, {closeButton: true, timeOut: 30000});
+      });
     }
 
     vm.OsServer.stopServer(force).then(response => {
@@ -559,25 +591,37 @@ export class RunController {
       vm.OsServer.setProgress(0, '');
       vm.toastr.clear();
       if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
-        vm.toastr.success('PAT successfully disconnected from remote server');
+        vm.$translate('toastr.disconnectedRemote').then(translation => {
+          vm.toastr.success(translation);
+        });
       } else if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
-        vm.toastr.success('PAT successfully terminated AWS cluster.  You should double check that the servers were terminated in the AWS Console.');
+        vm.$translate('toastr.terminatedCluster').then(translation => {
+          vm.toastr.success(translation);
+        });
         // debug
         vm.$log.info('***Cloud Cluster status: ', vm.$scope.remoteSettings.aws.cluster_status);
         vm.$log.info('***remoteSettings.Aws: ', vm.$scope.remoteSettings.aws);
       } else {
-        vm.toastr.success('Server stopped successfully');
+        vm.$translate('toastr.stoppedServer').then(translation => {
+          vm.toastr.success(translation);
+        });
       }
       deferred.resolve();
     }, response => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
       vm.$log.error('ERROR STOPPING SERVER, ERROR: ', response);
       if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
-        vm.toastr.error('PAT could not disconnect from remote server');
+        vm.$translate('toastr.disconnectedRemoteError').then(translation => {
+          vm.toastr.error(translation);
+        });
       } else if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
-        vm.toastr.error('PAT could not terminate AWS cluster.  Check the AWS console.');
+        vm.$translate('toastr.terminatedClusterError').then(translation => {
+          vm.toastr.error(translation);
+        });
       } else {
-        vm.toastr.error('Error: server could not be stopped');
+        vm.$translate('toastr.stoppedServerError').then(translation => {
+          vm.toastr.error(translation);
+        });
       }
       deferred.reject();
     });
@@ -917,36 +961,52 @@ export class RunController {
   downloadResults(datapoint) {
     const vm = this;
     vm.OsServer.downloadResults(datapoint).then(() => {
-      vm.toastr.success('Results downloaded successfully!');
+      vm.$translate('toastr.downloadedResults').then(translation => {
+        vm.toastr.success(translation);
+      });
     }, () => {
-      vm.toastr.error('Error downloading Results zip file');
+      vm.$translate('toastr.downloadedResultsError').then(translation => {
+        vm.toastr.error(translation);
+      });
     });
   }
 
   downloadAllResults() {
     const vm = this;
     vm.OsServer.downloadAllResults().then(() => {
-      vm.toastr.success('All Results downloaded successfully!');
+      vm.$translate('toastr.downloadedAllResults').then(translation => {
+        vm.toastr.success(translation);
+      });
     }, () => {
-      vm.toastr.error('Error downloading Results zip files');
+      vm.$translate('toastr.downloadedAllResultsError').then(translation => {
+        vm.toastr.error(translation);
+      });
     });
   }
 
   downloadOSM(datapoint) {
     const vm = this;
     vm.OsServer.downloadOSM(datapoint).then(() => {
-      vm.toastr.success('OSM downloaded successfully!');
+      vm.$translate('toastr.downloadedOsm').then(translation => {
+        vm.toastr.success(translation);
+      });
     }, () => {
-      vm.toastr.error('Error downloading OSM');
+      vm.$translate('toastr.downloadedOsmError').then(translation => {
+        vm.toastr.error(translation);
+      });
     });
   }
 
   downloadAllOSMs() {
     const vm = this;
     vm.OsServer.downloadAllOSMs().then(() => {
-      vm.toastr.success('All OSMs downloaded successfully!');
+      vm.$translate('toastr.downloadedA;;Osm').then(translation => {
+        vm.toastr.success(translation);
+      });
     }, () => {
-      vm.toastr.error('Error downloading OSMs');
+      vm.$translate('toastr.downloadedAllOsmError').then(translation => {
+        vm.toastr.error(translation);
+      });
     });
   }
 

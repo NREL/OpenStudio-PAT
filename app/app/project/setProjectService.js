@@ -6,7 +6,7 @@ import path from 'path';
 const {dialog} = remote;
 
 export class SetProject {
-  constructor($q, $log, $state, $uibModal, Project, OsServer, BCL, toastr, Message) {
+  constructor($q, $log, $state, $uibModal, Project, OsServer, BCL, $translate, toastr, Message) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
@@ -21,6 +21,7 @@ export class SetProject {
     vm.$state = $state;
     vm.newProjectName = null;
     vm.toastr = toastr;
+    vm.$translate = $translate;
     vm.Message = Message;
 
     // This bool is used to reduce the number of debug messages given the typical, non-developer user
@@ -32,7 +33,9 @@ export class SetProject {
     if (vm.Message.showDebug()) vm.$log.debug('saveProject');
     if (vm.Project.projectDir != undefined) {
       vm.Project.exportPAT();
-      vm.toastr.success('Project Saved!');
+      vm.$translate('toastr.projectSaved').then(translation => {
+        vm.toastr.success(translation);
+      });
     } else {
       vm.$log.error('saveProject: vm.Project.projectDir is undefined');
     }
@@ -110,13 +113,17 @@ export class SetProject {
 
             // set project Variables
             vm.setProjectVariables(projectDir);
-            vm.toastr.success('Project Saved!');
+            vm.$translate('toastr.projectSaved').then(translation => {
+              vm.toastr.success(translation);
+            });
             vm.$state.transitionTo('analysis', {}, {reload: true});
 
             // resolve promise
             deferred.resolve('resolve');
             // start server at new location
-            vm.toastr.info('Starting Local Server...This make take a while.');
+            vm.$translate('toastr.startLocalServer').then(translation => {
+              vm.toastr.info(translation);
+            });
             vm.OsServer.startServer().then(response => {
               if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
               if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
@@ -140,11 +147,15 @@ export class SetProject {
 
             // set project Variables
             vm.setProjectVariables(projectDir);
-            vm.toastr.success('Project Saved!');
+            vm.$translate('toastr.projectSaved').then(translation => {
+              vm.toastr.success(translation);
+            });
             vm.$state.transitionTo('analysis', {}, {reload: true});
 
             // start server at new location
-            vm.toastr.info('Starting Local Server...This make take a while.');
+            vm.$translate('toastr.startLocalServer').then(translation => {
+              vm.toastr.info(translation);
+            });
             vm.OsServer.startServer().then(response => {
               if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
               if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
@@ -232,7 +243,9 @@ export class SetProject {
             // For now: selected local run type and start local server
             vm.Project.setRunType(vm.Project.getRunTypes()[0]);
             // start local server at new location
-            vm.toastr.info('Starting Local Server...This make take a while.');
+            vm.$translate('toastr.startLocalServer').then(translation => {
+              vm.toastr.info(translation);
+            });
             vm.OsServer.startServer().then(response => {
               if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
               if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
@@ -330,7 +343,9 @@ export class SetProject {
           // For now: selected local run type and start local server
           vm.Project.setRunType(vm.Project.getRunTypes()[0]);
           // start local server at new location
-          vm.toastr.info('Starting Local Server...This make take a while.');
+          vm.$translate('toastr.startLocalServer').then(translation => {
+            vm.toastr.info(translation);
+          });
           vm.OsServer.startServer().then(response => {
             if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
             if (vm.Message.showDebug()) vm.$log.debug('response: ', response);

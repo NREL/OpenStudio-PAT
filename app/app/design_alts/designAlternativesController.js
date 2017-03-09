@@ -2,7 +2,7 @@ import jetpack from 'fs-jetpack';
 
 export class DesignAlternativesController {
 
-  constructor($log, Project, $scope, toastr, $q, $uibModal, Message) {
+  constructor($log, Project, $scope, $translate, toastr, $q, $uibModal, Message) {
     'ngInject';
 
     const vm = this;
@@ -11,6 +11,7 @@ export class DesignAlternativesController {
     vm.$scope = $scope;
     vm.Project = Project;
     vm.toastr = toastr;
+    vm.$translate = $translate;
     vm.$q = $q;
     vm.$uibModal = $uibModal;
     vm.jetpack = jetpack;
@@ -121,7 +122,9 @@ export class DesignAlternativesController {
               // not unique, restore old value and add toastr
               if (vm.Message.showDebug()) vm.$log.debug('DA name must be unique');
               rowEntity.name = oldValue;
-              vm.toastr.error('Cannot change design alternative name.  Selected name is not unique.');
+              vm.$translate('toastr.designAltNameError').then(translation => {
+                vm.toastr.error(translation);
+              });
             } else {
               // change name on datapoint
               const match = _.find(vm.datapoints, {name: oldValue});
@@ -135,7 +138,7 @@ export class DesignAlternativesController {
           if (newValue != oldValue) {
             // find datapoint and mark as modified (if already run)
             const match = _.find(vm.datapoints, {name: rowEntity.name});
-            if (_.get(match,'updated_at')) {
+            if (_.get(match, 'updated_at')) {
               match.modified = true;
             }
           }

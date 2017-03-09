@@ -2,7 +2,6 @@
 
 import {remote} from 'electron';
 const {app, Menu, shell} = remote;
-import jetpack from 'fs-jetpack';
 
 export function runBlock($rootScope, $state, $window, $document, $translate, toastr, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log, Message) {
   'ngInject';
@@ -16,32 +15,34 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
         // only if project is set
         if (Project.getProjectDir() != null) {
           e.returnValue = false;
-          toastr.info('Preparing to Exit');
+          $translate('toastr.prepareExit').then(translation => {
+            toastr.info(translation);
+          });
           Project.modifiedModal().then(() => {
             $log.debug('Resolving modifiedModal()');
             MeasureManager.stopMeasureManager();
             // stop cloud?
-            OsServer.cloudRunningModal().then(resp => {
+            OsServer.cloudRunningModal().then(() => {
               // stop success or nothing to stop
               // force stop LOCAL server (even if remote server is running)
-              OsServer.stopServer('local').then(response => {
+              OsServer.stopServer('local').then(() => {
                 //  server is stopped
                 //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
                 exitReady = true;
                 app.quit();
-              }, error => {
+              }, () => {
                 exitReady = true;
                 app.quit();
               });
-            }, err => {
+            }, () => {
               // stop error
               // force stop LOCAL server (even if remote server is running)
-              OsServer.stopServer('local').then(response => {
+              OsServer.stopServer('local').then(() => {
                 //  server is stopped
                 //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
                 exitReady = true;
                 app.quit();
-              }, error => {
+              }, () => {
                 exitReady = true;
                 app.quit();
               });
@@ -49,29 +50,27 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
           }, () => {
             $log.debug('Rejected modifiedModal()');
             // stop cloud?
-            OsServer.cloudRunningModal().then(resp => {
+            OsServer.cloudRunningModal().then(() => {
               // cloud stop success or nothing to stop
               MeasureManager.stopMeasureManager();
               // force stop LOCAL server (even if remote server is running)
-              OsServer.stopServer('local').then(response => {
+              OsServer.stopServer('local').then(() => {
                 //  server is stopped
-                //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
                 exitReady = true;
                 app.quit();
-              }, error => {
+              }, () => {
                 exitReady = true;
                 app.quit();
               });
-            }, err => {
+            }, () => {
               // cloud stop error
               MeasureManager.stopMeasureManager();
               // force stop LOCAL server (even if remote server is running)
-              OsServer.stopServer('local').then(response => {
+              OsServer.stopServer('local').then(() => {
                 //  server is stopped
-                //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
                 exitReady = true;
                 app.quit();
-              }, error => {
+              }, () => {
                 exitReady = true;
                 app.quit();
               });

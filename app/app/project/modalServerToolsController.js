@@ -2,7 +2,7 @@ import {shell} from 'electron';
 
 export class ModalServerToolsController {
 
-  constructor($log, $scope, $uibModalInstance, OsServer, Project, toastr, Message) {
+  constructor($log, $scope, $uibModalInstance, OsServer, Project, $translate, toastr, Message) {
     'ngInject';
 
     const vm = this;
@@ -12,6 +12,7 @@ export class ModalServerToolsController {
     vm.Project = Project;
     vm.$scope = $scope;
     vm.toastr = toastr;
+    vm.$translate = $translate;
     vm.shell = shell;
     vm.Message = Message;
 
@@ -31,27 +32,40 @@ export class ModalServerToolsController {
   startLocalServer() {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('IN MODAL START LOCAL SERVER');
-    vm.toastr.info('Starting Local Server...This make take a while.');
+    vm.$translate('toastr.startLocalServer').then(translation => {
+      vm.toastr.info(translation);
+    });
+
     vm.OsServer.startServer('local').then(() => {
-      vm.toastr.success('Connected to server!');
+      vm.$translate('toastr.connectedServer').then(translation => {
+        vm.toastr.success(translation);
+      });
     }, response => {
       if (vm.Message.showDebug()) vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
-      vm.toastr.error('Error: server did not start');
+      vm.$translate('toastr.connectedServerError').then(translation => {
+        vm.toastr.error(translation);
+      });
     });
   }
 
   stopLocalServer() {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('IN MODAL STOP LOCAL SERVER');
-    vm.toastr.info('Stopping Local Server...This make take a while.');
+    vm.$translate('toastr.stopLocalServer').then(translation => {
+      vm.toastr.info(translation);
+    });
     vm.OsServer.stopServer('local').then(() => {
       if (vm.Message.showDebug()) vm.$log.debug('*****  Local Server Stopped *****');
-      vm.toastr.success('Server stopped successfully');
+      vm.$translate('toastr.stoppedServer').then(translation => {
+        vm.toastr.success(translation);
+      });
 
     }, error => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
       if (vm.Message.showDebug()) vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', error);
-      vm.toastr.error('Error: server could not be stopped');
+      vm.$translate('toastr.stoppedServerError').then(translation => {
+        vm.toastr.error(translation);
+      });
     });
   }
 
@@ -60,10 +74,15 @@ export class ModalServerToolsController {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('IN MODAL PING SELECTED SERVER');
     vm.OsServer.pingServer().then(() => {
-      vm.toastr.success('Server is Alive');
+      vm.$translate('toastr.serverAlive').then(translation => {
+        vm.toastr.success(translation);
+      });
+
     }, error => {
       if (vm.Message.showDebug()) vm.$log.debug('Server is offline: ', error);
-      vm.toastr.error('Server is Offline');
+      vm.$translate('toastr.serverOffline').then(translation => {
+        vm.toastr.error(translation);
+      });
     });
   }
 
