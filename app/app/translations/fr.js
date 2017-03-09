@@ -38,7 +38,8 @@ export default {
     title: 'Nouveau projet',
     heading: 'Nom du nouveau projet',
     blurb: 'Ce sera le nom du répertoire contenant votre projet. À l\'étape suivante, vous choisirez l\'emplacement de votre nouveau dossier de projet.'
-  }, toastr: {
+  },
+  toastr: {
     measureAdded: 'Measure added to project!',
     measureAddedError: 'Measure added to project, but unable to compute arguments',
     measureDuplicated: 'Measure duplicated!',

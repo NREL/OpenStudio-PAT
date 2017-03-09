@@ -44,6 +44,10 @@ export class RunController {
       vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
     }
 
+    // get OpenStudio Version (for defaulting AMIs)
+    vm.package_openstudio_version = vm.OsServer.getOpenStudioVersion();
+    if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Version: ', vm.package_openstudio_version);
+
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
     if (vm.Message.showDebug()) vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();

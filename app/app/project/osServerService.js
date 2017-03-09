@@ -58,10 +58,13 @@ export class OsServer {
     vm.mongoDirPath = path.dirname(vm.mongoPath);
     vm.openstudioBindingsPath = DependencyManager.getPath('PAT_OS_BINDING_PATH');
     vm.openstudioBindingsDirPath = path.dirname(vm.openstudioBindingsPath);
-    vm.rubyPath = DependencyManager.getPath("PAT_RUBY_PATH");
-    vm.energyplusEXEPath = DependencyManager.getPath("ENERGYPLUS_EXE_PATH");
-    vm.perlEXEPath = DependencyManager.getPath("PERL_EXE_PATH");
-    vm.osrayPath = DependencyManager.getPath("OS_RAYPATH");
+    vm.rubyPath = DependencyManager.getPath('PAT_RUBY_PATH');
+    vm.energyplusEXEPath = DependencyManager.getPath('ENERGYPLUS_EXE_PATH');
+    vm.perlEXEPath = DependencyManager.getPath('PERL_EXE_PATH');
+    vm.osrayPath = DependencyManager.getPath('OS_RAYPATH');
+
+    vm.package_openstudio_version = '';
+    vm.setOpenStudioVersion();
 
     // server start in progress?
     // local
@@ -74,7 +77,6 @@ export class OsServer {
     vm.remoteStartDeferred = vm.$q.defer();
     // remote stop
     vm.remoteStopInProgress = false;
-
 
   }
 
@@ -140,6 +142,46 @@ export class OsServer {
   setRemoteStopInProgress(value) {
     const vm = this;
     vm.remoteStopInProgress = value;
+  }
+
+  setOpenStudioVersion() {
+    // call openstudio CLI to get its version
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    const command = '\"' + vm.cliPath + '\" openstudio_version';
+    vm.$log.info('get openstudio version command: ', command);
+
+    const child = vm.exec(command,
+      (error, stdout, stderr) => {
+        vm.$log.debug('THE PROCESS TERMINATED');
+        if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
+        if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+        if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
+        if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
+
+        if (child.exitCode == 0) {
+          // SUCCESS
+          deferred.resolve(child);
+        } else {
+          if (error !== null) {
+            vm.$log.error('exec error: ', error);
+          }
+          deferred.resolve(error);
+        }
+      });
+
+    child.stdout.on('data', (data) => {
+      if (vm.Message.showDebug()) vm.$log.debug('CAUGHT STDOUT: ', data);
+      vm.package_openstudio_version = data;
+    });
+
+    return deferred.promise;
+  }
+
+  getOpenStudioVersion() {
+    const vm = this;
+    return vm.package_openstudio_version;
   }
 
   openServerToolsModal() {
