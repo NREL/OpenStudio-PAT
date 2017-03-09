@@ -4,7 +4,7 @@ import {remote} from 'electron';
 const {app, Menu, shell} = remote;
 import jetpack from 'fs-jetpack';
 
-export function runBlock($rootScope, $state, $window, $document, $translate, toastr, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log) {
+export function runBlock($rootScope, $state, $window, $document, $translate, toastr, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log, Message) {
   'ngInject';
 
   let exitReady = false;
@@ -17,11 +17,11 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
         if (Project.getProjectDir() != null) {
           e.returnValue = false;
           toastr.info('Preparing to Exit');
-          Project.modifiedModal().then( () => {
+          Project.modifiedModal().then(() => {
             $log.debug('Resolving modifiedModal()');
             MeasureManager.stopMeasureManager();
             // stop cloud?
-            OsServer.cloudRunningModal().then( resp => {
+            OsServer.cloudRunningModal().then(resp => {
               // stop success or nothing to stop
               // force stop LOCAL server (even if remote server is running)
               OsServer.stopServer('local').then(response => {
@@ -49,7 +49,7 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
           }, () => {
             $log.debug('Rejected modifiedModal()');
             // stop cloud?
-            OsServer.cloudRunningModal().then( resp => {
+            OsServer.cloudRunningModal().then(resp => {
               // cloud stop success or nothing to stop
               MeasureManager.stopMeasureManager();
               // force stop LOCAL server (even if remote server is running)
@@ -208,6 +208,11 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
       accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
       click(item, focusedWindow) {
         if (focusedWindow) focusedWindow.webContents.toggleDevTools();
+      }
+    }, {
+      label: 'Toggle Debug Messages',
+      click() {
+        Message.setShowDebug(!Message.showDebug());
       }
     }]
   }, {

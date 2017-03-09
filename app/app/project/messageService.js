@@ -7,27 +7,43 @@ export class Message {
 
     // This bool is used to reduce the number of debug messages given the typical, non-developer user
     vm.showDebugMessages = false;
-    vm.$log.info('showDebugMessages = ', vm.showDebugMessages);
+    if (vm.showDebugMessages) vm.$log.info('showDebugMessages = ', vm.showDebugMessages);
 
     vm.showInfoMessages = true;
-    vm.$log.info('showInfoMessages = ', vm.showInfoMessages);
+    if (vm.showInfoMessages) vm.$log.info('showInfoMessages = ', vm.showInfoMessages);
 
     vm.showErrorMessages = true;
-    vm.$log.info('showErrorMessages = ', vm.showErrorMessages);
+    if (vm.showErrorMessages) vm.$log.info('showErrorMessages = ', vm.showErrorMessages);
   }
 
   showDebug() {
     const vm = this;
-    return vm.showDebug;
+    return vm.showDebugMessages;
+  }
+
+  setShowDebug(show) {
+    const vm = this;
+    vm.showDebugMessages = show;
+    if (vm.showDebugMessages) vm.$log.info('showDebugMessages = ', vm.showDebugMessages);
   }
 
   showInfo() {
     const vm = this;
-    return vm.showInfo;
+    return vm.showInfoMessages;
+  }
+
+  setShowInfog(show) {
+    const vm = this;
+    vm.showInfoMessages = show;
   }
 
   showError() {
     const vm = this;
-    return vm.showError;
+    return vm.showErrorMessages;
+  }
+
+  setShowError(show) {
+    const vm = this;
+    vm.showErrorMessages = show;
   }
 }
