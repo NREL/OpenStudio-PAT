@@ -84,15 +84,16 @@ export class AnalysisController {
       //if (vm.Message.showDebug()) vm.$log.debug('In getDistributions');
       let distributions = [];
       switch (vm.$scope.selectedSamplingMethod.id) {
-        case 'SPEA2':
-        case 'RGENOUD':
-        case 'NSGA2':
-        case 'LHS':
-        case 'PreFlight':
-        case 'Morris':
-        case 'DOE':
-        case 'SingleRun':
-        case 'RepeatRun':
+        case 'spea_nrel':
+        case 'rgenoud':
+        case 'nsga_nrel':
+        case 'lhs':
+        case 'preflight':
+        case 'morris':
+        case 'sobol':
+        case 'doe':
+        case 'single_run':
+        case 'repeat_run':
           distributions = ['Uniform', 'Triangle', 'Normal', 'LogNormal'];
           break;
         default:
@@ -1103,88 +1104,6 @@ export class AnalysisController {
     vm.Project.setModified(true);
   }
 
-  // getDistributions(argument) {
-  //   const vm = this;
-  //   if (vm.Message.showDebug()) vm.$log.debug('In getDistributions');
-  //
-  //   if (_.isNil(argument.inputs)) argument.inputs = {};
-  //
-  //   switch (vm.$scope.selectedSamplingMethod.id) {
-  //     case 'PSO':
-  //     case 'Optim':
-  //       argument.inputs.distributions = ['Uniform'];
-  //       break;
-  //     case 'SPEA2':
-  //     case 'RGENOUD':
-  //     case 'NSGA2':
-  //     case 'LHS':
-  //     case 'PreFlight':
-  //     case 'Morris':
-  //     case 'DOE':
-  //     case 'SingleRun':
-  //     case 'RepeatRun':
-  //       argument.inputs.distributions = ['Uniform', 'Triangle', 'Normal', 'LogNormal'];
-  //       break;
-  //     default:
-  //       argument.inputs.distributions = ['Unhandled Sampling Method'];
-  //   }
-  //   argument.inputs.distribution = argument.inputs.distributions[0];
-  // }
-
-  // getVariableSettings(argument) {
-  //   const vm = this;
-  //   if (vm.Message.showDebug()) vm.$log.debug('In getVariableSettings');
-  //
-  //   if (_.isNil(argument.inputs)) argument.inputs = {};
-  //
-  //   if (argument.type === 'Double') {
-  //     argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
-  //   } else {
-  //     argument.inputs.variableSettings = ['Argument', 'Discrete', 'Pivot'];
-  //   }
-  //
-  //   argument.inputs.variableSetting = _.isNil(argument.inputs.variableSetting) ? argument.inputs.variableSettings[0] : argument.inputs.variableSetting;
-  // }
-
-  // checkVariableSettings(argument) {
-  //   const vm = this;
-  //   if (vm.Message.showDebug()) vm.$log.debug('In checkVariableSettings');
-  //
-  //   if (_.isNil(argument.inputs)) argument.inputs = {};
-  //
-  //   switch (vm.$scope.selectedSamplingMethod.id) {
-  //     case 'SPEA2':
-  //     case 'PSO':
-  //       if (argument.type === 'Double') {
-  //         argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
-  //       } else {
-  //         argument.inputs.variableSettings = ['Argument'];
-  //       }
-  //       break;
-  //     case 'RGENOUD':
-  //     case 'Optim':
-  //       if (argument.type === 'Double') {
-  //         argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
-  //       } else {
-  //         argument.inputs.variableSettings = ['Argument'];
-  //       }
-  //       break;
-  //     case 'NSGA2':
-  //     case 'PreFlight':
-  //     case 'SingleRun':
-  //     case 'RepeatRun':
-  //       argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous'];
-  //       break;
-  //     case 'LHS':
-  //     case 'DOE':
-  //       argument.inputs.variableSettings = ['Argument', 'Discrete', 'Continuous', 'Pivot'];
-  //       break;
-  //     default:
-  //       argument.inputs.variableSettings = ['Unhandled Sampling Method'];
-  //   }
-  //   argument.inputs.variableSetting = argument.inputs.variableSettings[0];
-  // }
-
   addDiscreteVariable(argument) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In addDiscreteVariable');
@@ -1203,21 +1122,10 @@ export class AnalysisController {
     argument.inputs.discreteVariables.push(discreteVariable);
   }
 
-  // TODO: not needed?
-  // showValueAndWeights() {
-  //   const vm = this;
-  //   if (vm.Message.showDebug()) vm.$log.debug('In showValueAndWeights');
-  //   if (_.includes(['NSGA2', 'LHS', 'Preflight', 'Morris', 'DOE', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
-  //     vm.$scope.showValueAndWeights = true;
-  //   } else {
-  //     vm.$scope.showValueAndWeights = false;
-  //   }
-  // }
-
   showDeltaX() {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In showDeltaX');
-    if (_.includes(['RGENOUD', 'Optim'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['rgenoud', 'optim'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDeltaX = true;
     } else {
       vm.$scope.showDeltaX = false;
@@ -1227,7 +1135,7 @@ export class AnalysisController {
   showMinAndMax() {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In showMinAndMax');
-    if (_.includes(['PreFlight'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['preflight'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showMinAndMax = true;
     } else {
       vm.$scope.showMinAndMax = false;
@@ -1237,7 +1145,7 @@ export class AnalysisController {
   showDistributions() {
     const vm = this;
     //if (vm.Message.showDebug()) vm.$log.debug('In showDistributions');
-    if (!_.includes(['PSO', 'Optim'], vm.$scope.selectedSamplingMethod.id)) {
+    if (!_.includes(['pso', 'optim'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDistributions = true;
     } else {
       vm.$scope.showDistributions = false;
@@ -1246,7 +1154,7 @@ export class AnalysisController {
 
   showDiscreteDistributions() {
     const vm = this;
-    if (_.includes(['Diagonal'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['diag'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDiscreteDistributions = true;
     } else {
       vm.$scope.showDiscreteDistributions = false;
@@ -1256,7 +1164,7 @@ export class AnalysisController {
   showDiscreteVariables() {
     const vm = this;
     //if (vm.Message.showDebug()) vm.$log.debug('In showDiscreteVariables');
-    if (_.includes(['NSGA2', 'LHS', 'PreFlight', 'Morris', 'DOE', 'Diagonal', 'BaselinePerturbation'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['nsga_nrel', 'lhs', 'preflight', 'morris', 'sobol', 'doe', 'diag', 'baseline_perturbation'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDiscreteVariables = true;
     } else {
       vm.$scope.showDiscreteVariables = false;
@@ -1266,7 +1174,7 @@ export class AnalysisController {
   showPivotVariables() {
     const vm = this;
     //if (vm.Message.showDebug()) vm.$log.debug('In showPivotVariables');
-    if (_.includes(['LHS', 'Morris', 'DOE', 'BaselinePerturbation', 'Diagonal', 'PreFlight'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['lhs', 'morris', 'sobol', 'doe', 'baseline_perturbation', 'diag', 'preflight'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showPivotVariables = true;
     } else {
       vm.$scope.showPivotVariables = false;
@@ -1276,7 +1184,7 @@ export class AnalysisController {
   showContinuousVariables() {
     const vm = this;
     //if (vm.Message.showDebug()) vm.$log.debug('In showContinuousVariables');
-    if (_.includes(['Diagonal', 'BaselinePerturbation', 'SingleRun', 'RepeatRun'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['diag', 'baseline_perturbation', 'single_run', 'repeat_run'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showContinuousVariables = false;
     } else {
       vm.$scope.showContinuousVariables = true;

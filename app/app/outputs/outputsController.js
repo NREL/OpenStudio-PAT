@@ -216,7 +216,7 @@ export class OutputsController {
       // add objective function groups for SPEA, NSGA, and Morris only
       if (vm.Message.showDebug()) vm.$log.debug('sampling method: ', vm.$scope.selectedSamplingMethod);
 
-      if (['NSGA2', 'SPEA2', 'Morris'].indexOf(vm.$scope.selectedSamplingMethod.id) != -1) {
+      if (['nsga_nrel', 'spea_nrel', 'morris', 'sobol'].indexOf(vm.$scope.selectedSamplingMethod.id) != -1) {
         if (vm.Message.showDebug()) vm.$log.debug('adding objective function group column');
         const ofg = {
           name: 'obj_function_group',

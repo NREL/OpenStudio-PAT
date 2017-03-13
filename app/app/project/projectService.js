@@ -763,7 +763,7 @@ export class Project {
 
     // OUTPUTS
     let groupFlag = false;
-    if (['NSGA2', 'SPEA2', 'Morris'].indexOf(vm.samplingMethod.id) != -1) {
+    if (['nsga_nrel', 'spea_nrel', 'morris', 'sobol'].indexOf(vm.samplingMethod.id) != -1) {
       // this sampling method supports groups
       groupFlag = true;
     }
