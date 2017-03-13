@@ -55,6 +55,7 @@ export default {
     startLocalServer: 'Starting Local Server...this make take a while',
     connectedServer: 'Connected to server!',
     connectedServerError: 'Error: server did not start',
+    localStartInProgressBeforeStop: 'Local Server start is in progress for this project, and must complete before it can be stopped...this may take a few minutes',
     stopLocalServer: 'Stopping Local Server...this make take a while',
     stoppedServer: 'Server stopped successfully!',
     stoppedServerError: 'Error: server could not be stopped',

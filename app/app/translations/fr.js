@@ -51,6 +51,7 @@ export default {
     updatedMeasureProject: 'Measure successfully updated in your project!',
     designAltNameError: 'Cannot change design alternative name:  selected name is not unique',
     startLocalServer: 'Starting Local Server...this make take a while',
+    localStartInProgressBeforeStop: 'Local Server start is in progress for this project, and must complete before it can be stopped...this may take a few minutes',
     connectedServer: 'Connected to server!',
     connectedServerError: 'Error: server did not start',
     stopLocalServer: 'Stopping Local Server...this make take a while',

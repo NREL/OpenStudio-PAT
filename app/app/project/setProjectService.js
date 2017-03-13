@@ -86,8 +86,6 @@ export class SetProject {
         }
 
         if (!fileExists) {
-          vm.Project.setProjectName(vm.newProjectName);
-          projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
           // if (projectDir.path().indexOf(' ') >= 0) {
           //   // tell user to expect trouble
@@ -95,7 +93,9 @@ export class SetProject {
           //   });
           // }
 
-          vm.OsServer.stopServer().then(response => {
+          vm.OsServer.stopServer('local').then(response => {
+            vm.Project.setProjectName(vm.newProjectName);  // this is taken care of my setProjectVariables. remove?
+            projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
             vm.$log.info('SetProjectService::stop server: server stopped');
             vm.$log.info('response: ', response);
 
@@ -131,7 +131,11 @@ export class SetProject {
             });
 
           }, () => {
+
             vm.$log.info('stop server errored, but setting project anyway and starting new local server');
+
+            vm.Project.setProjectName(vm.newProjectName); // this is taken care of my setProjectVariables. remove?
+            projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
             // for saveAs: copy old project's folder structure to new location (from, to)
             vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
@@ -215,8 +219,6 @@ export class SetProject {
         }
 
         if (!fileExists) {
-          vm.Project.setProjectName(vm.newProjectName);
-          projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
           // if (projectDir.path().indexOf(' ') >= 0) {
           //   // tell user to expect trouble
@@ -228,6 +230,9 @@ export class SetProject {
           vm.OsServer.stopServer('local').then(response => {
             vm.$log.info('SetProjectService::stop server: local server stopped');
             vm.$log.info('response: ', response);
+
+            vm.Project.setProjectName(vm.newProjectName); // this is taken care of my setProjectVariables. remove?
+            projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
             // set project Variables
             vm.setProjectVariables(projectDir);
@@ -254,6 +259,8 @@ export class SetProject {
 
           }, () => {
             vm.$log.info('stop server errored, but setting project anyway');
+            vm.Project.setProjectName(vm.newProjectName);  // this is taken care of my setProjectVariables. remove?
+            projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
             // set project Variables anyway
             vm.setProjectVariables(projectDir);
 

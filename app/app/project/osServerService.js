@@ -7,7 +7,7 @@ import AdmZip from 'adm-zip';
 import YAML from 'yamljs';
 
 export class OsServer {
-  constructor($q, $http, $log, $uibModal, Project, DependencyManager, Message) {
+  constructor($q, $http, $log, $uibModal, Project, DependencyManager, Message, toastr, $translate) {
     'ngInject';
 
     const vm = this;
@@ -19,6 +19,8 @@ export class OsServer {
     vm.jetpack = jetpack;
     vm.AdmZip = AdmZip;
     vm.Message = Message;
+    vm.$translate = $translate;
+    vm.toastr = toastr;
 
     // set number of workers
     vm.numCores = os.cpus().length;
@@ -65,6 +67,9 @@ export class OsServer {
 
     vm.package_openstudio_version = '';
     vm.setOpenStudioVersion();
+
+    vm.localServerChild = null;
+    vm.remoteServerChild = null;
 
     // server start in progress?
     // local
@@ -515,14 +520,14 @@ export class OsServer {
           vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" ' + vm.Project.fixURL(dns);
           vm.$log.info('Start Server Command: ', vm.startServerCommand);
 
-          const child = vm.exec(vm.startServerCommand,
+          vm.remoteServerChild = vm.exec(vm.startServerCommand,
             (error, stdout, stderr) => {
-              if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
-              if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+              if (vm.Message.showDebug()) vm.$log.debug('exit code: ', vm.remoteServerChild.exitCode);
+              if (vm.Message.showDebug()) vm.$log.debug('child: ', vm.remoteServerChild);
               if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
               if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
 
-              if (child.exitCode == 0) {
+              if (vm.remoteServerChild.exitCode == 0) {
                 // SUCCESS
                 if (vm.Message.showDebug()) vm.$log.debug('CLOUD SERVER CONNECTION SUCCESS');
 
@@ -535,7 +540,7 @@ export class OsServer {
                 }
 
                 vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
-                deferred.resolve(child);
+                deferred.resolve(vm.remoteServerChild);
 
               } else {
                 vm.$log.error('CLOUD SERVER CONNECTION ERROR');
@@ -548,17 +553,17 @@ export class OsServer {
               }
             });
 
-          console.log(`Child pid: ${child.pid}`);
+          console.log(`Child pid: ${vm.remoteServerChild.pid}`);
 
-          child.on('close', (code, signal) => {
+          vm.remoteServerChild.on('close', (code, signal) => {
             console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
           });
 
-          child.on('disconnect', (code, signal) => {
+          vm.remoteServerChild.on('disconnect', (code, signal) => {
             console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
           });
 
-          child.on('exit', (code, signal) => {
+          vm.remoteServerChild.on('exit', (code, signal) => {
             console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
             if (code == 0) {
               vm.$log.info('Server connected');
@@ -575,11 +580,11 @@ export class OsServer {
             return deferred.promise;
           });
 
-          child.on('error', (code, signal) => {
+          vm.remoteServerChild.on('error', (code, signal) => {
             console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
           });
 
-          child.on('message', (code, signal) => {
+          vm.remoteServerChild.on('message', (code, signal) => {
             console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
           });
 
@@ -594,14 +599,14 @@ export class OsServer {
 
           const envCopy = vm.setAwsEnvVars();
 
-          const child = vm.exec(vm.startServerCommand, {env: envCopy},
+          vm.remoteServerChild = vm.exec(vm.startServerCommand, {env: envCopy},
             (error, stdout, stderr) => {
-              if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
-              if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+              if (vm.Message.showDebug()) vm.$log.debug('exit code: ', vm.remoteServerChild.exitCode);
+              if (vm.Message.showDebug()) vm.$log.debug('child: ', vm.remoteServerChild);
               if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
               if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
 
-              if (child.exitCode == 0) {
+              if (vm.remoteServerChild.exitCode == 0) {
                 // SUCCESS
                 if (vm.Message.showDebug()) vm.$log.debug('CLOUD SERVER START SUCCESS');
 
@@ -612,7 +617,7 @@ export class OsServer {
                   if (vm.Message.showDebug()) vm.$log.debug('Setting selectedServerURL to : ', vm.Project.fixURL(newDNS));
                   vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
                 }
-                deferred.resolve(child);
+                deferred.resolve(vm.remoteServerChild);
 
               } else {
                 vm.$log.error('CLOUD SERVER START ERROR');
@@ -624,17 +629,17 @@ export class OsServer {
               }
             });
 
-          console.log(`Child pid: ${child.pid}`);
+          console.log(`Child pid: ${vm.remoteServerChild.pid}`);
 
-          child.on('close', (code, signal) => {
+          vm.remoteServerChild.on('close', (code, signal) => {
             console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
           });
 
-          child.on('disconnect', (code, signal) => {
+          vm.remoteServerChild.on('disconnect', (code, signal) => {
             console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
           });
 
-          child.on('exit', (code, signal) => {
+          vm.remoteServerChild.on('exit', (code, signal) => {
             console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
             if (code == 0) {
               if (vm.Message.showDebug()) vm.$log.debug('Server started');
@@ -653,11 +658,11 @@ export class OsServer {
             return deferred.promise;
           });
 
-          child.on('error', (code, signal) => {
+          vm.remoteServerChild.on('error', (code, signal) => {
             console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
           });
 
-          child.on('message', (code, signal) => {
+          vm.remoteServerChild.on('message', (code, signal) => {
             console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
           });
         });
@@ -704,20 +709,20 @@ export class OsServer {
       vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --worker-number=' + vm.numWorkers + ' --energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
     vm.$log.info('start server command: ', vm.startServerCommand);
 
-    const child = vm.exec(vm.startServerCommand,
+    vm.localServerChild = vm.exec(vm.startServerCommand,
       (error, stdout, stderr) => {
-        if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
-        if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+        if (vm.Message.showDebug()) vm.$log.debug('exit code: ', vm.localServerChild.exitCode);
+        if (vm.Message.showDebug()) vm.$log.debug('child: ', vm.localServerChild);
         if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
         if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
 
-        if (child.exitCode == 0) {
+        if (vm.localServerChild.exitCode == 0) {
           // SUCCESS
           if (vm.Message.showDebug()) vm.$log.debug('SERVER SUCCESS');
           // get url from local_configuration.json
           vm.getLocalServerUrlFromFile();
           vm.$log.info('SERVER URL: ', vm.selectedServerURL);
-          deferred.resolve(child);
+          deferred.resolve(vm.localServerChild);
         } else {
           vm.$log.error('SERVER ERROR');
           if (error !== null) {
@@ -727,17 +732,17 @@ export class OsServer {
         }
       });
 
-    console.log(`Child pid: ${child.pid}`);
+    console.log(`Child pid: ${vm.localServerChild.pid}`);
 
-    child.on('close', (code, signal) => {
+    vm.localServerChild.on('close', (code, signal) => {
       console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
     });
 
-    child.on('disconnect', (code, signal) => {
+    vm.localServerChild.on('disconnect', (code, signal) => {
       console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
     });
 
-    child.on('exit', (code, signal) => {
+    vm.localServerChild.on('exit', (code, signal) => {
       console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
       if (code == 0) {
         if (vm.Message.showDebug()) vm.$log.debug('Server started');
@@ -751,11 +756,11 @@ export class OsServer {
       return deferred.promise;
     });
 
-    child.on('error', (code, signal) => {
+    vm.localServerChild.on('error', (code, signal) => {
       console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
     });
 
-    child.on('message', (code, signal) => {
+    vm.localServerChild.on('message', (code, signal) => {
       console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
     });
 
@@ -875,31 +880,98 @@ export class OsServer {
         vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_local ' + '\"' + vm.Project.projectDir.path() + '\"';
         vm.$log.info('stop server command: ', vm.stopServerCommand);
 
-        const child = vm.exec(vm.stopServerCommand,
-          (error, stdout, stderr) => {
-            console.log('THE PROCESS TERMINATED');
-            if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
-            if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
-            if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
-            if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
-
-            if (child.exitCode == 0) {
-              // SUCCESS
-              if (vm.Message.showDebug()) vm.$log.debug('Server Stopped');
-              vm.setServerStatus(serverType, 'stopped');
-              vm.localServerCleanup();
-              deferred.resolve(child);
-
-            } else {
-              if (error !== null) {
-                console.log('exec error: ', error);
-              }
-              // Note: even if there is an error stopping the server in one location,
-              // return resolved so promise can be used to start new server
-              vm.localServerCleanup();
-              deferred.resolve(error);
-            }
+        // if server is in process of starting, wait to start before stopping
+        if (vm.serverStartInProgress) {
+          // wait until server starts before stopping it
+          vm.$translate('toastr.localStartInProgressBeforeStop').then(translation => {
+            vm.toastr.info(translation, {timeOut: 120000});
           });
+          if (vm.Message.showDebug()) vm.$log.debug('***Server is in the process of starting...waiting on serverStartDeferred to resolve before stopping server');
+          vm.isServerReady().then((response) => {
+            vm.toastr.clear();
+            if (vm.Message.showDebug()) vm.$log.debug('serverStartDeferred has resolved...can now stop server');
+            const child = vm.exec(vm.stopServerCommand,
+              (error, stdout, stderr) => {
+                console.log('THE PROCESS TERMINATED');
+                if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
+                if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+                if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
+                if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
+
+                if (child.exitCode == 0) {
+                  // SUCCESS
+                  if (vm.Message.showDebug()) vm.$log.debug('Server Stopped');
+                  vm.setServerStatus(serverType, 'stopped');
+                  vm.localServerCleanup();
+                  deferred.resolve(child);
+
+                } else {
+                  if (error !== null) {
+                    console.log('exec error: ', error);
+                  }
+                  // Note: even if there is an error stopping the server in one location,
+                  // return resolved so promise can be used to start new server
+                  vm.localServerCleanup();
+                  deferred.resolve(error);
+                }
+              });
+          }, (error) => {
+            vm.$log.error('ERROR in start local server, but attempting to stop server anyway');
+            const child = vm.exec(vm.stopServerCommand,
+              (error, stdout, stderr) => {
+                console.log('THE PROCESS TERMINATED');
+                if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
+                if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+                if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
+                if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
+
+                if (child.exitCode == 0) {
+                  // SUCCESS
+                  if (vm.Message.showDebug()) vm.$log.debug('Server Stopped');
+                  vm.setServerStatus(serverType, 'stopped');
+                  vm.localServerCleanup();
+                  deferred.resolve(child);
+
+                } else {
+                  if (error !== null) {
+                    console.log('exec error: ', error);
+                  }
+                  // Note: even if there is an error stopping the server in one location,
+                  // return resolved so promise can be used to start new server
+                  vm.localServerCleanup();
+                  deferred.resolve(error);
+                }
+              });
+          });
+        } else {
+          // server start is not in progress
+          const child = vm.exec(vm.stopServerCommand,
+            (error, stdout, stderr) => {
+              console.log('THE PROCESS TERMINATED');
+              if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
+              if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
+              if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
+              if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
+
+              if (child.exitCode == 0) {
+                // SUCCESS
+                if (vm.Message.showDebug()) vm.$log.debug('Server Stopped');
+                vm.setServerStatus(serverType, 'stopped');
+                vm.localServerCleanup();
+                deferred.resolve(child);
+
+              } else {
+                if (error !== null) {
+                  console.log('exec error: ', error);
+                }
+                // Note: even if there is an error stopping the server in one location,
+                // return resolved so promise can be used to start new server
+                vm.localServerCleanup();
+                deferred.resolve(error);
+              }
+            });
+        }
+
       } else {
         if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server') {
           // remote server
