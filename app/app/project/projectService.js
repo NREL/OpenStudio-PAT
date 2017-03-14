@@ -2463,6 +2463,7 @@ export class Project {
     return vm.algorithmSettings;
   }
 
+  // TODO: not used. not connected to anything
   getAlgorithmSettingsForMethod() {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
@@ -2473,12 +2474,11 @@ export class Project {
     });
 
     return settings;
-
   }
 
-  setAlgorithmSettings(algorithm) {
+  setGetAlgorithmSettings(algorithm) {
     const vm = this;
-    if (vm.Message.showDebug()) vm.$log.debug('In setAlgorithmSettings in Project');
+    if (vm.Message.showDebug()) vm.$log.debug('In setGetAlgorithmSettings in Project');
 
     // remove non-applicable settings
     _.forEachRight(vm.algorithmSettings, (setting, key) => {
@@ -2504,6 +2504,7 @@ export class Project {
     });
 
     if (vm.Message.showDebug()) vm.$log.debug('new algorithmSettings: ', vm.algorithmSettings);
+    return vm.algorithmSettings;
   }
 
   getAlgorithmOptions() {

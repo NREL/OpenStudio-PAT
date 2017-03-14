@@ -54,7 +54,7 @@ export class AnalysisController {
     // Algorithmic Mode
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.samplingMethods = vm.Project.getSamplingMethods();
-    vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
+    vm.$scope.algorithmSettings = vm.Project.setGetAlgorithmSettings(vm.$scope.selectedSamplingMethod);
     vm.$scope.relationships = ['Standard', 'Inverse'];
 
     // size grids according to data
@@ -888,8 +888,7 @@ export class AnalysisController {
     if (vm.Message.showDebug()) vm.$log.debug('In setSamplingMethod in analysis');
     vm.setIsModified();
     vm.Project.setSamplingMethod(vm.$scope.selectedSamplingMethod);
-    vm.Project.setAlgorithmSettings(vm.$scope.selectedSamplingMethod);
-    vm.$scope.algorithmSettings = vm.Project.getAlgorithmSettingsForMethod(vm.$scope.selectedSamplingMethod);
+    vm.$scope.algorithmSettings = vm.Project.setGetAlgorithmSettings(vm.$scope.selectedSamplingMethod);
 
     vm.showDeltaX();
     vm.showMinAndMax();
