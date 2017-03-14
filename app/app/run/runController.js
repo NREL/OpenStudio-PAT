@@ -882,31 +882,27 @@ export class RunController {
             vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
             if (vm.Message.showDebug()) vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
 
-            // download/replace out.osw (local only)
-            if (vm.$scope.selectedRunType.name == 'local') {
-              vm.OsServer.updateDatapoints().then(response2 => {  // TODO: one by one
-                // refresh datapoints
-                vm.$scope.datapoints = vm.Project.getDatapoints();
-                // download reports
-                vm.OsServer.downloadReports().then(() => {  // TODO: one by one
-                  if (vm.Message.showDebug()) vm.$log.debug('downloaded all available reports');
-                  // refresh datapoints again
-                  vm.$scope.datapoints = vm.Project.getDatapoints();
-                  vm.$log.info('datapoints after download: ', vm.$scope.datapoints);
-                }, response3 => {
-                  // error in downloadReports
-                  vm.$log.error('download reports error: ', response3);
-                });
 
-                vm.$log.info('update datapoints succeeded: ', response2);
-              }, response2 => {
-                // error in updateDatapoints
-                vm.$log.error('update datapoints error: ', response2);
+            vm.OsServer.updateDatapoints().then(response2 => {
+              // refresh datapoints
+              vm.$scope.datapoints = vm.Project.getDatapoints();
+              // download reports
+              vm.OsServer.downloadReports().then(() => {
+                if (vm.Message.showDebug()) vm.$log.debug('downloaded all available reports');
+                // refresh datapoints again
+                vm.$scope.datapoints = vm.Project.getDatapoints();
+                vm.$log.info('datapoints after download: ', vm.$scope.datapoints);
+              }, response3 => {
+                // error in downloadReports
+                vm.$log.error('download reports error: ', response3);
               });
-            } else {
-              // set datapointsStatus as datapoints
-              vm.$scope.datapoints = vm.$scope.datapointsStatus;  // TODO: one by one
-            }
+
+              vm.$log.info('update datapoints succeeded: ', response2);
+            }, response2 => {
+              // error in updateDatapoints
+              vm.$log.error('update datapoints error: ', response2);
+            });
+
             if (response.data.analysis.status == 'completed') {
               // cancel loop
               vm.stopAnalysisStatus('completed');

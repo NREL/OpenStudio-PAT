@@ -109,8 +109,8 @@
                   <div class="col-sm-3 middle pad-top-5">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
                   <div class="col-sm-4">
                     <span ng-if="datapoint.completed_status" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</span>
-                    <span ng-if="datapoint.status_message" ng-class="{'green-text': datapoint.status_message.includes('normal'), 'red-text': datapoint.status_message == 'datapoint failure'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</span>
-                    <span ng-if="!datapoint.completed_status">{{datapoint.status}}</span>
+                    <span ng-if="!datapoint.completed_status && datapoint.status_message" ng-class="{'green-text': datapoint.status_message.includes('normal'), 'red-text': datapoint.status_message == 'datapoint failure'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</span>
+                    <span ng-if="!datapoint.completed_status && !datapoint.status_message">{{datapoint.status}}</span>
                   </div>
                 </div>
               </div>

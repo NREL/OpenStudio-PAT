@@ -1087,74 +1087,106 @@ export class OsServer {
     const vm = this;
     const deferred = vm.$q.defer();
     const promises = [];
+    let promise = null;
 
+    vm.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.datapoints = vm.Project.getDatapoints();
 
     _.forEach(vm.datapointsStatus, (dp) => {
       if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT STATUS: ', dp);
-      const url = vm.selectedServerURL + '/data_points/' + dp.id + '/download_result_file';
-      const params = {filename: 'out.osw'};
-      const config = {params: params, headers: {Accept: 'application/json'}};
-      if (vm.Message.showDebug()) vm.$log.debug('****URL: ', url);
-      const promise = vm.$http.get(url, config).then(response => {
-        // save OSW to file
-        if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT OUT.OSW response: ', response.data);
-        const datapoint = response.data;
-        vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(dp.id, 'out.osw'), datapoint);
 
-        // also load in datapoints array
-        datapoint.status = dp.status;
-        datapoint.final_message = dp.final_message;
-        datapoint.id = dp.id;
+      // download/replace out.osw (manual only)
+      if (vm.selectedAnalysisType == 'Manual') {
+        const url = vm.selectedServerURL + '/data_points/' + dp.id + '/download_result_file';
+        const params = {filename: 'out.osw'};
+        const config = {params: params, headers: {Accept: 'application/json'}};
+        if (vm.Message.showDebug()) vm.$log.debug('****URL: ', url);
+        promise = vm.$http.get(url, config).then(response => {
+          // save OSW to file
+          if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT OUT.OSW response: ', response.data);
+          const datapoint = response.data;
+          vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(dp.id, 'out.osw'), datapoint);
 
-        const dp_match = _.findIndex(vm.datapoints, {name: dp.name});
-        if (vm.Message.showDebug()) vm.$log.debug('DP match results for: ', dp.name, ': ', dp_match);
-        if (dp_match != -1) {
-          // merge
-          _.merge(vm.datapoints[dp_match], datapoint);
-          if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
-        } else {
-          // append datapoint to array
-          vm.datapoints.push(datapoint);
-        }
-        if (vm.Message.showDebug()) vm.$log.debug('PROJECT DATAPOINTS NOW: ', vm.Project.getDatapoints());
+          // also load in datapoints array
+          datapoint.status = dp.status;
+          datapoint.final_message = dp.final_message;
+          datapoint.id = dp.id;
 
-      }, error => {
-        vm.$log.error('GET DATAPOINT OUT.OSW ERROR (file probably not created yet): ', error);
-        // if 422 error, out.osw doesn't exist yet...get datapoint.json instead
-        if (error.status == 422 || error.status == 404) {
-          vm.$log.error('422/404 Error...GETting datapoint json instead');
-          const datapointUrl = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
-          if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT URL: ', datapointUrl);
-          if (vm.Message.showDebug()) vm.$log.debug('DP: ', dp);
-          const promise2 = vm.$http.get(datapointUrl).then(response2 => {
-            // set datapoint array
-            if (vm.Message.showDebug()) vm.$log.debug('datapoint JSON raw response: ', response2);
-            vm.$log.info('datapoint JSON response: ', response2.data.data_point);
-            const datapoint = response2.data.data_point;
-            datapoint.status = dp.status;
-            datapoint.final_message = dp.final_message;
-            datapoint.id = dp.id;
+          const dp_match = _.findIndex(vm.datapoints, {name: dp.name});
+          if (vm.Message.showDebug()) vm.$log.debug('DP match results for: ', dp.name, ': ', dp_match);
+          if (dp_match != -1) {
+            // merge
+            _.merge(vm.datapoints[dp_match], datapoint);
+            if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
+          } else {
+            // append datapoint to array
+            vm.datapoints.push(datapoint);
+          }
+          if (vm.Message.showDebug()) vm.$log.debug('PROJECT DATAPOINTS NOW: ', vm.Project.getDatapoints());
 
-            const dp_match = _.findIndex(vm.datapoints, {name: dp.name});
-            if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
-            if (dp_match != -1) {
-              // merge
-              _.merge(vm.datapoints[dp_match], datapoint);
-              if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
-            } else {
-              // also load in datapoints array
-              vm.datapoints.push(datapoint);
-            }
+        }, error => {
+          vm.$log.error('GET DATAPOINT OUT.OSW ERROR (file probably not created yet): ', error);
+          // if 422 error, out.osw doesn't exist yet...get datapoint.json instead
+          if (error.status == 422 || error.status == 404) {
+            vm.$log.error('422/404 Error...GETting datapoint json instead');
+            const datapointUrl = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
+            if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT URL: ', datapointUrl);
+            if (vm.Message.showDebug()) vm.$log.debug('DP: ', dp);
+            const promise2 = vm.$http.get(datapointUrl).then(response2 => {
+              // set datapoint array
+              if (vm.Message.showDebug()) vm.$log.debug('datapoint JSON raw response: ', response2);
+              vm.$log.info('datapoint JSON response: ', response2.data.data_point);
+              const datapoint = response2.data.data_point;
+              datapoint.status = dp.status;
+              datapoint.final_message = dp.final_message;
+              datapoint.id = dp.id;
+
+              const dp_match = _.findIndex(vm.datapoints, {name: dp.name});
+              if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
+              if (dp_match != -1) {
+                // merge
+                _.merge(vm.datapoints[dp_match], datapoint);
+                if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
+              } else {
+                // also load in datapoints array
+                vm.datapoints.push(datapoint);
+              }
 
 
-          }, error2 => {
-            vm.$log.error('GET Datapoint.json ERROR: ', error2);
-          });
-          promises.push(promise2);
-        }
+            }, error2 => {
+              vm.$log.error('GET Datapoint.json ERROR: ', error2);
+            });
+            promises.push(promise2);
+          }
+        });
+      } else {
+        // algorithmic, just get datapoint.json, not osw
+        const datapointUrl = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
+        if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT URL: ', datapointUrl);
+        if (vm.Message.showDebug()) vm.$log.debug('DP: ', dp);
+        promise = vm.$http.get(datapointUrl).then(response2 => {
+          // set datapoint array
+          if (vm.Message.showDebug()) vm.$log.debug('datapoint JSON raw response: ', response2);
+          vm.$log.info('datapoint JSON response: ', response2.data.data_point);
+          const datapoint = response2.data.data_point;
+          datapoint.status = dp.status;
+          datapoint.final_message = dp.final_message;
+          datapoint.id = dp.id;
 
-      });
+          const dp_match = _.findIndex(vm.datapoints, {name: dp.name});
+          if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
+          if (dp_match != -1) {
+            // merge
+            _.merge(vm.datapoints[dp_match], datapoint);
+            if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
+          } else {
+            // also load in datapoints array
+            vm.datapoints.push(datapoint);
+          }
+        }, error2 => {
+          vm.$log.error('GET Datapoint.json ERROR: ', error2);
+        });
+      }
       promises.push(promise);
     });
 
