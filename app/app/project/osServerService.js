@@ -1329,11 +1329,14 @@ export class OsServer {
         // convert arraybuffer to node buffer
         const buf = new Buffer(new Uint8Array(response.data));
         if (vm.Message.showDebug()) vm.$log.debug('buffer');
-        const zip = new vm.AdmZip(buf);
-        if (vm.Message.showDebug()) vm.$log.debug('zip');
-        // save
-        zip.writeZip(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name));
 
+        // THIS DOESN'T WORK ANYMORE
+        // const zip = new vm.AdmZip(buf);
+        // if (vm.Message.showDebug()) vm.$log.debug('zip');
+        //zip.writeZip(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name));
+
+        // save
+        vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), buf);
         file.downloaded = true;
         datapoint.downloaded_results = true;
         vm.Project.setModified(true);
@@ -1342,7 +1345,6 @@ export class OsServer {
         vm.$log.error('GET results zip error: ', error);
         deferred.reject();
       });
-
 
     } else {
       vm.$log.error('No zip file listed in the result_files for this datapoint');
@@ -1433,7 +1435,7 @@ export class OsServer {
     // results.csv
     // analyses/<id>/download_data.csv?export=true
     const url2 = vm.selectedServerURL + '/analyses/' + analysisID + 'download_data.csv';
-    params = {export: true};
+    params = {'export': true};
     config = {params: params, headers: {Accept: 'application/json'}};
     if (vm.Message.showDebug()) vm.$log.info('Download results CSV: ', url2);
     const promise2 = vm.$http.get(url1, config).then(response => {
