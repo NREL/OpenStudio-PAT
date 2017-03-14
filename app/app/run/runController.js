@@ -64,13 +64,6 @@ export class RunController {
       vm.$scope.remoteSettings.credentials.region = vm.$scope.awsRegions;
     }
 
-    vm.$scope.datapoints = vm.Project.getDatapoints();
-    if (vm.Message.showDebug()) vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
-    // MANUAL ONLY--set up datapoints
-    vm.setUpDatapoints();
-    vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-    if (vm.Message.showDebug()) vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
-
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
@@ -81,6 +74,14 @@ export class RunController {
     if (vm.Message.showDebug()) vm.$log.debug('Run Type: ', vm.$scope.selectedRunType);
     if (vm.Message.showDebug()) vm.$log.debug('Analysis Type: ', vm.$scope.selectedAnalysisType);
     if (vm.Message.showDebug()) vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod);
+
+    vm.$scope.datapoints = vm.Project.getDatapoints();
+    if (vm.Message.showDebug()) vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
+    // MANUAL ONLY--set up datapoints
+    vm.setUpDatapoints();
+    vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
+    if (vm.Message.showDebug()) vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
+
 
     // disabled button class
     vm.$scope.disabledButtonClass = function () {
@@ -156,14 +157,23 @@ export class RunController {
 
   setUpDatapoints() {
     const vm = this;
-    if (vm.$scope.selectedRunType.name == 'local') {
-      // ensure there is one datapoint per DA
-      const alternatives = vm.Project.getDesignAlternatives();
+    const alternatives = vm.Project.getDesignAlternatives();
 
+    if (vm.$scope.selectedAnalysisType == 'Manual') {
+      // ensure there is one datapoint per DA
       _.forEach(alternatives, (alt) => {
         if (!_.find(vm.$scope.datapoints, {name: alt.name})) {
           // add empty datapoint to array
           vm.$scope.datapoints.push({name: alt.name, run: false, modified: false});
+        }
+      });
+    } else {
+      // algorithmic: remove manual points if there are some
+      _.forEach(alternatives, (alt) => {
+        const index = _.findIndex(vm.$scope.datapoints, {name: alt.name});
+        if (index > -1) {
+          // remove
+          vm.$scope.datapoints.splice(index, 1);
         }
       });
     }

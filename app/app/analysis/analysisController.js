@@ -865,6 +865,8 @@ export class AnalysisController {
     if (vm.Message.showDebug()) vm.$log.debug('In setType in analysis');
     vm.setIsModified();
     vm.Project.setAnalysisType(vm.$scope.selectedAnalysisType);
+    // reset datapoints when switching run type
+    vm.Project.setDatapoints([]);
 
     vm.initializeTab();
   }
