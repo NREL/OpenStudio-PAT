@@ -907,6 +907,8 @@ export class RunController {
               // cancel loop
               vm.stopAnalysisStatus('completed');
 
+              // download result csvs if algorithmic
+              if (vm.$scope.selectedAnalysisType == 'Algorithmic') vm.OsServer.downloadAlgorithmResults();
             }
           }, response => {
             vm.$log.error('analysis status retrieval error: ', response);

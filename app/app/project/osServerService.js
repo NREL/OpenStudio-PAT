@@ -1386,7 +1386,7 @@ export class OsServer {
       const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
       const params = {filename: file.attachment_file_name};
       const config = {params: params, headers: {Accept: 'application/json'}};
-      vm.$log.info('Download OSM URL: ', reportUrl);
+      if (vm.Message.showDebug())  vm.$log.info('Download OSM URL: ', reportUrl);
       vm.$http.get(reportUrl, config).then(response => {
         // write file and set downloaded flag
         vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
@@ -1404,6 +1404,58 @@ export class OsServer {
     }
 
     return deferred.promise;
+  }
+
+  downloadAlgorithmResults() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    const promises = [];
+    const analysisID = vm.Project.getAnalysisID();
+    let config = {};
+    let params = {};
+
+
+    // metadata.csv
+    // analyses/<id>/variables/download_variables.csv
+    const url1 = vm.selectedServerURL + '/analyses/' + analysisID + '/variables/download_variables.csv';
+    config = {headers: {Accept: 'application/json'}};
+    if (vm.Message.showDebug()) vm.$log.info('Download Metadata CSV: ', url1);
+    const promise1 = vm.$http.get(url1, config).then(response => {
+      // write file
+      vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path('metadata.csv'), response.data);
+      deferred.resolve();
+    }, error => {
+      vm.$log.error('GET Metadata.csv error: ', error);
+      deferred.reject();
+    });
+    promises.push(promise1);
+
+    // results.csv
+    // analyses/<id>/download_data.csv?export=true
+    const url2 = vm.selectedServerURL + '/analyses/' + analysisID + 'download_data.csv';
+    params = {export: true};
+    config = {params: params, headers: {Accept: 'application/json'}};
+    if (vm.Message.showDebug()) vm.$log.info('Download results CSV: ', url2);
+    const promise2 = vm.$http.get(url1, config).then(response => {
+      // write file
+      vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path('results.csv'), response.data);
+      deferred.resolve();
+    }, error => {
+      vm.$log.error('GET results.csv error: ', error);
+      deferred.reject();
+    });
+    promises.push(promise2);
+
+    vm.$q.all(promises).then(() => {
+      vm.$log.info('Analysis CSVs downloaded');
+      vm.Project.setModified(true);
+      deferred.resolve();
+    }, error => {
+      vm.$log.error('ERROR downloading analysis CSVs', error);
+      deferred.reject(error);
+    });
+    return deferred.promise;
+
   }
 
   stopAnalysis() {
