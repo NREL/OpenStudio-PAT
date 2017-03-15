@@ -77,11 +77,9 @@ export class RunController {
 
     vm.$scope.datapoints = vm.Project.getDatapoints();
     if (vm.Message.showDebug()) vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
-    // MANUAL ONLY--set up datapoints
     vm.setUpDatapoints();
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
     if (vm.Message.showDebug()) vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
-
 
     // disabled button class
     vm.$scope.disabledButtonClass = function () {
@@ -1044,8 +1042,8 @@ export class RunController {
     // force delete everything in localResults folder in case there is leftover junk not associated with current datapoints
     vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
 
-    vm.Project.setDatapoints([]);
-    vm.$scope.datapoints = vm.Project.getDatapoints();
+    // this will take care of correctly resetting datapoints (manual vs algorithmic)
+    vm.deleteResults();
   }
 
   exportPAT() {
