@@ -729,29 +729,22 @@ export class RunController {
 
   warnBeforeDelete(type) {
     // type could be 'run' (warning before running a new analysis), or 'runtype' (warning before setting new run type)
+    // warn if datapoints have run (updated_at)
     const vm = this;
     const deferred = vm.$q.defer();
 
     if (vm.Message.showDebug()) vm.$log.debug('**** In RunController::WarnBeforeDeleting ****, type: ', type);
 
-    let contents = [];
-    if (type == 'selected') {
-      const matchingArr = [];
-      _.forEach(vm.$scope.datapoints, (dp) => {
-        if (dp.selected && dp.id) {
-          matchingArr.push(dp.id);
-        }
-      });
-      if (matchingArr.length){
-        contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: matchingArr});
-      }
-      if (vm.Message.showDebug()) vm.$log.debug('local results matching selected datapoints: ', contents.length);
-    } else {
-      contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
-      if (vm.Message.showDebug()) vm.$log.debug('Local results size:', contents.length);
-    }
+    let warn = false;
 
-    if (contents.length > 0) {
+    // any datapoints have already run?
+    _.forEach(vm.$scope.datapoints, (dp) => {
+      if ((type == 'selected' && dp.selected && dp.updated_at) || (type != 'selected' && dp.updated_at)){
+        warn = true;
+      }
+    });
+
+    if (warn) {
       // local results exist
       const modalInstance = vm.$uibModal.open({
         backdrop: 'static',
@@ -799,7 +792,6 @@ export class RunController {
       }
 
     }
-
     return deferred.promise;
   }
 
