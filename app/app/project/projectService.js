@@ -596,6 +596,11 @@ export class Project {
           ) {
             if (vm.Message.showDebug()) vm.$log.debug('ARGUMENT, not variable!');
             const argument = vm.makeArgument(arg);
+
+            // ** copy value to default_value if no default_value is present
+            if (!_.isNil(argument.default_value)){
+              argument.default_value = argument.value;
+            }
             // Make sure that argument is "complete"
             if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
               var_count += 1;
