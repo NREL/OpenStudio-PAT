@@ -732,18 +732,20 @@ export class RunController {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    if (vm.Message.showDebug()) vm.$log.debug('**** In RunController::WarnBeforeDeleting ****');
+    if (vm.Message.showDebug()) vm.$log.debug('**** In RunController::WarnBeforeDeleting ****, type: ', type);
 
     let contents = [];
     if (type == 'selected') {
       const matchingArr = [];
       _.forEach(vm.$scope.datapoints, (dp) => {
-        if (dp.selected) {
+        if (dp.selected && dp.id) {
           matchingArr.push(dp.id);
         }
-        contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: matchingArr});
-        if (vm.Message.showDebug()) vm.$log.debug('local results matching selected datapoints: ', contents.length);
       });
+      if (matchingArr.length){
+        contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: matchingArr});
+      }
+      if (vm.Message.showDebug()) vm.$log.debug('local results matching selected datapoints: ', contents.length);
     } else {
       contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
       if (vm.Message.showDebug()) vm.$log.debug('Local results size:', contents.length);
@@ -806,7 +808,7 @@ export class RunController {
 
     if (selectedOnly) {
       _.forEach(vm.$scope.datapoints, (dp) => {
-        if (dp.selected) {
+        if (dp.selected && dp.id) {
           vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(dp.id));
         }
       });
@@ -858,7 +860,7 @@ export class RunController {
 
       if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() ready to run analysis *****');
 
-      // set analysis type (sampling method).  batch_datapoints is for manual runs only
+      // set analysis type (sampling method).  batch_datapoints is for manual only
       let analysis_param = '';
       if (vm.$scope.selectedAnalysisType == 'Manual')
         analysis_param = 'batch_datapoints';
