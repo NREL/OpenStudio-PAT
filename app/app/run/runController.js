@@ -142,8 +142,8 @@ export class RunController {
     let htmlText = '';
     _.forEach(errorArr, (elem) => {
       elem = _.replace(elem, '** Warning **', '<span class="orange-button">** Warning **</span>');
-      elem = _.replace(elem, '** Error **', '<span class="red-button">** Error **</span>');
-      elem = _.replace(elem, '** Info **', '<span class="green-button">** Info **</span>');
+      elem = _.replace(elem, '** Severe  **', '<span class="red-button">** Severe  **</span>');
+      elem = _.replace(elem, '**  Fatal  **', '<span class="red-button">**  Fatal  **</span>');
       if (_.startsWith(elem, '  **   ~~~   **')){
         elem = '<span class="pad-left-5">' + elem + '</span>';
       }
