@@ -401,7 +401,8 @@ export default {
     modalClearResults: {
       title: 'Delete Local Results?',
       rerunAnalysisMessage: 'Running a new analysis will delete your local results. Are you sure you want to continue?',
-      setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?'
+      setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?',
+      rerunSelectedMessage: 'Running a new analysis will delete your local results for the selected datapoints.  Are you sure you want to continue?'
     },
     modalAwsWarning: {
       title: 'PAT Cloud Support with Amazon EC2',

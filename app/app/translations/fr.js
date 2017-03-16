@@ -397,7 +397,8 @@ export default {
     modalClearResults: {
       title: 'Supprimer les résultats locaux?',
       rerunAnalysisMessage: 'L\'exécution d\'une nouvelle analyse supprimera vos résultats locaux. êtes-vous sûr de vouloir continuer?',
-      setRunTypeMessage: 'La sélection d\'un nouveau type d\'exécution supprimera vos résultats locaux. êtes-vous sûr de vouloir continuer?'
+      setRunTypeMessage: 'La sélection d\'un nouveau type d\'exécution supprimera vos résultats locaux. êtes-vous sûr de vouloir continuer?',
+      rerunSelectedMessage: 'L\'exécution d\'une nouvelle analyse supprimera vos résultats locaux pour les points de données selectionés. Êtes-vous sûr de vouloir continuer?'
     },
     modalAwsWarning: {
       title: 'PAT Cloud Support with Amazon EC2',
