@@ -16,7 +16,7 @@ var merge = require('merge-stream');
 
 
 var $ = require('gulp-load-plugins')({
-  pattern: ['gulp-*', 'main-bower-files', 'uglify-save-license', 'del', 'lazypipe', 'streamify']
+  pattern: ['gulp-*', 'main-bower-files', 'del', 'lazypipe', 'streamify']
 });
 
 gulp.task('background', ['scripts'], function () {
@@ -40,7 +40,7 @@ gulp.task('html', ['background', 'preload', 'inject', 'partials'], function () {
     .pipe(jsFilter)
     .pipe($.ngAnnotate())
     .pipe($.rev())
-    .pipe($.uglify({preserveComments: $.uglifySaveLicense})).on('error', conf.errorHandler('Uglify'))
+    .pipe($.uglify()).on('error', conf.errorHandler('Uglify'))
     .pipe($.sourcemaps.write('maps'))
     .pipe(jsFilter.restore)
     .pipe(cssFilter)
