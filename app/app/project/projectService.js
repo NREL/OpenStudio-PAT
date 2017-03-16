@@ -1049,7 +1049,20 @@ export class Project {
       outHash.display_name = out.display_name;
       outHash.display_name_short = out.short_name;
       outHash.metadata_id = null; // always null for now.  This is related to DEnCity?
-      outHash.name = out.name; // always measure.name . measure.argument.name
+
+      // ensure name includes 'measure.name .'
+      if (!_.startsWith(out.name, out.measure_name + '.')){
+        outHash.name = out.measure_name + '.' + out.name;
+      } else {
+        outHash.name = out.name;
+      }
+
+      // if (!_.startsWith(out.display_name, out.measure_name + '.')){
+      //   outHash.display_name = out.measure_name + '.' + out.display_name;
+      // } else {
+      //   outHash.name = out.display_name;
+      // }
+
       outHash.visualize = out.visualize == 'true';
       outHash.export = true; // always true
       outHash.variable_type = out.type;  // options are: string, bool, double, integer?  TODO: find out what these can be. for now: use argument type
