@@ -427,15 +427,18 @@ export class Project {
       }
     });
 
-    // add 'files to include
+    // add files to include
     _.forEach(vm.filesToInclude, (file) => {
       if (file.dirToInclude) {
+
         if (!file.unpackDirName) {
           // use same name if no name is provided
           file.unpackDirName = file.dirToInclude.replace(/^.*[\\\/]/, '');
         }
+        const absPath = path.resolve(vm.projectDir.path(), file.dirToInclude);
+        if (vm.Message.showDebug()) vm.$log.debug('RESOLVED PATH: ', absPath, ' unpack DIR: ', file.unpackDirName);
         archive.bulk([
-          {expand: true, cwd: file.dirToInclude, src: ['**'], dest: 'lib/' + file.unpackDirName}
+          {expand: true, cwd: absPath, src: ['**'], dest: 'lib/' + file.unpackDirName}
         ]);
       }
     });

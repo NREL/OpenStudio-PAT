@@ -1,6 +1,7 @@
 import jetpack from 'fs-jetpack';
 import {remote} from 'electron';
 import {shell} from 'electron';
+import path from 'path';
 const {dialog} = remote;
 
 export class AnalysisController {
@@ -20,6 +21,7 @@ export class AnalysisController {
     vm.BCL = BCL;
     vm.dialog = dialog;
     vm.shell = shell;
+    vm.path = path;
     vm.$translate = $translate;
     vm.Message = Message;
 
@@ -939,7 +941,8 @@ export class AnalysisController {
 
     if (!_.isEmpty(result)) {
       if (vm.Message.showDebug()) vm.$log.debug(' result[0]:', result[0]);
-      file.dirToInclude = result[0];
+      if (vm.Message.showDebug()) vm.$log.debug('path relative to project: ', vm.path.relative(vm.Project.getProjectDir().path(), result[0]));
+      file.dirToInclude = vm.path.relative(vm.Project.getProjectDir().path(), result[0]);
       vm.setIsModified();
     }
   }
