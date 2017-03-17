@@ -324,7 +324,16 @@
       console.debug('In setData');
       $scope.setupAfterResultsAvailable();
     });
+  }
 
+  function setAlgorithmicData(metadata, results) {
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    $scope.$apply(function () {
+      $scope.algorithm_results = metadata;
+      $scope.algorithm_metadata = results;
+      $scope.setupAfterResultsAvailable();
+    });
   }
 
 

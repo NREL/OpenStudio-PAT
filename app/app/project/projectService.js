@@ -32,6 +32,7 @@ import {remote} from 'electron';
 import jsZip from 'jszip';
 import fs from 'fs';
 import archiver from 'archiver';
+import csvtojson from 'csvtojson';
 
 const {app, dialog} = remote;
 
@@ -46,6 +47,7 @@ export class Project {
     vm.MeasureManager = MeasureManager;
     vm.dialog = dialog;
     vm.archiver = archiver;
+    vm.csvtojson = csvtojson;
     vm.$q = $q;
     vm.$http = $http;
     vm.$uibModal = $uibModal;
@@ -2722,6 +2724,26 @@ export class Project {
       vm.weatherFilesDropdownArr.push({id: weather, name: weather});
     });
   }
+
+  loadAlgorithmicResults(type) {
+    const vm = this;
+    const filename = type == 'results' ? 'results.csv' : 'metadata.csv';
+    let resultsJson = [];
+    if (vm.jetpack.exists(vm.getProjectLocalResultsDir().path(filename))) {
+      const csv = vm.jetpack.read(vm.getProjectLocalResultsDir().path(filename));
+      resultsJson = vm.csvToJson(csv);
+    }
+    //if (vm.Message.showDebug()) vm.$log.debug('RESULTS JSON for type:', type, ' is: ', resultsJson);
+    return resultsJson;
+  }
+
+  csvToJson(csv) {
+  const content = csv.split('\n');
+  const header = content[0].split(',');
+  return _.tail(content).map((row) => {
+    return _.zipObject(header, row.split(','));
+  });
+}
 
   getSeedsDropdownArr() {
     const vm = this;

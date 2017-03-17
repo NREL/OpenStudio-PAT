@@ -54,6 +54,18 @@ export class ReportsController {
     if (vm.Message.showDebug()) vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
     vm.testResults = vm.$scope.datapoints;
 
+    // get algorithmic results
+    vm.selectedAnalysisType = vm.Project.getAnalysisType();
+    vm.$scope.algorithmic_results = [];
+    vm.$scope.algorithmic_metadata = [];
+    if (vm.selectedAnalysisType == 'Algorithmic') {
+      // load results
+      vm.$scope.algorithmic_results = vm.Project.loadAlgorithmicResults('results');
+      vm.$scope.algorithmic_metadata = vm.Project.loadAlgorithmicResults('metadata');
+    }
+    if (vm.Message.showDebug()) vm.$log.debug('Algorithmic RESULTS: ', vm.$scope.algorithmic_results);
+    if (vm.Message.showDebug()) vm.$log.debug('Algorithmic METADATA: ', vm.$scope.algorithmic_metadata);
+
     // preload.js path depends on environment.  we need full path to file
     vm.$scope.preloadPath = `file://${app.getAppPath()}/scripts/preload.js`;
 
@@ -136,12 +148,14 @@ export class ReportsController {
     });
   }
 
+
   // pass Data to report.html
   passData() {
     const vm = this;
     var wv = document.getElementById('wv');
     wv.executeJavaScript(`setReportDir(${JSON.stringify(vm.reportDirPath)});`);
     wv.executeJavaScript(`setData(${JSON.stringify(vm.testResults)});`);
+    wv.executeJavaScript(`setAlgorithmicData(${JSON.stringify(vm.algorithmic_metadata)}, ${JSON.stringify(vm.algorithmic_results)});`);
   }
 
 }

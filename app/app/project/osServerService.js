@@ -1449,9 +1449,9 @@ export class OsServer {
     const url1 = vm.selectedServerURL + '/analyses/' + analysisID + '/variables/download_variables.csv';
     config = {headers: {Accept: 'application/json'}};
     if (vm.Message.showDebug()) vm.$log.info('Download Metadata CSV: ', url1);
-    const promise1 = vm.$http.get(url1, config).then(response => {
+    const promise1 = vm.$http.get(url1, config).then(response1 => {
       // write file
-      vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path('metadata.csv'), response.data);
+      vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path('metadata.csv'), response1.data);
       deferred.resolve();
     }, error => {
       vm.$log.error('GET Metadata.csv error: ', error);
@@ -1465,9 +1465,9 @@ export class OsServer {
     params = {'export': true};
     config = {params: params, headers: {Accept: 'application/json'}};
     if (vm.Message.showDebug()) vm.$log.info('Download results CSV: ', url2);
-    const promise2 = vm.$http.get(url1, config).then(response => {
+    const promise2 = vm.$http.get(url2, config).then(response2 => {
       // write file
-      vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path('results.csv'), response.data);
+      vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path('results.csv'), response2.data);
       deferred.resolve();
     }, error => {
       vm.$log.error('GET results.csv error: ', error);
