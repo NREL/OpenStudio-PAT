@@ -32,7 +32,6 @@ import {remote} from 'electron';
 import jsZip from 'jszip';
 import fs from 'fs';
 import archiver from 'archiver';
-import csvtojson from 'csvtojson';
 
 const {app, dialog} = remote;
 
@@ -47,7 +46,6 @@ export class Project {
     vm.MeasureManager = MeasureManager;
     vm.dialog = dialog;
     vm.archiver = archiver;
-    vm.csvtojson = csvtojson;
     vm.$q = $q;
     vm.$http = $http;
     vm.$uibModal = $uibModal;
