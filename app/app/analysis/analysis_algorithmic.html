@@ -21,8 +21,11 @@
                 <div class="col-sm-12">
                   <label class="medium-label" for="{{option.name}}">{{option.displayName}}</label>
                   <span ng-if="option.description" class="small-text inline">&mdash; {{option.description}}</span>
-                  <input type="text" class="form-control" id="{{option.name}}" placeholder="{{option.defaultValue}}"
+
+                  <input ng-if="option.type == 'number'" type="number" class="form-control" id="{{option.name}}" placeholder="{{option.defaultValue}}"
                          ng-model="option.value">
+                  <input ng-if="option.type == 'string'" type="text" class="form-control" id="{{option.name}}" placeholder="{{option.defaultValue}}"
+                  ng-model="option.value">
                 </div>
               </div>
             </div>
@@ -33,7 +36,9 @@
                 <div class="col-sm-12">
                   <label class="medium-label" for="{{option.name}}">{{option.displayName}}</label>
                   <span ng-if="option.description" class="small-text inline">&mdash; {{option.description}}</span>
-                  <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}"
+                  <input ng-if="option.type == 'string'" type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}"
+                         ng-model="option.value">
+                  <input ng-if="option.type == 'number'" type="number" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}"
                          ng-model="option.value">
                 </div>
               </div>

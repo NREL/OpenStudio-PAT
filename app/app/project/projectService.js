@@ -1610,7 +1610,12 @@ export class Project {
     const vm = this;
     vm.osServerVersions = [];
     const amiURL = 'http://s3.amazonaws.com/openstudio-resources/server/api/v3/amis.json';
-    vm.$http.get(amiURL, {cache: false}).then(response => {
+    const headers = {};
+    headers['Cache-Control'] = 'no-cache';
+    headers['Pragma'] = 'no-cache';
+    headers['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT';
+    const config = {headers: headers};
+    vm.$http.get(amiURL, config).then(response => {
       if (response.data && response.data.builds) {
         vm.$log.info('OPENSTUDIO SERVER AMIS: ', response.data.builds);
         _.forEach(response.data.builds, version => {
@@ -1864,593 +1869,706 @@ export class Project {
       name: 'in_measure_combinations',
       displayName: 'In Measure Combinations',
       description: 'Options: \'true\' or \'false\'',
-      defaultValue: 'true'
+      defaultValue: 'true',
+      type: 'string'
     }, {
       name: 'include_baseline_in_combinations',
       displayName: 'Include Baseline in Combinations?',
       description: 'Options: \'true\' or \'false\'',
-      defaultValue: 'true'
+      defaultValue: 'true',
+      type: 'string'
     }];
 
     opts.diag = [{
       name: 'experiment_type',
       displayName: 'Experiment Type',
       description: 'Options: diagonal',
-      defaultValue: 'diagonal'
+      defaultValue: 'diagonal',
+      type: 'string'
     }, {
       name: 'number_of_samples',
       displayName: 'Number of Samples',
       description: 'Positive integer (if individual, total simulations is this times each variable)',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'run_baseline',
       displayName: 'Run Baseline?',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 1
+      defaultValue: 1,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e18
+      defaultValue: 1e18,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.doe = [{
       name: 'experiment_type',
       displayName: 'Experiment Type',
       description: 'Options: full_factorial',
-      defaultValue: 'full_factorial'
+      defaultValue: 'full_factorial',
+      type:'string'
     }, {
       name: 'number_of_samples',
       displayName: 'Number of Samples',
       description: 'Positive integer (this discretizes a continous variable)',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e18
+      defaultValue: 1e18,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.lhs = [{
       name: 'sample_method',
       displayName: 'Sample Method',
       description: 'Options: individual_variables or all_variables',
-      defaultValue: 'individual_variables'
+      defaultValue: 'individual_variables',
+      type:'string'
     }, {
       name: 'number_of_samples',
       displayName: 'Number of Samples',
       description: 'Positive integer (if individual, total simulations is this times each variable)',
-      defaultValue: 5
+      defaultValue: 5,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e18
+      defaultValue: 1e18,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.morris = [{
       name: 'r',
       displayName: 'r',
       description: 'Integer giving the number of repetitions of the design',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'levels',
       displayName: 'Levels',
       description: 'Positive integer (if individual, total simulations is this times each variable)',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'grid_jump',
       displayName: 'Levels',
       description: 'Integer specifying the number of levels that are increased/decreased for computing the elementary effects',
-      defaultValue: 1
+      defaultValue: 1,
+      type:'number'
     }, {
       name: 'type',
       displayName: 'Type',
       description: 'Options: oat (One at a Time)',
-      defaultValue: 'oat'
+      defaultValue: 'oat',
+      type:'string'
     }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
-      defaultValue: 'minkowski'
+      defaultValue: 'minkowski',
+      type:'string'
     }, {
       name: 'pPower',
       displayName: 'pPower',
       description: 'Options: Lp norm power (must be non-negative)',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1000000000000000000
+      defaultValue: 1000000000000000000,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.nsga_nrel = [{
       name: 'number_of_samples',
       displayName: 'Number of Samples',
       description: 'Size of initial population',
-      defaultValue: 30
+      defaultValue: 30,
+      type:'number'
     }, {
       name: 'generations',
       displayName: 'Generations',
       description: 'Number of generations',
-      defaultValue: 3
+      defaultValue: 3,
+      type:'number'
     }, {
       name: 'tournament_size',
       displayName: 'Tournament Size',
       description: 'Tournament Size',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'cprob',
       displayName: 'C Prob',
       description: 'Crossover probability [0,1]',
-      defaultValue: 0.85
+      defaultValue: 0.85,
+      type:'number'
     }, {
       name: 'xover_dist_idx',
       displayName: 'XoverDistIdx',
       description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
+      defaultValue: 5,
+      type:'number'
     }, {
       name: 'mu_dist_idx',
       displayName: 'MuDistIdx',
       description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
+      defaultValue: 5,
+      type:'number'
     }, {
       name: 'mprob',
       displayName: 'M Prob',
       description: 'Mutation probability [0,1]',
-      defaultValue: 0.8
+      defaultValue: 0.8,
+      type:'number'
     }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
-      defaultValue: 'minkowski'
+      defaultValue: 'minkowski',
+      type:'string'
     }, {
       name: 'p_power',
       displayName: 'P Power',
       description: 'Lp norm power (must be non-negative)',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'exit_on_guideline14',
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e18
+      defaultValue: 1e18,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.optim = [{
       name: 'epsilon_gradient',
       displayName: 'Epsilon Gradient',
       description: 'Epsilon in gradient calculation',
-      defaultValue: 1e-4
+      defaultValue: 1e-4,
+      type:'number'
     }, {
       name: 'pgtol',
       displayName: 'PG Tol',
       description: 'Tolerance on the projected gradient',
-      defaultValue: 1e-2
+      defaultValue: 1e-2,
+      type:'number'
     }, {
       name: 'factr',
       displayName: 'Factr',
       description: 'Tolerance on delta_F',
-      defaultValue: 4.5036e13
+      defaultValue: 4.5036e13,
+      type:'number'
     }, {
       name: 'maxit',
       displayName: 'Max iterations',
       description: 'Maximum number of iterations',
-      defaultValue: 10
+      defaultValue: 10,
+      type:'number'
     }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
-      defaultValue: 'minkowski'
+      defaultValue: 'minkowski',
+      type:'string'
     }, {
       name: 'p_power',
       displayName: 'P Power',
       description: 'Lp norm power (must be non-negative)',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'exit_on_guideline14',
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e18
+      defaultValue: 1e18,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.preflight = [{
       name: 'sample_method',
       displayName: 'Sample Method',
       description: 'Options: individual_variables or all_variables',
-      defaultValue: 'individual_variables'
+      defaultValue: 'individual_variables',
+      type:'string'
     }, {
       name: 'run_max',
       displayName: 'Run Max?',
       description: 'Options: true or false',
-      defaultValue: 'true'
+      defaultValue: 'true',
+      type:'string'
     }, {
       name: 'run_min',
       displayName: 'Run Min?',
       description: 'Options: true or false',
-      defaultValue: 'true'
+      defaultValue: 'true',
+      type:'string'
     }, {
       name: 'run_mode',
       displayName: 'Run Mode?',
       description: 'Options: true or false',
-      defaultValue: 'true'
+      defaultValue: 'true',
+      type:'string'
     }, {
       name: 'run_all_samples_for_pivots',
       displayName: 'Run all Samples for Pivots?',
       description: 'Options: true or false',
-      defaultValue: 'true'
+      defaultValue: 'true',
+      type:'string'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e19
+      defaultValue: 1e19,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.pso = [{
       name: 'npart',
       displayName: 'Number of Particles',
       description: 'Number of particles in the swarm',
-      defaultValue: 4
+      defaultValue: 4,
+      type:'number'
     }, {
       name: 'maxit',
       displayName: 'Max Iterations',
       description: 'Maximum number of iterations',
-      defaultValue: 20
+      defaultValue: 20,
+      type:'number'
     }, {
       name: 'maxfn',
       displayName: 'Max Function Evaluations',
       description: 'Maximum number of function evaluations',
-      defaultValue: 1000
+      defaultValue: 1000,
+      type:'number'
     }, {
       name: 'lambda',
       displayName: 'Lambda',
       description: '[0,1] a percentage to limit the maximum velocity (Vmax) for each dimension',
-      defaultValue: 0.9
+      defaultValue: 0.9,
+      type:'number'
     }, {
       name: 'c2',
       displayName: 'C2',
       description: 'Social acceleration coefficient',
-      defaultValue: 1.193147
+      defaultValue: 1.193147,
+      type:'number'
     }, {
       name: 'c1',
       displayName: 'C1',
       description: 'Cognitive acceleration coefficient',
-      defaultValue: 1.193147
+      defaultValue: 1.193147,
+      type:'number'
     }, {
       name: 'boundary',
       displayName: 'Boundary',
       description: 'Options: invisible, damping, reflecting, absorbing2007, absorbing2011, default',
-      defaultValue: 'reflecting'
+      defaultValue: 'reflecting',
+      type:'string'
     }, {
       name: 'topology',
       displayName: 'Topology',
       description: 'Options: gbest, lbest, vonneumann, random',
-      defaultValue: 'random'
+      defaultValue: 'random',
+      type:'string'
     }, {
       name: 'xini',
       displayName: 'Xini',
       description: 'Options: lhs, random',
-      defaultValue: 'lhs'
+      defaultValue: 'lhs',
+      type:'string'
     }, {
       name: 'vini',
       displayName: 'Vini',
       description: 'Options: zero, lhs2011, random2011, lhs2007, random2007, default',
-      defaultValue: 'lhs2011'
+      defaultValue: 'lhs2011',
+      type:'string'
     }, {
       name: 'abstol',
       displayName: 'Abs Tol',
       description: 'Absolute convergence tolerance',
-      defaultValue: 0.01
+      defaultValue: 0.01,
+      type:'number'
     }, {
       name: 'reltol',
       displayName: 'Rel Tol',
       description: 'Relative convergence tolerance',
-      defaultValue: 0.01
+      defaultValue: 0.01,
+      type:'number'
     }, {
       name: 'method',
       displayName: 'Method',
       description: 'Options: spso2007, spso2011, ipso, fips, wfips',
-      defaultValue: 'spso2011'
+      defaultValue: 'spso2011',
+      type:'string'
     }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
-      defaultValue: 'minkowski'
+      defaultValue: 'minkowski',
+      type:'string'
     }, {
       name: 'p_power',
       displayName: 'P Power',
       description: 'Lp norm power (must be non-negative)',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'exit_on_guideline14',
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e18
+      defaultValue: 1e18,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.repeat_run = [{
       name: 'number_of_runs',
       displayName: 'Number of Runs',
       description: 'Positive integer (if individual, total simulations is this times each variable)',
-      defaultValue: 30
+      defaultValue: 30,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e18
+      defaultValue: 1e18,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.rgenoud = [{
       name: 'popsize',
       displayName: 'Population Size',
       description: 'Size of initial population',
-      defaultValue: 30
+      defaultValue: 30,
+      type:'number'
     }, {
       name: 'generations',
       displayName: 'Generations',
       description: 'Number of generations',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'wait_generations',
       displayName: 'Generations to Wait',
       description: 'If no improvement in waitGenerations of generations, then exit',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'bfgsburnin',
       displayName: 'BFGS burn in',
       description: 'The number of generations which are run before the BFGS is ﬁrst used',
-      defaultValue: 6
+      defaultValue: 6,
+      type:'number'
     }, {
       name: 'solution_tolerance',
       displayName: 'Solution Tolerance',
       description: 'Numbers within solutionTolerance are considered equal',
-      defaultValue: 0.01
+      defaultValue: 0.01,
+      type:'number'
     }, {
       name: 'epsilon_gradient',
       displayName: 'Epsilon Gradient',
       description: 'epsilon in gradient calculation',
-      defaultValue: 0.01
+      defaultValue: 0.01,
+      type:'number'
     }, {
       name: 'pgtol',
       displayName: 'Projected Gradient Tolerance',
       description: 'Tolerance on the projected gradient',
-      defaultValue: 0.01
+      defaultValue: 0.01,
+      type:'number'
     }, {
       name: 'factr',
       displayName: 'Failed F Value',
       description: 'Tolerance on delta_F',
-      defaultValue: 450360000000000
+      defaultValue: 450360000000000,
+      type:'number'
     }, {
       name: 'maxit',
       displayName: 'Maximum Iterations',
       description: 'Maximum number of iterations',
-      defaultValue: 3
+      defaultValue: 3,
+      type:'number'
     }, {
       name: 'r_genoud_debug_flag',
       displayName: 'Failed F Value',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 1
+      defaultValue: 1,
+      type:'number'
     }, {
       name: 'print_level',
       displayName: 'Print Level',
       description: 'Options: 0 (minimal printing), 1 (normal), 2 (detailed), and 3 (debug)',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
-      defaultValue: 'minkowski'
+      defaultValue: 'minkowski',
+      type:'string'
     }, {
       name: 'p_power',
       displayName: 'P Power',
       description: 'Lp norm power (must be non-negative)',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'exit_on_guideline14',
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e18
+      defaultValue: 1e18,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.single_run = [{
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e18
+      defaultValue: 1e18,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.sobol = [{
       name: 'number_of_samples',
       displayName: 'Number of Samples',
       description: 'Positive integer',
-      defaultValue: 30
+      defaultValue: 30,
+      type:'number'
     }, {
       name: 'random_seed',
       displayName: 'Random Seed',
       description: 'The first random seed',
-      defaultValue: 1979
+      defaultValue: 1979,
+      type:'number'
     }, {
       name: 'random_seed2',
       displayName: 'Random Seed 2',
       description: 'the second random seed',
-      defaultValue: 1973
+      defaultValue: 1973,
+      type:'number'
     }, {
       name: 'order',
       displayName: 'Order',
       description: 'Integer, the maximum order in the ANOVA decomposition (all indices up to this order will be computed)',
-      defaultValue: 1
+      defaultValue: 1,
+      type:'number'
     }, {
       name: 'nboot',
       displayName: 'Num Boot',
       description: 'The number of bootstrap replicates',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }, {
       name: 'conf',
       displayName: 'Confidence',
       description: 'the confidence level for bootstrap confidence intervals',
-      defaultValue: 0.95
+      defaultValue: 0.95,
+      type:'number'
     }, {
       name: 'type',
       displayName: 'Type',
       description: 'Options: sobol, sobol2002, sobol2007, jansen, mara, martinez',
-      defaultValue: 'sobol'
+      defaultValue: 'sobol',
+      type:'string'
     }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
-      defaultValue: 'minkowski'
+      defaultValue: 'minkowski',
+      type:'string'
     }, {
       name: 'p_power',
       displayName: 'P Power',
       description: 'Lp norm power (must be non-negative)',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e18
+      defaultValue: 1e18,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     opts.spea_nrel = [{
       name: 'number_of_samples',
       displayName: 'Number of Samples',
       description: 'Size of Initial Population',
-      defaultValue: 30
+      defaultValue: 30,
+      type:'number'
     }, {
       name: 'generations',
       displayName: 'Generations',
       description: 'Number of generations',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'tournament_size',
       displayName: 'Tournament Size',
       description: 'Tournament Size',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'cprob',
       displayName: 'C Prob',
       description: 'Crossover probability [0,1]',
-      defaultValue: 0.85
+      defaultValue: 0.85,
+      type:'number'
     }, {
       name: 'cidx',
       displayName: 'C Idx',
       description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
+      defaultValue: 5,
+      type:'number'
     }, {
       name: 'midx',
       displayName: 'M Idx',
       description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
+      defaultValue: 5,
+      type:'number'
     }, {
       name: 'mprob',
       displayName: 'M Prob',
       description: 'Mutation probability [0,1]',
-      defaultValue: 0.8
+      defaultValue: 0.8,
+      type:'number'
     }, {
       name: 'norm_type',
       displayName: 'Norm Type',
       description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
-      defaultValue: 'minkowski'
+      defaultValue: 'minkowski',
+      type:'string'
     }, {
       name: 'p_power',
       displayName: 'P Power',
       description: 'Lp norm power (must be non-negative)',
-      defaultValue: 2
+      defaultValue: 2,
+      type:'number'
     }, {
       name: 'exit_on_guideline14',
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
-      defaultValue: 1e18
+      defaultValue: 1e18,
+      type:'number'
     }, {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
-      defaultValue: 0
+      defaultValue: 0,
+      type:'number'
     }];
 
     return opts;
@@ -2545,6 +2663,7 @@ export class Project {
         match.description = object.description;
         match.defaultValue = object.defaultValue;
         match.value = _.isNil(match.value) ? object.defaultValue : match.value;
+        match.type = object.type;
       }
       else {
         const temp = angular.copy(object);
