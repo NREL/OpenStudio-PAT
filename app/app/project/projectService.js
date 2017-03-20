@@ -36,7 +36,7 @@ import archiver from 'archiver';
 const {app, dialog} = remote;
 
 export class Project {
-  constructor($q, $log, $http, $uibModal, MeasureManager, $sce, Message) {
+  constructor($q, $log, $http, $uibModal, MeasureManager, $sce, Message, toastr, $translate) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -51,6 +51,8 @@ export class Project {
     vm.$uibModal = $uibModal;
     vm.$sce = $sce;
     vm.Message = Message;
+    vm.toastr = toastr;
+    vm.$translate = $translate;
 
     vm.analysisTypes = ['Manual', 'Algorithmic'];
 
@@ -1622,6 +1624,7 @@ export class Project {
 
   setOsServerVersions() {
     const vm = this;
+    const deferred = vm.$q.defer();
     vm.osServerVersions = [];
     const amiURL = 'http://s3.amazonaws.com/openstudio-resources/server/api/v3/amis.json';
     const headers = {};
@@ -1637,10 +1640,18 @@ export class Project {
         });
       }
       vm.$log.info('OS Server Versions: ', vm.osServerVersions);
+      deferred.resolve(vm.osServerVersions);
 
     }, error => {
       vm.$log.error('Error retrieving the OsServerVersions: ', error);
+      vm.$translate('toastr.amisError').then(translation => {
+        vm.toastr.error(translation);
+      });
+      deferred.reject();
+
     });
+
+    return deferred.promise;
   }
 
   setServerInstanceTypes() {

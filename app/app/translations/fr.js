@@ -111,7 +111,8 @@ export default {
     startCredentialsError: 'Error starting AWS server - No AWS Credentials Selected',
     connectedCloudError: 'Error connecting to AWS',
     startedCloudError: 'Error starting AWS server',
-    prepareExit: 'Preparing to exit...'
+    prepareExit: 'Preparing to exit...',
+    amisError: 'Cannot retrieve OpenStudio Server Versions'
   },
   analysis: {
     title: 'Analyse',
@@ -384,6 +385,7 @@ export default {
     exportToOSA: 'Exporter vers OSA',
     runEntireWorkflow: 'Exécuter tout le workflow',
     runSelected: 'Exécuter sélectionné',
+    pleaseWait: 'Please wait...',
     selectAll: 'Tout sélectionner',
     clearSelections: 'Effacer les sélections',
     algorithmicOnCloud: 'Algorithmic analyses cannot be run locally.  Select \'Run on Cloud\' from the dropdown above to run this analysis remotely.',

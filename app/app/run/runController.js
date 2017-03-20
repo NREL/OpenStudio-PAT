@@ -78,6 +78,7 @@ export class RunController {
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
     if (vm.Message.showDebug()) vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
+    if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Server Versions: ', vm.$scope.osServerVersions);
     vm.$scope.serverInstanceTypes = vm.Project.getServerInstanceTypes();
     vm.$scope.workerInstanceTypes = vm.Project.getWorkerInstanceTypes();
     // only valid region is us-east-1 for now
@@ -320,6 +321,8 @@ export class RunController {
 
   checkIfClusterIsRunning() {
     const vm = this;
+    // reset to terminated (while cluster is checked)
+    vm.$scope.remoteSettings.aws.cluster_status = '';
     // see if cluster is running; if so, set status
     if (vm.$scope.remoteSettings.aws && vm.$scope.remoteSettings.aws.cluster_name) {
       vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then(() => {
