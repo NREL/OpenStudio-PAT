@@ -1246,7 +1246,7 @@ export class OsServer {
 
     // download all reports (result files) as soon as a datapoint completes
 
-    datapoints = vm.Project.getDatapoints();
+    const datapoints = vm.Project.getDatapoints();
 
     _.forEach(datapoints, dp => {
       if (dp.status == 'completed' && !dp.downloaded_reports) {
@@ -1328,7 +1328,7 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const promises = [];
 
-    datapoints = vm.Project.getDatapoints();
+    const datapoints = vm.Project.getDatapoints();
 
     _.forEach(datapoints, dp => {
       const promise = vm.downloadResults(dp);
@@ -1398,7 +1398,7 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const promises = [];
 
-    datapoints = vm.Project.getDatapoints();
+    const datapoints = vm.Project.getDatapoints();
 
     _.forEach(datapoints, dp => {
       const promise = vm.downloadOSM(dp);
