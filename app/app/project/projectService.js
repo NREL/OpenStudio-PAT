@@ -808,6 +808,7 @@ export class Project {
     _.forEach(vm.measures, (measure) => {
       _.forEach(measure.analysisOutputs, (out) => {
         out.measure_name = measure.name;
+        out.measure_class_name = measure.class_name;
         out.measure_uid = measure.uid;
         tempOutputs.push(out);
       });
@@ -1078,14 +1079,15 @@ export class Project {
       outHash.metadata_id = null; // always null for now.  This is related to DEnCity?
 
       // ensure name includes 'measure.name .'
-      if (!_.startsWith(out.name, out.measure_name + '.')){
-        outHash.name = out.measure_name + '.' + out.name;
+      const measureName = _.upperFirst(_.camelCase(out.measure_class_name));
+      if (!_.startsWith(out.name, measureName + '.')){
+        outHash.name = measureName + '.' + out.name;
       } else {
         outHash.name = out.name;
       }
 
-      // if (!_.startsWith(out.display_name, out.measure_name + '.')){
-      //   outHash.display_name = out.measure_name + '.' + out.display_name;
+      // if (!_.startsWith(out.display_name, measureName + '.')){
+      //   outHash.display_name = measureName + '.' + out.display_name;
       // } else {
       //   outHash.name = out.display_name;
       // }
