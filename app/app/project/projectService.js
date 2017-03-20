@@ -2011,6 +2011,12 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
+    },{
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
     }];
 
     opts.nsga_nrel = [{
@@ -2085,6 +2091,12 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
+    },{
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
     }];
 
     opts.optim = [{
@@ -2140,6 +2152,12 @@ export class Project {
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
+      type:'number'
+    },{
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
       type:'number'
     }];
 
@@ -2295,6 +2313,12 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
+    },{
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
     }];
 
     opts.repeat_run = [{
@@ -2413,6 +2437,12 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
+    },{
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
     }];
 
     opts.single_run = [{
@@ -2495,6 +2525,12 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
+    },{
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
     }];
 
     opts.spea_nrel = [{
@@ -2568,6 +2604,12 @@ export class Project {
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
+      type:'number'
+    },{
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
       type:'number'
     }];
 
@@ -2657,7 +2699,7 @@ export class Project {
     });
 
     // add/update new settings
-    _.forEach(vm.algorithmOptions[algorithm.id], (object) => {
+    _.forEach(vm.algorithmOptions[algorithm.id], (object, index) => {
       const match = _.find(vm.algorithmSettings, {name: object.name});
       if (match) {
         match.description = object.description;
@@ -2668,7 +2710,8 @@ export class Project {
       else {
         const temp = angular.copy(object);
         temp.value = temp.defaultValue;
-        vm.algorithmSettings.push(temp);
+        //vm.algorithmSettings.push(temp);
+        vm.algorithmSettings.splice(index, 0, temp);
       }
     });
 
