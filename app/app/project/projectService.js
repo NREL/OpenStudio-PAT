@@ -1094,7 +1094,7 @@ export class Project {
 
       outHash.visualize = out.visualize == 'true';
       outHash.export = true; // always true
-      outHash.variable_type = out.type;  // options are: string, bool, double, integer?  TODO: find out what these can be. for now: use argument type
+      outHash.variable_type = vm.convertType(out.type);
       finalOutputs.push(outHash);
     });
     return finalOutputs;
@@ -1121,7 +1121,7 @@ export class Project {
     argument.display_name = arg.display_name;
     argument.display_name_short = arg.display_name_short ? arg.display_name_short : arg.name;
     argument.name = arg.name;
-    argument.value_type = _.toLower(arg.type); // TODO: choice, double, integer, bool, string (convert from BCL types)
+    argument.value_type = vm.convertType(arg.type);
     argument.default_value = arg.default_value;
     if (vm.analysisType == 'Manual')
       argument.value = arg.option_1 ? arg.option_1 : arg.default_value;
@@ -1131,13 +1131,27 @@ export class Project {
     return argument;
   }
 
+  convertType(type){
+    let newType = null;
+    if (_.toUpper(type) === 'CHOICE' || _.toUpper(type) === 'STRING') {
+      newType = 'string';
+    } else if (_.toUpper(type) === 'DOUBLE') {
+      newType = 'double';
+    } else if (_.toUpper(type) === 'INTEGER') {
+      newType = 'integer';
+    } else if (_.toUpper(type) === 'BOOLEAN' || _.toUpper(type) === 'BOOL'){
+      newType = 'boolean';
+    }
+    return newType;
+  }
+
   makeSkip(measure) {
     const v = {
       argument: {
         display_name: 'Skip ' + measure.display_name,
         display_name_short: 'Skip entire measure',
         name: '__SKIP__',
-        value_type: 'bool',
+        value_type: 'boolean',
         default_value: false,
         value: false
       },
