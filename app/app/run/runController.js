@@ -907,7 +907,7 @@ export class RunController {
             vm.OsServer.setAnalysisStatus(response.data.analysis.status);
             vm.$scope.analysisStatus = response.data.analysis.status;
             if (vm.Message.showDebug()) vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
-            vm.OsServer.setDatapointsStatus(response.data.analysis.data_points); // TODO: one by one
+            vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
             vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
             if (vm.Message.showDebug()) vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
 

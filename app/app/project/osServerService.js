@@ -1117,7 +1117,7 @@ export class OsServer {
     let promise = null;
 
     vm.selectedAnalysisType = vm.Project.getAnalysisType();
-    vm.datapoints = vm.Project.getDatapoints();
+    const datapoints = vm.Project.getDatapoints();
 
     _.forEach(vm.datapointsStatus, (dp) => {
       if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT STATUS: ', dp);
@@ -1139,15 +1139,15 @@ export class OsServer {
           datapoint.final_message = dp.final_message;
           datapoint.id = dp.id;
 
-          const dp_match = _.findIndex(vm.datapoints, {name: dp.name});
+          const dp_match = _.findIndex(datapoints, {name: dp.name});
           if (vm.Message.showDebug()) vm.$log.debug('DP match results for: ', dp.name, ': ', dp_match);
           if (dp_match != -1) {
             // merge
-            _.merge(vm.datapoints[dp_match], datapoint);
-            if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
+            _.merge(datapoints[dp_match], datapoint);
+            if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', datapoints[dp_match]);
           } else {
             // append datapoint to array
-            vm.datapoints.push(datapoint);
+            datapoints.push(datapoint);
           }
           if (vm.Message.showDebug()) vm.$log.debug('PROJECT DATAPOINTS NOW: ', vm.Project.getDatapoints());
 
@@ -1168,15 +1168,15 @@ export class OsServer {
               datapoint.final_message = dp.final_message;
               datapoint.id = dp.id;
 
-              const dp_match = _.findIndex(vm.datapoints, {name: dp.name});
+              const dp_match = _.findIndex(datapoints, {name: dp.name});
               if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
               if (dp_match != -1) {
                 // merge
-                _.merge(vm.datapoints[dp_match], datapoint);
-                if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
+                _.merge(datapoints[dp_match], datapoint);
+                if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', datapoints[dp_match]);
               } else {
                 // also load in datapoints array
-                vm.datapoints.push(datapoint);
+                datapoints.push(datapoint);
               }
 
 
@@ -1200,15 +1200,15 @@ export class OsServer {
           datapoint.final_message = dp.final_message;
           datapoint.id = dp.id;
 
-          const dp_match = _.findIndex(vm.datapoints, {name: dp.name});
-          if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
+          const dp_match = _.findIndex(datapoints, {name: dp.name});
+          //if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
           if (dp_match != -1) {
             // merge
-            _.merge(vm.datapoints[dp_match], datapoint);
-            if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', vm.datapoints[dp_match]);
+            _.merge(datapoints[dp_match], datapoint);
+           // if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', datapoints[dp_match]);
           } else {
             // also load in datapoints array
-            vm.datapoints.push(datapoint);
+            datapoints.push(datapoint);
           }
         }, error2 => {
           vm.$log.error('GET Datapoint.json ERROR: ', error2);
@@ -1218,7 +1218,19 @@ export class OsServer {
     });
 
     vm.$q.all(promises).then(() => {
-      deferred.resolve(vm.datapoints);
+      // reorder algorithmic datapoints to match status
+      if (vm.selectedAnalysisType == 'Algorithmic') {
+        const newDPs = [];
+        _.forEach(vm.datapointsStatus, (dp, index) => {
+          const dp_match = _.findIndex(datapoints, {name: dp.name});
+          if (dp_match != -1) {
+            newDPs.push(datapoints[dp_match]);
+          }
+        });
+        vm.Project.setDatapoints(newDPs);
+        if (vm.Message.showDebug()) vm.$log.debug('REORDERED ALGORITHMIC DATAPOINTS: ', vm.Project.getDatapoints());
+      }
+      deferred.resolve(datapoints);
       vm.Project.setModified(true);
     }, error => {
       vm.$log.error('ERROR retrieving datapoints OSWs: ', error);
@@ -1234,9 +1246,9 @@ export class OsServer {
 
     // download all reports (result files) as soon as a datapoint completes
 
-    vm.datapoints = vm.Project.getDatapoints();
+    datapoints = vm.Project.getDatapoints();
 
-    _.forEach(vm.datapoints, dp => {
+    _.forEach(datapoints, dp => {
       if (dp.status == 'completed' && !dp.downloaded_reports) {
         const url = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
         const promise = vm.$http.get(url).then(response => {
@@ -1300,8 +1312,8 @@ export class OsServer {
     });
 
     vm.$q.all(promises).then(() => {
-      vm.$log.info('Updated Datapoints with Reports: ', vm.datapoints);
-      deferred.resolve(vm.datapoints);
+      vm.$log.info('Updated Datapoints with Reports: ', datapoints);
+      deferred.resolve(datapoints);
       vm.Project.setModified(true);
     }, error => {
       vm.$log.error('ERROR retrieving datapoints JSONs: ', error);
@@ -1316,9 +1328,9 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const promises = [];
 
-    vm.datapoints = vm.Project.getDatapoints();
+    datapoints = vm.Project.getDatapoints();
 
-    _.forEach(vm.datapoints, dp => {
+    _.forEach(datapoints, dp => {
       const promise = vm.downloadResults(dp);
       promises.push(promise);
     });
@@ -1386,9 +1398,9 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const promises = [];
 
-    vm.datapoints = vm.Project.getDatapoints();
+    datapoints = vm.Project.getDatapoints();
 
-    _.forEach(vm.datapoints, dp => {
+    _.forEach(datapoints, dp => {
       const promise = vm.downloadOSM(dp);
       promises.push(promise);
     });
