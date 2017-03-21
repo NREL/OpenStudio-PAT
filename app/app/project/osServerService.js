@@ -619,6 +619,9 @@ export class OsServer {
         }, () => {
           // cluster terminated or new, connect with file
 
+          // remove folder from clusters in case it exists (since cluster isn't on)
+          vm.jetpack.remove(vm.Project.getProjectClustersDir().path(vm.remoteSettings.aws.cluster_name));
+
           // make sure file is saved
           vm.Project.saveClusterToFile();
           if (vm.Message.showDebug()) vm.$log.debug('Connecting to terminated/new cluster');
@@ -626,6 +629,7 @@ export class OsServer {
           vm.$log.info('Start Server Command: ', vm.startServerCommand);
 
           const envCopy = vm.setAwsEnvVars();
+
 
           vm.remoteServerChild = vm.exec(vm.startServerCommand, {env: envCopy},
             (error, stdout, stderr) => {
