@@ -112,7 +112,9 @@ export default {
     connectedCloudError: 'Error connecting to AWS',
     startedCloudError: 'Error starting AWS server',
     prepareExit: 'Preparing to exit...',
-    amisError: 'Cannot retrieve OpenStudio Server Versions'
+    amisError: 'Cannot retrieve OpenStudio Server Versions',
+    noYaml: 'No AWS credentials selected. Cannot start/connect to AWS',
+    noCluster: 'No cluster selected. Cannot start/connect to AWS'
   },
   analysis: {
     title: 'Analyse',

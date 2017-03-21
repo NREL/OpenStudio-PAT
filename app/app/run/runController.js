@@ -226,6 +226,9 @@ export class RunController {
     vm.OsServer.resetSelectedServerURL();
     vm.OsServer.setProgress(0, '');
 
+    // if switching to local, reset connection setting for remote type
+    vm.$scope.serverStatuses.remote = 'stopped';
+
     // if switching to remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
       vm.$scope.clusters = vm.Project.getClusters();
@@ -429,60 +432,84 @@ export class RunController {
     const vm = this;
     // always save cluster to file before connecting
     vm.saveClusterToFile();
-    if (type == 'connect') {
-      // toastr
-      vm.$translate('toastr.connectingCloud').then(translation => {
-        vm.toastr.info(translation);
-      });
-    } else {
-      // toastr
-      vm.$translate('toastr.startingCloud').then(translation => {
-        vm.toastr.info(translation, {closeButton: true, timeOut: 60000});
+    if (vm.checkConnectionParams()){
+      if (type == 'connect') {
+        // toastr
+        vm.$translate('toastr.connectingCloud').then(translation => {
+          vm.toastr.info(translation);
+        });
+      } else {
+        // toastr
+        vm.$translate('toastr.startingCloud').then(translation => {
+          vm.toastr.info(translation, {closeButton: true, timeOut: 60000});
+        });
+      }
+      vm.OsServer.startServer().then(() => {
+        vm.$log.info('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
+        if (vm.Message.showDebug()) vm.$log.debug('REMOTE SETTINGS: ', vm.$scope.remoteSettings);
+        vm.toastr.clear();
+        if (type == 'connect') {
+          vm.$translate('toastr.connectedCloud').then(translation => {
+            vm.toastr.success(translation);
+          });
+          vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
+          if (vm.Message.showDebug()) vm.$log.debug('clusterData: ', vm.$scope.clusterData);
+        }
+        else {
+          vm.$translate('toastr.startedCloud').then(translation => {
+            vm.toastr.success(translation);
+          });
+          vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
+        }
+      }, error => {
+        // error toastrs
+        vm.toastr.clear();
+        if (error == 'No Credentials') {
+          if (type == 'connect'){
+            vm.$translate('toastr.connectCredentialsError').then(translation => {
+              vm.toastr.error(translation);
+            });
+          } else {
+            vm.$translate('toastr.startCredentialsError').then(translation => {
+              vm.toastr.error(translation);
+            });
+          }
+        }
+        else {
+          if (type == 'connect')
+            vm.$translate('toastr.connectedCloudError').then(translation => {
+              vm.toastr.error(translation);
+            });
+          else {
+            vm.$translate('toastr.startedCloudError').then(translation => {
+              vm.toastr.error(translation);
+            });
+          }
+        }
+
       });
     }
-    vm.OsServer.startServer().then(() => {
-      vm.$log.info('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
-      vm.toastr.clear();
-      if (type == 'connect') {
-        vm.$translate('toastr.connectedCloud').then(translation => {
-          vm.toastr.success(translation);
-        });
-        vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
-        if (vm.Message.showDebug()) vm.$log.debug('clusterData: ', vm.$scope.clusterData);
-      }
-      else {
-        vm.$translate('toastr.startedCloud').then(translation => {
-          vm.toastr.success(translation);
-        });
-        vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
-      }
-    }, error => {
-      // error toastrs
-      vm.toastr.clear();
-      if (error == 'No Credentials') {
-        if (type == 'connect'){
-          vm.$translate('toastr.connectCredentialsError').then(translation => {
-            vm.toastr.error(translation);
-          });
-        } else {
-          vm.$translate('toastr.startCredentialsError').then(translation => {
-            vm.toastr.error(translation);
-          });
-        }
-      }
-      else {
-        if (type == 'connect')
-          vm.$translate('toastr.connectedCloudError').then(translation => {
-            vm.toastr.error(translation);
-          });
-        else {
-          vm.$translate('toastr.startedCloudError').then(translation => {
-            vm.toastr.error(translation);
-          });
-        }
-      }
+  }
 
-    });
+  checkConnectionParams() {
+    const vm = this;
+    let proceed = true;
+    // check for yml file
+    if (_.isNil(vm.$scope.remoteSettings.credentials.yamlFilename) || vm.$scope.remoteSettings.credentials.yamlFilename == '') {
+      proceed = false;
+      vm.$translate('toastr.noYaml').then(translation => {
+        vm.toastr.error(translation);
+      });
+    }
+    // check for cluster selection
+    if (_.isNil(vm.$scope.remoteSettings.aws.cluster_name) || vm.$scope.remoteSettings.aws.cluster_name == ''){
+      proceed = false;
+      vm.$translate('toastr.noCluster').then(translation => {
+        vm.toastr.error(translation);
+      });
+    }
+
+    return proceed;
   }
 
   connectRemoteServer(){

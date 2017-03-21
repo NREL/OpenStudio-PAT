@@ -565,8 +565,8 @@ export class OsServer {
                   vm.$log.info('Setting selectedServerURl to: ', vm.Project.fixURL(dns));
                   vm.setSelectedServerURL(vm.Project.fixURL(dns));
                 }
-
-                vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
+                vm.connectCluster();
+                //vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
                 deferred.resolve(vm.remoteServerChild);
 
               } else {
@@ -598,7 +598,8 @@ export class OsServer {
                 vm.$log.info('Setting selectedServerURL to: ', vm.Project.fixURL(dns));
                 vm.setSelectedServerURL(vm.Project.fixURL(dns));
               }
-              vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
+              vm.connectCluster();
+              //vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
               deferred.resolve('success');
             } else {
               vm.$log.error('Server failed to connect');
