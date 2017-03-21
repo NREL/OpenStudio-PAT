@@ -243,24 +243,26 @@ export class ModalBclController {
       _.forEach(vm.libMeasures.my, m => {
         if (m.addedToProject) {
           // add if not found
-          if (!(_.find(measures, {uid: m.uid, location: 'my'}))) measures.push(m);
+          if (!(_.find(measures, {uid: m.uid, location: 'my'}))){
+            measures.push(m);
+          }
         }
       });
       _.forEach(vm.libMeasures.local, m => {
         if (m.addedToProject) {
           // add if not found
-          if (!(_.find(measures, {uid: m.uid, location: 'local'}))) measures.push(m);
+          if (!(_.find(measures, {uid: m.uid, location: 'local'}))){
+            measures.push(m);
+          }
         }
       });
     }
     // add other checked
     _.forEach(vm.filters, (val, key) => {
-
       if (val) {
         if (vm.Message.showDebug()) vm.$log.debug('key: ', key);
         if (vm.Message.showDebug()) vm.$log.debug('measures: ', vm.libMeasures[key]);
         _.forEach(vm.libMeasures[key], m => {
-          // TODO: what if it's in the project but no longer in local/my folder? check for this?
           // add if not found (BCL online only)
           if (key == 'bcl') {
             // add if local measure of same UID isn't already added
@@ -398,16 +400,15 @@ export class ModalBclController {
         });
         return found;
       });
-
     }
-
   }
 
   // add measure to project
   addMeasure(rowEntity) {
 
     const vm = this;
-    const measure = _.find(vm.$scope.displayMeasures, {uid: rowEntity.uid});
+    if (vm.Message.showDebug()) vm.$log.debug('Adding this row to project: ', rowEntity);
+    const measure = _.find(vm.$scope.displayMeasures, {uid: rowEntity.uid, location: rowEntity.location});
 
     vm.addToProject(measure);
     vm.setMeasureInExistingDAs(measure);
@@ -425,7 +426,7 @@ export class ModalBclController {
     // copy on disk
     const dirNames = _.split(measure.measure_dir, '/');
     const dirName = _.last(dirNames);
-    //overwrite if measure is already in project folder
+    // overwrite if measure is already in project folder
     vm.jetpack.copy(measure.measure_dir, vm.projectDir.path(dirName), {overwrite: true});
 
     // add to project measures
