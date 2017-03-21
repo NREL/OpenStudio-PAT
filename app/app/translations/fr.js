@@ -69,6 +69,7 @@ export default {
   toastr: {
     measureAdded: 'Measure added to project!',
     measureAddedError: 'Measure added to project, but unable to compute arguments',
+    measureNameAlreadyAdded: 'Cannot add measure: measure names must be unique and there is already a measure with this name added to the project',
     measureDuplicated: 'Measure duplicated!',
     downloadingMeasure: 'Downloading measure from the BCL...',
     measureDownloaded: 'Measure downloaded!',

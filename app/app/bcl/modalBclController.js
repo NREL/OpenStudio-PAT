@@ -410,10 +410,21 @@ export class ModalBclController {
     if (vm.Message.showDebug()) vm.$log.debug('Adding this row to project: ', rowEntity);
     const measure = _.find(vm.$scope.displayMeasures, {uid: rowEntity.uid, location: rowEntity.location});
 
-    vm.addToProject(measure);
-    vm.setMeasureInExistingDAs(measure);
-    if (vm.Message.showDebug()) vm.$log.debug('Adding the following measure to project: ', measure);
-    if (vm.Message.showDebug()) vm.$log.debug('New project measures array: ', vm.projectMeasures);
+    // first check for uniqueness of measure name
+    const match = _.find(vm.projectMeasures, {name: measure.name});
+    if (vm.Message.showDebug()) vm.$log.debug('measure name match: ', match);
+    if (match) {
+      // there is already a measure with this name, to ensure uniqueness, can't add this second measure
+      vm.$log.error('Can\'t add measure to project: there is already a measure with that name added');
+      vm.$translate('toastr.measureNameAlreadyAdded').then( translation => {
+        vm.toastr.error(translation);
+      });
+    } else {
+      vm.addToProject(measure);
+      vm.setMeasureInExistingDAs(measure);
+      if (vm.Message.showDebug()) vm.$log.debug('Adding the following measure to project: ', measure);
+      if (vm.Message.showDebug()) vm.$log.debug('New project measures array: ', vm.projectMeasures);
+    }
   }
 
   addToProject(measure) {
