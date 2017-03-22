@@ -153,6 +153,10 @@
         _.forEach($scope.results, function (run) {
           numAlts += 1;
           _.forEach(run.steps, function (step) {
+            // Make sure the results exist
+            if (!step.hasOwnProperty('result')){
+              return;
+            }
             var idPlusArgs = step.result.measure_uid + JSON.stringify(step.arguments);
             step.idPlusArgs = idPlusArgs;
             if (measureCounts[idPlusArgs]) {
@@ -244,7 +248,9 @@
         }
 
         // Show a unique set of warnings
-        $scope.renderWarns.push.apply(_.uniq(renderWarns));
+        _.forEach(_.uniq(renderWarns), function (warn) {
+          $scope.renderWarns.push(warn);
+        });
 
       };
 
