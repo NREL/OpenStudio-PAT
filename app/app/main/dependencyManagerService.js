@@ -98,9 +98,7 @@ export class DependencyManager {
         } else if (name == 'perlEXEPath') {
           return prefixPath.path('Perl/perl/bin/perl' + exeExt);
         } else if (name == 'OS_RAYPATH') {
-          let temp3 = jetpack.cwd(app.getAppPath(), '..', 'Radiance');
-          vm.$log.error('getAppPath3: ', temp3.path());
-          return temp3.path();
+          return prefixPath.path('..', 'Radiance/');
         }
       } else {
         prefixPath = jetpack.cwd(app.getPath('exe'), '../..', 'Resources');
