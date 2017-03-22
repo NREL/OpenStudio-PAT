@@ -82,7 +82,7 @@ export class DependencyManager {
     if (env.name == 'production') {
       if (os.platform() == 'win32') {
         prefixPath = jetpack.cwd(app.getPath('exe'), '..');
-
+        vm.$log.error('production WIN prefixPath: ', prefixPath.path());
         if (name == 'PAT_OS_CLI_PATH') {
           return prefixPath.path('..', 'bin/openstudio' + exeExt);
         } else if (name == 'PAT_OS_BINDING_PATH') {
@@ -98,7 +98,9 @@ export class DependencyManager {
         } else if (name == 'perlEXEPath') {
           return prefixPath.path('Perl/perl/bin/perl' + exeExt);
         } else if (name == 'OS_RAYPATH') {
-          return prefixPath.path('Radiance');
+          let temp3 = jetpack.cwd(app.getAppPath(), '..', 'Radiance');
+          vm.$log.error('getAppPath3: ', temp3.path());
+          return temp3;
         }
       } else {
         prefixPath = jetpack.cwd(app.getPath('exe'), '../..', 'Resources');
