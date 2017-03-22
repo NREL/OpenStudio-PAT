@@ -630,7 +630,7 @@ export class Project {
             const argument = vm.makeArgument(arg);
 
             // ** copy value to default_value if no default_value is present
-            if (!_.isNil(argument.default_value)){
+            if (_.isNil(argument.default_value)){
               argument.default_value = argument.value;
             }
             // Make sure that argument is "complete"
