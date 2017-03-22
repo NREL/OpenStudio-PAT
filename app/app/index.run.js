@@ -167,11 +167,11 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
     submenu: [{
       label: 'New',
       accelerator: 'Ctrl+N',
-      click: () => SetProject.newProject()
+      click: () => SetProject.warnCloudRunning('new')
     }, {
       label: 'Open',
       accelerator: 'Ctrl+O',
-      click: () => SetProject.openProject()
+      click: () => SetProject.warnCloudRunning('open')
     }, {
       label: 'Save',
       accelerator: 'Ctrl+S',
@@ -323,13 +323,13 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
         label: 'New',
         accelerator: 'Command+N',
         click() {
-          SetProject.newProject();
+          SetProject.warnCloudRunning('new')
         }
       }, {
         label: 'Open',
         accelerator: 'Command+O',
         click() {
-          SetProject.openProject();
+          SetProject.warnCloudRunning('open')
         }
       }, {
         label: 'Save',

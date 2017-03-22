@@ -479,4 +479,64 @@ export class SetProject {
     vm.BCL.resetProjectVariables();
   }
 
+  warnCloudRunning(type) {
+
+    const vm = this;
+   // const deferred = vm.$q.defer();
+
+    const runType = vm.Project.getRunType();
+    const remoteSettings = vm.Project.getRemoteSettings();
+
+    if (vm.Message.showDebug()) vm.$log.debug('**** In setProjectService::warnCloudRunning ****');
+    if (vm.Message.showDebug()) vm.$log.debug('runType: ', runType);
+    if (vm.Message.showDebug()) vm.$log.debug('remoteSettings: ', remoteSettings);
+    if (runType.name == 'remote' && remoteSettings.remoteType == 'Amazon Cloud' && remoteSettings.aws && remoteSettings.aws.connected) {
+
+      const modalInstance = vm.$uibModal.open({
+        backdrop: 'static',
+        controller: 'ModalCloudRunningController',
+        controllerAs: 'modal',
+        templateUrl: 'app/run/cloudRunning.html'
+      });
+
+      modalInstance.result.then(() => {
+        // stop server
+        vm.OsServer.stopServer().then(() => {
+          // go to new/open
+          if (type == 'new') {
+            vm.newProject();
+          } else {
+            vm.openProject();
+          }
+
+        }, () => {
+          // go to new/open anyway
+          if (type == 'new') {
+            vm.newProject();
+          } else {
+            vm.openProject();
+          }
+        });
+
+      }, () => {
+
+        //deferred.reject();
+        // go to new/open
+        if (type == 'new') {
+          vm.newProject();
+        } else {
+          vm.openProject();
+        }
+
+      });
+    } else {
+      // go to new/open
+      if (type == 'new') {
+        vm.newProject();
+      } else {
+        vm.openProject();
+      }
+    }
+  }
+
 }
