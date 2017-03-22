@@ -155,6 +155,10 @@
         _.forEach($scope.results, function (run) {
           $scope.numAlts += 1;
           _.forEach(run.steps, function (step) {
+            // Make sure the results exist
+            if (!step.hasOwnProperty('result')){
+              return;
+            }
             var idPlusArgs = step.result.measure_uid + JSON.stringify(step.arguments);
             step.idPlusArgs = idPlusArgs;
             if ($scope.measureCounts[idPlusArgs]) {

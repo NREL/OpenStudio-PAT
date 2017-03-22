@@ -146,7 +146,9 @@
       });
 
       // Show a unique set of warnings
-      $scope.renderWarns.push.apply(_.uniq(renderWarns));
+      _.forEach(_.uniq(renderWarns), function (warn) {
+        $scope.renderWarns.push(warn);
+      });
 
     };
 
