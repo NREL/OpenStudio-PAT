@@ -57,8 +57,8 @@
 
 <div class="row pad-bot-10" ng-if="!disabledButtons && selectedAnalysisType != 'Algorithmic'">
   <div class="col-sm-12">
-    <button type="button" class="btn btn-primary" ng-if="!allSelected()" ng-click="run.selectAll(true)" translate>run.selectAll</button>
-    <button type="button" class="btn btn-primary" ng-if="allSelected()" ng-click="run.selectAll(false)" translate>run.clearSelections</button>
+    <button type="button" class="btn btn-primary" ng-if="!allSelected() && datapoints.length > 0" ng-click="run.selectAll(true)" translate>run.selectAll</button>
+    <button type="button" class="btn btn-primary" ng-if="allSelected() && datapoints.length > 0" ng-click="run.selectAll(false)" translate>run.clearSelections</button>
   </div>
 </div>
 
@@ -202,7 +202,7 @@
   </div>
 
   <hr class="gray-line">
-  <div class="row">
+  <div class="row" ng-if="atLeastOneModified()">
     <div class="col-sm-12">
       <span class="glyphicon glyphicon-exclamation-sign orange-button big-icon middle" aria-label="datapoint modified and must be rerun"></span>
       <span class="small-text pad-left-5 middle" translate>run.modifiedDP</span>

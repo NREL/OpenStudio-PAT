@@ -134,6 +134,10 @@ export class RunController {
       return _.filter(vm.$scope.datapoints, {selected: true}).length == vm.$scope.datapoints.length;
     };
 
+    vm.$scope.atLeastOneModified = function () {
+      return _.filter(vm.$scope.datapoints, {modified: true}).length > 0;
+    };
+
     // TROUBLESHOOTING PANEL STATUS
     vm.$scope.dev = {open: true};
 
