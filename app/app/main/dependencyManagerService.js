@@ -100,7 +100,7 @@ export class DependencyManager {
         } else if (name == 'OS_RAYPATH') {
           let temp3 = jetpack.cwd(app.getAppPath(), '..', 'Radiance');
           vm.$log.error('getAppPath3: ', temp3.path());
-          return temp3;
+          return temp3.path();
         }
       } else {
         prefixPath = jetpack.cwd(app.getPath('exe'), '../..', 'Resources');
