@@ -153,7 +153,7 @@
         _.forEach($scope.results, function (run) {
           numAlts += 1;
           _.forEach(run.steps, function (step) {
-            var idPlusArgs = step.measure_id + JSON.stringify(step.arguments);
+            var idPlusArgs = step.result.measure_uid + JSON.stringify(step.arguments);
             step.idPlusArgs = idPlusArgs;
             if (measureCounts[idPlusArgs]) {
               measureCounts[idPlusArgs] += 1;
@@ -173,7 +173,14 @@
         _.forEach($scope.results, function (run) {
 
           // Get the OpenStudio Results measure, which contains the results
-          var reportMeasure = _.find(run.steps, {'measure_id': "a25386cd-60e4-46bc-8b11-c755f379d916"});
+          var reportMeasure = null;
+          _(run.steps).forEach(function (step) {
+            if (step.hasOwnProperty('result')) {
+              if (step.result.measure_uid == "a25386cd-60e4-46bc-8b11-c755f379d916") {
+                reportMeasure = step;
+              }
+            }
+          });
           if (!reportMeasure) {
             renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
             return;
@@ -237,8 +244,15 @@
         }
 
         // Show a unique set of warnings
-        $scope.renderWarns = _.uniq(renderWarns);
+        $scope.renderWarns.push.apply(_.uniq(renderWarns));
 
+      };
+
+      // Warn user that this report doesn't work in Algorithmic mode
+      $scope.setupAfterAlgorithmicResultsAvailable = function () {
+        if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
+          $scope.renderWarns.push("This report will only work with Analysis Type = Manual.");
+        }
       };
 
     });
@@ -307,7 +321,7 @@
     $scope.$apply(function () {
       $scope.algorithm_results = metadata;
       $scope.algorithm_metadata = results;
-      $scope.setupAfterResultsAvailable();
+      $scope.setupAfterAlgorithmicResultsAvailable();
     });
   }
 
