@@ -1167,7 +1167,7 @@ export class OsServer {
             const promise2 = vm.$http.get(datapointUrl).then(response2 => {
               // set datapoint array
               if (vm.Message.showDebug()) vm.$log.debug('datapoint JSON raw response: ', response2);
-              vm.$log.info('datapoint JSON response: ', response2.data.data_point);
+              //vm.$log.info('datapoint JSON response: ', response2.data.data_point);
               const datapoint = response2.data.data_point;
               datapoint.status = dp.status;
               datapoint.final_message = dp.final_message;
@@ -1199,7 +1199,7 @@ export class OsServer {
         promise = vm.$http.get(datapointUrl).then(response2 => {
           // set datapoint array
           if (vm.Message.showDebug()) vm.$log.debug('datapoint JSON raw response: ', response2);
-          vm.$log.info('datapoint JSON response: ', response2.data.data_point);
+          //vm.$log.info('datapoint JSON response: ', response2.data.data_point);
           const datapoint = response2.data.data_point;
           datapoint.status = dp.status;
           datapoint.final_message = dp.final_message;

@@ -629,10 +629,6 @@ export class Project {
             if (vm.Message.showDebug()) vm.$log.debug('ARGUMENT, not variable!');
             const argument = vm.makeArgument(arg);
 
-            // ** copy value to default_value if no default_value is present
-            if (_.isNil(argument.default_value) || argument.default_value == ''){
-              argument.default_value = argument.value;
-            }
             // Make sure that argument is "complete"
             if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
               var_count += 1;
@@ -889,7 +885,7 @@ export class Project {
       // Variable arguments
       _.forEach(measure.arguments, (arg) => {
         if (arg.inputs && arg.inputs.variableSetting && arg.inputs.variableSetting != 'Argument' && !arg.inputs.showWarningIcon) {
-          if (vm.Message.showDebug()) vm.$log.debug('Project::exportAlgorithmic arg: ', arg);
+          if (vm.Message.showDebug()) vm.$log.debug('Project::exportAlgorithmic variable arg: ', arg);
 
           // VARIABLE ARGUMENT SECTION
           const v = {};
@@ -1129,6 +1125,11 @@ export class Project {
       argument.value = arg.option_1 ? arg.option_1 : arg.default_value;
     else
       argument.value = (arg.inputs && !_.isNil(arg.inputs.default_value)) ? arg.inputs.default_value : arg.default_value;
+
+    // ** copy value to default_value if no default_value is present
+    if (_.isNil(argument.default_value) || argument.default_value == ''){
+      argument.default_value = argument.value;
+    }
 
     return argument;
   }
