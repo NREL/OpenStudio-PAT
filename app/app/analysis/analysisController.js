@@ -279,7 +279,7 @@ export class AnalysisController {
           width: 300,
           minWidth: 100,
           cellTooltip: function (row) {
-            return row.entity.display_name;
+            return _.isNil(row.entity.description) || row.entity.description.length == 0 ? row.entity.display_name : row.entity.description;
           }
         }, {
           name: 'description',
