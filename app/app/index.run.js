@@ -323,13 +323,13 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
         label: 'New',
         accelerator: 'Command+N',
         click() {
-          SetProject.warnCloudRunning('new')
+          SetProject.warnCloudRunning('new');
         }
       }, {
         label: 'Open',
         accelerator: 'Command+O',
         click() {
-          SetProject.warnCloudRunning('open')
+          SetProject.warnCloudRunning('open');
         }
       }, {
         label: 'Save',
