@@ -281,6 +281,11 @@ export class AnalysisController {
           displayName: 'description',
           visible: false
         }, {
+          name: 'units',
+          displayName: 'Units',
+          width: 50,
+          minWidth: 10
+        }, {
           name: 'display_name_short',
           displayName: 'analysis.columns.shortName',
           cellEditableCondition: $scope => {
