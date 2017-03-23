@@ -214,6 +214,11 @@ export class AnalysisController {
       editableCellTemplate: 'app/analysis/optionInputTemplate.html',
       width: 200,
       minWidth: 100,
+      cellTooltip: function (row, colDef) {
+        if (!_.isNil(row.entity.specialRowId) && row.entity.specialRowId == 'optionDescription') {
+          return row.entity[colDef.field];
+        }
+      },
       //enableCellEdit: true
       cellEditableCondition: $scope => {
         if (!_.isNil($scope.row.entity.specialRowId)) {
@@ -274,12 +279,17 @@ export class AnalysisController {
           width: 300,
           minWidth: 100,
           cellTooltip: function (row) {
-            return row.entity.display_name;
+            return _.isNil(row.entity.description) || row.entity.description.length == 0 ? row.entity.display_name : row.entity.description;
           }
         }, {
           name: 'description',
           displayName: 'description',
           visible: false
+        }, {
+          name: 'units',
+          displayName: 'Units',
+          width: 50,
+          minWidth: 10
         }, {
           name: 'display_name_short',
           displayName: 'analysis.columns.shortName',
