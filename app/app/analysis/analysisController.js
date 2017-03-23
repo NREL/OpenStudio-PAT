@@ -214,6 +214,11 @@ export class AnalysisController {
       editableCellTemplate: 'app/analysis/optionInputTemplate.html',
       width: 200,
       minWidth: 100,
+      cellTooltip: function (row, colDef) {
+        if (!_.isNil(row.entity.specialRowId) && row.entity.specialRowId == 'optionDescription') {
+          return row.entity[colDef.field];
+        }
+      },
       //enableCellEdit: true
       cellEditableCondition: $scope => {
         if (!_.isNil($scope.row.entity.specialRowId)) {
