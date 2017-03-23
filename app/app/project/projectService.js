@@ -826,119 +826,116 @@ export class Project {
     // MEASURE DETAILS
     let measure_count = 0;
     _.forEach(vm.measures, (measure) => {
-      const m = {};
-      m.name = measure.name;
-      m.display_name = measure.display_name;
+      // for algorithmic workflows, don't add SKIPPED measure to JSON
+      if (!measure.skip){
+        const m = {};
+        m.name = measure.name;
+        m.display_name = measure.display_name;
 
-      m.measure_type = vm.getMeasureType(measure);
+        m.measure_type = vm.getMeasureType(measure);
 
-      m.measure_definition_class_name = measure.className;
-      //m.measure_definition_measureUID = measure.colDef.measureUID;
+        m.measure_definition_class_name = measure.className;
+        //m.measure_definition_measureUID = measure.colDef.measureUID;
 
-      const mdir = vm.getMeasureBaseDir(measure);
-      m.measure_definition_directory = './measures/' + mdir;
-      m.measure_definition_directory_local = measure.measure_dir;
-      m.measure_definition_class_name = measure.class_name;
-      m.measure_definition_display_name = measure.display_name;
-      m.measure_definition_name = measure.name;
-      m.measure_definition_name_xml = null;
-      m.measure_definition_uuid = measure.uid;
-      m.measure_definition_version_uuid = measure.version_id;
+        const mdir = vm.getMeasureBaseDir(measure);
+        m.measure_definition_directory = './measures/' + mdir;
+        m.measure_definition_directory_local = measure.measure_dir;
+        m.measure_definition_class_name = measure.class_name;
+        m.measure_definition_display_name = measure.display_name;
+        m.measure_definition_name = measure.name;
+        m.measure_definition_name_xml = null;
+        m.measure_definition_uuid = measure.uid;
+        m.measure_definition_version_uuid = measure.version_id;
 
-      // adding these to support EDAPT reporting
-      m.uuid = measure.uid;
-      m.version_uuid = measure.version_id;
-      m.description = measure.description;
-      m.taxonomy = measure.tags;
+        // adding these to support EDAPT reporting
+        m.uuid = measure.uid;
+        m.version_uuid = measure.version_id;
+        m.description = measure.description;
+        m.taxonomy = measure.tags;
 
-      // ARGUMENTS
-      m.arguments = [];
-      // This portion only has arguments that don't have the variable box checked
-      _.forEach(measure.arguments, (arg) => {
-        // if argument is set to 'Argument' or if the variable setting is not supported by selected algorithm
-        if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
-          if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' treated as ARGUMENT');
-          const argument = vm.makeArgument(arg);
-          // Make sure that argument is "complete"
-          if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
+        // ARGUMENTS
+        m.arguments = [];
+        // This portion only has arguments that don't have the variable box checked
+        _.forEach(measure.arguments, (arg) => {
+          // if argument is set to 'Argument' or if the variable setting is not supported by selected algorithm
+          if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
+            if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' treated as ARGUMENT');
+            const argument = vm.makeArgument(arg);
+            // Make sure that argument is "complete"
+            if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
+              var_count += 1;
+              m.arguments.push(argument);
+            } else {
+              if (vm.Message.showDebug()) vm.$log.debug('Not pushing partial arg to m.arguments');
+              if (vm.Message.showDebug()) vm.$log.debug('partial arg: ', argument);
+            }
+          }
+        });
+
+        // VARIABLES
+        let var_count = 0;
+        m.variables = [];
+
+        // TODO: implement a way to sample skipping a measure (On/Off)
+
+        // Variable arguments
+        _.forEach(measure.arguments, (arg) => {
+          if (arg.inputs && arg.inputs.variableSetting && arg.inputs.variableSetting != 'Argument' && !arg.inputs.showWarningIcon) {
+            if (vm.Message.showDebug()) vm.$log.debug('Project::exportAlgorithmic variable arg: ', arg);
+
+            // VARIABLE ARGUMENT SECTION
+            const v = {};
+            v.argument = vm.makeArgument(arg);
+
+            vm.$log.info(arg.choice_display_names);
+            v.argument.choice_display_names = arg.choice_display_names;  // TODO: not sure about this?
+
+            // VARIABLE DETAILS
+            v.display_name = arg.display_name;  // same as arg
+            v.display_name_short = arg.display_name_short;
+            v.variable_type = (arg.inputs.variableSetting == 'Pivot') ? 'pivot' : 'variable'; // this is 'variable' or 'pivot'
+            v.units = arg.units;
+            v.minimum = arg.inputs.minimum;
+            v.maximum = arg.inputs.maximum;
+            v.relation_to_output = arg.relationship;
+            v.static_value = arg.default_value;
+            v.uuid = '';
+            v.version_uuid = '';
+            if (arg.inputs.variableSetting == 'Pivot') {
+              v.pivot = true;
+            } else {
+              v.variable = true;
+            }
+            v.uncertainty_description = {};
+            // pivots can be discrete or integer_sequence_uncertain (handled in analysis controller)
+            // options are triangle, uniform, discrete, and normal, integer_sequence_uncertain
+            v.uncertainty_description.type = arg.inputs.distribution == 'Integer Sequence' ? 'integer_sequence' : arg.inputs.distribution.toLowerCase();
+            v.uncertainty_description.attributes = [];
+
+            // if discrete or pivot, make values and weights array (unless pivot w/ integer_sequence)
+            if ((arg.inputs.variableSetting == 'Pivot' || arg.inputs.variableSetting == 'Discrete') && arg.inputs.distribution != 'Integer Sequence') {
+              const valArr = vm.makeDiscreteValuesArray(arg.inputs.discreteVariables);
+              v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
+            }
+
+            // TODO: if any of these don't exist, set to inputs.default_value
+            v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.inputs.minimum});  // minimum
+            v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.inputs.maximum});  // maximum
+            v.uncertainty_description.attributes.push({name: 'modes', value: arg.inputs.mean}); // mean
+            v.uncertainty_description.attributes.push({name: 'delta_x', value: arg.inputs.deltaX}); // delta x
+            v.uncertainty_description.attributes.push({name: 'stddev', value: arg.inputs.stdDev});  // std dev
+
+            v.workflow_index = var_count;
             var_count += 1;
-            m.arguments.push(argument);
-          } else {
-            if (vm.Message.showDebug()) vm.$log.debug('Not pushing partial arg to m.arguments');
-            if (vm.Message.showDebug()) vm.$log.debug('partial arg: ', argument);
+            m.variables.push(v);
           }
-        }
-      });
+        });
 
-      // VARIABLES
-      let var_count = 0;
-      m.variables = [];
-
-      // skip this measure?
-      if (measure.skip) {
-        const v = vm.makeSkip(measure);
-        v.workflow_index = var_count;
-        var_count += 1;
-        m.variables.push(v);
+        m.workflow_index = measure_count;
+        measure_count += 1;
+        // push measure to OSA
+        vm.osa.analysis.problem.workflow.push(m);
       }
-
-      // Variable arguments
-      _.forEach(measure.arguments, (arg) => {
-        if (arg.inputs && arg.inputs.variableSetting && arg.inputs.variableSetting != 'Argument' && !arg.inputs.showWarningIcon) {
-          if (vm.Message.showDebug()) vm.$log.debug('Project::exportAlgorithmic variable arg: ', arg);
-
-          // VARIABLE ARGUMENT SECTION
-          const v = {};
-          v.argument = vm.makeArgument(arg);
-
-          vm.$log.info(arg.choice_display_names);
-          v.argument.choice_display_names = arg.choice_display_names;  // TODO: not sure about this?
-
-          // VARIABLE DETAILS
-          v.display_name = arg.display_name;  // same as arg
-          v.display_name_short = arg.display_name_short;
-          v.variable_type = (arg.inputs.variableSetting == 'Pivot') ? 'pivot' : 'variable'; // this is 'variable' or 'pivot'
-          v.units = arg.units;
-          v.minimum = arg.inputs.minimum;
-          v.maximum = arg.inputs.maximum;
-          v.relation_to_output = arg.relationship;
-          v.static_value = arg.default_value;
-          v.uuid = '';
-          v.version_uuid = '';
-          if (arg.inputs.variableSetting == 'Pivot') {
-            v.pivot = true;
-          } else {
-            v.variable = true;
-          }
-          v.uncertainty_description = {};
-          // pivots can be discrete or integer_sequence_uncertain (handled in analysis controller)
-          // options are triangle, uniform, discrete, and normal, integer_sequence_uncertain
-          v.uncertainty_description.type = arg.inputs.distribution == 'Integer Sequence' ? 'integer_sequence' : arg.inputs.distribution.toLowerCase();
-          v.uncertainty_description.attributes = [];
-
-          // if discrete or pivot, make values and weights array (unless pivot w/ integer_sequence)
-          if ((arg.inputs.variableSetting == 'Pivot' || arg.inputs.variableSetting == 'Discrete') && arg.inputs.distribution != 'Integer Sequence') {
-            const valArr = vm.makeDiscreteValuesArray(arg.inputs.discreteVariables);
-            v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
-          }
-
-          // TODO: if any of these don't exist, set to inputs.default_value
-          v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.inputs.minimum});  // minimum
-          v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.inputs.maximum});  // maximum
-          v.uncertainty_description.attributes.push({name: 'modes', value: arg.inputs.mean}); // mean
-          v.uncertainty_description.attributes.push({name: 'delta_x', value: arg.inputs.deltaX}); // delta x
-          v.uncertainty_description.attributes.push({name: 'stddev', value: arg.inputs.stdDev});  // std dev
-
-          v.workflow_index = var_count;
-          var_count += 1;
-          m.variables.push(v);
-        }
-      });
-
-      m.workflow_index = measure_count;
-      measure_count += 1;
-      // push measure to OSA
-      vm.osa.analysis.problem.workflow.push(m);
     });
   }
 
