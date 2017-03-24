@@ -881,6 +881,8 @@ export class RunController {
   runWorkflow(selectedOnly = false) {
     const vm = this;
 
+    vm.OsServer.setProgress(0, '');
+
     // set this to lock down runType
     vm.OsServer.setAnalysisStatus('starting');
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
@@ -892,114 +894,120 @@ export class RunController {
     // 1: delete old results (this sets modified flag)
     vm.deleteResults(selectedOnly);
 
+    vm.OsServer.setProgress(20, 'Creating Analysis Zip');
     // 2: make OSA and zip file
-    vm.Project.exportOSA(selectedOnly);
+    vm.Project.exportOSA(selectedOnly).then(() => {
 
-    // 3: hit PAT CLI to start server (local or remote)
-    vm.OsServer.setProgress(15, 'Starting server');
+      // 3: hit PAT CLI to start server (local or remote)
+      vm.OsServer.setProgress(30, 'Starting server');
 
-    if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() ready to start server *****');
+      if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() ready to start server *****');
 
-    vm.OsServer.startServer().then(response => {
+      vm.OsServer.startServer().then(response => {
 
-      vm.OsServer.setAnalysisRunningFlag(true);
-      if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() server started *****');
-      vm.$log.info('Start Server response: ', response);
+        vm.OsServer.setAnalysisRunningFlag(true);
+        if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() server started *****');
+        vm.$log.info('Start Server response: ', response);
 
-      vm.OsServer.setProgress(30, 'Server started');
+        vm.OsServer.setProgress(40, 'Server started');
 
-      // 4: hit PAT CLI to start run
-      vm.OsServer.setProgress(40, 'Starting analysis run');
+        // 4: hit PAT CLI to start run
+        vm.OsServer.setProgress(50, 'Starting analysis run');
 
-      if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() ready to run analysis *****');
+        if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() ready to run analysis *****');
 
-      // set analysis type (sampling method).  batch_datapoints is for manual only
-      let analysis_param = '';
-      if (vm.$scope.selectedAnalysisType == 'Manual')
-        analysis_param = 'batch_datapoints';
-      else {
-        if (vm.Message.showDebug()) vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod.id);
-        analysis_param = vm.$scope.selectedSamplingMethod.id;
-      }
-      vm.OsServer.setAnalysisStatus('starting');
-      vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-
-      vm.OsServer.runAnalysis(analysis_param).then(response => {
-        if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() analysis running *****');
-        vm.$log.info('Run Analysis response: ', response);
-        vm.OsServer.setAnalysisStatus('in progress');
+        // set analysis type (sampling method).  batch_datapoints is for manual only
+        let analysis_param = '';
+        if (vm.$scope.selectedAnalysisType == 'Manual')
+          analysis_param = 'batch_datapoints';
+        else {
+          if (vm.Message.showDebug()) vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod.id);
+          analysis_param = vm.$scope.selectedSamplingMethod.id;
+        }
+        vm.OsServer.setAnalysisStatus('starting');
         vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-        vm.OsServer.setProgress(45, 'Analysis started');
 
-        vm.$scope.analysisID = vm.Project.getAnalysisID();
+        vm.OsServer.runAnalysis(analysis_param).then(response => {
+          if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() analysis running *****');
+          vm.$log.info('Run Analysis response: ', response);
+          vm.OsServer.setAnalysisStatus('in progress');
+          vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+          vm.OsServer.setProgress(45, 'Analysis started');
 
-        // 5: until complete, hit serverAPI for updates (errors, warnings, status)
-        vm.getStatus = vm.$interval(() => {
+          vm.$scope.analysisID = vm.Project.getAnalysisID();
 
-          vm.OsServer.retrieveAnalysisStatus().then(response => {
-            if (vm.Message.showDebug()) vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
-            vm.OsServer.setAnalysisStatus(response.data.analysis.status);
-            vm.$scope.analysisStatus = response.data.analysis.status;
-            if (vm.Message.showDebug()) vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
-            vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
-            vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-            if (vm.Message.showDebug()) vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
+          // 5: until complete, hit serverAPI for updates (errors, warnings, status)
+          vm.getStatus = vm.$interval(() => {
 
+            vm.OsServer.retrieveAnalysisStatus().then(response => {
+              if (vm.Message.showDebug()) vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
+              vm.OsServer.setAnalysisStatus(response.data.analysis.status);
+              vm.$scope.analysisStatus = response.data.analysis.status;
+              if (vm.Message.showDebug()) vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
+              vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
+              vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
+              if (vm.Message.showDebug()) vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
 
-            vm.OsServer.updateDatapoints().then(response2 => {
-              // refresh datapoints
-              vm.$scope.datapoints = vm.Project.getDatapoints();
-              // download reports
-              vm.OsServer.downloadReports().then(() => {
-                if (vm.Message.showDebug()) vm.$log.debug('downloaded all available reports');
-                // refresh datapoints again
+              vm.OsServer.updateDatapoints().then(response2 => {
+                // refresh datapoints
                 vm.$scope.datapoints = vm.Project.getDatapoints();
-                vm.$log.info('datapoints after download: ', vm.$scope.datapoints);
-              }, response3 => {
-                // error in downloadReports
-                vm.$log.error('download reports error: ', response3);
+                // download reports
+                vm.OsServer.downloadReports().then(() => {
+                  if (vm.Message.showDebug()) vm.$log.debug('downloaded all available reports');
+                  // refresh datapoints again
+                  vm.$scope.datapoints = vm.Project.getDatapoints();
+                  vm.$log.info('datapoints after download: ', vm.$scope.datapoints);
+                }, response3 => {
+                  // error in downloadReports
+                  vm.$log.error('download reports error: ', response3);
+                });
+
+                vm.$log.info('update datapoints succeeded: ', response2);
+              }, response2 => {
+                // error in updateDatapoints
+                vm.$log.error('update datapoints error: ', response2);
               });
 
-              vm.$log.info('update datapoints succeeded: ', response2);
-            }, response2 => {
-              // error in updateDatapoints
-              vm.$log.error('update datapoints error: ', response2);
+              if (response.data.analysis.status == 'completed') {
+                // cancel loop
+                vm.stopAnalysisStatus('completed');
+
+                // download result csvs if algorithmic
+                if (vm.$scope.selectedAnalysisType == 'Algorithmic') vm.OsServer.downloadAlgorithmResults();
+              }
+            }, response => {
+              vm.$log.error('analysis status retrieval error: ', response);
             });
 
-            if (response.data.analysis.status == 'completed') {
-              // cancel loop
-              vm.stopAnalysisStatus('completed');
+          }, 20000);  // once per 20 seconds
 
-              // download result csvs if algorithmic
-              if (vm.$scope.selectedAnalysisType == 'Algorithmic') vm.OsServer.downloadAlgorithmResults();
-            }
-          }, response => {
-            vm.$log.error('analysis status retrieval error: ', response);
-          });
+        }, response => {
+          // analysis not started
+          vm.OsServer.setProgress(45, 'Analysis Error');
 
-        }, 20000);  // once per 20 seconds
+          vm.$log.error('ANALYSIS NOT STARTED, ERROR: ', response);
+          vm.OsServer.setAnalysisStatus('error');
+          vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+          vm.OsServer.setAnalysisRunningFlag(false);
+          vm.toggleButtons();
+
+        });
 
       }, response => {
-        // analysis not started
-        vm.OsServer.setProgress(45, 'Analysis Error');
-
-        vm.$log.error('ANALYSIS NOT STARTED, ERROR: ', response);
-        vm.OsServer.setAnalysisStatus('error');
+        vm.OsServer.setProgress(25, 'Server Error');
+        vm.$log.error('SERVER NOT STARTED, ERROR: ', response);
+        vm.OsServer.setAnalysisStatus('');
         vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
         vm.OsServer.setAnalysisRunningFlag(false);
         vm.toggleButtons();
 
       });
-
-    }, response => {
-      vm.OsServer.setProgress(25, 'Server Error');
-      vm.$log.error('SERVER NOT STARTED, ERROR: ', response);
-      vm.OsServer.setAnalysisStatus('');
-      vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-      vm.OsServer.setAnalysisRunningFlag(false);
-      vm.toggleButtons();
-
+    }, () => {
+      // error exporting OSA
+      vm.$log.error('Error exporting OSA');
     });
+
+
   }
 
   stopAnalysisStatus(status = 'completed') {

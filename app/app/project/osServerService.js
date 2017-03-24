@@ -902,6 +902,9 @@ export class OsServer {
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType().name;
 
+    // reset analysis progress
+    vm.setProgress(0, '');
+
     // can't stop anything if a project isn't selected
     if ((force || vm.getServerStatus(serverType) == 'started') && vm.Project.projectDir != null) {
 

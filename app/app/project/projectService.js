@@ -32,6 +32,7 @@ import {remote} from 'electron';
 import jsZip from 'jszip';
 import fs from 'fs';
 import archiver from 'archiver';
+import archiverPromise from 'archiver-promise';
 
 const {app, dialog} = remote;
 
@@ -46,6 +47,7 @@ export class Project {
     vm.MeasureManager = MeasureManager;
     vm.dialog = dialog;
     vm.archiver = archiver;
+    vm.archiverPromise = archiverPromise;
     vm.$q = $q;
     vm.$http = $http;
     vm.$uibModal = $uibModal;
@@ -400,6 +402,8 @@ export class Project {
   // export OSA
   exportOSA(selectedOnly = false) {
     const vm = this;
+    const deferred = vm.$q.defer();
+
     if (vm.Message.showDebug()) vm.$log.debug('In Project::exportOSA');
     if (vm.Message.showDebug()) vm.$log.debug('SelectedOnly? ', selectedOnly);
 
@@ -422,7 +426,7 @@ export class Project {
     if (vm.Message.showDebug()) vm.$log.debug('Project OSA file exported to ' + filename);
 
     const output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
-    const archive = archiver('zip');
+    const archive = vm.archiverPromise('zip');
 
     output.on('close', function () {
       console.log(archive.pointer() + ' total bytes');
@@ -472,7 +476,12 @@ export class Project {
       }
     });
 
-    archive.finalize();
+    archive.finalize().then(function(){
+      if (vm.Message.showDebug()) vm.$log.debug('**Done Archiving Zip!**');
+      deferred.resolve();
+    });
+
+    return deferred.promise;
   }
 
   // export data common to both manual and algorithmic workflows
@@ -626,16 +635,18 @@ export class Project {
             (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) &&
             (_.isUndefined(arg.variable) || arg.variable === false)
           ) {
-            if (vm.Message.showDebug()) vm.$log.debug('ARGUMENT, not variable!');
+            if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' is an ARGUMENT, not variable');
             const argument = vm.makeArgument(arg);
 
+            if (argument.value == '') vm.$log.error(arg.name, ' value is \'\', this will most likely cause errors on server');
+
             // Make sure that argument is "complete"
-            if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
+            if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value)) {
               var_count += 1;
               m.arguments.push(argument);
+              if (vm.Message.showDebug()) vm.$log.debug('argument: ', argument);
             } else {
-              if (vm.Message.showDebug()) vm.$log.debug('Not pushing partial arg to m.arguments');
-              if (vm.Message.showDebug()) vm.$log.debug('partial arg: ', argument);
+              vm.$log.error('Not pushing partial arg to json. Fix partial arg: ', argument);
             }
           }
         });
@@ -668,7 +679,7 @@ export class Project {
         // Variable arguments
         _.forEach(measure.arguments, (arg) => {
           if (((_.isUndefined(arg.specialRowId)) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) && (arg.variable === true)) {
-            if (vm.Message.showDebug()) vm.$log.debug('Project::exportManual arg: ', arg);
+            if (vm.Message.showDebug()) vm.$log.debug('Project::exportManual variable: ', arg.name);
             // see what arg is set to in each design alternative
             const valArr = [];
             let option_id;
@@ -681,11 +692,14 @@ export class Project {
                 if (da[measure.name] == 'None') {
                   if (vm.Message.showDebug()) vm.$log.debug('value: None');
                   // when set to 'None', sub a value of the right type
+                  if (vm.Message.showDebug()) vm.$log.debug('default_value for this arg: ', arg.default_value);
                   let the_value = arg.default_value;
                   if (!the_value) {
                     // if no default value, use first option value, otherwise set to None
-                    the_value = (arg.option_1) ? arg.option_1 : 'None';
+                    the_value = !_.isNil(arg.option_1) ? arg.option_1 : 'None';
+                    if (vm.Message.showDebug()) vm.$log.debug('option1 value for this arg: ', arg.option_1);
                   }
+                  if (vm.Message.showDebug()) vm.$log.debug('!! value for argument: ', arg.name, ' was set to: ', the_value);
                   valArr.push({value: the_value, weight: 1 / DAlength});
 
                 } else {
@@ -701,7 +715,7 @@ export class Project {
                   });
                   if (vm.Message.showDebug()) vm.$log.debug('arg[option_id]: ', arg[option_id]);
                   // check that you have a value here...if not error
-                  if (!arg[option_id]) {
+                  if (_.isNil(arg[option_id])) {
                     vm.$log.error('Option: ', option_name, 'for measure \'', measure.display_name, '\' does not have a value. Analysis will error.');
                   }
                   valArr.push({value: arg[option_id], weight: 1 / DAlength});
@@ -862,12 +876,11 @@ export class Project {
             if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' treated as ARGUMENT');
             const argument = vm.makeArgument(arg);
             // Make sure that argument is "complete"
-            if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
+            if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value)) {
               var_count += 1;
               m.arguments.push(argument);
             } else {
-              if (vm.Message.showDebug()) vm.$log.debug('Not pushing partial arg to m.arguments');
-              if (vm.Message.showDebug()) vm.$log.debug('partial arg: ', argument);
+              vm.$log.error('Not pushing partial argument to json.  Fix partial arg: ', argument);
             }
           }
         });
@@ -1119,7 +1132,7 @@ export class Project {
     argument.value_type = vm.convertType(arg.type);
     argument.default_value = arg.default_value;
     if (vm.analysisType == 'Manual')
-      argument.value = arg.option_1 ? arg.option_1 : arg.default_value;
+      argument.value = !_.isNil(arg.option_1) ? arg.option_1 : arg.default_value;
     else
       argument.value = (arg.inputs && !_.isNil(arg.inputs.default_value)) ? arg.inputs.default_value : arg.default_value;
 
