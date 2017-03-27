@@ -923,7 +923,7 @@ export class Project {
             // pivots can be discrete or integer_sequence_uncertain (handled in analysis controller)
             // options are triangle, uniform, discrete, and normal, integer_sequence_uncertain
             // TODO what about pivots?
-            if (arg.inputs.variableSetting == 'Discrete') {
+            if (arg.inputs.variableSetting == 'Discrete' || arg.inputs.variableSetting == 'Pivot') {
               v.uncertainty_description.type = 'discrete';
             } else {
               v.uncertainty_description.type = arg.inputs.distribution == 'Integer Sequence' ? 'integer_sequence' : arg.inputs.distribution.toLowerCase();
