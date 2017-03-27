@@ -32,7 +32,6 @@ import {remote} from 'electron';
 import jsZip from 'jszip';
 import fs from 'fs';
 import archiver from 'archiver';
-import archiverPromise from 'archiver-promise';
 
 const {app, dialog} = remote;
 
@@ -47,7 +46,6 @@ export class Project {
     vm.MeasureManager = MeasureManager;
     vm.dialog = dialog;
     vm.archiver = archiver;
-    vm.archiverPromise = archiverPromise;
     vm.$q = $q;
     vm.$http = $http;
     vm.$uibModal = $uibModal;
@@ -426,15 +424,17 @@ export class Project {
     if (vm.Message.showDebug()) vm.$log.debug('Project OSA file exported to ' + filename);
 
     const output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
-    const archive = vm.archiverPromise('zip');
+    const archive = vm.archiver('zip');
 
     output.on('close', function () {
       console.log(archive.pointer() + ' total bytes');
       console.log('archiver has been finalized and the output file descriptor has closed.');
+      deferred.resolve();
     });
 
     archive.on('error', function (err) {
       throw err;
+      deferred.reject();
     });
 
     archive.pipe(output);
@@ -476,10 +476,7 @@ export class Project {
       }
     });
 
-    archive.finalize().then(function(){
-      if (vm.Message.showDebug()) vm.$log.debug('**Done Archiving Zip!**');
-      deferred.resolve();
-    });
+    archive.finalize();
 
     return deferred.promise;
   }
