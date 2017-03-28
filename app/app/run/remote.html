@@ -213,7 +213,7 @@
     <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()" translate>run.viewServer</button>
   </div>
 
-  <div class="col-sm-4">
+  <div class="col-sm-3 col-sm-offset-1">
     <button type="button" class="btn btn-info" ng-if="selectedAnalysisType == 'Algorithmic' && analysisStatus == 'completed' && resultsExist()" ng-click="run.viewAlgorithmResults()" translate>run.viewAlgorithmResults</button>
     <button type="button" class="btn btn-info" ng-if="selectedAnalysisType == 'Algorithmic' && analysisStatus == 'completed' && !resultsExist()" ng-click="run.downloadAlgorithmResults()" translate>run.downloadAlgorithmResults</button>
   </div>
