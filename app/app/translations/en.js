@@ -215,7 +215,7 @@ export default {
     }
   },
   bcl: {
-    title: 'Building Component Library',
+    title: 'Measure Library',
     wait: 'Please wait',
     aside: {
       attributes: 'Attributes',

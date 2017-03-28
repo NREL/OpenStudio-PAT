@@ -211,7 +211,7 @@ export default {
     }
   },
   bcl: {
-    title: 'Bibliothèque de composantes de bâtiments',
+    title: 'Bibliothèque de mesures',
     wait: 'S\'il vous plaît, attendez',
     aside: {
       attributes: 'Attributs',
