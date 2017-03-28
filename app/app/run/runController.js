@@ -143,8 +143,6 @@ export class RunController {
       return vm.Project.algorithmResultsDownloaded();
     };
 
-    if (vm.Message.showDebug()) vm.$log.debug('RESULTS EXIST? ', vm.Project.algorithmResultsDownloaded());
-
     // TROUBLESHOOTING PANEL STATUS
     vm.$scope.dev = {open: true};
 
