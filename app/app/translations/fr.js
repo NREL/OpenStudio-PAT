@@ -101,7 +101,7 @@ export default {
     disconnectedRemoteError: 'Could not disconnect from remote server',
     terminatedClusterError: 'Could not terminate AWS cluster...check the AWS console',
     downloadedResults: 'Results downloaded!',
-    downloadedResultsError: 'Error downloading Results zip file',
+    downloadedResultsError: 'Error downloading Results file',
     downloadedAllResults: 'All Results downloaded!',
     downloadedAllResultsError: 'Error downloading Results zip files',
     downloadedOsm: 'OSM downloaded!',
@@ -393,6 +393,8 @@ export default {
     clearSelections: 'Effacer les sélections',
     algorithmicOnCloud: 'Algorithmic analyses cannot be run locally.  Select \'Run on Cloud\' from the dropdown above to run this analysis remotely.',
     viewServer: 'Afficher le serveur',
+    viewAlgorithmResults: 'Voir les Résultats',
+    downloadAlgorithmResults: 'Télécharger les résultats',
     modifiedDP: 'Les données associées à ce point de données ont changé depuis la dernière exécution',
     deletedDA: 'L\'alternative de conception associée à ce point de données a été supprimée du projet',
     modalAnalysisRunning: {

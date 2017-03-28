@@ -138,6 +138,13 @@ export class RunController {
       return _.filter(vm.$scope.datapoints, {modified: true}).length > 0;
     };
 
+    vm.$scope.resultsExist = function () {
+      if (vm.Message.showDebug()) vm.$log.debug('RESULTS EXIST? ', vm.Project.algorithmResultsDownloaded());
+      return vm.Project.algorithmResultsDownloaded();
+    };
+
+    if (vm.Message.showDebug()) vm.$log.debug('RESULTS EXIST? ', vm.Project.algorithmResultsDownloaded());
+
     // TROUBLESHOOTING PANEL STATUS
     vm.$scope.dev = {open: true};
 
@@ -1029,6 +1036,24 @@ export class RunController {
 
     vm.OsServer.setAnalysisRunningFlag(false);
 
+  }
+
+  downloadAlgorithmResults() {
+    const vm = this;
+    vm.OsServer.downloadAlgorithmResults().then( () => {
+      vm.$translate('toastr.downloadedResults').then(translation => {
+        vm.toastr.success(translation);
+      });
+    }, () => {
+      vm.$translate('toastr.downloadedResultsError').then(translation => {
+        vm.toastr.error(translation);
+      });
+    });
+  }
+
+  viewAlgorithmResults() {
+    const vm = this;
+    vm.shell.openItem(vm.Project.getAlgorithmResultsPath());
   }
 
   downloadResults(datapoint) {

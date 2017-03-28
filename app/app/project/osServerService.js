@@ -1481,7 +1481,7 @@ export class OsServer {
 
     // results.csv
     // analyses/<id>/download_data.csv?export=true
-    const url2 = vm.selectedServerURL + '/analyses/' + analysisID + 'download_data.csv';
+    const url2 = vm.selectedServerURL + '/analyses/' + analysisID + '/download_data.csv';
     params = {'export': true};
     config = {params: params, headers: {Accept: 'application/json'}};
     if (vm.Message.showDebug()) vm.$log.info('Download results CSV: ', url2);

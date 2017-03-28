@@ -115,7 +115,7 @@
                     <button type="button" ng-show="remoteSettings.aws.connected" class="btn btn-danger" ng-class="disabledStopButtonClass()" ng-click="run.stopServer()" translate>run.remote.terminate</button>
                     <button type="button" ng-show="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == 'running' && !run.OsServerService.getRemoteStartInProgress()" class="btn btn-primary" ng-class="disabledButtonClass()" ng-click="run.connectAws('connect')" translate>run.remote.connect</button>
                     <button type="button" ng-show="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == 'terminated'" class="btn btn-success" ng-click="run.warnAws()" ng-class="disabledButtonClass()" translate>run.remote.start</button>
-                    <span ng-if="remoteSettings.aws.cluster_status == ''" translate>run.pleaseWait</span>
+                    <span ng-if="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == ''" translate>run.pleaseWait</span>
                   </div>
                 </div>
               </div>
@@ -211,5 +211,10 @@
     <button type="button" class="btn btn-success" ng-if="!disabledButtons && atLeastOneSelected() && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.warnBeforeDelete('selected')" translate>run.runSelected</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.cancelRun()" translate>run.cancelRun</button>
     <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()" translate>run.viewServer</button>
+  </div>
+
+  <div class="col-sm-4 pull-right">
+    <button type="button" class="btn btn-info" ng-if="selectedAnalysisType != 'Algorithmic' && analysisStatus == 'completed' && resultsExist()" ng-click="run.viewAlgorithmResults()" translate>run.viewAlgorithmResults</button>
+    <button type="button" class="btn btn-info" ng-if="selectedAnalysisType != 'Algorithmic' && analysisStatus == 'completed' && !resultsExist()" ng-click="run.downloadAlgorithmResults()" translate>run.downloadAlgorithmResults</button>
   </div>
 </div>

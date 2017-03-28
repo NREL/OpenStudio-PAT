@@ -209,7 +209,16 @@ export class Project {
         // recalculate measure_dir to point to this location (in case project moved/copied)
         _.forEach(vm.measures, (measure) => {
           // windows vs mac paths are different, and we can't assume this project was created on this os
-          const path_parts = _.split(_.split(measure.measure_dir, '/'), '\\');
+          let path_parts = _.split(measure.measure_dir, '/');
+          if (path_parts.length == 1) {
+            // split again with other delimiter
+            path_parts = _.split(measure.measure_dir, '\\');
+            if (path_parts.length == 1){
+              path_parts = _.split(measure.measure_dir, '\\\\');
+            }
+          }
+
+          if (vm.Message.showDebug()) vm.$log.debug('PATH PARTS: ', path_parts);
           measure.measure_dir = vm.projectDir.path('measures', _.last(path_parts));
           measure.directory = measure.measure_dir;
         });
@@ -434,8 +443,8 @@ export class Project {
     });
 
     archive.on('error', function (err) {
-      throw err;
       deferred.reject();
+      throw err;
     });
 
     archive.pipe(output);
@@ -2936,6 +2945,27 @@ export class Project {
     }
     //if (vm.Message.showDebug()) vm.$log.debug('RESULTS JSON for type:', type, ' is: ', resultsJson);
     return resultsJson;
+  }
+
+  algorithmResultsDownloaded(){
+
+    // if these results are downloaded, return true
+    const vm = this;
+    let downloadedResults = false;
+    if (vm.jetpack.exists(vm.getAlgorithmResultsPath())) {
+      downloadedResults = true;
+    }
+    return downloadedResults;
+  }
+
+  getAlgorithmResultsPath() {
+    const vm = this;
+    return  vm.getProjectLocalResultsDir().path('results.csv');
+  }
+
+  getAlgorithmResultsMetadataPath() {
+    const vm = this;
+    return vm.getProjectLocalResultsDir().path('metadata.csv');
   }
 
   csvToJson(csv) {
