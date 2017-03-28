@@ -208,7 +208,8 @@ export class Project {
 
         // recalculate measure_dir to point to this location (in case project moved/copied)
         _.forEach(vm.measures, (measure) => {
-          const path_parts = _.split(measure.measure_dir, '/');
+          // windows vs mac paths are different, and we can't assume this project was created on this os
+          const path_parts = _.split(_.split(measure.measure_dir, '/'), '\\');
           measure.measure_dir = vm.projectDir.path('measures', _.last(path_parts));
           measure.directory = measure.measure_dir;
         });
