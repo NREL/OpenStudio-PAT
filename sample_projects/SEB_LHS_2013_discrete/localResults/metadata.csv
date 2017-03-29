@@ -1,0 +1,21 @@
+display_name,display_name_short,export,maximum,measure_id,metadata_id,minimum,name,objective_function,objective_function_group,objective_function_index,output,perturbable,pivot,static_value,units,value_type,visualize,measure_name,measure_display_name,type_of_variable
+electricity_consumption_actual,electricity_consumption_actual,true,,,,,CalibrationReportsEnhanced20.electricity_consumption_actual,false,,,true,false,false,,kWh,double,false,CalibrationReportsEnhanced20,,output
+electricity_consumption_cvrmse,electricity_consumption_cvrmse,true,,,,,CalibrationReportsEnhanced20.electricity_consumption_cvrmse,true,,0,0,true,false,false,,%,double,true,CalibrationReportsEnhanced20,,output
+electricity_consumption_modeled,electricity_consumption_modeled,true,,,,,CalibrationReportsEnhanced20.electricity_consumption_modeled,false,,,true,false,false,,kWh,double,false,CalibrationReportsEnhanced20,,output
+electricity_consumption_nmbe,electricity_consumption_nmbe,true,,,,,CalibrationReportsEnhanced20.electricity_consumption_nmbe,true,,1,0,true,false,false,,%,double,true,CalibrationReportsEnhanced20,,output
+electricity_cvrmse_within_limit,electricity_cvrmse_within_limit,true,,,,,CalibrationReportsEnhanced20.electricity_cvrmse_within_limit,false,,,true,false,false,,,double,true,CalibrationReportsEnhanced20,,output
+electricity_nmbe_within_limit,electricity_nmbe_within_limit,true,,,,,CalibrationReportsEnhanced20.electricity_nmbe_within_limit,false,,,true,false,false,,,double,true,CalibrationReportsEnhanced20,,output
+electricity_rmse,electricity_rmse,true,,,,,CalibrationReportsEnhanced20.electricity_rmse,false,,,true,false,false,,%,double,false,CalibrationReportsEnhanced20,,output
+natural_gas_consumption_actual,natural_gas_consumption_actual,true,,,,,CalibrationReportsEnhanced20.natural_gas_consumption_actual,false,,,true,false,false,,therms,double,false,CalibrationReportsEnhanced20,,output
+natural_gas_consumption_cvrmse,natural_gas_consumption_cvrmse,true,,,,,CalibrationReportsEnhanced20.natural_gas_consumption_cvrmse,true,,2,0,true,false,false,,%,double,true,CalibrationReportsEnhanced20,,output
+natural_gas_consumption_modeled,natural_gas_consumption_modeled,true,,,,,CalibrationReportsEnhanced20.natural_gas_consumption_modeled,false,,,true,false,false,,therms,double,false,CalibrationReportsEnhanced20,,output
+natural_gas_consumption_nmbe,natural_gas_consumption_nmbe,true,,,,,CalibrationReportsEnhanced20.natural_gas_consumption_nmbe,true,,3,0,true,false,false,,%,double,true,CalibrationReportsEnhanced20,,output
+natural_gas_cvrmse_within_limit,natural_gas_cvrmse_within_limit,true,,,,,CalibrationReportsEnhanced20.natural_gas_cvrmse_within_limit,false,,,true,false,false,,,double,true,CalibrationReportsEnhanced20,,output
+natural_gas_nmbe_within_limit,natural_gas_nmbe_within_limit,true,,,,,CalibrationReportsEnhanced20.natural_gas_nmbe_within_limit,false,,,true,false,false,,,double,true,CalibrationReportsEnhanced20,,output
+natural_gas_rmse,natural_gas_rmse,true,,,,,CalibrationReportsEnhanced20.natural_gas_rmse,false,,,true,false,false,,%,double,false,CalibrationReportsEnhanced20,,output
+electricity_ip,electricity_ip,true,,,,,OpenStudioResults.electricity_ip,false,,,true,false,false,,,double,false,OpenStudioResults,,output
+eui,eui,true,,,,,OpenStudioResults.eui,false,,,true,false,false,,,double,false,OpenStudioResults,,output
+natural_gas_ip,natural_gas_ip,true,,,,,OpenStudioResults.natural_gas_ip,false,,,true,false,false,,,double,false,OpenStudioResults,,output
+Run Measure,run_measure,true,1,0536a79b-fae9-4f26-abee-3b678b27867c,,1,change_electric_baseboard_diag.run_measure,false,,,false,true,false,1,,integer,true,change_electric_baseboard_diag,Change Electric Baseboard,variable
+Run Measure,run_measure,true,1,97cd16b4-3a68-4e2f-b4b6-0f8d5cc62616,,1,reduce_electric_equipment_loads_by_percentage_diag.run_measure,false,,,false,true,false,1,,integer,true,reduce_electric_equipment_loads_by_percentage_diag,Reduce Electric Equipment Loads by Percentage,variable
+Run Measure,run_measure,true,1,d5b67da1-d7c8-4b07-b056-7bc85ee52dbe,,1,set_gas_burner_efficiency_diag.run_measure,false,,,false,true,false,1,,integer,true,set_gas_burner_efficiency_diag,Set Gas Burner Efficiency,variable

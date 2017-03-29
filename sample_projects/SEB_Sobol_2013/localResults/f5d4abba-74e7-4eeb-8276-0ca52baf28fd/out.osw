@@ -1,0 +1,2292 @@
+{
+  "completed_at": "20170329T213523Z",
+  "completed_status": "Success",
+  "created_at": "2017-03-29 21:34:52 +0000",
+  "current_step": 13,
+  "description": "",
+  "eplusout_err": "Program Version,EnergyPlus, Version 8.7.0-ae053cab77, YMD=2017.03.29 21:35,IDD_Version 8.7.0\n   ************* IDF Context for following error/warning message:\n   ************* Note -- lines truncated at 300 characters, if necessary...\n   *************   2250 Material,\n   ************* indicated Name=Vegetable Fiber Board  Sheathing - Intermediate Density - 1/2 in. 1 in Calibrated Exterior EXTERIOR-ROOF\n   ************* Only last 1 lines before error line shown.....\n   *************   2251   Vegetable Fiber Board  Sheathing - Intermediate Density - 1/2 in. 1 in Calibrated Exterior EXTERIOR-ROOF, !- Name\n   ** Warning ** IP: IDF line~2251 Alpha Argument length exceeds maximum, will be truncated=  Vegetable Fiber Board  Sheathing - Intermediate Density - 1/2 in. 1 in Calibrated Exterior EXTERIOR-ROO\n   **   ~~~   ** Will be processed as Alpha=VEGETABLE FIBER BOARD  SHEATHING - INTERMEDIATE DENSITY - 1/2 IN. 1 IN CALIBRATED EXTERIOR EXTERIOR-ROOF\n   ************* IDF Context for following error/warning message:\n   ************* Note -- lines truncated at 300 characters, if necessary...\n   *************   2283 Material,\n   ************* indicated Name=Wood-Framed - 4 in. Studs - 16 in. OC - R-11 Cavity Insulation 1 in Calibrated Exterior EXTERIOR-WALL\n   ************* Only last 1 lines before error line shown.....\n   *************   2284   Wood-Framed - 4 in. Studs - 16 in. OC - R-11 Cavity Insulation 1 in Calibrated Exterior EXTERIOR-WALL, !- Name\n   ** Warning ** IP: IDF line~2284 Alpha Argument length exceeds maximum, will be truncated=  Wood-Framed - 4 in. Studs - 16 in. OC - R-11 Cavity Insulation 1 in Calibrated Exterior EXTERIOR-WAL\n   **   ~~~   ** Will be processed as Alpha=WOOD-FRAMED - 4 IN. STUDS - 16 IN. OC - R-11 CAVITY INSULATION 1 IN CALIBRATED EXTERIOR EXTERIOR-WALL\n   ************* IDF Context for following error/warning message:\n   ************* Note -- lines truncated at 300 characters, if necessary...\n   *************   2318 Construction,\n   ************* indicated Name=Calibrated Exterior EXTERIOR-ROOF\n   ************* Only last 5 lines before error line shown.....\n   *************   2319   Calibrated Exterior EXTERIOR-ROOF,      !- Name\n   *************   2320   Built-up Roofing - 3/8 in. 1 in Calibrated Exterior EXTERIOR-ROOF, !- Layer 1\n   *************   2321   Hardboard - High Density - Standard-tempered Grade - 3/4 in. 1 in Calibrated Exterior EXTERIOR-ROOF, !- Layer 2\n   *************   2322   Mineral Fiber Batt Insulation - 10 in. 1 in Calibrated Exterior EXTERIOR-ROOF, !- Layer 3\n   *************   2323   Vegetable Fiber Board  Sheathing - Intermediate Density - 1/2 in. 1 in Calibrated Exterior EXTERIOR-ROOF; !- Layer 4\n   ** Warning ** IP: IDF line~2323 Alpha Argument length exceeds maximum, will be truncated=  Vegetable Fiber Board  Sheathing - Intermediate Density - 1/2 in. 1 in Calibrated Exterior EXTERIOR-ROO\n   **   ~~~   ** Will be processed as Alpha=VEGETABLE FIBER BOARD  SHEATHING - INTERMEDIATE DENSITY - 1/2 IN. 1 IN CALIBRATED EXTERIOR EXTERIOR-ROOF\n   ************* IDF Context for following error/warning message:\n   ************* Note -- lines truncated at 300 characters, if necessary...\n   *************   2325 Construction,\n   ************* indicated Name=Calibrated Exterior EXTERIOR-WALL\n   ************* Only last 4 lines before error line shown.....\n   *************   2326   Calibrated Exterior EXTERIOR-WALL,      !- Name\n   *************   2327   Stuco 1 in Calibrated Exterior EXTERIOR-WALL, !- Layer 1\n   *************   2328   Expanded Polystyrene - Extruded - 1 in. 1 in Calibrated Exterior EXTERIOR-WALL, !- Layer 2\n   *************   2329   Wood-Framed - 4 in. Studs - 16 in. OC - R-11 Cavity Insulation 1 in Calibrated Exterior EXTERIOR-WALL, !- Layer 3\n   ** Warning ** IP: IDF line~2329 Alpha Argument length exceeds maximum, will be truncated=  Wood-Framed - 4 in. Studs - 16 in. OC - R-11 Cavity Insulation 1 in Calibrated Exterior EXTERIOR-WAL\n   **   ~~~   ** Will be processed as Alpha=WOOD-FRAMED - 4 IN. STUDS - 16 IN. OC - R-11 CAVITY INSULATION 1 IN CALIBRATED EXTERIOR EXTERIOR-WALL\n   ** Warning ** Timestep: Requested number (1) is less than the suggested minimum of 4.\n   **   ~~~   ** Please see entry for Timestep in Input/Output Reference for discussion of considerations.\n   ************* Beginning Zone Sizing Calculations\n   ** Warning ** ProcessScheduleInput: Schedule:Day:Interval=\"ALL WEEKDAYS\", , One or more values are not integer as required by Schedule Type Limits Name=HVAC OPERATION SCHEDULE TYPE LIMITS\n   ** Warning ** ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: 12:45\n   **   ~~~   ** Other errors may result. Occurred in Day Schedule=ALL WEEKDAYS 1\n   ** Warning ** ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: 06:45\n   **   ~~~   ** Other errors may result. Occurred in Day Schedule=ALL WEEKDAYS 2\n   ** Warning ** ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: 06:15\n   **   ~~~   ** Other errors may result. Occurred in Day Schedule=ALL WEEKDAYS 3\n   ** Warning ** ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: 06:15\n   **   ~~~   ** Other errors may result. Occurred in Day Schedule=ALL WEEKDAYS 4\n   ** Warning ** ProcessScheduleInput: Schedule:Day:Interval=\"ALL WEEKENDS\", , One or more values are not integer as required by Schedule Type Limits Name=HVAC OPERATION SCHEDULE TYPE LIMITS\n   ** Warning ** ProcessScheduleInput: Schedule:Day:Interval=\"ALL WEEKENDS 7\", , One or more values are not integer as required by Schedule Type Limits Name=HVAC OPERATION SCHEDULE TYPE LIMITS\n   ** Warning ** ProcessScheduleInput: Schedule:Day:Interval=\"BUILDING HVAC OPERATION DEFAULT WEEKDAY SCHEDULE\", , One or more values are not integer as required by Schedule Type Limits Name=HVAC OPERATION SCHEDULE TYPE LIMITS\n   ** Warning ** ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: 06:15\n   **   ~~~   ** Other errors may result. Occurred in Day Schedule=BUILDING PLUG LOAD DEFAULT WEEKDAY SCHEDULE\n   ** Warning ** ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: 06:45\n   **   ~~~   ** Other errors may result. Occurred in Day Schedule=BUILDING WATER USE DEFAULT WEEKDAY SCHEDULE\n   ** Warning ** ProcessScheduleInput: Schedule:Day:Interval=\"SIMUWATT DEFAULT SUMMER CLG SCH - 68F\", Blank Schedule Type Limits Name input -- will not be validated.\n   ** Warning ** ProcessScheduleInput: Schedule:Day:Interval=\"SIMUWATT DEFAULT SUMMER HTG SCH - 68F\", Blank Schedule Type Limits Name input -- will not be validated.\n   ** Warning ** ProcessScheduleInput: Schedule:Day:Interval=\"SIMUWATT DEFAULT WINTER CLG SCH - 68F\", Blank Schedule Type Limits Name input -- will not be validated.\n   ** Warning ** ProcessScheduleInput: Schedule:Day:Interval=\"SIMUWATT DEFAULT WINTER HTG SCH - 68F\", Blank Schedule Type Limits Name input -- will not be validated.\n   ** Warning ** ProcessScheduleInput: DecodeHHMMField, Invalid \"until\" field value is not a multiple of the minutes for each timestep: 16:15\n   **   ~~~   ** Other errors may result. Occurred in Day Schedule=SPACE OCCUPANCY DEFAULT WEEKDAY SCHEDULE\n   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"ALWAYS OFF DISCRETE\", Blank Schedule Type Limits Name input -- will not be validated.\n   ** Warning ** ProcessScheduleInput: Schedule:Constant=\"ALWAYS ON CONTINUOUS\", Blank Schedule Type Limits Name input -- will not be validated.\n   ** Warning ** GetHTSurfaceData: Surfaces with interface to Ground found but no \"Ground Temperatures\" were input.\n   **   ~~~   ** Found first in surface=ENTRY WAY  FLOOR\n   **   ~~~   ** Defaults, constant throughout the year of (18.0) will be used.\n   ** Warning ** GetSurfaceData: InterZone Surface Tilts do not match as expected.\n   **   ~~~   **   Tilt=0.0 in Surface=LEVEL 0 ENTRY WAY  CEILING PLENUM DROPPEDCEILING, Zone=LEVEL 0 CEILING PLENUM ZONE\n   **   ~~~   **   Tilt=0.0 in Surface=ENTRY WAY  DROPPEDCEILING, Zone=SINGLE ZONE\n   ** Warning ** GetSurfaceData: InterZone Surface Classes do not match as expected.\n   **   ~~~   ** Surface=\"LEVEL 0 ENTRY WAY  CEILING PLENUM DROPPEDCEILING\", surface class=Roof\n   **   ~~~   ** Adjacent Surface=\"ENTRY WAY  DROPPEDCEILING\", surface class=Roof\n   **   ~~~   ** Other errors/warnings may follow about these surfaces.\n   ** Warning ** GetSurfaceData: InterZone Surface Tilts do not match as expected.\n   **   ~~~   **   Tilt=0.0 in Surface=LEVEL 0 OPEN AREA 1 CEILING PLENUM DROPPEDCEILING, Zone=LEVEL 0 CEILING PLENUM ZONE\n   **   ~~~   **   Tilt=0.0 in Surface=OPEN AREA 1 DROPPEDCEILING, Zone=SINGLE ZONE\n   ** Warning ** GetSurfaceData: InterZone Surface Classes do not match as expected.\n   **   ~~~   ** Surface=\"LEVEL 0 OPEN AREA 1 CEILING PLENUM DROPPEDCEILING\", surface class=Roof\n   **   ~~~   ** Adjacent Surface=\"OPEN AREA 1 DROPPEDCEILING\", surface class=Roof\n   **   ~~~   ** Other errors/warnings may follow about these surfaces.\n   ** Warning ** GetSurfaceData: InterZone Surface Tilts do not match as expected.\n   **   ~~~   **   Tilt=0.0 in Surface=LEVEL 0 SMALL OFFICE 1 CEILING PLENUM DROPPEDCEILING, Zone=LEVEL 0 CEILING PLENUM ZONE\n   **   ~~~   **   Tilt=0.0 in Surface=SMALL OFFICE 1 DROPPEDCEILING, Zone=SINGLE ZONE\n   ** Warning ** GetSurfaceData: InterZone Surface Classes do not match as expected.\n   **   ~~~   ** Surface=\"LEVEL 0 SMALL OFFICE 1 CEILING PLENUM DROPPEDCEILING\", surface class=Roof\n   **   ~~~   ** Adjacent Surface=\"SMALL OFFICE 1 DROPPEDCEILING\", surface class=Roof\n   **   ~~~   ** Other errors/warnings may follow about these surfaces.\n   ** Warning ** GetSurfaceData: InterZone Surface Tilts do not match as expected.\n   **   ~~~   **   Tilt=0.0 in Surface=LEVEL 0 UTILITY 1 CEILING PLENUM DROPPEDCEILING, Zone=LEVEL 0 CEILING PLENUM ZONE\n   **   ~~~   **   Tilt=0.0 in Surface=UTILITY 1 DROPPEDCEILING, Zone=SINGLE ZONE\n   ** Warning ** GetSurfaceData: InterZone Surface Classes do not match as expected.\n   **   ~~~   ** Surface=\"LEVEL 0 UTILITY 1 CEILING PLENUM DROPPEDCEILING\", surface class=Roof\n   **   ~~~   ** Adjacent Surface=\"UTILITY 1 DROPPEDCEILING\", surface class=Roof\n   **   ~~~   ** Other errors/warnings may follow about these surfaces.\n   ** Warning ** No floor exists in Zone=\"LEVEL 0 CEILING PLENUM ZONE\", zone floor area is zero. All values for this zone that are entered per floor area will be zero.\n   ** Warning ** CheckUsedConstructions: There are 3 nominally unused constructions in input.\n   **   ~~~   ** For explicit details on each unused construction, use Output:Diagnostics,DisplayExtraWarnings;\n   ************* Beginning System Sizing Calculations\n   ************* Beginning Plant Sizing Calculations\n   ** Warning ** GetDXCoils: Coil:Cooling:DX:SingleSpeed=\"COIL COOLING DX SINGLE SPEED 1\":\n   **   ~~~   ** ...At least one of the four input parameters for the latent capacity degradation model\n   **   ~~~   ** ...is set to zero. Therefore, the latent degradation model will not be used for this simulation.\n   ** Warning ** Output:Meter: invalid Name=\"DISTRICTCOOLING:FACILITY\" - not found.\n   ** Warning ** Output:Meter: invalid Name=\"DISTRICTHEATING:FACILITY\" - not found.\n   ** Warning ** Output:Meter:MeterFileOnly requested for \"Electricity:Facility\" (TimeStep), already on \"Output:Meter\". Will report to both eplusout.eso and eplusout.mtr\n   ************* Testing Individual Branch Integrity\n   ************* All Branches passed integrity testing\n   ************* Testing Individual Supply Air Path Integrity\n   ************* All Supply Air Paths passed integrity testing\n   ************* Testing Individual Return Air Path Integrity\n   ************* All Return Air Paths passed integrity testing\n   ************* No node connection errors were found.\n   ************* Beginning Simulation\n   ** Warning ** CalcDoe2DXCoil: Coil:Cooling:DX:SingleSpeed \"COIL COOLING DX SINGLE SPEED 1\" - Full load outlet air dry-bulb temperature < 2C. This indicates the possibility of coil frost/freeze. Outlet temperature = 0.98 C.\n   **   ~~~   **  ...Occurrence info = RUN PERIOD 1, 01/07 13:30 - 14:00\n   **   ~~~   ** ... Possible reasons for low outlet air dry-bulb temperatures are: This DX coil\n   **   ~~~   **    1) may have a low inlet air dry-bulb temperature. Inlet air temperature = 18.761 C.\n   **   ~~~   **    2) may have a low air flow rate per watt of cooling capacity. Check inputs.\n   **   ~~~   **    3) is used as part of a HX assisted cooling coil which uses a high sensible effectiveness. Check inputs.\n   ************* Simulation Error Summary *************\n   ************* There are 7 unused schedules in input.\n   ************* There are 10 unused week schedules in input.\n   ************* There are 46 unused day schedules in input.\n   ************* Use Output:Diagnostics,DisplayUnusedSchedules; to see them.\n   *************\n   ************* ===== Recurring Error Summary =====\n   ************* The following recurring error messages occurred.\n   *************\n   *************  ** Warning ** CalcDoe2DXCoil: Coil:Cooling:DX:SingleSpeed=\"COIL COOLING DX SINGLE SPEED 1\" - Full load outlet temperature indicates a possibility of frost/freeze error continues. Outlet air temperature statistics follow:\n   *************  **   ~~~   **   This error occurred 152 total times;\n   *************  **   ~~~   **   during Warmup 0 times;\n   *************  **   ~~~   **   during Sizing 0 times.\n   *************  **   ~~~   **   Max=1.995636  Min=0.91248\n   *************\n   *************\n   ************* ===== Final Error Summary =====\n   ************* The following error categories occurred.  Consider correcting or noting.\n   ************* InterZone Surface Tilts -- mismatch\n   ************* Nominally Unused Constructions\n   ************* ..The nominally unused constructions warning is provided to alert you to potential conditions that can cause\n   ************* ..extra time during simulation. Each construction is calculated by the algorithm indicated in the HeatBalanceAlgorithm\n   ************* ..object. You may remove the constructions indicated (when you use the DisplayExtraWarnings option).\n   *************\n   ************* EnergyPlus Warmup Error Summary. During Warmup: 0 Warning; 0 Severe Errors.\n   ************* EnergyPlus Sizing Error Summary. During Sizing: 28 Warning; 0 Severe Errors.\n   ************* EnergyPlus Completed Successfully-- 189 Warning; 0 Severe Errors; Elapsed Time=00hr 00min  6.28sec\n",
+  "file_format_version": "0.0.1",
+  "file_paths": [
+    "../weather",
+    "../seeds",
+    "../seed"
+  ],
+  "hash": "453723B6",
+  "measure_paths": [
+    "../measures"
+  ],
+  "name": "API Generated 2017-03-29 21:34:50 +0000",
+  "osa_id": "5b8a7cd7-e26a-4678-a2f3-24495c8a24bc",
+  "osd_id": "f5d4abba-74e7-4eeb-8276-0ca52baf28fd",
+  "run_directory": "./run",
+  "seed_file": "SEB4_baseboard.osm",
+  "started_at": "20170329T213456Z",
+  "steps": [
+    {
+      "arguments": {
+        "consumption_unit": "kWh",
+        "data_key_name": "tot_kwh",
+        "end_date": "2013-12-31",
+        "fuel_type": "Electricity",
+        "json": "../../../lib/calibration_data/electric.json",
+        "remove_existing_data": true,
+        "set_runperiod": true,
+        "start_date": "2013-01-1",
+        "variable_name": "Electric Bill"
+      },
+      "description": "Reads in json format and adds utility data",
+      "measure_dir_name": "AddMonthlyJSONUtilityData",
+      "name": "add_monthly_json_utility_data",
+      "result": {
+        "completed_at": "20170329T213458Z",
+        "measure_class_name": "AddMonthlyJSONUtilityData",
+        "measure_display_name": "AddMonthlyJSONUtilityData",
+        "measure_name": "add_monthly_json_utility_data",
+        "measure_taxonomy": "Economics.Life Cycle Cost Analysis",
+        "measure_type": "ModelMeasure",
+        "measure_uid": "6da969e0-4256-49bf-9607-26504cc3d423",
+        "measure_version_id": "cb687d6c-6ee1-4488-800b-8bdce34214ce",
+        "measure_version_modified": "20170320T192149Z",
+        "measure_xml_checksum": "9064277D",
+        "started_at": "20170329T213458Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n[utilities.time.Date] <1> Comparing Dates with improper base years\n[utilities.time.Date] <1> Comparing Dates with improper base years\n[utilities.time.Date] <1> Comparing Dates with improper base years\n[utilities.time.Date] <1> Comparing Dates with improper base years\n[utilities.time.Date] <1> Comparing Dates with improper base years\n[utilities.time.Date] <1> Comparing Dates with improper base years\n[utilities.time.Date] <1> Comparing Dates with improper base years\n[utilities.time.Date] <1> Comparing Dates with improper base years\n[utilities.time.Date] <1> Comparing Dates with improper base years\n[utilities.time.Date] <1> Comparing Dates with improper base years\n[utilities.time.Date] <1> Comparing Dates with improper base years\n[utilities.time.Date] <1> Comparing Dates with improper base years\n",
+        "step_errors": [],
+        "step_files": [],
+        "step_final_condition": "Utility bill data has been added to the model.",
+        "step_info": [
+          "RunPeriod start date set to 2013-Jan-01",
+          "RunPeriod end date set to 2013-Dec-31",
+          "json is ../../../lib/calibration_data/electric.json",
+          "json_path is /mnt/openstudio/analysis_5b8a7cd7-e26a-4678-a2f3-24495c8a24bc/lib/calibration_data/electric.json",
+          "fuel_type is Electricity",
+          "skipping period 2012-Jan-01 to 2012-Jan-30",
+          "skipping period 2012-Feb-01 to 2012-Feb-28",
+          "skipping period 2012-Mar-01 to 2012-Mar-31",
+          "skipping period 2012-Apr-01 to 2012-Apr-30",
+          "skipping period 2012-May-01 to 2012-May-31",
+          "skipping period 2012-Jun-01 to 2012-Jun-30",
+          "skipping period 2012-Jul-01 to 2012-Jul-31",
+          "skipping period 2012-Aug-01 to 2012-Aug-31",
+          "skipping period 2012-Sep-01 to 2012-Sep-30",
+          "skipping period 2012-Oct-01 to 2012-Oct-31",
+          "skipping period 2012-Nov-01 to 2012-Nov-30",
+          "skipping period 2012-Dec-01 to 2012-Dec-31",
+          "period {\"from\"=>\"2013-01-01T00:00:00Z\", \"to\"=>\"2013-01-30T23:59:59Z\", \"tot_kwh\"=>1562}",
+          "period_start_date: 2013-Jan-01, period_end_date: 2013-Jan-30, tot_kwh: 1562.0",
+          "period {\"from\"=>\"2013-02-01T00:00:00Z\", \"to\"=>\"2013-02-28T23:59:59Z\", \"tot_kwh\"=>1395}",
+          "period_start_date: 2013-Feb-01, period_end_date: 2013-Feb-28, tot_kwh: 1395.0",
+          "period {\"from\"=>\"2013-03-01T00:00:00Z\", \"to\"=>\"2013-03-31T23:59:59Z\", \"tot_kwh\"=>1279}",
+          "period_start_date: 2013-Mar-01, period_end_date: 2013-Mar-31, tot_kwh: 1279.0",
+          "period {\"from\"=>\"2013-04-01T00:00:00Z\", \"to\"=>\"2013-04-30T23:59:59Z\", \"tot_kwh\"=>1347}",
+          "period_start_date: 2013-Apr-01, period_end_date: 2013-Apr-30, tot_kwh: 1347.0",
+          "period {\"from\"=>\"2013-05-01T00:00:00Z\", \"to\"=>\"2013-05-31T23:59:59Z\", \"tot_kwh\"=>1363}",
+          "period_start_date: 2013-May-01, period_end_date: 2013-May-31, tot_kwh: 1363.0",
+          "period {\"from\"=>\"2013-06-01T00:00:00Z\", \"to\"=>\"2013-06-30T23:59:59Z\", \"tot_kwh\"=>1691}",
+          "period_start_date: 2013-Jun-01, period_end_date: 2013-Jun-30, tot_kwh: 1691.0",
+          "period {\"from\"=>\"2013-07-01T00:00:00Z\", \"to\"=>\"2013-07-31T23:59:59Z\", \"tot_kwh\"=>1852}",
+          "period_start_date: 2013-Jul-01, period_end_date: 2013-Jul-31, tot_kwh: 1852.0",
+          "period {\"from\"=>\"2013-08-01T00:00:00Z\", \"to\"=>\"2013-08-31T23:59:59Z\", \"tot_kwh\"=>1983}",
+          "period_start_date: 2013-Aug-01, period_end_date: 2013-Aug-31, tot_kwh: 1983.0",
+          "period {\"from\"=>\"2013-09-01T00:00:00Z\", \"to\"=>\"2013-09-30T23:59:59Z\", \"tot_kwh\"=>1650}",
+          "period_start_date: 2013-Sep-01, period_end_date: 2013-Sep-30, tot_kwh: 1650.0",
+          "period {\"from\"=>\"2013-10-01T00:00:00Z\", \"to\"=>\"2013-10-31T23:59:59Z\", \"tot_kwh\"=>1385}",
+          "period_start_date: 2013-Oct-01, period_end_date: 2013-Oct-31, tot_kwh: 1385.0",
+          "period {\"from\"=>\"2013-11-01T00:00:00Z\", \"to\"=>\"2013-11-30T23:59:59Z\", \"tot_kwh\"=>1347}",
+          "period_start_date: 2013-Nov-01, period_end_date: 2013-Nov-30, tot_kwh: 1347.0",
+          "period {\"from\"=>\"2013-12-01T00:00:00Z\", \"to\"=>\"2013-12-31T23:59:59Z\", \"tot_kwh\"=>1524}",
+          "period_start_date: 2013-Dec-01, period_end_date: 2013-Dec-31, tot_kwh: 1524.0"
+        ],
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "json",
+            "value": "../../../lib/calibration_data/electric.json"
+          },
+          {
+            "name": "variable_name",
+            "value": "Electric Bill"
+          },
+          {
+            "name": "fuel_type",
+            "value": "Electricity"
+          },
+          {
+            "name": "consumption_unit",
+            "value": "kWh"
+          },
+          {
+            "name": "data_key_name",
+            "value": "tot_kwh"
+          },
+          {
+            "name": "start_date",
+            "value": "2013-01-1"
+          },
+          {
+            "name": "end_date",
+            "value": "2013-12-31"
+          },
+          {
+            "name": "remove_existing_data",
+            "value": true
+          },
+          {
+            "name": "set_runperiod",
+            "value": true
+          }
+        ],
+        "step_warnings": []
+      }
+    },
+    {
+      "arguments": {
+        "constant_coefficient": 1,
+        "material_and_installation_cost": 0,
+        "om_cost": 0,
+        "om_frequency": 1,
+        "space_infiltration_reduction_percent": 12.9149149346631,
+        "space_type": "*Entire Building*",
+        "temperature_coefficient": 0,
+        "wind_speed_coefficient": 0,
+        "wind_speed_squared_coefficient": 0
+      },
+      "description": "This measure will reduce space infiltration rates by the requested percentage. A cost per square foot of building area can be added to the model.",
+      "measure_dir_name": "ReduceSpaceInfiltrationByPercentage",
+      "name": "reduce_space_infiltration_by_percentage",
+      "result": {
+        "completed_at": "20170329T213458Z",
+        "measure_class_name": "ReduceSpaceInfiltrationByPercentage",
+        "measure_display_name": "ReduceSpaceInfiltrationByPercentage",
+        "measure_name": "reduce_space_infiltration_by_percentage",
+        "measure_taxonomy": "Envelope.Infiltration",
+        "measure_type": "ModelMeasure",
+        "measure_uid": "d8161857-8b77-4e1a-a76c-ae5deab7c1e0",
+        "measure_version_id": "29be5e7f-a965-4305-8617-97c59a710c19",
+        "measure_version_modified": "20170320T192151Z",
+        "measure_xml_checksum": "EACB548E",
+        "started_at": "20170329T213458Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
+        "step_errors": [],
+        "step_files": [],
+        "step_final_condition": "5 space infiltration objects in the model were altered affecting 885(ft^2) at a total cost of $0.",
+        "step_info": [
+          "Cost arguments were not provided, no cost objects were added to the model."
+        ],
+        "step_initial_condition": "The initial model contained 5 space infiltration objects.",
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "space_type",
+            "value": "{ef611f95-658d-4609-9b31-7cfea756bfd5}"
+          },
+          {
+            "name": "space_infiltration_reduction_percent",
+            "value": 12.9149149346631
+          },
+          {
+            "name": "constant_coefficient",
+            "value": 1
+          },
+          {
+            "name": "temperature_coefficient",
+            "value": 0
+          },
+          {
+            "name": "wind_speed_coefficient",
+            "value": 0
+          },
+          {
+            "name": "wind_speed_squared_coefficient",
+            "value": 0
+          },
+          {
+            "name": "material_and_installation_cost",
+            "value": 0
+          },
+          {
+            "name": "om_cost",
+            "value": 0
+          },
+          {
+            "name": "om_frequency",
+            "value": 1
+          }
+        ],
+        "step_warnings": []
+      }
+    },
+    {
+      "arguments": {
+        "demo_cost_initial_const": true,
+        "demolition_cost": 0,
+        "expected_life": 15,
+        "lighting_power_reduction_percent": 0,
+        "material_and_installation_cost": 0,
+        "om_cost": 0,
+        "om_frequency": 1,
+        "space_type": "*Entire Building*",
+        "years_until_costs_start": 0
+      },
+      "description": "The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process.",
+      "measure_dir_name": "ReduceLightingLoadsByPercentage",
+      "name": "reduce_lighting_loads_by_percentage",
+      "result": {
+        "completed_at": "20170329T213458Z",
+        "measure_class_name": "ReduceLightingLoadsByPercentage",
+        "measure_display_name": "Reduce Lighting Loads by Percentage",
+        "measure_name": "reduce_lighting_loads_by_percentage",
+        "measure_taxonomy": "Electric Lighting.Lighting Equipment",
+        "measure_type": "ModelMeasure",
+        "measure_uid": "d37b7ed5-887a-4d1f-b304-259462eadbe9",
+        "measure_version_id": "28227a92-7dc9-447c-a7b0-2aca5b0dcace",
+        "measure_version_modified": "20170320T192150Z",
+        "measure_xml_checksum": "293730A7",
+        "started_at": "20170329T213458Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
+        "step_errors": [],
+        "step_files": [],
+        "step_final_condition": "The model's final building lighting power was  1,450 watts, a lighting power density of 1.64 w/ft^2. Initial capital costs associated with the improvements are $0.",
+        "step_info": [
+          "No lighting power adjustment requested, but some life cycle costs may still be affected.",
+          "Adding one time cost of $0 related to demolition of baseline objects."
+        ],
+        "step_initial_condition": "The model's initial building lighting power was  1,450 watts, a lighting power density of 1.64 w/ft^2.",
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "space_type",
+            "value": "{ef611f95-658d-4609-9b31-7cfea756bfd5}"
+          },
+          {
+            "name": "lighting_power_reduction_percent",
+            "value": 0
+          },
+          {
+            "name": "material_and_installation_cost",
+            "value": 0
+          },
+          {
+            "name": "demolition_cost",
+            "value": 0
+          },
+          {
+            "name": "years_until_costs_start",
+            "value": 0
+          },
+          {
+            "name": "demo_cost_initial_const",
+            "value": true
+          },
+          {
+            "name": "expected_life",
+            "value": 15
+          },
+          {
+            "name": "om_cost",
+            "value": 0
+          },
+          {
+            "name": "om_frequency",
+            "value": 1
+          }
+        ],
+        "step_warnings": []
+      }
+    },
+    {
+      "arguments": {
+        "demo_cost_initial_const": false,
+        "demolition_cost": 0,
+        "elecequip_power_reduction_percent": 61.3057688809931,
+        "expected_life": 15,
+        "material_and_installation_cost": 0,
+        "om_cost": 0,
+        "om_frequency": 1,
+        "space_type": "*Entire Building*",
+        "years_until_costs_start": 0
+      },
+      "description": "Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power.",
+      "measure_dir_name": "ReduceElectricEquipmentLoadsByPercentage",
+      "name": "reduce_electric_equipment_loads_by_percentage",
+      "result": {
+        "completed_at": "20170329T213458Z",
+        "measure_class_name": "ReduceElectricEquipmentLoadsByPercentage",
+        "measure_display_name": "Reduce Electric Equipment Loads by Percentage",
+        "measure_name": "reduce_electric_equipment_loads_by_percentage",
+        "measure_taxonomy": "Equipment.Electric Equipment",
+        "measure_type": "ModelMeasure",
+        "measure_uid": "b93f5c07-a1a8-4741-9d47-af00a2e7e288",
+        "measure_version_id": "adc6a0d5-afe5-4bc9-a113-285e78c94d2a",
+        "measure_version_modified": "20170320T192150Z",
+        "measure_xml_checksum": "F9A5B8F0",
+        "started_at": "20170329T213458Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
+        "step_errors": [],
+        "step_files": [],
+        "step_final_condition": "The model's final building electric equipment power was  962 watts, an electric equipment power density of 1.09 w/ft^2. Initial capital costs associated with the improvements are $0.",
+        "step_info": [],
+        "step_initial_condition": "The model's initial building electric equipment power was  2,485 watts, an electric equipment power density of 2.81 w/ft^2.",
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "space_type",
+            "value": "{ef611f95-658d-4609-9b31-7cfea756bfd5}"
+          },
+          {
+            "name": "elecequip_power_reduction_percent",
+            "value": 61.3057688809931
+          },
+          {
+            "name": "material_and_installation_cost",
+            "value": 0
+          },
+          {
+            "name": "demolition_cost",
+            "value": 0
+          },
+          {
+            "name": "years_until_costs_start",
+            "value": 0
+          },
+          {
+            "name": "demo_cost_initial_const",
+            "value": false
+          },
+          {
+            "name": "expected_life",
+            "value": 15
+          },
+          {
+            "name": "om_cost",
+            "value": 0
+          },
+          {
+            "name": "om_frequency",
+            "value": 1
+          }
+        ],
+        "step_warnings": []
+      }
+    },
+    {
+      "arguments": {
+        "demo_cost_initial_const": false,
+        "demolition_cost": 0,
+        "eff": 0.962881768315565,
+        "expected_life": 15,
+        "material_cost": 0,
+        "object": "*All Air Loops*",
+        "om_cost": 0,
+        "om_frequency": 1,
+        "remove_costs": false,
+        "run_measure": 1,
+        "years_until_costs_start": 0
+      },
+      "description": "This measure will find Coil Heating Gas units in the model and will alter the burner efficiency to a specified value. It can be run on a single or all air loops in the model.",
+      "measure_dir_name": "SetGasBurnerEfficiencyDiag",
+      "name": "set_gas_burner_efficiency_diag",
+      "result": {
+        "completed_at": "20170329T213459Z",
+        "measure_class_name": "SetGasBurnerEfficiencyDiag",
+        "measure_display_name": "Set Gas Burner Efficiency",
+        "measure_name": "set_gas_burner_efficiency_diag",
+        "measure_taxonomy": "HVAC.Heating",
+        "measure_type": "ModelMeasure",
+        "measure_uid": "28c79510-5001-4582-bf93-d34d223f19ca",
+        "measure_version_id": "e7069360-caee-44aa-a190-04a7ec3c3761",
+        "measure_version_modified": "20170320T192151Z",
+        "measure_xml_checksum": "0DA5C9E6",
+        "started_at": "20170329T213458Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
+        "step_errors": [],
+        "step_files": [],
+        "step_final_condition": "1 Coil Heating Gas units had their Rated COP values set to 0.962881768315565. Final year 0 capital costs for affected Coil Heating Gas units is $0.",
+        "step_info": [
+          "No costs were requested for Coil Cooling DX Two Speed units.",
+          "Changing the burner efficiency from 0.95 to 0.962881768315565 for gas heating units 'OS:Coil:Heating:Gas 1' on air loop 'Small heating and cooling furnace'"
+        ],
+        "step_initial_condition": "The starting efficiency values in affected loop(s) range from 0.95 to 0.95. Initial year 0 capital costs for affected Coil Heating Gas units is $0.",
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "run_measure",
+            "value": 1
+          },
+          {
+            "name": "object",
+            "value": "{ef611f95-658d-4609-9b31-7cfea756bfd5}"
+          },
+          {
+            "name": "eff",
+            "value": 0.962881768315565
+          },
+          {
+            "name": "remove_costs",
+            "value": false
+          },
+          {
+            "name": "material_cost",
+            "value": 0
+          },
+          {
+            "name": "demolition_cost",
+            "value": 0
+          },
+          {
+            "name": "years_until_costs_start",
+            "value": 0
+          },
+          {
+            "name": "demo_cost_initial_const",
+            "value": false
+          },
+          {
+            "name": "expected_life",
+            "value": 15
+          },
+          {
+            "name": "om_cost",
+            "value": 0
+          },
+          {
+            "name": "om_frequency",
+            "value": 1
+          }
+        ],
+        "step_warnings": []
+      }
+    },
+    {
+      "arguments": {
+        "cop": 3.57698101905407,
+        "demo_cost_initial_const": false,
+        "demolition_cost": 0,
+        "expected_life": 15,
+        "material_cost": 0,
+        "object": "*All Air Loops*",
+        "om_cost": 0,
+        "om_frequency": 1,
+        "remove_costs": false,
+        "years_until_costs_start": 0
+      },
+      "description": "This measure will find single speed DX cooling units in the model and will alter the Rated COP to a specified value. It can be run on a single or all air loops in the model.",
+      "measure_dir_name": "SetCOPforSingleSpeedDXCoolingUnits",
+      "name": "set_co_pfor_single_speed_dx_cooling_units",
+      "result": {
+        "completed_at": "20170329T213459Z",
+        "measure_class_name": "SetCOPforSingleSpeedDXCoolingUnits",
+        "measure_display_name": "Set COP for Single Speed DX Cooling Units",
+        "measure_name": "set_co_pfor_single_speed_dx_cooling_units",
+        "measure_taxonomy": "HVAC.Cooling",
+        "measure_type": "ModelMeasure",
+        "measure_uid": "4a737582-b5fc-477a-89e9-f8501af13b10",
+        "measure_version_id": "306dc9a7-0126-4461-b76a-9e130cf0870c",
+        "measure_version_modified": "20170320T192151Z",
+        "measure_xml_checksum": "9E2537CD",
+        "started_at": "20170329T213459Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
+        "step_errors": [],
+        "step_files": [],
+        "step_final_condition": "1 single speed dx units had their Rated COP values set to 3.57698101905407. Final year 0 capital costs for affected Coil Cooling DX Single Speed units is $0.",
+        "step_info": [
+          "No costs were requested for Coil Cooling DX Single Speed units.",
+          "Changing the Rated COP from 4.1 to 3.57698101905407 for single speed dx unit 'Coil Cooling DX Single Speed 1' on air loop 'Small heating and cooling furnace'"
+        ],
+        "step_initial_condition": "The starting Rated COP values in affected loop(s) range from 4.1 to 4.1. Initial year 0 capital costs for affected Coil Cooling DX Single Speed units is $0.",
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "object",
+            "value": "{ef611f95-658d-4609-9b31-7cfea756bfd5}"
+          },
+          {
+            "name": "cop",
+            "value": 3.57698101905407
+          },
+          {
+            "name": "remove_costs",
+            "value": false
+          },
+          {
+            "name": "material_cost",
+            "value": 0
+          },
+          {
+            "name": "demolition_cost",
+            "value": 0
+          },
+          {
+            "name": "years_until_costs_start",
+            "value": 0
+          },
+          {
+            "name": "demo_cost_initial_const",
+            "value": false
+          },
+          {
+            "name": "expected_life",
+            "value": 15
+          },
+          {
+            "name": "om_cost",
+            "value": 0
+          },
+          {
+            "name": "om_frequency",
+            "value": 1
+          }
+        ],
+        "step_warnings": []
+      }
+    },
+    {
+      "arguments": {
+        "demo_cost_initial_const": false,
+        "demolition_cost": 0,
+        "expected_life": 15,
+        "fan_eff": 15.569055818778,
+        "material_cost": 0,
+        "motor_eff": -7.26624807459302,
+        "object": "*All Air Loops*",
+        "om_cost": 0,
+        "om_frequency": 1,
+        "remove_costs": false,
+        "years_until_costs_start": 0
+      },
+      "description": "The assessment team observed opportunities for fan belt improvements on HVAC fan drives. These motors are asynchronous induction motors.\r\r\r\r\r\n\r\r\r\r\r\nImprovements in belt efficiency result in energy savings at the motor. The three common belt efficiency measures are belt tightening (1%-5% savings per motor), replace standard v-belts with cogged v-belts (2% savings per motor), and replace standard belts with synchronous belts (3% savings per motor).\r\r\r\r\r\n\r\r\r\r\r\nWell-adjusted belts run cooler, last longer, and operate at higher efficiency than standard belts. The belts associated with the largest motors, longest run times, and that are run closest to full load should be given priority when making replacements.\r\r\r\r\r\n  ",
+      "measure_dir_name": "ImproveFanBeltEfficiency",
+      "name": "improve_fan_belt_efficiency",
+      "result": {
+        "completed_at": "20170329T213459Z",
+        "measure_class_name": "ImproveFanBeltEfficiency",
+        "measure_display_name": "Improve Fan Belt Efficiency",
+        "measure_name": "improve_fan_belt_efficiency",
+        "measure_taxonomy": "HVAC.Distribution",
+        "measure_type": "ModelMeasure",
+        "measure_uid": "724ef0bb-49ab-4697-bcab-09a8846a3714",
+        "measure_version_id": "1adbc719-13af-407d-ab5c-7bf2544a193e",
+        "measure_version_modified": "20170320T192150Z",
+        "measure_xml_checksum": "F78494F2",
+        "started_at": "20170329T213459Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
+        "step_errors": [],
+        "step_files": [],
+        "step_final_condition": "1 fans had motor efficiency values set to altered. Final year 0 capital costs for affected fans is $0.",
+        "step_info": [
+          "No costs were requested for motors improvements.",
+          "Changing the motor efficiency from 85.7399978637695% to 78.47374978917648% for 'User defined fan 1' onloop 'Small heating and cooling furnace.'",
+          "Changing the motor efficiency from 70.0% to 85.569055818778% for 'User defined fan 1' onloop 'Small heating and cooling furnace.'"
+        ],
+        "step_initial_condition": "The starting motor efficiency values in affected loop(s) range from 85.7399978637695% to 85.7399978637695%. Initial year 0 capital costs for affected fans is $0.",
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "object",
+            "value": "{ef611f95-658d-4609-9b31-7cfea756bfd5}"
+          },
+          {
+            "name": "motor_eff",
+            "value": -7.26624807459302
+          },
+          {
+            "name": "fan_eff",
+            "value": 15.569055818778
+          },
+          {
+            "name": "remove_costs",
+            "value": false
+          },
+          {
+            "name": "material_cost",
+            "value": 0
+          },
+          {
+            "name": "demolition_cost",
+            "value": 0
+          },
+          {
+            "name": "years_until_costs_start",
+            "value": 0
+          },
+          {
+            "name": "demo_cost_initial_const",
+            "value": false
+          },
+          {
+            "name": "expected_life",
+            "value": 15
+          },
+          {
+            "name": "om_cost",
+            "value": 0
+          },
+          {
+            "name": "om_frequency",
+            "value": 1
+          }
+        ],
+        "step_warnings": []
+      }
+    },
+    {
+      "arguments": {
+        "alter_design_days": false,
+        "cooling_adjustment": -1.90001683309674,
+        "heating_adjustment": 0.925145578826778
+      },
+      "description": "This measure adjusts heating and cooling setpoints by a user specified number of degrees. This is applied throughout the entire building.",
+      "measure_dir_name": "AdjustThermostatSetpointsByDegrees",
+      "name": "adjust_thermostat_setpoints_by_degrees",
+      "result": {
+        "completed_at": "20170329T213459Z",
+        "measure_class_name": "AdjustThermostatSetpointsByDegrees",
+        "measure_display_name": "Adjust Thermostat Setpoints by Degrees",
+        "measure_name": "adjust_thermostat_setpoints_by_degrees",
+        "measure_taxonomy": "HVAC.HVAC Controls",
+        "measure_type": "ModelMeasure",
+        "measure_uid": "6e1f34f9-92e1-44ea-9279-de0b9b64f6a1",
+        "measure_version_id": "3c8ef97f-ae6a-43e5-a880-bd45098b0efc",
+        "measure_version_modified": "20170320T192149Z",
+        "measure_xml_checksum": "4F7846F2",
+        "started_at": "20170329T213459Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
+        "step_errors": [],
+        "step_files": [],
+        "step_final_condition": "Final cooling setpoints used in the model range from 73.1 F to 73.1 F. Final heating setpoints used in the model range from 65.9251 F to 65.9251 F.",
+        "step_info": [],
+        "step_initial_condition": "Initial cooling setpoints used in the model range from 75 F to 75 F. Initial heating setpoints used in the model range from 65 F to 65 F.",
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "cooling_adjustment",
+            "value": -1.90001683309674
+          },
+          {
+            "name": "heating_adjustment",
+            "value": 0.925145578826778
+          },
+          {
+            "name": "alter_design_days",
+            "value": false
+          }
+        ],
+        "step_warnings": [
+          "Lowering the cooling setpoint will increase energy use.",
+          "Raising the heating setpoint will increase energy use."
+        ]
+      }
+    },
+    {
+      "arguments": {
+        "r_value_mult": 1.83809254830703,
+        "solar_abs_mult": 4.09803119513672,
+        "thermal_mass_mult": 2.11682387581095
+      },
+      "description": "Allows calibration of exterior walls by altering the thermal resistance, density, and solar absorptance of the wall constructions independently.",
+      "measure_dir_name": "ChangeExteriorWallThermalProperties",
+      "name": "change_exterior_wall_thermal_properties",
+      "result": {
+        "completed_at": "20170329T213459Z",
+        "measure_class_name": "ChangeExteriorWallThermalProperties",
+        "measure_display_name": "Change Exterior Wall Thermal Properties",
+        "measure_name": "change_exterior_wall_thermal_properties",
+        "measure_taxonomy": "Envelope.Opaque",
+        "measure_type": "ModelMeasure",
+        "measure_uid": "a2221a95-99c2-4445-a6ff-c57d34410662",
+        "measure_version_id": "0510a4cd-abde-41a4-aa8d-835e069ec880",
+        "measure_version_modified": "20170320T192150Z",
+        "measure_xml_checksum": "31085437",
+        "started_at": "20170329T213459Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
+        "step_errors": [],
+        "step_files": [],
+        "step_final_condition": "Final number of surfaces of each construction type: 'Calibrated Exterior EXTERIOR-WALL': 26, ",
+        "step_info": [
+          "Updated material 'Stuco' in construction 'EXTERIOR-WALL' to 'Stuco 1 in Calibrated Exterior EXTERIOR-WALL' as follows:",
+          " R-Value updated from 0.02 to 0.03 (1.8380925483070307 mult)",
+          "Thermal Mass updated from 2,659.00 to 5,628.63 (2.1168238758109514 mult)",
+          "Solar Absorptance updated from 0.50 to 1.00 (2.0 mult)",
+          "Updated material 'Expanded Polystyrene - Extruded - 1 in.' in construction 'EXTERIOR-WALL' to 'Expanded Polystyrene - Extruded - 1 in. 1 in Calibrated Exterior EXTERIOR-WALL' as follows:",
+          " R-Value updated from 0.88 to 1.61 (1.8380925483070316 mult)",
+          "Thermal Mass updated from 29.00 to 61.39 (2.116823875810952 mult)",
+          "Updated material 'Wood-Framed - 4 in. Studs - 16 in. OC - R-11 Cavity Insulation' in construction 'EXTERIOR-WALL' to 'Wood-Framed - 4 in. Studs - 16 in. OC - R-11 Cavity Insulation 1 in Calibrated Exterior EXTERIOR-WALL' as follows:",
+          " R-Value updated from 1.47 to 2.71 (1.8380925483070303 mult)",
+          "Thermal Mass updated from 126.15 to 267.03 (2.1168238758109506 mult)",
+          "Updated material 'Gypsum Board - 5/8 in.' in construction 'EXTERIOR-WALL' to 'Gypsum Board - 5/8 in. 1 in Calibrated Exterior EXTERIOR-WALL' as follows:",
+          " R-Value updated from 0.10 to 0.18 (1.83809254830703 mult)",
+          "Thermal Mass updated from 800.00 to 1,693.46 (2.11682387581095 mult)"
+        ],
+        "step_initial_condition": "Initial number of surfaces of each construction type: 'EXTERIOR-WALL': 26, ",
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "r_value_mult",
+            "value": 1.83809254830703
+          },
+          {
+            "name": "solar_abs_mult",
+            "value": 4.09803119513672
+          },
+          {
+            "name": "thermal_mass_mult",
+            "value": 2.11682387581095
+          }
+        ],
+        "step_warnings": [
+          "Solar absorptance multiplier was set equal to 4.09803119513672. Please ensure that the desired value was entered as a multiplier, not a percentage.",
+          "Initial solar absorptance of 'Stuco' was 0.5. Multiplying it by 4.09803119513672 results in a number greater than 1, which is outside the allowed range. The value is instead being set to 1"
+        ]
+      }
+    },
+    {
+      "arguments": {
+        "r_value_mult": 2.21934406150831,
+        "solar_abs_mult": 1.21138154459186,
+        "thermal_mass_mult": 2.40677099089953
+      },
+      "description": "Allows calibration of roof by altering the thermal resistance, density, and solar absorptance of the wall constructions independently.",
+      "measure_dir_name": "ChangeRoofThermalProperties",
+      "name": "change_roof_thermal_properties",
+      "result": {
+        "completed_at": "20170329T213459Z",
+        "measure_class_name": "ChangeRoofThermalProperties",
+        "measure_display_name": "Change Roof Thermal Properties",
+        "measure_name": "change_roof_thermal_properties",
+        "measure_taxonomy": "Envelope.Opaque",
+        "measure_type": "ModelMeasure",
+        "measure_uid": "6c4eb22b-770f-456c-bcd1-084cfad89eeb",
+        "measure_version_id": "f7b551df-9610-44f4-9ee2-ddf69bf6f965",
+        "measure_version_modified": "20170320T192150Z",
+        "measure_xml_checksum": "31085437",
+        "started_at": "20170329T213459Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
+        "step_errors": [],
+        "step_files": [],
+        "step_final_condition": "Final number of surfaces of each construction type: 'Calibrated Exterior EXTERIOR-ROOF': 4, ",
+        "step_info": [
+          "Updated material 'Built-up Roofing - 3/8 in.' in construction 'EXTERIOR-ROOF' to 'Built-up Roofing - 3/8 in. 1 in Calibrated Exterior EXTERIOR-ROOF' as follows:",
+          " R-Value updated from 0.06 to 0.13 (2.219344061508315 mult)",
+          "Thermal Mass updated from 1,120.00 to 2,695.58 (2.4067709908995267 mult)",
+          "Solar Absorptance updated from 0.70 to 0.85 (1.21138154459186 mult)",
+          "Updated material 'Hardboard - High Density - Standard-tempered Grade - 3/4 in.' in construction 'EXTERIOR-ROOF' to 'Hardboard - High Density - Standard-tempered Grade - 3/4 in. 1 in Calibrated Exterior EXTERIOR-ROOF' as follows:",
+          " R-Value updated from 0.13 to 0.29 (2.2193440615083095 mult)",
+          "Thermal Mass updated from 1,010.00 to 2,430.84 (2.4067709908995347 mult)",
+          "Updated material 'Mineral Fiber Batt Insulation - 10 in.' in construction 'EXTERIOR-ROOF' to 'Mineral Fiber Batt Insulation - 10 in. 1 in Calibrated Exterior EXTERIOR-ROOF' as follows:",
+          " R-Value updated from 5.08 to 11.27 (2.219344061508311 mult)",
+          "Thermal Mass updated from 19.00 to 45.73 (2.4067709908995316 mult)",
+          "Updated material 'Vegetable Fiber Board  Sheathing - Intermediate Density - 1/2 in.' in construction 'EXTERIOR-ROOF' to 'Vegetable Fiber Board  Sheathing - Intermediate Density - 1/2 in. 1 in Calibrated Exterior EXTERIOR-ROOF' as follows:",
+          " R-Value updated from 0.22 to 0.49 (2.2193440615083073 mult)",
+          "Thermal Mass updated from 350.00 to 842.37 (2.4067709908995285 mult)"
+        ],
+        "step_initial_condition": "Initial number of surfaces of each construction type: 'EXTERIOR-ROOF': 4, ",
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "r_value_mult",
+            "value": 2.21934406150831
+          },
+          {
+            "name": "solar_abs_mult",
+            "value": 1.21138154459186
+          },
+          {
+            "name": "thermal_mass_mult",
+            "value": 2.40677099089953
+          }
+        ],
+        "step_warnings": []
+      }
+    },
+    {
+      "arguments": {
+        "base_eff": 1,
+        "nom_cap": 2570.61092433287
+      },
+      "description": "Change Electric Baseboard",
+      "measure_dir_name": "ChangeElectricBaseboard",
+      "name": "change_electric_baseboard",
+      "result": {
+        "completed_at": "20170329T213459Z",
+        "measure_class_name": "ChangeElectricBaseboard",
+        "measure_display_name": "Change Electric Baseboard",
+        "measure_name": "change_electric_baseboard",
+        "measure_taxonomy": "Envelope.Form",
+        "measure_type": "ModelMeasure",
+        "measure_uid": "4253e38c-6b48-4e96-8da7-002cec68d376",
+        "measure_version_id": "37660462-0af0-4d6f-b90c-6b60f1aa312a",
+        "measure_version_modified": "20170320T192149Z",
+        "measure_xml_checksum": "45097B60",
+        "started_at": "20170329T213459Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
+        "step_errors": [],
+        "step_files": [],
+        "step_info": [
+          "Changing the base_eff to 1 ",
+          "Changing the nominal capacity to #<OpenStudio::OSOptionalQuantity:0x000000052d14a0> "
+        ],
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "base_eff",
+            "value": 1
+          },
+          {
+            "name": "nom_cap",
+            "value": 2570.61092433287
+          }
+        ],
+        "step_warnings": []
+      }
+    },
+    {
+      "arguments": {
+        "air_loops_detail_section": true,
+        "annual_overview_section": true,
+        "building_summary_section": true,
+        "cost_summary_section": true,
+        "envelope_section_section": true,
+        "exterior_light_section": true,
+        "hvac_load_profile": true,
+        "interior_lighting_section": true,
+        "monthly_overview_section": true,
+        "outdoor_air_section": true,
+        "plant_loops_detail_section": true,
+        "plug_loads_section": true,
+        "schedules_overview_section": true,
+        "source_energy_section": true,
+        "space_type_breakdown_section": true,
+        "space_type_details_section": true,
+        "utility_bills_rates_section": true,
+        "water_use_section": true,
+        "zone_condition_section": true,
+        "zone_equipment_detail_section": true,
+        "zone_summary_section": true
+      },
+      "description": "This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data.",
+      "measure_dir_name": "f8e23017-894d-4bdf-977f-37e3961e6f42",
+      "name": "openstudio_results",
+      "result": {
+        "completed_at": "20170329T213521Z",
+        "measure_class_name": "OpenStudioResults",
+        "measure_display_name": "OpenStudio Results",
+        "measure_name": "openstudio_results",
+        "measure_taxonomy": "Reporting.QAQC",
+        "measure_type": "ReportingMeasure",
+        "measure_uid": "a25386cd-60e4-46bc-8b11-c755f379d916",
+        "measure_version_id": "96d48c9c-dd58-4ace-b2b0-0a2b36fd603d",
+        "measure_version_modified": "20170315T161128Z",
+        "measure_xml_checksum": "557BF06F",
+        "started_at": "20170329T213517Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
+        "step_errors": [],
+        "step_files": [
+          "/mnt/openstudio/analysis_5b8a7cd7-e26a-4678-a2f3-24495c8a24bc/data_point_f5d4abba-74e7-4eeb-8276-0ca52baf28fd/run/011_f8e23017-894d-4bdf-977f-37e3961e6f42/report.html"
+        ],
+        "step_final_condition": "Generated report with 21 sections to ./report.html.",
+        "step_info": [],
+        "step_initial_condition": "Gathering data from EnergyPlus SQL file and OSM model.",
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "building_summary_section",
+            "value": true
+          },
+          {
+            "name": "annual_overview_section",
+            "value": true
+          },
+          {
+            "name": "monthly_overview_section",
+            "value": true
+          },
+          {
+            "name": "utility_bills_rates_section",
+            "value": true
+          },
+          {
+            "name": "envelope_section_section",
+            "value": true
+          },
+          {
+            "name": "space_type_breakdown_section",
+            "value": true
+          },
+          {
+            "name": "space_type_details_section",
+            "value": true
+          },
+          {
+            "name": "interior_lighting_section",
+            "value": true
+          },
+          {
+            "name": "plug_loads_section",
+            "value": true
+          },
+          {
+            "name": "exterior_light_section",
+            "value": true
+          },
+          {
+            "name": "water_use_section",
+            "value": true
+          },
+          {
+            "name": "hvac_load_profile",
+            "value": true
+          },
+          {
+            "name": "zone_condition_section",
+            "value": true
+          },
+          {
+            "name": "zone_summary_section",
+            "value": true
+          },
+          {
+            "name": "zone_equipment_detail_section",
+            "value": true
+          },
+          {
+            "name": "air_loops_detail_section",
+            "value": true
+          },
+          {
+            "name": "plant_loops_detail_section",
+            "value": true
+          },
+          {
+            "name": "outdoor_air_section",
+            "value": true
+          },
+          {
+            "name": "cost_summary_section",
+            "value": true
+          },
+          {
+            "name": "source_energy_section",
+            "value": true
+          },
+          {
+            "name": "schedules_overview_section",
+            "value": true
+          },
+          {
+            "display_name": "East entrance bldg v2",
+            "name": "building_name",
+            "value": "building_name"
+          },
+          {
+            "name": "net_site_energy",
+            "units": "kBtu",
+            "value": 119936.77840444718
+          },
+          {
+            "name": "total_building_area",
+            "units": "ft^2",
+            "value": 884.9010753577062
+          },
+          {
+            "name": "eui",
+            "units": "kBtu/ft^2",
+            "value": 135.53693372557467
+          },
+          {
+            "name": "unmet_hours_during_heating",
+            "units": "hr",
+            "value": 152
+          },
+          {
+            "name": "unmet_hours_during_cooling",
+            "units": "hr",
+            "value": 0
+          },
+          {
+            "name": "unmet_hours_during_occupied_heating",
+            "units": "hr",
+            "value": 152
+          },
+          {
+            "name": "unmet_hours_during_occupied_cooling",
+            "units": "hr",
+            "value": 0
+          },
+          {
+            "name": "unmet_hours_tolerance_heating",
+            "units": "F",
+            "value": 0.36
+          },
+          {
+            "name": "unmet_hours_tolerance_cooling",
+            "units": "F",
+            "value": 0.36
+          },
+          {
+            "name": "end_use_heating",
+            "units": "kBtu",
+            "value": 64688.5184613839
+          },
+          {
+            "name": "end_use_cooling",
+            "units": "kBtu",
+            "value": 4824.389142394785
+          },
+          {
+            "name": "end_use_interior_lighting",
+            "units": "kBtu",
+            "value": 22937.17431158228
+          },
+          {
+            "name": "end_use_exterior_lighting",
+            "units": "kBtu",
+            "value": 0
+          },
+          {
+            "name": "end_use_interior_equipment",
+            "units": "kBtu",
+            "value": 14710.121707262684
+          },
+          {
+            "name": "end_use_exterior_equipment",
+            "units": "kBtu",
+            "value": 0
+          },
+          {
+            "name": "end_use_fans",
+            "units": "kBtu",
+            "value": 9648.77828478957
+          },
+          {
+            "name": "end_use_pumps",
+            "units": "kBtu",
+            "value": 47.39085601566587
+          },
+          {
+            "name": "end_use_heat_rejection",
+            "units": "kBtu",
+            "value": 0
+          },
+          {
+            "name": "end_use_humidification",
+            "units": "kBtu",
+            "value": 0
+          },
+          {
+            "name": "end_use_heat_recovery",
+            "units": "kBtu",
+            "value": 0
+          },
+          {
+            "name": "end_use_water_systems",
+            "units": "kBtu",
+            "value": 3080.405641018281
+          },
+          {
+            "name": "end_use_refrigeration",
+            "units": "kBtu",
+            "value": 0
+          },
+          {
+            "name": "end_use_generators",
+            "units": "kBtu",
+            "value": 0
+          },
+          {
+            "name": "fuel_electricity",
+            "units": "kBtu",
+            "value": 57570.411887830895
+          },
+          {
+            "name": "fuel_natural_gas",
+            "units": "kBtu",
+            "value": 62366.366516616275
+          },
+          {
+            "name": "fuel_additional_fuel",
+            "units": "kBtu",
+            "value": 0
+          },
+          {
+            "name": "fuel_district_cooling",
+            "units": "kBtu",
+            "value": 0
+          },
+          {
+            "name": "fuel_district_heating",
+            "units": "kBtu",
+            "value": 0
+          },
+          {
+            "name": "end_use_electricity_heating",
+            "units": "kWh",
+            "value": 680.5555555555555
+          },
+          {
+            "name": "end_use_electricity_cooling",
+            "units": "kWh",
+            "value": 1413.888888888889
+          },
+          {
+            "name": "end_use_electricity_interior_lighting",
+            "units": "kWh",
+            "value": 6722.222222222222
+          },
+          {
+            "name": "end_use_electricity_exterior_lighting",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "end_use_electricity_interior_equipment",
+            "units": "kWh",
+            "value": 4311.111111111111
+          },
+          {
+            "name": "end_use_electricity_exterior_equipment",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "end_use_electricity_fans",
+            "units": "kWh",
+            "value": 2827.777777777778
+          },
+          {
+            "name": "end_use_electricity_pumps",
+            "units": "kWh",
+            "value": 13.88888888888889
+          },
+          {
+            "name": "end_use_electricity_heat_rejection",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "end_use_electricity_humidification",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "end_use_electricity_heat_recovery",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "end_use_electricity_water_systems",
+            "units": "kWh",
+            "value": 902.7777777777777
+          },
+          {
+            "name": "end_use_electricity_refrigeration",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "end_use_electricity_generators",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_heating",
+            "units": "therms",
+            "value": 623.784
+          },
+          {
+            "name": "end_use_natural_gas_cooling",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_interior_lighting",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_exterior_lighting",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_interior_equipment",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_exterior_equipment",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_fans",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_pumps",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_heat_rejection",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_humidification",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_heat_recovery",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_water_systems",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_refrigeration",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "end_use_natural_gas_generators",
+            "units": "therms",
+            "value": 0
+          },
+          {
+            "name": "electricity_heating_ip",
+            "units": "kWh",
+            "value": 681.4601062805556
+          },
+          {
+            "name": "electricity_cooling_ip",
+            "units": "kWh",
+            "value": 1412.5398140999998
+          },
+          {
+            "name": "electricity_interior_lighting_ip",
+            "units": "kWh",
+            "value": 6722.963888888889
+          },
+          {
+            "name": "electricity_exterior_lighting_ip",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "electricity_interior_equipment_ip",
+            "units": "kWh",
+            "value": 4311.294444444444
+          },
+          {
+            "name": "electricity_exterior_equipment_ip",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "electricity_fans_ip",
+            "units": "kWh",
+            "value": 2828.8480555555557
+          },
+          {
+            "name": "electricity_pumps_ip",
+            "units": "kWh",
+            "value": 12.596346341666663
+          },
+          {
+            "name": "electricity_heat_rejection_ip",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "electricity_humidification_ip",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "electricity_heat_recovery_ip",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "electricity_water_systems_ip",
+            "units": "kWh",
+            "value": 901.9388888888889
+          },
+          {
+            "name": "electricity_refrigeration_ip",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "electricity_generators_ip",
+            "units": "kWh",
+            "value": 0
+          },
+          {
+            "name": "electricity_ip",
+            "units": "kWh",
+            "value": 16871.641544500002
+          },
+          {
+            "name": "natural_gas_heating_ip",
+            "units": "MBtu",
+            "value": 62.36500423263251
+          },
+          {
+            "name": "natural_gas_cooling_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_interior_lighting_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_exterior_lighting_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_interior_equipment_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_exterior_equipment_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_fans_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_pumps_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_heat_rejection_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_humidification_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_heat_recovery_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_water_systems_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_refrigeration_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_generators_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "natural_gas_ip",
+            "units": "MBtu",
+            "value": 62.36500423263251
+          },
+          {
+            "name": "additional_fuel_heating_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_cooling_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_interior_lighting_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_exterior_lighting_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_interior_equipment_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_exterior_equipment_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_fans_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_pumps_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_heat_rejection_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_humidification_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_heat_recovery_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_water_systems_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_refrigeration_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_generators_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "additional_fuel_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_heating_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_cooling_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_interior_lighting_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_exterior_lighting_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_interior_equipment_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_exterior_equipment_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_fans_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_pumps_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_heat_rejection_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_humidification_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_heat_recovery_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_water_systems_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_refrigeration_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_generators_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_cooling_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_heating_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_cooling_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_interior_lighting_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_exterior_lighting_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_interior_equipment_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_exterior_equipment_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_fans_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_pumps_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_heat_rejection_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_humidification_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_heat_recovery_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_water_systems_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_refrigeration_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_generators_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "district_heating_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_heating_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_cooling_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_interior_lighting_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_exterior_lighting_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_interior_equipment_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_exterior_equipment_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_fans_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_pumps_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_heat_rejection_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_humidification_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_heat_recovery_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_water_systems_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_refrigeration_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_generators_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "water_ip",
+            "units": "MBtu",
+            "value": 0
+          },
+          {
+            "name": "calibrated_exterior_exterior_roof",
+            "units": "ft^2",
+            "value": 884.8935977289597
+          },
+          {
+            "name": "calibrated_exterior_exterior_wall",
+            "units": "ft^2",
+            "value": 1361.666484197408
+          },
+          {
+            "name": "_3_0_x_3_0_double_pane_alum_construction",
+            "units": "ft^2",
+            "value": 198.00000000000037
+          },
+          {
+            "name": "gross_window_wall_ratio",
+            "units": "%",
+            "value": 12.7
+          },
+          {
+            "name": "gross_window_wall_ratio_conditioned",
+            "units": "%",
+            "value": 15
+          },
+          {
+            "name": "skylight_roof_ratio",
+            "units": "%",
+            "value": 0
+          },
+          {
+            "name": "space_type_entry_way",
+            "units": "ft^2",
+            "value": 134.02431004174898
+          },
+          {
+            "name": "space_type_open_area",
+            "units": "ft^2",
+            "value": 383.76965692882305
+          },
+          {
+            "name": "space_type_small_office",
+            "units": "ft^2",
+            "value": 190.16681007129264
+          },
+          {
+            "name": "space_type_utility",
+            "units": "ft^2",
+            "value": 176.93282068709485
+          },
+          {
+            "name": "exterior_lighting_total_power",
+            "units": "W",
+            "value": 0
+          },
+          {
+            "name": "exterior_lighting_total_consumption",
+            "units": "kWh",
+            "value": 35150
+          },
+          {
+            "name": "utility_1_water_fixture_1",
+            "units": "gal/min",
+            "value": 0.2666376581822811
+          },
+          {
+            "name": "utility_1_water_fixture_2",
+            "units": "gal/min",
+            "value": 0.2777769130568054
+          },
+          {
+            "name": "inflation_approach",
+            "value": "Constant Dollar"
+          },
+          {
+            "name": "analysis_length",
+            "units": "yrs",
+            "value": 25
+          },
+          {
+            "name": "annual_peak_electric_demand",
+            "units": "kW",
+            "value": 5.959350000000001
+          },
+          {
+            "name": "first_year_capital_cost",
+            "units": "$",
+            "value": 0
+          },
+          {
+            "name": "annual_utility_cost",
+            "units": "$",
+            "value": 0
+          },
+          {
+            "name": "total_lifecycle_cost",
+            "units": "$",
+            "value": 0
+          }
+        ],
+        "step_warnings": []
+      }
+    },
+    {
+      "arguments": {
+        "electric_cvrmse_limit": 15,
+        "electric_nmbe_limit": 5,
+        "gas_cvrmse_limit": 15,
+        "gas_nmbe_limit": 5
+      },
+      "description": "This measure is intended for calibibration of modeled results against user entered utility bill.",
+      "measure_dir_name": "CalibrationReportsEnhanced20",
+      "name": "calibration_reports_enhanced_20",
+      "result": {
+        "completed_at": "20170329T213521Z",
+        "measure_class_name": "CalibrationReportsEnhanced20",
+        "measure_display_name": "Calibration Reports Enhanced",
+        "measure_name": "calibration_reports_enhanced_20",
+        "measure_taxonomy": "Reporting.QAQC",
+        "measure_type": "ReportingMeasure",
+        "measure_uid": "e6642d40-7366-4647-8724-53a37991d668",
+        "measure_version_id": "ceb75240-70f0-4129-9caa-1195bbb0f07d",
+        "measure_version_modified": "20170320T192149Z",
+        "measure_xml_checksum": "2C8A3EEF",
+        "started_at": "20170329T213521Z",
+        "stderr": "",
+        "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n[OpenStudio] <0> getSharedResourcesPath is deprecated.\n",
+        "step_errors": [],
+        "step_files": [
+          "/mnt/openstudio/analysis_5b8a7cd7-e26a-4678-a2f3-24495c8a24bc/data_point_f5d4abba-74e7-4eeb-8276-0ca52baf28fd/run/012_CalibrationReportsEnhanced20/report.html",
+          "/mnt/openstudio/analysis_5b8a7cd7-e26a-4678-a2f3-24495c8a24bc/data_point_f5d4abba-74e7-4eeb-8276-0ca52baf28fd/run/012_CalibrationReportsEnhanced20/guideline.json"
+        ],
+        "step_final_condition": "Calibration Report generated successfully.",
+        "step_info": [],
+        "step_result": "Success",
+        "step_values": [
+          {
+            "name": "electric_nmbe_limit",
+            "value": 5
+          },
+          {
+            "name": "electric_cvrmse_limit",
+            "value": 15
+          },
+          {
+            "name": "gas_nmbe_limit",
+            "value": 5
+          },
+          {
+            "name": "gas_cvrmse_limit",
+            "value": 15
+          },
+          {
+            "name": "ashrae_max_nmbe",
+            "units": "%",
+            "value": 5
+          },
+          {
+            "name": "ashrae_max_cvrmse",
+            "units": "%",
+            "value": 15
+          },
+          {
+            "name": "femp_max_nmbe",
+            "units": "%",
+            "value": 15
+          },
+          {
+            "name": "femp_max_cvrmse",
+            "units": "%",
+            "value": 10
+          },
+          {
+            "name": "electricity_consumption_cvrmse",
+            "units": "%",
+            "value": 11.718610851204009
+          },
+          {
+            "name": "electricity_consumption_nmbe",
+            "units": "%",
+            "value": 9.198944431415779
+          },
+          {
+            "name": "electricity_period_1_start_date",
+            "value": "2013-Jan-01"
+          },
+          {
+            "name": "electricity_period_1_end_date",
+            "value": "2013-Jan-30"
+          },
+          {
+            "name": "electricity_period_1_consumption_actual",
+            "units": "kWh",
+            "value": 1562
+          },
+          {
+            "name": "electricity_period_1_consumption_modeled",
+            "units": "kWh",
+            "value": 1413.366307738842
+          },
+          {
+            "name": "electricity_period_1_peak_demand_modeled",
+            "units": "kW",
+            "value": 5.959155311361832
+          },
+          {
+            "name": "electricity_period_1_consumption_nmbe",
+            "units": "%",
+            "value": -9.5156012971292
+          },
+          {
+            "name": "electricity_period_2_start_date",
+            "value": "2013-Feb-01"
+          },
+          {
+            "name": "electricity_period_2_end_date",
+            "value": "2013-Feb-28"
+          },
+          {
+            "name": "electricity_period_2_consumption_actual",
+            "units": "kWh",
+            "value": 1395
+          },
+          {
+            "name": "electricity_period_2_consumption_modeled",
+            "units": "kWh",
+            "value": 1179.5931184327571
+          },
+          {
+            "name": "electricity_period_2_peak_demand_modeled",
+            "units": "kW",
+            "value": 3.435477486939646
+          },
+          {
+            "name": "electricity_period_2_consumption_nmbe",
+            "units": "%",
+            "value": -15.44135351736508
+          },
+          {
+            "name": "electricity_period_3_start_date",
+            "value": "2013-Mar-01"
+          },
+          {
+            "name": "electricity_period_3_end_date",
+            "value": "2013-Mar-31"
+          },
+          {
+            "name": "electricity_period_3_consumption_actual",
+            "units": "kWh",
+            "value": 1279
+          },
+          {
+            "name": "electricity_period_3_consumption_modeled",
+            "units": "kWh",
+            "value": 1298.1239527337077
+          },
+          {
+            "name": "electricity_period_3_peak_demand_modeled",
+            "units": "kW",
+            "value": 4.050560083760227
+          },
+          {
+            "name": "electricity_period_3_consumption_nmbe",
+            "units": "%",
+            "value": 1.4952269533782416
+          },
+          {
+            "name": "electricity_period_4_start_date",
+            "value": "2013-Apr-01"
+          },
+          {
+            "name": "electricity_period_4_end_date",
+            "value": "2013-Apr-30"
+          },
+          {
+            "name": "electricity_period_4_consumption_actual",
+            "units": "kWh",
+            "value": 1347
+          },
+          {
+            "name": "electricity_period_4_consumption_modeled",
+            "units": "kWh",
+            "value": 1279.1436428747782
+          },
+          {
+            "name": "electricity_period_4_peak_demand_modeled",
+            "units": "kW",
+            "value": 4.60348191178299
+          },
+          {
+            "name": "electricity_period_4_consumption_nmbe",
+            "units": "%",
+            "value": -5.037591471805631
+          },
+          {
+            "name": "electricity_period_5_start_date",
+            "value": "2013-May-01"
+          },
+          {
+            "name": "electricity_period_5_end_date",
+            "value": "2013-May-31"
+          },
+          {
+            "name": "electricity_period_5_consumption_actual",
+            "units": "kWh",
+            "value": 1363
+          },
+          {
+            "name": "electricity_period_5_consumption_modeled",
+            "units": "kWh",
+            "value": 1353.1525110689822
+          },
+          {
+            "name": "electricity_period_5_peak_demand_modeled",
+            "units": "kW",
+            "value": 4.471372679711452
+          },
+          {
+            "name": "electricity_period_5_consumption_nmbe",
+            "units": "%",
+            "value": -0.7224863485706368
+          },
+          {
+            "name": "electricity_period_6_start_date",
+            "value": "2013-Jun-01"
+          },
+          {
+            "name": "electricity_period_6_end_date",
+            "value": "2013-Jun-30"
+          },
+          {
+            "name": "electricity_period_6_consumption_actual",
+            "units": "kWh",
+            "value": 1691
+          },
+          {
+            "name": "electricity_period_6_consumption_modeled",
+            "units": "kWh",
+            "value": 1521.8798343022331
+          },
+          {
+            "name": "electricity_period_6_peak_demand_modeled",
+            "units": "kW",
+            "value": 5.322807723142935
+          },
+          {
+            "name": "electricity_period_6_consumption_nmbe",
+            "units": "%",
+            "value": -10.001192530914658
+          },
+          {
+            "name": "electricity_period_7_start_date",
+            "value": "2013-Jul-01"
+          },
+          {
+            "name": "electricity_period_7_end_date",
+            "value": "2013-Jul-31"
+          },
+          {
+            "name": "electricity_period_7_consumption_actual",
+            "units": "kWh",
+            "value": 1852
+          },
+          {
+            "name": "electricity_period_7_consumption_modeled",
+            "units": "kWh",
+            "value": 1646.6583187589072
+          },
+          {
+            "name": "electricity_period_7_peak_demand_modeled",
+            "units": "kW",
+            "value": 5.423655541404441
+          },
+          {
+            "name": "electricity_period_7_consumption_nmbe",
+            "units": "%",
+            "value": -11.087563781916458
+          },
+          {
+            "name": "electricity_period_8_start_date",
+            "value": "2013-Aug-01"
+          },
+          {
+            "name": "electricity_period_8_end_date",
+            "value": "2013-Aug-31"
+          },
+          {
+            "name": "electricity_period_8_consumption_actual",
+            "units": "kWh",
+            "value": 1983
+          },
+          {
+            "name": "electricity_period_8_consumption_modeled",
+            "units": "kWh",
+            "value": 1632.1805121491448
+          },
+          {
+            "name": "electricity_period_8_peak_demand_modeled",
+            "units": "kW",
+            "value": 5.212113236861248
+          },
+          {
+            "name": "electricity_period_8_consumption_nmbe",
+            "units": "%",
+            "value": -17.691350874980092
+          },
+          {
+            "name": "electricity_period_9_start_date",
+            "value": "2013-Sep-01"
+          },
+          {
+            "name": "electricity_period_9_end_date",
+            "value": "2013-Sep-30"
+          },
+          {
+            "name": "electricity_period_9_consumption_actual",
+            "units": "kWh",
+            "value": 1650
+          },
+          {
+            "name": "electricity_period_9_consumption_modeled",
+            "units": "kWh",
+            "value": 1404.9836684286784
+          },
+          {
+            "name": "electricity_period_9_peak_demand_modeled",
+            "units": "kW",
+            "value": 5.191789032925301
+          },
+          {
+            "name": "electricity_period_9_consumption_nmbe",
+            "units": "%",
+            "value": -14.84947464068616
+          },
+          {
+            "name": "electricity_period_10_start_date",
+            "value": "2013-Oct-01"
+          },
+          {
+            "name": "electricity_period_10_end_date",
+            "value": "2013-Oct-31"
+          },
+          {
+            "name": "electricity_period_10_consumption_actual",
+            "units": "kWh",
+            "value": 1385
+          },
+          {
+            "name": "electricity_period_10_consumption_modeled",
+            "units": "kWh",
+            "value": 1283.7552052823557
+          },
+          {
+            "name": "electricity_period_10_peak_demand_modeled",
+            "units": "kW",
+            "value": 4.067231808725233
+          },
+          {
+            "name": "electricity_period_10_consumption_nmbe",
+            "units": "%",
+            "value": -7.310093481418358
+          },
+          {
+            "name": "electricity_period_11_start_date",
+            "value": "2013-Nov-01"
+          },
+          {
+            "name": "electricity_period_11_end_date",
+            "value": "2013-Nov-30"
+          },
+          {
+            "name": "electricity_period_11_consumption_actual",
+            "units": "kWh",
+            "value": 1347
+          },
+          {
+            "name": "electricity_period_11_consumption_modeled",
+            "units": "kWh",
+            "value": 1232.3975502410567
+          },
+          {
+            "name": "electricity_period_11_peak_demand_modeled",
+            "units": "kW",
+            "value": 3.501830766676398
+          },
+          {
+            "name": "electricity_period_11_consumption_nmbe",
+            "units": "%",
+            "value": -8.50797696799876
+          },
+          {
+            "name": "electricity_period_12_start_date",
+            "value": "2013-Dec-01"
+          },
+          {
+            "name": "electricity_period_12_end_date",
+            "value": "2013-Dec-31"
+          },
+          {
+            "name": "electricity_period_12_consumption_actual",
+            "units": "kWh",
+            "value": 1524
+          },
+          {
+            "name": "electricity_period_12_consumption_modeled",
+            "units": "kWh",
+            "value": 1583.0652043500982
+          },
+          {
+            "name": "electricity_period_12_peak_demand_modeled",
+            "units": "kW",
+            "value": 5.959347734558735
+          },
+          {
+            "name": "electricity_period_12_consumption_nmbe",
+            "units": "%",
+            "value": 3.8756695767780944
+          },
+          {
+            "name": "electricity_consumption_actual",
+            "units": "kWh",
+            "value": 18378
+          },
+          {
+            "name": "electricity_consumption_modeled",
+            "units": "kWh",
+            "value": 16828.299826361545
+          },
+          {
+            "name": "electricity_sum_of_squares",
+            "units": "kWh",
+            "value": 354306.363516673
+          },
+          {
+            "name": "electricity_dof",
+            "value": 12
+          },
+          {
+            "name": "electricity_rmse",
+            "units": "kWh^0.5",
+            "value": 171.82994585652432
+          },
+          {
+            "name": "total_sum_of_squares",
+            "units": "kBtu",
+            "value": 4591810448295368000
+          },
+          {
+            "name": "total_dof",
+            "value": 12
+          },
+          {
+            "name": "total_rmse",
+            "units": "kBtu^0.5",
+            "value": 618587803.5422947
+          },
+          {
+            "name": "electricity_cvrmse_within_limit",
+            "value": 1
+          },
+          {
+            "name": "electricity_nmbe_within_limit",
+            "value": 0
+          }
+        ],
+        "step_warnings": []
+      }
+    }
+  ],
+  "updated_at": "20170329T213524Z",
+  "weather_file": "SRRL_2013AMY_60min.epw"
+}
