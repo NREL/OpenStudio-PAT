@@ -519,7 +519,7 @@ export class AnalysisController {
       else if (argument.specialRowId === 'optionDescription') {
         argument[opt.field] = opt.display_name + ' Description: ' + measure.description;
       }
-      else if (!argument.variable) {
+      else if (_.isUndefined(argument.variable)) {
         argument.variable = false;
       }
       else if (!argument.variable) {
