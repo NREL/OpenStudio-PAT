@@ -1,0 +1,66 @@
+<measure>
+  <schema_version>3.0</schema_version>
+  <name>change_electric_baseboard</name>
+  <uid>4253e38c-6b48-4e96-8da7-002cec68d376</uid>
+  <version_id>37660462-0af0-4d6f-b90c-6b60f1aa312a</version_id>
+  <version_modified>20170320T192149Z</version_modified>
+  <xml_checksum>45097B60</xml_checksum>
+  <class_name>ChangeElectricBaseboard</class_name>
+  <display_name>Change Electric Baseboard</display_name>
+  <description>Change Electric Baseboard</description>
+  <modeler_description>Change Electric Baseboard</modeler_description>
+  <arguments>
+    <argument>
+      <name>base_eff</name>
+      <display_name>efficiency</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1</default_value>
+    </argument>
+    <argument>
+      <name>nom_cap</name>
+      <display_name>Nominal Capacity (W)</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1500</default_value>
+    </argument>
+  </arguments>
+  <outputs/>
+  <provenances/>
+  <tags>
+    <tag>Envelope.Form</tag>
+  </tags>
+  <attributes>
+    <attribute>
+      <name>Measure Type</name>
+      <value>ModelMeasure</value>
+      <datatype>string</datatype>
+    </attribute>
+    <attribute>
+      <name>Uses SketchUp API</name>
+      <value>false</value>
+      <datatype>boolean</datatype>
+    </attribute>
+  </attributes>
+  <files>
+    <file>
+      <filename>change_electric_baseboard_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>A7A48F1C</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.5.3</identifier>
+        <min_compatible>1.5.3</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>AD731017</checksum>
+    </file>
+  </files>
+</measure>
