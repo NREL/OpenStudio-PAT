@@ -690,7 +690,7 @@ export class AnalysisController {
     // TODO: add logic related to whether an arg is variable or not (if not, use option1's value in subsequent options)
     _.forEach(measure.arguments, (argument) => {
       // use default value, otherwise leave blank
-      argument[option.field] = argument.default_value ? argument.default_value : '';
+      argument[option.field] = !_.isNil(argument.default_value) ? argument.default_value : '';
     });
   }
 
