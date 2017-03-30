@@ -838,7 +838,7 @@ export class Project {
     if (vm.Message.showDebug()) vm.$log.debug('tempOutputs sorted: ', tempOutputs);
 
     // add objective function names to algorithm section
-    vm.osa.analysis.problem.algorithm.objective_functions = _.map(_.filter(tempOutputs, {objective_function: true}), 'name');
+    vm.osa.analysis.problem.algorithm.objective_functions = _.map(_.filter(tempOutputs, {objective_function: 'true'}), 'name');
     if (!vm.osa.analysis.problem.algorithm.objective_functions) {
       vm.osa.analysis.problem.algorithm.objective_functions = [];
     }
