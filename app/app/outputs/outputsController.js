@@ -122,6 +122,7 @@ export class OutputsController {
     if (vm.Message.showDebug()) vm.$log.debug('Output::initializeGrids');
     vm.$scope.measures = _.sortBy(vm.$scope.measures, ['workflow_index']);
     vm.setGridOptions();
+    if (vm.Message.showDebug()) vm.$log.debug('SET GRID OPTIONS: ', vm.$scope.gridOptions);
 
   }
 
