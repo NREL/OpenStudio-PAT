@@ -1376,5 +1376,31 @@ export class AnalysisController {
     });
     return deferred.promise;
   }
+
+  onGridChoiceChange(type, col, row) {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('Analysis::onGridChoiceChange');
+    vm.setIsModified();
+
+    const instanceId = col.colDef.instanceId;
+    const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
+    const variable = row.entity.variable;
+    const name = row.entity.name;
+
+    if (!variable) {
+      _.forEach(measure.arguments, (argument) => {
+        if (argument.name == name) {
+          const keys = _.keys(argument);
+          const optionKeys = _.filter(keys, (k) => {
+            return k.indexOf('option_') !== -1;
+          });
+          for (let j = 1; j < optionKeys.length; j++) {
+            argument[optionKeys[j]] = argument[optionKeys[0]];
+          }
+        }
+      });
+    }
+  }
+
 }
 
