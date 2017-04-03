@@ -1,4 +1,4 @@
-#PAT Example Projects
+# PAT Example Projects
 
 This directory contains a number of sample and test projects for PAT 2.x along with supporting files.
 
@@ -8,4 +8,6 @@ This directory contains a number of sample and test projects for PAT 2.x along w
 4. __Office_HVAC__ - A simple manual-mode project that can be run locally or in the cloud.  It applies multiple "AEDG" HVAC measures to an office building.
 5. __Office_Study__ - This project can be run in manual mode or as a DOE/LHS example in the cloud.  It starts with an empty seed model, applies the DOE prototype measure to create small, medium, and large offices, then applies WWR and LPD measures.  It is a good demonstration of using PAT to build potential studies, and is a useful test of the Standards Gem with OpenStudio server.
 6. __original_SEB_spreadsheets__ - The original SEB spreadsheet input files from the [OpenStudio Analysis Spreadsheet repo.](https://github.com/NREL/OpenStudio-analysis-spreadsheet)
-7. __SEB*__ - SEB project directories are PAT projects that correspond to the SEB spreadsheets, and are used to demonstrate and test OpenStudio Server's various algorithms for sampling and optimization.  Many of these projects are used to perform a model calibration of NREL's Site Entrance Building utilizing 2013 consumption and AMY data.
+7. __SEB_measures__ - Measures used by the SEB calibration projects.
+8. __SEB_CSVs__ - CSV results files from the SEB projects.
+9. __SEB*__ - SEB project directories are PAT projects that correspond to the SEB spreadsheets, and are used to demonstrate and test OpenStudio Server's various algorithms for sampling and optimization.  Many of these projects are used to perform a model calibration of NREL's Site Entrance Building utilizing 2013 consumption and AMY data.
