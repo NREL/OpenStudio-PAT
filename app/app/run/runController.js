@@ -450,7 +450,7 @@ export class RunController {
       } else {
         // toastr
         vm.$translate('toastr.startingCloud').then(translation => {
-          vm.toastr.info(translation, {closeButton: true, timeOut: 100000});
+          vm.toastr.info(translation, {closeButton: true, timeOut: 600000});
         });
       }
       vm.OsServer.startServer().then(() => {

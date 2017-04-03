@@ -919,7 +919,7 @@ export class OsServer {
         if (vm.serverStartInProgress) {
           // wait until server starts before stopping it
           vm.$translate('toastr.localStartInProgressBeforeStop').then(translation => {
-            vm.toastr.info(translation, {timeOut: 120000});
+            vm.toastr.info(translation, {timeOut: 600000});
           });
           if (vm.Message.showDebug()) vm.$log.debug('***Server is in the process of starting...waiting on serverStartDeferred to resolve before stopping server');
           vm.isServerReady().then((response) => {
@@ -939,6 +939,7 @@ export class OsServer {
                   vm.setServerStatus(serverType, 'stopped');
                   vm.localServerCleanup();
                   deferred.resolve(child);
+                  vm.toastr.clear();
 
                 } else {
                   if (error !== null) {
@@ -948,6 +949,7 @@ export class OsServer {
                   // return resolved so promise can be used to start new server
                   vm.localServerCleanup();
                   deferred.resolve(error);
+                  vm.toastr.clear();
                 }
               });
           }, (error) => {
