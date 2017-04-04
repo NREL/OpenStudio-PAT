@@ -834,6 +834,17 @@ export class Project {
     });
     if (groupFlag) {
       tempOutputs = _.sortBy(tempOutputs, ['obj_function_group']);
+      // check objective function groups number for algorithms
+      let groups = _.map(tempOutputs, 'obj_function_group');
+      groups = _.filter(groups, function(o) { return !_.isNil(o); });
+      if (vm.Message.showDebug()) vm.$log.debug('GROUPS: ', groups);
+      if (groups.length < 2) {
+        vm.$log.error('This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully.');
+        vm.$translate('toastr.objFunctionGroupError').then(translation => {
+          vm.toastr.warning(translation);
+        });
+      }
+
     }
     if (vm.Message.showDebug()) vm.$log.debug('tempOutputs sorted: ', tempOutputs);
 
@@ -1118,6 +1129,7 @@ export class Project {
       outHash.variable_type = vm.convertType(out.type);
       finalOutputs.push(outHash);
     });
+
     return finalOutputs;
   }
 
@@ -2060,7 +2072,7 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
-    },{
+    }, {
       name: 'max_queued_jobs',
       displayName: 'Max Queued Jobs',
       description: 'Integer specifying the maximum number of queued jobs',
@@ -2140,7 +2152,7 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
-    },{
+    }, {
       name: 'max_queued_jobs',
       displayName: 'Max Queued Jobs',
       description: 'Integer specifying the maximum number of queued jobs',
@@ -2202,7 +2214,7 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
-    },{
+    }, {
       name: 'max_queued_jobs',
       displayName: 'Max Queued Jobs',
       description: 'Integer specifying the maximum number of queued jobs',
@@ -2362,7 +2374,7 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
-    },{
+    }, {
       name: 'max_queued_jobs',
       displayName: 'Max Queued Jobs',
       description: 'Integer specifying the maximum number of queued jobs',
@@ -2486,7 +2498,7 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
-    },{
+    }, {
       name: 'max_queued_jobs',
       displayName: 'Max Queued Jobs',
       description: 'Integer specifying the maximum number of queued jobs',
@@ -2574,7 +2586,7 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
-    },{
+    }, {
       name: 'max_queued_jobs',
       displayName: 'Max Queued Jobs',
       description: 'Integer specifying the maximum number of queued jobs',
@@ -2654,7 +2666,7 @@ export class Project {
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
       type:'number'
-    },{
+    }, {
       name: 'max_queued_jobs',
       displayName: 'Max Queued Jobs',
       description: 'Integer specifying the maximum number of queued jobs',
