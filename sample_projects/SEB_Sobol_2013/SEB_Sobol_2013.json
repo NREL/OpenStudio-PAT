@@ -4,6 +4,66 @@
     "name": "SEB_Sobol_2013",
     "output_variables": [
       {
+        "units": "%",
+        "objective_function": true,
+        "objective_function_index": 0,
+        "objective_function_target": 0,
+        "objective_function_group": 1,
+        "scaling_factor": null,
+        "display_name": "electricity_consumption_cvrmse",
+        "display_name_short": "electricity_consumption_cvrmse",
+        "metadata_id": null,
+        "name": "CalibrationReportsEnhanced20.electricity_consumption_cvrmse",
+        "visualize": true,
+        "export": true,
+        "variable_type": "double"
+      },
+      {
+        "units": "%",
+        "objective_function": true,
+        "objective_function_index": 1,
+        "objective_function_target": 0,
+        "objective_function_group": 2,
+        "scaling_factor": null,
+        "display_name": "electricity_consumption_nmbe",
+        "display_name_short": "electricity_consumption_nmbe",
+        "metadata_id": null,
+        "name": "CalibrationReportsEnhanced20.electricity_consumption_nmbe",
+        "visualize": true,
+        "export": true,
+        "variable_type": "double"
+      },
+      {
+        "units": "%",
+        "objective_function": true,
+        "objective_function_index": 2,
+        "objective_function_target": 0,
+        "objective_function_group": 3,
+        "scaling_factor": null,
+        "display_name": "natural_gas_consumption_cvrmse",
+        "display_name_short": "natural_gas_consumption_cvrmse",
+        "metadata_id": null,
+        "name": "CalibrationReportsEnhanced20.natural_gas_consumption_cvrmse",
+        "visualize": true,
+        "export": true,
+        "variable_type": "double"
+      },
+      {
+        "units": "%",
+        "objective_function": true,
+        "objective_function_index": 3,
+        "objective_function_target": 0,
+        "objective_function_group": 4,
+        "scaling_factor": null,
+        "display_name": "natural_gas_consumption_nmbe",
+        "display_name_short": "natural_gas_consumption_nmbe",
+        "metadata_id": null,
+        "name": "CalibrationReportsEnhanced20.natural_gas_consumption_nmbe",
+        "visualize": true,
+        "export": true,
+        "variable_type": "double"
+      },
+      {
         "objective_function": false,
         "objective_function_index": null,
         "objective_function_target": null,
@@ -77,36 +137,6 @@
       },
       {
         "units": "%",
-        "objective_function": true,
-        "objective_function_index": 0,
-        "objective_function_target": 0,
-        "objective_function_group": null,
-        "scaling_factor": null,
-        "display_name": "electricity_consumption_cvrmse",
-        "display_name_short": "electricity_consumption_cvrmse",
-        "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.electricity_consumption_cvrmse",
-        "visualize": true,
-        "export": true,
-        "variable_type": "double"
-      },
-      {
-        "units": "%",
-        "objective_function": true,
-        "objective_function_index": 1,
-        "objective_function_target": 0,
-        "objective_function_group": null,
-        "scaling_factor": null,
-        "display_name": "electricity_consumption_nmbe",
-        "display_name_short": "electricity_consumption_nmbe",
-        "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.electricity_consumption_nmbe",
-        "visualize": true,
-        "export": true,
-        "variable_type": "double"
-      },
-      {
-        "units": "%",
         "objective_function": false,
         "objective_function_index": null,
         "objective_function_target": null,
@@ -147,36 +177,6 @@
         "metadata_id": null,
         "name": "CalibrationReportsEnhanced20.natural_gas_consumption_modeled",
         "visualize": false,
-        "export": true,
-        "variable_type": "double"
-      },
-      {
-        "units": "%",
-        "objective_function": true,
-        "objective_function_index": 2,
-        "objective_function_target": 0,
-        "objective_function_group": null,
-        "scaling_factor": null,
-        "display_name": "natural_gas_consumption_cvrmse",
-        "display_name_short": "natural_gas_consumption_cvrmse",
-        "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.natural_gas_consumption_cvrmse",
-        "visualize": true,
-        "export": true,
-        "variable_type": "double"
-      },
-      {
-        "units": "%",
-        "objective_function": true,
-        "objective_function_index": 3,
-        "objective_function_target": 0,
-        "objective_function_group": null,
-        "scaling_factor": null,
-        "display_name": "natural_gas_consumption_nmbe",
-        "display_name_short": "natural_gas_consumption_nmbe",
-        "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.natural_gas_consumption_nmbe",
-        "visualize": true,
         "export": true,
         "variable_type": "double"
       },
@@ -348,6 +348,99 @@
           "workflow_index": 0
         },
         {
+          "name": "add_monthly_json_utility_data_2",
+          "display_name": "AddMonthlyJSONUtilityData 2",
+          "measure_type": "RubyMeasure",
+          "measure_definition_class_name": "AddMonthlyJSONUtilityData",
+          "measure_definition_directory": "./measures/AddMonthlyJSONUtilityData",
+          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_Sobol_2013/measures/AddMonthlyJSONUtilityData",
+          "measure_definition_display_name": "AddMonthlyJSONUtilityData 2",
+          "measure_definition_name": "add_monthly_json_utility_data_2",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "6da969e0-4256-49bf-9607-26504cc3d423",
+          "measure_definition_version_uuid": "cb687d6c-6ee1-4488-800b-8bdce34214ce",
+          "uuid": "6da969e0-4256-49bf-9607-26504cc3d423",
+          "version_uuid": "cb687d6c-6ee1-4488-800b-8bdce34214ce",
+          "description": "Reads in json format and adds utility data",
+          "taxonomy": "Economics.Life Cycle Cost Analysis",
+          "arguments": [
+            {
+              "display_name": "Path to JSON",
+              "display_name_short": "json",
+              "name": "json",
+              "value_type": "string",
+              "default_value": "../../../lib/calibration_data/gas.json",
+              "value": "../../../lib/calibration_data/gas.json"
+            },
+            {
+              "display_name": "Variable name",
+              "display_name_short": "variable_name",
+              "name": "variable_name",
+              "value_type": "string",
+              "default_value": "Electric Bill",
+              "value": "Gas Bill"
+            },
+            {
+              "display_name": "Fuel Type",
+              "display_name_short": "fuel_type",
+              "name": "fuel_type",
+              "value_type": "string",
+              "default_value": "Electricity",
+              "value": "Gas"
+            },
+            {
+              "display_name": "Consumption Unit",
+              "display_name_short": "consumption_unit",
+              "name": "consumption_unit",
+              "value_type": "string",
+              "default_value": "kWh",
+              "value": "therms"
+            },
+            {
+              "display_name": "data key name",
+              "display_name_short": "data_key_name",
+              "name": "data_key_name",
+              "value_type": "string",
+              "default_value": "tot_kwh",
+              "value": "tot_therms"
+            },
+            {
+              "display_name": "Start date",
+              "display_name_short": "start_date",
+              "name": "start_date",
+              "value_type": "string",
+              "default_value": "2013-01-1",
+              "value": "2013-01-1"
+            },
+            {
+              "display_name": "End date",
+              "display_name_short": "end_date",
+              "name": "end_date",
+              "value_type": "string",
+              "default_value": "2013-12-31",
+              "value": "2013-12-31"
+            },
+            {
+              "display_name": "remove existing Utility Bill data",
+              "display_name_short": "remove_existing_data",
+              "name": "remove_existing_data",
+              "value_type": "boolean",
+              "default_value": false,
+              "value": false
+            },
+            {
+              "display_name": "Set RunPeriod in model",
+              "display_name_short": "set_runperiod",
+              "name": "set_runperiod",
+              "value_type": "boolean",
+              "default_value": false,
+              "value": false
+            }
+          ],
+          "variables": [],
+          "workflow_index": 1
+        },
+        {
           "name": "reduce_space_infiltration_by_percentage",
           "display_name": "ReduceSpaceInfiltrationByPercentage",
           "measure_type": "RubyMeasure",
@@ -476,7 +569,7 @@
               "workflow_index": 0
             }
           ],
-          "workflow_index": 1
+          "workflow_index": 2
         },
         {
           "name": "reduce_lighting_loads_by_percentage",
@@ -569,7 +662,7 @@
             }
           ],
           "variables": [],
-          "workflow_index": 2
+          "workflow_index": 3
         },
         {
           "name": "reduce_electric_equipment_loads_by_percentage",
@@ -700,7 +793,7 @@
               "workflow_index": 0
             }
           ],
-          "workflow_index": 3
+          "workflow_index": 4
         },
         {
           "name": "set_gas_burner_efficiency_diag",
@@ -847,7 +940,7 @@
               "workflow_index": 0
             }
           ],
-          "workflow_index": 4
+          "workflow_index": 5
         },
         {
           "name": "set_co_pfor_single_speed_dx_cooling_units",
@@ -986,7 +1079,7 @@
               "workflow_index": 0
             }
           ],
-          "workflow_index": 5
+          "workflow_index": 6
         },
         {
           "name": "improve_fan_belt_efficiency",
@@ -1170,7 +1263,7 @@
               "workflow_index": 1
             }
           ],
-          "workflow_index": 6
+          "workflow_index": 7
         },
         {
           "name": "adjust_thermostat_setpoints_by_degrees",
@@ -1290,7 +1383,7 @@
               "workflow_index": 1
             }
           ],
-          "workflow_index": 7
+          "workflow_index": 8
         },
         {
           "name": "change_exterior_wall_thermal_properties",
@@ -1446,7 +1539,7 @@
               "workflow_index": 2
             }
           ],
-          "workflow_index": 8
+          "workflow_index": 9
         },
         {
           "name": "change_roof_thermal_properties",
@@ -1602,7 +1695,7 @@
               "workflow_index": 2
             }
           ],
-          "workflow_index": 9
+          "workflow_index": 10
         },
         {
           "name": "change_electric_baseboard",
@@ -1677,7 +1770,7 @@
               "workflow_index": 0
             }
           ],
-          "workflow_index": 10
+          "workflow_index": 11
         },
         {
           "name": "openstudio_results",
@@ -1866,7 +1959,7 @@
             }
           ],
           "variables": [],
-          "workflow_index": 11
+          "workflow_index": 12
         },
         {
           "name": "calibration_reports_enhanced_20",
@@ -1919,7 +2012,7 @@
             }
           ],
           "variables": [],
-          "workflow_index": 12
+          "workflow_index": 13
         }
       ],
       "algorithm": {
@@ -1935,7 +2028,12 @@
         "failed_f_value": 1000000000000000000,
         "debug_messages": 1,
         "max_queued_jobs": 100,
-        "objective_functions": []
+        "objective_functions": [
+          "CalibrationReportsEnhanced20.electricity_consumption_cvrmse",
+          "CalibrationReportsEnhanced20.electricity_consumption_nmbe",
+          "CalibrationReportsEnhanced20.natural_gas_consumption_cvrmse",
+          "CalibrationReportsEnhanced20.natural_gas_consumption_nmbe"
+        ]
       },
       "analysis_type": "sobol"
     },
