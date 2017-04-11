@@ -135,7 +135,7 @@ export class AnalysisController {
       //if (vm.Message.showDebug()) vm.$log.debug('In get Discrete Distributions');
       let distributions = [];
       switch (vm.$scope.selectedSamplingMethod.id) {
-        case 'Diagonal':
+        case 'diag':
           distributions = ['Discrete', 'Integer Sequence'];
           break;
         default:
