@@ -1552,7 +1552,7 @@ export class Project {
     vm.awsYamlFiles = [];
     const files = vm.jetpack.find(vm.awsDir.path(), {matching: '*.yml'});
     _.forEach(files, file => {
-      vm.awsYamlFiles.push(_.replace(_.last(_.split(file, '/')), '.yml', ''));
+      vm.awsYamlFiles.push(_.replace(_.last(_.split(file, path.sep)), '.yml', ''));
     });
     return vm.awsYamlFiles;
   }
@@ -1565,7 +1565,7 @@ export class Project {
     _.forEach(tempClusters, cluster => {
       if (vm.Message.showDebug()) vm.$log.debug('CLUSTER: ', cluster);
       //const clusterFile = vm.jetpack.read(cluster);
-      let clusterName = _.last(_.split(cluster, '/'));
+      let clusterName = _.last(_.split(cluster, path.sep));
       clusterName = _.replace(clusterName, '_cluster.json', '');
       vm.clusters.all.push(clusterName);
       // PING (by name)
