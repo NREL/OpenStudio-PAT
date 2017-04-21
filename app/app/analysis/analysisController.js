@@ -802,8 +802,16 @@ export class AnalysisController {
     // Close the original measure's accordion
     measure.open = false;
 
-    vm.$scope.measures.push(copiedMeasure);
-    vm.Project.measures.push(copiedMeasure);
+    // find index of current measure and insert new measure right after it
+    const index = _.findIndex(vm.$scope.measures, measure);
+    if (vm.Message.showDebug()) vm.$log.debug('current measure index: ', index);
+    vm.$scope.measures.splice(index +1, 0, copiedMeasure);
+    vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+
+    // update workflow indices
+    vm.Project.recalculateMeasureWorkflowIndexes();
+
+    if (vm.Message.showDebug()) vm.$log.debug('Measures in Analysis Tab: ', vm.$scope.measures);
 
     vm.$translate('toastr.measureDuplicated').then(translation => {
       vm.toastr.success(translation);
