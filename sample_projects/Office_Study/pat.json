@@ -3,7 +3,7 @@
   "projectDir": "/Users/lbrackne/Documents/OpenStudio/Office_Study",
   "seed": "empty.osm",
   "weatherFile": "USA_CO_Golden-NREL.724666_TMY3.epw",
-  "analysis_type": "Algorithmic",
+  "analysis_type": "Manual",
   "remoteSettings": {
     "open": true,
     "remoteType": "Existing Remote Server",
@@ -70,25 +70,25 @@
     "openstudio_server_version": ""
   },
   "samplingMethod": {
-    "id": "lhs",
-    "name": "analysis.type.lhs",
-    "link": "https://cran.r-project.org/web/packages/lhs/lhs.pdf"
+    "id": "doe",
+    "name": "analysis.type.doe",
+    "link": "https://cran.r-project.org/web/packages/DoE.base/DoE.base.pdf"
   },
   "algorithmSettings": [
     {
-      "name": "sample_method",
-      "displayName": "Sample Method",
-      "description": "Options: individual_variables or all_variables",
-      "defaultValue": "individual_variables",
+      "name": "experiment_type",
+      "displayName": "Experiment Type",
+      "description": "Options: full_factorial",
+      "defaultValue": "full_factorial",
       "type": "string",
-      "value": "individual_variables",
-      "$$hashKey": "object:12834"
+      "value": "full_factorial",
+      "$$hashKey": "object:26638"
     },
     {
       "name": "number_of_samples",
       "displayName": "Number of Samples",
-      "description": "Positive integer (if individual, total simulations is this times each variable)",
-      "defaultValue": 5,
+      "description": "Positive integer (this discretizes a continous variable)",
+      "defaultValue": 2,
       "value": 3,
       "$$hashKey": "object:37379",
       "type": "number"
@@ -287,28 +287,28 @@
             "discreteVariables": [
               {
                 "value": "SmallOffice",
-                "weight": 0,
+                "weight": 0.2,
                 "$$hashKey": "object:2801"
               },
               {
                 "value": "MediumOffice",
-                "weight": "",
+                "weight": 0.2,
                 "$$hashKey": "object:5571"
               },
               {
-                "value": "RetailStripmall",
-                "weight": "",
-                "$$hashKey": "object:25312"
+                "value": "SecondarySchool",
+                "weight": 0.2,
+                "$$hashKey": "object:81496"
               },
               {
-                "value": "SecondarySchool",
-                "weight": "",
-                "$$hashKey": "object:25322"
+                "value": "RetailStripmall",
+                "weight": 0.2,
+                "$$hashKey": "object:81506"
               },
               {
                 "value": "MidriseApartment",
-                "weight": "",
-                "$$hashKey": "object:44482"
+                "weight": 0.2,
+                "$$hashKey": "object:81516"
               }
             ],
             "maximum": "SmallOffice",
@@ -793,7 +793,7 @@
       "numberOfOptions": 2,
       "$$hashKey": "object:1236",
       "descOpen": false,
-      "instanceId": 0.850155857055618,
+      "instanceId": 0.14526275019036206,
       "skip": false,
       "showWarningText": false,
       "outputMeasure": false
@@ -946,7 +946,7 @@
             "relationship": null,
             "choiceDisplayNames": [],
             "variableSetting": "Continuous",
-            "distribution": "Normal",
+            "distribution": "Triangle",
             "discreteVariables": [],
             "maximum": 60,
             "minimum": 0,
@@ -1209,7 +1209,7 @@
           "description": "Option 2 Description: The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process."
         }
       ],
-      "instanceId": 0.7593729014602264,
+      "instanceId": 0.7976289757774397,
       "numberOfOptions": 1,
       "$$hashKey": "object:10545",
       "skip": false,
@@ -1271,7 +1271,8 @@
             "stdDev": null,
             "default_value": null,
             "showWarningIcon": false
-          }
+          },
+          "option_1": "option_1"
         },
         {
           "specialRowId": "optionName",
@@ -1290,7 +1291,8 @@
             "stdDev": "",
             "default_value": "",
             "showWarningIcon": false
-          }
+          },
+          "option_1": "Reduce EDP by 30%"
         },
         {
           "specialRowId": "optionDescription",
@@ -1309,7 +1311,8 @@
             "stdDev": "",
             "default_value": "",
             "showWarningIcon": false
-          }
+          },
+          "option_1": "Option 1 Description: Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
         },
         {
           "name": "run_measure",
@@ -1334,7 +1337,9 @@
             "default_value": 1,
             "showWarningIcon": false
           },
-          "$$hashKey": "object:38571"
+          "$$hashKey": "object:38571",
+          "option_1": 1,
+          "variable": false
         },
         {
           "name": "space_type",
@@ -1367,7 +1372,9 @@
             "default_value": "*Entire Building*",
             "showWarningIcon": false
           },
-          "$$hashKey": "object:38572"
+          "$$hashKey": "object:38572",
+          "option_1": "*Entire Building*",
+          "variable": false
         },
         {
           "name": "elecequip_power_reduction_percent",
@@ -1382,7 +1389,7 @@
             "relationship": null,
             "choiceDisplayNames": [],
             "variableSetting": "Continuous",
-            "distribution": "Normal",
+            "distribution": "Triangle",
             "discreteVariables": [],
             "maximum": 30,
             "minimum": 0,
@@ -1392,7 +1399,13 @@
             "default_value": 30,
             "showWarningIcon": false
           },
-          "$$hashKey": "object:38573"
+          "$$hashKey": "object:38573",
+          "option_1": 30,
+          "variable": true,
+          "units": "",
+          "minimum": 30,
+          "maximum": 30,
+          "mode": 30
         },
         {
           "name": "material_and_installation_cost",
@@ -1417,7 +1430,9 @@
             "default_value": 0,
             "showWarningIcon": false
           },
-          "$$hashKey": "object:38574"
+          "$$hashKey": "object:38574",
+          "option_1": 0,
+          "variable": false
         },
         {
           "name": "demolition_cost",
@@ -1442,7 +1457,9 @@
             "default_value": 0,
             "showWarningIcon": false
           },
-          "$$hashKey": "object:38575"
+          "$$hashKey": "object:38575",
+          "option_1": 0,
+          "variable": false
         },
         {
           "name": "years_until_costs_start",
@@ -1467,7 +1484,9 @@
             "default_value": 0,
             "showWarningIcon": false
           },
-          "$$hashKey": "object:38576"
+          "$$hashKey": "object:38576",
+          "option_1": 0,
+          "variable": false
         },
         {
           "name": "demo_cost_initial_const",
@@ -1492,7 +1511,9 @@
             "default_value": false,
             "showWarningIcon": false
           },
-          "$$hashKey": "object:38577"
+          "$$hashKey": "object:38577",
+          "option_1": false,
+          "variable": false
         },
         {
           "name": "expected_life",
@@ -1517,7 +1538,9 @@
             "default_value": 15,
             "showWarningIcon": false
           },
-          "$$hashKey": "object:38578"
+          "$$hashKey": "object:38578",
+          "option_1": 15,
+          "variable": false
         },
         {
           "name": "om_cost",
@@ -1542,7 +1565,9 @@
             "default_value": 0,
             "showWarningIcon": false
           },
-          "$$hashKey": "object:38579"
+          "$$hashKey": "object:38579",
+          "option_1": 0,
+          "variable": false
         },
         {
           "name": "om_frequency",
@@ -1567,7 +1592,9 @@
             "default_value": 1,
             "showWarningIcon": false
           },
-          "$$hashKey": "object:38580"
+          "$$hashKey": "object:38580",
+          "option_1": 1,
+          "variable": false
         }
       ],
       "edit": "",
@@ -1582,13 +1609,61 @@
       "type": "ModelMeasure",
       "seed": "empty.osm",
       "workflow_index": 2,
-      "options": [],
-      "instanceId": 0.37570348150878297,
+      "options": [
+        {
+          "id": "option_1",
+          "arguments": [
+            {
+              "name": "run_measure",
+              "value": 1
+            },
+            {
+              "name": "space_type",
+              "value": "*Entire Building*"
+            },
+            {
+              "name": "elecequip_power_reduction_percent",
+              "value": 30
+            },
+            {
+              "name": "material_and_installation_cost",
+              "value": 0
+            },
+            {
+              "name": "demolition_cost",
+              "value": 0
+            },
+            {
+              "name": "years_until_costs_start",
+              "value": 0
+            },
+            {
+              "name": "demo_cost_initial_const",
+              "value": false
+            },
+            {
+              "name": "expected_life",
+              "value": 15
+            },
+            {
+              "name": "om_cost",
+              "value": 0
+            },
+            {
+              "name": "om_frequency",
+              "value": 1
+            }
+          ],
+          "name": "Reduce EDP by 30%",
+          "description": "Option 1 Description: Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
+        }
+      ],
+      "instanceId": 0.33147182178293977,
       "skip": false,
       "$$hashKey": "object:38535",
       "showWarningText": false,
       "outputMeasure": false,
-      "numberOfOptions": 0
+      "numberOfOptions": 1
     },
     {
       "measure_dir": "/Users/lbrackne/Documents/OpenStudio/Office_Study/measures/ffca943f-bb8f-4b9d-8bf8-24d1e8cb1c18",
@@ -1715,26 +1790,29 @@
           "type": "Double",
           "required": true,
           "model_dependent": false,
-          "units": "fraction",
+          "units": "",
           "default_value": 0.75,
           "$$hashKey": "uiGrid-01R4",
-          "option_1": 0.75,
-          "variable": false,
+          "option_1": 0.5,
+          "variable": true,
           "display_name_short": "fraction_of_surface",
           "inputs": {
             "relationship": null,
             "choiceDisplayNames": [],
             "variableSetting": "Continuous",
-            "distribution": "Normal",
+            "distribution": "Triangle",
             "discreteVariables": [],
             "maximum": 0.75,
             "minimum": 0,
-            "mean": 0.75,
+            "mean": 0.375,
             "deltaX": 0.75,
-            "stdDev": 0.2,
+            "stdDev": 0.15,
             "default_value": 0.75,
             "showWarningIcon": false
-          }
+          },
+          "minimum": 0.5,
+          "maximum": 0.5,
+          "mode": 0.5
         },
         {
           "name": "cell_efficiency",
@@ -1753,13 +1831,13 @@
             "relationship": null,
             "choiceDisplayNames": [],
             "variableSetting": "Continuous",
-            "distribution": "Normal",
+            "distribution": "Triangle",
             "discreteVariables": [],
             "maximum": 0.25,
             "minimum": 0.1,
-            "mean": 0.18,
+            "mean": 0.175,
             "deltaX": 0.18,
-            "stdDev": 0.18,
+            "stdDev": 0.05,
             "default_value": 0.18,
             "showWarningIcon": false
           }
@@ -1811,7 +1889,7 @@
           "arguments": [
             {
               "name": "fraction_of_surface",
-              "value": 0.75
+              "value": 0.5
             },
             {
               "name": "cell_efficiency",
@@ -1826,7 +1904,7 @@
           "description": "Option 1 Description: This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV"
         }
       ],
-      "instanceId": 0.2264214048353952,
+      "instanceId": 0.8374925179473509,
       "numberOfOptions": 1,
       "$$hashKey": "object:5806",
       "skip": false,
@@ -2079,7 +2157,7 @@
           "description": "Option 1 Description: Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program."
         }
       ],
-      "instanceId": 0.015889188586899472,
+      "instanceId": 0.12763036901038682,
       "numberOfOptions": 1,
       "$$hashKey": "object:10147",
       "outputMeasure": false,
@@ -2155,7 +2233,7 @@
           "type": "Double",
           "model_dependent": false,
           "$$hashKey": "object:56518",
-          "checked": true,
+          "checked": false,
           "measure_name": "openstudio_results",
           "measure_class_name": "OpenStudioResults",
           "measure_uid": "a25386cd-60e4-46bc-8b11-c755f379d916"
@@ -2179,7 +2257,7 @@
           "type": "Double",
           "model_dependent": false,
           "$$hashKey": "object:56520",
-          "checked": true,
+          "checked": false,
           "measure_name": "openstudio_results",
           "measure_class_name": "OpenStudioResults",
           "measure_uid": "a25386cd-60e4-46bc-8b11-c755f379d916"
@@ -2999,7 +3077,7 @@
           "description": "Option 1 Description: This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data."
         }
       ],
-      "instanceId": 0.27892667094395507,
+      "instanceId": 0.8875207496510771,
       "skip": false,
       "$$hashKey": "object:1679",
       "outputMeasure": true,
@@ -3020,34 +3098,6 @@
           "measure_uid": "a25386cd-60e4-46bc-8b11-c755f379d916",
           "objective_function": "true",
           "target_value": "0"
-        },
-        {
-          "name": "eui",
-          "display_name": "eui",
-          "short_name": "eui",
-          "description": "",
-          "type": "Double",
-          "model_dependent": false,
-          "$$hashKey": "object:56518",
-          "checked": true,
-          "measure_name": "openstudio_results",
-          "measure_class_name": "OpenStudioResults",
-          "measure_uid": "a25386cd-60e4-46bc-8b11-c755f379d916",
-          "visualize": "true"
-        },
-        {
-          "name": "annual_peak_electric_demand",
-          "display_name": "annual_peak_electric_demand",
-          "short_name": "annual_peak_electric_demand",
-          "description": "",
-          "type": "Double",
-          "model_dependent": false,
-          "$$hashKey": "object:56520",
-          "checked": true,
-          "measure_name": "openstudio_results",
-          "measure_class_name": "OpenStudioResults",
-          "measure_uid": "a25386cd-60e4-46bc-8b11-c755f379d916",
-          "visualize": "true"
         }
       ],
       "numberOfOptions": 1,
@@ -3087,7 +3137,7 @@
       "reduce_electric_equipment_loads_by_percentage_diag": "None"
     },
     {
-      "name": "Small Office WWR 0.2",
+      "name": "Small Office EPD 30%",
       "seedModel": "empty.osm",
       "weatherFile": "USA_CO_Golden-NREL.724666_TMY3.epw",
       "create_doe_prototype_building": "Small Office",
@@ -3096,7 +3146,7 @@
       "openstudio_results": "Results",
       "$$hashKey": "uiGrid-02BB",
       "add_rooftop_pv": "None",
-      "reduce_electric_equipment_loads_by_percentage_diag": "None"
+      "reduce_electric_equipment_loads_by_percentage_diag": "Reduce EDP by 30%"
     },
     {
       "name": "Small Office LPD 50%",
@@ -3120,7 +3170,7 @@
       "openstudio_results": "Results",
       "$$hashKey": "uiGrid-02BF",
       "add_rooftop_pv": "None",
-      "reduce_electric_equipment_loads_by_percentage_diag": "None"
+      "reduce_electric_equipment_loads_by_percentage_diag": "Reduce EDP by 30%"
     },
     {
       "name": "Small Office with EE and PV",
@@ -3132,7 +3182,7 @@
       "xcel_eda_tariff_selectionand_model_setup": "Xcel",
       "openstudio_results": "Results",
       "$$hashKey": "uiGrid-029L",
-      "reduce_electric_equipment_loads_by_percentage_diag": "None"
+      "reduce_electric_equipment_loads_by_percentage_diag": "Reduce EDP by 30%"
     },
     {
       "name": "Med Office",
@@ -3147,7 +3197,7 @@
       "reduce_electric_equipment_loads_by_percentage_diag": "None"
     },
     {
-      "name": "Med Office WWR 0.2",
+      "name": "Med Office EPD 30%",
       "seedModel": "empty.osm",
       "weatherFile": "USA_CO_Golden-NREL.724666_TMY3.epw",
       "create_doe_prototype_building": "Medium Office",
@@ -3156,7 +3206,7 @@
       "openstudio_results": "Results",
       "add_rooftop_pv": "None",
       "$$hashKey": "uiGrid-02BZ",
-      "reduce_electric_equipment_loads_by_percentage_diag": "None"
+      "reduce_electric_equipment_loads_by_percentage_diag": "Reduce EDP by 30%"
     },
     {
       "name": "Med Office LPD 50%",
@@ -3180,7 +3230,7 @@
       "openstudio_results": "Results",
       "add_rooftop_pv": "None",
       "$$hashKey": "uiGrid-02BV",
-      "reduce_electric_equipment_loads_by_percentage_diag": "None"
+      "reduce_electric_equipment_loads_by_percentage_diag": "Reduce EDP by 30%"
     },
     {
       "name": "Med Office with EE and PV",
@@ -3192,2540 +3242,9 @@
       "xcel_eda_tariff_selectionand_model_setup": "Xcel",
       "openstudio_results": "Results",
       "$$hashKey": "uiGrid-02AQ",
-      "reduce_electric_equipment_loads_by_percentage_diag": "None"
+      "reduce_electric_equipment_loads_by_percentage_diag": "Reduce EDP by 30%"
     }
   ],
-  "analysisID": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-  "datapoints": [
-    {
-      "_id": "9e361a38-9459-454e-801b-8b916b35e1c7",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.798Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44d1",
-      "name": "LHS Autogenerated 45",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.020+00:00",
-      "run_start_time": null,
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MidriseApartment",
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.12886720380047337,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "queued",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.021Z",
-      "uuid": "9e361a38-9459-454e-801b-8b916b35e1c7",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MidriseApartment",
-        "add_rooftop_pv.cell_efficiency": 0.12886720380047337,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MidriseApartment",
-        "Cell Efficiency": 0.12886720380047337,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "9e361a38-9459-454e-801b-8b916b35e1c7",
-      "$$hashKey": "object:12913"
-    },
-    {
-      "_id": "352d1619-3aa7-40ef-9ea0-9098e9622a37",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.800Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44d2",
-      "name": "LHS Autogenerated 46",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.024+00:00",
-      "run_start_time": null,
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MidriseApartment",
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.1461716901099914,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "queued",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.025Z",
-      "uuid": "352d1619-3aa7-40ef-9ea0-9098e9622a37",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MidriseApartment",
-        "add_rooftop_pv.cell_efficiency": 0.1461716901099914,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MidriseApartment",
-        "Cell Efficiency": 0.1461716901099914,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "352d1619-3aa7-40ef-9ea0-9098e9622a37",
-      "$$hashKey": "object:13086"
-    },
-    {
-      "_id": "0b3edf5c-8f35-4dd7-9f61-fcb17c6c0b10",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.802Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44d3",
-      "name": "LHS Autogenerated 47",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.029+00:00",
-      "run_start_time": null,
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MidriseApartment",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.7031417565483494,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "queued",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.029Z",
-      "uuid": "0b3edf5c-8f35-4dd7-9f61-fcb17c6c0b10",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MidriseApartment",
-        "add_rooftop_pv.fraction_of_surface": 0.7031417565483494,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MidriseApartment",
-        "Fraction of Surface Area with Active Solar Cells": 0.7031417565483494,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "0b3edf5c-8f35-4dd7-9f61-fcb17c6c0b10",
-      "$$hashKey": "object:12960"
-    },
-    {
-      "_id": "d53f5494-4e3c-44c7-81f4-e45236359a7d",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.805Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44d4",
-      "name": "LHS Autogenerated 48",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.033+00:00",
-      "run_start_time": null,
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MidriseApartment",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.6428280554828234,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "queued",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.033Z",
-      "uuid": "d53f5494-4e3c-44c7-81f4-e45236359a7d",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MidriseApartment",
-        "add_rooftop_pv.fraction_of_surface": 0.6428280554828234,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MidriseApartment",
-        "Fraction of Surface Area with Active Solar Cells": 0.6428280554828234,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "d53f5494-4e3c-44c7-81f4-e45236359a7d",
-      "$$hashKey": "object:13002"
-    },
-    {
-      "_id": "26e22e75-7f18-4fd6-88ad-a684bfa7d56f",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.807Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44d5",
-      "name": "LHS Autogenerated 49",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.037+00:00",
-      "run_start_time": null,
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MidriseApartment",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.5002525450370837,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "queued",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.037Z",
-      "uuid": "26e22e75-7f18-4fd6-88ad-a684bfa7d56f",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MidriseApartment",
-        "add_rooftop_pv.fraction_of_surface": 0.5002525450370837,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MidriseApartment",
-        "Fraction of Surface Area with Active Solar Cells": 0.5002525450370837,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "26e22e75-7f18-4fd6-88ad-a684bfa7d56f",
-      "$$hashKey": "object:13044"
-    },
-    {
-      "_id": "ff9b919a-3e1f-4307-a4f7-8c0225269a3b",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.809Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44d6",
-      "name": "LHS Autogenerated 50",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.041+00:00",
-      "run_start_time": null,
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MidriseApartment",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 15.60711774567726,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "queued",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.041Z",
-      "uuid": "ff9b919a-3e1f-4307-a4f7-8c0225269a3b",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MidriseApartment",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 15.60711774567726,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MidriseApartment",
-        "Electric Equipment Power Reduction (%).": 15.60711774567726,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "ff9b919a-3e1f-4307-a4f7-8c0225269a3b",
-      "$$hashKey": "object:13128"
-    },
-    {
-      "_id": "89cd2d25-d0b5-45a1-946f-ec36955acbf7",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.812Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44d7",
-      "name": "LHS Autogenerated 51",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.045+00:00",
-      "run_start_time": null,
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MidriseApartment",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 29.029614292941474,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "queued",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.045Z",
-      "uuid": "89cd2d25-d0b5-45a1-946f-ec36955acbf7",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MidriseApartment",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 29.029614292941474,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MidriseApartment",
-        "Electric Equipment Power Reduction (%).": 29.029614292941474,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "89cd2d25-d0b5-45a1-946f-ec36955acbf7",
-      "$$hashKey": "object:13170"
-    },
-    {
-      "_id": "c3f74188-cd6c-42b7-afb3-e4594e3e1ebf",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.814Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44d8",
-      "name": "LHS Autogenerated 52",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.049+00:00",
-      "run_start_time": null,
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MidriseApartment",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 10.268187687514605,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "queued",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.049Z",
-      "uuid": "c3f74188-cd6c-42b7-afb3-e4594e3e1ebf",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MidriseApartment",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 10.268187687514605,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MidriseApartment",
-        "Electric Equipment Power Reduction (%).": 10.268187687514605,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "c3f74188-cd6c-42b7-afb3-e4594e3e1ebf",
-      "$$hashKey": "object:13212"
-    },
-    {
-      "_id": "37911405-787b-443c-ac93-58ab0ed91f0b",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.816Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44d9",
-      "name": "LHS Autogenerated 53",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.053+00:00",
-      "run_start_time": null,
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MidriseApartment",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 42.24079480038075,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "queued",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.053Z",
-      "uuid": "37911405-787b-443c-ac93-58ab0ed91f0b",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MidriseApartment",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 42.24079480038075,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MidriseApartment",
-        "Lighting Power Reduction (%).": 42.24079480038075,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "37911405-787b-443c-ac93-58ab0ed91f0b",
-      "$$hashKey": "object:13254"
-    },
-    {
-      "_id": "e35c8676-7922-486e-8637-1c54c7428e1c",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.819Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44da",
-      "name": "LHS Autogenerated 54",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.057+00:00",
-      "run_start_time": null,
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MidriseApartment",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 26.899582534581928,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "queued",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.057Z",
-      "uuid": "e35c8676-7922-486e-8637-1c54c7428e1c",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MidriseApartment",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 26.899582534581928,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MidriseApartment",
-        "Lighting Power Reduction (%).": 26.899582534581928,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "e35c8676-7922-486e-8637-1c54c7428e1c",
-      "$$hashKey": "object:13296"
-    },
-    {
-      "_id": "4a2b2d0b-8c80-409d-a015-6862fd3ac430",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.821Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44db",
-      "name": "LHS Autogenerated 55",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.061+00:00",
-      "run_start_time": null,
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MidriseApartment",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 25.380157934468684,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "queued",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.061Z",
-      "uuid": "4a2b2d0b-8c80-409d-a015-6862fd3ac430",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MidriseApartment",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 25.380157934468684,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MidriseApartment",
-        "Lighting Power Reduction (%).": 25.380157934468684,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "4a2b2d0b-8c80-409d-a015-6862fd3ac430",
-      "$$hashKey": "object:13338"
-    },
-    {
-      "_id": "193cafdc-e1ba-4515-9a5a-2aa5e96de4ab",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.693Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44a5",
-      "name": "LHS Autogenerated 1",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.848+00:00",
-      "run_start_time": "2017-04-22T15:17:26.977+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SmallOffice",
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.12886720380047337,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:26.977Z",
-      "uuid": "193cafdc-e1ba-4515-9a5a-2aa5e96de4ab",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SmallOffice",
-        "add_rooftop_pv.cell_efficiency": 0.12886720380047337,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SmallOffice",
-        "Cell Efficiency": 0.12886720380047337,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "193cafdc-e1ba-4515-9a5a-2aa5e96de4ab",
-      "$$hashKey": "object:13380"
-    },
-    {
-      "_id": "98b6c41c-c430-46a2-86b8-f94959314d7c",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.696Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44a6",
-      "name": "LHS Autogenerated 2",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.852+00:00",
-      "run_start_time": "2017-04-22T15:17:27.240+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SmallOffice",
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.1461716901099914,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.240Z",
-      "uuid": "98b6c41c-c430-46a2-86b8-f94959314d7c",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SmallOffice",
-        "add_rooftop_pv.cell_efficiency": 0.1461716901099914,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SmallOffice",
-        "Cell Efficiency": 0.1461716901099914,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "98b6c41c-c430-46a2-86b8-f94959314d7c",
-      "$$hashKey": "object:13422"
-    },
-    {
-      "_id": "32c3ddaa-34c3-4035-b955-2bbdf1838064",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.698Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44a7",
-      "name": "LHS Autogenerated 3",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.856+00:00",
-      "run_start_time": "2017-04-22T15:17:27.240+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SmallOffice",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.7031417565483494,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.240Z",
-      "uuid": "32c3ddaa-34c3-4035-b955-2bbdf1838064",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SmallOffice",
-        "add_rooftop_pv.fraction_of_surface": 0.7031417565483494,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SmallOffice",
-        "Fraction of Surface Area with Active Solar Cells": 0.7031417565483494,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "32c3ddaa-34c3-4035-b955-2bbdf1838064",
-      "$$hashKey": "object:13464"
-    },
-    {
-      "_id": "3c58c260-e5c4-4804-8841-b1d07e3754b7",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.701Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44a8",
-      "name": "LHS Autogenerated 4",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.860+00:00",
-      "run_start_time": "2017-04-22T15:17:27.351+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SmallOffice",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.6428280554828234,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.351Z",
-      "uuid": "3c58c260-e5c4-4804-8841-b1d07e3754b7",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SmallOffice",
-        "add_rooftop_pv.fraction_of_surface": 0.6428280554828234,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SmallOffice",
-        "Fraction of Surface Area with Active Solar Cells": 0.6428280554828234,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "3c58c260-e5c4-4804-8841-b1d07e3754b7",
-      "$$hashKey": "object:13506"
-    },
-    {
-      "_id": "a46e27cb-3dd0-49a6-a17b-4f61e33ce9b1",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.703Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44a9",
-      "name": "LHS Autogenerated 5",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.864+00:00",
-      "run_start_time": "2017-04-22T15:17:27.359+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SmallOffice",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.5002525450370837,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.360Z",
-      "uuid": "a46e27cb-3dd0-49a6-a17b-4f61e33ce9b1",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SmallOffice",
-        "add_rooftop_pv.fraction_of_surface": 0.5002525450370837,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SmallOffice",
-        "Fraction of Surface Area with Active Solar Cells": 0.5002525450370837,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "a46e27cb-3dd0-49a6-a17b-4f61e33ce9b1",
-      "$$hashKey": "object:13548"
-    },
-    {
-      "_id": "707c7667-8b88-4599-9edb-3f834d86329c",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.706Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44aa",
-      "name": "LHS Autogenerated 6",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.868+00:00",
-      "run_start_time": "2017-04-22T15:17:27.359+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SmallOffice",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 15.60711774567726,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.360Z",
-      "uuid": "707c7667-8b88-4599-9edb-3f834d86329c",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SmallOffice",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 15.60711774567726,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SmallOffice",
-        "Electric Equipment Power Reduction (%).": 15.60711774567726,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "707c7667-8b88-4599-9edb-3f834d86329c",
-      "$$hashKey": "object:13590"
-    },
-    {
-      "_id": "70fad0bb-c813-41f4-84cd-cac18f08060c",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.708Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44ab",
-      "name": "LHS Autogenerated 7",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.871+00:00",
-      "run_start_time": "2017-04-22T15:17:27.360+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SmallOffice",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 29.029614292941474,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.360Z",
-      "uuid": "70fad0bb-c813-41f4-84cd-cac18f08060c",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SmallOffice",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 29.029614292941474,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SmallOffice",
-        "Electric Equipment Power Reduction (%).": 29.029614292941474,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "70fad0bb-c813-41f4-84cd-cac18f08060c",
-      "$$hashKey": "object:13632"
-    },
-    {
-      "_id": "9d7389a4-c83f-4bd4-ac08-26a3c8968c35",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.710Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44ac",
-      "name": "LHS Autogenerated 8",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.875+00:00",
-      "run_start_time": "2017-04-22T15:17:27.363+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SmallOffice",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 10.268187687514605,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.363Z",
-      "uuid": "9d7389a4-c83f-4bd4-ac08-26a3c8968c35",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SmallOffice",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 10.268187687514605,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SmallOffice",
-        "Electric Equipment Power Reduction (%).": 10.268187687514605,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "9d7389a4-c83f-4bd4-ac08-26a3c8968c35",
-      "$$hashKey": "object:13674"
-    },
-    {
-      "_id": "9d1edf6d-59e4-46d0-9f7e-86e388396a00",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.713Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44ad",
-      "name": "LHS Autogenerated 9",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.879+00:00",
-      "run_start_time": "2017-04-22T15:17:27.368+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SmallOffice",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 42.24079480038075,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.368Z",
-      "uuid": "9d1edf6d-59e4-46d0-9f7e-86e388396a00",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SmallOffice",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 42.24079480038075,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SmallOffice",
-        "Lighting Power Reduction (%).": 42.24079480038075,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "9d1edf6d-59e4-46d0-9f7e-86e388396a00",
-      "$$hashKey": "object:13758"
-    },
-    {
-      "_id": "6a50f629-6b23-4096-9e80-8b5aedaf23f8",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.715Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44ae",
-      "name": "LHS Autogenerated 10",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.883+00:00",
-      "run_start_time": "2017-04-22T15:17:27.370+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SmallOffice",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 26.899582534581928,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.371Z",
-      "uuid": "6a50f629-6b23-4096-9e80-8b5aedaf23f8",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SmallOffice",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 26.899582534581928,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SmallOffice",
-        "Lighting Power Reduction (%).": 26.899582534581928,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "6a50f629-6b23-4096-9e80-8b5aedaf23f8",
-      "$$hashKey": "object:13716"
-    },
-    {
-      "_id": "15b9a951-c817-4f11-95be-8a5273b1254b",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.718Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44af",
-      "name": "LHS Autogenerated 11",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.887+00:00",
-      "run_start_time": "2017-04-22T15:17:27.371+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SmallOffice",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 25.380157934468684,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.371Z",
-      "uuid": "15b9a951-c817-4f11-95be-8a5273b1254b",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SmallOffice",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 25.380157934468684,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SmallOffice",
-        "Lighting Power Reduction (%).": 25.380157934468684,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "15b9a951-c817-4f11-95be-8a5273b1254b",
-      "$$hashKey": "object:13800"
-    },
-    {
-      "_id": "1ef05ec4-e8f2-46db-a50a-7e098e6a3bc7",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.720Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44b0",
-      "name": "LHS Autogenerated 12",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.891+00:00",
-      "run_start_time": "2017-04-22T15:17:27.372+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MediumOffice",
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.12886720380047337,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.372Z",
-      "uuid": "1ef05ec4-e8f2-46db-a50a-7e098e6a3bc7",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MediumOffice",
-        "add_rooftop_pv.cell_efficiency": 0.12886720380047337,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MediumOffice",
-        "Cell Efficiency": 0.12886720380047337,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "1ef05ec4-e8f2-46db-a50a-7e098e6a3bc7",
-      "$$hashKey": "object:13842"
-    },
-    {
-      "_id": "4577b926-3644-4f96-8b95-486d20ba88bc",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.723Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44b1",
-      "name": "LHS Autogenerated 13",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.895+00:00",
-      "run_start_time": "2017-04-22T15:17:27.393+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MediumOffice",
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.1461716901099914,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.394Z",
-      "uuid": "4577b926-3644-4f96-8b95-486d20ba88bc",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MediumOffice",
-        "add_rooftop_pv.cell_efficiency": 0.1461716901099914,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MediumOffice",
-        "Cell Efficiency": 0.1461716901099914,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "4577b926-3644-4f96-8b95-486d20ba88bc",
-      "$$hashKey": "object:13884"
-    },
-    {
-      "_id": "b012cfb3-1a19-45ad-96c9-acd6af4e007e",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.725Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44b2",
-      "name": "LHS Autogenerated 14",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.899+00:00",
-      "run_start_time": "2017-04-22T15:17:27.416+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MediumOffice",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.7031417565483494,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.417Z",
-      "uuid": "b012cfb3-1a19-45ad-96c9-acd6af4e007e",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MediumOffice",
-        "add_rooftop_pv.fraction_of_surface": 0.7031417565483494,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MediumOffice",
-        "Fraction of Surface Area with Active Solar Cells": 0.7031417565483494,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "b012cfb3-1a19-45ad-96c9-acd6af4e007e",
-      "$$hashKey": "object:13926"
-    },
-    {
-      "_id": "2895d0ef-7f44-4fc9-a2aa-f4fd5b2d231f",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.728Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44b3",
-      "name": "LHS Autogenerated 15",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.902+00:00",
-      "run_start_time": "2017-04-22T15:17:27.414+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MediumOffice",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.6428280554828234,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.415Z",
-      "uuid": "2895d0ef-7f44-4fc9-a2aa-f4fd5b2d231f",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MediumOffice",
-        "add_rooftop_pv.fraction_of_surface": 0.6428280554828234,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MediumOffice",
-        "Fraction of Surface Area with Active Solar Cells": 0.6428280554828234,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "2895d0ef-7f44-4fc9-a2aa-f4fd5b2d231f",
-      "$$hashKey": "object:14010"
-    },
-    {
-      "_id": "110cc701-f7ed-4259-b4a1-37aa9621f29e",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.730Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44b4",
-      "name": "LHS Autogenerated 16",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.906+00:00",
-      "run_start_time": "2017-04-22T15:17:27.442+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MediumOffice",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.5002525450370837,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.442Z",
-      "uuid": "110cc701-f7ed-4259-b4a1-37aa9621f29e",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MediumOffice",
-        "add_rooftop_pv.fraction_of_surface": 0.5002525450370837,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MediumOffice",
-        "Fraction of Surface Area with Active Solar Cells": 0.5002525450370837,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "110cc701-f7ed-4259-b4a1-37aa9621f29e",
-      "$$hashKey": "object:13968"
-    },
-    {
-      "_id": "5f49ee12-f111-47c9-94e1-466771955d44",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.732Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44b5",
-      "name": "LHS Autogenerated 17",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.910+00:00",
-      "run_start_time": "2017-04-22T15:17:27.461+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MediumOffice",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 15.60711774567726,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.461Z",
-      "uuid": "5f49ee12-f111-47c9-94e1-466771955d44",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MediumOffice",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 15.60711774567726,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MediumOffice",
-        "Electric Equipment Power Reduction (%).": 15.60711774567726,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "5f49ee12-f111-47c9-94e1-466771955d44",
-      "$$hashKey": "object:14052"
-    },
-    {
-      "_id": "265b507a-8b23-4aeb-99c8-8f1cd354e73a",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.735Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44b6",
-      "name": "LHS Autogenerated 18",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.914+00:00",
-      "run_start_time": "2017-04-22T15:17:27.684+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MediumOffice",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 29.029614292941474,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.684Z",
-      "uuid": "265b507a-8b23-4aeb-99c8-8f1cd354e73a",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MediumOffice",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 29.029614292941474,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MediumOffice",
-        "Electric Equipment Power Reduction (%).": 29.029614292941474,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "265b507a-8b23-4aeb-99c8-8f1cd354e73a",
-      "$$hashKey": "object:14094"
-    },
-    {
-      "_id": "ffea0c52-d7f0-4a0b-9d4b-556f4ff48e3d",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.737Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44b7",
-      "name": "LHS Autogenerated 19",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.918+00:00",
-      "run_start_time": "2017-04-22T15:17:27.732+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MediumOffice",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 10.268187687514605,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:27.732Z",
-      "uuid": "ffea0c52-d7f0-4a0b-9d4b-556f4ff48e3d",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MediumOffice",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 10.268187687514605,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MediumOffice",
-        "Electric Equipment Power Reduction (%).": 10.268187687514605,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "ffea0c52-d7f0-4a0b-9d4b-556f4ff48e3d",
-      "$$hashKey": "object:14178"
-    },
-    {
-      "_id": "12f07eb3-1db4-4acf-aaae-a44c76b826da",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.739Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44b8",
-      "name": "LHS Autogenerated 20",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.922+00:00",
-      "run_start_time": "2017-04-22T15:17:28.618+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MediumOffice",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 42.24079480038075,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:28.618Z",
-      "uuid": "12f07eb3-1db4-4acf-aaae-a44c76b826da",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MediumOffice",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 42.24079480038075,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MediumOffice",
-        "Lighting Power Reduction (%).": 42.24079480038075,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "12f07eb3-1db4-4acf-aaae-a44c76b826da",
-      "$$hashKey": "object:14136"
-    },
-    {
-      "_id": "ba3c81cb-c2b6-4ff7-9d5c-79f58cc3bff1",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.742Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44b9",
-      "name": "LHS Autogenerated 21",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.925+00:00",
-      "run_start_time": "2017-04-22T15:17:28.675+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MediumOffice",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 26.899582534581928,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:28.675Z",
-      "uuid": "ba3c81cb-c2b6-4ff7-9d5c-79f58cc3bff1",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MediumOffice",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 26.899582534581928,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MediumOffice",
-        "Lighting Power Reduction (%).": 26.899582534581928,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "ba3c81cb-c2b6-4ff7-9d5c-79f58cc3bff1",
-      "$$hashKey": "object:14220"
-    },
-    {
-      "_id": "e6f5b265-a13d-4677-baa1-3b6dd696db84",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.744Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44ba",
-      "name": "LHS Autogenerated 22",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.929+00:00",
-      "run_start_time": "2017-04-22T15:17:28.791+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "MediumOffice",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 25.380157934468684,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:28.791Z",
-      "uuid": "e6f5b265-a13d-4677-baa1-3b6dd696db84",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "MediumOffice",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 25.380157934468684,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "MediumOffice",
-        "Lighting Power Reduction (%).": 25.380157934468684,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "e6f5b265-a13d-4677-baa1-3b6dd696db84",
-      "$$hashKey": "object:14262"
-    },
-    {
-      "_id": "39d374fe-a1cf-4059-9dc3-6e6df68d173e",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.746Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44bb",
-      "name": "LHS Autogenerated 23",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.933+00:00",
-      "run_start_time": "2017-04-22T15:17:28.853+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "RetailStripmall",
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.12886720380047337,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:28.853Z",
-      "uuid": "39d374fe-a1cf-4059-9dc3-6e6df68d173e",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "RetailStripmall",
-        "add_rooftop_pv.cell_efficiency": 0.12886720380047337,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "RetailStripmall",
-        "Cell Efficiency": 0.12886720380047337,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "39d374fe-a1cf-4059-9dc3-6e6df68d173e",
-      "$$hashKey": "object:14346"
-    },
-    {
-      "_id": "bd1eef54-d295-4404-adb5-a7f3350c36c6",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.749Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44bc",
-      "name": "LHS Autogenerated 24",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.937+00:00",
-      "run_start_time": "2017-04-22T15:17:28.853+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "RetailStripmall",
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.1461716901099914,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:28.853Z",
-      "uuid": "bd1eef54-d295-4404-adb5-a7f3350c36c6",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "RetailStripmall",
-        "add_rooftop_pv.cell_efficiency": 0.1461716901099914,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "RetailStripmall",
-        "Cell Efficiency": 0.1461716901099914,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "bd1eef54-d295-4404-adb5-a7f3350c36c6",
-      "$$hashKey": "object:14304"
-    },
-    {
-      "_id": "09f8f10b-5006-4a8e-ad15-1c72d976cf31",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.751Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44bd",
-      "name": "LHS Autogenerated 25",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.941+00:00",
-      "run_start_time": "2017-04-22T15:17:28.854+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "RetailStripmall",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.7031417565483494,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:28.854Z",
-      "uuid": "09f8f10b-5006-4a8e-ad15-1c72d976cf31",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "RetailStripmall",
-        "add_rooftop_pv.fraction_of_surface": 0.7031417565483494,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "RetailStripmall",
-        "Fraction of Surface Area with Active Solar Cells": 0.7031417565483494,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "09f8f10b-5006-4a8e-ad15-1c72d976cf31",
-      "$$hashKey": "object:14388"
-    },
-    {
-      "_id": "a93a5949-3eb1-4b2c-bbd2-ad04c162bf50",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.753Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44be",
-      "name": "LHS Autogenerated 26",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.944+00:00",
-      "run_start_time": "2017-04-22T15:17:29.122+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "RetailStripmall",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.6428280554828234,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:29.122Z",
-      "uuid": "a93a5949-3eb1-4b2c-bbd2-ad04c162bf50",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "RetailStripmall",
-        "add_rooftop_pv.fraction_of_surface": 0.6428280554828234,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "RetailStripmall",
-        "Fraction of Surface Area with Active Solar Cells": 0.6428280554828234,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "a93a5949-3eb1-4b2c-bbd2-ad04c162bf50",
-      "$$hashKey": "object:14430"
-    },
-    {
-      "_id": "575f0c43-0b21-4444-bd9b-6e82562c99b4",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.755Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44bf",
-      "name": "LHS Autogenerated 27",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.948+00:00",
-      "run_start_time": "2017-04-22T15:17:29.242+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "RetailStripmall",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.5002525450370837,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:29.243Z",
-      "uuid": "575f0c43-0b21-4444-bd9b-6e82562c99b4",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "RetailStripmall",
-        "add_rooftop_pv.fraction_of_surface": 0.5002525450370837,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "RetailStripmall",
-        "Fraction of Surface Area with Active Solar Cells": 0.5002525450370837,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "575f0c43-0b21-4444-bd9b-6e82562c99b4",
-      "$$hashKey": "object:14514"
-    },
-    {
-      "_id": "57e5dc8a-d042-4372-bade-9dc86a9bab4c",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.758Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44c0",
-      "name": "LHS Autogenerated 28",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.952+00:00",
-      "run_start_time": "2017-04-22T15:17:29.461+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "RetailStripmall",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 15.60711774567726,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:29.461Z",
-      "uuid": "57e5dc8a-d042-4372-bade-9dc86a9bab4c",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "RetailStripmall",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 15.60711774567726,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "RetailStripmall",
-        "Electric Equipment Power Reduction (%).": 15.60711774567726,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "57e5dc8a-d042-4372-bade-9dc86a9bab4c",
-      "$$hashKey": "object:14472"
-    },
-    {
-      "_id": "13335b5c-c573-4979-928b-17c37c39326b",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.760Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44c1",
-      "name": "LHS Autogenerated 29",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.956+00:00",
-      "run_start_time": "2017-04-22T15:17:29.462+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "RetailStripmall",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 29.029614292941474,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:29.463Z",
-      "uuid": "13335b5c-c573-4979-928b-17c37c39326b",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "RetailStripmall",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 29.029614292941474,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "RetailStripmall",
-        "Electric Equipment Power Reduction (%).": 29.029614292941474,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "13335b5c-c573-4979-928b-17c37c39326b",
-      "$$hashKey": "object:14556"
-    },
-    {
-      "_id": "853f1136-fc5a-4340-a5d0-91f13bb113af",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.762Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44c2",
-      "name": "LHS Autogenerated 30",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.960+00:00",
-      "run_start_time": "2017-04-22T15:17:29.739+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "RetailStripmall",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 10.268187687514605,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:29.740Z",
-      "uuid": "853f1136-fc5a-4340-a5d0-91f13bb113af",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "RetailStripmall",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 10.268187687514605,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "RetailStripmall",
-        "Electric Equipment Power Reduction (%).": 10.268187687514605,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "853f1136-fc5a-4340-a5d0-91f13bb113af",
-      "$$hashKey": "object:14598"
-    },
-    {
-      "_id": "e8cf8374-7857-47d7-9c66-b2f843bfcb95",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.765Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44c3",
-      "name": "LHS Autogenerated 31",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.964+00:00",
-      "run_start_time": "2017-04-22T15:17:30.025+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "RetailStripmall",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 42.24079480038075,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:30.025Z",
-      "uuid": "e8cf8374-7857-47d7-9c66-b2f843bfcb95",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "RetailStripmall",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 42.24079480038075,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "RetailStripmall",
-        "Lighting Power Reduction (%).": 42.24079480038075,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "e8cf8374-7857-47d7-9c66-b2f843bfcb95",
-      "$$hashKey": "object:14640"
-    },
-    {
-      "_id": "890da462-5031-40e9-ab7a-0959a0ad8b64",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.767Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44c4",
-      "name": "LHS Autogenerated 32",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.967+00:00",
-      "run_start_time": "2017-04-22T15:17:30.025+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "RetailStripmall",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 26.899582534581928,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:30.025Z",
-      "uuid": "890da462-5031-40e9-ab7a-0959a0ad8b64",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "RetailStripmall",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 26.899582534581928,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "RetailStripmall",
-        "Lighting Power Reduction (%).": 26.899582534581928,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "890da462-5031-40e9-ab7a-0959a0ad8b64",
-      "$$hashKey": "object:14682"
-    },
-    {
-      "_id": "9ea367b9-b671-4b77-8755-a5d619b4afb9",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.769Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44c5",
-      "name": "LHS Autogenerated 33",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.972+00:00",
-      "run_start_time": "2017-04-22T15:17:30.930+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "RetailStripmall",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 25.380157934468684,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:30.930Z",
-      "uuid": "9ea367b9-b671-4b77-8755-a5d619b4afb9",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "RetailStripmall",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 25.380157934468684,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "RetailStripmall",
-        "Lighting Power Reduction (%).": 25.380157934468684,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "9ea367b9-b671-4b77-8755-a5d619b4afb9",
-      "$$hashKey": "object:14766"
-    },
-    {
-      "_id": "617c89e0-e6a3-41ca-acd5-ebf8840633cc",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.772Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44c6",
-      "name": "LHS Autogenerated 34",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.976+00:00",
-      "run_start_time": "2017-04-22T15:17:30.986+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SecondarySchool",
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.12886720380047337,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:30.986Z",
-      "uuid": "617c89e0-e6a3-41ca-acd5-ebf8840633cc",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SecondarySchool",
-        "add_rooftop_pv.cell_efficiency": 0.12886720380047337,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SecondarySchool",
-        "Cell Efficiency": 0.12886720380047337,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "617c89e0-e6a3-41ca-acd5-ebf8840633cc",
-      "$$hashKey": "object:14724"
-    },
-    {
-      "_id": "180f5a17-832f-4c2b-a7e1-458b3898da62",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.774Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44c7",
-      "name": "LHS Autogenerated 35",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.980+00:00",
-      "run_start_time": "2017-04-22T15:17:30.985+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SecondarySchool",
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.1461716901099914,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:30.985Z",
-      "uuid": "180f5a17-832f-4c2b-a7e1-458b3898da62",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SecondarySchool",
-        "add_rooftop_pv.cell_efficiency": 0.1461716901099914,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SecondarySchool",
-        "Cell Efficiency": 0.1461716901099914,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "180f5a17-832f-4c2b-a7e1-458b3898da62",
-      "$$hashKey": "object:14808"
-    },
-    {
-      "_id": "5a046f5c-cd36-4fbc-81e8-77013bf2cfc4",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.776Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44c8",
-      "name": "LHS Autogenerated 36",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.984+00:00",
-      "run_start_time": "2017-04-22T15:17:30.986+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SecondarySchool",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.7031417565483494,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:30.986Z",
-      "uuid": "5a046f5c-cd36-4fbc-81e8-77013bf2cfc4",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SecondarySchool",
-        "add_rooftop_pv.fraction_of_surface": 0.7031417565483494,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SecondarySchool",
-        "Fraction of Surface Area with Active Solar Cells": 0.7031417565483494,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "5a046f5c-cd36-4fbc-81e8-77013bf2cfc4",
-      "$$hashKey": "object:14850"
-    },
-    {
-      "_id": "699a0ff8-0f39-45bc-9543-efe06d97bcd0",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.779Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44c9",
-      "name": "LHS Autogenerated 37",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.988+00:00",
-      "run_start_time": "2017-04-22T15:17:30.985+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SecondarySchool",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.6428280554828234,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:30.985Z",
-      "uuid": "699a0ff8-0f39-45bc-9543-efe06d97bcd0",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SecondarySchool",
-        "add_rooftop_pv.fraction_of_surface": 0.6428280554828234,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SecondarySchool",
-        "Fraction of Surface Area with Active Solar Cells": 0.6428280554828234,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "699a0ff8-0f39-45bc-9543-efe06d97bcd0",
-      "$$hashKey": "object:14892"
-    },
-    {
-      "_id": "663194f4-2d36-4fc0-b984-23e0e45e8580",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.781Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44ca",
-      "name": "LHS Autogenerated 38",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.992+00:00",
-      "run_start_time": "2017-04-22T15:17:30.989+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SecondarySchool",
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.5002525450370837,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:30.989Z",
-      "uuid": "663194f4-2d36-4fc0-b984-23e0e45e8580",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SecondarySchool",
-        "add_rooftop_pv.fraction_of_surface": 0.5002525450370837,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SecondarySchool",
-        "Fraction of Surface Area with Active Solar Cells": 0.5002525450370837,
-        "Cell Efficiency": 0.18,
-        "Electric Equipment Power Reduction (%).": 30,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "663194f4-2d36-4fc0-b984-23e0e45e8580",
-      "$$hashKey": "object:14934"
-    },
-    {
-      "_id": "dff134bc-5592-4c92-a69a-98c1e48426fc",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.784Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44cb",
-      "name": "LHS Autogenerated 39",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:26.996+00:00",
-      "run_start_time": "2017-04-22T15:17:31.020+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SecondarySchool",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 15.60711774567726,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:31.020Z",
-      "uuid": "dff134bc-5592-4c92-a69a-98c1e48426fc",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SecondarySchool",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 15.60711774567726,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SecondarySchool",
-        "Electric Equipment Power Reduction (%).": 15.60711774567726,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "dff134bc-5592-4c92-a69a-98c1e48426fc",
-      "$$hashKey": "object:14976"
-    },
-    {
-      "_id": "982fffb7-4f16-49cf-9a56-47d99d42ce85",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.786Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44cc",
-      "name": "LHS Autogenerated 40",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.000+00:00",
-      "run_start_time": "2017-04-22T15:17:31.020+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SecondarySchool",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 29.029614292941474,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:31.021Z",
-      "uuid": "982fffb7-4f16-49cf-9a56-47d99d42ce85",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SecondarySchool",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 29.029614292941474,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SecondarySchool",
-        "Electric Equipment Power Reduction (%).": 29.029614292941474,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "982fffb7-4f16-49cf-9a56-47d99d42ce85",
-      "$$hashKey": "object:15018"
-    },
-    {
-      "_id": "49e79f5b-8481-4876-bc7d-d4dc8041de4d",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.788Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7406d0de640001eb44cd",
-      "name": "LHS Autogenerated 41",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.004+00:00",
-      "run_start_time": "2017-04-22T15:17:31.025+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SecondarySchool",
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 10.268187687514605,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:31.026Z",
-      "uuid": "49e79f5b-8481-4876-bc7d-d4dc8041de4d",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SecondarySchool",
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 10.268187687514605,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SecondarySchool",
-        "Electric Equipment Power Reduction (%).": 10.268187687514605,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Lighting Power Reduction (%).": 30
-      },
-      "id": "49e79f5b-8481-4876-bc7d-d4dc8041de4d",
-      "$$hashKey": "object:15060"
-    },
-    {
-      "_id": "b2b20ec5-128f-4af5-8c4c-2b1fe56ab54c",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.791Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44ce",
-      "name": "LHS Autogenerated 42",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.008+00:00",
-      "run_start_time": "2017-04-22T15:17:31.069+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SecondarySchool",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 42.24079480038075,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:31.070Z",
-      "uuid": "b2b20ec5-128f-4af5-8c4c-2b1fe56ab54c",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SecondarySchool",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 42.24079480038075,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SecondarySchool",
-        "Lighting Power Reduction (%).": 42.24079480038075,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "b2b20ec5-128f-4af5-8c4c-2b1fe56ab54c",
-      "$$hashKey": "object:15102"
-    },
-    {
-      "_id": "81500b3a-2586-4e16-a90f-59381df94f63",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.793Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44cf",
-      "name": "LHS Autogenerated 43",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.012+00:00",
-      "run_start_time": "2017-04-22T15:17:31.282+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SecondarySchool",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 26.899582534581928,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:31.282Z",
-      "uuid": "81500b3a-2586-4e16-a90f-59381df94f63",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SecondarySchool",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 26.899582534581928,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SecondarySchool",
-        "Lighting Power Reduction (%).": 26.899582534581928,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "81500b3a-2586-4e16-a90f-59381df94f63",
-      "$$hashKey": "object:15144"
-    },
-    {
-      "_id": "39de1ae4-761b-4935-a216-ec256d0daf11",
-      "analysis_id": "d0630db0-59fc-4d11-add2-ab64f0dba0e4",
-      "created_at": "2017-04-22T15:17:26.795Z",
-      "da_descriptions": [],
-      "description": "",
-      "internal_ip_address": null,
-      "ip_address": null,
-      "job_id": "58fb7407d0de640001eb44d0",
-      "name": "LHS Autogenerated 44",
-      "results": {},
-      "run_end_time": null,
-      "run_queue_time": "2017-04-22T15:17:27.016+00:00",
-      "run_start_time": "2017-04-22T15:17:31.631+00:00",
-      "sdp_log_file": [],
-      "seed": "",
-      "set_variable_values": {
-        "2e9274f0-7f81-47ef-94be-90ccced1a96d": "SecondarySchool",
-        "89da0229-4653-4cf3-a81e-360c59e1119b": 25.380157934468684,
-        "e6594eaf-d539-4f1d-9792-d874b3dfc63a": 0.18,
-        "38c3679c-8a26-4637-b271-1318f5a81801": 0.75,
-        "5e70081e-67cd-4274-a369-8d0431de7b1e": 30
-      },
-      "status": "started",
-      "status_message": "",
-      "updated_at": "2017-04-22T15:17:31.631Z",
-      "uuid": "39de1ae4-761b-4935-a216-ec256d0daf11",
-      "variable_values": null,
-      "weather_file": "",
-      "set_variable_values_names": {
-        "create_doe_prototype_building.building_type": "SecondarySchool",
-        "reduce_lighting_loads_by_percentage.lighting_power_reduction_percent": 25.380157934468684,
-        "add_rooftop_pv.cell_efficiency": 0.18,
-        "add_rooftop_pv.fraction_of_surface": 0.75,
-        "reduce_electric_equipment_loads_by_percentage_diag.elecequip_power_reduction_percent": 30
-      },
-      "set_variable_values_display_names": {
-        "Building Type.": "SecondarySchool",
-        "Lighting Power Reduction (%).": 25.380157934468684,
-        "Cell Efficiency": 0.18,
-        "Fraction of Surface Area with Active Solar Cells": 0.75,
-        "Electric Equipment Power Reduction (%).": 30
-      },
-      "id": "39de1ae4-761b-4935-a216-ec256d0daf11",
-      "$$hashKey": "object:15186"
-    }
-  ]
+  "analysisID": "016c3798-4a2a-4261-a383-944f86aee6fc",
+  "datapoints": []
 }
