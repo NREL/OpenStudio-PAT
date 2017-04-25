@@ -2,7 +2,22 @@
   "analysis": {
     "display_name": "Office_Study",
     "name": "Office_Study",
-    "output_variables": [],
+    "output_variables": [
+      {
+        "objective_function": true,
+        "objective_function_index": 0,
+        "objective_function_target": 0,
+        "objective_function_group": null,
+        "scaling_factor": null,
+        "display_name": "net_site_energy",
+        "display_name_short": "net_site_energy",
+        "metadata_id": null,
+        "name": "OpenStudioResults.net_site_energy",
+        "visualize": true,
+        "export": true,
+        "variable_type": "double"
+      }
+    ],
     "problem": {
       "workflow": [
         {
@@ -76,16 +91,15 @@
                 ]
               },
               "display_name": "Building Type.",
-              "display_name_short": "Building Type.",
-              "variable_type": "variable",
+              "display_name_short": "building_type",
+              "variable_type": "pivot",
               "units": "",
               "minimum": "SmallOffice",
               "maximum": "SmallOffice",
-              "relation_to_output": null,
               "static_value": "SmallOffice",
               "uuid": "",
               "version_uuid": "",
-              "variable": true,
+              "pivot": true,
               "uncertainty_description": {
                 "type": "discrete",
                 "attributes": [
@@ -94,43 +108,23 @@
                     "values_and_weights": [
                       {
                         "value": "SmallOffice",
-                        "weight": 0.1
+                        "weight": 0.2
                       },
                       {
-                        "value": "SmallOffice",
-                        "weight": 0.1
+                        "value": "MediumOffice",
+                        "weight": 0.2
                       },
                       {
-                        "value": "SmallOffice",
-                        "weight": 0.1
+                        "value": "SecondarySchool",
+                        "weight": 0.2
                       },
                       {
-                        "value": "SmallOffice",
-                        "weight": 0.1
+                        "value": "RetailStripmall",
+                        "weight": 0.2
                       },
                       {
-                        "value": "SmallOffice",
-                        "weight": 0.1
-                      },
-                      {
-                        "value": "SmallOffice",
-                        "weight": 0.1
-                      },
-                      {
-                        "value": "SmallOffice",
-                        "weight": 0.1
-                      },
-                      {
-                        "value": "SmallOffice",
-                        "weight": 0.1
-                      },
-                      {
-                        "value": "SmallOffice",
-                        "weight": 0.1
-                      },
-                      {
-                        "value": "SmallOffice",
-                        "weight": 0.1
+                        "value": "MidriseApartment",
+                        "weight": 0.2
                       }
                     ]
                   },
@@ -144,15 +138,15 @@
                   },
                   {
                     "name": "modes",
-                    "value": null
+                    "value": "SmallOffice"
                   },
                   {
                     "name": "delta_x",
-                    "value": null
+                    "value": "SmallOffice"
                   },
                   {
                     "name": "stddev",
-                    "value": null
+                    "value": "SmallOffice"
                   }
                 ]
               },
@@ -246,100 +240,6 @@
           "variables": [
             {
               "argument": {
-                "display_name": "Skip Reduce Lighting Loads by Percentage",
-                "display_name_short": "Skip entire measure",
-                "name": "__SKIP__",
-                "value_type": "boolean",
-                "default_value": false,
-                "value": false
-              },
-              "display_name": "Skip Reduce Lighting Loads by Percentage",
-              "display_name_short": "Skip entire measure",
-              "variable_type": "variable",
-              "units": null,
-              "minimum": false,
-              "maximum": true,
-              "relation_to_output": null,
-              "static_value": false,
-              "variable": true,
-              "uncertainty_description": {
-                "attributes": [
-                  {
-                    "name": "discrete",
-                    "values_and_weights": []
-                  },
-                  {
-                    "name": "lower_bounds",
-                    "value": false
-                  },
-                  {
-                    "name": "upper_bounds",
-                    "value": false
-                  },
-                  {
-                    "name": "modes",
-                    "value": false
-                  },
-                  {
-                    "name": "delta_x",
-                    "value": null
-                  },
-                  {
-                    "name": "stddev",
-                    "value": null
-                  },
-                  {
-                    "name": "discrete",
-                    "values_and_weights": [
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      }
-                    ]
-                  }
-                ],
-                "type": "discrete"
-              },
-              "workflow_index": 0
-            },
-            {
-              "argument": {
                 "display_name": "Lighting Power Reduction (%).",
                 "display_name_short": "lighting_power_reduction_percent",
                 "name": "lighting_power_reduction_percent",
@@ -348,12 +248,11 @@
                 "value": 30
               },
               "display_name": "Lighting Power Reduction (%).",
-              "display_name_short": "Lighting Power Reduction (%).",
+              "display_name_short": "lighting_power_reduction_percent",
               "variable_type": "variable",
               "units": "",
-              "minimum": 50,
-              "maximum": 50,
-              "relation_to_output": null,
+              "minimum": 0,
+              "maximum": 60,
               "static_value": 30,
               "uuid": "",
               "version_uuid": "",
@@ -365,70 +264,42 @@
                     "name": "discrete",
                     "values_and_weights": [
                       {
-                        "value": 30,
-                        "weight": 0.1
+                        "value": 0,
+                        "weight": 0.33
                       },
                       {
                         "value": 30,
-                        "weight": 0.1
+                        "weight": 0.33
                       },
                       {
-                        "value": 50,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 50,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 50,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 30,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 30,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 50,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 50,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 50,
-                        "weight": 0.1
+                        "value": 60,
+                        "weight": 0.33
                       }
                     ]
                   },
                   {
                     "name": "lower_bounds",
-                    "value": 50
+                    "value": 0
                   },
                   {
                     "name": "upper_bounds",
-                    "value": 50
+                    "value": 60
                   },
                   {
                     "name": "modes",
-                    "value": 50
+                    "value": 30
                   },
                   {
                     "name": "delta_x",
-                    "value": null
+                    "value": 30
                   },
                   {
                     "name": "stddev",
-                    "value": null
+                    "value": 10
                   }
                 ]
               },
-              "workflow_index": 1
+              "workflow_index": 0
             }
           ],
           "workflow_index": 1
@@ -526,100 +397,6 @@
           "variables": [
             {
               "argument": {
-                "display_name": "Skip Reduce Electric Equipment Loads by Percentage",
-                "display_name_short": "Skip entire measure",
-                "name": "__SKIP__",
-                "value_type": "boolean",
-                "default_value": false,
-                "value": false
-              },
-              "display_name": "Skip Reduce Electric Equipment Loads by Percentage",
-              "display_name_short": "Skip entire measure",
-              "variable_type": "variable",
-              "units": null,
-              "minimum": false,
-              "maximum": true,
-              "relation_to_output": null,
-              "static_value": false,
-              "variable": true,
-              "uncertainty_description": {
-                "attributes": [
-                  {
-                    "name": "discrete",
-                    "values_and_weights": []
-                  },
-                  {
-                    "name": "lower_bounds",
-                    "value": false
-                  },
-                  {
-                    "name": "upper_bounds",
-                    "value": false
-                  },
-                  {
-                    "name": "modes",
-                    "value": false
-                  },
-                  {
-                    "name": "delta_x",
-                    "value": null
-                  },
-                  {
-                    "name": "stddev",
-                    "value": null
-                  },
-                  {
-                    "name": "discrete",
-                    "values_and_weights": [
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      }
-                    ]
-                  }
-                ],
-                "type": "discrete"
-              },
-              "workflow_index": 0
-            },
-            {
-              "argument": {
                 "display_name": "Electric Equipment Power Reduction (%).",
                 "display_name_short": "elecequip_power_reduction_percent",
                 "name": "elecequip_power_reduction_percent",
@@ -628,12 +405,11 @@
                 "value": 30
               },
               "display_name": "Electric Equipment Power Reduction (%).",
-              "display_name_short": "Electric Equipment Power Reduction (%).",
+              "display_name_short": "elecequip_power_reduction_percent",
               "variable_type": "variable",
               "units": "",
-              "minimum": 30,
+              "minimum": 0,
               "maximum": 30,
-              "relation_to_output": null,
               "static_value": 30,
               "uuid": "",
               "version_uuid": "",
@@ -645,50 +421,22 @@
                     "name": "discrete",
                     "values_and_weights": [
                       {
-                        "value": 30,
-                        "weight": 0.1
+                        "value": 0,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 15,
+                        "weight": 0.33
                       },
                       {
                         "value": 30,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 30,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 30,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 30,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 30,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 30,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 30,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 30,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 30,
-                        "weight": 0.1
+                        "weight": 0.33
                       }
                     ]
                   },
                   {
                     "name": "lower_bounds",
-                    "value": 30
+                    "value": 0
                   },
                   {
                     "name": "upper_bounds",
@@ -696,19 +444,19 @@
                   },
                   {
                     "name": "modes",
-                    "value": 30
+                    "value": 15
                   },
                   {
                     "name": "delta_x",
-                    "value": null
+                    "value": 30
                   },
                   {
                     "name": "stddev",
-                    "value": null
+                    "value": 10
                   }
                 ]
               },
-              "workflow_index": 1
+              "workflow_index": 0
             }
           ],
           "workflow_index": 2
@@ -731,14 +479,6 @@
           "taxonomy": "Onsite Power Generation.Photovoltaic",
           "arguments": [
             {
-              "display_name": "Cell Efficiency",
-              "display_name_short": "cell_efficiency",
-              "name": "cell_efficiency",
-              "value_type": "double",
-              "default_value": 0.18,
-              "value": 0.18
-            },
-            {
               "display_name": "Inverter Efficiency",
               "display_name_short": "inverter_efficiency",
               "name": "inverter_efficiency",
@@ -750,114 +490,19 @@
           "variables": [
             {
               "argument": {
-                "display_name": "Skip Add Rooftop PV",
-                "display_name_short": "Skip entire measure",
-                "name": "__SKIP__",
-                "value_type": "boolean",
-                "default_value": false,
-                "value": false
-              },
-              "display_name": "Skip Add Rooftop PV",
-              "display_name_short": "Skip entire measure",
-              "variable_type": "variable",
-              "units": null,
-              "minimum": false,
-              "maximum": true,
-              "relation_to_output": null,
-              "static_value": false,
-              "variable": true,
-              "uncertainty_description": {
-                "attributes": [
-                  {
-                    "name": "discrete",
-                    "values_and_weights": []
-                  },
-                  {
-                    "name": "lower_bounds",
-                    "value": false
-                  },
-                  {
-                    "name": "upper_bounds",
-                    "value": false
-                  },
-                  {
-                    "name": "modes",
-                    "value": false
-                  },
-                  {
-                    "name": "delta_x",
-                    "value": null
-                  },
-                  {
-                    "name": "stddev",
-                    "value": null
-                  },
-                  {
-                    "name": "discrete",
-                    "values_and_weights": [
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": true,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": false,
-                        "weight": 0.1
-                      }
-                    ]
-                  }
-                ],
-                "type": "discrete"
-              },
-              "workflow_index": 0
-            },
-            {
-              "argument": {
                 "display_name": "Fraction of Surface Area with Active Solar Cells",
                 "display_name_short": "fraction_of_surface",
                 "name": "fraction_of_surface",
                 "value_type": "double",
                 "default_value": 0.75,
-                "value": 0.5
+                "value": 0.75
               },
               "display_name": "Fraction of Surface Area with Active Solar Cells",
-              "display_name_short": "Fraction of Surface Area with Active Solar Cells",
+              "display_name_short": "fraction_of_surface",
               "variable_type": "variable",
               "units": "",
-              "minimum": 0.5,
-              "maximum": 0.5,
-              "relation_to_output": null,
+              "minimum": 0,
+              "maximum": 0.75,
               "static_value": 0.75,
               "uuid": "",
               "version_uuid": "",
@@ -869,66 +514,101 @@
                     "name": "discrete",
                     "values_and_weights": [
                       {
-                        "value": 0.75,
-                        "weight": 0.1
+                        "value": 0,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 0.375,
+                        "weight": 0.33
                       },
                       {
                         "value": 0.75,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 0.75,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 0.75,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 0.5,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 0.75,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 0.75,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 0.75,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 0.75,
-                        "weight": 0.1
-                      },
-                      {
-                        "value": 0.5,
-                        "weight": 0.1
+                        "weight": 0.33
                       }
                     ]
                   },
                   {
                     "name": "lower_bounds",
-                    "value": 0.5
+                    "value": 0
                   },
                   {
                     "name": "upper_bounds",
-                    "value": 0.5
+                    "value": 0.75
                   },
                   {
                     "name": "modes",
-                    "value": 0.5
+                    "value": 0.375
                   },
                   {
                     "name": "delta_x",
-                    "value": null
+                    "value": 0.75
                   },
                   {
                     "name": "stddev",
-                    "value": null
+                    "value": 0.15
+                  }
+                ]
+              },
+              "workflow_index": 0
+            },
+            {
+              "argument": {
+                "display_name": "Cell Efficiency",
+                "display_name_short": "cell_efficiency",
+                "name": "cell_efficiency",
+                "value_type": "double",
+                "default_value": 0.18,
+                "value": 0.18
+              },
+              "display_name": "Cell Efficiency",
+              "display_name_short": "cell_efficiency",
+              "variable_type": "variable",
+              "units": "fraction",
+              "minimum": 0.1,
+              "maximum": 0.25,
+              "static_value": 0.18,
+              "uuid": "",
+              "version_uuid": "",
+              "variable": true,
+              "uncertainty_description": {
+                "type": "discrete",
+                "attributes": [
+                  {
+                    "name": "discrete",
+                    "values_and_weights": [
+                      {
+                        "value": 0.1,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 0.175,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 0.25,
+                        "weight": 0.33
+                      }
+                    ]
+                  },
+                  {
+                    "name": "lower_bounds",
+                    "value": 0.1
+                  },
+                  {
+                    "name": "upper_bounds",
+                    "value": 0.25
+                  },
+                  {
+                    "name": "modes",
+                    "value": 0.175
+                  },
+                  {
+                    "name": "delta_x",
+                    "value": 0.18
+                  },
+                  {
+                    "name": "stddev",
+                    "value": 0.05
                   }
                 ]
               },
@@ -960,7 +640,7 @@
               "name": "elec_tar",
               "value_type": "string",
               "default_value": "Secondary General",
-              "value": "Secondary General"
+              "value": "Commercial"
             },
             {
               "display_name": "Select a Gas Tariff.",
@@ -968,7 +648,7 @@
               "name": "gas_tar",
               "value_type": "string",
               "default_value": "Large CG",
-              "value": "Large CG"
+              "value": "Small CG"
             }
           ],
           "variables": [],
@@ -1165,421 +845,15 @@
         }
       ],
       "algorithm": {
-        "objective_functions": []
+        "experiment_type": "full_factorial",
+        "number_of_samples": 3,
+        "failed_f_value": 1000000000000000000,
+        "debug_messages": 0,
+        "objective_functions": [
+          "OpenStudioResults.net_site_energy"
+        ]
       },
-      "analysis_type": null,
-      "design_alternatives": [
-        {
-          "name": "Small Office",
-          "options": [
-            {
-              "measure_name": "create_doe_prototype_building",
-              "workflow_index": 0,
-              "name": "Small Office",
-              "description": "Option 1 Description"
-            },
-            {
-              "measure_name": "reduce_lighting_loads_by_percentage",
-              "workflow_index": 1,
-              "name": "reduce_lighting_loads_by_percentage",
-              "description": "The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process."
-            },
-            {
-              "measure_name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "workflow_index": 2,
-              "name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "description": "Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
-            },
-            {
-              "measure_name": "add_rooftop_pv",
-              "workflow_index": 3,
-              "name": "add_rooftop_pv",
-              "description": "This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV"
-            },
-            {
-              "measure_name": "xcel_eda_tariff_selectionand_model_setup",
-              "workflow_index": 4,
-              "name": "Xcel",
-              "description": "Option 1 Description: Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program."
-            },
-            {
-              "measure_name": "openstudio_results",
-              "workflow_index": 5,
-              "name": "Results",
-              "description": "Option 1 Description: This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data."
-            }
-          ]
-        },
-        {
-          "name": "Small Office EPD 30%",
-          "options": [
-            {
-              "measure_name": "create_doe_prototype_building",
-              "workflow_index": 0,
-              "name": "Small Office",
-              "description": "Option 1 Description"
-            },
-            {
-              "measure_name": "reduce_lighting_loads_by_percentage",
-              "workflow_index": 1,
-              "name": "reduce_lighting_loads_by_percentage",
-              "description": "The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process."
-            },
-            {
-              "measure_name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "workflow_index": 2,
-              "name": "Reduce EDP by 30%",
-              "description": "Option 1 Description: Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
-            },
-            {
-              "measure_name": "add_rooftop_pv",
-              "workflow_index": 3,
-              "name": "add_rooftop_pv",
-              "description": "This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV"
-            },
-            {
-              "measure_name": "xcel_eda_tariff_selectionand_model_setup",
-              "workflow_index": 4,
-              "name": "Xcel",
-              "description": "Option 1 Description: Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program."
-            },
-            {
-              "measure_name": "openstudio_results",
-              "workflow_index": 5,
-              "name": "Results",
-              "description": "Option 1 Description: This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data."
-            }
-          ]
-        },
-        {
-          "name": "Small Office LPD 50%",
-          "options": [
-            {
-              "measure_name": "create_doe_prototype_building",
-              "workflow_index": 0,
-              "name": "Small Office",
-              "description": "Option 1 Description"
-            },
-            {
-              "measure_name": "reduce_lighting_loads_by_percentage",
-              "workflow_index": 1,
-              "name": "LPD 50% Reduction",
-              "description": "Option 2 Description: The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process."
-            },
-            {
-              "measure_name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "workflow_index": 2,
-              "name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "description": "Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
-            },
-            {
-              "measure_name": "add_rooftop_pv",
-              "workflow_index": 3,
-              "name": "add_rooftop_pv",
-              "description": "This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV"
-            },
-            {
-              "measure_name": "xcel_eda_tariff_selectionand_model_setup",
-              "workflow_index": 4,
-              "name": "Xcel",
-              "description": "Option 1 Description: Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program."
-            },
-            {
-              "measure_name": "openstudio_results",
-              "workflow_index": 5,
-              "name": "Results",
-              "description": "Option 1 Description: This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data."
-            }
-          ]
-        },
-        {
-          "name": "Small Office Both",
-          "options": [
-            {
-              "measure_name": "create_doe_prototype_building",
-              "workflow_index": 0,
-              "name": "Small Office",
-              "description": "Option 1 Description"
-            },
-            {
-              "measure_name": "reduce_lighting_loads_by_percentage",
-              "workflow_index": 1,
-              "name": "LPD 50% Reduction",
-              "description": "Option 2 Description: The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process."
-            },
-            {
-              "measure_name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "workflow_index": 2,
-              "name": "Reduce EDP by 30%",
-              "description": "Option 1 Description: Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
-            },
-            {
-              "measure_name": "add_rooftop_pv",
-              "workflow_index": 3,
-              "name": "add_rooftop_pv",
-              "description": "This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV"
-            },
-            {
-              "measure_name": "xcel_eda_tariff_selectionand_model_setup",
-              "workflow_index": 4,
-              "name": "Xcel",
-              "description": "Option 1 Description: Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program."
-            },
-            {
-              "measure_name": "openstudio_results",
-              "workflow_index": 5,
-              "name": "Results",
-              "description": "Option 1 Description: This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data."
-            }
-          ]
-        },
-        {
-          "name": "Small Office with EE and PV",
-          "options": [
-            {
-              "measure_name": "create_doe_prototype_building",
-              "workflow_index": 0,
-              "name": "Small Office",
-              "description": "Option 1 Description"
-            },
-            {
-              "measure_name": "reduce_lighting_loads_by_percentage",
-              "workflow_index": 1,
-              "name": "LPD 50% Reduction",
-              "description": "Option 2 Description: The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process."
-            },
-            {
-              "measure_name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "workflow_index": 2,
-              "name": "Reduce EDP by 30%",
-              "description": "Option 1 Description: Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
-            },
-            {
-              "measure_name": "add_rooftop_pv",
-              "workflow_index": 3,
-              "name": "Add PV",
-              "description": "Option 1 Description: This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV"
-            },
-            {
-              "measure_name": "xcel_eda_tariff_selectionand_model_setup",
-              "workflow_index": 4,
-              "name": "Xcel",
-              "description": "Option 1 Description: Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program."
-            },
-            {
-              "measure_name": "openstudio_results",
-              "workflow_index": 5,
-              "name": "Results",
-              "description": "Option 1 Description: This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data."
-            }
-          ]
-        },
-        {
-          "name": "Med Office",
-          "options": [
-            {
-              "measure_name": "create_doe_prototype_building",
-              "workflow_index": 0,
-              "name": "Medium Office",
-              "description": "Option 2 Description: Creates the DOE Reference Building Models as starting points for other analyses."
-            },
-            {
-              "measure_name": "reduce_lighting_loads_by_percentage",
-              "workflow_index": 1,
-              "name": "reduce_lighting_loads_by_percentage",
-              "description": "The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process."
-            },
-            {
-              "measure_name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "workflow_index": 2,
-              "name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "description": "Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
-            },
-            {
-              "measure_name": "add_rooftop_pv",
-              "workflow_index": 3,
-              "name": "add_rooftop_pv",
-              "description": "This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV"
-            },
-            {
-              "measure_name": "xcel_eda_tariff_selectionand_model_setup",
-              "workflow_index": 4,
-              "name": "Xcel",
-              "description": "Option 1 Description: Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program."
-            },
-            {
-              "measure_name": "openstudio_results",
-              "workflow_index": 5,
-              "name": "Results",
-              "description": "Option 1 Description: This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data."
-            }
-          ]
-        },
-        {
-          "name": "Med Office EPD 30%",
-          "options": [
-            {
-              "measure_name": "create_doe_prototype_building",
-              "workflow_index": 0,
-              "name": "Medium Office",
-              "description": "Option 2 Description: Creates the DOE Reference Building Models as starting points for other analyses."
-            },
-            {
-              "measure_name": "reduce_lighting_loads_by_percentage",
-              "workflow_index": 1,
-              "name": "reduce_lighting_loads_by_percentage",
-              "description": "The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process."
-            },
-            {
-              "measure_name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "workflow_index": 2,
-              "name": "Reduce EDP by 30%",
-              "description": "Option 1 Description: Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
-            },
-            {
-              "measure_name": "add_rooftop_pv",
-              "workflow_index": 3,
-              "name": "add_rooftop_pv",
-              "description": "This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV"
-            },
-            {
-              "measure_name": "xcel_eda_tariff_selectionand_model_setup",
-              "workflow_index": 4,
-              "name": "Xcel",
-              "description": "Option 1 Description: Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program."
-            },
-            {
-              "measure_name": "openstudio_results",
-              "workflow_index": 5,
-              "name": "Results",
-              "description": "Option 1 Description: This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data."
-            }
-          ]
-        },
-        {
-          "name": "Med Office LPD 50%",
-          "options": [
-            {
-              "measure_name": "create_doe_prototype_building",
-              "workflow_index": 0,
-              "name": "Medium Office",
-              "description": "Option 2 Description: Creates the DOE Reference Building Models as starting points for other analyses."
-            },
-            {
-              "measure_name": "reduce_lighting_loads_by_percentage",
-              "workflow_index": 1,
-              "name": "LPD 50% Reduction",
-              "description": "Option 2 Description: The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process."
-            },
-            {
-              "measure_name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "workflow_index": 2,
-              "name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "description": "Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
-            },
-            {
-              "measure_name": "add_rooftop_pv",
-              "workflow_index": 3,
-              "name": "add_rooftop_pv",
-              "description": "This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV"
-            },
-            {
-              "measure_name": "xcel_eda_tariff_selectionand_model_setup",
-              "workflow_index": 4,
-              "name": "Xcel",
-              "description": "Option 1 Description: Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program."
-            },
-            {
-              "measure_name": "openstudio_results",
-              "workflow_index": 5,
-              "name": "Results",
-              "description": "Option 1 Description: This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data."
-            }
-          ]
-        },
-        {
-          "name": "Med Office Both",
-          "options": [
-            {
-              "measure_name": "create_doe_prototype_building",
-              "workflow_index": 0,
-              "name": "Medium Office",
-              "description": "Option 2 Description: Creates the DOE Reference Building Models as starting points for other analyses."
-            },
-            {
-              "measure_name": "reduce_lighting_loads_by_percentage",
-              "workflow_index": 1,
-              "name": "LPD 50% Reduction",
-              "description": "Option 2 Description: The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process."
-            },
-            {
-              "measure_name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "workflow_index": 2,
-              "name": "Reduce EDP by 30%",
-              "description": "Option 1 Description: Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
-            },
-            {
-              "measure_name": "add_rooftop_pv",
-              "workflow_index": 3,
-              "name": "add_rooftop_pv",
-              "description": "This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV"
-            },
-            {
-              "measure_name": "xcel_eda_tariff_selectionand_model_setup",
-              "workflow_index": 4,
-              "name": "Xcel",
-              "description": "Option 1 Description: Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program."
-            },
-            {
-              "measure_name": "openstudio_results",
-              "workflow_index": 5,
-              "name": "Results",
-              "description": "Option 1 Description: This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data."
-            }
-          ]
-        },
-        {
-          "name": "Med Office with EE and PV",
-          "options": [
-            {
-              "measure_name": "create_doe_prototype_building",
-              "workflow_index": 0,
-              "name": "Medium Office",
-              "description": "Option 2 Description: Creates the DOE Reference Building Models as starting points for other analyses."
-            },
-            {
-              "measure_name": "reduce_lighting_loads_by_percentage",
-              "workflow_index": 1,
-              "name": "LPD 50% Reduction",
-              "description": "Option 2 Description: The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process."
-            },
-            {
-              "measure_name": "reduce_electric_equipment_loads_by_percentage_diag",
-              "workflow_index": 2,
-              "name": "Reduce EDP by 30%",
-              "description": "Option 1 Description: Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power."
-            },
-            {
-              "measure_name": "add_rooftop_pv",
-              "workflow_index": 3,
-              "name": "Add PV",
-              "description": "Option 1 Description: This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV"
-            },
-            {
-              "measure_name": "xcel_eda_tariff_selectionand_model_setup",
-              "workflow_index": 4,
-              "name": "Xcel",
-              "description": "Option 1 Description: Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program."
-            },
-            {
-              "measure_name": "openstudio_results",
-              "workflow_index": 5,
-              "name": "Results",
-              "description": "Option 1 Description: This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data."
-            }
-          ]
-        }
-      ]
+      "analysis_type": "doe"
     },
     "seed": {
       "file_type": "OSM",
