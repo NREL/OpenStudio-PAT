@@ -1154,6 +1154,7 @@ export class OsServer {
             _.merge(datapoints[dp_match], datapoint);
             if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH (by ID)! New dp: ', datapoints[dp_match]);
           } else {
+            // match by name
             const dp_match2 = _.findIndex(datapoints, {name: dp.name});
             if (dp_match2 != -1) {
               // merge
@@ -1162,6 +1163,7 @@ export class OsServer {
             } else {
               // append datapoint to array
               datapoints.push(datapoint);
+              if (vm.Message.showDebug()) vm.$log.debug('No Datapoint match for: ', dp.name);
             }
           }
           if (vm.Message.showDebug()) vm.$log.debug('PROJECT DATAPOINTS NOW: ', vm.Project.getDatapoints());
@@ -1182,16 +1184,26 @@ export class OsServer {
               datapoint.status = dp.status;
               datapoint.final_message = dp.final_message;
               datapoint.id = dp.id;
-
+              // match by ID first
               const dp_match = _.findIndex(datapoints, {id: dp.id});
               if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
               if (dp_match != -1) {
                 // merge
                 _.merge(datapoints[dp_match], datapoint);
-                if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', datapoints[dp_match]);
+                if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH (by ID)! New dp: ', datapoints[dp_match]);
               } else {
-                // also load in datapoints array
-                datapoints.push(datapoint);
+                // match by name
+                const dp_match2 = _.findIndex(datapoints, {name: dp.name});
+                if (dp_match2 != -1) {
+                  // merge
+                  _.merge(datapoints[dp_match2], datapoint);
+                  if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH (by Name)! New dp: ', datapoints[dp_match2]);
+                }
+                else {
+                  // append datapoint to array
+                  datapoints.push(datapoint);
+                  if (vm.Message.showDebug()) vm.$log.debug('No Datapoint match for: ', dp.name);
+                }
               }
             }, error2 => {
               vm.$log.error('GET Datapoint.json ERROR: ', error2);
