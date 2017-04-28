@@ -4,29 +4,15 @@
     "name": "Office_Study",
     "output_variables": [
       {
-        "objective_function": false,
-        "objective_function_index": null,
-        "objective_function_target": null,
+        "objective_function": true,
+        "objective_function_index": 0,
+        "objective_function_target": 0,
         "objective_function_group": null,
         "scaling_factor": null,
-        "display_name": "eui",
-        "display_name_short": "eui",
+        "display_name": "net_site_energy",
+        "display_name_short": "net_site_energy",
         "metadata_id": null,
-        "name": "OpenStudioResults.eui",
-        "visualize": true,
-        "export": true,
-        "variable_type": "double"
-      },
-      {
-        "objective_function": false,
-        "objective_function_index": null,
-        "objective_function_target": null,
-        "objective_function_group": null,
-        "scaling_factor": null,
-        "display_name": "annual_peak_electric_demand",
-        "display_name_short": "annual_peak_electric_demand",
-        "metadata_id": null,
-        "name": "OpenStudioResults.annual_peak_electric_demand",
+        "name": "OpenStudioResults.net_site_energy",
         "visualize": true,
         "export": true,
         "variable_type": "double"
@@ -122,15 +108,23 @@
                     "values_and_weights": [
                       {
                         "value": "SmallOffice",
-                        "weight": 0
+                        "weight": 0.2
                       },
                       {
                         "value": "MediumOffice",
-                        "weight": 0.5
+                        "weight": 0.2
                       },
                       {
-                        "value": "LargeOffice",
-                        "weight": 0.5
+                        "value": "SecondarySchool",
+                        "weight": 0.2
+                      },
+                      {
+                        "value": "RetailStripmall",
+                        "weight": 0.2
+                      },
+                      {
+                        "value": "MidriseApartment",
+                        "weight": 0.2
                       }
                     ]
                   },
@@ -160,90 +154,6 @@
             }
           ],
           "workflow_index": 0
-        },
-        {
-          "name": "set_window_to_wall_ratio_by_facade",
-          "display_name": "Set Window to Wall Ratio by Facade",
-          "measure_type": "RubyMeasure",
-          "measure_definition_class_name": "SetWindowToWallRatioByFacade",
-          "measure_definition_directory": "./measures/7c1d72ce-8e72-44a7-a0b0-d049cd5fb5d0",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_Study/measures/7c1d72ce-8e72-44a7-a0b0-d049cd5fb5d0",
-          "measure_definition_display_name": "Set Window to Wall Ratio by Facade",
-          "measure_definition_name": "set_window_to_wall_ratio_by_facade",
-          "measure_definition_name_xml": null,
-          "measure_definition_uuid": "f347ae80-48b4-4c40-bfd4-6c5139b38136",
-          "measure_definition_version_uuid": "869f49f5-ac00-4e1d-8c60-3188cf59f906",
-          "uuid": "f347ae80-48b4-4c40-bfd4-6c5139b38136",
-          "version_uuid": "869f49f5-ac00-4e1d-8c60-3188cf59f906",
-          "description": "This measure will set the window to wall ratio for exterior surfaces with a specified orientation. If one or more windows exist on an affected wall, they will be removed and replaced with a single ribbon window. Doors will not be removed. If the requested ratio can't be achieved then the wall will remain untouched.",
-          "taxonomy": "Envelope.Fenestration",
-          "arguments": [
-            {
-              "display_name": "Sill Height (in).",
-              "display_name_short": "sillHeight",
-              "name": "sillHeight",
-              "value_type": "double",
-              "default_value": 30,
-              "value": 30
-            },
-            {
-              "display_name": "Cardinal Direction.",
-              "display_name_short": "facade",
-              "name": "facade",
-              "value_type": "string",
-              "default_value": "South",
-              "value": "South"
-            }
-          ],
-          "variables": [
-            {
-              "argument": {
-                "display_name": "Window to Wall Ratio (fraction).",
-                "display_name_short": "wwr",
-                "name": "wwr",
-                "value_type": "double",
-                "default_value": 0.4,
-                "value": 0.4
-              },
-              "display_name": "Window to Wall Ratio (fraction).",
-              "display_name_short": "wwr",
-              "variable_type": "variable",
-              "units": "",
-              "minimum": 0.2,
-              "maximum": 0.8,
-              "static_value": 0.4,
-              "uuid": "",
-              "version_uuid": "",
-              "variable": true,
-              "uncertainty_description": {
-                "type": "triangle",
-                "attributes": [
-                  {
-                    "name": "lower_bounds",
-                    "value": 0.2
-                  },
-                  {
-                    "name": "upper_bounds",
-                    "value": 0.8
-                  },
-                  {
-                    "name": "modes",
-                    "value": 0.6
-                  },
-                  {
-                    "name": "delta_x",
-                    "value": 0.4
-                  },
-                  {
-                    "name": "stddev",
-                    "value": 0.1
-                  }
-                ]
-              },
-              "workflow_index": 0
-            }
-          ],
-          "workflow_index": 1
         },
         {
           "name": "reduce_lighting_loads_by_percentage",
@@ -348,8 +258,25 @@
               "version_uuid": "",
               "variable": true,
               "uncertainty_description": {
-                "type": "normal",
+                "type": "discrete",
                 "attributes": [
+                  {
+                    "name": "discrete",
+                    "values_and_weights": [
+                      {
+                        "value": 0,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 30,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 60,
+                        "weight": 0.33
+                      }
+                    ]
+                  },
                   {
                     "name": "lower_bounds",
                     "value": 0
@@ -375,7 +302,320 @@
               "workflow_index": 0
             }
           ],
+          "workflow_index": 1
+        },
+        {
+          "name": "reduce_electric_equipment_loads_by_percentage_diag",
+          "display_name": "Reduce Electric Equipment Loads by Percentage",
+          "measure_type": "RubyMeasure",
+          "measure_definition_class_name": "ReduceElectricEquipmentLoadsByPercentageDiag",
+          "measure_definition_directory": "./measures/ReduceElectricEquipmentLoadsByPercentageDiag",
+          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_Study/measures/ReduceElectricEquipmentLoadsByPercentageDiag",
+          "measure_definition_display_name": "Reduce Electric Equipment Loads by Percentage",
+          "measure_definition_name": "reduce_electric_equipment_loads_by_percentage_diag",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "428bba5b-84c3-4c4c-a94d-88a5f59f51ee",
+          "measure_definition_version_uuid": "d79b6424-5611-4f01-a3f4-2468f95bcb50",
+          "uuid": "428bba5b-84c3-4c4c-a94d-88a5f59f51ee",
+          "version_uuid": "d79b6424-5611-4f01-a3f4-2468f95bcb50",
+          "description": "Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power.",
+          "taxonomy": "Equipment.Electric Equipment",
+          "arguments": [
+            {
+              "display_name": "Run Measure",
+              "display_name_short": "run_measure",
+              "name": "run_measure",
+              "value_type": "integer",
+              "default_value": 1,
+              "value": 1
+            },
+            {
+              "display_name": "Apply the Measure to a Specific Space Type or to the Entire Model.",
+              "display_name_short": "space_type",
+              "name": "space_type",
+              "value_type": "string",
+              "default_value": "*Entire Building*",
+              "value": "*Entire Building*"
+            },
+            {
+              "display_name": "Increase in Material and Installation Cost for Electric Equipment per Floor Area (%).",
+              "display_name_short": "material_and_installation_cost",
+              "name": "material_and_installation_cost",
+              "value_type": "double",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "Increase in Demolition Costs for Electric Equipment per Floor Area (%).",
+              "display_name_short": "demolition_cost",
+              "name": "demolition_cost",
+              "value_type": "double",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "Years Until Costs Start (whole years).",
+              "display_name_short": "years_until_costs_start",
+              "name": "years_until_costs_start",
+              "value_type": "integer",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "Demolition Costs Occur During Initial Construction?",
+              "display_name_short": "demo_cost_initial_const",
+              "name": "demo_cost_initial_const",
+              "value_type": "boolean",
+              "default_value": false,
+              "value": false
+            },
+            {
+              "display_name": "Expected Life (whole years).",
+              "display_name_short": "expected_life",
+              "name": "expected_life",
+              "value_type": "integer",
+              "default_value": 15,
+              "value": 15
+            },
+            {
+              "display_name": "Increase O & M Costs for Electric Equipment per Floor Area (%).",
+              "display_name_short": "om_cost",
+              "name": "om_cost",
+              "value_type": "double",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "O & M Frequency (whole years).",
+              "display_name_short": "om_frequency",
+              "name": "om_frequency",
+              "value_type": "integer",
+              "default_value": 1,
+              "value": 1
+            }
+          ],
+          "variables": [
+            {
+              "argument": {
+                "display_name": "Electric Equipment Power Reduction (%).",
+                "display_name_short": "elecequip_power_reduction_percent",
+                "name": "elecequip_power_reduction_percent",
+                "value_type": "double",
+                "default_value": 30,
+                "value": 30
+              },
+              "display_name": "Electric Equipment Power Reduction (%).",
+              "display_name_short": "elecequip_power_reduction_percent",
+              "variable_type": "variable",
+              "units": "",
+              "minimum": 0,
+              "maximum": 30,
+              "static_value": 30,
+              "uuid": "",
+              "version_uuid": "",
+              "variable": true,
+              "uncertainty_description": {
+                "type": "discrete",
+                "attributes": [
+                  {
+                    "name": "discrete",
+                    "values_and_weights": [
+                      {
+                        "value": 0,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 15,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 30,
+                        "weight": 0.33
+                      }
+                    ]
+                  },
+                  {
+                    "name": "lower_bounds",
+                    "value": 0
+                  },
+                  {
+                    "name": "upper_bounds",
+                    "value": 30
+                  },
+                  {
+                    "name": "modes",
+                    "value": 15
+                  },
+                  {
+                    "name": "delta_x",
+                    "value": 30
+                  },
+                  {
+                    "name": "stddev",
+                    "value": 10
+                  }
+                ]
+              },
+              "workflow_index": 0
+            }
+          ],
           "workflow_index": 2
+        },
+        {
+          "name": "add_rooftop_pv",
+          "display_name": "Add Rooftop PV",
+          "measure_type": "RubyMeasure",
+          "measure_definition_class_name": "AddRooftopPV",
+          "measure_definition_directory": "./measures/ffca943f-bb8f-4b9d-8bf8-24d1e8cb1c18",
+          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_Study/measures/ffca943f-bb8f-4b9d-8bf8-24d1e8cb1c18",
+          "measure_definition_display_name": "Add Rooftop PV",
+          "measure_definition_name": "add_rooftop_pv",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "34550614-0c87-44db-9252-0ca0915b1e64",
+          "measure_definition_version_uuid": "ffca943f-bb8f-4b9d-8bf8-24d1e8cb1c18",
+          "uuid": "34550614-0c87-44db-9252-0ca0915b1e64",
+          "version_uuid": "ffca943f-bb8f-4b9d-8bf8-24d1e8cb1c18",
+          "description": "This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV",
+          "taxonomy": "Onsite Power Generation.Photovoltaic",
+          "arguments": [
+            {
+              "display_name": "Inverter Efficiency",
+              "display_name_short": "inverter_efficiency",
+              "name": "inverter_efficiency",
+              "value_type": "double",
+              "default_value": 0.98,
+              "value": 0.98
+            }
+          ],
+          "variables": [
+            {
+              "argument": {
+                "display_name": "Fraction of Surface Area with Active Solar Cells",
+                "display_name_short": "fraction_of_surface",
+                "name": "fraction_of_surface",
+                "value_type": "double",
+                "default_value": 0.75,
+                "value": 0.75
+              },
+              "display_name": "Fraction of Surface Area with Active Solar Cells",
+              "display_name_short": "fraction_of_surface",
+              "variable_type": "variable",
+              "units": "",
+              "minimum": 0,
+              "maximum": 0.75,
+              "static_value": 0.75,
+              "uuid": "",
+              "version_uuid": "",
+              "variable": true,
+              "uncertainty_description": {
+                "type": "discrete",
+                "attributes": [
+                  {
+                    "name": "discrete",
+                    "values_and_weights": [
+                      {
+                        "value": 0,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 0.375,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 0.75,
+                        "weight": 0.33
+                      }
+                    ]
+                  },
+                  {
+                    "name": "lower_bounds",
+                    "value": 0
+                  },
+                  {
+                    "name": "upper_bounds",
+                    "value": 0.75
+                  },
+                  {
+                    "name": "modes",
+                    "value": 0.375
+                  },
+                  {
+                    "name": "delta_x",
+                    "value": 0.75
+                  },
+                  {
+                    "name": "stddev",
+                    "value": 0.15
+                  }
+                ]
+              },
+              "workflow_index": 0
+            },
+            {
+              "argument": {
+                "display_name": "Cell Efficiency",
+                "display_name_short": "cell_efficiency",
+                "name": "cell_efficiency",
+                "value_type": "double",
+                "default_value": 0.18,
+                "value": 0.18
+              },
+              "display_name": "Cell Efficiency",
+              "display_name_short": "cell_efficiency",
+              "variable_type": "variable",
+              "units": "fraction",
+              "minimum": 0.1,
+              "maximum": 0.25,
+              "static_value": 0.18,
+              "uuid": "",
+              "version_uuid": "",
+              "variable": true,
+              "uncertainty_description": {
+                "type": "discrete",
+                "attributes": [
+                  {
+                    "name": "discrete",
+                    "values_and_weights": [
+                      {
+                        "value": 0.1,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 0.175,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 0.25,
+                        "weight": 0.33
+                      }
+                    ]
+                  },
+                  {
+                    "name": "lower_bounds",
+                    "value": 0.1
+                  },
+                  {
+                    "name": "upper_bounds",
+                    "value": 0.25
+                  },
+                  {
+                    "name": "modes",
+                    "value": 0.175
+                  },
+                  {
+                    "name": "delta_x",
+                    "value": 0.18
+                  },
+                  {
+                    "name": "stddev",
+                    "value": 0.05
+                  }
+                ]
+              },
+              "workflow_index": 1
+            }
+          ],
+          "workflow_index": 3
         },
         {
           "name": "xcel_eda_tariff_selectionand_model_setup",
@@ -412,7 +652,7 @@
             }
           ],
           "variables": [],
-          "workflow_index": 3
+          "workflow_index": 4
         },
         {
           "name": "openstudio_results",
@@ -601,15 +841,17 @@
             }
           ],
           "variables": [],
-          "workflow_index": 4
+          "workflow_index": 5
         }
       ],
       "algorithm": {
         "experiment_type": "full_factorial",
-        "number_of_samples": 5,
+        "number_of_samples": 3,
         "failed_f_value": 1000000000000000000,
         "debug_messages": 0,
-        "objective_functions": []
+        "objective_functions": [
+          "OpenStudioResults.net_site_energy"
+        ]
       },
       "analysis_type": "doe"
     },
