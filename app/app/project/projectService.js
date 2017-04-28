@@ -2135,7 +2135,7 @@ export class Project {
       defaultValue: 2,
       type:'number'
     }, {
-      name: 'exit_on_guideline14',
+      name: 'exit_on_guideline_14',
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
@@ -2197,7 +2197,7 @@ export class Project {
       defaultValue: 2,
       type:'number'
     }, {
-      name: 'exit_on_guideline14',
+      name: 'exit_on_guideline_14',
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
@@ -2357,7 +2357,7 @@ export class Project {
       defaultValue: 2,
       type:'number'
     }, {
-      name: 'exit_on_guideline14',
+      name: 'exit_on_guideline_14',
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
@@ -2481,7 +2481,7 @@ export class Project {
       defaultValue: 2,
       type:'number'
     }, {
-      name: 'exit_on_guideline14',
+      name: 'exit_on_guideline_14',
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
@@ -2649,7 +2649,7 @@ export class Project {
       defaultValue: 2,
       type:'number'
     }, {
-      name: 'exit_on_guideline14',
+      name: 'exit_on_guideline_14',
       displayName: 'Exit on Guideline 14?',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
