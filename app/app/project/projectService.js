@@ -2137,7 +2137,7 @@ export class Project {
     }, {
       name: 'exit_on_guideline_14',
       displayName: 'Exit on Guideline 14?',
-      description: 'Options: 1 or 0 (True or False)',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
       defaultValue: 0,
       type:'number'
     }, {
@@ -2199,7 +2199,7 @@ export class Project {
     }, {
       name: 'exit_on_guideline_14',
       displayName: 'Exit on Guideline 14?',
-      description: 'Options: 1 or 0 (True or False)',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
       defaultValue: 0,
       type:'number'
     }, {
@@ -2359,7 +2359,7 @@ export class Project {
     }, {
       name: 'exit_on_guideline_14',
       displayName: 'Exit on Guideline 14?',
-      description: 'Options: 1 or 0 (True or False)',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
       defaultValue: 0,
       type:'number'
     }, {
@@ -2483,7 +2483,7 @@ export class Project {
     }, {
       name: 'exit_on_guideline_14',
       displayName: 'Exit on Guideline 14?',
-      description: 'Options: 1 or 0 (True or False)',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
       defaultValue: 0,
       type:'number'
     }, {
@@ -2651,7 +2651,7 @@ export class Project {
     }, {
       name: 'exit_on_guideline_14',
       displayName: 'Exit on Guideline 14?',
-      description: 'Options: 1 or 0 (True or False)',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
       defaultValue: 0,
       type:'number'
     }, {
