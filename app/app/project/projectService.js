@@ -944,14 +944,14 @@ export class Project {
             // pivots can be discrete or integer_sequence_uncertain (handled in analysis controller)
             // options are triangle, uniform, discrete, and normal, integer_sequence_uncertain
             // TODO what about pivots?
-            if (arg.inputs.variableSetting == 'Discrete' || arg.inputs.variableSetting == 'Pivot') {
+            if ((arg.inputs.variableSetting == 'Discrete' || arg.inputs.variableSetting == 'Pivot') && arg.inputs.distribution != 'Integer Sequence') {
               v.uncertainty_description.type = 'discrete';
             } else {
               v.uncertainty_description.type = arg.inputs.distribution == 'Integer Sequence' ? 'integer_sequence' : arg.inputs.distribution.toLowerCase();
             }
             v.uncertainty_description.attributes = [];
 
-            // if discrete or pivot, make values and weights array (unless pivot w/ integer_sequence)
+            // if discrete or pivot, make values and weights array (unless integer_sequence)
             if ((arg.inputs.variableSetting == 'Pivot' || arg.inputs.variableSetting == 'Discrete') && arg.inputs.distribution != 'Integer Sequence') {
               const valArr = vm.makeDiscreteValuesArray(arg.inputs.discreteVariables);
               v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
@@ -975,7 +975,7 @@ export class Project {
         measure_count += 1;
         // push measure to OSA
         vm.osa.analysis.problem.workflow.push(m);
-        
+
       }
     });
 
