@@ -960,7 +960,16 @@ export class Project {
             // TODO: if any of these don't exist, set to inputs.default_value
             v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.inputs.minimum});  // minimum
             v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.inputs.maximum});  // maximum
-            v.uncertainty_description.attributes.push({name: 'modes', value: arg.inputs.mean}); // mean
+
+            // special case for integer_sequence
+            if (arg.inputs.distribution == 'Integer Sequence') {
+              v.uncertainty_description.attributes.push({name: 'modes', value: 1}); // mean
+            } else {
+              v.uncertainty_description.attributes.push({name: 'modes', value: arg.inputs.mean}); // mean
+            }
+
+
+
             v.uncertainty_description.attributes.push({name: 'delta_x', value: arg.inputs.deltaX}); // delta x
             v.uncertainty_description.attributes.push({name: 'stddev', value: arg.inputs.stdDev});  // std dev
 
