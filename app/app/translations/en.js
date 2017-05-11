@@ -118,7 +118,8 @@ export default {
     amisError: 'Cannot retrieve OpenStudio Server Versions',
     noYaml: 'No AWS credentials selected. Cannot start/connect to AWS',
     noCluster: 'No cluster selected. Cannot start/connect to AWS',
-    objFunctionGroupError: 'This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully'
+    objFunctionGroupError: 'This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully',
+    numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully'
   },
   analysis: {
     title: 'Analysis',

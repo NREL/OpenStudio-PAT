@@ -857,6 +857,8 @@ export class Project {
     }
 
     // MEASURE DETAILS
+    let analysis_variables = 0;
+
     let measure_count = 0;
     _.forEach(vm.measures, (measure) => {
       // for algorithmic workflows, don't add SKIPPED measure to JSON
@@ -964,6 +966,7 @@ export class Project {
 
             v.workflow_index = var_count;
             var_count += 1;
+            analysis_variables += 1;
             m.variables.push(v);
           }
         });
@@ -972,8 +975,18 @@ export class Project {
         measure_count += 1;
         // push measure to OSA
         vm.osa.analysis.problem.workflow.push(m);
+        
       }
     });
+
+    // ensure at least 2 variables for certain algorithms
+    if (analysis_variables < 2 && ['nsga_nrel', 'doe'].indexOf(vm.samplingMethod.id) != -1) {
+
+      vm.$log.error('This algorithm needs at least 2 variables defined on the analysis tab to run successfully.');
+      vm.$translate('toastr.numberVariablesError').then(translation => {
+        vm.toastr.warning(translation);
+      });
+    }
   }
 
   makeDiscreteValuesArray(discreteVariables) {
