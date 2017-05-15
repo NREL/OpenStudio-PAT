@@ -1,0 +1,103 @@
+<measure>
+  <schema_version>3.0</schema_version>
+  <name>change_roof_thermal_properties</name>
+  <uid>6c4eb22b-770f-456c-bcd1-084cfad89eeb</uid>
+  <version_id>f7b551df-9610-44f4-9ee2-ddf69bf6f965</version_id>
+  <version_modified>20170320T192150Z</version_modified>
+  <xml_checksum>31085437</xml_checksum>
+  <class_name>ChangeRoofThermalProperties</class_name>
+  <display_name>Change Roof Thermal Properties</display_name>
+  <description>Allows calibration of roof by altering the thermal resistance, density, and solar absorptance of the wall constructions independently.</description>
+  <modeler_description>Tunes all roof surfaces by providing separate calibration multipliers to thermal resistance, thermal mass, and solar absorptance.</modeler_description>
+  <arguments>
+    <argument>
+      <name>r_value_mult</name>
+      <display_name>Roof total R-value multiplier</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1</default_value>
+    </argument>
+    <argument>
+      <name>solar_abs_mult</name>
+      <display_name>Roof solar absorptance multiplier</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1</default_value>
+    </argument>
+    <argument>
+      <name>thermal_mass_mult</name>
+      <display_name>Roof thermal mass multiplier</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1</default_value>
+    </argument>
+  </arguments>
+  <outputs/>
+  <provenances/>
+  <tags>
+    <tag>Envelope.Opaque</tag>
+    <tag>Calibration</tag>
+  </tags>
+  <attributes>
+    <attribute>
+      <name>Measure Function</name>
+      <value>Measure</value>
+      <datatype>string</datatype>
+    </attribute>
+    <attribute>
+      <name>Requires EnergyPlus Results</name>
+      <value>false</value>
+      <datatype>boolean</datatype>
+    </attribute>
+    <attribute>
+      <name>Measure Type</name>
+      <value>ModelMeasure</value>
+      <datatype>string</datatype>
+    </attribute>
+    <attribute>
+      <name>Uses SketchUp API</name>
+      <value>false</value>
+      <datatype>boolean</datatype>
+    </attribute>
+  </attributes>
+  <files>
+    <file>
+      <filename>EnvelopeAndLoadTestModel_01.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>10AA8866</checksum>
+    </file>
+    <file>
+      <filename>ReverseTranslatedModel.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>0B94403D</checksum>
+    </file>
+    <file>
+      <filename>ChangeRoofThermalProperties_Test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>D73E5688</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>0.11.5</identifier>
+        <min_compatible>0.11.5</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>2E673C0C</checksum>
+    </file>
+    <file>
+      <filename>ChangeRoofThermalProperties_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>D73E5688</checksum>
+    </file>
+  </files>
+</measure>

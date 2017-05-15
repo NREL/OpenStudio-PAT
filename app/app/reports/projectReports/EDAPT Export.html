@@ -17,6 +17,11 @@
   <div ng-controller="MyAppCtrl">
 
     <h1>EDAPT Export</h1>
+
+    <ul>
+      <li class="alert alert-warning" ng-repeat="warn in renderWarns">{{ warn }}</li>
+    </ul>
+
     <h2>Select Baselines</h2>
     <table class="table-bordered table-condensed table-striped">
       <tr>
@@ -132,6 +137,9 @@
       $scope.cost_baseline = "";
       $scope.proposed_baseline = "";
 
+      // Show any issues
+      $scope.renderWarns = [];
+
       // Set up some additional data properties after the results
       // are passed in.
       $scope.setupAfterResultsAvailable = function () {
@@ -147,7 +155,11 @@
         _.forEach($scope.results, function (run) {
           $scope.numAlts += 1;
           _.forEach(run.steps, function (step) {
-            var idPlusArgs = step.measure_id + JSON.stringify(step.arguments);
+            // Make sure the results exist
+            if (!step.hasOwnProperty('result')){
+              return;
+            }
+            var idPlusArgs = step.result.measure_uid + JSON.stringify(step.arguments);
             step.idPlusArgs = idPlusArgs;
             if ($scope.measureCounts[idPlusArgs]) {
               $scope.measureCounts[idPlusArgs] += 1;
@@ -179,6 +191,13 @@
           }
         });
 
+      };
+
+      // Warn user that this report doesn't work in Algorithmic mode
+      $scope.setupAfterAlgorithmicResultsAvailable = function () {
+        if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
+          $scope.renderWarns.push("This report will only work with Analysis Type = Manual.");
+        }
       };
 
       // Move the design alternative up one position
@@ -288,8 +307,8 @@
 
             var measure = {};
             measure.name = step.name;
-            measure.id = step.measure_id;
-            measure.category = step.taxonomy;
+            measure.id = step.result.measure_uid;
+            measure.category = step.result.measure_taxonomy;
             measure.description = step.description;
             measure.initial_condition = step.result.step_initial_condition;
             measure.final_condition = step.result.step_final_condition;
@@ -603,6 +622,16 @@
     $scope.$apply(function () {
       $scope.results = data;
       $scope.setupAfterResultsAvailable();
+    });
+  }
+
+  function setAlgorithmicData(metadata, results) {
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    $scope.$apply(function () {
+      $scope.algorithm_results = metadata;
+      $scope.algorithm_metadata = results;
+      $scope.setupAfterAlgorithmicResultsAvailable();
     });
   }
 

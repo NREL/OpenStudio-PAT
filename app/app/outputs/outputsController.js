@@ -1,6 +1,33 @@
+/***********************************************************************************************************************
+ *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *  following conditions are met:
+ *
+ *  (1) Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *  disclaimer.
+ *
+ *  (2) Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *  following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *  (3) Neither the name of the copyright holder nor the names of any contributors may be used to endorse or promote
+ *  products derived from this software without specific prior written permission from the respective party.
+ *
+ *  (4) Other than as required in clauses (1) and (2), distributions in any form of modifications or other derivative
+ *  works may not use the "OpenStudio" trademark, "OS", "os", or any other confusingly similar designation without
+ *  specific prior written permission from Alliance for Sustainable Energy, LLC.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER, THE UNITED STATES GOVERNMENT, OR ANY CONTRIBUTORS BE LIABLE FOR
+ *  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **********************************************************************************************************************/
 export class OutputsController {
 
-  constructor($log, Project, $scope, $uibModal, $q, $window) {
+  constructor($log, Project, $scope, $uibModal, $q, $window, Message) {
     'ngInject';
 
     const vm = this;
@@ -11,6 +38,7 @@ export class OutputsController {
     vm.$uibModal = $uibModal;
     vm.$q = $q;
     vm.$window = $window;
+    vm.Message = Message;
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
@@ -25,7 +53,7 @@ export class OutputsController {
 
     // initialize grid dropdowns
     vm.booleanDropdownArr = [{id: 'true', name: 'true'}, {id: 'false', name: 'false'}];
-    vm.variableTypeDropdownArr = [{id: 'Double'}, {id: 'Integer'}, {id:'Bool'}, {id:'String'}];
+    vm.variableTypeDropdownArr = [{id: 'Double'}, {id: 'Integer'}, {id: 'Bool'}, {id: 'String'}];
 
     vm.gridApis = [];
     vm.$scope.gridOptions = [];
@@ -33,11 +61,11 @@ export class OutputsController {
 
     // size grids according to data
     vm.$scope.getTableHeight = function (name) {
-      let rowHeight = 30; // row height
-      let headerHeight = 55; // header height
+      const rowHeight = 30; // row height
+      const headerHeight = 55; // header height
       const m = _.find(vm.$scope.measures, {name: name});
       const length = _.filter(m.analysisOutputs).length;
-      vm.$log.debug('data length: ', length);
+      if (vm.Message.showDebug()) vm.$log.debug('data length: ', length);
       return {
         height: (length * rowHeight + headerHeight + 15) + 'px'
       };
@@ -47,7 +75,7 @@ export class OutputsController {
 
   setOutputMeasures() {
     const vm = this;
-    if (!vm.$scope.outputMeasures){
+    if (!vm.$scope.outputMeasures) {
       vm.$scope.outputMeasures = [];
     }
 
@@ -67,33 +95,34 @@ export class OutputsController {
     }
 
     // user-added measures
-    const others = _.filter(vm.$scope.measures, {outputMeasure: true} );
-    vm.$log.debug('All Output Measures: ', others);
+    const others = _.filter(vm.$scope.measures, {outputMeasure: true});
+    if (vm.Message.showDebug()) vm.$log.debug('All Output Measures: ', others);
     vm.$scope.outputMeasures = _.union(vm.$scope.outputMeasures, others);
 
     // ensure there's a key for user-defined outputs
     _.forEach(vm.$scope.outputMeasures, (measure) => {
-      if (!measure.userDefinedOutputs){
+      if (!measure.userDefinedOutputs) {
         measure.userDefinedOutputs = [];
       }
     });
 
     // make sure all measures have a outputMeasure key
     _.forEach(vm.$scope.measures, (measure) => {
-      if (!measure.outputMeasure){
+      if (!measure.outputMeasure) {
         measure.outputMeasure = false;
       }
     });
 
-    vm.$log.debug('Output Measures: ', vm.$scope.outputMeasures);
+    if (vm.Message.showDebug()) vm.$log.debug('Output Measures: ', vm.$scope.outputMeasures);
 
   }
 
   initializeGrids() {
     const vm = this;
-    vm.$log.debug('Output::initializeGrids');
+    if (vm.Message.showDebug()) vm.$log.debug('Output::initializeGrids');
     vm.$scope.measures = _.sortBy(vm.$scope.measures, ['workflow_index']);
     vm.setGridOptions();
+    if (vm.Message.showDebug()) vm.$log.debug('SET GRID OPTIONS: ', vm.$scope.gridOptions);
 
   }
 
@@ -108,9 +137,9 @@ export class OutputsController {
     _.forEach(vm.$scope.outputMeasures, (measure) => {
 
       if (measure.analysisOutputs == undefined) measure.analysisOutputs = [];
-      vm.$log.debug('measure: ', measure);
+      if (vm.Message.showDebug()) vm.$log.debug('measure: ', measure);
 
-      vm.$scope.gridOptions[measure.instanceId] = {
+      vm.$scope.gridOptions[measure.name] = {
         data: 'measure.analysisOutputs',
         enableSorting: false,
         autoResize: true,
@@ -162,7 +191,7 @@ export class OutputsController {
           editDropdownOptionsArray: vm.booleanDropdownArr,
           headerCellFilter: 'translate',
           category: 'Output Selection',
-          width:100,
+          width: 100,
           minWidth: 70
         }, {
           name: 'objective_function',
@@ -187,7 +216,7 @@ export class OutputsController {
           displayName: 'outputs.columns.units',
           headerCellFilter: 'translate',
           category: 'Objective Function Settings',
-          width:70,
+          width: 70,
           minWidth: 40
         }, {
           name: 'weighting_factor',
@@ -199,12 +228,12 @@ export class OutputsController {
           minWidth: 50
         }],
         onRegisterApi: function (gridApi) {
-          vm.gridApis[measure.instanceId] = gridApi;
+          vm.gridApis[measure.name] = gridApi;
           gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
             // set modified
             vm.setIsModified();
             // check if obj function is selected on an invalid variable type (only when editing objective_function or type
-            if ((['objective_function', 'type'].indexOf(colDef.name) != -1) && oldValue != newValue && rowEntity.objective_function == 'true' && ['Double', 'Integer', 'Bool'].indexOf(rowEntity.type) == -1 ){
+            if ((['objective_function', 'type'].indexOf(colDef.name) != -1) && oldValue != newValue && rowEntity.objective_function == 'true' && ['Double', 'Integer', 'Bool'].indexOf(rowEntity.type) == -1) {
               // invalid choice for objective function
               vm.$window.alert('Objective Functions can only be used with outputs of type Double, Integer, or Bool.');
             }
@@ -212,14 +241,14 @@ export class OutputsController {
         }
       };
 
-      // add objective function groups for SPEA and NSGA only
-      vm.$log.debug('sampling method: ', vm.$scope.selectedSamplingMethod);
+      // add objective function groups for SPEA, NSGA, and Morris only
+      if (vm.Message.showDebug()) vm.$log.debug('sampling method: ', vm.$scope.selectedSamplingMethod);
 
-      if (['NSGA2', 'SPEA2'].indexOf(vm.$scope.selectedSamplingMethod.id) != -1) {
-        vm.$log.debug('adding objective function group column');
+      if (['nsga_nrel', 'spea_nrel', 'morris', 'sobol'].indexOf(vm.$scope.selectedSamplingMethod.id) != -1) {
+        if (vm.Message.showDebug()) vm.$log.debug('adding objective function group column');
         const ofg = {
           name: 'obj_function_group',
-            displayName: 'outputs.columns.objectiveFunctionGroup',
+          displayName: 'outputs.columns.objectiveFunctionGroup',
           category: 'Objective Function Settings',
           editDropdownIdLabel: 'name',
           type: 'number',
@@ -227,7 +256,7 @@ export class OutputsController {
           width: 100,
           minWidth: 40
         };
-        vm.$scope.gridOptions[measure.instanceId].columnDefs.push(ofg);
+        vm.$scope.gridOptions[measure.name].columnDefs.push(ofg);
       }
 
     });
@@ -242,7 +271,7 @@ export class OutputsController {
   addOutputs(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('Output::addOutputs');
+    if (vm.Message.showDebug()) vm.$log.debug('Output::addOutputs');
 
     // open modal for user to select outputs. Already selected outputs are shown as checked ?
     const modalInstance = vm.$uibModal.open({
@@ -261,7 +290,7 @@ export class OutputsController {
     });
 
     modalInstance.result.then(() => {
-      vm.$log.debug('NEW Analysis OUTPUTS: ', measure.analysisOutputs);
+      if (vm.Message.showDebug()) vm.$log.debug('NEW Analysis OUTPUTS: ', measure.analysisOutputs);
       vm.setIsModified();
       deferred.resolve();
 
@@ -276,15 +305,15 @@ export class OutputsController {
   removeMeasure(measure) {
     const vm = this;
     measure.outputMeasure = false;
-    _.remove(vm.$scope.outputMeasures, {instanceId: measure.instanceId});
+    _.remove(vm.$scope.outputMeasures, {name: measure.name});
   }
 
   addMeasure() {
     const vm = this;
-    vm.$log.debug('in Outputs::addMeasure');
-    vm.$log.debug('measure to add: ', vm.$scope.addMeasure.measure);
-    if (vm.$scope.addMeasure.measure){
-      vm.$log.debug('Adding this measure: ', vm.$scope.addMeasure.measure);
+    if (vm.Message.showDebug()) vm.$log.debug('in Outputs::addMeasure');
+    if (vm.Message.showDebug()) vm.$log.debug('measure to add: ', vm.$scope.addMeasure.measure);
+    if (vm.$scope.addMeasure.measure) {
+      if (vm.Message.showDebug()) vm.$log.debug('Adding this measure: ', vm.$scope.addMeasure.measure);
       const measure = _.find(vm.$scope.measures, {name: vm.$scope.addMeasure.measure.name});
       if (measure) {
         measure.outputMeasure = true;
@@ -293,7 +322,7 @@ export class OutputsController {
       }
       vm.$scope.addMeasure.measure = null;
     } else {
-      vm.$log.debug("No Measure Selected");
+      if (vm.Message.showDebug()) vm.$log.debug('No Measure Selected');
     }
   }
 

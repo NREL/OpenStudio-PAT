@@ -1,10 +1,36 @@
+/***********************************************************************************************************************
+ *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *  following conditions are met:
+ *
+ *  (1) Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *  disclaimer.
+ *
+ *  (2) Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *  following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *  (3) Neither the name of the copyright holder nor the names of any contributors may be used to endorse or promote
+ *  products derived from this software without specific prior written permission from the respective party.
+ *
+ *  (4) Other than as required in clauses (1) and (2), distributions in any form of modifications or other derivative
+ *  works may not use the "OpenStudio" trademark, "OS", "os", or any other confusingly similar designation without
+ *  specific prior written permission from Alliance for Sustainable Energy, LLC.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER, THE UNITED STATES GOVERNMENT, OR ANY CONTRIBUTORS BE LIABLE FOR
+ *  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **********************************************************************************************************************/
 /*global bootlint*/
 
 import {remote} from 'electron';
 const {app, Menu, shell} = remote;
-import jetpack from 'fs-jetpack';
 
-export function runBlock($rootScope, $state, $window, $document, $translate, toastr, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log) {
+export function runBlock($rootScope, $state, $window, $document, $translate, toastr, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log, Message) {
   'ngInject';
 
   let exitReady = false;
@@ -16,32 +42,34 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
         // only if project is set
         if (Project.getProjectDir() != null) {
           e.returnValue = false;
-          toastr.info('Preparing to Exit');
-          Project.modifiedModal().then( () => {
+          $translate('toastr.prepareExit').then(translation => {
+            toastr.info(translation);
+          });
+          Project.modifiedModal().then(() => {
             $log.debug('Resolving modifiedModal()');
             MeasureManager.stopMeasureManager();
             // stop cloud?
-            OsServer.cloudRunningModal().then( resp => {
+            OsServer.cloudRunningModal().then(() => {
               // stop success or nothing to stop
               // force stop LOCAL server (even if remote server is running)
-              OsServer.stopServer('local').then(response => {
+              OsServer.stopServer('local').then(() => {
                 //  server is stopped
                 //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
                 exitReady = true;
                 app.quit();
-              }, error => {
+              }, () => {
                 exitReady = true;
                 app.quit();
               });
-            }, err => {
+            }, () => {
               // stop error
               // force stop LOCAL server (even if remote server is running)
-              OsServer.stopServer('local').then(response => {
+              OsServer.stopServer('local').then(() => {
                 //  server is stopped
                 //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
                 exitReady = true;
                 app.quit();
-              }, error => {
+              }, () => {
                 exitReady = true;
                 app.quit();
               });
@@ -49,29 +77,27 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
           }, () => {
             $log.debug('Rejected modifiedModal()');
             // stop cloud?
-            OsServer.cloudRunningModal().then( resp => {
+            OsServer.cloudRunningModal().then(() => {
               // cloud stop success or nothing to stop
               MeasureManager.stopMeasureManager();
               // force stop LOCAL server (even if remote server is running)
-              OsServer.stopServer('local').then(response => {
+              OsServer.stopServer('local').then(() => {
                 //  server is stopped
-                //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
                 exitReady = true;
                 app.quit();
-              }, error => {
+              }, () => {
                 exitReady = true;
                 app.quit();
               });
-            }, err => {
+            }, () => {
               // cloud stop error
               MeasureManager.stopMeasureManager();
               // force stop LOCAL server (even if remote server is running)
-              OsServer.stopServer('local').then(response => {
+              OsServer.stopServer('local').then(() => {
                 //  server is stopped
-                //jetpack.write(Project.getProjectDir().path('serverStopTest.json'), {message: 'Server stopped.'});
                 exitReady = true;
                 app.quit();
-              }, error => {
+              }, () => {
                 exitReady = true;
                 app.quit();
               });
@@ -109,6 +135,7 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
     if (fromState.name == 'analysis') {
       Project.savePrettyOptions();
     }
+
     // warn user that they need to cancel their run before moving from this state
     if (fromState.name == 'run' && OsServer.getAnalysisRunningFlag()) {
       event.preventDefault();
@@ -140,11 +167,11 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
     submenu: [{
       label: 'New',
       accelerator: 'Ctrl+N',
-      click: () => SetProject.newProject()
+      click: () => SetProject.warnCloudRunning('new')
     }, {
       label: 'Open',
       accelerator: 'Ctrl+O',
-      click: () => SetProject.openProject()
+      click: () => SetProject.warnCloudRunning('open')
     }, {
       label: 'Save',
       accelerator: 'Ctrl+S',
@@ -207,6 +234,11 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
       accelerator: process.platform === 'darwin' ? 'Alt+Command+I' : 'Ctrl+Shift+I',
       click(item, focusedWindow) {
         if (focusedWindow) focusedWindow.webContents.toggleDevTools();
+      }
+    }, {
+      label: 'Toggle Debug Messages',
+      click() {
+        Message.setShowDebug(!Message.showDebug());
       }
     }]
   }, {
@@ -291,13 +323,13 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
         label: 'New',
         accelerator: 'Command+N',
         click() {
-          SetProject.newProject();
+          SetProject.warnCloudRunning('new');
         }
       }, {
         label: 'Open',
         accelerator: 'Command+O',
         click() {
-          SetProject.openProject();
+          SetProject.warnCloudRunning('open');
         }
       }, {
         label: 'Save',

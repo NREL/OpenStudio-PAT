@@ -1,3 +1,30 @@
+/***********************************************************************************************************************
+ *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *  following conditions are met:
+ *
+ *  (1) Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *  disclaimer.
+ *
+ *  (2) Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *  following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *  (3) Neither the name of the copyright holder nor the names of any contributors may be used to endorse or promote
+ *  products derived from this software without specific prior written permission from the respective party.
+ *
+ *  (4) Other than as required in clauses (1) and (2), distributions in any form of modifications or other derivative
+ *  works may not use the "OpenStudio" trademark, "OS", "os", or any other confusingly similar designation without
+ *  specific prior written permission from Alliance for Sustainable Energy, LLC.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER, THE UNITED STATES GOVERNMENT, OR ANY CONTRIBUTORS BE LIABLE FOR
+ *  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **********************************************************************************************************************/
 import {remote} from 'electron';
 const {app} = remote;
 import jetpack from 'fs-jetpack';
@@ -11,7 +38,7 @@ const manifest = jetpack.cwd(app.getAppPath()).read('manifest.json', 'json');
 
 export class DependencyManager {
 
-  constructor($q, $http, $log, $translate, $uibModal, StatusBar) {
+  constructor($q, $http, $log, $translate, $uibModal, StatusBar, Message) {
     'ngInject';
 
     const vm = this;
@@ -28,12 +55,12 @@ export class DependencyManager {
     vm.$q = $q;
     vm.$uibModal = $uibModal;
     vm.downloadStatus = 'N/A';
+    vm.Message = Message;
 
     vm.tempDir = jetpack.cwd(app.getPath('temp'));
-    vm.$log.debug('TEMPDIR HERE: ', app.getPath('temp'));
+    if (vm.Message.showDebug()) vm.$log.debug('TEMPDIR HERE: ', app.getPath('temp'));
     vm.src = jetpack.cwd(app.getAppPath() + "/Resources/");
-    vm.$log.debug('src:', vm.src.path());
-
+    if (vm.Message.showDebug()) vm.$log.debug('src:', vm.src.path());
   }
 
   // The following are valid names to ask for
@@ -68,6 +95,10 @@ export class DependencyManager {
           return prefixPath.path('mongo/bin/mongod' + exeExt);
         } else if (name == 'ENERGYPLUS_EXE_PATH') {
           return prefixPath.path('..', 'EnergyPlus/energyplus' + exeExt);
+        } else if (name == 'perlEXEPath') {
+          return prefixPath.path('Perl/perl/bin/perl' + exeExt);
+        } else if (name == 'OS_RAYPATH') {
+          return prefixPath.path('Radiance');
         }
       } else {
         prefixPath = jetpack.cwd(app.getPath('exe'), '../..', 'Resources');
@@ -84,6 +115,10 @@ export class DependencyManager {
           return prefixPath.path('mongo/bin/mongod' + exeExt);
         } else if (name == 'ENERGYPLUS_EXE_PATH') {
           return prefixPath.path('EnergyPlus/energyplus' + exeExt);
+        } else if (name == 'perlEXEPath') {
+          return prefixPath.path('Perl/perl/bin/perl' + exeExt);
+        } else if (name == 'OS_RAYPATH') {
+          return prefixPath.path('Radiance');
         }
       }
     } else {
@@ -92,7 +127,7 @@ export class DependencyManager {
 
     if (env[name]) {
       // Look in the env.json file
-      vm.$log.debug('*** DEPENDENCY found in json file: ', env[name], ' ', name);
+      if (vm.Message.showDebug()) vm.$log.debug('*** DEPENDENCY found in json file: ', env[name], ' ', name);
       return env[name];
     } else if (process.env[name]) {
       // Look for a system environment variable
@@ -112,6 +147,10 @@ export class DependencyManager {
       } else if (name == 'ENERGYPLUS_EXE_PATH') {
         // No default for EP. OpenStudio will look for ENERGYPLUS_EXE_PATH env var and then in the default, global location.
         return '';
+      } else if (name == 'PERL_EXE_PATH') {
+        return prefixPath.path('Perl/perl/bin/perl' + exeExt);
+      } else if (name == 'OS_RAYPATH') {
+        return prefixPath.path('Radiance');
       }
     }
   }

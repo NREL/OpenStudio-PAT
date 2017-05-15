@@ -1,5 +1,32 @@
+/***********************************************************************************************************************
+ *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *  following conditions are met:
+ *
+ *  (1) Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *  disclaimer.
+ *
+ *  (2) Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *  following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *  (3) Neither the name of the copyright holder nor the names of any contributors may be used to endorse or promote
+ *  products derived from this software without specific prior written permission from the respective party.
+ *
+ *  (4) Other than as required in clauses (1) and (2), distributions in any form of modifications or other derivative
+ *  works may not use the "OpenStudio" trademark, "OS", "os", or any other confusingly similar designation without
+ *  specific prior written permission from Alliance for Sustainable Energy, LLC.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER, THE UNITED STATES GOVERNMENT, OR ANY CONTRIBUTORS BE LIABLE FOR
+ *  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-import os from 'os';
+//import os from 'os';
 import path from 'path';
 import {remote} from 'electron';
 import jsZip from 'jszip';
@@ -9,7 +36,7 @@ import archiver from 'archiver';
 const {app, dialog} = remote;
 
 export class Project {
-  constructor($q, $log, $http, $uibModal, MeasureManager, $sce) {
+  constructor($q, $log, $http, $uibModal, MeasureManager, $sce, Message, toastr, $translate) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -23,9 +50,9 @@ export class Project {
     vm.$http = $http;
     vm.$uibModal = $uibModal;
     vm.$sce = $sce;
-
-    // ignore camelcase for this file
-    /* eslint camelcase: 0 */
+    vm.Message = Message;
+    vm.toastr = toastr;
+    vm.$translate = $translate;
 
     vm.analysisTypes = ['Manual', 'Algorithmic'];
 
@@ -93,7 +120,7 @@ export class Project {
     vm.railsDir = jetpack.dir(path.resolve(src.path() + '/openstudioServer/openstudio-server/server'));
     // aws path
     vm.awsDir = jetpack.dir(app.getPath('appData') + '/.aws');
-    vm.$log.debug('.aws dir location: ', vm.awsDir.path());
+    if (vm.Message.showDebug()) vm.$log.debug('.aws dir location: ', vm.awsDir.path());
 
     // set my measures dir
     vm.MeasureManager.isReady().then(() => {
@@ -104,12 +131,12 @@ export class Project {
         if (response.my_measures_dir) {
           vm.setMeasuresDir(response.my_measures_dir);
         }
-        vm.$log.debug('My measures Dir: ', vm.myMeasuresDir.path());
+        if (vm.Message.showDebug()) vm.$log.debug('My measures Dir: ', vm.myMeasuresDir.path());
       }, error => {
-        vm.$log.debug('Error in Measure Manager getMyMeasuresDir');
+        vm.$log.error('Error in Measure Manager getMyMeasuresDir: ', error);
       });
     }, error => {
-      vm.$log.debug('Error in Measure Manager isReady function ', error);
+      vm.$log.error('Error in Measure Manager isReady function ', error);
     });
 
     // json objects
@@ -161,23 +188,42 @@ export class Project {
   // TODO: if measure is in pat dir, not in json, and user tries to add it, overwrite existing measure in dir? (currently it doesn't overwrite)
   initializeProject() {
     const vm = this;
-    vm.$log.debug('Project initializeProject');
+    if (vm.Message.showDebug()) vm.$log.debug('Project initializeProject');
     if (angular.isDefined(vm.projectName)) {
       const filename = vm.projectDir.path('pat.json');
-      vm.$log.debug('filename: ', filename);
+      if (vm.Message.showDebug()) vm.$log.debug('filename: ', filename);
       // for new and existing projects
       vm.setDefaults();
 
       if (vm.jetpack.exists(filename)) {
         // existing project
         vm.pat = vm.jetpack.read(filename, 'json');
-        vm.$log.debug('PAT.json: ', vm.pat);
-        vm.$log.debug('filename: ', filename);
+        if (vm.Message.showDebug()) vm.$log.debug('PAT.json: ', vm.pat);
+        if (vm.Message.showDebug()) vm.$log.debug('filename: ', filename);
 
         vm.measures = vm.pat.measures;
         if (!angular.isDefined(vm.measures)) {
           vm.measures = [];
         }
+
+        // recalculate measure_dir to point to this location (in case project moved/copied)
+        _.forEach(vm.measures, (measure) => {
+          // windows vs mac paths are different, and we can't assume this project was created on this os
+          let path_parts = _.split(measure.measure_dir, '/');
+          if (path_parts.length == 1) {
+            // split again with other delimiter
+            path_parts = _.split(measure.measure_dir, '\\');
+            if (path_parts.length == 1){
+              path_parts = _.split(measure.measure_dir, '\\\\');
+            }
+          }
+
+          if (vm.Message.showDebug()) vm.$log.debug('PATH PARTS: ', path_parts);
+          measure.measure_dir = vm.projectDir.path('measures', _.last(path_parts));
+          measure.directory = measure.measure_dir;
+        });
+
+        if (vm.Message.showDebug()) vm.$log.debug('InitializeProject-measures with updated dir paths: ', vm.measures);
 
         vm.designAlternatives = vm.pat.designAlternatives;
         if (!angular.isDefined(vm.designAlternatives)) {
@@ -188,8 +234,8 @@ export class Project {
         vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
         vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
         vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
-        vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
-        vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
+        if (vm.Message.showDebug()) vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
+        if (vm.Message.showDebug()) vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
         vm.algorithmSettings = vm.pat.algorithmSettings ? vm.pat.algorithmSettings : vm.algorithmSettings;
         vm.rubyMD5 = vm.pat.rubyMD5 ? vm.pat.rubyMD5 : vm.rubyMD5;
         vm.mongoMD5 = vm.pat.mongoMD5 ? vm.pat.mongoMD5 : vm.mongoMD5;
@@ -206,7 +252,7 @@ export class Project {
       vm.$log.error('No project selected...cannot initialize project');
     }
 
-    vm.$log.debug("Server Scripts: ", vm.serverScripts);
+    if (vm.Message.showDebug()) vm.$log.debug('Server Scripts: ', vm.serverScripts);
 
   }
 
@@ -216,7 +262,7 @@ export class Project {
 
   savePrettyOptions() {
     const vm = this;
-    vm.$log.debug('Parse arguments and save Options hash to each measure');
+    if (vm.Message.showDebug()) vm.$log.debug('Parse arguments and save Options hash to each measure');
 
     _.forEach(vm.measures, (measure) => {
 
@@ -225,7 +271,7 @@ export class Project {
       let optionKeys = [];
       if (!_.isNil(measure.arguments) && measure.arguments.length > 0) {
         const keys = Object.keys(measure.arguments[0]);
-        optionKeys = _.filter(keys, function (k) {
+        optionKeys = _.filter(keys, (k) => {
           return k.indexOf('option_') !== -1;
         });
       }
@@ -257,7 +303,7 @@ export class Project {
               // check if argument is required
               if (argument.required) {
                 // TODO: throw an error here: need a value for this argument in this option
-                vm.$log.debug('ARG: ', argument.name, ' value left blank in option: ', theOption.name);
+                if (vm.Message.showDebug()) vm.$log.debug('ARG: ', argument.name, ' value left blank in option: ', theOption.name);
               }
             }
           }
@@ -270,7 +316,7 @@ export class Project {
 
     });
 
-    vm.$log.debug('Measures with pretty options: ', vm.measures);
+    if (vm.Message.showDebug()) vm.$log.debug('Measures with pretty options: ', vm.measures);
 
   }
 
@@ -281,24 +327,24 @@ export class Project {
     const deferred = vm.$q.defer();
     const promises = [];
 
-    vm.$log.debug('in Project computeAllMeasureArguments()');
-    let osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
+    if (vm.Message.showDebug()) vm.$log.debug('in Project computeAllMeasureArguments()');
+    // const osmPath = (vm.defaultSeed == null) ? null : vm.seedDir.path(vm.defaultSeed);
 
     _.forEach(vm.measures, (measure) => {
       if (!_.isNil(measure.seed)) {
-        vm.$log.debug(`computeAllMeasureArguments using unique seed for measure: ${measure}`);
+        if (vm.Message.showDebug()) vm.$log.debug(`computeAllMeasureArguments using unique seed for measure: ${measure}`);
       }
       // todo: ensure that this modifies the vm.measures directly
       const promise = vm.computeMeasureArguments(measure);
       promises.push(promise);
     });
 
-    vm.$q.all(promises).then(response => {
-      vm.$log.debug('ComputeAllMeasures resolved');
+    vm.$q.all(promises).then(() => {
+      if (vm.Message.showDebug()) vm.$log.debug('ComputeAllMeasures resolved');
       deferred.resolve();
       vm.setModified(true);
     }, error => {
-      vm.$log.debug('ERROR in ComputeAllMeasures: ', error);
+      vm.$log.error('ERROR in ComputeAllMeasures: ', error);
       deferred.reject(error);
     });
 
@@ -312,7 +358,7 @@ export class Project {
   computeMeasureArguments(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('in Project computeMeasureArguments()');
+    if (vm.Message.showDebug()) vm.$log.debug('in Project computeMeasureArguments()');
     let osmPath;
     if (_.isNil(vm.seedDir)) {
       vm.$log.error('vm.seedDir is undefined. Unable to compute measure arguments.');
@@ -328,7 +374,7 @@ export class Project {
 
     vm.MeasureManager.computeArguments(measure.measure_dir, osmPath).then((newMeasure) => {
       // merge with existing project measure
-      vm.$log.debug('New computed measure: ', newMeasure);
+      if (vm.Message.showDebug()) vm.$log.debug('New computed measure: ', newMeasure);
 
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
       _.forEachRight(measure.arguments, (arg, index) => {
@@ -352,7 +398,7 @@ export class Project {
       deferred.resolve(measure);
 
     }, error => {
-      vm.$log.debug('Error in MM computerArguments: ', error);
+      vm.$log.error('Error in MM computerArguments: ', error);
       deferred.reject();
 
     });
@@ -362,16 +408,19 @@ export class Project {
   }
 
   // export OSA
-  exportOSA() {
+  exportOSA(selectedOnly = false) {
     const vm = this;
-    vm.$log.debug('In Project::exportOSA');
+    const deferred = vm.$q.defer();
+
+    if (vm.Message.showDebug()) vm.$log.debug('In Project::exportOSA');
+    if (vm.Message.showDebug()) vm.$log.debug('SelectedOnly? ', selectedOnly);
 
     // first export common data
     vm.exportCommon();
 
     // check what kind of analysis it is
     if (vm.analysisType == 'Manual') {
-      vm.exportManual();
+      vm.exportManual(selectedOnly);
     } else {
       vm.exportAlgorithmic();
     }
@@ -379,21 +428,22 @@ export class Project {
     // export serverScripts
     vm.exportScripts();
 
-
     // write to file
-    let filename = vm.projectDir.path(vm.projectName + '.json');
+    const filename = vm.projectDir.path(vm.projectName + '.json');
     vm.jetpack.write(filename, vm.osa);
-    vm.$log.debug('Project OSA file exported to ' + filename);
+    if (vm.Message.showDebug()) vm.$log.debug('Project OSA file exported to ' + filename);
 
-    var output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
-    var archive = archiver('zip');
+    const output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
+    const archive = vm.archiver('zip');
 
     output.on('close', function () {
       console.log(archive.pointer() + ' total bytes');
       console.log('archiver has been finalized and the output file descriptor has closed.');
+      deferred.resolve();
     });
 
     archive.on('error', function (err) {
+      deferred.reject();
       throw err;
     });
 
@@ -413,27 +463,32 @@ export class Project {
 
     // add server scripts (if they exist)
     _.forEach(vm.serverScripts, (script, type) => {
-      if (script.file){
+      if (script.file) {
         archive.bulk([
           {expand: true, cwd: vm.projectDir.path('scripts', type), src: ['**'], dest: 'scripts/' + type}
         ]);
       }
     });
 
-    // add 'files to include
+    // add files to include
     _.forEach(vm.filesToInclude, (file) => {
-      if (file.dirToInclude){
-        if (!file.unpackDirName){
+      if (file.dirToInclude) {
+
+        if (!file.unpackDirName) {
           // use same name if no name is provided
           file.unpackDirName = file.dirToInclude.replace(/^.*[\\\/]/, '');
         }
+        const absPath = path.resolve(vm.projectDir.path(), file.dirToInclude);
+        if (vm.Message.showDebug()) vm.$log.debug('RESOLVED PATH: ', absPath, ' unpack DIR: ', file.unpackDirName);
         archive.bulk([
-          {expand: true, cwd: file.dirToInclude, src: ['**'], dest: 'lib/' + file.unpackDirName}
+          {expand: true, cwd: absPath, src: ['**'], dest: 'lib/' + file.unpackDirName}
         ]);
       }
     });
 
     archive.finalize();
+
+    return deferred.promise;
   }
 
   // export data common to both manual and algorithmic workflows
@@ -462,16 +517,17 @@ export class Project {
     // server scripts (will only work on the cloud, but always put in OSA?)
     vm.osa.analysis.server_scripts = {};
     _.forEach(vm.serverScripts, (script, type) => {
-      if (script.file){
+      if (script.file) {
         vm.osa.analysis.server_scripts[type] = './scripts/' + type + '/' + script.file;
       }
     });
 
   }
 
-  exportManual() {
+  exportManual(selectedOnly = false) {
     const vm = this;
-    vm.$log.debug('In Project::exportManual');
+    if (vm.Message.showDebug()) vm.$log.debug('In Project::exportManual');
+    if (vm.Message.showDebug()) vm.$log.debug('selectedONly? ', selectedOnly);
 
     //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO which is correct?
     vm.osa.analysis.problem.analysis_type = null;
@@ -479,38 +535,50 @@ export class Project {
     // DESIGN ALTERNATIVES ARRAY
     vm.osa.analysis.problem.design_alternatives = [];
     _.forEach(vm.designAlternatives, (da) => {
-      const da_hash = {};
-      da_hash.name = da.name;
-      da_hash.description = da.description;
-      if (da.seedModel != vm.defaultSeed) {
-        const seed = {};
-        seed.file_type = 'OSM';
-        seed.path = './seeds/' + da.seedModel;
-        da_hash.seed = seed;
-      }
-      // add option names and descriptions
-      const options = [];
-      _.forEach(vm.measures, (measure) => {
-        const option = {};
-        option.measure_name = measure.name;
-        option.workflow_index = measure.workflow_index;
-        option.name = da[measure.name];
-        if (option.name == 'None' || !option.name) {
-          // use measure name/desc if no option
-          option.name = measure.name;
-          option.description = measure.description;
+      const dpMatch = _.find(vm.datapoints, {name: da.name});
+      // do this for entire workflow or if matching datapoint is selected
+      if (!selectedOnly || (_.get(dpMatch, 'selected'))) {
+        const da_hash = {};
+        da_hash.name = da.name;
+        da_hash.description = da.description;
+        // add if other seed
+        if (da.seedModel != vm.defaultSeed) {
+          const seed = {};
+          seed.file_type = 'OSM';
+          seed.path = './seeds/' + da.seedModel;
+          da_hash.seed = seed;
         }
-        else {
-          const opt = _.find(measure.options, {name: option.name});
-          if (opt)
-            option.description = opt.description;
-          else
+        // add if other weather
+        if (da.weatherFile != vm.defaultWeatherFile) {
+          const weather = {};
+          weather.file_type = 'EPW';
+          weather.path = './weather/' + da.weatherFile;
+          da_hash.weather_file = weather;
+        }
+        // add option names and descriptions
+        const options = [];
+        _.forEach(vm.measures, (measure) => {
+          const option = {};
+          option.measure_name = measure.name;
+          option.workflow_index = measure.workflow_index;
+          option.name = da[measure.name];
+          if (option.name == 'None' || !option.name) {
+            // use measure name/desc if no option
+            option.name = measure.name;
             option.description = measure.description;
-        }
-        options.push(option);
-      });
-      da_hash.options = options;
-      vm.osa.analysis.problem.design_alternatives.push(da_hash);
+          }
+          else {
+            const opt = _.find(measure.options, {name: option.name});
+            if (opt)
+              option.description = opt.description;
+            else
+              option.description = measure.description;
+          }
+          options.push(option);
+        });
+        da_hash.options = options;
+        vm.osa.analysis.problem.design_alternatives.push(da_hash);
+      }
     });
 
     // MEASURE DETAILS
@@ -521,16 +589,19 @@ export class Project {
       // go through alternatives, also see if need skip
       const vars = [];
       _.forEach(vm.designAlternatives, (da) => {
-        if (da[measure.name] == 'None' || _.isUndefined(da[measure.name])) {
-          vars.push(true);
-        } else {
-          vars.push(false);
-          measureAdded = true; // measure option is added to at least 1 DA
+        const dpMatch = _.find(vm.datapoints, {name: da.name});
+        // do this for entire workflow or if matching datapoint is selected
+        if (!selectedOnly || (_.get(dpMatch, 'selected'))) {
+          if (da[measure.name] == 'None' || _.isUndefined(da[measure.name])) {
+            vars.push(true);
+          } else {
+            vars.push(false);
+            measureAdded = true; // measure option is added to at least 1 DA
+          }
         }
       });
-      vm.$log.debug('Measure: ', measure.name, ', numOfOptions: ', measure.numberOfOptions, ' measure added to at least 1 DA? ', measureAdded);
+      if (vm.Message.showDebug()) vm.$log.debug('Measure: ', measure.name, ', numOfOptions: ', measure.numberOfOptions, ' measure added to at least 1 DA? ', measureAdded);
       if (measure.numberOfOptions > 0 && measureAdded) {
-
         const m = {};
         m.name = measure.name;
         m.display_name = measure.display_name;
@@ -538,7 +609,7 @@ export class Project {
         m.measure_definition_class_name = measure.className;
         //m.measure_definition_measureUID = measure.colDef.measureUID;
 
-        let mdir = vm.getMeasureBaseDir(measure);
+        const mdir = vm.getMeasureBaseDir(measure);
         m.measure_definition_directory = './measures/' + mdir;
         m.measure_definition_directory_local = measure.measure_dir;
         m.measure_definition_class_name = measure.class_name;
@@ -558,7 +629,7 @@ export class Project {
         let optionKeys = [];
         //if (measure.arguments.length > 0) {
         const keys = Object.keys(measure.arguments[0]);
-        optionKeys = _.filter(keys, function (k) {
+        optionKeys = _.filter(keys, (k) => {
           return k.indexOf('option_') !== -1;
         });
         //}
@@ -571,15 +642,18 @@ export class Project {
             (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) &&
             (_.isUndefined(arg.variable) || arg.variable === false)
           ) {
-            vm.$log.debug('ARGUMENT, not variable!');
+            if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' is an ARGUMENT, not variable');
             const argument = vm.makeArgument(arg);
+
+            if (argument.value == '') vm.$log.error(arg.name, ' value is \'\', this will most likely cause errors on server');
+
             // Make sure that argument is "complete"
-            if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
+            if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value)) {
               var_count += 1;
               m.arguments.push(argument);
+              if (vm.Message.showDebug()) vm.$log.debug('argument: ', argument);
             } else {
-              vm.$log.debug('Not pushing partial arg to m.arguments');
-              vm.$log.debug('partial arg: ', argument);
+              vm.$log.error('Not pushing partial arg to json. Fix partial arg: ', argument);
             }
           }
         });
@@ -603,53 +677,66 @@ export class Project {
           m.variables.push(v);
         }
 
+        let DAlength = null;
+        if (selectedOnly) {
+          DAlength = _.filter(vm.datapoints, {selected: true}).length;
+        } else {
+          DAlength = vm.designAlternatives.length;
+        }
         // Variable arguments
         _.forEach(measure.arguments, (arg) => {
           if (((_.isUndefined(arg.specialRowId)) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)) && (arg.variable === true)) {
-            vm.$log.debug('Project::exportManual arg: ', arg);
+            if (vm.Message.showDebug()) vm.$log.debug('Project::exportManual variable: ', arg.name);
             // see what arg is set to in each design alternative
             const valArr = [];
             let option_id;
-            _.forEach(vm.designAlternatives, (da) => {
-              vm.$log.debug('Project::exportManual da: ', da);
-              if (da[measure.name] == 'None') {
-                vm.$log.debug('value: None');
-                // when set to 'None', sub a value of the right type
-                let the_value = arg.default_value;
-                if (!the_value) {
-                  // if no default value, use first option value, otherwise set to None
-                  the_value = (arg.option_1) ? arg.option_1 : 'None';
-                }
-                valArr.push({value: the_value, weight: 1 / vm.designAlternatives.length});
 
-              } else {
-                const option_name = da[measure.name];
-                vm.$log.debug('arg: ', arg);
-                vm.$log.debug('option_name: ', option_name);
-                vm.$log.debug('MEASURE', measure);
-                // retrieve the option ID from the option_name in measure.options
-                _.forEach(measure.options, (option) => {
-                  if (option.name == option_name) {
-                    option_id = option.id;
+            _.forEach(vm.designAlternatives, (da) => {
+              const dpMatch = _.find(vm.datapoints, {name: da.name});
+              // do this for entire workflow or if matching datapoint is selected
+              if (!selectedOnly || (dpMatch && dpMatch.selected)) {
+                if (vm.Message.showDebug()) vm.$log.debug('Project::exportManual da: ', da);
+                if (da[measure.name] == 'None') {
+                  if (vm.Message.showDebug()) vm.$log.debug('value: None');
+                  // when set to 'None', sub a value of the right type
+                  if (vm.Message.showDebug()) vm.$log.debug('default_value for this arg: ', arg.default_value);
+                  let the_value = arg.default_value;
+                  if (!the_value) {
+                    // if no default value, use first option value, otherwise set to None
+                    the_value = !_.isNil(arg.option_1) ? arg.option_1 : 'None';
+                    if (vm.Message.showDebug()) vm.$log.debug('option1 value for this arg: ', arg.option_1);
                   }
-                });
-                vm.$log.debug('arg[option_id]: ', arg[option_id]);
-                // check that you have a value here...if not error
-                if (!arg[option_id]) {
-                  vm.$log.error('Option: ', option_name, 'for measure \'', measure.display_name, '\' does not have a value. Analysis will error.');
+                  if (vm.Message.showDebug()) vm.$log.debug('!! value for argument: ', arg.name, ' was set to: ', the_value);
+                  valArr.push({value: the_value, weight: 1 / DAlength});
+
+                } else {
+                  const option_name = da[measure.name];
+                  if (vm.Message.showDebug()) vm.$log.debug('arg: ', arg);
+                  if (vm.Message.showDebug()) vm.$log.debug('option_name: ', option_name);
+                  if (vm.Message.showDebug()) vm.$log.debug('MEASURE', measure);
+                  // retrieve the option ID from the option_name in measure.options
+                  _.forEach(measure.options, (option) => {
+                    if (option.name == option_name) {
+                      option_id = option.id;
+                    }
+                  });
+                  if (vm.Message.showDebug()) vm.$log.debug('arg[option_id]: ', arg[option_id]);
+                  // check that you have a value here...if not error
+                  if (_.isNil(arg[option_id])) {
+                    vm.$log.error('Option: ', option_name, 'for argument: ', arg.name, ' in measure: ', measure.display_name, ' does not have a value. Analysis will error.');
+                  }
+                  valArr.push({value: arg[option_id], weight: 1 / DAlength});
                 }
-                valArr.push({value: arg[option_id], weight: 1 / vm.designAlternatives.length});
               }
             });
 
             const values = _.values(_.pick(arg, optionKeys));
 
-
             const min = _.min(values),
               max = _.max(values);
 
             const mode = function mode(ar) {
-              let numMapping = {};
+              const numMapping = {};
               let greatestFreq = 0;
               let currentMode = 0;
               ar.forEach(function findMode(number) {
@@ -694,10 +781,10 @@ export class Project {
             v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.minimum});  // minimum
             v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.maximum});  // maximum
             if (valArr.length > 0) {
-              vm.$log.debug('Setting attribute');
+              if (vm.Message.showDebug()) vm.$log.debug('Setting attribute');
               v.uncertainty_description.attributes.push({name: 'modes', value: arg.mode}); // TODO: use minimum? or fake-calculate a mode btw min and max and of right type
             } else {
-              vm.$log.debug('Skipping attribute');
+              if (vm.Message.showDebug()) vm.$log.debug('Skipping attribute');
             }
             v.uncertainty_description.attributes.push({name: 'delta_x', value: null});
             v.uncertainty_description.attributes.push({name: 'stddev', value: null});
@@ -719,18 +806,18 @@ export class Project {
 
   exportAlgorithmic() {
     const vm = this;
-    vm.$log.debug('In Project::exportAlgorithmic');
+    if (vm.Message.showDebug()) vm.$log.debug('In Project::exportAlgorithmic');
 
     // ALGORITHM SETTINGS
-    vm.osa.analysis.problem.analysis_type = vm.samplingMethod.id;
+    vm.osa.analysis.problem.analysis_type = vm.samplingMethod.id.toLowerCase();
     vm.osa.analysis.problem.algorithm = {};
     _.forEach(vm.algorithmSettings, (setting) => {
-      vm.osa.analysis.problem.algorithm[setting.name] = setting.value;
+      vm.osa.analysis.problem.algorithm[_.snakeCase(setting.name)] = setting.value;
     });
 
     // OUTPUTS
     let groupFlag = false;
-    if (['NSGA2', 'SPEA2'].indexOf(vm.samplingMethod.id) != -1) {
+    if (['nsga_nrel', 'spea_nrel', 'morris', 'sobol'].indexOf(vm.samplingMethod.id) != -1) {
       // this sampling method supports groups
       groupFlag = true;
     }
@@ -740,139 +827,178 @@ export class Project {
     _.forEach(vm.measures, (measure) => {
       _.forEach(measure.analysisOutputs, (out) => {
         out.measure_name = measure.name;
+        out.measure_class_name = measure.class_name;
         out.measure_uid = measure.uid;
         tempOutputs.push(out);
       });
     });
     if (groupFlag) {
       tempOutputs = _.sortBy(tempOutputs, ['obj_function_group']);
-    }
-    vm.$log.debug("tempOutputs sorted: ", tempOutputs);
-
-    // add objective function names to algorithm section
-    vm.osa.analysis.problem.algorithm.objective_functions = _.map(_.filter(tempOutputs, {objective_function: true}), 'name');
-    vm.osa.analysis.output_variables = vm.makeOutputs(tempOutputs, groupFlag);
-
-    // MEASURE DETAILS
-    let measure_count = 0;
-    _.forEach(vm.measures, (measure) => {
-      const m = {};
-      m.name = measure.name;
-      m.display_name = measure.display_name;
-
-      m.measure_type = vm.getMeasureType(measure);
-
-      m.measure_definition_class_name = measure.className;
-      //m.measure_definition_measureUID = measure.colDef.measureUID;
-
-      let mdir = vm.getMeasureBaseDir(measure);
-      m.measure_definition_directory = './measures/' + mdir;
-      m.measure_definition_directory_local = measure.measure_dir;
-      m.measure_definition_class_name = measure.class_name;
-      m.measure_definition_display_name = measure.display_name;
-      m.measure_definition_name = measure.name;
-      m.measure_definition_name_xml = null;
-      m.measure_definition_uuid = measure.uid;
-      m.measure_definition_version_uuid = measure.version_id;
-
-      // adding these to support EDAPT reporting
-      m.uuid = measure.uid;
-      m.version_uuid = measure.version_id;
-      m.description = measure.description;
-      m.taxonomy = measure.tags;
-
-      // ARGUMENTS
-      m.arguments = [];
-      // This portion only has arguments that don't have the variable box checked
-      _.forEach(measure.arguments, (arg) => {
-        // if argument is set to 'Argument' or if the variable setting is not supported by selected algorithm
-        if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
-          vm.$log.debug(arg.name, ' treated as ARGUMENT');
-          const argument = vm.makeArgument(arg);
-          // Make sure that argument is "complete"
-          if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && angular.isDefined(argument.default_value) && angular.isDefined(argument.value)) {
-            var_count += 1;
-            m.arguments.push(argument);
-          } else {
-            vm.$log.debug('Not pushing partial arg to m.arguments');
-            vm.$log.debug('partial arg: ', argument);
-          }
-        }
-      });
-
-      // VARIABLES
-      let var_count = 0;
-      m.variables = [];
-
-      // skip this measure?
-      if (measure.skip) {
-        const v =  vm.makeSkip(measure);
-        v.workflow_index = var_count;
-        var_count += 1;
-        m.variables.push(v);
+      // check objective function groups number for algorithms
+      let groups = _.map(tempOutputs, 'obj_function_group');
+      groups = _.filter(groups, function(o) { return !_.isNil(o); });
+      if (vm.Message.showDebug()) vm.$log.debug('GROUPS: ', groups);
+      if (groups.length < 2) {
+        vm.$log.error('This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully.');
+        vm.$translate('toastr.objFunctionGroupError').then(translation => {
+          vm.toastr.warning(translation);
+        });
       }
 
-      // Variable arguments
-      _.forEach(measure.arguments, (arg) => {
-        if (arg.inputs && arg.inputs.variableSetting && arg.inputs.variableSetting != 'Argument' && !arg.inputs.showWarningIcon) {
-          vm.$log.debug('Project::exportAlgorithmic arg: ', arg);
+    }
+    if (vm.Message.showDebug()) vm.$log.debug('tempOutputs sorted: ', tempOutputs);
 
-          // VARIABLE ARGUMENT SECTION
-          const v = {};
-          v.argument = vm.makeArgument(arg);
+    vm.osa.analysis.output_variables = vm.makeOutputs(tempOutputs, groupFlag);
 
-          vm.$log.info(arg.choice_display_names);
-          v.argument.choice_display_names = arg.choice_display_names;  // TODO: not sure about this?
+    // add objective function NEW names to algorithm section
+    vm.osa.analysis.problem.algorithm.objective_functions = _.map(_.filter(vm.osa.analysis.output_variables, {objective_function: true}), 'name');
+    if (!vm.osa.analysis.problem.algorithm.objective_functions) {
+      vm.osa.analysis.problem.algorithm.objective_functions = [];
+    }
 
-          // VARIABLE DETAILS
-          v.display_name = arg.display_name;  // same as arg
-          v.display_name_short = arg.display_name_short;
-          v.variable_type = (arg.inputs.variableSetting == 'Pivot') ? 'pivot' : 'variable'; // this is 'variable' or 'pivot'
-          v.units = arg.units;
-          v.minimum = arg.inputs.minimum;
-          v.maximum = arg.inputs.maximum;
-          v.relation_to_output = arg.relationship;
-          v.static_value = arg.default_value;
-          v.uuid = '';
-          v.version_uuid = '';
-          if (arg.inputs.variableSetting == 'Pivot') {
-            v.pivot = true;
-          } else {
-            v.variable = true;
+    // MEASURE DETAILS
+    let analysis_variables = 0;
+
+    let measure_count = 0;
+    _.forEach(vm.measures, (measure) => {
+      // for algorithmic workflows, don't add SKIPPED measure to JSON
+      if (!measure.skip){
+        const m = {};
+        m.name = measure.name;
+        m.display_name = measure.display_name;
+
+        m.measure_type = vm.getMeasureType(measure);
+
+        m.measure_definition_class_name = measure.className;
+        //m.measure_definition_measureUID = measure.colDef.measureUID;
+
+        const mdir = vm.getMeasureBaseDir(measure);
+        m.measure_definition_directory = './measures/' + mdir;
+        m.measure_definition_directory_local = measure.measure_dir;
+        m.measure_definition_class_name = measure.class_name;
+        m.measure_definition_display_name = measure.display_name;
+        m.measure_definition_name = measure.name;
+        m.measure_definition_name_xml = null;
+        m.measure_definition_uuid = measure.uid;
+        m.measure_definition_version_uuid = measure.version_id;
+
+        // adding these to support EDAPT reporting
+        m.uuid = measure.uid;
+        m.version_uuid = measure.version_id;
+        m.description = measure.description;
+        m.taxonomy = measure.tags;
+
+        // ARGUMENTS
+        m.arguments = [];
+        // This portion only has arguments that don't have the variable box checked
+        _.forEach(measure.arguments, (arg) => {
+          // if argument is set to 'Argument' or if the variable setting is not supported by selected algorithm
+          if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
+            if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' treated as ARGUMENT');
+            const argument = vm.makeArgument(arg);
+            // Make sure that argument is "complete"
+            if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value)) {
+              var_count += 1;
+              m.arguments.push(argument);
+            } else {
+              vm.$log.error('Not pushing partial argument to json.  Fix partial arg: ', argument);
+            }
           }
-          v.uncertainty_description = {};
-          // pivots can be discrete or integer_sequence_uncertain (handled in analysis controller)
-          // options are triangle, uniform, discrete, and normal, integer_sequence_uncertain
-          v.uncertainty_description.type = arg.inputs.distribution == 'Integer Sequence' ? 'integer_sequence_uncertain' : arg.inputs.distribution;
-          v.uncertainty_description.attributes = [];
+        });
 
-          // if discrete or pivot, make values and weights array (unless pivot w/ integer_sequence)
-          if ((arg.inputs.variableSetting == 'Pivot' || arg.inputs.variableSetting == 'Discrete') && arg.inputs.distribution != 'Integer Sequence'){
-            const valArr = vm.makeDiscreteValuesArray(arg.inputs.discreteVariables);
-            v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
+        // VARIABLES
+        let var_count = 0;
+        m.variables = [];
+
+        // TODO: implement a way to sample skipping a measure (On/Off)
+
+        // Variable arguments
+        _.forEach(measure.arguments, (arg) => {
+          if (arg.inputs && arg.inputs.variableSetting && arg.inputs.variableSetting != 'Argument' && !arg.inputs.showWarningIcon) {
+            if (vm.Message.showDebug()) vm.$log.debug('Project::exportAlgorithmic variable arg: ', arg);
+
+            // VARIABLE ARGUMENT SECTION
+            const v = {};
+            v.argument = vm.makeArgument(arg);
+
+            vm.$log.info(arg.choice_display_names);
+            v.argument.choice_display_names = arg.choice_display_names;  // TODO: not sure about this?
+
+            // VARIABLE DETAILS
+            v.display_name = arg.display_name;  // same as arg
+            v.display_name_short = arg.display_name_short;
+            v.variable_type = (arg.inputs.variableSetting == 'Pivot') ? 'pivot' : 'variable'; // this is 'variable' or 'pivot'
+            v.units = arg.units;
+            v.minimum = arg.inputs.minimum;
+            v.maximum = arg.inputs.maximum;
+            v.relation_to_output = arg.relationship;
+            v.static_value = arg.default_value;
+            v.uuid = '';
+            v.version_uuid = '';
+            if (arg.inputs.variableSetting == 'Pivot') {
+              v.pivot = true;
+            } else {
+              v.variable = true;
+            }
+            v.uncertainty_description = {};
+            // pivots can be discrete or integer_sequence_uncertain (handled in analysis controller)
+            // options are triangle, uniform, discrete, and normal, integer_sequence_uncertain
+            // TODO what about pivots?
+            if ((arg.inputs.variableSetting == 'Discrete' || arg.inputs.variableSetting == 'Pivot') && arg.inputs.distribution != 'Integer Sequence') {
+              v.uncertainty_description.type = 'discrete';
+            } else {
+              v.uncertainty_description.type = arg.inputs.distribution == 'Integer Sequence' ? 'integer_sequence' : arg.inputs.distribution.toLowerCase();
+            }
+            v.uncertainty_description.attributes = [];
+
+            // if discrete or pivot, make values and weights array (unless integer_sequence)
+            if ((arg.inputs.variableSetting == 'Pivot' || arg.inputs.variableSetting == 'Discrete') && arg.inputs.distribution != 'Integer Sequence') {
+              const valArr = vm.makeDiscreteValuesArray(arg.inputs.discreteVariables);
+              v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
+            }
+
+            // TODO: if any of these don't exist, set to inputs.default_value
+            v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.inputs.minimum});  // minimum
+            v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.inputs.maximum});  // maximum
+
+            // special case for integer_sequence
+            if (arg.inputs.distribution == 'Integer Sequence') {
+              v.uncertainty_description.attributes.push({name: 'modes', value: 1}); // mean
+            } else {
+              v.uncertainty_description.attributes.push({name: 'modes', value: arg.inputs.mean}); // mean
+            }
+
+
+
+            v.uncertainty_description.attributes.push({name: 'delta_x', value: arg.inputs.deltaX}); // delta x
+            v.uncertainty_description.attributes.push({name: 'stddev', value: arg.inputs.stdDev});  // std dev
+
+            v.workflow_index = var_count;
+            var_count += 1;
+            analysis_variables += 1;
+            m.variables.push(v);
           }
+        });
 
-          // TODO: if any of these don't exist, set to inputs.default_value
-          v.uncertainty_description.attributes.push({name: 'lower_bounds', value: arg.inputs.minimum});  // minimum
-          v.uncertainty_description.attributes.push({name: 'upper_bounds', value: arg.inputs.maximum});  // maximum
-          v.uncertainty_description.attributes.push({name: 'modes', value: arg.inputs.mean}); // mean
-          v.uncertainty_description.attributes.push({name: 'delta_x', value: arg.inputs.deltaX}); // delta x
-          v.uncertainty_description.attributes.push({name: 'stddev', value: arg.inputs.stdDev});  // std dev
+        m.workflow_index = measure_count;
+        measure_count += 1;
+        // push measure to OSA
+        vm.osa.analysis.problem.workflow.push(m);
 
-          v.workflow_index = var_count;
-          var_count += 1;
-          m.variables.push(v);
-        }
-      });
-
-      m.workflow_index = measure_count;
-      measure_count += 1;
-      // push measure to OSA
-      vm.osa.analysis.problem.workflow.push(m);
+      }
     });
+
+    // ensure at least 2 variables for certain algorithms
+    if (analysis_variables < 2 && ['nsga_nrel', 'doe'].indexOf(vm.samplingMethod.id) != -1) {
+
+      vm.$log.error('This algorithm needs at least 2 variables defined on the analysis tab to run successfully.');
+      vm.$translate('toastr.numberVariablesError').then(translation => {
+        vm.toastr.warning(translation);
+      });
+    }
   }
 
-  makeDiscreteValuesArray(discreteVariables){
+  makeDiscreteValuesArray(discreteVariables) {
     const vm = this;
     const valArr = [];
     _.forEach(discreteVariables, (valueHash) => {
@@ -882,41 +1008,41 @@ export class Project {
     // TODO: more complicated weighting scheme?
     let weightSum = 0;
     _.forEach(valArr, (valueHash) => {
-      vm.$log.debug('weight: ', parseFloat(valueHash.weight));
+      if (vm.Message.showDebug()) vm.$log.debug('weight: ', parseFloat(valueHash.weight));
 
-      if (vm.isNumeric(valueHash.weight)){
-        vm.$log.debug('weight for ', valueHash.value);
+      if (vm.isNumeric(valueHash.weight)) {
+        if (vm.Message.showDebug()) vm.$log.debug('weight for ', valueHash.value);
         valueHash.weight = parseFloat(valueHash.weight);
         weightSum = weightSum + valueHash.weight;
       }
     });
-    vm.$log.debug('current weight sum: ', weightSum);
+    if (vm.Message.showDebug()) vm.$log.debug('current weight sum: ', weightSum);
 
-    if (weightSum > 1){
-      vm.$log.debug('ERROR: weights do not add up to 1');
+    if (weightSum > 1) {
+      vm.$log.error('ERROR: weights do not add up to 1');
       // TODO: what to do here?
     }
 
     let missingCount = 0;
     _.forEach(valArr, (valueHash) => {
-      if (!vm.isNumeric(valueHash.weight)){
+      if (!vm.isNumeric(valueHash.weight)) {
         missingCount = missingCount + 1;
       }
     });
-    vm.$log.debug('missing count: ', missingCount);
+    if (vm.Message.showDebug()) vm.$log.debug('missing count: ', missingCount);
 
-    if (missingCount > 0){
-      vm.$log.debug('calculating missing weights');
-      const weightVal = (1 - weightSum)/missingCount; // TODO: limit
-      vm.$log.debug('calculated weight Val: ', weightVal);
+    if (missingCount > 0) {
+      if (vm.Message.showDebug()) vm.$log.debug('calculating missing weights');
+      const weightVal = (1 - weightSum) / missingCount; // TODO: limit
+      if (vm.Message.showDebug()) vm.$log.debug('calculated weight Val: ', weightVal);
       _.forEach(valArr, (valueHash) => {
-        if (!vm.isNumeric(valueHash.weight)){
+        if (!vm.isNumeric(valueHash.weight)) {
           valueHash.weight = weightVal;
         }
       });
     }
 
-    vm.$log.debug('Final discrete values array: ', valArr);
+    if (vm.Message.showDebug()) vm.$log.debug('Final discrete values array: ', valArr);
     return valArr;
   }
 
@@ -925,13 +1051,12 @@ export class Project {
   }
 
   getMeasureType(measure) {
-    const vm = this;
     // measure types: ModelMeasure, EnergyPlusMeasure, ReportingMeasure
     // OSA wants: Ruby, EnergyPlus, Reporting
     let type = null;
     if (measure.type === 'ModelMeasure') {
       //type = 'Ruby';
-       type = 'RubyMeasure';
+      type = 'RubyMeasure';
     } else if (measure.type === 'EnergyPlusMeasure') {
       //type = 'EnergyPlus';
       type = 'EnergyPlusMeasure';
@@ -944,13 +1069,13 @@ export class Project {
     return type;
   }
 
-  makeOutputs(outputs, groupFlag){
+  makeOutputs(outputs, groupFlag) {
     const vm = this;
     let index = 0;
     let currentGroup = null;
     const finalOutputs = [];
     _.forEach(outputs, (out) => {
-      vm.$log.debug('OUTPUT: ', out);
+      if (vm.Message.showDebug()) vm.$log.debug('OUTPUT: ', out);
       const outHash = {};
       outHash.units = out.units;
       outHash.objective_function = out.objective_function == 'true';  // true or false
@@ -1006,12 +1131,27 @@ export class Project {
       outHash.display_name = out.display_name;
       outHash.display_name_short = out.short_name;
       outHash.metadata_id = null; // always null for now.  This is related to DEnCity?
-      outHash.name = out.name; // always measure.name . measure.argument.name
+
+      // ensure name includes 'measure.name .'
+      const measureName = _.upperFirst(_.camelCase(out.measure_class_name));
+      if (!_.startsWith(out.name, measureName + '.')){
+        outHash.name = measureName + '.' + out.name;
+      } else {
+        outHash.name = out.name;
+      }
+
+      // if (!_.startsWith(out.display_name, measureName + '.')){
+      //   outHash.display_name = measureName + '.' + out.display_name;
+      // } else {
+      //   outHash.name = out.display_name;
+      // }
+
       outHash.visualize = out.visualize == 'true';
       outHash.export = true; // always true
-      outHash.variable_type = out.type;  // options are: string, bool, double, integer?  TODO: find out what these can be. for now: use argument type
+      outHash.variable_type = vm.convertType(out.type);
       finalOutputs.push(outHash);
     });
+
     return finalOutputs;
   }
 
@@ -1026,34 +1166,52 @@ export class Project {
       // assume windows paths '\\'
       mdir = _.last(_.split(measure.measure_dir, '\\'));
     }
-    vm.$log.debug("***MEASURE DIR NAME: ", mdir);
+    if (vm.Message.showDebug()) vm.$log.debug('***MEASURE DIR NAME: ', mdir);
     return mdir;
   }
 
-  makeArgument(arg){
+  makeArgument(arg) {
     const vm = this;
     const argument = {};
     argument.display_name = arg.display_name;
     argument.display_name_short = arg.display_name_short ? arg.display_name_short : arg.name;
     argument.name = arg.name;
-    argument.value_type = _.toLower(arg.type); // TODO: choice, double, integer, bool, string (convert from BCL types)
+    argument.value_type = vm.convertType(arg.type);
     argument.default_value = arg.default_value;
     if (vm.analysisType == 'Manual')
-      argument.value = arg.option_1 ? arg.option_1 : arg.default_value;
+      argument.value = !_.isNil(arg.option_1) ? arg.option_1 : arg.default_value;
     else
       argument.value = (arg.inputs && !_.isNil(arg.inputs.default_value)) ? arg.inputs.default_value : arg.default_value;
+
+    // ** copy value to default_value if no default_value is present
+    if (_.isNil(argument.default_value) || argument.default_value == ''){
+      argument.default_value = argument.value;
+    }
 
     return argument;
   }
 
-  makeSkip(measure){
-    const vm = this;
+  convertType(type){
+    let newType = null;
+    if (_.toUpper(type) === 'CHOICE' || _.toUpper(type) === 'STRING') {
+      newType = 'string';
+    } else if (_.toUpper(type) === 'DOUBLE') {
+      newType = 'double';
+    } else if (_.toUpper(type) === 'INTEGER') {
+      newType = 'integer';
+    } else if (_.toUpper(type) === 'BOOLEAN' || _.toUpper(type) === 'BOOL'){
+      newType = 'boolean';
+    }
+    return newType;
+  }
+
+  makeSkip(measure) {
     const v = {
       argument: {
         display_name: 'Skip ' + measure.display_name,
         display_name_short: 'Skip entire measure',
         name: '__SKIP__',
-        value_type: 'bool',
+        value_type: 'boolean',
         default_value: false,
         value: false
       },
@@ -1084,9 +1242,9 @@ export class Project {
 
   exportScripts() {
     const vm = this;
-    vm.$log.debug('exporting server scripts');
+    if (vm.Message.showDebug()) vm.$log.debug('exporting server scripts');
     _.forEach(vm.serverScripts, (script, type) => {
-      // vm.$log.debug('type: ', type, 'scriptdata: ', script);
+      // if (vm.Message.showDebug()) vm.$log.debug('type: ', type, 'scriptdata: ', script);
       if (script.file) {
         // create argument file
         let argFilename = script.file.substr(0, script.file.lastIndexOf('.')) || script.file;
@@ -1097,7 +1255,6 @@ export class Project {
   }
 
   typeTargetValue(value, type) {
-    const vm = this;
     let newVal;
     if (value == null) {
       newVal = value;
@@ -1161,7 +1318,7 @@ export class Project {
     vm.pat.datapoints = vm.datapoints;
 
     vm.jetpack.write(vm.projectDir.path('pat.json'), vm.pat);
-    vm.$log.debug('Project exported to pat.json');
+    if (vm.Message.showDebug()) vm.$log.debug('Project exported to pat.json');
     vm.setModified(false);
   }
 
@@ -1191,18 +1348,18 @@ export class Project {
     // measures should already be in correct order
     // make sure workflowIndex's are consecutive and match measure index in array
     const vm = this;
-    vm.$log.debug('ProjectService::RecalculateMeasureWorkflowIndexes');
+    if (vm.Message.showDebug()) vm.$log.debug('ProjectService::RecalculateMeasureWorkflowIndexes');
     _.forEach(vm.measures, (measure, key) => {
       measure.workflow_index = key;
-      vm.$log.debug('key: ', key);
+      if (vm.Message.showDebug()) vm.$log.debug('key: ', key);
     });
 
-    vm.$log.debug('***REORDERED PROJECT MEASURES: ', vm.measures);
+    if (vm.Message.showDebug()) vm.$log.debug('***REORDERED PROJECT MEASURES: ', vm.measures);
   }
 
   openSetMyMeasuresDirModal() {
     const vm = this;
-    vm.$log.debug('in SetMyMeasures Modal function');
+    if (vm.Message.showDebug()) vm.$log.debug('in SetMyMeasures Modal function');
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
       controller: 'ModalSetMeasuresDirController',
@@ -1219,7 +1376,7 @@ export class Project {
 
   setProjectName(name) {
     const vm = this;
-    vm.$log.debug('Project setProjectName name:', name);
+    if (vm.Message.showDebug()) vm.$log.debug('Project setProjectName name:', name);
     vm.projectName = name;
   }
 
@@ -1264,12 +1421,12 @@ export class Project {
   // projectDir is a jetpack object (not a string)
   setProject(projectDir) {
     const vm = this;
-    vm.$log.debug('Project setProject');
+    if (vm.Message.showDebug()) vm.$log.debug('Project setProject');
 
     vm.setProjectDir(projectDir);
-    vm.$log.debug('in set project: projectDir: ', vm.projectDir.path());
+    if (vm.Message.showDebug()) vm.$log.debug('in set project: projectDir: ', vm.projectDir.path());
     vm.setProjectName(projectDir.path().replace(/^.*[\\\/]/, ''));
-    vm.$log.debug('project name: ', vm.projectName);
+    if (vm.Message.showDebug()) vm.$log.debug('project name: ', vm.projectName);
 
     vm.mongoDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/data/db'));
     vm.logsDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/logs'));
@@ -1320,7 +1477,7 @@ export class Project {
 
   getMeasuresAndOptions() {
     const vm = this;
-    vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
+    if (vm.Message.showDebug()) vm.$log.debug('GetMeasuresAndOptions measures: ', vm.measures);
     return vm.measures;
   }
 
@@ -1398,7 +1555,7 @@ export class Project {
       aws: {},
       credentials: {yamlFilename: null, accessKey: null, region: 'us-east-1'}
     });
-    vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
+    if (vm.Message.showDebug()) vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
 
   setRemoteSettings(settings) {
@@ -1417,7 +1574,7 @@ export class Project {
     vm.awsYamlFiles = [];
     const files = vm.jetpack.find(vm.awsDir.path(), {matching: '*.yml'});
     _.forEach(files, file => {
-      vm.awsYamlFiles.push(_.replace(_.last(_.split(file, '/')), '.yml', ''));
+      vm.awsYamlFiles.push(_.replace(_.last(_.split(file, path.sep)), '.yml', ''));
     });
     return vm.awsYamlFiles;
   }
@@ -1428,13 +1585,13 @@ export class Project {
     vm.clusters = {running: [], all: []};
     const tempClusters = vm.jetpack.find(vm.projectDir.path(), {matching: '*_cluster.json'});
     _.forEach(tempClusters, cluster => {
-      vm.$log.debug('CLUSTER: ', cluster);
-      const clusterFile = vm.jetpack.read(cluster);
-      let clusterName = _.last(_.split(cluster, '/'));
+      if (vm.Message.showDebug()) vm.$log.debug('CLUSTER: ', cluster);
+      //const clusterFile = vm.jetpack.read(cluster);
+      let clusterName = _.last(_.split(cluster, path.sep));
       clusterName = _.replace(clusterName, '_cluster.json', '');
       vm.clusters.all.push(clusterName);
       // PING (by name)
-      vm.pingCluster(clusterName).then((dns) => {
+      vm.pingCluster(clusterName).then(() => {
         // running
         vm.clusters.running.push(clusterName);
       }, () => {
@@ -1442,7 +1599,7 @@ export class Project {
       });
     });
 
-    vm.$log.debug('Cluster files found: ', vm.clusters);
+    vm.$log.info('Cluster files found: ', vm.clusters);
     return vm.clusters;
   }
 
@@ -1451,7 +1608,7 @@ export class Project {
     let dns = null;
     if (clusterName && vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
       const clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName, clusterName + '.json'), 'json');
-      vm.$log.debug('Cluster File Data: ', clusterData);
+      vm.$log.info('Cluster File Data: ', clusterData);
       if (clusterData && clusterData.server && clusterData.server.dns) {
         dns = clusterData.server.dns;
       }
@@ -1459,6 +1616,7 @@ export class Project {
     return dns;
   }
 
+  // todo: used?
   readClusterFile(clusterName) {
     const vm = this;
     let clusterData = {};
@@ -1471,24 +1629,24 @@ export class Project {
   pingCluster(clusterName) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('Locating config file for cluster: ', clusterName);
+    if (vm.Message.showDebug()) vm.$log.debug('Locating config file for cluster: ', clusterName);
 
     const dns = vm.getDNSFromFile(clusterName);
 
     if (dns) {
-      vm.$log.debug('PING: ', dns);
+      vm.$log.info('PING: ', dns);
       vm.$http.get(vm.fixURL(dns)).then(response => {
         // send json to run controller
-        vm.$log.debug('Cluster RUNNING at: ', dns);
-        vm.$log.debug('JSON response: ', response);
+        vm.$log.info('Cluster RUNNING at: ', dns);
+        vm.$log.info('JSON response: ', response);
         deferred.resolve(dns);
       }, () => {
-        vm.$log.debug('Cluster TERMINATED at: ', dns);
+        vm.$log.info('Cluster TERMINATED at: ', dns);
         deferred.reject();
       });
     } else {
       // nothing to ping
-      vm.$log.debug("Nothing to ping");
+      vm.$log.info('No DNS to ping for this cluster');
       deferred.reject();
     }
 
@@ -1510,12 +1668,12 @@ export class Project {
 
   saveClusterToFile() {
     const vm = this;
-    vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
+    if (vm.Message.showDebug()) vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
     // copy and clean up what you don't need
     const cluster = angular.copy(vm.remoteSettings.aws);
-    cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : null;
-    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name : null;
-    cluster.openstudio_server_version = cluster.openstudio_server_version ? cluster.openstudio_server_version.name : null;
+    cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : '';
+    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name : '';
+    cluster.openstudio_server_version = cluster.openstudio_server_version ? cluster.openstudio_server_version.name : '';
     // TODO: make sure worker number is a number
     // this is hard-coded
     cluster.ami_lookup_version = 3;
@@ -1524,20 +1682,34 @@ export class Project {
 
   setOsServerVersions() {
     const vm = this;
+    const deferred = vm.$q.defer();
     vm.osServerVersions = [];
     const amiURL = 'http://s3.amazonaws.com/openstudio-resources/server/api/v3/amis.json';
-    vm.$http.get(amiURL, {cache: false}).then(response => {
+    const headers = {};
+    headers['Cache-Control'] = 'no-cache';
+    headers['Pragma'] = 'no-cache';
+    headers['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT';
+    const config = {headers: headers};
+    vm.$http.get(amiURL, config).then(response => {
       if (response.data && response.data.builds) {
-        vm.$log.debug('OPENSTUDIO SERVER AMIS: ', response.data.builds);
+        vm.$log.info('OPENSTUDIO SERVER AMIS: ', response.data.builds);
         _.forEach(response.data.builds, version => {
           vm.osServerVersions.push(version);
         });
       }
-      vm.$log.debug('OS Server Versions: ', vm.osServerVersions);
+      vm.$log.info('OS Server Versions: ', vm.osServerVersions);
+      deferred.resolve(vm.osServerVersions);
 
     }, error => {
-      vm.$log.debug('Error retrieving the OsServerVersions: ', error);
+      vm.$log.error('Error retrieving the OsServerVersions: ', error);
+      vm.$translate('toastr.amisError').then(translation => {
+        vm.toastr.error(translation);
+      });
+      deferred.reject();
+
     });
+
+    return deferred.promise;
   }
 
   setServerInstanceTypes() {
@@ -1547,61 +1719,64 @@ export class Project {
         name: 'm3.xlarge',
         cpus: '4',
         memory: '15 GiB',
-        storage: '2 x 40 GB'
+        storage: '2 x 40 GB',
+        cost: '$0.28/hr'
       },
       {
         name: 'm3.2xlarge',
         cpus: '8',
         memory: '30 GiB',
-        storage: '2 x 80 GB'
+        storage: '2 x 80 GB',
+        cost: '$0.56/hr'
       },
       {
         name: 'c3.xlarge',
         cpus: '4',
         memory: '7.5 GiB',
-        storage: '2 x 40 GB'
+        storage: '2 x 40 GB',
+        cost: '$0.21/hr'
       },
       {
         name: 'c3.2xlarge',
         cpus: '8',
         memory: '15 GiB',
-        storage: '2 x 80 GB'
+        storage: '2 x 80 GB',
+        cost: '	$0.42/hr'
       },
       {
         name: 'c3.4xlarge',
         cpus: '16',
         memory: '30 GiB',
-        storage: '2 x 160 GB'
+        storage: '2 x 160 GB',
+        cost: '$0.84/hr'
       },
       {
         name: 'c3.8xlarge',
         cpus: '32',
         memory: '60 GiB',
-        storage: '2 x 320 GB'
+        storage: '2 x 320 GB',
+        cost: '$1.68/hr'
       },
       {
         name: 'i2.xlarge',
         cpus: '4',
         memory: '30.5 GiB',
-        storage: '1 x 800 GB'
+        storage: '1 x 800 GB',
+        cost: '$0.85/hr'
       },
       {
         name: 'i2.2xlarge',
         cpus: '8',
         memory: '61 GiB',
-        storage: '2 x 800 GB'
+        storage: '2 x 800 GB',
+        cost: '$1.71/hr'
       },
       {
         name: 'i2.4xlarge',
         cpus: '16',
         memory: '122 GiB',
-        storage: '4 x 800 GB'
-      },
-      {
-        name: 'i2.8xlarge',
-        cpus: '32',
-        memory: '244 GiB',
-        storage: '8 x 800 GB'
+        storage: '4 x 800 GB',
+        cost: '$3.41/hr'
       }
     ];
   }
@@ -1613,85 +1788,92 @@ export class Project {
         name: 'm3.medium',
         cpus: '1',
         memory: '3.75 GiB',
-        storage: '1 x 4 GB'
+        storage: '1 x 4 GB',
+        cost: '$0.07/hr'
       },
       {
         name: 'm3.large',
         cpus: '2',
         memory: '7.5 GiB',
-        storage: '1 x 32 GB'
+        storage: '1 x 32 GB',
+        cost: '$0.14/hr'
       },
       {
         name: 'm3.xlarge',
         cpus: '4',
         memory: '15 GiB',
-        storage: '2 x 40 GB'
+        storage: '2 x 40 GB',
+        cost: '$0.28/hr'
       },
       {
         name: 'm3.2xlarge',
         cpus: '8',
         memory: '30 GiB',
-        storage: '2 x 80 GB'
+        storage: '2 x 80 GB',
+        cost: '$0.56/hr'
       },
       {
         name: 'c3.large',
         cpus: '2',
         memory: '3.75 GiB',
-        storage: '2 x 16 GB'
+        storage: '2 x 16 GB',
+        cost: '$0.11/hr'
       },
       {
         name: 'c3.xlarge',
         cpus: '4',
         memory: '7.5 GiB',
-        storage: '2 x 40 GB'
+        storage: '2 x 40 GB',
+        cost: '$0.21/hr'
       },
       {
         name: 'c3.2xlarge',
         cpus: '8',
         memory: '15 GiB',
-        storage: '2 x 80 GB'
+        storage: '2 x 80 GB',
+        cost: '$0.42/hr'
       },
       {
         name: 'c3.4xlarge',
         cpus: '16',
         memory: '30 GiB',
-        storage: '2 x 160 GB'
+        storage: '2 x 160 GB',
+        cost: '$0.84/hr'
       },
       {
         name: 'c3.8xlarge',
         cpus: '32',
         memory: '60 GiB',
-        storage: '2 x 320 GB'
+        storage: '2 x 320 GB',
+        cost: '$1.68/hr'
       },
       {
         name: 'r3.large',
         cpus: '2',
         memory: '15.25 GiB',
-        storage: '1 x 32 GB'
+        storage: '1 x 32 GB',
+        cost: '$0.85/hr'
       },
       {
         name: 'i2.xlarge',
         cpus: '4',
         memory: '30.5 GiB',
-        storage: '1 x 800 GB'
+        storage: '1 x 800 GB',
+        cost: '$1.71/hr'
       },
       {
         name: 'i2.2xlarge',
         cpus: '8',
         memory: '61 GiB',
-        storage: '2 x 800 GB'
+        storage: '2 x 800 GB',
+        cost: '$1.71/hr'
       },
       {
         name: 'i2.4xlarge',
         cpus: '16',
         memory: '122 GiB',
-        storage: '4 x 800 GB'
-      },
-      {
-        name: 'i2.8xlarge',
-        cpus: '32',
-        memory: '244 GiB',
-        storage: '8 x 800 GB'
+        storage: '4 x 800 GB',
+        cost: '$3.41/hr'
       }
     ];
   }
@@ -1741,7 +1923,7 @@ export class Project {
       worker_initialization: {file: null, arguments: []},
       worker_finalization: {file: null, arguments: []}
     };
-    vm.$log.debug('setServerScripts: ', vm.serverScripts);
+    if (vm.Message.showDebug()) vm.$log.debug('setServerScripts: ', vm.serverScripts);
   }
 
   getServerScripts() {
@@ -1765,245 +1947,757 @@ export class Project {
   }
 
   setAlgorithmOptions() {
-    const at = {};
-    at.BaselinePerturbation =[{
+    const opts = {};
+    opts.baseline_perturbation = [{
       name: 'in_measure_combinations',
-      description: '(TRUE/FALSE) Run full factorial search over in-measure variable combinations',
-      defaultValue: 'TRUE'
-    }];
-    at.Diagonal = [{
-      name: 'Number of Samples',
-      description: 'positive integer (this discretizes a continuous variable)',
-      defaultValue: 2
-    }, {
-      name: 'Run_Baseline',
-      description: '(1/0) Run static values',
-      defaultValue: 1
-    }];
-    at.Morris = [{
-      name: 'r',
-      description: 'integer giving the number of repetitions of the design',
-      defaultValue: 10
-    }, {
-      name: 'levels',
-      description: '',
-      defaultValue: 10
-    }, {
-      name: 'grid_jump',
-      description: '',
-      defaultValue: 1
-    }, {
-      name: 'type',
-      description: 'oat',
-      defaultValue: 'oat'
-    }];
-    at.LHS = [{
-      name: 'Sample Method',
-      description: 'individual_variables / all_variables',
-      defaultValue: 'individual_variables'
-    }, {
-      name: 'Number of Samples',
-      description: 'positive integer (if individual, total simulations is this times each variable)',
-      defaultValue: 30
-    }];
-    at.Optim = [{
-      name: 'epsilonGradient',
-      description: 'epsilon in gradient calculation',
-      defaultValue: 0.01
-    }, {
-      name: 'pgtol',
-      description: 'tolerance on the projected gradient',
-      defaultValue: 0.01
-    }, {
-      name: 'factr',
-      description: 'Tolerance on delta_F',
-      defaultValue: 45036000000000
-    }, {
-      name: 'maxit',
-      description: 'Maximum number of iterations',
-      defaultValue: 100
-    }, {
-      name: 'normType',
-      description: '',
-      defaultValue: 'minkowski'
-    }, {
-      name: 'pPower',
-      description: 'Lp norm power',
-      defaultValue: 2
-    }, {
-      name: 'Exit On Guideline14',
-      description: '0 false / 1 true (for use with calibration report)',
-      defaultValue: 0
-    }];
-    at.RGENOUD = [{
-      name: 'popSize',
-      description: 'Size of initial population',
-      defaultValue: 30
-    }, {
-      name: 'Generations',
-      description: 'Number of generations',
-      defaultValue: 5
-    }, {
-      name: 'waitGenerations',
-      description: 'If no improvement in waitGenerations of generations, then exit',
-      defaultValue: 2
-    }, {
-      name: 'bfgsburnin',
-      description: 'The number of generations which are run before the BFGS is ﬁrst used',
-      defaultValue: 2
-    }, {
-      name: 'gradientcheck',
-      description: '0 false / 1 true',
-      defaultValue: 1
-    }, {
-      name: 'solutionTolerance',
-      description: '',
-      defaultValue: 0.01
-    }, {
-      name: 'epsilonGradient',
-      description: 'epsilon in gradient calculation',
-      defaultValue: 0.01
-    }, {
-      name: 'pgtol',
-      description: 'tolerance on the projected gradient',
-      defaultValue: 0.01
-    }, {
-      name: 'factr',
-      description: 'Tolerance on delta_F',
-      defaultValue: 45036000000000
-    }, {
-      name: 'maxit',
-      description: 'Maximum number of iterations',
-      defaultValue: 100
-    }, {
-      name: 'normType',
-      description: '',
-      defaultValue: 'minkowski'
-    }, {
-      name: 'pPower',
-      description: 'Lp norm power',
-      defaultValue: 2
-    }, {
-      name: 'Exit On Guideline14',
-      description: '0 false / 1 true (for use with calibration report)',
-      defaultValue: 0
-    }, {
-      name: 'balance',
-      description: '0 false / 1 true (load balancing)',
-      defaultValue: 1
-    }];
-    at.NSGA2 = [{
-      name: 'Number of Samples',
-      description: 'Size of initial population',
-      defaultValue: 30
-    }, {
-      name: 'Generations',
-      description: 'Number of generations',
-      defaultValue: 30
-    }, {
-      name: 'cprob',
-      description: 'Crossover probability [0,1]',
-      defaultValue: 0.85
-    }, {
-      name: 'XoverDistIdx',
-      description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
-    }, {
-      name: 'MuDistIdx',
-      description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
-    }, {
-      name: 'mprob',
-      description: 'Mutation probability [0,1]',
-      defaultValue: 0.8
-    }, {
-      name: 'toursize',
-      description: 'Tournament Size',
-      defaultValue: 2
-    }, {
-      name: 'normType',
-      description: '',
-      defaultValue: 'minkowski'
-    }, {
-      name: 'pPower',
-      description: 'Lp norm power',
-      defaultValue: 2
-    }, {
-      name: 'Exit On Guideline14',
-      description: '0 false / 1 true (for use with calibration report)',
-      defaultValue: 0
-    }];
-    at.SPEA2 = [{
-      name: 'Number of Samples',
-      description: 'Size of initial population',
-      defaultValue: 30
-    }, {
-      name: 'Generations',
-      description: 'Number of generations',
-      defaultValue: 30
-    }, {
-      name: 'cprob',
-      description: 'Crossover probability [0,1]',
-      defaultValue: 0.85
-    }, {
-      name: 'XoverDistIdx',
-      description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
-    }, {
-      name: 'MuDistIdx',
-      description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
-      defaultValue: 5
-    }, {
-      name: 'mprob',
-      description: 'Mutation probability [0,1]',
-      defaultValue: 0.8
-    }, {
-      name: 'toursize',
-      description: 'Tournament Size',
-      defaultValue: 2
-    }, {
-      name: 'normType',
-      description: '',
-      defaultValue: 'minkowski'
-    }, {
-      name: 'pPower',
-      description: 'Lp norm power',
-      defaultValue: 2
-    }, {
-      name: 'Exit On Guideline14',
-      description: '0 false / 1 true (for use with calibration report)',
-      defaultValue: 0
-    }];
-    at.PreFlight = [];
-    at.DOE = [{
-      name: 'Experiment Type',
-      description: 'full_factorial',
-      defaultValue: 'full_factorial'
-    }, {
-      name: 'Number of Samples',
-      description: 'positive integer (this discretizes a continuous variable)',
-      defaultValue: 2
-    }];
-    at.SingleRun = [{
-      name: '',
-      description: '',
-      defaultValue: ''
-    }];
-    at.RepeatRun = [{
-      name: 'Number of Runs',
-      description: 'positive integer (if individual, total simulations is this times each variable)',
-      defaultValue: 30
-    }];
-    at.PSO = [{
-      name: 'in_measure_combinations',
-      description: '(TRUE/FALSE) Run full factorial search over in-measure variable combinations',
-      defaultValue: 'TRUE'
+      displayName: 'In Measure Combinations',
+      description: 'Options: \'true\' or \'false\'',
+      defaultValue: 'true',
+      type: 'string'
     }, {
       name: 'include_baseline_in_combinations',
-      description: '(TRUE/FALSE) If in_measure_combinations are TRUE, sets if static values be included in combinations',
-      defaultValue: 'TRUE'
+      displayName: 'Include Baseline in Combinations?',
+      description: 'Options: \'true\' or \'false\'',
+      defaultValue: 'true',
+      type: 'string'
     }];
-    return at;
+
+    opts.diag = [{
+      name: 'experiment_type',
+      displayName: 'Experiment Type',
+      description: 'Options: diagonal',
+      defaultValue: 'diagonal',
+      type: 'string'
+    }, {
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Positive integer (if individual, total simulations is this times each variable)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'run_baseline',
+      displayName: 'Run Baseline?',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 1,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }];
+
+    opts.doe = [{
+      name: 'experiment_type',
+      displayName: 'Experiment Type',
+      description: 'Options: full_factorial',
+      defaultValue: 'full_factorial',
+      type:'string'
+    }, {
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Positive integer (this discretizes a continous variable)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }];
+
+    opts.lhs = [{
+      name: 'sample_method',
+      displayName: 'Sample Method',
+      description: 'Options: individual_variables or all_variables',
+      defaultValue: 'individual_variables',
+      type:'string'
+    }, {
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Positive integer (if individual, total simulations is this times each variable)',
+      defaultValue: 5,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }];
+
+    opts.morris = [{
+      name: 'r',
+      displayName: 'r',
+      description: 'Integer giving the number of repetitions of the design',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'levels',
+      displayName: 'Levels',
+      description: 'Positive integer (if individual, total simulations is this times each variable)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'grid_jump',
+      displayName: 'Levels',
+      description: 'Integer specifying the number of levels that are increased/decreased for computing the elementary effects',
+      defaultValue: 1,
+      type:'number'
+    }, {
+      name: 'type',
+      displayName: 'Type',
+      description: 'Options: oat (One at a Time)',
+      defaultValue: 'oat',
+      type:'string'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski',
+      type:'string'
+    }, {
+      name: 'pPower',
+      displayName: 'pPower',
+      description: 'Options: Lp norm power (must be non-negative)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1000000000000000000,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
+    }];
+
+    opts.nsga_nrel = [{
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Size of initial population',
+      defaultValue: 30,
+      type:'number'
+    }, {
+      name: 'generations',
+      displayName: 'Generations',
+      description: 'Number of generations',
+      defaultValue: 3,
+      type:'number'
+    }, {
+      name: 'tournament_size',
+      displayName: 'Tournament Size',
+      description: 'Tournament Size',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'cprob',
+      displayName: 'C Prob',
+      description: 'Crossover probability [0,1]',
+      defaultValue: 0.85,
+      type:'number'
+    }, {
+      name: 'xover_dist_idx',
+      displayName: 'XoverDistIdx',
+      description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5,
+      type:'number'
+    }, {
+      name: 'mu_dist_idx',
+      displayName: 'MuDistIdx',
+      description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5,
+      type:'number'
+    }, {
+      name: 'mprob',
+      displayName: 'M Prob',
+      description: 'Mutation probability [0,1]',
+      defaultValue: 0.8,
+      type:'number'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski',
+      type:'string'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'exit_on_guideline_14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
+    }];
+
+    opts.optim = [{
+      name: 'epsilon_gradient',
+      displayName: 'Epsilon Gradient',
+      description: 'Epsilon in gradient calculation',
+      defaultValue: 1e-4,
+      type:'number'
+    }, {
+      name: 'pgtol',
+      displayName: 'PG Tol',
+      description: 'Tolerance on the projected gradient',
+      defaultValue: 1e-2,
+      type:'number'
+    }, {
+      name: 'factr',
+      displayName: 'Factr',
+      description: 'Tolerance on delta_F',
+      defaultValue: 4.5036e13,
+      type:'number'
+    }, {
+      name: 'maxit',
+      displayName: 'Max iterations',
+      description: 'Maximum number of iterations',
+      defaultValue: 10,
+      type:'number'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski',
+      type:'string'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'exit_on_guideline_14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
+    }];
+
+    opts.preflight = [{
+      name: 'sample_method',
+      displayName: 'Sample Method',
+      description: 'Options: individual_variables or all_variables',
+      defaultValue: 'individual_variables',
+      type:'string'
+    }, {
+      name: 'run_max',
+      displayName: 'Run Max?',
+      description: 'Options: true or false',
+      defaultValue: 'true',
+      type:'string'
+    }, {
+      name: 'run_min',
+      displayName: 'Run Min?',
+      description: 'Options: true or false',
+      defaultValue: 'true',
+      type:'string'
+    }, {
+      name: 'run_mode',
+      displayName: 'Run Mode?',
+      description: 'Options: true or false',
+      defaultValue: 'true',
+      type:'string'
+    }, {
+      name: 'run_all_samples_for_pivots',
+      displayName: 'Run all Samples for Pivots?',
+      description: 'Options: true or false',
+      defaultValue: 'true',
+      type:'string'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e19,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }];
+
+    opts.pso = [{
+      name: 'npart',
+      displayName: 'Number of Particles',
+      description: 'Number of particles in the swarm',
+      defaultValue: 4,
+      type:'number'
+    }, {
+      name: 'maxit',
+      displayName: 'Max Iterations',
+      description: 'Maximum number of iterations',
+      defaultValue: 20,
+      type:'number'
+    }, {
+      name: 'maxfn',
+      displayName: 'Max Function Evaluations',
+      description: 'Maximum number of function evaluations',
+      defaultValue: 1000,
+      type:'number'
+    }, {
+      name: 'lambda',
+      displayName: 'Lambda',
+      description: '[0,1] a percentage to limit the maximum velocity (Vmax) for each dimension',
+      defaultValue: 0.9,
+      type:'number'
+    }, {
+      name: 'c2',
+      displayName: 'C2',
+      description: 'Social acceleration coefficient',
+      defaultValue: 1.193147,
+      type:'number'
+    }, {
+      name: 'c1',
+      displayName: 'C1',
+      description: 'Cognitive acceleration coefficient',
+      defaultValue: 1.193147,
+      type:'number'
+    }, {
+      name: 'boundary',
+      displayName: 'Boundary',
+      description: 'Options: invisible, damping, reflecting, absorbing2007, absorbing2011, default',
+      defaultValue: 'reflecting',
+      type:'string'
+    }, {
+      name: 'topology',
+      displayName: 'Topology',
+      description: 'Options: gbest, lbest, vonneumann, random',
+      defaultValue: 'random',
+      type:'string'
+    }, {
+      name: 'xini',
+      displayName: 'Xini',
+      description: 'Options: lhs, random',
+      defaultValue: 'lhs',
+      type:'string'
+    }, {
+      name: 'vini',
+      displayName: 'Vini',
+      description: 'Options: zero, lhs2011, random2011, lhs2007, random2007, default',
+      defaultValue: 'lhs2011',
+      type:'string'
+    }, {
+      name: 'abstol',
+      displayName: 'Abs Tol',
+      description: 'Absolute convergence tolerance',
+      defaultValue: 0.01,
+      type:'number'
+    }, {
+      name: 'reltol',
+      displayName: 'Rel Tol',
+      description: 'Relative convergence tolerance',
+      defaultValue: 0.01,
+      type:'number'
+    }, {
+      name: 'method',
+      displayName: 'Method',
+      description: 'Options: spso2007, spso2011, ipso, fips, wfips',
+      defaultValue: 'spso2011',
+      type:'string'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski',
+      type:'string'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'exit_on_guideline_14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
+    }];
+
+    opts.repeat_run = [{
+      name: 'number_of_runs',
+      displayName: 'Number of Runs',
+      description: 'Positive integer (if individual, total simulations is this times each variable)',
+      defaultValue: 30,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }];
+
+    opts.rgenoud = [{
+      name: 'popsize',
+      displayName: 'Population Size',
+      description: 'Size of initial population',
+      defaultValue: 30,
+      type:'number'
+    }, {
+      name: 'generations',
+      displayName: 'Generations',
+      description: 'Number of generations',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'wait_generations',
+      displayName: 'Generations to Wait',
+      description: 'If no improvement in waitGenerations of generations, then exit',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'bfgsburnin',
+      displayName: 'BFGS burn in',
+      description: 'The number of generations which are run before the BFGS is ﬁrst used',
+      defaultValue: 6,
+      type:'number'
+    }, {
+      name: 'solution_tolerance',
+      displayName: 'Solution Tolerance',
+      description: 'Numbers within solutionTolerance are considered equal',
+      defaultValue: 0.01,
+      type:'number'
+    }, {
+      name: 'epsilon_gradient',
+      displayName: 'Epsilon Gradient',
+      description: 'epsilon in gradient calculation',
+      defaultValue: 0.01,
+      type:'number'
+    }, {
+      name: 'pgtol',
+      displayName: 'Projected Gradient Tolerance',
+      description: 'Tolerance on the projected gradient',
+      defaultValue: 0.01,
+      type:'number'
+    }, {
+      name: 'factr',
+      displayName: 'Failed F Value',
+      description: 'Tolerance on delta_F',
+      defaultValue: 450360000000000,
+      type:'number'
+    }, {
+      name: 'maxit',
+      displayName: 'Maximum Iterations',
+      description: 'Maximum number of iterations',
+      defaultValue: 3,
+      type:'number'
+    }, {
+      name: 'r_genoud_debug_flag',
+      displayName: 'Failed F Value',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 1,
+      type:'number'
+    }, {
+      name: 'print_level',
+      displayName: 'Print Level',
+      description: 'Options: 0 (minimal printing), 1 (normal), 2 (detailed), and 3 (debug)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski',
+      type:'string'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'exit_on_guideline_14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
+    }];
+
+    opts.single_run = [{
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }];
+
+    opts.sobol = [{
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Positive integer',
+      defaultValue: 30,
+      type:'number'
+    }, {
+      name: 'random_seed',
+      displayName: 'Random Seed',
+      description: 'The first random seed',
+      defaultValue: 1979,
+      type:'number'
+    }, {
+      name: 'random_seed2',
+      displayName: 'Random Seed 2',
+      description: 'the second random seed',
+      defaultValue: 1973,
+      type:'number'
+    }, {
+      name: 'order',
+      displayName: 'Order',
+      description: 'Integer, the maximum order in the ANOVA decomposition (all indices up to this order will be computed)',
+      defaultValue: 1,
+      type:'number'
+    }, {
+      name: 'nboot',
+      displayName: 'Num Boot',
+      description: 'The number of bootstrap replicates',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'conf',
+      displayName: 'Confidence',
+      description: 'the confidence level for bootstrap confidence intervals',
+      defaultValue: 0.95,
+      type:'number'
+    }, {
+      name: 'type',
+      displayName: 'Type',
+      description: 'Options: sobol, sobol2002, sobol2007, jansen, mara, martinez',
+      defaultValue: 'sobol',
+      type:'string'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski',
+      type:'string'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
+    }];
+
+    opts.spea_nrel = [{
+      name: 'number_of_samples',
+      displayName: 'Number of Samples',
+      description: 'Size of Initial Population',
+      defaultValue: 30,
+      type:'number'
+    }, {
+      name: 'generations',
+      displayName: 'Generations',
+      description: 'Number of generations',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'tournament_size',
+      displayName: 'Tournament Size',
+      description: 'Tournament Size',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'cprob',
+      displayName: 'C Prob',
+      description: 'Crossover probability [0,1]',
+      defaultValue: 0.85,
+      type:'number'
+    }, {
+      name: 'cidx',
+      displayName: 'C Idx',
+      description: 'Crossover Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5,
+      type:'number'
+    }, {
+      name: 'midx',
+      displayName: 'M Idx',
+      description: 'Mutation Distribution Index (large values give higher probabilities of offspring close to parent)',
+      defaultValue: 5,
+      type:'number'
+    }, {
+      name: 'mprob',
+      displayName: 'M Prob',
+      description: 'Mutation probability [0,1]',
+      defaultValue: 0.8,
+      type:'number'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski',
+      type:'string'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'exit_on_guideline_14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 100,
+      type:'number'
+    }];
+
+    return opts;
+
   }
 
   getRubyMD5() {
@@ -2062,9 +2756,10 @@ export class Project {
     return vm.algorithmSettings;
   }
 
+  // TODO: not used. not connected to anything
   getAlgorithmSettingsForMethod() {
     const vm = this;
-    vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
+    if (vm.Message.showDebug()) vm.$log.debug('In getAlgorithmSettingsForMethod in Project');
 
     const settings = [];
     _.forEach(vm.algorithmOptions[vm.samplingMethod.id], object => {
@@ -2072,31 +2767,39 @@ export class Project {
     });
 
     return settings;
-
   }
 
-  setAlgorithmSettings(algorithm) {
+  setGetAlgorithmSettings(algorithm) {
     const vm = this;
-    vm.$log.debug('In setAlgorithmSettings in Project');
-    _.forEach(vm.algorithmOptions[algorithm.id], (object) => {
-      let flag = 0;
-      _.forEach(vm.algorithmSettings, (setting) => {
-        if (object.name === setting.name) {
-          setting.description = object.description;
-          setting.defaultValue = object.defaultValue;
-          if (!setting.value) {
-            setting.value = object.value;
-          }
-          flag = 1;
-        }
-      });
-      if (!flag) {
-        object.value = object.defaultValue;
-        vm.algorithmSettings.push(object);
+    if (vm.Message.showDebug()) vm.$log.debug('In setGetAlgorithmSettings in Project');
+
+    // remove non-applicable settings
+    _.forEachRight(vm.algorithmSettings, (setting, key) => {
+      const match = _.find(vm.algorithmOptions[algorithm.id], {name: setting.name});
+      if (!match) {
+        vm.algorithmSettings.splice(key, 1);
       }
     });
 
-    vm.algorithmSettings = vm.algorithmOptions[algorithm.id];
+    // add/update new settings
+    _.forEach(vm.algorithmOptions[algorithm.id], (object, index) => {
+      const match = _.find(vm.algorithmSettings, {name: object.name});
+      if (match) {
+        match.description = object.description;
+        match.defaultValue = object.defaultValue;
+        match.value = _.isNil(match.value) ? object.defaultValue : match.value;
+        match.type = object.type;
+      }
+      else {
+        const temp = angular.copy(object);
+        temp.value = temp.defaultValue;
+        //vm.algorithmSettings.push(temp);
+        vm.algorithmSettings.splice(index, 0, temp);
+      }
+    });
+
+    if (vm.Message.showDebug()) vm.$log.debug('new algorithmSettings: ', vm.algorithmSettings);
+    return vm.algorithmSettings;
   }
 
   getAlgorithmOptions() {
@@ -2105,47 +2808,63 @@ export class Project {
   }
 
   setSamplingMethods() {
-    const vm = this;
 
     return [{
-      id: 'NSGA2',
-      name: 'analysis.type.nsga2'
+      id: 'baseline_perturbation',
+      name: 'analysis.type.baselinePerturbation',
+      link: null
     }, {
-      id: 'SPEA2',
-      name: 'analysis.type.spea2'
+      id: 'diag',
+      name: 'analysis.type.diagonal',
+      link: null
     }, {
-      id: 'PSO',
-      name: 'analysis.type.pso'
+      id: 'doe',
+      name: 'analysis.type.doe',
+      link: 'https://cran.r-project.org/web/packages/DoE.base/DoE.base.pdf'
     }, {
-      id: 'RGENOUD',
-      name: 'analysis.type.rgenoud'
+      id: 'lhs',
+      name: 'analysis.type.lhs',
+      link: 'https://cran.r-project.org/web/packages/lhs/lhs.pdf'
     }, {
-      id: 'Optim',
-      name: 'analysis.type.optim'
+      id: 'morris',
+      name: 'analysis.type.morris',
+      link: 'https://cran.r-project.org/web/packages/sensitivity/sensitivity.pdf'
     }, {
-      id: 'LHS',
-      name: 'analysis.type.lhs'
+      id: 'nsga_nrel',
+      name: 'analysis.type.nsga2',
+      link: 'https://cran.r-project.org/web/packages/nsga2R/nsga2R.pdf'
     }, {
-      id: 'Morris',
-      name: 'analysis.type.morris'
+      id: 'optim',
+      name: 'analysis.type.optim',
+      link: 'http://stat.ethz.ch/R-manual/R-devel/library/stats/html/optim.html'
     }, {
-      id: 'DOE',
-      name: 'analysis.type.doe'
+      id: 'preflight',
+      name: 'analysis.type.preFlight',
+      link: null
     }, {
-      id: 'PreFlight',
-      name: 'analysis.type.preFlight'
+      id: 'pso',
+      name: 'analysis.type.pso',
+      link: 'https://cran.r-project.org/web/packages/hydroPSO/hydroPSO.pdf'
     }, {
-      id: 'SingleRun',
-      name: 'analysis.type.singleRun'
+      id: 'repeat_run',
+      name: 'analysis.type.repeatRun',
+      link: null
     }, {
-      id: 'RepeatRun',
-      name: 'analysis.type.repeatRun'
+      id: 'rgenoud',
+      name: 'analysis.type.rgenoud',
+      link: 'https://cran.r-project.org/web/packages/rgenoud/rgenoud.pdf'
     }, {
-      id: 'BaselinePerturbation',
-      name: 'analysis.type.baselinePerturbation'
-    },{
-      id: 'Diagonal',
-      name: 'analysis.type.diagonal'
+      id: 'single_run',
+      name: 'analysis.type.singleRun',
+      link: null
+    }, {
+      id: 'sobol',
+      name: 'analysis.type.sobol',
+      link: 'https://cran.r-project.org/web/packages/sensitivity/sensitivity.pdf'
+    }, {
+      id: 'spea_nrel',
+      name: 'analysis.type.spea2',
+      link: 'https://cran.r-project.org/web/packages/nsga2R/nsga2R.pdf'
     }];
   }
 
@@ -2211,7 +2930,7 @@ export class Project {
       }
       else vm.$log.error('The seeds directory (%s) does not exist', vm.seedDir.cwd());
     } else {
-      vm.$log.debug('There is no seed directory defined (project not selected?)');
+      if (vm.Message.showDebug()) vm.$log.debug('There is no seed directory defined (project not selected?)');
     }
 
   }
@@ -2227,7 +2946,7 @@ export class Project {
       }
       else vm.$log.error('The weather file directory (%s) does not exist', vm.weatherDir.cwd());
     } else {
-      vm.$log.debug('There is no weather directory defined (project not selected?)');
+      if (vm.Message.showDebug()) vm.$log.debug('There is no weather directory defined (project not selected?)');
     }
 
   }
@@ -2251,6 +2970,47 @@ export class Project {
     });
   }
 
+  loadAlgorithmicResults(type) {
+    const vm = this;
+    const filename = type == 'results' ? 'results.csv' : 'metadata.csv';
+    let resultsJson = [];
+    if (vm.jetpack.exists(vm.getProjectLocalResultsDir().path(filename))) {
+      const csv = vm.jetpack.read(vm.getProjectLocalResultsDir().path(filename));
+      resultsJson = vm.csvToJson(csv);
+    }
+    //if (vm.Message.showDebug()) vm.$log.debug('RESULTS JSON for type:', type, ' is: ', resultsJson);
+    return resultsJson;
+  }
+
+  algorithmResultsDownloaded(){
+
+    // if these results are downloaded, return true
+    const vm = this;
+    let downloadedResults = false;
+    if (vm.jetpack.exists(vm.getAlgorithmResultsPath())) {
+      downloadedResults = true;
+    }
+    return downloadedResults;
+  }
+
+  getAlgorithmResultsPath() {
+    const vm = this;
+    return  vm.getProjectLocalResultsDir().path('results.csv');
+  }
+
+  getAlgorithmResultsMetadataPath() {
+    const vm = this;
+    return vm.getProjectLocalResultsDir().path('metadata.csv');
+  }
+
+  csvToJson(csv) {
+  const content = csv.split('\n');
+  const header = content[0].split(',');
+  return _.tail(content).map((row) => {
+    return _.zipObject(header, row.split(','));
+  });
+}
+
   getSeedsDropdownArr() {
     const vm = this;
     return vm.seedsDropdownArr;
@@ -2263,16 +3023,15 @@ export class Project {
 
   setModified(isModified) {
     const vm = this;
-    vm.$log.debug('Project::setModified isModified: ', isModified);
+    if (vm.Message.showDebug()) vm.$log.debug('Project::setModified isModified: ', isModified);
     vm.modified = isModified;
   }
 
   // takes datestrings like these: 20161110T212644Z, 2016-11-22 11:10:50 -0700, 2016-11-22 04:32:23 UTC, or 2016-11-22T04:32:13.626Z
   makeDate(dateString) {
-    const vm = this;
+
     let theDate = '';
     if (dateString) {
-
       if (dateString.slice(8, 9) == 'T') {
         // YYYYMMDDTHHMMSSZ: add punctuation to convert to valid datetime format and parse normally
         const tmp = dateString.slice(0, 4) + '-' + dateString.slice(4, 6) + '-' + dateString.slice(6, 11) + ':' + dateString.slice(11, 13) + ':' + dateString.slice(13, 16);
@@ -2280,12 +3039,9 @@ export class Project {
       } else {
         theDate = new Date(dateString);
       }
-
-      // vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
+      // if (vm.Message.showDebug()) vm.$log.debug('***DATE: ', theDate, 'datestring was: ', dateString);
     }
-
     return theDate;
-
   }
 
   formatDate(dateString) {
@@ -2295,7 +3051,7 @@ export class Project {
     if (dateString) {
       theDate = vm.makeDate(dateString);
       // format
-      theDate = theDate.getMonth() + 1 + "/" + theDate.getDate() + "/" + theDate.getFullYear();
+      theDate = theDate.getMonth() + 1 + '/' + theDate.getDate() + '/' + theDate.getFullYear();
     }
 
     return theDate;
@@ -2309,7 +3065,7 @@ export class Project {
   modifiedModal() {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('Project::modifiedModal');
+    if (vm.Message.showDebug()) vm.$log.debug('Project::modifiedModal');
 
     if (vm.getModified()) {
       const modalInstance = vm.$uibModal.open({
@@ -2320,7 +3076,7 @@ export class Project {
       });
 
       modalInstance.result.then(() => {
-        vm.$log.debug('Resolving openModal()');
+        if (vm.Message.showDebug()) vm.$log.debug('Resolving openModal()');
         deferred.resolve('resolved');
       }, () => {
         // Modal canceled

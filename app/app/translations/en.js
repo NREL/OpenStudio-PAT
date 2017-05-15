@@ -1,3 +1,30 @@
+/***********************************************************************************************************************
+ *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *  following conditions are met:
+ *
+ *  (1) Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *  disclaimer.
+ *
+ *  (2) Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *  following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *  (3) Neither the name of the copyright holder nor the names of any contributors may be used to endorse or promote
+ *  products derived from this software without specific prior written permission from the respective party.
+ *
+ *  (4) Other than as required in clauses (1) and (2), distributions in any form of modifications or other derivative
+ *  works may not use the "OpenStudio" trademark, "OS", "os", or any other confusingly similar designation without
+ *  specific prior written permission from Alliance for Sustainable Energy, LLC.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER, THE UNITED STATES GOVERNMENT, OR ANY CONTRIBUTORS BE LIABLE FOR
+ *  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **********************************************************************************************************************/
 export default {
   dependency: {
     title: 'PAT Dependency Download Status'
@@ -28,6 +55,7 @@ export default {
     start: 'Start Local Server',
     stop: 'Stop Local Server',
     ping: 'Ping Server and Set Status',
+    viewServer: 'View Local Server',
     noProject: 'You must open a project first'
   },
   setMeasuresDir: {
@@ -39,6 +67,60 @@ export default {
     heading: 'New Project Name',
     blurb: 'This will be the name of the directory containing your project. In the next step, you will choose the location for your new project folder.'
   },
+  toastr: {
+    measureAdded: 'Measure added to project!',
+    measureAddedError: 'Measure added to project, but unable to compute arguments',
+    measureNameAlreadyAdded: 'Cannot add measure: measure names must be unique and there is already a measure with this name added to the project',
+    measureDuplicated: 'Measure duplicated!',
+    measureDuplicatedError: 'Error duplicating measure',
+    downloadingMeasure: 'Downloading measure from the BCL...',
+    measureDownloaded: 'Measure downloaded!',
+    measureDownloadedError: 'Measure download error',
+    openMeasure: 'Measure will open in a text editor for editing',
+    updatedMeasureLocal: 'Measure successfully updated in your local BCL!',
+    updatedMeasureProject: 'Measure successfully updated in your project!',
+    designAltNameError: 'Cannot change design alternative name:  selected name is not unique',
+    startLocalServer: 'Starting Local Server...this make take a while',
+    connectedServer: 'Connected to server!',
+    connectedServerError: 'Error: server did not start',
+    localStartInProgressBeforeStop: 'Local Server start is in progress for this project, and must complete before it can be stopped...this may take a few minutes',
+    stopLocalServer: 'Stopping Local Server...this make take a while',
+    stoppedServer: 'Server stopped successfully!',
+    stoppedServerError: 'Error: server could not be stopped',
+    serverAlive: 'Server is Alive',
+    serverOffline: 'Server is Offline',
+    projectSaved: 'Project saved!',
+    clusterSaved: 'Cluster details saved!',
+    connectingCloud: 'Connecting to the cloud...this may take a few minutes',
+    startingCloud: 'Starting cloud cluster...this may take up to 10 minutes',
+    connectedCloud: 'Connected to AWS!',
+    startedCloud: 'AWS server started!',
+    connectedRemote: 'Connected to remote server!',
+    connectedRemoteError: 'Error connecting to existing remote server',
+    terminatingCluster: 'Terminating cloud clusters',
+    terminatedCluster: 'Successfully terminated AWS cluster!  You should double check that the servers were terminated in the AWS Console',
+    disconnectedRemote: 'Disconnected from remote server',
+    disconnectedRemoteError: 'Could not disconnect from remote server',
+    terminatedClusterError: 'Could not terminate AWS cluster...check the AWS console',
+    downloadedResults: 'Results downloaded!',
+    downloadedResultsError: 'Error downloading Results file',
+    downloadedAllResults: 'All Results downloaded!',
+    downloadedAllResultsError: 'Error downloading Results zip files',
+    downloadedOsm: 'OSM downloaded!',
+    downloadedOsmError: 'Error downloading OSM',
+    downloadedAllOsm: 'All OSMs downloaded!',
+    downloadedAllOsmError: 'Error downloading OSMs',
+    connectCredentialsError: 'Error connecting to AWS - No AWS Credentials Selected',
+    startCredentialsError: 'Error starting AWS server - No AWS Credentials Selected',
+    connectedCloudError: 'Error connecting to AWS',
+    startedCloudError: 'Error starting AWS server',
+    prepareExit: 'Preparing to exit...',
+    amisError: 'Cannot retrieve OpenStudio Server Versions',
+    noYaml: 'No AWS credentials selected. Cannot start/connect to AWS',
+    noCluster: 'No cluster selected. Cannot start/connect to AWS',
+    objFunctionGroupError: 'This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully',
+    numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully'
+  },
   analysis: {
     title: 'Analysis',
     projectName: 'Project Name',
@@ -46,6 +128,7 @@ export default {
     addMeasureOption: 'Add Measure Option',
     checkAll: 'Check to make all arguments variable',
     checkForUpdates: 'Check for Updates',
+    viewAlgorithmReference: 'View Algorithm Documentation',
     columns: {
       argumentName: 'Argument Name',
       shortName: 'Short Name',
@@ -55,6 +138,7 @@ export default {
     defaultSeedModel: 'Default Seed Model',
     defaultWeatherFile: 'Default Weather File',
     deleteLastOption: 'Delete Last Option',
+    duplicateMeasure: 'Duplicate Measure',
     duplicateMeasureAndOption: 'Duplicate Measure & Option',
     duplicateOption: 'Duplicate Option',
     energyplusMeasures: 'EnergyPlus Measures',
@@ -69,18 +153,19 @@ export default {
     helpReportingMeasures: 'A Reporting Measure is a script that creates a report describing some aspect of the or the simulation results.  These Measures have access to the OpenStudio model, the EnergyPlus IDF, and the simulation results.',
     type: {
       diagonal: 'Diagonal',
-      nsga2: 'Nondominated Sorting Genetic Algorithm 2',
-      spea2: 'Strength Pareto Evolutionary Algorithm 2',
-      pso: 'Particle Swarm',
-      rgenoud: 'R-GENetic Optimization Using Derivatives',
+      nsga2: 'Nondominated Sorting Genetic Algorithm 2 (NSGA2)',
+      spea2: 'Strength Pareto Evolutionary Algorithm 2 (SPEA2)',
+      pso: 'Particle Swarm (PSO)',
+      rgenoud: 'R-GENetic Optimization Using Derivatives (RGENOUD)',
       optim: 'Optim',
-      lhs: 'Latin Hypercube Sampling',
+      lhs: 'Latin Hypercube Sampling (LHS)',
       morris: 'Morris Method',
-      doe: 'DesignOfExperiments',
-      preFlight: 'PreFlight',
-      singleRun: 'SingleRun',
-      repeatRun: 'RepeatRun',
-      baselinePerturbation: 'BaselinePerturbation'
+      doe: 'Design Of Experiments (DOE)',
+      preFlight: 'Pre Flight',
+      singleRun: 'Single Run',
+      sobol: 'Sobol',
+      repeatRun: 'Repeat Run',
+      baselinePerturbation: 'Baseline Perturbation'
     },
     algorithmic: {
       algorithmSetting: 'Algorithm Settings',
@@ -127,11 +212,12 @@ export default {
         message: 'Select which options you would like to duplicate in this measure.',
         selectAll: 'Select All',
         deselectAll: 'Deselect All'
-      }
+      },
+      modalEditOptionDescription: 'Edit Option Description'
     }
   },
   bcl: {
-    title: 'Building Component Library',
+    title: 'Measure Library',
     wait: 'Please wait',
     aside: {
       attributes: 'Attributes',
@@ -214,6 +300,17 @@ export default {
       openstudio: 'OpenStudio',
       reporting: 'Reporting'
     },
+    createNewMeasure: {
+      title: 'Create New Measure',
+      name: 'Name',
+      className: 'Class Name',
+      description: 'Description',
+      modelerDescription: 'Modeler Description',
+      measureType: 'Measure Type',
+      taxonomy: 'Taxonomy',
+      createNewMeasure: 'Create New Measure',
+      createMeasure: 'Create Measure and Open for Editing'
+    },
     duplicateMeasure: {
       title: 'Duplicate Measure',
       name: 'Name',
@@ -242,6 +339,10 @@ export default {
       locationOrWeatherFile: 'Location or Weather File',
       name: 'Name',
       seedModel: 'Seed Model'
+    },
+    modalClearDatapoint: {
+      title: 'Clear Datapoint Results',
+      message: 'Deleting this alternative will delete its associated datapoint and results.  Proceed with the deletion?'
     },
     createOneDesignAlternative: 'Create One Design Alternative with Each Measure Option',
     duplicateAlternative: 'Duplicate Alternative',
@@ -292,8 +393,16 @@ export default {
     stopServer: 'Stop Server',
     exportToOSA: 'Export to OSA',
     runEntireWorkflow: 'Run Entire Workflow',
+    runSelected: 'Run Selected',
+    pleaseWait: 'Please wait...',
+    selectAll: 'Select All',
+    clearSelections: 'Clear Selections',
     algorithmicOnCloud: 'Algorithmic analyses cannot be run locally.  Select \'Run on Cloud\' from the dropdown above to run this analysis remotely.',
     viewServer: 'View Server',
+    viewAlgorithmResults: 'View Results',
+    downloadAlgorithmResults: 'Download Algorithm Results',
+    modifiedDP: 'The design alternative data associated with this datapoint has changed since it was last run',
+    deletedDA: 'The design alternative associated with this datapoint has been deleted from the project',
     modalAnalysisRunning: {
       title: 'Analysis is Running',
       message: 'The analysis is currently running.  Wait for the analysis to complete or cancel the run before leaving this tab.'
@@ -301,7 +410,13 @@ export default {
     modalClearResults: {
       title: 'Delete Local Results?',
       rerunAnalysisMessage: 'Running a new analysis will delete your local results. Are you sure you want to continue?',
-      setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?'
+      setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?',
+      rerunSelectedMessage: 'Running a new analysis will delete your local results for the selected datapoints.  Are you sure you want to continue?'
+    },
+    modalAwsWarning: {
+      title: 'PAT Cloud Support with Amazon EC2',
+      message: 'The user assumes all responsibility for orphaned EC2 processes.  It is strongly recommended that you monitor EC2 cloud usage in the Amazon AWS Console to avoid any unwanted charges.',
+      agree: 'I agree'
     },
     modalCloudRunning: {
       title: 'Cloud Cluster is Running',
@@ -331,6 +446,7 @@ export default {
       awsAccessKey: 'Access Key',
       awsRegion: 'Region',
       cpus: 'CPUs',
+      cost: 'Cost',
       memory: 'Memory',
       storage: 'Storage',
       numberOfWorkers: 'Number of Workers',

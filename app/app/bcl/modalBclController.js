@@ -1,3 +1,30 @@
+/***********************************************************************************************************************
+ *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *  following conditions are met:
+ *
+ *  (1) Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *  disclaimer.
+ *
+ *  (2) Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *  following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *  (3) Neither the name of the copyright holder nor the names of any contributors may be used to endorse or promote
+ *  products derived from this software without specific prior written permission from the respective party.
+ *
+ *  (4) Other than as required in clauses (1) and (2), distributions in any form of modifications or other derivative
+ *  works may not use the "OpenStudio" trademark, "OS", "os", or any other confusingly similar designation without
+ *  specific prior written permission from Alliance for Sustainable Energy, LLC.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER, THE UNITED STATES GOVERNMENT, OR ANY CONTRIBUTORS BE LIABLE FOR
+ *  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
 //const {shell} = require('electron');
 import {remote} from 'electron';
@@ -5,7 +32,7 @@ const {shell} = remote;
 
 export class ModalBclController {
 
-  constructor($log, $q, $uibModalInstance, $timeout, $uibModal, uiGridConstants, $scope, toastr, BCL, params, Project, MeasureManager) {
+  constructor($log, $q, $uibModalInstance, $timeout, $uibModal, uiGridConstants, $scope, $translate, toastr, BCL, params, Project, MeasureManager, Message) {
     'ngInject';
 
     const vm = this;
@@ -22,7 +49,9 @@ export class ModalBclController {
     vm.jetpack = jetpack;
     vm.shell = shell;
     vm.params = params;
+    vm.$translate = $translate;
     vm.MeasureManager = MeasureManager;
+    vm.Message = Message;
 
     vm.selected = null;
     vm.keyword = '';
@@ -55,7 +84,7 @@ export class ModalBclController {
     // get project measures
     vm.projectMeasures = vm.Project.getMeasuresAndOptions();
     vm.designAlternatives = vm.Project.getDesignAlternatives();
-    vm.$log.debug('Project Measures(): ', vm.projectMeasures);
+    if (vm.Message.showDebug()) vm.$log.debug('Project Measures(): ', vm.projectMeasures);
 
     // get measures array for Library display
     vm.$scope.displayMeasures = [];
@@ -70,18 +99,14 @@ export class ModalBclController {
     // get all measures (this also checks for updates)
     vm.BCL.getMeasures().then((measures) => {
       vm.libMeasures = measures;
-      vm.$log.debug('***LibMeasures retrieved from BCL.getMeasures(): ', vm.libMeasures);
+      if (vm.Message.showDebug()) vm.$log.debug('***LibMeasures retrieved from BCL.getMeasures(): ', vm.libMeasures);
       // reload BCL measures
       vm.getBCLMeasures();
-
-      // _.forEach(vm.libMeasures.my, (m) => {
-      //   vm.$log.debug('Added to project: ', m.addedToProject, 'measure: ', m.name);
-      // });
 
       // apply filters
       vm.resetFilters();
 
-      vm.$log.debug('DISPLAY MEASURES', vm.$scope.displayMeasures);
+      if (vm.Message.showDebug()) vm.$log.debug('DISPLAY MEASURES', vm.$scope.displayMeasures);
 
     });
 
@@ -93,7 +118,7 @@ export class ModalBclController {
         enableCellEdit: false,
         headerCellFilter: 'translate',
         width: '35%',
-        cellTooltip: function(row) {
+        cellTooltip: function (row) {
           return row.entity.display_name;
         }
       }, {
@@ -113,45 +138,45 @@ export class ModalBclController {
         headerCellFilter: 'translate',
         width: '14%'
       }, /*{
-        name: 'author',
-        displayName: 'bcl.columns.author',
-        enableCellEdit: false,
-        headerCellFilter: 'translate',
-        visible: false
-      }, */
-      {
-        name: 'date',
-        displayName: 'bcl.columns.date',
-        cellFilter: 'date:"dd/MM/yyyy"',
-        enableCellEdit: false,
-        headerCellFilter: 'translate',
-        type: 'date',
-        width: '10%'
-      }, {
-        name: 'edit',
-        displayName: 'bcl.columns.edit',
-        cellClass: 'dropdown-button',
-        cellTemplate: 'app/bcl/editButtonTemplate.html',
-        enableCellEdit: false,
-        headerCellFilter: 'translate',
-        width: '13%'
-      }, {
-        name: 'status',
-        displayName: 'bcl.columns.status',
-        cellClass: 'icon-cell',
-        cellTemplate: 'app/bcl/updateButtonTemplate.html',
-        enableCellEdit: false,
-        headerCellFilter: 'translate',
-        width: '10%'
-      }, {
-        name: 'add',
-        displayName: 'bcl.columns.add',
-        cellClass: 'icon-cell',
-        cellTemplate: 'app/bcl/addButtonTemplate.html',
-        enableCellEdit: false,
-        headerCellFilter: 'translate',
-        width: '9%'
-      }],
+       name: 'author',
+       displayName: 'bcl.columns.author',
+       enableCellEdit: false,
+       headerCellFilter: 'translate',
+       visible: false
+       }, */
+        {
+          name: 'date',
+          displayName: 'bcl.columns.date',
+          cellFilter: 'date:"dd/MM/yyyy"',
+          enableCellEdit: false,
+          headerCellFilter: 'translate',
+          type: 'date',
+          width: '10%'
+        }, {
+          name: 'edit',
+          displayName: 'bcl.columns.edit',
+          cellClass: 'dropdown-button',
+          cellTemplate: 'app/bcl/editButtonTemplate.html',
+          enableCellEdit: false,
+          headerCellFilter: 'translate',
+          width: '13%'
+        }, {
+          name: 'status',
+          displayName: 'bcl.columns.status',
+          cellClass: 'icon-cell',
+          cellTemplate: 'app/bcl/updateButtonTemplate.html',
+          enableCellEdit: false,
+          headerCellFilter: 'translate',
+          width: '10%'
+        }, {
+          name: 'add',
+          displayName: 'bcl.columns.add',
+          cellClass: 'icon-cell',
+          cellTemplate: 'app/bcl/addButtonTemplate.html',
+          enableCellEdit: false,
+          headerCellFilter: 'translate',
+          width: '9%'
+        }],
       data: 'displayMeasures',
       rowHeight: 45,
       /*enableCellEditOnFocus: true,*/
@@ -159,7 +184,7 @@ export class ModalBclController {
       enableColumnMenus: false,
       enableRowSelection: true,
       enableRowHeaderSelection: false,
-      enableVerticalScrollbar:uiGridConstants.scrollbars.ALWAYS,
+      enableVerticalScrollbar: uiGridConstants.scrollbars.ALWAYS,
       multiSelect: false,
       onRegisterApi: function (gridApi) {
         vm.gridApi = gridApi;
@@ -208,8 +233,8 @@ export class ModalBclController {
   // get measures for display based on filter values
   setDisplayMeasures() {
     const vm = this;
-    vm.$log.debug('in setDisplayMeasures');
-    vm.$log.debug('FILTERS: ', vm.filters);
+    if (vm.Message.showDebug()) vm.$log.debug('in setDisplayMeasures');
+    if (vm.Message.showDebug()) vm.$log.debug('FILTERS: ', vm.filters);
     const measures = [];
 
     // special case: show only project measures
@@ -218,29 +243,40 @@ export class ModalBclController {
       _.forEach(vm.libMeasures.my, m => {
         if (m.addedToProject) {
           // add if not found
-          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+          if (!(_.find(measures, {uid: m.uid, location: 'my'}))){
+            measures.push(m);
+          }
         }
       });
       _.forEach(vm.libMeasures.local, m => {
         if (m.addedToProject) {
           // add if not found
-          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+          if (!(_.find(measures, {uid: m.uid, location: 'local'}))){
+            measures.push(m);
+          }
         }
       });
     }
     // add other checked
     _.forEach(vm.filters, (val, key) => {
       if (val) {
-        vm.$log.debug('key: ', key);
-        vm.$log.debug('measures: ', vm.libMeasures[key]);
+        if (vm.Message.showDebug()) vm.$log.debug('key: ', key);
+        if (vm.Message.showDebug()) vm.$log.debug('measures: ', vm.libMeasures[key]);
         _.forEach(vm.libMeasures[key], m => {
-          // add if not found
-          if (!(_.find(measures, {uid: m.uid}))) measures.push(m);
+          // add if not found (BCL online only)
+          if (key == 'bcl') {
+            // add if local measure of same UID isn't already added
+            if (!(_.find(measures, {uid: m.uid, location: 'local'}))) measures.push(m);
+          } else {
+            // add if uid and location not found
+            if (!(_.find(measures, {uid: m.uid, location: m.location}))) measures.push(m);
+          }
         });
       }
     });
 
     vm.$scope.displayMeasures = measures;
+    if (vm.Message.showDebug()) vm.$log.debug('***DisplayMeasures: ', vm.$scope.displayMeasures);
     return measures;
   }
 
@@ -277,7 +313,7 @@ export class ModalBclController {
     const vm = this;
     const catsArr = [];
 
-    vm.$log.debug('level: ', level, ' namesArr: ', namesArr);
+    if (vm.Message.showDebug()) vm.$log.debug('level: ', level, ' namesArr: ', namesArr);
 
     // first check/uncheck sub categories (if a filter change just happened)
     if (level != null) {
@@ -364,26 +400,36 @@ export class ModalBclController {
         });
         return found;
       });
-
     }
-
   }
 
   // add measure to project
   addMeasure(rowEntity) {
 
     const vm = this;
-    const measure = _.find(vm.$scope.displayMeasures, {uid: rowEntity.uid});
+    if (vm.Message.showDebug()) vm.$log.debug('Adding this row to project: ', rowEntity);
+    const measure = _.find(vm.$scope.displayMeasures, {uid: rowEntity.uid, location: rowEntity.location});
 
-    vm.addToProject(measure);
-    vm.setMeasureInExistingDAs(measure);
-    vm.$log.debug('Adding the following measure to project: ', measure);
-    vm.$log.debug('New project measures array: ', vm.projectMeasures);
+    // first check for uniqueness of measure name
+    const match = _.find(vm.projectMeasures, {name: measure.name});
+    if (vm.Message.showDebug()) vm.$log.debug('measure name match: ', match);
+    if (match) {
+      // there is already a measure with this name, to ensure uniqueness, can't add this second measure
+      vm.$log.error('Can\'t add measure to project: there is already a measure with that name added');
+      vm.$translate('toastr.measureNameAlreadyAdded').then( translation => {
+        vm.toastr.error(translation);
+      });
+    } else {
+      vm.addToProject(measure);
+      vm.setMeasureInExistingDAs(measure);
+      if (vm.Message.showDebug()) vm.$log.debug('Adding the following measure to project: ', measure);
+      if (vm.Message.showDebug()) vm.$log.debug('New project measures array: ', vm.projectMeasures);
+    }
   }
 
   addToProject(measure) {
     const vm = this;
-    vm.$log.debug('ModalBCL::addToProject');
+    if (vm.Message.showDebug()) vm.$log.debug('ModalBCL::addToProject');
 
     // prevent user from closing modal until measure is done getting added
     vm.$scope.addInProgress = true;
@@ -391,7 +437,7 @@ export class ModalBclController {
     // copy on disk
     const dirNames = _.split(measure.measure_dir, '/');
     const dirName = _.last(dirNames);
-    //overwrite if measure is already in project folder
+    // overwrite if measure is already in project folder
     vm.jetpack.copy(measure.measure_dir, vm.projectDir.path(dirName), {overwrite: true});
 
     // add to project measures
@@ -400,24 +446,29 @@ export class ModalBclController {
     measure.seed = vm.Project.getDefaultSeed();
     vm.Project.computeMeasureArguments(measure).then(response => {
       measure = response;
-      vm.$log.debug('New Measure with computed args: ', measure);
+      if (vm.Message.showDebug()) vm.$log.debug('New Measure with computed args: ', measure);
       const project_measure = angular.copy(measure);
       project_measure.measure_dir = vm.projectDir.path(dirName);
       vm.insertIntoProjectMeasuresArray(project_measure);
-      vm.toastr.success('Measure Added to Project!');
+
+      vm.$translate('toastr.measureAdded').then( translation => {
+        vm.toastr.success(translation);
+      });
       vm.$scope.addInProgress = false;
     }, error => {
-      vm.$log.debug('Error in MM compute args.  Will add measure as is: ', error);
+      if (vm.Message.showDebug()) vm.$log.debug('Error in MM compute args.  Will add measure as is: ', error);
       const project_measure = angular.copy(measure);
       project_measure.measure_dir = vm.projectDir.path(dirName);
       vm.insertIntoProjectMeasuresArray(project_measure);
-      vm.toastr.error('Measure added to project without computing arguments');
+      vm.$translate('toastr.measureAddedError').then( translation => {
+        vm.toastr.error(translation);
+      });
       vm.$scope.addInProgress = false;
     });
 
   }
 
-  setMeasureInExistingDAs(measure){
+  setMeasureInExistingDAs(measure) {
     const vm = this;
 
     _.forEach(vm.designAlternatives, (alt) => {
@@ -428,27 +479,27 @@ export class ModalBclController {
 
   insertIntoProjectMeasuresArray(project_measure) {
     const vm = this;
-    vm.$log.debug('ModalBCL::insertIntoProjectMeasuresArray');
+    if (vm.Message.showDebug()) vm.$log.debug('ModalBCL::insertIntoProjectMeasuresArray');
     // order = model, energyplus, reporting
     // check type
     if (_.findIndex(vm.projectMeasures, {type: project_measure.type}) != -1) {
       // figure out where to put new measure in array
-      const index = _.findLastIndex(vm.projectMeasures, {type: project_measure.type });
+      const index = _.findLastIndex(vm.projectMeasures, {type: project_measure.type});
       // add to array at the end of the correct measure type section
       vm.projectMeasures.splice(index + 1, 0, project_measure);
     } else {
       // first measure of this type
       if (project_measure.type == 'ModelMeasure') {
         // append to front
-        vm.projectMeasures.splice(0,0, project_measure);
-      }  else if (project_measure.type == 'EnergyPlusMeasure') {
-        const index2 = _.findLastIndex(vm.projectMeasures, {type: 'ModelMeasure' });
+        vm.projectMeasures.splice(0, 0, project_measure);
+      } else if (project_measure.type == 'EnergyPlusMeasure') {
+        const index2 = _.findLastIndex(vm.projectMeasures, {type: 'ModelMeasure'});
         if (index2 != -1) {
           // add after model measures
           vm.projectMeasures.splice(index2 + 1, 0, project_measure);
         } else {
           // no model measures, append to front
-          vm.projectMeasures.splice(0,0, project_measure);
+          vm.projectMeasures.splice(0, 0, project_measure);
         }
       } else {
         // append to end
@@ -465,21 +516,37 @@ export class ModalBclController {
     const deferred = vm.$q.defer();
     // prevent user from closing modal
     vm.$scope.downloadInProgress = true;
-    vm.toastr.info('Downloading measure from the BCL...');
+    vm.$translate('toastr.downloadingMeasure').then(translation => {
+      vm.toastr.info(translation);
+    });
     vm.BCL.downloadBCLMeasure(measure).then(newMeasure => {
-      vm.$log.debug('In modal download()');
-      vm.$log.debug('Local Measures: ', vm.libMeasures.local);
-      vm.$log.debug('new measure: ', newMeasure);
-      vm.resetFilters();
-      // select newly added row
-      vm.selectARow(measure.uid);
-      vm.$scope.downloadInProgress = false;
-      vm.toastr.success('Measure Downloaded!');
-      deferred.resolve();
+      if (vm.Message.showDebug()) vm.$log.debug('In modal download()');
+      if (vm.Message.showDebug()) vm.$log.debug('new measure: ', newMeasure);
+      // if (vm.Message.showDebug()) vm.$log.debug('Local Measures, update?: ', vm.libMeasures.local);
+      // check for updates in case this measure is somehow already added to project
+      vm.BCL.checkForUpdatesLocalBcl().then(() => {
+        vm.resetFilters();
+        // select newly added row
+        vm.selectARow(measure.uid);
+        vm.$scope.downloadInProgress = false;
+        vm.$translate('toastr.measureDownloaded').then(translation => {
+          vm.toastr.success(translation);
+        });
+        deferred.resolve('success');
+      }, () => {
+        if (vm.Message.showDebug()) vm.$log.debug('Error checking for local BCL updates...');
+        vm.$scope.downloadInProgress = false;
+        vm.$translate('toastr.measureDownloaded').then(translation => {
+          vm.toastr.success(translation);
+        });
+        deferred.resolve('measure downloaded successfully but not updated');
+      });
 
     }, () => {
       vm.$scope.downloadInProgress = false;
-      vm.toastr.error('Measure Download Error');
+      vm.$translate('toastr.measureDownloadedError').then(translation => {
+        vm.toastr.error(translation);
+      });
       deferred.reject();
     });
 
@@ -493,7 +560,7 @@ export class ModalBclController {
     vm.gridApi.grid.modifyRows(vm.$scope.displayMeasures);
     vm.gridApi.selection.selectRow(vm.$scope.displayMeasures[index]);
     // scroll to row
-    vm.$timeout(function() {
+    vm.$timeout(function () {
       vm.gridApi.cellNav.scrollToFocus(vm.$scope.displayMeasures[index], vm.libraryGridOptions.columnDefs[0]);
     });
   }
@@ -501,16 +568,18 @@ export class ModalBclController {
   // edit My measure
   editMeasure(measure) {
     const vm = this;
-    vm.$log.debug('in EDIT MEASURE function');
+    if (vm.Message.showDebug()) vm.$log.debug('in EDIT MEASURE function');
     console.log(measure.measure_dir + '/measure.rb');
     // show toastr for 2 seconds then open file
-    const msg = 'Measure \'' + measure.name + '\' will open in a text editor for editing.';
-    vm.toastr.info(msg, {
-      timeOut: 3000, onHidden: function () {
-        //vm.$log.debug('Opening measure file');
-        vm.shell.openItem(measure.measure_dir + '/measure.rb');
-      }
+    vm.$translate('toastr.openMeasure').then( translation => {
+      vm.toastr.info(translation, {
+        timeOut: 3000, onHidden: function () {
+          //if (vm.Message.showDebug()) vm.$log.debug('Opening measure file');
+          vm.shell.openItem(measure.measure_dir + '/measure.rb');
+        }
+      });
     });
+
   }
 
   // update LocalBCL measure from Online BCL
@@ -518,7 +587,7 @@ export class ModalBclController {
     const vm = this;
     const deferred = vm.$q.defer();
     const originalStatus = angular.copy(measure.status);
-    vm.$log.debug('in UPDATE LOCAL BCL MEASURE function');
+    if (vm.Message.showDebug()) vm.$log.debug('in UPDATE LOCAL BCL MEASURE function');
 
     // delete from disk first
     vm.jetpack.remove(measure.measure_dir);
@@ -528,8 +597,9 @@ export class ModalBclController {
 
       // unset 'bcl update' status on original measure
       measure.bcl_update = false;
-      const msg = 'Measure \'' + measure.display_name + '\' was successfully updated in your local BCL.';
-      vm.toastr.success(msg);
+      vm.$translate('toastr.updatedMeasureLocal').then(translation => {
+        vm.toastr.success(translation);
+      });
 
       if (updateProject) {
         vm.updateProjectMeasure(measure).then(() => {
@@ -549,7 +619,7 @@ export class ModalBclController {
   updateProjectMeasure(measure) {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$log.debug('in UPDATE PROJECT MEASURE function');
+    if (vm.Message.showDebug()) vm.$log.debug('in UPDATE PROJECT MEASURE function');
 
     // delete old directory first (in projectMeasures)
     const dirNames = _.split(measure.measure_dir, '/');
@@ -567,50 +637,53 @@ export class ModalBclController {
     // retrieve newly copied measure data (with calculated arguments)
     vm.MeasureManager.computeArguments(vm.projectDir.path(dirName), osmPath).then((newMeasure) => {
       // success
-      // vm.$log.debug('New computed measure: ', newMeasure);
+      // if (vm.Message.showDebug()) vm.$log.debug('New computed measure: ', newMeasure);
       // merge project measure in array to preserve prepareMeasure arguments and already-set arguments
-      const project_measure = _.find(vm.projectMeasures, {instanceId: measure.instanceId});
+      // get ALL project_measures that match the UID and the location (my vs local)
+      const project_measures = _.filter(vm.projectMeasures, {uid: measure.uid, location: measure.location});
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
-      // TODO project_measure can now be more than just 1 and must be iterated over (Evan)
-      _.forEachRight(project_measure.arguments, (arg, index) => {
-        if (_.isUndefined(arg.specialRowId)) {
-          const match = _.find(measure.arguments, {name: arg.name});
-          if (_.isUndefined(match)) {
-            project_measure.arguments.splice(index, 1);
-            // vm.$log.debug('removing argument: ', arg.name);
+      if (vm.Message.showDebug()) vm.$log.debug('Project Measures to Update: ', project_measures);
+      _.forEach(project_measures, (project_measure) => {
+        _.forEachRight(project_measure.arguments, (arg, index) => {
+          if (_.isUndefined(arg.specialRowId)) {
+            const match = _.find(measure.arguments, {name: arg.name});
+            if (_.isUndefined(match)) {
+              project_measure.arguments.splice(index, 1);
+              // if (vm.Message.showDebug()) vm.$log.debug('removing argument: ', arg.name);
+            }
           }
-        }
+        });
+        // then add/merge (at argument level)
+        _.forEach(newMeasure.arguments, (arg) => {
+          const match = _.find(project_measure.arguments, {name: arg.name});
+          if (_.isUndefined(match)) {
+            // if (vm.Message.showDebug()) vm.$log.debug('adding argument: ', arg.name);
+            project_measure.arguments.push(arg);
+          } else {
+            // if (vm.Message.showDebug()) vm.$log.debug('merging argument: ', arg.name);
+            _.merge(match, arg);
+            // if (vm.Message.showDebug()) vm.$log.debug('merged match: ', match);
+          }
+        });
+        // unset 'update' status on original measure
+        measure.status = '';
+        // remove arguments and merge rest with project_measure
+        const measure_copy = angular.copy(measure);
+        delete measure_copy.arguments;
+        delete measure_copy.open;
+        _.assignIn(project_measure, measure_copy);
+
+        if (vm.Message.showDebug()) vm.$log.debug('updated project measure: ', project_measure);
+        vm.$translate('toastr.updatedMeasureProject').then(translation => {
+          vm.toastr.success(translation);
+        });
       });
-      // then add/merge (at argument level)
-      _.forEach(newMeasure.arguments, (arg) => {
-        const match = _.find(project_measure.arguments, {name: arg.name});
-        if (_.isUndefined(match)) {
-          // vm.$log.debug('adding argument: ', arg.name);
-          project_measure.arguments.push(arg);
-        } else {
-          // vm.$log.debug('merging argument: ', arg.name);
-          _.merge(match, arg);
-          // vm.$log.debug('merged match: ', match);
-        }
-      });
 
-      // unset 'update' status on original measure
-      measure.status = '';
-
-      // remove arguments and merge rest with project_measure
-      let measure_copy = angular.copy(measure);
-      delete measure_copy.arguments;
-      delete measure_copy.open;
-      _.assignIn(project_measure, measure_copy);
-
-      const msg = 'Measure \'' + project_measure.display_name + '\' was successfully updated in your project.';
-      vm.$log.debug('updated project measure: ', project_measure);
-      vm.toastr.success(msg);
       deferred.resolve();
 
     }, () => {
       // failure
-      //vm.$log.debug('Measure Manager computeArguments failed');
+      //if (vm.Message.showDebug()) vm.$log.debug('Measure Manager computeArguments failed');
       deferred.reject();
     });
 
@@ -620,7 +693,7 @@ export class ModalBclController {
   // update button
   updateAMeasure(measure) {
     const vm = this;
-    vm.$log.debug('in Update A Measure function');
+    if (vm.Message.showDebug()) vm.$log.debug('in Update A Measure function');
     //const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
@@ -646,17 +719,15 @@ export class ModalBclController {
         vm.updateLocalBCLMeasure(measure, true);
 
       } else {
-        vm.$log.debug('Invalid action in modal');
+        if (vm.Message.showDebug()) vm.$log.debug('Invalid action in modal');
       }
-
     });
-
   }
 
   // copy from local and edit (2X)
   copyAndEditMeasure(measure) {
     const vm = this;
-    vm.$log.debug('in COPY AND EDIT function');
+    if (vm.Message.showDebug()) vm.$log.debug('in COPY AND EDIT function');
     const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
@@ -674,22 +745,28 @@ export class ModalBclController {
     modalInstance.result.then((params) => {
       vm.MeasureManager.duplicateMeasure(params).then((newMeasure) => {
         // success
-        vm.$log.debug('Measure Manager duplicateMeasure succeeded');
+        if (vm.Message.showDebug()) vm.$log.debug('Measure Manager duplicateMeasure succeeded');
         // add and prepare new measure
         newMeasure = vm.BCL.prepareMeasure(newMeasure, 'my');
         vm.libMeasures.my.push(newMeasure);
         vm.resetFilters();
         // select newly added row
         vm.selectARow(newMeasure.uid);
+        vm.$translate('toastr.measureDuplicated').then( translation => {
+          vm.toastr.success(translation);
+        });
         deferred.resolve();
       }, () => {
         // failure
-        vm.$log.debug('Measure Manager duplicateMeasure failed');
+        if (vm.Message.showDebug()) vm.$log.debug('Measure Manager duplicateMeasure failed');
+        vm.$translate('toastr.measureDuplicatedError').then( translation => {
+          vm.toastr.error(translation);
+        });
         deferred.reject();
       });
     }, () => {
       // Modal canceled
-      vm.$log.debug('DuplicateMeasure Modal was canceled');
+      if (vm.Message.showDebug()) vm.$log.debug('DuplicateMeasure Modal was canceled');
       deferred.reject();
     });
 
@@ -700,12 +777,57 @@ export class ModalBclController {
     const vm = this;
     // save pretty options in case changes were made to project measures
     vm.Project.savePrettyOptions();
-    vm.$log.debug('Project Measures: ', vm.projectMeasures);
+    if (vm.Message.showDebug()) vm.$log.debug('Project Measures: ', vm.projectMeasures);
     vm.$uibModalInstance.close();
   }
 
   search() {
     // TODO
+  }
+
+  createNewMeasure() {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('ModalBCL::createNewMeasure');
+
+    const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalCreateNewMeasureController',
+      controllerAs: 'modal',
+      templateUrl: 'app/bcl/create_new_measure.html',
+      windowClass: 'modal',
+      resolve: {
+        measure: function () {
+          const bclCategories = vm.BCL.getBCLCategories();
+          if (vm.Message.showDebug()) vm.$log.debug('bclCategories: ', bclCategories);
+        }
+      }
+    });
+
+    modalInstance.result.then((params) => {
+      vm.MeasureManager.createNewMeasure(params).then((newMeasure) => {
+        // success
+        if (vm.Message.showDebug()) vm.$log.debug('ModalBclController::createNewMeasure succeeded');
+        // add and prepare new measure
+        newMeasure = vm.BCL.prepareMeasure(newMeasure, 'my');
+        vm.libMeasures.my.push(newMeasure);
+        vm.resetFilters();
+        // select newly added row
+        vm.selectARow(newMeasure.uid);
+        vm.editMeasure(newMeasure);
+        deferred.resolve();
+      }, () => {
+        // failure
+        if (vm.Message.showDebug()) vm.$log.debug('ModalBclController::createNewMeasure failed');
+        deferred.reject();
+      });
+    }, () => {
+      // Modal canceled
+      if (vm.Message.showDebug()) vm.$log.debug('ModalBclController::createNewMeasure was canceled');
+      deferred.reject();
+    });
+
+    return deferred.promise;
   }
 
 }

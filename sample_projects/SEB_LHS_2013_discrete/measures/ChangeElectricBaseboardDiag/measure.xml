@@ -1,0 +1,75 @@
+<measure>
+  <schema_version>3.0</schema_version>
+  <name>change_electric_baseboard_diag</name>
+  <uid>325cd385-bbaf-4f4f-adb2-8eb928c2de9d</uid>
+  <version_id>1835d0eb-f2d2-49d9-a828-558a919b9841</version_id>
+  <version_modified>20170321T143325Z</version_modified>
+  <xml_checksum>45097B60</xml_checksum>
+  <class_name>ChangeElectricBaseboardDiag</class_name>
+  <display_name>Change Electric Baseboard</display_name>
+  <description>Change Electric Baseboard</description>
+  <modeler_description>Change Electric Baseboard</modeler_description>
+  <arguments>
+    <argument>
+      <name>run_measure</name>
+      <display_name>Run Measure</display_name>
+      <description>integer argument to run measure [1 is run, 0 is no run]</description>
+      <type>Integer</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1</default_value>
+    </argument>
+    <argument>
+      <name>base_eff</name>
+      <display_name>efficiency</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1</default_value>
+    </argument>
+    <argument>
+      <name>nom_cap</name>
+      <display_name>Nominal Capacity (W)</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1500</default_value>
+    </argument>
+  </arguments>
+  <outputs/>
+  <provenances/>
+  <tags>
+    <tag>Envelope.Form</tag>
+  </tags>
+  <attributes>
+    <attribute>
+      <name>Measure Type</name>
+      <value>ModelMeasure</value>
+      <datatype>string</datatype>
+    </attribute>
+    <attribute>
+      <name>Uses SketchUp API</name>
+      <value>false</value>
+      <datatype>boolean</datatype>
+    </attribute>
+  </attributes>
+  <files>
+    <file>
+      <filename>change_electric_baseboard_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>A7A48F1C</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.5.3</identifier>
+        <min_compatible>1.5.3</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>985BA55C</checksum>
+    </file>
+  </files>
+</measure>

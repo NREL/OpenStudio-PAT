@@ -1,14 +1,39 @@
+/***********************************************************************************************************************
+ *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *  following conditions are met:
+ *
+ *  (1) Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *  disclaimer.
+ *
+ *  (2) Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *  following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *  (3) Neither the name of the copyright holder nor the names of any contributors may be used to endorse or promote
+ *  products derived from this software without specific prior written permission from the respective party.
+ *
+ *  (4) Other than as required in clauses (1) and (2), distributions in any form of modifications or other derivative
+ *  works may not use the "OpenStudio" trademark, "OS", "os", or any other confusingly similar designation without
+ *  specific prior written permission from Alliance for Sustainable Energy, LLC.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER, THE UNITED STATES GOVERNMENT, OR ANY CONTRIBUTORS BE LIABLE FOR
+ *  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **********************************************************************************************************************/
 import {shell} from 'electron';
 import jetpack from 'fs-jetpack';
 import YAML from 'yamljs';
 
 export class RunController {
 
-  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, toastr) {
-    'ngInject';
+  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, $translate, toastr, $sce, Message) {
 
-    // ignore camelcase for this file
-    /* eslint camelcase: 0 */
+    'ngInject';
 
     const vm = this;
     vm.$log = $log;
@@ -19,12 +44,13 @@ export class RunController {
     vm.Project = Project;
     vm.OsServer = OsServer;
     vm.toastr = toastr;
+    vm.$translate = $translate;
     vm.shell = shell;
     vm.jetpack = jetpack;
+    vm.$sce = $sce;
+    vm.Message = Message;
 
     vm.runTypes = vm.Project.getRunTypes();
-    // TEMPORARY:  only show local server
-    //vm.runTypes = _.filter(vm.runTypes, {name: 'local'});
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
@@ -32,54 +58,89 @@ export class RunController {
 
     // remote settings
     vm.$scope.remoteSettings = vm.Project.getRemoteSettings();
-    vm.$log.debug("REMOTE SETTINGS: ", vm.$scope.remoteSettings);
+    if (vm.Message.showDebug()) vm.$log.debug('REMOTE SETTINGS: ', vm.$scope.remoteSettings);
 
     vm.$scope.clusterData = {};
+    vm.$scope.clusters = [];
+    if (vm.$scope.selectedRunType.name == 'remote'){
+      vm.$scope.clusters = vm.Project.getClusters();
+    }
     // if remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
       vm.checkIfClusterIsRunning();
       vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
     }
 
+    // get OpenStudio Version (for defaulting AMIs)
+    vm.package_openstudio_version = vm.OsServer.getOpenStudioVersion();
+    if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Version: ', vm.package_openstudio_version);
+
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
-    vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
+    if (vm.Message.showDebug()) vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
+    if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Server Versions: ', vm.$scope.osServerVersions);
     vm.$scope.serverInstanceTypes = vm.Project.getServerInstanceTypes();
     vm.$scope.workerInstanceTypes = vm.Project.getWorkerInstanceTypes();
     // only valid region is us-east-1 for now
     vm.$scope.awsRegions = vm.Project.getAwsRegions()[0];
-    vm.$scope.clusters = vm.Project.getClusters();
     vm.$scope.awsYamlFiles = vm.Project.getAwsYamlFiles();
 
     // clear out aws settings if can't find file
     vm.resetAwsCredentials();
-
-    vm.$scope.datapoints = vm.Project.getDatapoints();
-    vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
-    vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-    vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
+    // set region if missing
+    if (vm.$scope.remoteSettings.credentials) {
+      vm.$scope.remoteSettings.credentials.region = vm.$scope.awsRegions;
+    }
 
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.selectedSamplingMethod = vm.Project.getSamplingMethod();
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
-    vm.$log.debug('DISABLED BUTTONS? ', vm.$scope.disabledButtons);
+    if (vm.Message.showDebug()) vm.$log.debug('DISABLED BUTTONS? ', vm.$scope.disabledButtons);
     vm.$scope.progress = vm.OsServer.getProgress();
 
     // DEBUG
-    vm.$log.debug('Run Type: ', vm.$scope.selectedRunType);
-    vm.$log.debug('Analysis Type: ', vm.$scope.selectedAnalysisType);
-    vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod);
+    if (vm.Message.showDebug()) vm.$log.debug('Run Type: ', vm.$scope.selectedRunType);
+    if (vm.Message.showDebug()) vm.$log.debug('Analysis Type: ', vm.$scope.selectedAnalysisType);
+    if (vm.Message.showDebug()) vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod);
+
+    vm.$scope.datapoints = vm.Project.getDatapoints();
+    if (vm.Message.showDebug()) vm.$log.debug('Datapoints: ', vm.$scope.datapoints);
+    vm.setUpDatapoints();
+    vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
+    if (vm.Message.showDebug()) vm.$log.debug('SERVER STATUS for ', vm.$scope.selectedRunType.name, ': ', vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
 
     // disabled button class
-    vm.$scope.disabledButtonClass = function() {
+    vm.$scope.disabledButtonClass = function () {
       const disable = vm.OsServer.getRemoteStartInProgress() ? 'disabled' : '';
       return disable;
     };
 
     // disabled stop button class
-    vm.$scope.disabledStopButtonClass = function() {
+    vm.$scope.disabledStopButtonClass = function () {
       const disable = vm.OsServer.getRemoteStopInProgress() ? 'disabled' : '';
       return disable;
+    };
+
+    // disabled fields
+    vm.$scope.disabledFields = function () {
+      return vm.OsServer.getRemoteStartInProgress() || vm.$scope.remoteSettings.aws.cluster_status == 'running';
+    };
+
+    vm.$scope.atLeastOneSelected = function () {
+      return _.filter(vm.$scope.datapoints, {selected: true}).length > 0;
+    };
+
+    vm.$scope.allSelected = function () {
+      return _.filter(vm.$scope.datapoints, {selected: true}).length == vm.$scope.datapoints.length;
+    };
+
+    vm.$scope.atLeastOneModified = function () {
+      return _.filter(vm.$scope.datapoints, {modified: true}).length > 0;
+    };
+
+    vm.$scope.resultsExist = function () {
+      if (vm.Message.showDebug()) vm.$log.debug('RESULTS EXIST? ', vm.Project.algorithmResultsDownloaded());
+      return vm.Project.algorithmResultsDownloaded();
     };
 
     // TROUBLESHOOTING PANEL STATUS
@@ -93,13 +154,12 @@ export class RunController {
     // don't show skipped measures in datapoint accordion
     vm.$scope.filterSkipped = function (item) {
       let isSkipped = false;
-      let firstArg = undefined;
       const skipArg = '__SKIP__';
-      if (item.arguments){
-        if (_.find(_.keys(item.arguments)), skipArg){
+      if (item.arguments) {
+        if (_.find(_.keys(item.arguments), skipArg)) {
           // found a skip..is it TRUE?
-          if (item.arguments['__SKIP__'] == true){
-            vm.$log.debug('Found SKIP=true in item: ', item);
+          if (item.arguments.__SKIP__ == true) {
+            //if (vm.Message.showDebug()) vm.$log.debug('Found SKIP=true in item: ', item);
             isSkipped = true;
           }
         }
@@ -109,36 +169,104 @@ export class RunController {
 
   }
 
+  formatEplusErr(errorText) {
+    const vm = this;
+    let errorArr = [];
+    if (errorText){
+      errorArr = errorText.split('\n');
+    }
+
+    let htmlText = '';
+    _.forEach(errorArr, (elem) => {
+      elem = _.replace(elem, '** Warning **', '<span class="orange-button">** Warning **</span>');
+      elem = _.replace(elem, '** Severe  **', '<span class="red-button">** Severe  **</span>');
+      elem = _.replace(elem, '**  Fatal  **', '<span class="red-button">**  Fatal  **</span>');
+      if (_.startsWith(elem, '  **   ~~~   **')){
+        elem = '<span class="pad-left-5">' + elem + '</span>';
+      }
+      htmlText = htmlText + elem + '<br/>';
+    });
+
+    return vm.$sce.trustAsHtml(htmlText);
+  }
+
+  setUpDatapoints() {
+    const vm = this;
+    const alternatives = vm.Project.getDesignAlternatives();
+
+    if (vm.$scope.selectedAnalysisType == 'Manual') {
+      // ensure that current datapoints have an ID (backward compatible)
+      _.forEach(vm.$scope.datapoints, (dp) => {
+        if (_.isNil(dp.id)) {
+          dp.id = dp.name;
+        }
+      });
+      // ensure there is one datapoint per DA
+      _.forEach(alternatives, (alt) => {
+        if (!_.find(vm.$scope.datapoints, {name: alt.name})) {
+          // add empty datapoint to array
+          vm.$scope.datapoints.push({name: alt.name, id: alt.name, run: false, modified: false});
+        }
+      });
+
+      // remove algorithmic points if there are some
+      _.forEachRight(vm.$scope.datapoints, (dp, key) => {
+        const index = _.findIndex(alternatives, {name: dp.name});
+        if (index == -1) {
+          // remove
+          vm.$scope.datapoints.splice(key, 1);
+        }
+      });
+    } else {
+      // algorithmic: remove manual points if there are some
+      _.forEachRight(alternatives, (alt) => {
+        const index = _.findIndex(vm.$scope.datapoints, {name: alt.name});
+        if (index > -1) {
+          // remove
+          vm.$scope.datapoints.splice(index, 1);
+        }
+      });
+    }
+
+    if (vm.Message.showDebug()) vm.$log.debug("Datapoints after SetUp: ", vm.$scope.datapoints);
+  }
 
   remoteTypeChange() {
     const vm = this;
+    // reset connection setting for remote type
+    vm.$scope.serverStatuses.remote = 'stopped';
     vm.OsServer.resetSelectedServerURL();
     // if switching to remote and amazon is selected, ping cluster
-    if (vm.$scope.remoteSettings.remoteType == 'Amazon Cloud'){
+    if (vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+      vm.resetClusterSettings();
       vm.checkIfClusterIsRunning();
-      vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
     }
   }
 
   setRunType() {
     const vm = this;
     vm.deleteResults();
-    vm.$log.debug('old run type: ', vm.Project.getRunType());
-    vm.$log.debug('new run type: ', vm.$scope.selectedRunType);
+    if (vm.Message.showDebug()) vm.$log.debug('old run type: ', vm.Project.getRunType());
+    if (vm.Message.showDebug()) vm.$log.debug('new run type: ', vm.$scope.selectedRunType);
     vm.Project.setRunType(vm.$scope.selectedRunType);
     vm.OsServer.resetSelectedServerURL();
     vm.OsServer.setProgress(0, '');
 
+    // if switching to local, reset connection setting for remote type
+    vm.$scope.serverStatuses.remote = 'stopped';
+
     // if switching to remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+      vm.$scope.clusters = vm.Project.getClusters();
+      vm.resetClusterSettings();
       vm.checkIfClusterIsRunning();
     }
   }
 
   viewServer() {
     const vm = this;
-    vm.$log.debug("in Run::viewServer");
-    vm.$log.debug("selected Server URL: ", vm.OsServer.getSelectedServerURL());
+    if (vm.Message.showDebug()) vm.$log.debug('in Run::viewServer');
+    if (vm.Message.showDebug()) vm.$log.debug('selected Server URL: ', vm.OsServer.getSelectedServerURL());
     vm.shell.openExternal(vm.OsServer.getSelectedServerURL());
   }
 
@@ -152,21 +280,23 @@ export class RunController {
     // open file, set truncatedAccessKey
     const yamlStr = vm.jetpack.read(vm.Project.getAwsDir().path(vm.$scope.remoteSettings.credentials.yamlFilename + '.yml'));
     let yamlData = YAML.parse(yamlStr);
-    vm.$scope.remoteSettings.credentials.accessKey = yamlData.accessKey.substr(0,4) + '****';
+    vm.$scope.remoteSettings.credentials.accessKey = yamlData.accessKey.substr(0, 4) + '****';
+    vm.$scope.remoteSettings.credentials.region = vm.$scope.awsRegions;
     yamlData = null;
   }
 
   resetAwsCredentials() {
     const vm = this;
-    if (vm.$scope.remoteSettings && vm.$scope.remoteSettings.credentials && vm.$scope.remoteSettings.yamlFilename){
+    if (vm.$scope.remoteSettings && vm.$scope.remoteSettings.credentials && vm.$scope.remoteSettings.yamlFilename) {
       if (_.find(vm.$scope.awsYamlFiles, vm.$scope.remoteSettings.credentials.yamlFilename) == undefined) {
         vm.$scope.remoteSettings.credentials.accessKey = null;
         vm.$scope.remoteSettings.credentials.awsYamlFile = null;
+        vm.$scope.remoteSettings.credentials.region = vm.$scope.awsRegions;
       }
     }
   }
 
-  newAwsCredentialsModal(){
+  newAwsCredentialsModal() {
     const vm = this;
     const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({
@@ -176,12 +306,13 @@ export class RunController {
       templateUrl: 'app/run/newAwsCredentials.html'
     });
 
-    modalInstance.result.then((name, truncatedAccessKey) => {
-      vm.$log.debug('In modal new credentials result function, name: ', name);
+    modalInstance.result.then((data) => {
+      if (vm.Message.showDebug()) vm.$log.debug('In modal new credentials result function, name: ', data[0], ' key: ', data[1]);
       vm.$scope.awsYamlFiles = vm.Project.getAwsYamlFiles();
       // set selected file to new file
-      vm.$scope.remoteSettings.credentials.yamlFilename = name;
-      vm.$scope.remoteSettings.credentials.accessKey = truncatedAccessKey;
+      vm.$scope.remoteSettings.credentials.yamlFilename = data[0];
+      vm.$scope.remoteSettings.credentials.accessKey = data[1];
+      vm.$scope.remoteSettings.credentials.region = vm.awsRegions;
       deferred.resolve();
     }, () => {
       // Modal canceled
@@ -190,7 +321,7 @@ export class RunController {
     return deferred.promise;
   }
 
-  newClusterModal(){
+  newClusterModal() {
     const vm = this;
     const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({
@@ -201,7 +332,7 @@ export class RunController {
     });
 
     modalInstance.result.then((name) => {
-      vm.$log.debug('In modal new cluster result function, name: ', name);
+      if (vm.Message.showDebug()) vm.$log.debug('In modal new cluster result function, name: ', name);
       // get cluster files
       vm.$scope.clusters = vm.Project.getClusters();
       // select new one
@@ -217,18 +348,23 @@ export class RunController {
     return deferred.promise;
   }
 
-  checkIfClusterIsRunning(){
+  checkIfClusterIsRunning() {
     const vm = this;
+    // reset to terminated (while cluster is checked)
+    vm.$scope.remoteSettings.aws.cluster_status = '';
     // see if cluster is running; if so, set status
-    if (vm.$scope.remoteSettings.aws && vm.$scope.remoteSettings.aws.cluster_name){
-      vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
+    if (vm.$scope.remoteSettings.aws && vm.$scope.remoteSettings.aws.cluster_name) {
+      vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then(() => {
         // running
         vm.$scope.remoteSettings.aws.cluster_status = 'running';
-        vm.$log.debug('Run::checkIfClusterIsRunning Current Cluster RUNNING!');
+        if (vm.Message.showDebug()) vm.$log.debug('Run::checkIfClusterIsRunning Current Cluster RUNNING!');
       }, () => {
         // terminated
         vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
-        vm.$log.debug("Run::checkIfClusterIsRunning Current cluster TERMINATED");
+        vm.$scope.remoteSettings.aws.connected = false;
+        vm.$scope.serverStatuses[vm.$scope.selectedRunType.name] == 'stopped';
+        vm.$log.info('Run::checkIfClusterIsRunning Current cluster TERMINATED');
+
       });
     } else {
       vm.$scope.remoteSettings.aws = {};
@@ -236,52 +372,85 @@ export class RunController {
     }
   }
 
-  resetClusterSettings(){
+  resetClusterSettings() {
     const vm = this;
     // read in json file
-    const clusterFile = vm.jetpack.read(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json');
-    vm.$scope.remoteSettings.aws.connected = false;
+    if (vm.jetpack.exists(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json')) {
+      const clusterFile = vm.jetpack.read(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json');
+      if (vm.Message.showDebug()) vm.$log.debug('clusterFile data: ', clusterFile);
+      vm.$scope.remoteSettings.aws.connected = false;
 
-    // see if cluster is running; if so, set status
-    vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then((dns) => {
-      // running
-      vm.$scope.remoteSettings.aws.cluster_status = 'running';
-    }, () => {
-      // terminated
-      vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
-    });
+      // see if cluster is running; if so, set status
+      vm.Project.pingCluster(vm.$scope.remoteSettings.aws.cluster_name).then(() => {
+        // running
+        vm.$scope.remoteSettings.aws.cluster_status = 'running';
+      }, () => {
+        // terminated
+        vm.$scope.remoteSettings.aws.cluster_status = 'terminated';
+      });
 
-    // set variables
-    vm.$scope.remoteSettings.aws.server_instance_type = null;
-    if (clusterFile.server_instance_type) {
-      const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.server_instance_type});
-      vm.$log.debug("Server match: ", match);
-      if (match) {
-        vm.$scope.remoteSettings.aws.server_instance_type = match;
+      if (vm.$scope.remoteSettings.aws.cluster_name) {
+        vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
+      } else {
+        vm.$scope.clusterData = {};
+      }
+
+      // set variables
+      vm.$scope.remoteSettings.aws.server_instance_type = '';
+      if (vm.Message.showDebug()) vm.$log.debug('serverinstancetypes: ', vm.$scope.serverInstanceTypes);
+      if (clusterFile.server_instance_type) {
+        const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.server_instance_type});
+        if (vm.Message.showDebug()) vm.$log.debug('Server match: ', match);
+        if (match) {
+          vm.$scope.remoteSettings.aws.server_instance_type = match;
+        }
+      }
+      vm.$scope.remoteSettings.aws.worker_instance_type = '';
+      if (vm.Message.showDebug()) vm.$log.debug('workerinstancetypes: ', vm.$scope.workerInstanceTypes);
+      if (clusterFile.worker_instance_type) {
+        const match = _.find(vm.$scope.workerInstanceTypes, {name: clusterFile.worker_instance_type});
+        if (vm.Message.showDebug()) vm.$log.debug('Worker match: ', match);
+        if (match) {
+          vm.$scope.remoteSettings.aws.worker_instance_type = match;
+        }
+      }
+      vm.$scope.remoteSettings.aws.user_id = clusterFile.user_id ? clusterFile.user_id : '';
+      vm.$scope.remoteSettings.aws.worker_node_number = clusterFile.worker_node_number ? clusterFile.worker_node_number : 0;
+      vm.$scope.remoteSettings.aws.aws_tags = []; // leave empty for now
+      if (vm.Message.showDebug()) vm.$log.debug('server versions: ', vm.$scope.osServerVersions);
+      vm.$scope.remoteSettings.openstudio_server_version = '';
+      if (clusterFile.openstudio_server_version) {
+        const match = _.find(vm.$scope.osServerVersions, {name: clusterFile.openstudio_server_version});
+        if (vm.Message.showDebug()) vm.$log.debug('AMI match: ', match);
+        if (match) {
+          vm.$scope.remoteSettings.aws.openstudio_server_version = match;
+        }
       }
     }
-    vm.$scope.remoteSettings.aws.worker_instance_type = null;
-    if (clusterFile.worker_instance_type) {
-      const match = _.find(vm.$scope.serverInstanceTypes, {name: clusterFile.worker_instance_type});
-      vm.$log.debug('Worker match: ', match);
-      if (match) {
-        vm.$scope.remoteSettings.aws.worker_instance_type = match;
-      }
+    else {
+      // clear out
+      vm.$scope.remoteSettings.aws = {
+        connected: false,
+        cluster_name: '',
+        server_instance_type:'',
+        worker_instance_type: '',
+        user_id: '',
+        worker_node_number: 0,
+        aws_tags: [],
+        openstudio_server_version: ''
+      };
+
     }
-    vm.$scope.remoteSettings.aws.user_id = clusterFile.user_id ? clusterFile.user_id : null;
-    vm.$scope.remoteSettings.aws.worker_node_number = clusterFile.worker_node_number ? clusterFile.worker_node_number: null;
-    vm.$scope.remoteSettings.aws.aws_tags = []; // leave empty for now
-    vm.$scope.remoteSettings.aws.openstudio_server_version = clusterFile.openstudio_server_version ? clusterFile.openstudio_server_version: null;
 
-    vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
-
-    vm.$log.debug('remote settings.aws reset: ', vm.$scope.remoteSettings.aws);
+    if (vm.Message.showDebug()) vm.$log.debug('remote settings.aws reset: ', vm.$scope.remoteSettings.aws);
   }
 
   saveClusterToFile() {
     const vm = this;
     vm.Project.saveClusterToFile();
-    vm.toastr.success('Cluster saved!');
+    vm.$translate('toastr.clusterSaved').then(translation => {
+      vm.toastr.success(translation);
+    });
   }
 
   connectAws(type) {
@@ -289,42 +458,111 @@ export class RunController {
     const vm = this;
     // always save cluster to file before connecting
     vm.saveClusterToFile();
-    if (type == 'connect') {
-      // toastr
-      vm.toastr.info('Connecting to the Cloud...this may take a few minutes.');
-    } else {
-      // toastr
-      vm.toastr.info('Starting Cloud cluster...this may take up to 10 minutes', {closeButton: true, timeOut: 60000});
-    }
-    vm.OsServer.startServer().then( response => {
-      vm.$log.debug('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
-      vm.toastr.clear();
-      if (type == 'connect'){
-        vm.toastr.success('Connected to AWS!');
-        vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
-        vm.$log.debug('clusterData: ', vm.$scope.clusterData);
+    if (vm.checkConnectionParams()){
+      if (type == 'connect') {
+        // toastr
+        vm.$translate('toastr.connectingCloud').then(translation => {
+          vm.toastr.info(translation);
+        });
+      } else {
+        // toastr
+        vm.$translate('toastr.startingCloud').then(translation => {
+          vm.toastr.info(translation, {closeButton: true, timeOut: 600000});
+        });
       }
-      else{
-        vm.toastr.success('AWS server started!');
-        vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
+      vm.OsServer.startServer().then(() => {
+        vm.$log.info('**connectAWS--cluster_status should be running and server status should be started: ', vm.$scope.remoteSettings.aws.cluster_status, vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]);
+        if (vm.Message.showDebug()) vm.$log.debug('REMOTE SETTINGS: ', vm.$scope.remoteSettings);
+        vm.toastr.clear();
+        if (type == 'connect') {
+          vm.$translate('toastr.connectedCloud').then(translation => {
+            vm.toastr.success(translation);
+          });
+          vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
+          if (vm.Message.showDebug()) vm.$log.debug('clusterData: ', vm.$scope.clusterData);
+        }
+        else {
+          vm.$translate('toastr.startedCloud').then(translation => {
+            vm.toastr.success(translation);
+          });
+          vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
+        }
+      }, error => {
+        // error toastrs
+        vm.toastr.clear();
+        if (error == 'No Credentials') {
+          if (type == 'connect'){
+            vm.$translate('toastr.connectCredentialsError').then(translation => {
+              vm.toastr.error(translation);
+            });
+          } else {
+            vm.$translate('toastr.startCredentialsError').then(translation => {
+              vm.toastr.error(translation);
+            });
+          }
+        }
+        else {
+          if (type == 'connect')
+            vm.$translate('toastr.connectedCloudError').then(translation => {
+              vm.toastr.error(translation);
+            });
+          else {
+            vm.$translate('toastr.startedCloudError').then(translation => {
+              vm.toastr.error(translation);
+            });
+          }
+        }
+
+      });
+    }
+  }
+
+  checkConnectionParams() {
+    const vm = this;
+    let proceed = true;
+    // check for yml file
+    if (_.isNil(vm.$scope.remoteSettings.credentials.yamlFilename) || vm.$scope.remoteSettings.credentials.yamlFilename == '') {
+      proceed = false;
+      vm.$translate('toastr.noYaml').then(translation => {
+        vm.toastr.error(translation);
+      });
+    }
+    // check for cluster selection
+    if (_.isNil(vm.$scope.remoteSettings.aws.cluster_name) || vm.$scope.remoteSettings.aws.cluster_name == ''){
+      proceed = false;
+      vm.$translate('toastr.noCluster').then(translation => {
+        vm.toastr.error(translation);
+      });
+    }
+
+    return proceed;
+  }
+
+  connectRemoteServer(){
+    const vm = this;
+
+    vm.OsServer.startServer().then(response => {
+      if (vm.Message.showDebug()) vm.$log.debug('Run::connectRemoteServer response: ', response);
+      vm.OsServer.setProgress(0, '');
+      vm.toastr.clear();
+      if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
+        vm.$translate('toastr.connectedRemote').then(translation => {
+          vm.toastr.success(translation);
+        });
       }
     }, error => {
-      // error toastr
-      let msg = '';
-      if (error == 'No Credentials') {
-        msg = ': No AWS Credentials Selected';
-      }
       vm.toastr.clear();
-      if (type == 'connect')
-        vm.toastr.error('Error connecting to AWS' + msg);
-      else
-        vm.toastr.error('Error starting AWS server' + msg);
+      vm.$translate('toastr.connectedRemoteError').then(translation => {
+        vm.toastr.error(translation);
+      });
+      if (vm.Message.showDebug()) vm.$log.debug('Connection error: ', error);
     });
   }
 
+
   viewReportModal(datapoint, report) {
     const vm = this;
-    vm.$log.debug('In viewReport- ', report);
+    if (vm.Message.showDebug()) vm.$log.debug('In viewReport- ', report);
     const deferred = vm.$q.defer();
     const modalInstance = vm.$uibModal.open({
       backdrop: 'static',
@@ -358,23 +596,33 @@ export class RunController {
       const start = vm.Project.makeDate(startStr);
       const end = vm.Project.makeDate(endStr);
 
-      const diff = end - start;
-      let sec = parseInt((end - start) / 1000);
-      sec = (sec < 10) ? '0' + sec : sec;
-      let min = parseInt(sec / 60);
-      min = (min < 10) ? '0' + min : min;
-      let hours = parseInt(min / 60);
+      let delta = Math.abs(end - start) / 1000;
+
+      // calculate (and subtract) whole hours
+      let hours = Math.floor(delta / 3600) % 24;
+      delta -= hours * 3600;
       hours = (hours < 10) ? '0' + hours : hours;
-      result = hours + ":" + min + ":" + sec;
+
+      // calculate (and subtract) whole minutes
+      let minutes = Math.floor(delta / 60) % 60;
+      delta -= minutes * 60;
+      minutes = (minutes < 10) ? '0' + minutes : minutes;
+
+      // what's left is seconds
+      let seconds = delta % 60;  // in theory the modulus is not required
+      seconds = (seconds < 10) ? '0' + seconds : seconds;
+
+      result = hours + ':' + minutes + ':' + seconds;
+
     }
     return result;
   }
 
   calculateWarnings(dp) {
     let warn = 0;
-    if (dp && dp.steps) {
+    if (_.get(dp, 'steps')) {
       _.forEach(dp.steps, step => {
-        if (step.result && step.result.step_warnings)
+        if (_.get(step, 'result.step_warnings'))
           warn = warn + step.result.step_warnings.length;
       });
     }
@@ -383,9 +631,9 @@ export class RunController {
 
   calculateErrors(dp) {
     let err = 0;
-    if (dp && dp.steps) {
+    if (_.get(dp, 'steps')) {
       _.forEach(dp.steps, step => {
-        if (step.result && step.result.step_errors)
+        if (_.get(step, 'result.step_errors'))
           err = err + step.result.step_errors.length;
       });
     }
@@ -394,7 +642,7 @@ export class RunController {
 
   calculateNAs(dp) {
     let nas = 0;
-    if (dp && dp.steps) {
+    if (_.get(dp, 'steps')) {
       _.forEach(dp.steps, step => {
         if (step.step_result == 'NotApplicable') {
           nas = nas + 1;
@@ -408,11 +656,11 @@ export class RunController {
     const vm = this;
 
     // disconnect if connected to remote existing server
-    if (vm.$scope.remoteSettings.remoteType == 'Existing Remote Server' && vm.$scope.selectedRunType.name == 'remote' && vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]){
-      vm.OsServer.stopServer().then(response => {
+    if (vm.$scope.remoteSettings.remoteType == 'Existing Remote Server' && vm.$scope.selectedRunType.name == 'remote' && vm.$scope.serverStatuses[vm.$scope.selectedRunType.name]) {
+      vm.OsServer.stopServer().then(() => {
         vm.OsServer.resetSelectedServerURL();
       }, error => {
-        vm.$log.debug('Couldn\'t disconnect from server: ', error);
+        if (vm.Message.showDebug()) vm.$log.debug('Couldn\'t disconnect from server: ', error);
         // reset anyway
         vm.OsServer.resetSelectedServerURL();
       });
@@ -426,36 +674,49 @@ export class RunController {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    if(vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud')
-    {
-      vm.toastr.info('Terminating Cloud Clusters...', {closeButton: true, timeOut: 30000});
+    if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+      vm.$translate('toastr.terminatingCluster').then(translation => {
+        vm.toastr.info(translation, {closeButton: true, timeOut: 30000});
+      });
     }
 
     vm.OsServer.stopServer(force).then(response => {
-      vm.$log.debug('Run::stopServer response: ', response);
-      vm.$log.debug('***** ', vm.$scope.selectedRunType.name, ' Server Stopped *****');
+      if (vm.Message.showDebug()) vm.$log.debug('Run::stopServer response: ', response);
+      if (vm.Message.showDebug()) vm.$log.debug('***** ', vm.$scope.selectedRunType.name, ' Server Stopped *****');
       vm.OsServer.setProgress(0, '');
       vm.toastr.clear();
       if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
-        vm.toastr.success('PAT successfully disconnected from remote server');
+        vm.$translate('toastr.disconnectedRemote').then(translation => {
+          vm.toastr.success(translation);
+        });
       } else if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
-        vm.toastr.success('PAT successfully terminated AWS cluster.  You should double check that the servers were terminated in the AWS Console.');
+        vm.$translate('toastr.terminatedCluster').then(translation => {
+          vm.toastr.success(translation);
+        });
         // debug
-        vm.$log.debug('***Cloud Cluster status: ', vm.$scope.remoteSettings.aws.cluster_status);
-        vm.$log.debug('***remoteSettings.Aws: ', vm.$scope.remoteSettings.aws);
+        vm.$log.info('***Cloud Cluster status: ', vm.$scope.remoteSettings.aws.cluster_status);
+        vm.$log.info('***remoteSettings.Aws: ', vm.$scope.remoteSettings.aws);
       } else {
-        vm.toastr.success('Server stopped successfully');
+        vm.$translate('toastr.stoppedServer').then(translation => {
+          vm.toastr.success(translation);
+        });
       }
       deferred.resolve();
     }, response => {
       vm.OsServer.setProgress(0, 'Error Stopping Server');
-      vm.$log.debug('ERROR STOPPING SERVER, ERROR: ', response);
+      vm.$log.error('ERROR STOPPING SERVER, ERROR: ', response);
       if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Existing Remote Server') {
-        vm.toastr.error('PAT could not disconnect from remote server');
+        vm.$translate('toastr.disconnectedRemoteError').then(translation => {
+          vm.toastr.error(translation);
+        });
       } else if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
-        vm.toastr.error('PAT could not terminate AWS cluster.  Check the AWS console.');
+        vm.$translate('toastr.terminatedClusterError').then(translation => {
+          vm.toastr.error(translation);
+        });
       } else {
-        vm.toastr.error('Error: server could not be stopped');
+        vm.$translate('toastr.stoppedServerError').then(translation => {
+          vm.toastr.error(translation);
+        });
       }
       deferred.reject();
     });
@@ -463,15 +724,41 @@ export class RunController {
     return deferred.promise;
   }
 
-  warnCloudRunning(type=null, oldValue=null) {
+  // display warning message when Starting a Cloud connection
+  warnAws() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    if (vm.Message.showDebug()) vm.$log.debug('**** In RunController::WarnAws ****');
+
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalAwsWarningController',
+      controllerAs: 'modal',
+      templateUrl: 'app/run/awsWarning.html'
+    });
+
+    modalInstance.result.then(() => {
+      vm.connectAws('start');
+      deferred.resolve();
+    }, () => {
+
+      deferred.reject();
+
+    });
+
+    return deferred.promise;
+  }
+
+  warnCloudRunning(type = null, oldValue = null) {
     const vm = this;
     const deferred = vm.$q.defer();
 
     // type = runtype, remotetype, or null (when called from PAT exit)
 
-    vm.$log.debug('**** In RunController::WarnCloudRunning ****');
+    if (vm.Message.showDebug()) vm.$log.debug('**** In RunController::WarnCloudRunning ****');
     // if connected to cloud
-    if (((type == 'runtype' && oldValue.includes('"remote"')) || (type == 'remotetype' && oldValue.includes('Amazon Cloud')) || (type == null && oldValue == null)) && vm.$scope.remoteSettings.aws && vm.$scope.remoteSettings.aws.connected){
+    if (((type == 'runtype' && oldValue.includes('"remote"')) || (type == 'remotetype' && oldValue.includes('Amazon Cloud')) || (type == null && oldValue == null)) && vm.$scope.remoteSettings.aws && vm.$scope.remoteSettings.aws.connected) {
       // local results exist
       const modalInstance = vm.$uibModal.open({
         backdrop: 'static',
@@ -484,55 +771,63 @@ export class RunController {
         // stop server before switching run type
         vm.stopServer().then(() => {
           deferred.resolve();
-          if (type == 'runtype'){
+          if (type == 'runtype') {
             vm.warnBeforeDelete('runtype');
           }
-          else if (type == 'remotetype'){
+          else if (type == 'remotetype') {
             vm.remoteTypeChange();
           }
         }, () => {
           deferred.reject();
-          if (type == 'runtype'){
+          if (type == 'runtype') {
             vm.warnBeforeDelete('runtype');
           }
-          else if (type == 'remotetype'){
+          else if (type == 'remotetype') {
             vm.remoteTypeChange();
           }
         });
       }, () => {
         // Modal canceled
         deferred.reject();
-        if (type == 'runtype'){
+        if (type == 'runtype') {
           vm.warnBeforeDelete('runtype');
         }
-        else if (type == 'remotetype'){
+        else if (type == 'remotetype') {
           vm.remoteTypeChange();
         }
       });
     } else {
       // no local results
       deferred.resolve();
-      if (type == 'runtype'){
+      if (type == 'runtype') {
         vm.warnBeforeDelete('runtype');
       }
-      else if (type == 'remotetype'){
+      else if (type == 'remotetype') {
         vm.remoteTypeChange();
       }
     }
+
     return deferred.promise;
   }
 
   warnBeforeDelete(type) {
     // type could be 'run' (warning before running a new analysis), or 'runtype' (warning before setting new run type)
+    // warn if datapoints have run (updated_at)
     const vm = this;
     const deferred = vm.$q.defer();
 
-    vm.$log.debug('**** In RunController::WarnBeforeDeleting ****');
+    if (vm.Message.showDebug()) vm.$log.debug('**** In RunController::WarnBeforeDeleting ****, type: ', type);
 
-    const contents = vm.jetpack.find(vm.Project.getProjectLocalResultsDir().path(), {matching: '*'});
-    vm.$log.debug('Local results size:', contents.length);
+    let warn = false;
 
-    if (contents.length > 0) {
+    // any datapoints have already run?
+    _.forEach(vm.$scope.datapoints, (dp) => {
+      if ((type == 'selected' && dp.selected && dp.updated_at) || (type != 'selected' && dp.updated_at)){
+        warn = true;
+      }
+    });
+
+    if (warn) {
       // local results exist
       const modalInstance = vm.$uibModal.open({
         backdrop: 'static',
@@ -552,9 +847,11 @@ export class RunController {
         // go on to run workflow
         deferred.resolve();
         if (type == 'run') {
-          vm.runEntireWorkflow();
+          vm.runWorkflow();
         } else if (type == 'runtype') {
           vm.setRunType();
+        } else if (type == 'selected') {
+          vm.runWorkflow(true);
         }
 
       }, () => {
@@ -569,158 +866,175 @@ export class RunController {
       // no local results
       deferred.resolve();
       if (type == 'run') {
-        vm.runEntireWorkflow();
+        vm.runWorkflow();
       } else if (type == 'runtype') {
         vm.setRunType();
+      } else if (type == 'selected') {
+        if (vm.Message.showDebug()) vm.$log.debug('type == selected');
+        vm.runWorkflow(true);
       }
 
     }
-
     return deferred.promise;
   }
 
-  deleteResults() {
+  deleteResults(selectedOnly = false) {
     const vm = this;
-    // remove localResults contents
-    vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
+
+    if (selectedOnly) {
+      _.forEach(vm.$scope.datapoints, (dp) => {
+        if (dp.selected && dp.id) {
+          vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(dp.id));
+        }
+      });
+    } else {
+      // remove localResults contents
+      vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
+    }
 
     // reset analysis
-    vm.OsServer.resetAnalysis();
+    vm.OsServer.resetAnalysis(selectedOnly);
     vm.$scope.analysisID = vm.Project.getAnalysisID();
     vm.$scope.datapoints = vm.Project.getDatapoints();
+    if (vm.Message.showDebug()) vm.$log.debug('DATAPOINTS AFTER DELETE: ', vm.$scope.datapoints);
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
   }
 
-  runEntireWorkflow() {
+  runWorkflow(selectedOnly = false) {
     const vm = this;
+
+    vm.OsServer.setProgress(0, '');
 
     // set this to lock down runType
     vm.OsServer.setAnalysisStatus('starting');
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
 
-    vm.$log.debug('***** In runController::runEntireWorkflow() *****');
+    if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() *****');
+    if (vm.Message.showDebug()) vm.$log.debug('selectedOnly? ', selectedOnly);
     vm.toggleButtons();
 
     // 1: delete old results (this sets modified flag)
-    vm.deleteResults();
+    vm.deleteResults(selectedOnly);
 
+    vm.OsServer.setProgress(20, 'Creating Analysis Zip');
     // 2: make OSA and zip file
-    vm.exportOSA();
+    vm.Project.exportOSA(selectedOnly).then(() => {
 
-    // 3: hit PAT CLI to start server (local or remote)
-    vm.OsServer.setProgress(15, 'Starting server');
+      // 3: hit PAT CLI to start server (local or remote)
+      vm.OsServer.setProgress(30, 'Starting server');
 
-    vm.$log.debug('***** In runController::runEntireWorkflow() ready to start server *****');
+      if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() ready to start server *****');
 
-    vm.OsServer.startServer().then(response => {
+      vm.OsServer.startServer().then(response => {
 
-      vm.OsServer.setAnalysisRunningFlag(true);
-      vm.$log.debug('***** In runController::runEntireWorkflow() server started *****');
-      vm.$log.debug('Start Server response: ', response);
+        vm.OsServer.setAnalysisRunningFlag(true);
+        if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() server started *****');
+        vm.$log.info('Start Server response: ', response);
 
-      vm.OsServer.setProgress(30, 'Server started');
+        vm.OsServer.setProgress(40, 'Server started');
 
-      //vm.$scope.serverStatuses = vm.OsServer.getServerStatuses();
-      //vm.$log.debug('Server Statuses: ', vm.$scope.serverStatuses);
+        // 4: hit PAT CLI to start run
+        vm.OsServer.setProgress(50, 'Starting analysis run');
 
-      // 4: hit PAT CLI to start run
-      vm.OsServer.setProgress(40, 'Starting analysis run');
+        if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() ready to run analysis *****');
 
-      vm.$log.debug('***** In runController::runEntireWorkflow() ready to run analysis *****');
-
-      // set analysis type (sampling method).  batch_datapoints is for manual runs only
-      let analysis_param = '';
-      if (vm.$scope.selectedAnalysisType == 'Manual')
-        analysis_param = 'batch_datapoints';
-      else {
-        vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod.id);
-        analysis_param = vm.$scope.selectedSamplingMethod.id;
-      }
-      vm.OsServer.setAnalysisStatus('starting');
-      vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-
-      vm.OsServer.runAnalysis(analysis_param).then(response => {
-        vm.$log.debug('***** In runController::runEntireWorkflow() analysis running *****');
-        vm.$log.debug('Run Analysis response: ', response);
-        vm.OsServer.setAnalysisStatus('in progress');
+        // set analysis type (sampling method).  batch_datapoints is for manual only
+        let analysis_param = '';
+        if (vm.$scope.selectedAnalysisType == 'Manual')
+          analysis_param = 'batch_datapoints';
+        else {
+          if (vm.Message.showDebug()) vm.$log.debug('Sampling Method: ', vm.$scope.selectedSamplingMethod.id);
+          analysis_param = vm.$scope.selectedSamplingMethod.id;
+        }
+        vm.OsServer.setAnalysisStatus('starting');
         vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-        vm.OsServer.setProgress(45, 'Analysis started');
 
-        vm.$scope.analysisID = vm.Project.getAnalysisID();
+        vm.OsServer.runAnalysis(analysis_param).then(response => {
+          if (vm.Message.showDebug()) vm.$log.debug('***** In runController::runWorkflow() analysis running *****');
+          vm.$log.info('Run Analysis response: ', response);
+          vm.OsServer.setAnalysisStatus('in progress');
+          vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+          vm.OsServer.setProgress(45, 'Analysis started');
 
-        // 5: until complete, hit serverAPI for updates (errors, warnings, status)
-        vm.getStatus = vm.$interval(function () {
+          vm.$scope.analysisID = vm.Project.getAnalysisID();
 
-          vm.OsServer.retrieveAnalysisStatus().then(response => {
-            vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
-            vm.OsServer.setAnalysisStatus(response.data.analysis.status);
-            vm.$scope.analysisStatus = response.data.analysis.status;
-            vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
-            vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
-            vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-            vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
+          // 5: until complete, hit serverAPI for updates (errors, warnings, status)
+          vm.getStatus = vm.$interval(() => {
 
-            // download/replace out.osw (local only)
-            if(vm.$scope.selectedRunType.name == 'local') {
+            vm.OsServer.retrieveAnalysisStatus().then(response => {
+              if (vm.Message.showDebug()) vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
+              vm.OsServer.setAnalysisStatus(response.data.analysis.status);
+              vm.$scope.analysisStatus = response.data.analysis.status;
+              if (vm.Message.showDebug()) vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
+              vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
+              vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
+              if (vm.Message.showDebug()) vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
+
               vm.OsServer.updateDatapoints().then(response2 => {
                 // refresh datapoints
-                  vm.$scope.datapoints = vm.Project.getDatapoints();
+                vm.$scope.datapoints = vm.Project.getDatapoints();
                 // download reports
-                vm.OsServer.downloadReports().then(response3 => {
-                  vm.$log.debug('downloaded all available reports');
+                vm.OsServer.downloadReports().then(() => {
+                  if (vm.Message.showDebug()) vm.$log.debug('downloaded all available reports');
                   // refresh datapoints again
                   vm.$scope.datapoints = vm.Project.getDatapoints();
-                  vm.$log.debug('datapoints after download: ', vm.$scope.datapoints);
+                  vm.$log.info('datapoints after download: ', vm.$scope.datapoints);
                 }, response3 => {
                   // error in downloadReports
-                  vm.$log.debug('download reports error: ', response3);
+                  vm.$log.error('download reports error: ', response3);
                 });
 
-                vm.$log.debug('update datapoints succeeded: ', response2);
+                vm.$log.info('update datapoints succeeded: ', response2);
               }, response2 => {
                 // error in updateDatapoints
-                vm.$log.debug('update datapoints error: ', response2);
+                vm.$log.error('update datapoints error: ', response2);
               });
-            } else {
-              // set datapointsStatus as datapoints
-              vm.$scope.datapoints = vm.$scope.datapointsStatus;
-            }
-            if (response.data.analysis.status == 'completed') {
-              // cancel loop
-              vm.stopAnalysisStatus('completed');
-            }
-          }, response => {
-            vm.$log.debug('analysis status retrieval error: ', response);
-          });
 
-        }, 20000);  // once per 20 seconds
+              if (response.data.analysis.status == 'completed') {
+                // cancel loop
+                vm.stopAnalysisStatus('completed');
+
+                // download result csvs if algorithmic
+                if (vm.$scope.selectedAnalysisType == 'Algorithmic') vm.OsServer.downloadAlgorithmResults();
+              }
+            }, response => {
+              vm.$log.error('analysis status retrieval error: ', response);
+            });
+
+          }, 60000);  // once per minute
+
+        }, response => {
+          // analysis not started
+          vm.OsServer.setProgress(45, 'Analysis Error');
+
+          vm.$log.error('ANALYSIS NOT STARTED, ERROR: ', response);
+          vm.OsServer.setAnalysisStatus('error');
+          vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+          vm.OsServer.setAnalysisRunningFlag(false);
+          vm.toggleButtons();
+
+        });
 
       }, response => {
-        // analysis not started
-        vm.OsServer.setProgress(45, 'Analysis Error');
-
-        vm.$log.debug('ANALYSIS NOT STARTED, ERROR: ', response);
-        vm.OsServer.setAnalysisStatus('error');
+        vm.OsServer.setProgress(25, 'Server Error');
+        vm.$log.error('SERVER NOT STARTED, ERROR: ', response);
+        vm.OsServer.setAnalysisStatus('');
         vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
         vm.OsServer.setAnalysisRunningFlag(false);
         vm.toggleButtons();
 
       });
-
-    }, response => {
-      vm.OsServer.setProgress(25, 'Server Error');
-      vm.$log.debug('SERVER NOT STARTED, ERROR: ', response);
-      vm.OsServer.setAnalysisStatus('');
-      vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
-      vm.OsServer.setAnalysisRunningFlag(false);
-      vm.toggleButtons();
-
+    }, () => {
+      // error exporting OSA
+      vm.$log.error('Error exporting OSA');
     });
+
+
   }
 
   stopAnalysisStatus(status = 'completed') {
     const vm = this;
-    vm.$log.debug('***** In runController::stopAnalysisStatus() *****');
+    if (vm.Message.showDebug()) vm.$log.debug('***** In runController::stopAnalysisStatus() *****');
     if (angular.isDefined(vm.getStatus)) {
       vm.$interval.cancel(vm.getStatus);
       vm.getStatus = undefined;
@@ -739,45 +1053,79 @@ export class RunController {
 
   }
 
+  downloadAlgorithmResults() {
+    const vm = this;
+    vm.OsServer.downloadAlgorithmResults().then( () => {
+      vm.$translate('toastr.downloadedResults').then(translation => {
+        vm.toastr.success(translation);
+      });
+    }, () => {
+      vm.$translate('toastr.downloadedResultsError').then(translation => {
+        vm.toastr.error(translation);
+      });
+    });
+  }
+
+  viewAlgorithmResults() {
+    const vm = this;
+    vm.shell.openItem(vm.Project.getAlgorithmResultsPath());
+  }
+
   downloadResults(datapoint) {
     const vm = this;
     vm.OsServer.downloadResults(datapoint).then(() => {
-      vm.toastr.success('Results downloaded successfully!');
+      vm.$translate('toastr.downloadedResults').then(translation => {
+        vm.toastr.success(translation);
+      });
     }, () => {
-      vm.toastr.error('Error downloading Results zip file');
+      vm.$translate('toastr.downloadedResultsError').then(translation => {
+        vm.toastr.error(translation);
+      });
     });
   }
 
   downloadAllResults() {
     const vm = this;
     vm.OsServer.downloadAllResults().then(() => {
-      vm.toastr.success('All Results downloaded successfully!');
+      vm.$translate('toastr.downloadedAllResults').then(translation => {
+        vm.toastr.success(translation);
+      });
     }, () => {
-      vm.toastr.error('Error downloading Results zip files');
+      vm.$translate('toastr.downloadedAllResultsError').then(translation => {
+        vm.toastr.error(translation);
+      });
     });
   }
 
   downloadOSM(datapoint) {
     const vm = this;
     vm.OsServer.downloadOSM(datapoint).then(() => {
-      vm.toastr.success('OSM downloaded successfully!');
+      vm.$translate('toastr.downloadedOsm').then(translation => {
+        vm.toastr.success(translation);
+      });
     }, () => {
-      vm.toastr.error('Error downloading OSM');
+      vm.$translate('toastr.downloadedOsmError').then(translation => {
+        vm.toastr.error(translation);
+      });
     });
   }
 
   downloadAllOSMs() {
     const vm = this;
     vm.OsServer.downloadAllOSMs().then(() => {
-      vm.toastr.success('All OSMs downloaded successfully!');
+      vm.$translate('toastr.downloadedA;;Osm').then(translation => {
+        vm.toastr.success(translation);
+      });
     }, () => {
-      vm.toastr.error('Error downloading OSMs');
+      vm.$translate('toastr.downloadedAllOsmError').then(translation => {
+        vm.toastr.error(translation);
+      });
     });
   }
 
   clearDatapoint(datapoint) {
     const vm = this;
-    vm.$log.debug('In clear datapoint');
+    if (vm.Message.showDebug()) vm.$log.debug('In clear datapoint');
     // clear from disk
     vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(datapoint.id));
     // clear from PAT
@@ -787,18 +1135,18 @@ export class RunController {
       vm.$scope.datapoints.splice(index, 1);
       vm.Project.setModified(true);
     } else {
-      vm.$log.debug('Datapoint ID not found in array');
+      vm.$log.error('Datapoint ID not found in array');
     }
   }
 
   clearAllDatapoints() {
     const vm = this;
-    vm.$log.debug('In clear ALL Datapoints');
+    if (vm.Message.showDebug()) vm.$log.debug('In clear ALL Datapoints');
     // force delete everything in localResults folder in case there is leftover junk not associated with current datapoints
     vm.jetpack.dir(vm.Project.getProjectLocalResultsDir().path(), {empty: true});
 
-    vm.Project.setDatapoints([]);
-    vm.$scope.datapoints = vm.Project.getDatapoints();
+    // this will take care of correctly resetting datapoints (manual vs algorithmic)
+    vm.deleteResults();
   }
 
   exportPAT() {
@@ -808,52 +1156,31 @@ export class RunController {
     vm.Project.exportPAT();
   }
 
-  exportOSA() {
-    const vm = this;
-    vm.Project.exportOSA();
-  }
-
-  runSelected() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
-  runUpdated() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
-  runEnergyPlus() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
-  runReportingMeasures() {
-    const vm = this;
-    vm.toggleButtons();
-    // TODO
-  }
-
   toggleButtons() {
     const vm = this;
     vm.OsServer.setDisabledButtons(!vm.$scope.disabledButtons);
     vm.$scope.disabledButtons = vm.OsServer.getDisabledButtons();
   }
 
+  selectAll(toggle = true) {
+    // toggle is value to set 'selected' key
+    const vm = this;
+    _.forEach(vm.$scope.datapoints, (dp) => {
+      dp.selected = toggle;
+    });
+  }
+
   cancelRun() {
     const vm = this;
-    vm.OsServer.stopAnalysis().then(response => {
+    vm.OsServer.stopAnalysis().then(() => {
       //vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
       vm.toggleButtons();
       vm.OsServer.setProgress(0, '');
 
       vm.stopAnalysisStatus('canceled');
-    }, response => {
-      vm.$log.debug('ERROR attempting to stop analysis / cancel run');
-      vm.$log.debug('Resetting buttons anyway');
+    }, () => {
+      vm.$log.error('ERROR attempting to stop analysis / cancel run');
+      vm.$log.info('Resetting buttons anyway');
       // reset anyway
       vm.toggleButtons();
       vm.OsServer.setProgress(0, '');

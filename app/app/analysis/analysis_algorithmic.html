@@ -9,26 +9,37 @@
           <span class="badge badge-info" title="{{'analysis.helpAnalysis' | translate}}">&nbsp;?&nbsp;</span>
         </uib-accordion-heading>
 
+        <div ng-if="selectedSamplingMethod.link" class="row pad-bot-10">
+          <div class="col-sm-12">
+            <button type="button" class="btn btn-info"  ng-click="analysis.viewAlgorithmLink()" translate>analysis.viewAlgorithmReference</button>
+          </div>
+        </div>
+
         <div class="row pad-bot-10">
           <div class="col-sm-6">
-            <div ng-repeat="option in algorithmSettings" ng-if="$odd">
+            <div ng-repeat="option in algorithmSettings" ng-if="$even">
               <div class="row pad-bot-10">
                 <div class="col-sm-12">
-                  <label class="medium-label" for="{{option.name}}">{{option.name}}</label>
+                  <label class="medium-label" for="{{option.name}}">{{option.displayName}}</label>
                   <span ng-if="option.description" class="small-text inline">&mdash; {{option.description}}</span>
-                  <input type="text" class="form-control" id="{{option.name}}" placeholder="{{option.defaultValue}}"
+
+                  <input ng-if="option.type == 'number'" type="number" class="form-control" id="{{option.name}}" placeholder="{{option.defaultValue}}"
                          ng-model="option.value">
+                  <input ng-if="option.type == 'string'" type="text" class="form-control" id="{{option.name}}" placeholder="{{option.defaultValue}}"
+                  ng-model="option.value">
                 </div>
               </div>
             </div>
           </div>
           <div class="col-sm-6">
-            <div ng-repeat="option in algorithmSettings" ng-if="$even">
+            <div ng-repeat="option in algorithmSettings" ng-if="$odd">
               <div class="row pad-bot-10">
                 <div class="col-sm-12">
-                  <label class="medium-label" for="{{option.name}}">{{option.name}}</label>
-                  <span class="small-text inline">{{option.description}}</span>
-                  <input type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}"
+                  <label class="medium-label" for="{{option.name}}">{{option.displayName}}</label>
+                  <span ng-if="option.description" class="small-text inline">&mdash; {{option.description}}</span>
+                  <input ng-if="option.type == 'string'" type="text" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}"
+                         ng-model="option.value">
+                  <input ng-if="option.type == 'number'" type="number" class="form-control " id="{{option.name}}" placeholder="{{option.defaultValue}}"
                          ng-model="option.value">
                 </div>
               </div>
@@ -194,6 +205,13 @@
           </span>
         </uib-accordion-heading>
         <div class="button-div">
+          <div class="row">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
+                <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasure</translate>
+              </button>
+            </div>
+          </div>
           <div class="row pad-top-10 normal-text">
             <div class="col-sm-3 pad-bot-10">
               <label translate>analysis.modelToBaseInputsOn</label>
@@ -207,7 +225,6 @@
             </div>
           </div>
         </div>
-
         <div class="button-div">
           <div class="row normal-text">
             <div class="col-sm-3 pad-bot-10">
@@ -327,7 +344,7 @@
             <div class="col-sm-4"
                  ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
               <div class="row"
-                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"
+                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">
                 <!-- pivots only -->
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
@@ -423,7 +440,8 @@
                         </div>
                         <div ng-if="argument.type == 'Choice'">
                           <select class="form-control"
-                                  ng-options="value as value for value in argument.inputs.choice_display_names"
+                                  ng-options="value for value in argument.choice_display_names"
+                                  ng-init="discreteVariable.value = discreteVariable.value || argument.choice_display_names[0]"
                                   ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
                         </div>
                       </div>
@@ -492,6 +510,13 @@
           </span>
         </uib-accordion-heading>
         <div class="button-div">
+          <div class="row">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
+                <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasure</translate>
+              </button>
+            </div>
+          </div>
           <div class="row pad-top-10 normal-text">
             <div class="col-sm-3 pad-bot-10">
               <label translate>analysis.modelToBaseInputsOn</label>
@@ -721,7 +746,8 @@
                         </div>
                         <div ng-if="argument.type == 'Choice'">
                           <select class="form-control"
-                                  ng-options="value as value for value in argument.inputs.choice_display_names"
+                                  ng-options="value for value in argument.choice_display_names"
+                                  ng-init="discreteVariable.value = discreteVariable.value || argument.choice_display_names[0]"
                                   ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
                         </div>
                       </div>
@@ -790,6 +816,13 @@
           </span>
         </uib-accordion-heading>
         <div class="button-div">
+          <div class="row">
+            <div class="col-sm-12">
+              <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
+                <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasure</translate>
+              </button>
+            </div>
+          </div>
           <div class="row pad-top-10 normal-text">
             <div class="col-sm-3 pad-bot-10">
               <label translate>analysis.modelToBaseInputsOn</label>
@@ -1019,7 +1052,8 @@
                         </div>
                         <div ng-if="argument.type == 'Choice'">
                           <select class="form-control"
-                                  ng-options="value as value for value in argument.inputs.choice_display_names"
+                                  ng-options="value for value in argument.choice_display_names"
+                                  ng-init="discreteVariable.value = discreteVariable.value || argument.choice_display_names[0]"
                                   ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
                         </div>
                       </div>

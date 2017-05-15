@@ -2,9 +2,12 @@
   <span class="glyphicon glyphicon-ok-sign library-grid-button green-button" aria-hidden="true" aria-label="Measure Already Added to Project">
   </span>
 </div>
-<div ng-if="!row.entity.addedToProject && row.entity.location != 'bcl'" class="library-grid-button-container">
+<div ng-if="!row.entity.addedToProject && row.entity.location != 'bcl' && !row.entity.error" class="library-grid-button-container">
   <span class="glyphicon glyphicon-plus-sign library-grid-button blue-button" aria-hidden="true" aria-label="Add to Project" ng-click="grid.appScope.modal.addMeasure(row.entity); $event.stopPropagation();">
   </span>
+</div>
+<div ng-if="!row.entity.addedToProject && row.entity.location != 'bcl' && row.entity.error" tooltip="Error in measure. Cannot add to project" title="Error in measure. Cannot add to project" class="library-grid-button-container ui-grid-cell-contents">
+  <span class="library-grid-button"><img ng-src="assets/images/broken_script.png" alt="Error in Measure"></span>
 </div>
 <div ng-if="!row.entity.addedToProject && row.entity.location == 'bcl'" class="library-grid-button-container">
   <span class="glyphicon glyphicon-plus-sign library-grid-button gray-button" aria-hidden="true" aria-label="Download before Adding to Project">

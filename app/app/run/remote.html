@@ -18,7 +18,7 @@
             <input class="form-control" id="externalURL" type="text" ng-model="remoteSettings.remoteServerURL" ng-change="run.resetRemoteServerURL()">
           </div>
           <div class="col-sm-1">
-            <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] != 'started'" ng-click="run.startServer()" translate>run.remote.connect</button>
+            <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] != 'started'" ng-click="run.connectRemoteServer()" translate>run.remote.connect</button>
             <button type="button" class="btn btn-danger" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.stopServer()" translate>run.remote.disconnect</button>
           </div>
         </div>
@@ -29,17 +29,17 @@
               <div class="row pad-bot-20 normal-text">
                 <div class="col-sm-8">
                   <label for="cluster" class="run-label" translate>run.remote.clusterText</label>
-                  <select id="cluster" class="form-control" ng-options="option for option in clusters.all" ng-model="remoteSettings.aws.cluster_name"  ng-disabled="remoteSettings.aws.connected" ng-change="run.resetClusterSettings()"></select>
+                  <select id="cluster" class="form-control" ng-options="option for option in clusters.all" ng-model="remoteSettings.aws.cluster_name"  ng-disabled="disabledFields()" ng-change="run.resetClusterSettings()"></select>
                   <div class="normal-text" ng-if="clusters.running.size > 0"><translate>run.remote.runningClusters</translate>: {{clusters.running}}</div>
                 </div>
                 <div class="col-sm-2 pad-top-25">
-                  <button type="button" class="btn btn-primary" ng-click="run.newClusterModal()" ng-hide="remoteSettings.aws.connected" translate>run.remote.newCluster</button>
+                  <button type="button" class="btn btn-primary" ng-click="run.newClusterModal()" ng-hide="disabledFields()" translate>run.remote.newCluster</button>
                 </div>
               </div>
               <div class="row pad-bot-10" ng-if="remoteSettings.aws.cluster_name">
                 <div class="col-sm-5">
                   <label for="serverVersion" class="run-label" translate>run.remote.osServerVersion</label>
-                  <select id="serverVersion" class="form-control" ng-options="option.name for option in osServerVersions track by option" ng-model="remoteSettings.aws.openstudio_server_version" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
+                  <select id="serverVersion" class="form-control" ng-options="option.name for option in osServerVersions track by option.name" ng-model="remoteSettings.aws.openstudio_server_version" ng-disabled="disabledFields()"></select>
                 </div>
                 <div class="col-sm-3">
                   <label for="osv" class="run-label" translate>run.remote.osVersion</label>
@@ -53,19 +53,27 @@
               <div class="row pad-bot-10" ng-if="remoteSettings.aws.cluster_name">
                 <div class="col-sm-6">
                   <label for="serverInstanceType" class="run-label" translate>run.remote.serverInstanceType</label>
-                  <select id="serverInstanceType" class="form-control" ng-options="option.name for option in serverInstanceTypes track by option.name" ng-model="remoteSettings.aws.server_instance_type" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
+                  <select id="serverInstanceType" class="form-control" ng-options="option.name for option in serverInstanceTypes track by option.name" ng-model="remoteSettings.aws.server_instance_type" ng-disabled="disabledFields()"></select>
                 </div>
-                <div class="col-sm-2">
-                  <label for="cpus" class="run-label" translate>run.remote.cpus</label>
-                  <div id="cpus" class="normal-text">{{remoteSettings.aws.server_instance_type.cpus}}</div>
-                </div>
-                <div class="col-sm-2">
-                  <label for="mem" class="run-label" translate>run.remote.memory</label>
-                  <div id="mem" class="normal-text">{{remoteSettings.aws.server_instance_type.memory}}</div>
-                </div>
-                <div class="col-sm-2">
-                  <label for="storage" class="run-label" translate>run.remote.storage</label>
-                  <div id="storage" class="normal-text">{{remoteSettings.aws.server_instance_type.storage}}</div>
+                <div class="col-sm-6">
+                  <div class="row">
+                    <div class="col-sm-2">
+                      <label for="cpus" class="run-label" translate>run.remote.cpus</label>
+                      <div id="cpus" class="normal-text">{{remoteSettings.aws.server_instance_type.cpus}}</div>
+                    </div>
+                    <div class="col-sm-3">
+                      <label for="cpus" class="run-label" translate>run.remote.cost</label>
+                      <div id="cpus" class="normal-text">{{remoteSettings.aws.server_instance_type.cost}}</div>
+                    </div>
+                    <div class="col-sm-3">
+                      <label for="mem" class="run-label" translate>run.remote.memory</label>
+                      <div id="mem" class="normal-text">{{remoteSettings.aws.server_instance_type.memory}}</div>
+                    </div>
+                    <div class="col-sm-4">
+                      <label for="storage" class="run-label" translate>run.remote.storage</label>
+                      <div id="storage" class="normal-text">{{remoteSettings.aws.server_instance_type.storage}}</div>
+                    </div>
+                  </div>
                 </div>
               </div>
               <div class="row pad-bot-10" ng-if="remoteSettings.aws.cluster_name">
@@ -76,20 +84,20 @@
               <div class="row pad-bot-20" ng-if="remoteSettings.aws.cluster_name">
                 <div class="col-sm-4">
                   <label for="workerInstanceType" class="run-label" translate>run.remote.workerInstanceType</label>
-                  <select id="workerInstanceType" class="form-control" ng-options="option.name for option in workerInstanceTypes track by option.name" ng-model="remoteSettings.aws.worker_instance_type" ng-disabled="remoteSettings.aws.cluster_status=='running'"></select>
+                  <select id="workerInstanceType" class="form-control" ng-options="option.name for option in workerInstanceTypes track by option.name" ng-model="remoteSettings.aws.worker_instance_type" ng-disabled="disabledFields()"></select>
                 </div>
-                <div class="col-sm-3">
+                <div class="col-sm-4">
                   <label for="numWorkers" class="run-label" translate>run.remote.numberOfWorkers</label>
-                  <input class="form-control" id="numWorkers" type="number" ng-model="remoteSettings.aws.worker_node_number" ng-disabled="remoteSettings.aws.cluster_status=='running'"/>
+                  <input class="form-control" id="numWorkers" type="number" ng-model="remoteSettings.aws.worker_node_number" ng-disabled="disabledFields()"/>
                 </div>
                 <div class="col-sm-3">
                   <label for="awsUserID" class="run-label" translate>run.remote.awsUserID</label>
-                  <input class="form-control" id="awsUserID" type="text" ng-model="remoteSettings.aws.user_id" ng-disabled="remoteSettings.aws.cluster_status=='running'"/>
+                  <input class="form-control" id="awsUserID" type="text" ng-model="remoteSettings.aws.user_id" ng-disabled="disabledFields()"/>
                 </div>
               </div>
               <div class="row pad-bot-10 pad-top-10" ng-if="remoteSettings.aws.cluster_name">
                 <div class="col-sm-3 col-sm-offset-3">
-                  <button type="button" class="btn btn-success" ng-click="run.saveClusterToFile()" translate>run.remote.saveCluster</button>
+                  <button type="button" class="btn btn-success" ng-click="run.saveClusterToFile()" ng-hide="disabledFields()" translate>run.remote.saveCluster</button>
                 </div>
               </div>
             </div>
@@ -106,7 +114,8 @@
                   <div class="inline pad-left-5">
                     <button type="button" ng-show="remoteSettings.aws.connected" class="btn btn-danger" ng-class="disabledStopButtonClass()" ng-click="run.stopServer()" translate>run.remote.terminate</button>
                     <button type="button" ng-show="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == 'running' && !run.OsServerService.getRemoteStartInProgress()" class="btn btn-primary" ng-class="disabledButtonClass()" ng-click="run.connectAws('connect')" translate>run.remote.connect</button>
-                    <button type="button" ng-show="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == 'terminated'" class="btn btn-success" ng-click="run.connectAws('start')" ng-class="disabledButtonClass()" translate>run.remote.start</button>
+                    <button type="button" ng-show="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == 'terminated'" class="btn btn-success" ng-click="run.warnAws()" ng-class="disabledButtonClass()" translate>run.remote.start</button>
+                    <span ng-if="!remoteSettings.aws.connected && remoteSettings.aws.cluster_status == ''" translate>run.pleaseWait</span>
                   </div>
                 </div>
               </div>
@@ -128,10 +137,10 @@
                     </div>
                     <div class="row">
                       <div class="col-sm-8">
-                        <select id="awsCred" class="form-control" ng-options="option for option in awsYamlFiles" ng-model="remoteSettings.credentials.yamlFilename" ng-change="run.selectAwsCredentials()" ng-disabled="remoteSettings.aws.connected"></select>
+                        <select id="awsCred" class="form-control" ng-options="option for option in awsYamlFiles" ng-model="remoteSettings.credentials.yamlFilename" ng-change="run.selectAwsCredentials()" ng-disabled="remoteSettings.aws.connected || run.OsServer.getRemoteStartInProgress()"></select>
                       </div>
                       <div class="col-sm-3">
-                        <button type="button" class="btn btn-primary" ng-click="run.newAwsCredentialsModal()" ng-hide="remoteSettings.aws.connected" translate>run.remote.newAwsCredentials</button>
+                        <button type="button" class="btn btn-primary" ng-click="run.newAwsCredentialsModal()" ng-hide="remoteSettings.aws.connected || run.OsServer.getRemoteStartInProgress()" translate>run.remote.newAwsCredentials</button>
                       </div>
                     </div>
                     <div class="row pad-top-10" ng-show="remoteSettings.credentials.yamlFilename" >
@@ -198,8 +207,14 @@
 
 <div class="row pad-bot-20">
   <div class="col-sm-8">
-    <button type="button" class="btn btn-success" ng-show="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
+    <button type="button" class="btn btn-success" ng-show="!disabledButtons && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
+    <button type="button" class="btn btn-success" ng-if="!disabledButtons && atLeastOneSelected() && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.warnBeforeDelete('selected')" translate>run.runSelected</button>
     <button type="button" class="btn btn-danger" ng-show="disabledButtons && serverStatuses[selectedRunType.name] == 'started'" ng-click="run.cancelRun()" translate>run.cancelRun</button>
     <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()" translate>run.viewServer</button>
+  </div>
+
+  <div class="col-sm-3 col-sm-offset-1">
+    <button type="button" class="btn btn-info" ng-if="selectedAnalysisType == 'Algorithmic' && analysisStatus == 'completed' && resultsExist()" ng-click="run.viewAlgorithmResults()" translate>run.viewAlgorithmResults</button>
+    <button type="button" class="btn btn-info" ng-if="selectedAnalysisType == 'Algorithmic' && analysisStatus == 'completed' && !resultsExist()" ng-click="run.downloadAlgorithmResults()" translate>run.downloadAlgorithmResults</button>
   </div>
 </div>

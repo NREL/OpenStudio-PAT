@@ -1,6 +1,35 @@
+/***********************************************************************************************************************
+ *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *
+ *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
+ *  following conditions are met:
+ *
+ *  (1) Redistributions of source code must retain the above copyright notice, this list of conditions and the following
+ *  disclaimer.
+ *
+ *  (2) Redistributions in binary form must reproduce the above copyright notice, this list of conditions and the
+ *  following disclaimer in the documentation and/or other materials provided with the distribution.
+ *
+ *  (3) Neither the name of the copyright holder nor the names of any contributors may be used to endorse or promote
+ *  products derived from this software without specific prior written permission from the respective party.
+ *
+ *  (4) Other than as required in clauses (1) and (2), distributions in any form of modifications or other derivative
+ *  works may not use the "OpenStudio" trademark, "OS", "os", or any other confusingly similar designation without
+ *  specific prior written permission from Alliance for Sustainable Energy, LLC.
+ *
+ *  THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES,
+ *  INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+ *  DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER, THE UNITED STATES GOVERNMENT, OR ANY CONTRIBUTORS BE LIABLE FOR
+ *  ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
+ *  PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED
+ *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ **********************************************************************************************************************/
+import jetpack from 'fs-jetpack';
+
 export class DesignAlternativesController {
 
-  constructor($log, Project, $scope) {
+  constructor($log, Project, $scope, $translate, toastr, $q, $uibModal, Message) {
     'ngInject';
 
     const vm = this;
@@ -8,10 +37,16 @@ export class DesignAlternativesController {
     vm.$log = $log;
     vm.$scope = $scope;
     vm.Project = Project;
+    vm.toastr = toastr;
+    vm.$translate = $translate;
+    vm.$q = $q;
+    vm.$uibModal = $uibModal;
+    vm.jetpack = jetpack;
+    vm.Message = Message;
 
     vm.selected = null;
     vm.measures = vm.Project.getMeasuresAndOptions();
-    vm.$log.debug('DA MEASURE RETRIEVED: ', vm.measures);
+    if (vm.Message.showDebug()) vm.$log.debug('DA MEASURE RETRIEVED: ', vm.measures);
 
     // get seed and weather defaults and dropdown options
     vm.seedsDropdownArr = vm.Project.getSeedsDropdownArr();
@@ -22,6 +57,7 @@ export class DesignAlternativesController {
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
 
     vm.$scope.alternatives = vm.Project.getDesignAlternatives();
+    vm.datapoints = vm.Project.getDatapoints();
 
     vm.$scope.gridOptions = [];
     vm.setGridOptions();
@@ -105,6 +141,35 @@ export class DesignAlternativesController {
             vm.selected = null;
           }
         });
+        gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
+          if (newValue != oldValue && colDef.name == 'name') {
+            const rowIndex = _.findIndex(vm.$scope.alternatives, {$$hashKey: rowEntity.$$hashKey});
+            const isUnique = vm.checkUnique(vm.$scope.alternatives, newValue, rowIndex);
+            if (!isUnique) {
+              // not unique, restore old value and add toastr
+              if (vm.Message.showDebug()) vm.$log.debug('DA name must be unique');
+              rowEntity.name = oldValue;
+              vm.$translate('toastr.designAltNameError').then(translation => {
+                vm.toastr.error(translation);
+              });
+            } else {
+              // change name on datapoint
+              const match = _.find(vm.datapoints, {name: oldValue});
+              if (match) {
+                match.name = newValue;
+              }
+            }
+          }
+
+          // figure out if there are datapoints to update
+          if (newValue != oldValue) {
+            // find datapoint and mark as modified (if already run)
+            const match = _.find(vm.datapoints, {name: rowEntity.name});
+            if (_.get(match, 'updated_at')) {
+              match.modified = true;
+            }
+          }
+        });
         gridApi.cellNav.on.navigate(null, (newRowCol) => {
           vm.$scope.gridApi.selection.selectRow(newRowCol.row.entity);
         });
@@ -115,7 +180,7 @@ export class DesignAlternativesController {
     //vm.$log.info('DesignAlternativesController constructor measures: ', vm.measures);
     _.forEach(vm.measures, (measure) => {
       const optionsArr = vm.setOptionsArray(measure);
-      vm.$log.debug(optionsArr);
+      if (vm.Message.showDebug()) vm.$log.debug(optionsArr);
       vm.$scope.gridOptions.columnDefs.push({
         name: measure.name,
         displayName: measure.displayName,
@@ -128,7 +193,7 @@ export class DesignAlternativesController {
 
       // also ensure that options have this measure's key in it (to fix blanks on older projects)
       _.forEach(vm.$scope.alternatives, (alt) => {
-        if (!alt[measure.name] || alt[measure.name] == ''){
+        if (!alt[measure.name] || alt[measure.name] == '') {
           alt[measure.name] = 'None';
         }
       });
@@ -151,6 +216,59 @@ export class DesignAlternativesController {
     vm.setIsModified();
     const index = vm.$scope.alternatives.indexOf(alternative);
     vm.$scope.alternatives.splice(index, 1);
+
+    // delete Associated Datapoint
+    vm.deleteAssociatedDatapoint(alternative);
+  }
+
+  deleteAssociatedDatapoint(alternative) {
+    const vm = this;
+    const matchIndex = _.findIndex(vm.datapoints, {name: alternative.name});
+    if (matchIndex > -1) {
+      const dp = vm.datapoints[matchIndex];
+      // remove localResults and delete datapoint
+      if (!_.isNil(dp.id)){
+        vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(dp.id));
+      }
+      vm.datapoints.splice(matchIndex, 1);
+    }
+  }
+
+  warnBeforeDelete(alternative) {
+
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    if (vm.Message.showDebug()) vm.$log.debug('**** In DAController::WarnBeforeDeleting ****');
+
+    const match = _.find(vm.datapoints, {name: alternative.name});
+
+    if (_.get(match, 'updated_at')) {
+      // dp with results exists
+      const modalInstance = vm.$uibModal.open({
+        backdrop: 'static',
+        controller: 'ModalClearDatapointController',
+        controllerAs: 'modal',
+        templateUrl: 'app/design_alts/clearDatapoint.html'
+      });
+
+      modalInstance.result.then(() => {
+        // go on to run workflow
+        deferred.resolve();
+        // DELETE BOTH
+        vm.deleteAlternative(alternative);
+
+      }, () => {
+        // Modal canceled
+        deferred.reject();
+      });
+    } else {
+      // no dp
+      deferred.resolve();
+      // delete
+      vm.deleteAlternative(alternative);
+    }
+    return deferred.promise;
   }
 
   moveUp(alternative) {
@@ -179,7 +297,6 @@ export class DesignAlternativesController {
   createAlternatives() {
     const vm = this;
     vm.setIsModified();
-    let alternatives = vm.Project.getDesignAlternatives();
 
     _.forEach(vm.measures, (measure) => {
       _.forEach(measure.options, (option) => {
@@ -198,8 +315,8 @@ export class DesignAlternativesController {
 
   duplicateAlternative() {
     const vm = this;
-    vm.$log.debug('In DesignAlternatives::duplicateAlternative');
-    if (vm.selected){
+    if (vm.Message.showDebug()) vm.$log.debug('In DesignAlternatives::duplicateAlternative');
+    if (vm.selected) {
       vm.setIsModified();
       const dupAlt = angular.copy(vm.selected);
       delete dupAlt.$$hashKey;
@@ -212,12 +329,12 @@ export class DesignAlternativesController {
 
   }
 
-  findNextName(name){
+  findNextName(name) {
     const vm = this;
     let newName = name + ' Duplicate';
     const matchArr = [];
     _.forEach(vm.$scope.alternatives, (alt) => {
-      if (_.includes(alt.name, newName)){
+      if (_.includes(alt.name, newName)) {
         matchArr.push(alt.name);
       }
     });
@@ -225,15 +342,15 @@ export class DesignAlternativesController {
       // found at least a match.  find next available number
       const newMatchArr = [];
       _.forEach(matchArr, (match) => {
-        let newMatch = _.trim(match.replace(newName, ''));
-        //vm.$log.debug('match after: ', newMatch);
-        if (_.isNumber(_.toNumber(newMatch))){
-          //vm.$log.debug('match is a number');
+        const newMatch = _.trim(match.replace(newName, ''));
+        //if (vm.Message.showDebug()) vm.$log.debug('match after: ', newMatch);
+        if (_.isNumber(_.toNumber(newMatch))) {
+          //if (vm.Message.showDebug()) vm.$log.debug('match is a number');
           newMatchArr.push(_.toNumber(newMatch));
         }
       });
-      vm.$log.debug('New matchArr: ', newMatchArr);
-      if (newMatchArr.length > 0){
+      if (vm.Message.showDebug()) vm.$log.debug('New matchArr: ', newMatchArr);
+      if (newMatchArr.length > 0) {
         // find max and add 1
         newName = newName + ' ' + (_.max(newMatchArr) + 1);
       } else {
@@ -242,7 +359,7 @@ export class DesignAlternativesController {
     } else {
       newName = newName + ' 1';
     }
-    vm.$log.debug("newName: ", newName);
+    if (vm.Message.showDebug()) vm.$log.debug('newName: ', newName);
     return newName;
   }
 
