@@ -1,31 +1,47 @@
 <div>
   <form name="inputForm">
-    <select ng-if="row.entity.type=='Choice' && col.colDef.field == 'option_1'" ng-class="'colt' + col.uid" ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" ui-grid-edit-dropdown
+    <select ng-if="row.entity.type=='Choice' && col.colDef.field == 'option_1'" ng-class="'colt' + col.uid"
+            ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" ui-grid-edit-dropdown
             ng-model="MODEL_COL_FIELD"
             ng-options="field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray"></select>
-    <select ng-if="row.entity.type=='Choice' && col.colDef.field != 'option_1'" ng-class="'colt' + col.uid" ui-grid-edit-dropdown
+    <select ng-if="row.entity.type=='Choice' && col.colDef.field != 'option_1'" ng-class="'colt' + col.uid"
+            ui-grid-edit-dropdown
             ng-model="MODEL_COL_FIELD"
             ng-options="field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray"></select>
 
-    <input ng-if="row.entity.type=='Boolean' && col.colDef.field == 'option_1' && row.entity.variable == false" type="checkbox" ng-class="'colt' + col.uid" ui-grid-checkbox
-           ng-change="grid.appScope.analysis.optionCheckboxChanged()" ng-model="MODEL_COL_FIELD">
-    <input ng-if="row.entity.type=='Boolean' && col.colDef.field == 'option_1'" type="checkbox" ng-class="'colt' + col.uid" ui-grid-checkbox
-           ng-change="grid.appScope.analysis.optionCheckboxChanged()" ng-model="MODEL_COL_FIELD">
+    <input ng-if="row.entity.type=='Boolean' && col.colDef.field == 'option_1' && row.entity.variable == false"
+           type="checkbox" ng-class="'colt' + col.uid" ui-grid-checkbox
+           ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" ng-model="MODEL_COL_FIELD">
+    <input
+      ng-if="row.entity.type=='Boolean' && (col.colDef.field != 'option_1' || (col.colDef.field == 'option_1'  && row.entity.variable == true))"
+      type="checkbox" ng-class="'colt' + col.uid" ui-grid-checkbox ng-model="MODEL_COL_FIELD">
 
-    <input ng-if="row.entity.type=='Integer' && col.colDef.field == 'option_1' && row.entity.variable == false" type="number" ng-class="'colt' + col.uid" ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" ui-grid-editor
+    <input ng-if="row.entity.type=='Integer' && col.colDef.field == 'option_1' && row.entity.variable == false"
+           type="number" ng-class="'colt' + col.uid"
+           ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" ui-grid-editor
            ng-model="MODEL_COL_FIELD">
-    <input ng-if="row.entity.type=='Integer' && (col.colDef.field != 'option_1' || (col.colDef.field == 'option_1'  && row.entity.variable == true))" type="number" ng-class="'colt' + col.uid" ui-grid-editor
-           ng-model="MODEL_COL_FIELD">
+    <input
+      ng-if="row.entity.type=='Integer' && (col.colDef.field != 'option_1' || (col.colDef.field == 'option_1'  && row.entity.variable == true))"
+      type="number" ng-class="'colt' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD">
 
-    <input ng-if="row.entity.type=='Double' && col.colDef.field == 'option_1' && row.entity.variable == false" type="number" ng-class="'colt' + col.uid" ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" ui-grid-editor
+    <input ng-if="row.entity.type=='Double' && col.colDef.field == 'option_1' && row.entity.variable == false"
+           type="number" ng-class="'colt' + col.uid"
+           ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" ui-grid-editor
            ng-model="MODEL_COL_FIELD">
-    <input ng-if="row.entity.type=='Double' && (col.colDef.field != 'option_1' || (col.colDef.field == 'option_1'  && row.entity.variable == true))" type="number" ng-class="'colt' + col.uid" ui-grid-editor
-           ng-model="MODEL_COL_FIELD">
+    <input
+      ng-if="row.entity.type=='Double' && (col.colDef.field != 'option_1' || (col.colDef.field == 'option_1'  && row.entity.variable == true))"
+      type="number" ng-class="'colt' + col.uid" ui-grid-editor
+      ng-model="MODEL_COL_FIELD">
 
-    <input ng-if="row.entity.type=='String' && (col.colDef.field == 'option_1'  && row.entity.variable == false) && !row.entity.specialRowId" ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" type="text" ng-class="'colt' + col.uid"
-           ui-grid-editor ng-model="MODEL_COL_FIELD">
-    <input ng-if="row.entity.type=='String' && (col.colDef.field != 'option_1' || (col.colDef.field == 'option_1'  && row.entity.variable == true)) && !row.entity.specialRowId" type="text" ng-class="'colt' + col.uid"
-           ui-grid-editor ng-model="MODEL_COL_FIELD">
+    <input
+      ng-if="row.entity.type=='String' && (col.colDef.field == 'option_1'  && row.entity.variable == false) && !row.entity.specialRowId"
+      ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" type="text"
+      ng-class="'colt' + col.uid"
+      ui-grid-editor ng-model="MODEL_COL_FIELD">
+    <input
+      ng-if="row.entity.type=='String' && (col.colDef.field != 'option_1' || (col.colDef.field == 'option_1'  && row.entity.variable == true)) && !row.entity.specialRowId"
+      type="text" ng-class="'colt' + col.uid"
+      ui-grid-editor ng-model="MODEL_COL_FIELD">
 
     <input ng-if="row.entity.type=='String' && row.entity.specialRowId=='optionName'" type="text"
            ng-class="'colt' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD">

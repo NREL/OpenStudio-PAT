@@ -624,14 +624,6 @@ export class AnalysisController {
     //vm.$scope.$broadcast('uiGridEventEndCellEdit'); Note: this causes page to jump to bottom, and is visually unacceptable (Evan)
   }
 
-  optionCheckboxChanged() {
-    const vm = this;
-    if (vm.Message.showDebug()) vm.$log.debug('In optionCheckboxChanged in analysis');
-    vm.setIsModified();
-
-    //vm.$scope.$broadcast('uiGridEventEndCellEdit'); Note: this causes page to jump to bottom, and is visually unacceptable (Evan)
-  }
-
   allVariableCheckboxesChanged(row, col) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In allVariableCheckboxesChanged in analysis');
@@ -805,7 +797,7 @@ export class AnalysisController {
     // find index of current measure and insert new measure right after it
     const index = _.findIndex(vm.$scope.measures, measure);
     if (vm.Message.showDebug()) vm.$log.debug('current measure index: ', index);
-    vm.$scope.measures.splice(index +1, 0, copiedMeasure);
+    vm.$scope.measures.splice(index + 1, 0, copiedMeasure);
     vm.Project.setMeasuresAndOptions(vm.$scope.measures);
 
     // update workflow indices
@@ -1387,7 +1379,10 @@ export class AnalysisController {
 
   onGridChoiceChange(type, col, row) {
     const vm = this;
-    if (vm.Message.showDebug()) vm.$log.debug('Analysis::onGridChoiceChange');
+    vm.$log.debug('Analysis::onGridChoiceChange');
+    vm.$log.debug('type', type);
+    vm.$log.debug('row', row);
+    vm.$log.debug('col', col);
     vm.setIsModified();
 
     const instanceId = col.colDef.instanceId;
@@ -1420,10 +1415,10 @@ export class AnalysisController {
     else if (scriptType == 'server_finalization') {
       return 'analysis.algorithmic.helpServerFinalization';
     }
-    else if(scriptType == 'worker_initialization') {
+    else if (scriptType == 'worker_initialization') {
       return 'analysis.algorithmic.helpWorkerInitialization';
     }
-    else if(scriptType == 'worker_finalization') {
+    else if (scriptType == 'worker_finalization') {
       return 'analysis.algorithmic.helpWorkerFinalization';
     }
     else {
