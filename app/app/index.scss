@@ -380,6 +380,9 @@ select {
     overflow-y: auto;
   }
 }
+.panel-default > .panel-heading .badge-info{
+  background-color: #6ACBE5;
+}
 
 .modal {
   text-align: center;

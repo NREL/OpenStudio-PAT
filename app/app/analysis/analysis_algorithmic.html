@@ -6,7 +6,7 @@
           <i class="pull-left glyphicon pad-right-5 black-button"
              ng-class="{'glyphicon-chevron-down': settings.open, 'glyphicon-chevron-right': !settings.open}"></i>
           <translate>analysis.algorithmic.algorithmSetting</translate>
-          <span class="badge badge-info" title="{{'analysis.helpAnalysis' | translate}}">&nbsp;?&nbsp;</span>
+          <span class="badge badge-info" title="{{'analysis.algorithmic.helpAlgorithmSettings' | translate}}">&nbsp;?&nbsp;</span>
         </uib-accordion-heading>
 
         <div ng-if="selectedSamplingMethod.link" class="row pad-bot-10">
@@ -60,7 +60,7 @@
           <i class="pull-left glyphicon pad-right-5 black-button"
              ng-class="{'glyphicon-chevron-down': filesToInclude.open, 'glyphicon-chevron-right': !filesToInclude.open}"></i>
           <translate>analysis.algorithmic.filesToInclude</translate>
-          <span class="badge badge-info" title="{{'analysis.helpAnalysis' | translate}}">&nbsp;?&nbsp;</span>
+          <span class="badge badge-info" title="{{'analysis.algorithmic.helpAdditionalAnalysisFiles' | translate}}">&nbsp;?&nbsp;</span>
         </uib-accordion-heading>
 
         <div class="row pad-bot-10">
@@ -115,7 +115,7 @@
           <i class="pull-left glyphicon pad-right-5 black-button"
              ng-class="{'glyphicon-chevron-down': serverScriptsAccordionOpen, 'glyphicon-chevron-right': !serverScriptAccordionOpen}"></i>
           <translate>analysis.algorithmic.serverScripts</translate>
-          <span class="badge badge-info" title="{{'analysis.helpAnalysis' | translate}}">&nbsp;?&nbsp;</span>
+          <span class="badge badge-info" title="{{'analysis.algorithmic.helpSeverScripts' | translate}}">&nbsp;?&nbsp;</span>
         </uib-accordion-heading>
 
         <div class="row pad-bot-10">
@@ -136,12 +136,13 @@
                     class="glyphicon glyphicon-remove-sign black-button header-text pad-top-25 inline"
                     ng-click="analysis.deleteScript(scriptType)" aria-hidden="true"
                     aria-label="Delete Script"></span>
-              <span class="badge badge-info" title="{{'analysis.helpAnalysis' | translate}}">&nbsp;?&nbsp;</span>
+              <span class="badge badge-info" title="{{analysis.getScriptHelp(scriptType) | translate}}">&nbsp;?&nbsp;</span>
 
             </div>
             <div class="col-sm-6">
               <!-- todo: list of arguments -->
               <label class="medium-label" translate>analysis.algorithmic.args</label>
+              <span class="badge badge-info" title="{{'analysis.algorithmic.helpScriptArguments' | translate}}">&nbsp;?&nbsp;</span>
               <div class="row">
                 <div class="col-sm-10">
                   <div ng-repeat="arg in scriptData.arguments track by $index">

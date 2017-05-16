@@ -21,13 +21,13 @@
   <div class="row">
     <div ng-show="selectedAnalysisType == 'Algorithmic'">
       <div class="col-sm-4 pad-bot-20">
-        <label class="medium-label" translate>analysis.samplingMethod</label>
+        <label class="medium-label" translate>analysis.algorithmicMethod</label>
         <div class="input-group">
           <select class="form-control inline form-control-smaller-width"
                   ng-options="method.name | translate for method in analysis.samplingMethods track by method.id"
                   ng-model="selectedSamplingMethod" ng-change="analysis.setSamplingMethod()"></select>
           <span class="input-group-addon"><span class="badge badge-info"
-                                                title="{{'analysis.helpAnalysis' | translate}}">&nbsp;?&nbsp;</span></span>
+                                                title="{{'analysis.helpAlgorithmicMethod' | translate}}">&nbsp;?&nbsp;</span></span>
         </div>
       </div>
     </div>

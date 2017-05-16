@@ -142,7 +142,8 @@ export default {
     modelToBaseInputsOn: 'Modèle pour les entrées de base activées',
     openstudioMeasures: 'Mesures OpenStudio',
     reportingMeasures: 'Mesures de déclaration',
-    samplingMethod: 'Méthode d\'échantillonnage',
+    algorithmicMethod: 'Algorithmic Method', // TODO
+    helpAlgorithmicMethod: 'Specify the type of algorithm to be used to execute the analysis.', // TODO
     helpAnalysis: 'En mode manuel, les utilisateurs créent des options de mesure et paramètrent à la main différentes alternatives de conception. En mode Algorithmique, les utilisateurs spécifient des plages pour chaque Argument de Mesure. La méthode d\'échantillonnage sélectionnée créera automatiquement une série d\'alternatives de conception pour l\'utilisateur. Le mode manuel est plus utile pour l\'analyse ciblée. Mode algorithmique est plus utile lorsque l\'utilisateur veut explorer un grand nombre de concepts ou veut optimiser pour un certain résultat.',
     helpProjectyMeasuresAndOptions: 'Une mesure est un script qui est utilisé pour modifier un modèle d\'énergie ou créer un rapport sur le modèle. Les mesures peuvent être téléchargées à partir de la bibliothèque de composants de bâtiment (BCL) ou écrites par l\'utilisateur.',
     helpOpenStudioMeasures: 'Une mesure OpenStudio est un script qui modifie le modèle OpenStudio (fichier .osm).',
@@ -164,6 +165,14 @@ export default {
       baselinePerturbation: 'Perturbation de la base de référence'
     },
     algorithmic: {
+      helpAlgorithmSettings: 'These settings control the manner in which the given algorithm is executed. Please see each attribute for further details.', // TODO
+      helpAdditionalAnalysisFiles: '', // TODO
+      helpSeverScripts: 'For advanced use only; not required for general use of the application. If your analysis requires server and worker initialization or finalization scripts, add them here. Note that these scripts will not run on a local server; they can only be run on a cloud server.', // TODO
+      helpServerInitialization: 'A shell script that runs before the analysis is begun. If this script fails the analysis will be automatically set to a completed failed state.', // TODO
+      helpServerFinalization: 'A shell script that runs after the analysis has finished, but before the analysis flag is set to completed. This script is run even if the analysis has failed.', // TODO
+      helpWorkerInitialization: 'A shell script that runs on a worker container before each datapoint is executed.', // TODO
+      helpWorkerFinalization: 'A shell script that runs on a worker container after a datapoint has been executed, even in the datapoint failed.', // TODO
+      helpScriptArguments: 'An array of arguments to pass to the script. Currently these arguments are dynamically parsed, meaning that expressions will be evaluated prior to being passed to the shell script.', // TODO
       algorithmSetting: 'Paramètres de l\'algorithme',
       skipThisMeasure: 'Ignorer cette mesure',
       filesToIncludeMessage: 'Si votre analyse nécessite l\'importation de fichiers supplémentaires sur le serveur, indiquez chaque répertoire à inclure ainsi que le nom du dossier à extraire sur le serveur, ci-dessous.',

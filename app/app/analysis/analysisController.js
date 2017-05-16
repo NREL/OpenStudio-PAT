@@ -1410,5 +1410,25 @@ export class AnalysisController {
     }
   }
 
+  getScriptHelp(scriptType) {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('getScriptHelp: scriptType = ', scriptType);
+
+    if (scriptType == 'server_initialization') {
+      return 'analysis.algorithmic.helpServerInitialization';
+    }
+    else if (scriptType == 'server_finalization') {
+      return 'analysis.algorithmic.helpServerFinalization';
+    }
+    else if(scriptType == 'worker_initialization') {
+      return 'analysis.algorithmic.helpWorkerInitialization';
+    }
+    else if(scriptType == 'worker_finalization') {
+      return 'analysis.algorithmic.helpWorkerFinalization';
+    }
+    else {
+      return 'Error, unsupported script type';
+    }
+  }
 }
 
