@@ -1132,7 +1132,7 @@ export class Project {
       outHash.display_name_short = out.short_name;
       outHash.metadata_id = null; // always null for now.  This is related to DEnCity?
 
-      // ensure name includes 'measure.name .'
+      // ensure name includes 'UpperCamelCase of class_name (which should be same as name)'
       const measureName = _.upperFirst(_.camelCase(out.measure_class_name));
       if (!_.startsWith(out.name, measureName + '.')){
         outHash.name = measureName + '.' + out.name;

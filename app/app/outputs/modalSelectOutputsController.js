@@ -70,8 +70,9 @@ export class ModalSelectOutputsController {
       if (output.newOut){
         // create name and make sure output name includes measure name
         const name = _.snakeCase(output.display_name);
-        if (name.indexOf(vm.$scope.measure.name + '.') == -1) {
-          output.name = vm.$scope.measure.name + '.' + name;
+        const prefix = _.upperFirst(_.camelCase(vm.$scope.measure.measure_class_name));
+        if (name.indexOf(prefix + '.') == -1) {
+          output.name = prefix + '.' + name;
         }
         // TODO: Is this a unique name?
         // add to analysisOutputs
