@@ -645,10 +645,11 @@ export class Project {
             if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' is an ARGUMENT, not variable');
             const argument = vm.makeArgument(arg);
 
-            if (argument.value == '') vm.$log.error(arg.name, ' value is \'\', this will most likely cause errors on server');
+            if ((argument.value == '' || _.isNil(argument.value)) && argument.required) vm.$log.error(arg.name, ' value is \'\', this will most likely cause errors on server');
 
-            // Make sure that argument is "complete"
-            if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value)) {
+            // Make sure that argument is "complete" (for required arguments)
+            // TODO: what happens when an argument is not required but not complete?
+            if (!argument.required || (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value))) {
               var_count += 1;
               m.arguments.push(argument);
               if (vm.Message.showDebug()) vm.$log.debug('argument: ', argument);
@@ -897,7 +898,8 @@ export class Project {
             if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' treated as ARGUMENT');
             const argument = vm.makeArgument(arg);
             // Make sure that argument is "complete"
-            if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value)) {
+            // TODO: what if it is optional but not "complete" (display name missing for example)?  do a better check here?
+            if (!argument.required || (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value))) {
               var_count += 1;
               m.arguments.push(argument);
             } else {
@@ -1178,11 +1180,17 @@ export class Project {
     argument.name = arg.name;
     argument.value_type = vm.convertType(arg.type);
     argument.default_value = arg.default_value;
-    if (vm.analysisType == 'Manual')
-      argument.value = !_.isNil(arg.option_1) ? arg.option_1 : arg.default_value;
-    else
+    if (vm.analysisType == 'Manual') {
+      if (argument.required) {
+        argument.value = !_.isNil(arg.option_1) ? arg.option_1 : arg.default_value;
+      } else {
+        // if optional and empty string (''), set to null (it was probably set to '' artificially by analysis controller
+        // TODO might have to fix this - check if can handle this in OSA
+        argument.value = arg.option_1 == '' || _.isNil(arg.option_1) ? null : arg.option_1;
+      }
+    } else {
       argument.value = (arg.inputs && !_.isNil(arg.inputs.default_value)) ? arg.inputs.default_value : arg.default_value;
-
+    }
     // ** copy value to default_value if no default_value is present
     if (_.isNil(argument.default_value) || argument.default_value == ''){
       argument.default_value = argument.value;
