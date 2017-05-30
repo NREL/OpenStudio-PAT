@@ -770,7 +770,7 @@ export class Project {
             v.minimum = arg.minimum;  // TODO: must be alphabetically ordered if string, otherwise standard order (pick from option values mean must be btw min and max, and max > min)
             v.maximum = arg.maximum;  // TODO: must be alphabetically ordered
             v.relation_to_output = null;
-            v.static_value = arg.default_value;
+            v.static_value = v.argument.value;
             v.uuid = '';
             v.version_uuid = '';
             v.variable = true; // this is always true
@@ -934,7 +934,7 @@ export class Project {
             v.minimum = arg.inputs.minimum;
             v.maximum = arg.inputs.maximum;
             v.relation_to_output = arg.relationship;
-            v.static_value = arg.default_value;
+            v.static_value = v.argument.value;
             v.uuid = '';
             v.version_uuid = '';
             if (arg.inputs.variableSetting == 'Pivot') {
@@ -945,7 +945,6 @@ export class Project {
             v.uncertainty_description = {};
             // pivots can be discrete or integer_sequence_uncertain (handled in analysis controller)
             // options are triangle, uniform, discrete, and normal, integer_sequence_uncertain
-            // TODO what about pivots?
             if ((arg.inputs.variableSetting == 'Discrete' || arg.inputs.variableSetting == 'Pivot') && arg.inputs.distribution != 'Integer Sequence') {
               v.uncertainty_description.type = 'discrete';
             } else {
@@ -969,8 +968,6 @@ export class Project {
             } else {
               v.uncertainty_description.attributes.push({name: 'modes', value: arg.inputs.mean}); // mean
             }
-
-
 
             v.uncertainty_description.attributes.push({name: 'delta_x', value: arg.inputs.deltaX}); // delta x
             v.uncertainty_description.attributes.push({name: 'stddev', value: arg.inputs.stdDev});  // std dev
