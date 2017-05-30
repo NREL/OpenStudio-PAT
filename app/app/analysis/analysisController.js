@@ -1408,7 +1408,7 @@ export class AnalysisController {
 
   getScriptHelp(scriptType) {
     const vm = this;
-    if (vm.Message.showDebug()) vm.$log.debug('getScriptHelp: scriptType = ', scriptType);
+    // if (vm.Message.showDebug()) vm.$log.debug('getScriptHelp: scriptType = ', scriptType);
 
     if (scriptType == 'server_initialization') {
       return 'analysis.algorithmic.helpServerInitialization';
