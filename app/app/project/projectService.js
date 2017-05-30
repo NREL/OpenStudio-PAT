@@ -894,16 +894,19 @@ export class Project {
         // This portion only has arguments that don't have the variable box checked
         _.forEach(measure.arguments, (arg) => {
           // if argument is set to 'Argument' or if the variable setting is not supported by selected algorithm
-          if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
-            if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' treated as ARGUMENT');
-            const argument = vm.makeArgument(arg);
-            // Make sure that argument is "complete"
-            // TODO: what if it is optional but not "complete" (display name missing for example)?  do a better check here?
-            if (!argument.required || (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value))) {
-              var_count += 1;
-              m.arguments.push(argument);
-            } else {
-              vm.$log.error('Not pushing partial argument to json.  Fix partial arg: ', argument);
+          // also remove special row IDs if they are there
+          if (_.isUndefined(arg.specialRowId) || (angular.isDefined(arg.specialRowId) && arg.specialRowId.length === 0)){
+            if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
+              if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' treated as ARGUMENT');
+              const argument = vm.makeArgument(arg);
+              // Make sure that argument is "complete"
+              // TODO: what if it is optional but not "complete" (display name missing for example)?  do a better check here?
+              if (!argument.required || (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value))) {
+                var_count += 1;
+                m.arguments.push(argument);
+              } else {
+                vm.$log.error('Not pushing partial argument to json.  Fix partial arg: ', argument);
+              }
             }
           }
         });
