@@ -73,6 +73,7 @@ export class OutputsController {
 
   }
 
+
   setOutputMeasures() {
     const vm = this;
     if (!vm.$scope.outputMeasures) {
@@ -113,6 +114,15 @@ export class OutputsController {
       }
     });
 
+    // initialize visualize keys to true if undefined (for older PAT projects)
+    _.forEach(vm.$scope.measures, (measure) => {
+      if (!_.isNil(measure.analysisOutputs)) {
+        _.forEach(measure.analysisOutputs, (out) => {
+          if (_.isNil(out.visualize)) out.visualize = 'true';
+        });
+      }
+    });
+
     if (vm.Message.showDebug()) vm.$log.debug('Output Measures: ', vm.$scope.outputMeasures);
 
   }
@@ -138,6 +148,8 @@ export class OutputsController {
 
       if (measure.analysisOutputs == undefined) measure.analysisOutputs = [];
       if (vm.Message.showDebug()) vm.$log.debug('measure: ', measure);
+
+
 
       vm.$scope.gridOptions[measure.name] = {
         data: 'measure.analysisOutputs',

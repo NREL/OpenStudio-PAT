@@ -58,6 +58,7 @@ export class ModalSelectOutputsController {
     _.forEach(vm.$scope.measure.outputs, (output) => {
       if (output.checked && !_.find(vm.$scope.measure.analysisOutputs, {display_name: output.display_name})){
         // add
+        output.visualize = 'true'; // default to true
         vm.$scope.measure.analysisOutputs.push(output);
       } else if (!output.checked && _.find(vm.$scope.measure.analysisOutputs, {display_name: output.display_name})) {
         // remove
@@ -78,6 +79,7 @@ export class ModalSelectOutputsController {
         // add to analysisOutputs
         output.display_name = output.display_name ? output.display_name : output.display_name;
         output.short_name = output.short_name ? output.short_name : _.snakeCase(output.display_name);
+        output.visualize = 'true';  // default to true
         vm.$scope.measure.analysisOutputs.push(output);
         output.newOut = false;
       }
