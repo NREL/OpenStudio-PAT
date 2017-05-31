@@ -647,14 +647,17 @@ export class Project {
 
             if ((argument.value == '' || _.isNil(argument.value)) && argument.required) vm.$log.error(arg.name, ' value is \'\', this will most likely cause errors on server');
 
-            // Make sure that argument is "complete" (for required arguments)
-            // TODO: what happens when an argument is not required but not complete?
-            if (!argument.required || (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value))) {
+            if (!argument.required && (argument.value == '' || _.isNil(argument.value))){
+              // don't send optional incomplete/null arguments
+              vm.$log.info('Info: Not pushing optional argument ', argument.display_name, ' to json because it is not set.');
+            }
+            else if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value)) {
+              // make sure argument is complete
               var_count += 1;
               m.arguments.push(argument);
               if (vm.Message.showDebug()) vm.$log.debug('argument: ', argument);
             } else {
-              vm.$log.error('Not pushing partial arg to json. Fix partial arg: ', argument);
+              vm.$log.error('Not pushing partial argument to json. Fix partial argument: ', argument);
             }
           }
         });
@@ -899,13 +902,17 @@ export class Project {
             if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
               if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' treated as ARGUMENT');
               const argument = vm.makeArgument(arg);
+              if (!argument.required && (argument.value == '' || _.isNil(argument.value))){
+                // don't send optional incomplete/null arguments
+                vm.$log.info('Info: Not pushing optional argument ', argument.display_name, ' to json because it is not set.');
+              }
               // Make sure that argument is "complete"
               // TODO: what if it is optional but not "complete" (display name missing for example)?  do a better check here?
-              if (!argument.required || (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value))) {
+              if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value)) {
                 var_count += 1;
                 m.arguments.push(argument);
               } else {
-                vm.$log.error('Not pushing partial argument to json.  Fix partial arg: ', argument);
+                vm.$log.error('Not pushing partial argument to json.  Fix partial argument: ', argument);
               }
             }
           }
