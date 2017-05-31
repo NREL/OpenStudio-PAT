@@ -136,6 +136,7 @@ export class AnalysisController {
       let distributions = [];
       switch (vm.$scope.selectedSamplingMethod.id) {
         case 'diag':
+        case 'lhs':
           distributions = ['Discrete', 'Integer Sequence'];
           break;
         default:
@@ -1196,7 +1197,7 @@ export class AnalysisController {
 
   showDiscreteDistributions() {
     const vm = this;
-    if (_.includes(['diag'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['diag', 'lhs'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDiscreteDistributions = true;
     } else {
       vm.$scope.showDiscreteDistributions = false;
