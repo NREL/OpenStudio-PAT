@@ -57,6 +57,7 @@ import { ModalEditOptionDescriptionController } from '../app/analysis/modalEditO
 import { ModalNewClusterController } from '../app/run/modalNewClusterController';
 import { ModalNewAwsCredentialsController } from '../app/run/modalNewAwsCredentialsController';
 import { ModalAwsWarningController } from '../app/run/modalAwsWarningController';
+import { ModalOsaErrorsController } from '../app/run/modalOsaErrorsController';
 import { ModalCloudRunningController } from '../app/run/modalCloudRunningController';
 import { NavController } from '../app/nav/navController';
 import { OsServer } from '../app/project/osServerService';
@@ -98,6 +99,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalNewClusterController', ModalNewClusterController)
   .controller('ModalNewAwsCredentialsController', ModalNewAwsCredentialsController)
   .controller('ModalAwsWarningController', ModalAwsWarningController)
+  .controller('ModalOsaErrorsController', ModalOsaErrorsController)
   .controller('ModalCloudRunningController', ModalCloudRunningController)
   .controller('AnalysisController', AnalysisController)
   .controller('DesignAlternativesController', DesignAlternativesController)

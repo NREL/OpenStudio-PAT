@@ -427,6 +427,10 @@ export default {
       message: 'The user assumes all responsibility for orphaned EC2 processes.  It is strongly recommended that you monitor EC2 cloud usage in the Amazon AWS Console to avoid any unwanted charges.',
       agree: 'I agree'
     },
+    modalOsaErrors: {
+      title: 'OSA Errors',
+      message: 'The following errors were encountered while generating the OSA and must be fixed before the project can be run successfully.'
+    },
     modalCloudRunning: {
       title: 'Cloud Cluster is Running',
       message: 'You are still connected to AWS. Terminate the cluster?',

@@ -348,6 +348,30 @@ export class RunController {
     return deferred.promise;
   }
 
+  osaErrorsModal(errors) {
+    const vm = this;
+    // const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalOsaErrorsController',
+      controllerAs: 'modal',
+      templateUrl: 'app/run/osaErrors.html',
+      windowClass: 'wide-modal',
+      resolve: {
+        params: function () {
+          return {
+            errors: errors
+          };
+        }
+      }
+    });
+
+    // modalInstance.result.then(() => {
+    //   deferred.resolve('resolved');
+    // });
+    // return deferred.promise;
+  }
+
   checkIfClusterIsRunning() {
     const vm = this;
     // reset to terminated (while cluster is checked)
@@ -1024,9 +1048,17 @@ export class RunController {
         vm.toggleButtons();
 
       });
-    }, () => {
+    }, (errors) => {
       // error exporting OSA
-      vm.$log.error('Error exporting OSA');
+      vm.OsServer.setProgress(25, 'OSA export error');
+      vm.$log.error('Error(s) exporting OSA');
+      vm.OsServer.setAnalysisStatus('');
+      vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();
+      vm.toggleButtons();
+
+      // display errors in modal
+      vm.osaErrorsModal(errors);
+
     });
 
 

@@ -410,6 +410,7 @@ export class Project {
   // export OSA
   exportOSA(selectedOnly = false) {
     const vm = this;
+    vm.osaErrors = [];
     const deferred = vm.$q.defer();
 
     if (vm.Message.showDebug()) vm.$log.debug('In Project::exportOSA');
@@ -425,68 +426,73 @@ export class Project {
       vm.exportAlgorithmic();
     }
 
-    // export serverScripts
-    vm.exportScripts();
+    // reject if there are errors in osa
+    if (vm.osaErrors.length > 0){
+      deferred.reject(vm.osaErrors);
+    } else {
+      // export serverScripts
+      vm.exportScripts();
 
-    // write to file
-    const filename = vm.projectDir.path(vm.projectName + '.json');
-    vm.jetpack.write(filename, vm.osa);
-    if (vm.Message.showDebug()) vm.$log.debug('Project OSA file exported to ' + filename);
+      // write to file
+      const filename = vm.projectDir.path(vm.projectName + '.json');
+      vm.jetpack.write(filename, vm.osa);
+      if (vm.Message.showDebug()) vm.$log.debug('Project OSA file exported to ' + filename);
 
-    const output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
-    const archive = vm.archiver('zip');
+      const output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
+      const archive = vm.archiver('zip');
 
-    output.on('close', function () {
-      console.log(archive.pointer() + ' total bytes');
-      console.log('archiver has been finalized and the output file descriptor has closed.');
-      deferred.resolve();
-    });
+      output.on('close', function () {
+        console.log(archive.pointer() + ' total bytes');
+        console.log('archiver has been finalized and the output file descriptor has closed.');
+        deferred.resolve();
+      });
 
-    archive.on('error', function (err) {
-      deferred.reject();
-      throw err;
-    });
+      archive.on('error', function (err) {
+        deferred.reject();
+        throw err;
+      });
 
-    archive.pipe(output);
+      archive.pipe(output);
 
-    archive.bulk([
-      {expand: true, cwd: vm.projectMeasuresDir.path(), src: ['**'], dest: 'measures/'}
-    ]);
+      archive.bulk([
+        {expand: true, cwd: vm.projectMeasuresDir.path(), src: ['**'], dest: 'measures/'}
+      ]);
 
-    archive.bulk([
-      {expand: true, cwd: vm.seedDir.path(), src: ['**'], dest: 'seeds/'}
-    ]);
+      archive.bulk([
+        {expand: true, cwd: vm.seedDir.path(), src: ['**'], dest: 'seeds/'}
+      ]);
 
-    archive.bulk([
-      {expand: true, cwd: vm.weatherDir.path(), src: ['**'], dest: 'weather/'}
-    ]);
+      archive.bulk([
+        {expand: true, cwd: vm.weatherDir.path(), src: ['**'], dest: 'weather/'}
+      ]);
 
-    // add server scripts (if they exist)
-    _.forEach(vm.serverScripts, (script, type) => {
-      if (script.file) {
-        archive.bulk([
-          {expand: true, cwd: vm.projectDir.path('scripts', type), src: ['**'], dest: 'scripts/' + type}
-        ]);
-      }
-    });
-
-    // add files to include
-    _.forEach(vm.filesToInclude, (file) => {
-      if (file.dirToInclude) {
-
-        if (!file.unpackDirName) {
-          // use same name if no name is provided
-          file.unpackDirName = file.dirToInclude.replace(/^.*[\\\/]/, '');
+      // add server scripts (if they exist)
+      _.forEach(vm.serverScripts, (script, type) => {
+        if (script.file) {
+          archive.bulk([
+            {expand: true, cwd: vm.projectDir.path('scripts', type), src: ['**'], dest: 'scripts/' + type}
+          ]);
         }
-        const absPath = path.resolve(vm.projectDir.path(), file.dirToInclude);
-        if (vm.Message.showDebug()) vm.$log.debug('RESOLVED PATH: ', absPath, ' unpack DIR: ', file.unpackDirName);
-        archive.bulk([
-          {expand: true, cwd: absPath, src: ['**'], dest: 'lib/' + file.unpackDirName}
-        ]);
-      }
-    });
+      });
 
-    archive.finalize();
+      // add files to include
+      _.forEach(vm.filesToInclude, (file) => {
+        if (file.dirToInclude) {
+
+          if (!file.unpackDirName) {
+            // use same name if no name is provided
+            file.unpackDirName = file.dirToInclude.replace(/^.*[\\\/]/, '');
+          }
+          const absPath = path.resolve(vm.projectDir.path(), file.dirToInclude);
+          if (vm.Message.showDebug()) vm.$log.debug('RESOLVED PATH: ', absPath, ' unpack DIR: ', file.unpackDirName);
+          archive.bulk([
+            {expand: true, cwd: absPath, src: ['**'], dest: 'lib/' + file.unpackDirName}
+          ]);
+        }
+      });
+
+      archive.finalize();
+    }
 
     return deferred.promise;
   }
@@ -526,6 +532,7 @@ export class Project {
 
   exportManual(selectedOnly = false) {
     const vm = this;
+
     if (vm.Message.showDebug()) vm.$log.debug('In Project::exportManual');
     if (vm.Message.showDebug()) vm.$log.debug('selectedONly? ', selectedOnly);
 
@@ -645,19 +652,25 @@ export class Project {
             if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' is an ARGUMENT, not variable');
             const argument = vm.makeArgument(arg);
 
-            if ((argument.value == '' || _.isNil(argument.value)) && argument.required) vm.$log.error(arg.name, ' value is \'\', this will most likely cause errors on server');
+            if ((argument.value == '' || _.isNil(argument.value)) && arg.required) {
+              vm.$log.error(arg.name, ' value is \'\', this will most likely cause errors on server');
+              vm.osaErrors.push(`measure '${measure.display_name}' required argument '${arg.name}' value is nil or blank`);
+            }
 
-            if (!argument.required && (argument.value == '' || _.isNil(argument.value))){
+            if (!arg.required && (argument.value == '' || _.isNil(argument.value))){
               // don't send optional incomplete/null arguments
               vm.$log.info('Info: Not pushing optional argument ', argument.display_name, ' to json because it is not set.');
             }
-            else if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value)) {
+            else if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.value)) {
               // make sure argument is complete
               var_count += 1;
               m.arguments.push(argument);
               if (vm.Message.showDebug()) vm.$log.debug('argument: ', argument);
             } else {
               vm.$log.error('Not pushing partial argument to json. Fix partial argument: ', argument);
+              if (!argument.display_name || !argument.display_name_short || !argument.name || !argument.value_type){
+                vm.osaErrors.push(`measure '${measure.display_name}' argument '${arg.name}' is missing a value for display_name, display_name_short, name, or value_type`);
+              }
             }
           }
         });
@@ -728,6 +741,7 @@ export class Project {
                   // check that you have a value here...if not error
                   if (_.isNil(arg[option_id])) {
                     vm.$log.error('Option: ', option_name, 'for argument: ', arg.name, ' in measure: ', measure.display_name, ' does not have a value. Analysis will error.');
+                    vm.osaErrors.push(`Measure '${measure.display_name}' argument '${arg.name}' does not have a value for option '${option_name}'`);
                   }
                   valArr.push({value: arg[option_id], weight: 1 / DAlength});
                 }
@@ -844,9 +858,10 @@ export class Project {
       if (vm.Message.showDebug()) vm.$log.debug('GROUPS: ', groups);
       if (groups.length < 2) {
         vm.$log.error('This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully.');
-        vm.$translate('toastr.objFunctionGroupError').then(translation => {
-          vm.toastr.warning(translation);
-        });
+        vm.osaErrors.push('This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully');
+        // vm.$translate('toastr.objFunctionGroupError').then(translation => {
+        //   vm.toastr.warning(translation);
+        // });
       }
 
     }
@@ -902,17 +917,24 @@ export class Project {
             if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
               if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' treated as ARGUMENT');
               const argument = vm.makeArgument(arg);
-              if (!argument.required && (argument.value == '' || _.isNil(argument.value))){
+              if ((argument.value == '' || _.isNil(argument.value)) && arg.required) {
+                vm.$log.error(arg.name, ' value is \'\', this will most likely cause errors on server');
+                vm.osaErrors.push(`measure '${measure.display_name}' required argument '${arg.name}' value is nil or blank`);
+              }
+
+              if (!arg.required && (argument.value == '' || _.isNil(argument.value))){
                 // don't send optional incomplete/null arguments
                 vm.$log.info('Info: Not pushing optional argument ', argument.display_name, ' to json because it is not set.');
               }
-              // Make sure that argument is "complete"
-              // TODO: what if it is optional but not "complete" (display name missing for example)?  do a better check here?
-              if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.default_value) && !_.isNil(argument.value)) {
+              else if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.value)) {
+                // Make sure that argument is "complete"
                 var_count += 1;
                 m.arguments.push(argument);
               } else {
                 vm.$log.error('Not pushing partial argument to json.  Fix partial argument: ', argument);
+                if (!argument.display_name || !argument.display_name_short || !argument.name || !argument.value_type){
+                  vm.osaErrors.push(`measure '${measure.display_name}' argument '${arg.name}' is missing a value for display_name, display_name_short, name, or value_type`);
+                }
               }
             }
           }
@@ -1001,9 +1023,10 @@ export class Project {
     if (analysis_variables < 2 && ['nsga_nrel', 'doe'].indexOf(vm.samplingMethod.id) != -1) {
 
       vm.$log.error('This algorithm needs at least 2 variables defined on the analysis tab to run successfully.');
-      vm.$translate('toastr.numberVariablesError').then(translation => {
-        vm.toastr.warning(translation);
-      });
+      vm.osaErrors.push('This algorithm needs at least 2 variables defined on the analysis tab to run successfully');
+      // vm.$translate('toastr.numberVariablesError').then(translation => {
+      //   vm.toastr.warning(translation);
+      // });
     }
   }
 
@@ -1188,7 +1211,7 @@ export class Project {
     argument.value_type = vm.convertType(arg.type);
     argument.default_value = arg.default_value;
     if (vm.analysisType == 'Manual') {
-      if (argument.required) {
+      if (arg.required) {
         argument.value = !_.isNil(arg.option_1) ? arg.option_1 : arg.default_value;
       } else {
         // if optional and empty string (''), set to null (it was probably set to '' artificially by analysis controller

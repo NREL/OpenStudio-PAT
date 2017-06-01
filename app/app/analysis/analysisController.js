@@ -314,7 +314,6 @@ export class AnalysisController {
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.instanceId] = gridApi;
           gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
-            if (vm.Message.showDebug()) vm.$log.debug('HI!');
             if (newValue != oldValue) {
               // if (vm.Message.showDebug()) vm.$log.debug('CELL has changed in: ', measure.instanceId, ' old val: ', oldValue, ' new val: ', newValue);
               if (vm.Message.showDebug()) vm.$log.debug('rowEntity: ', rowEntity);

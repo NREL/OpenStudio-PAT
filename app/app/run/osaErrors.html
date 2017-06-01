@@ -1,0 +1,18 @@
+<div class="modal-header">
+  <h3 class="modal-title" translate>run.modalOsaErrors.title</h3>
+</div>
+
+<div class="modal-body">
+  <div class="row pad-bot-10">
+    <div class="col-sm-12 modal-text bold"><translate>run.modalOsaErrors.message</translate></div>
+  </div>
+  <div class="row pad-bot-10">
+    <div class="col-sm-12 modal-text" ng-repeat="err in errors">
+        {{err}}
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
+</div>
