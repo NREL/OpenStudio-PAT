@@ -652,12 +652,12 @@ export class Project {
             if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' is an ARGUMENT, not variable');
             const argument = vm.makeArgument(arg);
 
-            if ((argument.value == '' || _.isNil(argument.value)) && arg.required) {
+            if ((argument.value === '' || _.isNil(argument.value)) && arg.required) {
               vm.$log.error(arg.name, ' value is \'\', this will most likely cause errors on server');
               vm.osaErrors.push(`measure '${measure.display_name}' required argument '${arg.name}' value is nil or blank`);
             }
 
-            if (!arg.required && (argument.value == '' || _.isNil(argument.value))){
+            if (!arg.required && (argument.value === '' || _.isNil(argument.value))){
               // don't send optional incomplete/null arguments
               vm.$log.info('Info: Not pushing optional argument ', argument.display_name, ' to json because it is not set.');
             }
@@ -917,12 +917,12 @@ export class Project {
             if ((!arg.inputs || !arg.inputs.variableSetting || arg.inputs.variableSetting == 'Argument') || (arg.inputs.showWarningIcon)) {
               if (vm.Message.showDebug()) vm.$log.debug(arg.name, ' treated as ARGUMENT');
               const argument = vm.makeArgument(arg);
-              if ((argument.value == '' || _.isNil(argument.value)) && arg.required) {
-                vm.$log.error(arg.name, ' value is \'\', this will most likely cause errors on server');
-                vm.osaErrors.push(`measure '${measure.display_name}' required argument '${arg.name}' value is nil or blank`);
+              if ((argument.value === '' || _.isNil(argument.value)) && arg.required) {
+                vm.$log.error(arg.name, ' value is \'\', this will most likely cause errors on server. value is: ', argument.value);
+                vm.osaErrors.push(`measure '${measure.display_name}' required argument '${arg.name}' value is nil or blank.  value: ${argument.value}, blank?: ${argument.value == ''}, nil? ${_.isNil(argument.value)}`);
               }
 
-              if (!arg.required && (argument.value == '' || _.isNil(argument.value))){
+              if (!arg.required && (argument.value === '' || _.isNil(argument.value))){
                 // don't send optional incomplete/null arguments
                 vm.$log.info('Info: Not pushing optional argument ', argument.display_name, ' to json because it is not set.');
               }
@@ -1216,13 +1216,18 @@ export class Project {
       } else {
         // if optional and empty string (''), set to null (it was probably set to '' artificially by analysis controller
         // TODO might have to fix this - check if can handle this in OSA
-        argument.value = arg.option_1 == '' || _.isNil(arg.option_1) ? null : arg.option_1;
+        argument.value = arg.option_1 === '' || _.isNil(arg.option_1) ? null : arg.option_1;
       }
     } else {
-      argument.value = (arg.inputs && !_.isNil(arg.inputs.default_value)) ? arg.inputs.default_value : arg.default_value;
+      if (arg.required){
+        argument.value = (arg.inputs && !_.isNil(arg.inputs.default_value)) ? arg.inputs.default_value : arg.default_value;
+      } else {
+        // if optional and empty string st to null
+        argument.value = arg.inputs && !_.isNil(arg.inputs.default_value) ? arg.inputs.default_value : null;
+      }
     }
     // ** copy value to default_value if no default_value is present
-    if (_.isNil(argument.default_value) || argument.default_value == ''){
+    if (_.isNil(argument.default_value) || argument.default_value === ''){
       argument.default_value = argument.value;
     }
 
