@@ -54,6 +54,7 @@ import { ModalClearDatapointController } from '../app/design_alts/modalClearData
 import { ModalSelectOutputsController } from '../app/outputs/modalSelectOutputsController';
 import { ModalSelectOptionsController } from '../app/analysis/modalSelectOptionsController';
 import { ModalEditOptionDescriptionController } from '../app/analysis/modalEditOptionDescriptionController';
+import { ModalDeleteMeasureController } from '../app/analysis/modalDeleteMeasureController';
 import { ModalNewClusterController } from '../app/run/modalNewClusterController';
 import { ModalNewAwsCredentialsController } from '../app/run/modalNewAwsCredentialsController';
 import { ModalAwsWarningController } from '../app/run/modalAwsWarningController';
@@ -94,6 +95,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalSelectOutputsController', ModalSelectOutputsController)
   .controller('ModalSelectOptionsController', ModalSelectOptionsController)
   .controller('ModalEditOptionDescriptionController', ModalEditOptionDescriptionController)
+  .controller('ModalDeleteMeasureController', ModalDeleteMeasureController)
   .controller('ModalClearResultsController', ModalClearResultsController)
   .controller('ModalClearDatapointController', ModalClearDatapointController)
   .controller('ModalNewClusterController', ModalNewClusterController)
