@@ -33,12 +33,13 @@ const {dialog} = remote;
 
 export class AnalysisController {
 
-  constructor($log, $q, BCL, Project, $scope, $document, $uibModal, toastr, Message, $translate) {
+  constructor($log, $q, BCL, Project, SetProject, $scope, $document, $uibModal, toastr, Message, $translate) {
     'ngInject';
 
     const vm = this;
     vm.toastr = toastr;
     vm.Project = Project;
+    vm.SetProject = SetProject;
     vm.$log = $log;
     vm.$q = $q;
     vm.$uibModal = $uibModal;
@@ -448,29 +449,48 @@ export class AnalysisController {
   removeMeasure(measure) {
     const vm = this;
     vm.setIsModified();
-    vm.updateAlternatives(measure.name);
 
-    if (vm.Message.showDebug()) vm.$log.debug('Deleting measure: ', measure);
+    // open modal for user to ok deleting measure
+    // and saving project.
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalDeleteMeasureController',
+      controllerAs: 'modal',
+      templateUrl: 'app/analysis/delete_measure.html'
+    });
 
-    // line below also removes it from bclService 'getProjectMeasures'
-    _.remove(vm.$scope.measures, {instanceId: measure.instanceId});
-    vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+    modalInstance.result.then(() => {
 
-    const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.instanceId + '"]'));
-    measurePanel.remove();
+      vm.updateAlternatives(measure.name);
 
-    // Note: jetpack.remove() does not have any return
-    // only remove if there are no other measures pointing to this location
-    const copies = _.find(vm.$scope.measures, {measure_dir: measure.measure_dir});
-    if (!copies) {
-      // can delete from disk
-      vm.jetpack.remove(measure.measure_dir);
-    }
+      if (vm.Message.showDebug()) vm.$log.debug('Deleting measure: ', measure);
 
-    // recalculate workflow indexes
-    vm.Project.recalculateMeasureWorkflowIndexes();
+      // line below also removes it from bclService 'getProjectMeasures'
+      _.remove(vm.$scope.measures, {instanceId: measure.instanceId});
+      vm.Project.setMeasuresAndOptions(vm.$scope.measures);
 
-    vm.initializeTab();
+      const measurePanel = angular.element(vm.$document[0].querySelector('div[id="' + measure.instanceId + '"]'));
+      measurePanel.remove();
+
+      // Note: jetpack.remove() does not have any return
+      // only remove if there are no other measures pointing to this location
+      const copies = _.find(vm.$scope.measures, {measure_dir: measure.measure_dir});
+      if (!copies) {
+        // can delete from disk
+        vm.jetpack.remove(measure.measure_dir);
+      }
+
+      // recalculate workflow indexes
+      vm.Project.recalculateMeasureWorkflowIndexes();
+
+      vm.SetProject.saveProject();
+
+      vm.initializeTab();
+
+    }, () => {
+      // Modal canceled
+    });
+
   }
 
   addMeasureOption(measure) {

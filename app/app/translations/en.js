@@ -152,6 +152,10 @@ export default {
     helpOpenStudioMeasures: 'An OpenStudio Measure is a script that modifies the OpenStudio model (.osm file).',
     helpEnergyPlusMeasures: 'An EnergyPlus Measure is a script that modifies the EnergyPlus model (.idf file).  This happens after the OpenStudio model (.osm) is translated to EnergyPlus format (.idf).  EnergyPlus Measures are typically used to add objects that are not yet supported by OpenStudio to the input file.',
     helpReportingMeasures: 'A Reporting Measure is a script that creates a report describing some aspect of the or the simulation results.  These Measures have access to the OpenStudio model, the EnergyPlus IDF, and the simulation results.',
+    modalDeleteMeasure: {
+      title: 'Delete Measure',
+      message: 'Are you sure you want to delete this measure? Deleting this measure will result in the automatic saving of this project.'
+    },
     type: {
       diagonal: 'Diagonal',
       nsga2: 'Nondominated Sorting Genetic Algorithm 2 (NSGA2)',
