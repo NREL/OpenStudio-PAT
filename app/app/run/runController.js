@@ -194,7 +194,18 @@ export class RunController {
     const vm = this;
     const alternatives = vm.Project.getDesignAlternatives();
 
+
     if (vm.$scope.selectedAnalysisType == 'Manual') {
+
+      // if you find duplicates by name, clear everything
+      let uniqDBs = _.uniqBy(vm.$scope.datapoints, 'name');
+      // if (vm.Message.showDebug()) vm.$log.debug('UNIQUE DBS: ', uniqDBs);
+      if (uniqDBs.length !== vm.$scope.datapoints.length) {
+        if (vm.Message.showDebug()) vm.$log.debug("Datapoint duplicates found! This is caused by an older/corrupted PAT project.  To fix this issue, datapoints will be cleared.  Datapoints: ", vm.$scope.datapoints);
+        vm.Project.setDatapoints([]);
+        vm.$scope.datapoints = vm.Project.getDatapoints();
+      }
+
       // ensure that current datapoints have an ID (backward compatible)
       _.forEach(vm.$scope.datapoints, (dp) => {
         if (_.isNil(dp.id)) {
@@ -226,6 +237,7 @@ export class RunController {
           vm.$scope.datapoints.splice(index, 1);
         }
       });
+
     }
 
     if (vm.Message.showDebug()) vm.$log.debug("Datapoints after SetUp: ", vm.$scope.datapoints);
