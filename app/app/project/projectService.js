@@ -1006,7 +1006,9 @@ export class Project {
 
             v.workflow_index = var_count;
             var_count += 1;
-            analysis_variables += 1;
+            if (v.variable_type == 'variable'){
+              analysis_variables += 1;
+            }
             m.variables.push(v);
           }
         });
