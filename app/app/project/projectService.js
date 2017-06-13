@@ -56,6 +56,8 @@ export class Project {
 
     vm.analysisTypes = ['Manual', 'Algorithmic'];
 
+    vm.numberDPsToDisplay = 150;
+
     vm.reportTypes = [{
       id: 'Calibration Report',
       name: 'reports.type.calibrationReport'
@@ -1539,6 +1541,11 @@ export class Project {
   setMeasuresDir(strPath) {
     const vm = this;
     vm.myMeasuresDir = vm.jetpack.cwd(strPath);
+  }
+
+  getNumberDPsToDisplay() {
+    const vm = this;
+    return vm.numberDPsToDisplay;
   }
 
   getSeedDir() {

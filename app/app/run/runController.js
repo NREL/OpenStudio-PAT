@@ -50,6 +50,8 @@ export class RunController {
     vm.$sce = $sce;
     vm.Message = Message;
 
+    vm.$scope.numberDPsToDisplay = vm.Project.getNumberDPsToDisplay();
+
     vm.runTypes = vm.Project.getRunTypes();
     vm.$scope.selectedRunType = vm.Project.getRunType();
     vm.$scope.analysisID = vm.Project.getAnalysisID();
@@ -136,6 +138,10 @@ export class RunController {
 
     vm.$scope.atLeastOneModified = function () {
       return _.filter(vm.$scope.datapoints, {modified: true}).length > 0;
+    };
+
+    vm.$scope.numDatapointsByType = function(type) {
+      return _.filter(vm.$scope.datapoints, {status: type}).length;
     };
 
     vm.$scope.resultsExist = function () {
@@ -382,6 +388,51 @@ export class RunController {
     //   deferred.resolve('resolved');
     // });
     // return deferred.promise;
+  }
+
+  // types:  'osm, results'
+  largeDownloadModal(type) {
+    const vm = this;
+    const deferred = vm.$q.defer();
+
+    if (vm.Message.showDebug()) vm.$log.debug('in Large Download Modal');
+    if (vm.Message.showDebug()) vm.$log.debug(vm.$scope.datapoints.length, vm.$scope.numberDPsToDisplay);
+
+    if (vm.$scope.datapoints.length > vm.$scope.numberDPsToDisplay){
+      // large download
+      const modalInstance = vm.$uibModal.open({
+        backdrop: 'static',
+        controller: 'ModalLargeDownloadController',
+        controllerAs: 'modal',
+        templateUrl: 'app/run/largeDownload.html'
+      });
+
+      modalInstance.result.then(() => {
+        deferred.resolve('resolve');
+        // download
+        if (type === 'osm'){
+          // osm only
+          vm.downloadAllOSMs();
+        } else {
+          // all results
+          vm.downloadAllResults();
+        }
+      }, () => {
+        // Modal canceled
+        deferred.reject('rejected');
+      });
+    } else {
+      // not too large download
+      if (type === 'osm'){
+        // osm only
+        vm.downloadAllOSMs();
+      } else {
+        // all results
+        vm.downloadAllResults();
+      }
+    }
+
+    return deferred.promise;
   }
 
   checkIfClusterIsRunning() {
@@ -655,8 +706,9 @@ export class RunController {
   }
 
   calculateWarnings(dp) {
-    let warn = 0;
+    let warn = undefined;
     if (_.get(dp, 'steps')) {
+      warn = 0;
       _.forEach(dp.steps, step => {
         if (_.get(step, 'result.step_warnings'))
           warn = warn + step.result.step_warnings.length;
@@ -666,8 +718,9 @@ export class RunController {
   }
 
   calculateErrors(dp) {
-    let err = 0;
+    let err = undefined;
     if (_.get(dp, 'steps')) {
+      err = 0;
       _.forEach(dp.steps, step => {
         if (_.get(step, 'result.step_errors'))
           err = err + step.result.step_errors.length;
@@ -677,8 +730,9 @@ export class RunController {
   }
 
   calculateNAs(dp) {
-    let nas = 0;
+    let nas = undefined;
     if (_.get(dp, 'steps')) {
+      nas = 0;
       _.forEach(dp.steps, step => {
         if (step.step_result == 'NotApplicable') {
           nas = nas + 1;
@@ -1037,7 +1091,7 @@ export class RunController {
               vm.$log.error('analysis status retrieval error: ', response);
             });
 
-          }, 60000);  // once per minute
+          }, 20000);  // once per 20s
 
         }, response => {
           // analysis not started
@@ -1117,6 +1171,7 @@ export class RunController {
 
   downloadResults(datapoint) {
     const vm = this;
+
     vm.OsServer.downloadResults(datapoint).then(() => {
       vm.$translate('toastr.downloadedResults').then(translation => {
         vm.toastr.success(translation);
@@ -1130,11 +1185,18 @@ export class RunController {
 
   downloadAllResults() {
     const vm = this;
+
+    vm.$translate('toastr.downloadingResultsWarning').then(translation => {
+      vm.toastr.info(translation, {timeOut: 120000});
+    });
+
     vm.OsServer.downloadAllResults().then(() => {
+      vm.toastr.clear();
       vm.$translate('toastr.downloadedAllResults').then(translation => {
         vm.toastr.success(translation);
       });
     }, () => {
+      vm.toastr.clear();
       vm.$translate('toastr.downloadedAllResultsError').then(translation => {
         vm.toastr.error(translation);
       });
@@ -1156,11 +1218,17 @@ export class RunController {
 
   downloadAllOSMs() {
     const vm = this;
+    vm.$translate('toastr.downloadingOSMsWarning').then(translation => {
+      vm.toastr.info(translation, {timeOut: 120000});
+    });
+
     vm.OsServer.downloadAllOSMs().then(() => {
-      vm.$translate('toastr.downloadedA;;Osm').then(translation => {
+      vm.toastr.clear();
+      vm.$translate('toastr.downloadedAllOsm').then(translation => {
         vm.toastr.success(translation);
       });
     }, () => {
+      vm.toastr.clear();
       vm.$translate('toastr.downloadedAllOsmError').then(translation => {
         vm.toastr.error(translation);
       });

@@ -108,6 +108,8 @@ export default {
     downloadedOsmError: 'Error downloading OSM',
     downloadedAllOsm: 'All OSMs downloaded!',
     downloadedAllOsmError: 'Error downloading OSMs',
+    downloadingResultsWarning: 'Downloading Results for all datapoints...this may take several minutes',
+    downloadingOSMsWarning: 'Downloading OSMs for all datapoints...this may take several minutes',
     connectCredentialsError: 'Error connecting to AWS - No AWS Credentials Selected',
     startCredentialsError: 'Error starting AWS server - No AWS Credentials Selected',
     connectedCloudError: 'Error connecting to AWS',
@@ -412,6 +414,11 @@ export default {
     downloadAlgorithmResults: 'Télécharger les résultats',
     modifiedDP: 'Les données associées à ce point de données ont changé depuis la dernière exécution',
     deletedDA: 'L\'alternative de conception associée à ce point de données a été supprimée du projet',
+    truncatedDatapoints: '...[truncated]',
+    queued: 'Queued',
+    totalDatapoints: 'Total Datapoints',
+    completed: 'Completed',
+    started: 'Started',
     modalAnalysisRunning: {
       title: 'Analyse en cours',
       message: 'L\'analyse est actuellement en cours. Attendez que l\'analyse soit terminée ou annulez l\'exécution avant de quitter cet onglet.'
@@ -426,6 +433,10 @@ export default {
       title: 'PAT Cloud Support with Amazon EC2',
       message: 'The user assumes all responsibility for orphaned EC2 processes.  It is strongly recommended that you monitor EC2 cloud usage in the Amazon AWS Console to avoid any unwanted charges.',
       agree: 'I agree'
+    },
+    modalLargeDownload: {
+      title: 'Large Number of Files to Download',
+      message: 'You are attempting to download a large number of files from the server.  This may freeze the PAT application and some files may not download.  Save your project and proceed at your own risk.'
     },
     modalOsaErrors: {
       title: 'OSA Errors',

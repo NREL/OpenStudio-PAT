@@ -49,6 +49,8 @@ export class OsServer {
     vm.$translate = $translate;
     vm.toastr = toastr;
 
+    vm.numberDPsToDisplay = vm.Project.getNumberDPsToDisplay();
+
     // set number of workers
     vm.numCores = os.cpus().length;
     vm.numWorkers = 1;
@@ -1213,31 +1215,49 @@ export class OsServer {
         });
       } else {
         // algorithmic, just get datapoint.json, not osw
-        const datapointUrl = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
-        if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT URL: ', datapointUrl);
-        if (vm.Message.showDebug()) vm.$log.debug('DP: ', dp);
-        promise = vm.$http.get(datapointUrl).then(response2 => {
-          // set datapoint array
-          if (vm.Message.showDebug()) vm.$log.debug('datapoint JSON raw response: ', response2);
-          //vm.$log.info('datapoint JSON response: ', response2.data.data_point);
-          const datapoint = response2.data.data_point;
-          datapoint.status = dp.status;
-          datapoint.final_message = dp.final_message;
-          datapoint.id = dp.id;
+        if (vm.datapointsStatus.length <= vm.numberDPsToDisplay){
+          const datapointUrl = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
+          if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT URL: ', datapointUrl);
+          if (vm.Message.showDebug()) vm.$log.debug('DP: ', dp);
+          promise = vm.$http.get(datapointUrl).then(response2 => {
+            // set datapoint array
+            if (vm.Message.showDebug()) vm.$log.debug('datapoint JSON raw response: ', response2);
+            //vm.$log.info('datapoint JSON response: ', response2.data.data_point);
+            const datapoint = response2.data.data_point;
+            datapoint.status = dp.status;
+            datapoint.final_message = dp.final_message;
+            datapoint.id = dp.id;
 
+            const dp_match = _.findIndex(datapoints, {id: dp.id});
+            //if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
+            if (dp_match != -1) {
+              // merge
+              _.merge(datapoints[dp_match], datapoint);
+              // if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', datapoints[dp_match]);
+            } else {
+              // also load in datapoints array
+              datapoints.push(datapoint);
+            }
+          }, error2 => {
+            vm.$log.error('GET Datapoint.json ERROR: ', error2);
+          });
+        } else {
+          // too many datapoints:  use datapointStatus only
+          promise = vm.$q.defer();
+          const datapoint = dp;
+          datapoints.push(datapoint);
           const dp_match = _.findIndex(datapoints, {id: dp.id});
           //if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
           if (dp_match != -1) {
             // merge
             _.merge(datapoints[dp_match], datapoint);
-           // if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', datapoints[dp_match]);
+            // if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', datapoints[dp_match]);
           } else {
             // also load in datapoints array
             datapoints.push(datapoint);
           }
-        }, error2 => {
-          vm.$log.error('GET Datapoint.json ERROR: ', error2);
-        });
+          promise.resolve();
+        }
       }
       promises.push(promise);
     });
@@ -1258,7 +1278,7 @@ export class OsServer {
       deferred.resolve(datapoints);
       vm.Project.setModified(true);
     }, error => {
-      vm.$log.error('ERROR retrieving datapoints OSWs: ', error);
+      vm.$log.error('ERROR retrieving datapoints: ', error);
       deferred.reject(error);
     });
     return deferred.promise;
@@ -1273,77 +1293,83 @@ export class OsServer {
 
     const datapoints = vm.Project.getDatapoints();
 
-    _.forEach(datapoints, dp => {
-      if (dp.status == 'completed' && !dp.downloaded_reports) {
-        const url = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
-        const promise = vm.$http.get(url).then(response => {
-          // get result files from response
-          if (vm.Message.showDebug()) vm.$log.debug('datapoint.json: ', response);
-          const resultFiles = response.data.data_point.result_files;
-          dp.result_files = dp.result_files ? _.merge(dp.result_files, resultFiles) : resultFiles;
-          const reportPromises = [];
-          _.forEach(dp.result_files, file => {
-            if (file.type == 'Report' && !file.downloaded) {
-              // download file
-              const reportUrl = vm.selectedServerURL + '/data_points/' + dp.id + '/download_result_file';
-              const params = {filename: file.attachment_file_name};
-              const config = {params: params, headers: {Accept: 'application/json'}};
-              if (vm.Message.showDebug()) vm.$log.debug('****URL: ', reportUrl);
-              const reportPromise = vm.$http.get(reportUrl, config).then(response => {
-                // write file and set downloaded flag
-                vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(dp.id, file.attachment_file_name), response.data);
-                file.downloaded = true;
+    if (datapoints.length > vm.numberDPsToDisplay) {
+      // don't download anything...too many datapoints!
+      deferred.resolve(datapoints);
+    } else {
+      _.forEach(datapoints, dp => {
+        if (dp.status == 'completed' && !dp.downloaded_reports) {
+          const url = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
+          const promise = vm.$http.get(url).then(response => {
+            // get result files from response
+            if (vm.Message.showDebug()) vm.$log.debug('datapoint.json: ', response);
+            const resultFiles = response.data.data_point.result_files;
+            dp.result_files = dp.result_files ? _.merge(dp.result_files, resultFiles) : resultFiles;
+            const reportPromises = [];
+            _.forEach(dp.result_files, file => {
+              if (file.type == 'Report' && !file.downloaded) {
+                // download file
+                const reportUrl = vm.selectedServerURL + '/data_points/' + dp.id + '/download_result_file';
+                const params = {filename: file.attachment_file_name};
+                const config = {params: params, headers: {Accept: 'application/json'}};
+                if (vm.Message.showDebug()) vm.$log.debug('****URL: ', reportUrl);
+                const reportPromise = vm.$http.get(reportUrl, config).then(response => {
+                  // write file and set downloaded flag
+                  vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(dp.id, file.attachment_file_name), response.data);
+                  file.downloaded = true;
 
-              }, reportError => {
-                vm.$log.error('GET report error: ', reportError);
-              });
-              reportPromises.push(reportPromise);  // this to set flag
-              promises.push(reportPromise);  // this one to resolve overall function
-            }
-          });
-          // when all reports are downloaded for a single datapoint
-          vm.$q.all(reportPromises).then(() => {
-            // set downloaded_reports flag
-            dp.downloaded_reports = true;
-            vm.Project.setModified(true);
+                }, reportError => {
+                  vm.$log.error('GET report error: ', reportError);
+                });
+                reportPromises.push(reportPromise);  // this to set flag
+                promises.push(reportPromise);  // this one to resolve overall function
+              }
+            });
+            // when all reports are downloaded for a single datapoint
+            vm.$q.all(reportPromises).then(() => {
+              // set downloaded_reports flag
+              dp.downloaded_reports = true;
+              vm.Project.setModified(true);
 
-            // if running locally, also download osm and results
-            if (vm.Project.getRunType().name == 'local') {
-              if (vm.Message.showDebug()) vm.$log.debug('Run Type is set to Local');
-              const osm_promise = vm.downloadOSM(dp).then(() => {
-                vm.$log.info('osm downloaded for ', dp.name);
-              }, error => {
-                vm.$log.error('OSM download failed for ', dp.name, ', error: ', error);
-              });
-              //promises.push(osm_promise);
-              const result_promise = vm.downloadResults(dp).then(() => {
-                vm.$log.info('results downloaded for ', dp.name);
-              }, error => {
-                vm.$log.error('RESULTS download failed for ', dp.name, ', error: ', error);
-              });
-              //promises.push(result_promise);
-            }
+              // if running locally, also download osm and results
+              if (vm.Project.getRunType().name == 'local') {
+                if (vm.Message.showDebug()) vm.$log.debug('Run Type is set to Local');
+                const osm_promise = vm.downloadOSM(dp).then(() => {
+                  vm.$log.info('osm downloaded for ', dp.name);
+                }, error => {
+                  vm.$log.error('OSM download failed for ', dp.name, ', error: ', error);
+                });
+                //promises.push(osm_promise);
+                const result_promise = vm.downloadResults(dp).then(() => {
+                  vm.$log.info('results downloaded for ', dp.name);
+                }, error => {
+                  vm.$log.error('RESULTS download failed for ', dp.name, ', error: ', error);
+                });
+                //promises.push(result_promise);
+              }
+
+            }, error => {
+              vm.$log.error('Error downloading all reports for datapoint: ', dp.id, 'error: ', error);
+            });
 
           }, error => {
-            vm.$log.error('Error downloading all reports for datapoint: ', dp.id, 'error: ', error);
+            vm.$log.error('GET datapoint.json error: ', error);
           });
+          promises.push(promise);
 
-        }, error => {
-          vm.$log.error('GET datapoint.json error: ', error);
-        });
-        promises.push(promise);
+        }
+      });
 
-      }
-    });
+      vm.$q.all(promises).then(() => {
+        vm.$log.info('Updated Datapoints with Reports: ', datapoints);
+        deferred.resolve(datapoints);
+        vm.Project.setModified(true);
+      }, error => {
+        vm.$log.error('ERROR retrieving datapoints JSONs: ', error);
+        deferred.reject(error);
+      });
+    }
 
-    vm.$q.all(promises).then(() => {
-      vm.$log.info('Updated Datapoints with Reports: ', datapoints);
-      deferred.resolve(datapoints);
-      vm.Project.setModified(true);
-    }, error => {
-      vm.$log.error('ERROR retrieving datapoints JSONs: ', error);
-      deferred.reject(error);
-    });
     return deferred.promise;
   }
 
@@ -1356,8 +1382,11 @@ export class OsServer {
     const datapoints = vm.Project.getDatapoints();
 
     _.forEach(datapoints, dp => {
-      const promise = vm.downloadResults(dp);
-      promises.push(promise);
+      // download only non-downloaded results
+      if (!dp.downloaded_results){
+        const promise = vm.downloadResults(dp);
+        promises.push(promise);
+      }
     });
 
     vm.$q.all(promises).then(() => {
@@ -1376,44 +1405,38 @@ export class OsServer {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    // check for file in result_files to get correct name (in case it changes)
+    // assume filename is data_point.zip so we don't have to ping the datapoint.json
+    let filename = 'data_point.zip';
     const file = _.find(datapoint.result_files, {type: 'Data Point'});
-
-    if (file) {
-      const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
-      const params = {filename: file.attachment_file_name};
-      const config = {params: params, headers: {Accept: 'application/json'}, responseType: 'arraybuffer'};
-      vm.$log.info('Download Results URL: ', reportUrl);
-      if (vm.Message.showDebug()) vm.$log.debug('params: ', params);
-      vm.$http.get(reportUrl, config).then(response => {
-        // write file and set downloaded flag
-        if (vm.Message.showDebug()) vm.$log.debug('RESPONSE!! ', response);
-
-        // extract dir and save to disk in local measures directory
-        // convert arraybuffer to node buffer
-        const buf = new Buffer(new Uint8Array(response.data));
-        if (vm.Message.showDebug()) vm.$log.debug('buffer');
-
-        // THIS DOESN'T WORK ANYMORE
-        // const zip = new vm.AdmZip(buf);
-        // if (vm.Message.showDebug()) vm.$log.debug('zip');
-        //zip.writeZip(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name));
-
-        // save
-        vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), buf);
-        file.downloaded = true;
-        datapoint.downloaded_results = true;
-        vm.Project.setModified(true);
-        deferred.resolve();
-      }, error => {
-        vm.$log.error('GET results zip error: ', error);
-        deferred.reject();
-      });
-
-    } else {
-      vm.$log.error('No zip file listed in the result_files for this datapoint');
-      deferred.reject();
+    if (file){
+      filename = file.attachment_file_name;
     }
+
+    const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
+    const params = {filename: filename};
+    const config = {params: params, headers: {Accept: 'application/json'}, responseType: 'arraybuffer'};
+    vm.$log.info('Download Results URL: ', reportUrl);
+    if (vm.Message.showDebug()) vm.$log.debug('params: ', params);
+    vm.$http.get(reportUrl, config).then(response => {
+      // write file and set downloaded flag
+      if (vm.Message.showDebug()) vm.$log.debug('RESPONSE!! ', response);
+
+      // extract dir and save to disk in local measures directory
+      // convert arraybuffer to node buffer
+      const buf = new Buffer(new Uint8Array(response.data));
+      if (vm.Message.showDebug()) vm.$log.debug('buffer');
+
+      // save
+      vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, filename), buf);
+      if (file) file.downloaded = true;
+      datapoint.downloaded_results = true;
+      vm.Project.setModified(true);
+      deferred.resolve();
+    }, error => {
+      vm.$log.error('GET results zip error: ', error);
+      deferred.reject();
+    });
+
     return deferred.promise;
   }
 
@@ -1426,8 +1449,11 @@ export class OsServer {
     const datapoints = vm.Project.getDatapoints();
 
     _.forEach(datapoints, dp => {
-      const promise = vm.downloadOSM(dp);
-      promises.push(promise);
+      if (!dp.downloaded_osm){
+        // download only the ones not yet downloaded
+        const promise = vm.downloadOSM(dp);
+        promises.push(promise);
+      }
     });
 
     vm.$q.all(promises).then(() => {
@@ -1446,28 +1472,27 @@ export class OsServer {
     const vm = this;
     const deferred = vm.$q.defer();
 
+    let filename = 'in.osm';
     const file = _.find(datapoint.result_files, {type: 'OpenStudio Model'});
-
-    if (file) {
-      const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
-      const params = {filename: file.attachment_file_name};
-      const config = {params: params, headers: {Accept: 'application/json'}};
-      if (vm.Message.showDebug())  vm.$log.info('Download OSM URL: ', reportUrl);
-      vm.$http.get(reportUrl, config).then(response => {
-        // write file and set downloaded flag
-        vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, file.attachment_file_name), response.data);
-        file.downloaded = true;
-        datapoint.downloaded_osm = true;
-        vm.Project.setModified(true);
-        deferred.resolve();
-      }, error => {
-        vm.$log.error('GET OSM error: ', error);
-        deferred.reject();
-      });
-    } else {
-      vm.$log.error('No OpenStudio model file found');
-      deferred.reject();
+    if (file){
+      filename = file.attachment_file_name;
     }
+
+    const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
+    const params = {filename: filename};
+    const config = {params: params, headers: {Accept: 'application/json'}};
+    if (vm.Message.showDebug())  vm.$log.info('Download OSM URL: ', reportUrl);
+    vm.$http.get(reportUrl, config).then(response => {
+      // write file and set downloaded flag
+      vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, filename), response.data);
+      if (file) file.downloaded = true;
+      datapoint.downloaded_osm = true;
+      vm.Project.setModified(true);
+      deferred.resolve();
+    }, error => {
+      vm.$log.error('GET OSM error: ', error);
+      deferred.reject();
+    });
 
     return deferred.promise;
   }
