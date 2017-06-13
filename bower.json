@@ -35,6 +35,16 @@
         "assets/fonts/bootstrap/glyphicons-halflings-regular.woff",
         "assets/fonts/bootstrap/glyphicons-halflings-regular.woff2"
       ]
+    },
+    "angular-ui-grid": {
+      "main": [
+        "ui-grid.css",
+        "ui-grid.js",
+        "ui-grid.eot",
+        "ui-grid.svg",
+        "ui-grid.ttf",
+        "ui-grid.woff"
+      ]
     }
   },
   "resolutions": {
