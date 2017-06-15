@@ -194,7 +194,7 @@
                       <div ng-repeat="item in step.result.step_info track by $index"><span class="green-text">Info: </span>{{item}}</div>
                     </div>
                   </uib-accordion-group>
-                  <uib-accordion-group ng-if="_.has(datapoint, 'steps')">
+                  <uib-accordion-group ng-if="datapoint.eplusout_err">
                     <uib-accordion-heading>
                       <div class="row measure-accordion pad-bot-10">
                         <div class="col-sm-6 bold">EnergyPlus Results</div>

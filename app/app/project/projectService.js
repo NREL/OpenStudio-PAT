@@ -538,8 +538,22 @@ export class Project {
     if (vm.Message.showDebug()) vm.$log.debug('In Project::exportManual');
     if (vm.Message.showDebug()) vm.$log.debug('selectedONly? ', selectedOnly);
 
-    //vm.osa.analysis.problem.analysis_type = 'batch_datapoints'; // TODO which is correct?
+    //vm.osa.analysis.problem.analysis_type = 'batch_datapoints';
     vm.osa.analysis.problem.analysis_type = null;
+
+    // go through measures and don't include those that are set to None across all DAs
+    const included_measures = [];
+    _.forEach(vm.measures, (measure) => {
+      let used = false;
+      _.forEach(vm.designAlternatives, (da) => {
+        if (da[measure.name] !== 'None'){
+          used = true;
+        }
+      });
+      if (used){
+        included_measures.push(measure.name);
+      }
+    });
 
     // DESIGN ALTERNATIVES ARRAY
     vm.osa.analysis.problem.design_alternatives = [];
@@ -564,26 +578,31 @@ export class Project {
           weather.path = './weather/' + da.weatherFile;
           da_hash.weather_file = weather;
         }
-        // add option names and descriptions
+        // add option names and descriptions (only for measures that aren't skipped across all DAs)
         const options = [];
+        let measure_count = 0;
         _.forEach(vm.measures, (measure) => {
-          const option = {};
-          option.measure_name = measure.name;
-          option.workflow_index = measure.workflow_index;
-          option.name = da[measure.name];
-          if (option.name == 'None' || !option.name) {
-            // use measure name/desc if no option
-            option.name = measure.name;
-            option.description = measure.description;
-          }
-          else {
-            const opt = _.find(measure.options, {name: option.name});
-            if (opt)
-              option.description = opt.description;
-            else
+          if (included_measures.indexOf(measure.name) != -1) {
+            const option = {};
+            option.measure_name = measure.name;
+            option.workflow_index = measure_count;
+            // increment count
+            measure_count += 1;
+            option.name = da[measure.name];
+            if (option.name == 'None' || !option.name) {
+              // use measure name/desc if no option
+              option.name = measure.name;
               option.description = measure.description;
+            }
+            else {
+              const opt = _.find(measure.options, {name: option.name});
+              if (opt)
+                option.description = opt.description;
+              else
+                option.description = measure.description;
+            }
+            options.push(option);
           }
-          options.push(option);
         });
         da_hash.options = options;
         vm.osa.analysis.problem.design_alternatives.push(da_hash);

@@ -4,7 +4,7 @@
   "PAT_OS_CLI_PATH": "",
   "PAT_OS_BINDING_PATH": "",
   "PAT_OS_META_CLI_PATH": "",
-  "ENERGYPLUS_EXE_PATH": "",
+  "ENERGYPLUS_EXE_PATH": "/Applications/OpenStudio-2.1.1/EnergyPlus/energyplus",
   "PAT_RUBY_PATH": "",
   "PAT_MONGO_PATH": ""
 }
