@@ -71,7 +71,7 @@ export class ModalSelectOutputsController {
       if (output.newOut){
         // create name and make sure output name includes measure name
         const name = _.snakeCase(output.display_name);
-        const prefix = _.upperFirst(_.camelCase(vm.$scope.measure.class_name));
+        const prefix = vm.$scope.measure.name;
         if (vm.Message.showDebug()) vm.$log.debug('Output Prefix: ', prefix);
         if ((!_.isNil(prefix) && prefix != '') && name.indexOf(prefix + '.') == -1) {
           output.name = prefix + '.' + name;
