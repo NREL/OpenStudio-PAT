@@ -219,6 +219,21 @@ export class RunController {
         }
       });
       // ensure there is one datapoint per DA
+      // and reorder like the designAlternatives
+      var newDatapoints = [];
+      _.forEach(alternatives, (alt) => {
+        const match = _.find(vm.$scope.datapoints, {name: alt.name});
+        if (!match) {
+          // add empty datapoint to array
+          newDatapoints.push({name: alt.name, id: alt.name, run: false, modified: false});
+        } else {
+          newDatapoints.push(match);
+        }
+      });
+      vm.$scope.datapoints = newDatapoints;
+      // TODO: is it really where it should be reordered?
+      vm.Project.setDatapoints(newDatapoints);
+
       _.forEach(alternatives, (alt) => {
         if (!_.find(vm.$scope.datapoints, {name: alt.name})) {
           // add empty datapoint to array

@@ -243,7 +243,8 @@
 
         // Make the comparison point the first run to start
         if ($scope.resultsWithInfo.length > 0) {
-          $scope.baseline = $scope.resultsWithInfo.reverse()[0];
+          // resultsWithInfo is already in the right order
+          $scope.baseline = $scope.resultsWithInfo[0];
           $scope.baseline_name = $scope.baseline.name;
         }
 
