@@ -1829,25 +1829,25 @@ export class Project {
         cost: '$1.68/hr'
       },
       {
-        name: 'i2.xlarge',
+        name: 'd2.xlarge',
         cpus: '4',
         memory: '30.5 GiB',
-        storage: '1 x 800 GB',
-        cost: '$0.85/hr'
+        storage: '3 x 2000 GB',
+        cost: '$0.69/hr'
       },
       {
-        name: 'i2.2xlarge',
+        name: 'd2.2xlarge',
         cpus: '8',
         memory: '61 GiB',
-        storage: '2 x 800 GB',
-        cost: '$1.71/hr'
+        storage: '6 x 2000 GB',
+        cost: '$1.38/hr'
       },
       {
-        name: 'i2.4xlarge',
+        name: 'd2.4xlarge',
         cpus: '16',
         memory: '122 GiB',
-        storage: '4 x 800 GB',
-        cost: '$3.41/hr'
+        storage: '12 x 2000 GB',
+        cost: '$2.76/hr'
       }
     ];
   }
