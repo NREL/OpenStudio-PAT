@@ -476,8 +476,10 @@ export class AnalysisController {
       // only remove if there are no other measures pointing to this location
       const copies = _.find(vm.$scope.measures, {measure_dir: measure.measure_dir});
       if (!copies) {
-        // can delete from disk
-        vm.jetpack.remove(measure.measure_dir);
+        // can delete from disk -- from project only
+        const dirNames = _.split(measure.measure_dir, '/');
+        const dirName = _.last(dirNames);
+        vm.jetpack.remove(vm.Project.getProjectDir().path(dirName));
       }
 
       // recalculate workflow indexes
