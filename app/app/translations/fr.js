@@ -77,6 +77,8 @@ export default {
     openMeasure: 'Measure will open in a text editor for editing',
     updatedMeasureLocal: 'Measure successfully updated in your local BCL!',
     updatedMeasureProject: 'Measure successfully updated in your project!',
+    updatingMeasureLocal: 'Measure successfully updated in your local BCL!',
+    updatingMeasureProject: 'Updating measure in your project!',
     designAltNameError: 'Cannot change design alternative name:  selected name is not unique',
     startLocalServer: 'Starting Local Server...this make take a while',
     localStartInProgressBeforeStop: 'Local Server start is in progress for this project, and must complete before it can be stopped...this may take a few minutes',
