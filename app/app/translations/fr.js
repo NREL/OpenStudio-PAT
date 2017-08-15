@@ -121,7 +121,8 @@ export default {
     noYaml: 'No AWS credentials selected. Cannot start/connect to AWS',
     noCluster: 'No cluster selected. Cannot start/connect to AWS',
     objFunctionGroupError: 'This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully',
-    numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully'
+    numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully',
+    projectNameError: 'Project cannot be named PAT'
   },
   analysis: {
     title: 'Analyse',
