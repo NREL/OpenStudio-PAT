@@ -95,13 +95,13 @@
         <td>{{ baseline.district_heating_ip - run.district_heating_ip | number:1}} <br> {{
           100*(baseline.district_heating_ip - run.district_heating_ip)/baseline.district_heating_ip | number:0}}%
         </td>
-        <td>{{ baseline.first_year_cap_cost - run.first_year_cap_cost | number:1}} <br> {{
-          100*(baseline.first_year_cap_cost - run.first_year_cap_cost)/baseline.first_year_cap_cost | number:0}}%
+        <td>{{ run.first_year_cap_cost - baseline.first_year_cap_cost | number:1}} <br> {{
+          100*(run.first_year_cap_cost - baseline.first_year_cap_cost)/baseline.first_year_cap_cost | number:0}}%
         </td>
         <td>{{ baseline.ann_util_cost - run.ann_util_cost | number:0}} <br> {{ 100*(baseline.ann_util_cost -
           run.ann_util_cost)/baseline.ann_util_cost | number:0}}%
         </td>
-        <td>{{ (baseline.first_year_cap_cost - run.first_year_cap_cost) / (baseline.ann_util_cost - run.ann_util_cost) |
+        <td>{{ (run.first_year_cap_cost - baseline.first_year_cap_cost) / (baseline.ann_util_cost - run.ann_util_cost) |
           number:1}}
         </td>
         <td>{{ baseline.total_lcc - run.total_lcc | number:0}} <br> {{ 100*(baseline.total_lcc -
