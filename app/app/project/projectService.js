@@ -1623,7 +1623,16 @@ export class Project {
       open: true,
       remoteType: vm.remoteTypes[1],
       remoteServerURL: null,
-      aws: {},
+      aws: {
+        connected: false,
+        cluster_name: '',
+        server_instance_type: '',
+        worker_instance_type: '',
+        user_id: '',
+        worker_node_number: 0,
+        aws_tags: [],
+        openstudio_server_version: ''
+      },
       credentials: {yamlFilename: null, accessKey: null, region: 'us-east-1'}
     });
     if (vm.Message.showDebug()) vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
@@ -1706,11 +1715,18 @@ export class Project {
 
     if (dns) {
       vm.$log.info('PING: ', dns);
-      vm.$http.get(vm.fixURL(dns)).then(response => {
+      vm.$http.get(vm.fixURL(dns) + '/status.json').then(response => {
         // send json to run controller
         vm.$log.info('Cluster RUNNING at: ', dns);
         vm.$log.info('JSON response: ', response);
-        deferred.resolve(dns);
+        if (response.data.status.awake) {
+          deferred.resolve(dns);
+        } else {
+          // error
+          vm.$log.info('Cluster not running: did not get expected status response');
+          deferred.reject();
+        }
+
       }, () => {
         vm.$log.info('Cluster TERMINATED at: ', dns);
         deferred.reject();

@@ -60,6 +60,7 @@ export class RunController {
 
     // remote settings
     vm.$scope.remoteSettings = vm.Project.getRemoteSettings();
+
     if (vm.Message.showDebug()) vm.$log.debug('REMOTE SETTINGS: ', vm.$scope.remoteSettings);
 
     vm.$scope.clusterData = {};
@@ -67,6 +68,7 @@ export class RunController {
     if (vm.$scope.selectedRunType.name == 'remote'){
       vm.$scope.clusters = vm.Project.getClusters();
     }
+
     // if remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
       vm.checkIfClusterIsRunning();
@@ -256,6 +258,7 @@ export class RunController {
     vm.OsServer.resetSelectedServerURL();
     // if switching to remote and amazon is selected, ping cluster
     if (vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+      vm.$scope.clusters = vm.Project.getClusters();
       vm.resetClusterSettings();
       vm.checkIfClusterIsRunning();
     }
@@ -461,6 +464,7 @@ export class RunController {
 
   resetClusterSettings() {
     const vm = this;
+
     // read in json file
     if (vm.jetpack.exists(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json')) {
       const clusterFile = vm.jetpack.read(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json');
