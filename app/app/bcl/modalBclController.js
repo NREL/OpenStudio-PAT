@@ -58,6 +58,7 @@ export class ModalBclController {
 
     vm.$scope.addingInProgress = false;
     vm.$scope.downloadInProgress = false;
+    vm.$scope.updateInProgress = false;
 
     vm.projectDir = vm.Project.getProjectMeasuresDir();
 
@@ -589,6 +590,11 @@ export class ModalBclController {
     const originalStatus = angular.copy(measure.status);
     if (vm.Message.showDebug()) vm.$log.debug('in UPDATE LOCAL BCL MEASURE function');
 
+    vm.$scope.updateInProgress = true;
+    vm.$translate('toastr.updatingMeasureLocal').then(translation => {
+      vm.toastr.info(translation);
+    });
+
     // delete from disk first
     vm.jetpack.remove(measure.measure_dir);
 
@@ -603,11 +609,13 @@ export class ModalBclController {
 
       if (updateProject) {
         vm.updateProjectMeasure(measure).then(() => {
+          vm.$scope.updateInProgress = false;
           deferred.resolve();
         });
       } else {
         // restore status (in case didn't update measure in project)
         measure.status = originalStatus;
+        vm.$scope.updateInProgress = false;
         deferred.resolve();
       }
     });
@@ -620,6 +628,13 @@ export class ModalBclController {
     const vm = this;
     const deferred = vm.$q.defer();
     if (vm.Message.showDebug()) vm.$log.debug('in UPDATE PROJECT MEASURE function');
+
+    // unset 'update' status on original measure
+    measure.status = '';
+    vm.$scope.updateInProgress = true;
+    vm.$translate('toastr.updatingMeasureProject').then(translation => {
+      vm.toastr.info(translation);
+    });
 
     // delete old directory first (in projectMeasures)
     const dirNames = _.split(measure.measure_dir, '/');
@@ -665,25 +680,29 @@ export class ModalBclController {
             // if (vm.Message.showDebug()) vm.$log.debug('merged match: ', match);
           }
         });
-        // unset 'update' status on original measure
-        measure.status = '';
+        // save display_name and name so it is not overwritten, in case it is a duplicate measure instance
+        const display_name = project_measure.display_name;
+        const name = project_measure.name;
         // remove arguments and merge rest with project_measure
         const measure_copy = angular.copy(measure);
         delete measure_copy.arguments;
         delete measure_copy.open;
         _.assignIn(project_measure, measure_copy);
-
+        project_measure.display_name = display_name;
+        project_measure.name = name;
         if (vm.Message.showDebug()) vm.$log.debug('updated project measure: ', project_measure);
         vm.$translate('toastr.updatedMeasureProject').then(translation => {
           vm.toastr.success(translation);
         });
       });
 
+      vm.$scope.updateInProgress = false;
       deferred.resolve();
 
     }, () => {
       // failure
       //if (vm.Message.showDebug()) vm.$log.debug('Measure Manager computeArguments failed');
+      vm.$scope.updateInProgress = false;
       deferred.reject();
     });
 

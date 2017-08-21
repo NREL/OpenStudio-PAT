@@ -77,8 +77,10 @@ export default {
     measureDownloaded: 'Measure downloaded!',
     measureDownloadedError: 'Measure download error',
     openMeasure: 'Measure will open in a text editor for editing',
-    updatedMeasureLocal: 'Measure successfully updated in your local BCL!',
+    updatedMeasureLocal: 'Updating measure in your local BCL!',
     updatedMeasureProject: 'Measure successfully updated in your project!',
+    updatingMeasureLocal: 'Measure successfully updated in your local BCL!',
+    updatingMeasureProject: 'Updating measure in your project!',
     designAltNameError: 'Cannot change design alternative name:  selected name is not unique',
     startLocalServer: 'Starting Local Server...this make take a while',
     connectedServer: 'Connected to server!',
@@ -121,7 +123,8 @@ export default {
     noYaml: 'No AWS credentials selected. Cannot start/connect to AWS',
     noCluster: 'No cluster selected. Cannot start/connect to AWS',
     objFunctionGroupError: 'This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully',
-    numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully'
+    numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully',
+    projectNameError: 'Project cannot be named PAT'
   },
   analysis: {
     title: 'Analysis',
