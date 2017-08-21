@@ -2131,7 +2131,7 @@ export class Project {
       type:'number'
     }, {
       name: 'grid_jump',
-      displayName: 'Levels',
+      displayName: 'Grid Jump',
       description: 'Integer specifying the number of levels that are increased/decreased for computing the elementary effects',
       defaultValue: 1,
       type:'number'
