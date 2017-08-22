@@ -1219,7 +1219,7 @@ export class OsServer {
       });
     } else {
       if (vm.datapointsStatus.length <= vm.numberDPsToDisplay){
-
+        if (vm.Message.showDebug()) vm.$log.debug('HERE: algorithmic - small project');
         // algorithmic, just get datapoint.json, not osw
         _.forEach(vm.datapointsStatus, (dp) => {
 
@@ -1248,7 +1248,9 @@ export class OsServer {
           }, error2 => {
             vm.$log.error('GET Datapoint.json ERROR: ', error2);
           });
+          promises.push(promise);
         });
+        if (vm.Message.showDebug()) vm.$log.debug('**DATAPOINTS**: ', datapoints);
       } else {
         if (vm.Message.showDebug()) vm.$log.debug('Too many datapoints...using datapointStatus instead');
           // too many datapoints:  use datapointStatus only
