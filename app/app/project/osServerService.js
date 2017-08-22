@@ -1128,15 +1128,17 @@ export class OsServer {
     vm.selectedAnalysisType = vm.Project.getAnalysisType();
     const datapoints = vm.Project.getDatapoints();
 
-    _.forEach(vm.datapointsStatus, (dp) => {
-      if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT STATUS: ', dp);
+    // download/replace out.osw (manual only)
+    if (vm.selectedAnalysisType == 'Manual') {
 
-      // download/replace out.osw (manual only)
-      if (vm.selectedAnalysisType == 'Manual') {
+      _.forEach(vm.datapointsStatus, (dp) => {
+        // if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT STATUS: ', dp);
+
         const url = vm.selectedServerURL + '/data_points/' + dp.id + '/download_result_file';
         const params = {filename: 'out.osw'};
         const config = {params: params, headers: {Accept: 'application/json'}};
         if (vm.Message.showDebug()) vm.$log.debug('****URL: ', url);
+
         promise = vm.$http.get(url, config).then(response => {
           // save OSW to file
           if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT OUT.OSW response: ', response.data);
@@ -1213,9 +1215,14 @@ export class OsServer {
             promises.push(promise2);
           }
         });
-      } else {
+        promises.push(promise);
+      });
+    } else {
+      if (vm.datapointsStatus.length <= vm.numberDPsToDisplay){
+
         // algorithmic, just get datapoint.json, not osw
-        if (vm.datapointsStatus.length <= vm.numberDPsToDisplay){
+        _.forEach(vm.datapointsStatus, (dp) => {
+
           const datapointUrl = vm.selectedServerURL + '/data_points/' + dp.id + '.json';
           if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT URL: ', datapointUrl);
           if (vm.Message.showDebug()) vm.$log.debug('DP: ', dp);
@@ -1241,30 +1248,36 @@ export class OsServer {
           }, error2 => {
             vm.$log.error('GET Datapoint.json ERROR: ', error2);
           });
-        } else {
+        });
+      } else {
+        if (vm.Message.showDebug()) vm.$log.debug('Too many datapoints...using datapointStatus instead');
           // too many datapoints:  use datapointStatus only
-          promise = vm.$q.defer();
-          const datapoint = dp;
-          datapoints.push(datapoint);
-          const dp_match = _.findIndex(datapoints, {id: dp.id});
+        const newDPs = [];
+
+        for (var i=0; i < vm.numberDPsToDisplay; i++) {
+
+          const datapoint = vm.datapointsStatus[i];
+          const dp_match = _.findIndex(datapoints, {id: datapoint.id});
           //if (vm.Message.showDebug()) vm.$log.debug('DP2 match results for: ', dp.name, ' : ', dp_match);
           if (dp_match != -1) {
             // merge
             _.merge(datapoints[dp_match], datapoint);
             // if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH! New dp: ', datapoints[dp_match]);
+            newDPs.push(datapoints[dp_match]);
           } else {
             // also load in datapoints array
-            datapoints.push(datapoint);
+            newDPs.push(datapoint);
           }
-          promise.resolve();
         }
+        vm.Project.setDatapoints(newDPs);
+        if (vm.Message.showDebug()) vm.$log.debug('REORDERED ALGORITHMIC DATAPOINTS: ', vm.Project.getDatapoints());
       }
-      promises.push(promise);
-    });
+    }
 
     vm.$q.all(promises).then(() => {
       // reorder algorithmic datapoints to match status
-      if (vm.selectedAnalysisType == 'Algorithmic') {
+      if (vm.selectedAnalysisType == 'Algorithmic' && vm.datapointsStatus.length <= vm.numberDPsToDisplay) {
+        // do this now for smaller projects.  already done (above) for large projects
         const newDPs = [];
         _.forEach(vm.datapointsStatus, (dp, index) => {
           const dp_match = _.findIndex(datapoints, {id: dp.id});
