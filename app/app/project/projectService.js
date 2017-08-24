@@ -247,8 +247,29 @@ export class Project {
         vm.analysisID = vm.pat.analysisID ? vm.pat.analysisID : vm.analysisID;
         vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
         vm.remoteSettings = vm.pat.remoteSettings ? vm.pat.remoteSettings : vm.remoteSettings;
-        vm.filesToInclude = vm.pat.filesToInclude ? vm.pat.filesToInclude : vm.filesToInclude;
         vm.serverScripts = vm.pat.serverScripts ? vm.pat.serverScripts : vm.serverScripts;
+
+        // filesToInclude
+        // convert paths to platform-specific delimiters
+        _.forEach(vm.pat.filesToInclude, (file) => {
+          let path_parts = [];
+          // first check for no leading dots (current directory)
+          if (file.dirToInclude.substring(0, 2) != '..')
+            path_parts.push(file.dirToInclude);
+          else {
+            path_parts = _.split(file.dirToInclude, '/');
+            if (path_parts.length == 1) {
+              // split again with other delimiter
+              path_parts = _.split(file.dirToInclude, '\\');
+              if (path_parts.length == 1) {
+                path_parts = _.split(file.dirToInclude, '\\\\');
+              }
+            }
+          }
+          file.dirToInclude = path.join.apply(this, path_parts);
+          if (vm.Message.showDebug()) vm.$log.debug('new file to include path: ', file.dirToInclude);
+        });
+        vm.filesToInclude = vm.pat.filesToInclude ? vm.pat.filesToInclude : vm.filesToInclude;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
