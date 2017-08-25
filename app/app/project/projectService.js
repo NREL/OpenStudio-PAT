@@ -632,6 +632,7 @@ export class Project {
 
     // MEASURE DETAILS
     let measure_count = 0;
+    let analysis_variables = 0;
     _.forEach(vm.measures, (measure) => {
       // ONLY INCLUDE if measure has options set AND if at least 1 option is added to a DA
       let measureAdded = false;
@@ -750,6 +751,9 @@ export class Project {
             const valArr = [];
             let option_id;
 
+            // update total analysis variable count
+            analysis_variables += 1;
+
             _.forEach(vm.designAlternatives, (da) => {
               const dpMatch = _.find(vm.datapoints, {name: da.name});
               // do this for entire workflow or if matching datapoint is selected
@@ -862,6 +866,16 @@ export class Project {
         vm.osa.analysis.problem.workflow.push(m);
       } // end if measure has options or is used
     });
+
+    if (analysis_variables == 0){
+      // error: must have at least one variable to run a PAT analysis
+
+      vm.$log.error('You need at least 1 variable in order to run a PAT analysis.');
+      vm.osaErrors.push(`You need at least 1 variable set on the analysis tab in order to run the analysis.`);
+
+    }
+
+
   }
 
   exportAlgorithmic() {
@@ -2163,7 +2177,7 @@ export class Project {
     }, {
       name: 'levels',
       displayName: 'Levels',
-      description: 'Positive integer (if individual, total simulations is this times each variable)',
+      description: 'Positive integer (if individual, total simulations is this times each variable). Must be at least 2.',
       defaultValue: 2,
       type:'number'
     }, {
