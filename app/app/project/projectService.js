@@ -889,6 +889,12 @@ export class Project {
       vm.osa.analysis.problem.algorithm[_.snakeCase(setting.name)] = setting.value;
     });
 
+    // ensure # of levels is at least 2 for Morris algorithm
+    if (vm.samplingMethod.id === 'morris' && vm.osa.analysis.problem.algorithm.levels < 2){
+      vm.$log.error('This algorithm\'s \'levels\' setting (defined on the analysis tab) needs a value of at least 2 to run successfully');
+      vm.osaErrors.push('This algorithm\'s \'levels\' setting (defined on the analysis tab) needs a value of at least 2 to run successfully');
+    }
+
     // OUTPUTS
     let groupFlag = false;
     if (['nsga_nrel', 'spea_nrel', 'morris', 'sobol'].indexOf(vm.samplingMethod.id) != -1) {
@@ -1087,6 +1093,7 @@ export class Project {
       // });
     }
   }
+
 
   makeDiscreteValuesArray(discreteVariables) {
     const vm = this;
