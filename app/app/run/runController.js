@@ -31,13 +31,14 @@ import YAML from 'yamljs';
 
 export class RunController {
 
-  constructor($log, Project, OsServer, $scope, $interval, $uibModal, $q, $translate, toastr, $sce, Message) {
+  constructor($log, Project, OsServer, $scope, $interval, $timeout, $uibModal, $q, $translate, toastr, $sce, Message) {
 
     'ngInject';
 
     const vm = this;
     vm.$log = $log;
     vm.$interval = $interval;
+    vm.$timeout = $timeout;
     vm.$uibModal = $uibModal;
     vm.$scope = $scope;
     vm.$q = $q;
@@ -60,6 +61,7 @@ export class RunController {
 
     // remote settings
     vm.$scope.remoteSettings = vm.Project.getRemoteSettings();
+
     if (vm.Message.showDebug()) vm.$log.debug('REMOTE SETTINGS: ', vm.$scope.remoteSettings);
 
     vm.$scope.clusterData = {};
@@ -67,6 +69,7 @@ export class RunController {
     if (vm.$scope.selectedRunType.name == 'remote'){
       vm.$scope.clusters = vm.Project.getClusters();
     }
+
     // if remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
       vm.checkIfClusterIsRunning();
@@ -256,6 +259,7 @@ export class RunController {
     vm.OsServer.resetSelectedServerURL();
     // if switching to remote and amazon is selected, ping cluster
     if (vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+      vm.$scope.clusters = vm.Project.getClusters();
       vm.resetClusterSettings();
       vm.checkIfClusterIsRunning();
     }
@@ -461,6 +465,7 @@ export class RunController {
 
   resetClusterSettings() {
     const vm = this;
+
     // read in json file
     if (vm.jetpack.exists(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json')) {
       const clusterFile = vm.jetpack.read(vm.Project.getProjectDir().path(vm.$scope.remoteSettings.aws.cluster_name + '_cluster.json'), 'json');
@@ -1049,49 +1054,16 @@ export class RunController {
           vm.$scope.analysisID = vm.Project.getAnalysisID();
 
           // 5: until complete, hit serverAPI for updates (errors, warnings, status)
-          vm.getStatus = vm.$interval(() => {
-
-            vm.OsServer.retrieveAnalysisStatus().then(response => {
-              if (vm.Message.showDebug()) vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
-              vm.OsServer.setAnalysisStatus(response.data.analysis.status);
-              vm.$scope.analysisStatus = response.data.analysis.status;
-              if (vm.Message.showDebug()) vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
-              vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
-              vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
-              if (vm.Message.showDebug()) vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
-
-              vm.OsServer.updateDatapoints().then(response2 => {
-                // refresh datapoints
-                vm.$scope.datapoints = vm.Project.getDatapoints();
-                // download reports
-                vm.OsServer.downloadReports().then(() => {
-                  if (vm.Message.showDebug()) vm.$log.debug('downloaded all available reports');
-                  // refresh datapoints again
-                  vm.$scope.datapoints = vm.Project.getDatapoints();
-                  vm.$log.info('datapoints after download: ', vm.$scope.datapoints);
-                }, response3 => {
-                  // error in downloadReports
-                  vm.$log.error('download reports error: ', response3);
-                });
-
-                vm.$log.info('update datapoints succeeded: ', response2);
-              }, response2 => {
-                // error in updateDatapoints
-                vm.$log.error('update datapoints error: ', response2);
-              });
-
-              if (response.data.analysis.status == 'completed') {
-                // cancel loop
-                vm.stopAnalysisStatus('completed');
-
-                // download result csvs if algorithmic
-                if (vm.$scope.selectedAnalysisType == 'Algorithmic') vm.OsServer.downloadAlgorithmResults();
+          vm.getStatus = true;
+          const runLoop = () => {
+            vm.analysisLoop().finally(() => {
+              if (vm.getStatus)  {
+                vm.$timeout(runLoop, 20000);
               }
-            }, response => {
-              vm.$log.error('analysis status retrieval error: ', response);
             });
-
-          }, 20000);  // once per 20s
+          };
+          // initial call to runLoop
+          runLoop();
 
         }, response => {
           // analysis not started
@@ -1126,8 +1098,62 @@ export class RunController {
       vm.osaErrorsModal(errors);
 
     });
+  }
 
 
+
+  analysisLoop() {
+    const vm = this;
+    const deferred = vm.$q.defer();
+    if (vm.Message.showDebug()) vm.$log.debug('***** In runController::analysisLoop() *****');
+    vm.OsServer.retrieveAnalysisStatus().then(response => {
+      if (vm.Message.showDebug()) vm.$log.debug('GET ANALYSIS STATUS RESPONSE: ', response);
+      vm.OsServer.setAnalysisStatus(response.data.analysis.status);
+      vm.$scope.analysisStatus = response.data.analysis.status;
+      if (vm.Message.showDebug()) vm.$log.debug('analysis status: ', vm.$scope.analysisStatus);
+      vm.OsServer.setDatapointsStatus(response.data.analysis.data_points);
+      vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
+      if (vm.Message.showDebug()) vm.$log.debug('**DATAPOINTS Status: ', vm.$scope.datapointsStatus);
+
+      vm.OsServer.updateDatapoints().then(response2 => {
+        vm.$log.info('update datapoints succeeded: ', response2);
+        // refresh datapoints
+        vm.$scope.datapoints = vm.Project.getDatapoints();
+        // download reports
+        vm.OsServer.downloadReports().then(() => {
+          if (vm.Message.showDebug()) vm.$log.debug('downloaded all available reports');
+          // refresh datapoints again
+          vm.$scope.datapoints = vm.Project.getDatapoints();
+          vm.$log.info('datapoints after download: ', vm.$scope.datapoints);
+        }, response3 => {
+          // error in downloadReports
+          vm.$log.error('download reports error: ', response3);
+          deferred.reject(response3);
+        });
+
+      }, response2 => {
+        // error in updateDatapoints
+        vm.$log.error('update datapoints error: ', response2);
+        deferred.reject(response2);
+      });
+
+      if (response.data.analysis.status == 'completed') {
+        // cancel loop
+        vm.stopAnalysisStatus('completed');
+
+        // download result csvs if algorithmic
+        if (vm.$scope.selectedAnalysisType == 'Algorithmic') vm.OsServer.downloadAlgorithmResults();
+      }
+
+      // resolve
+      deferred.resolve();
+
+    }, response => {
+      vm.$log.error('analysis status retrieval error: ', response);
+      deferred.reject();
+    });
+
+    return deferred.promise;
   }
 
   stopAnalysisStatus(status = 'completed') {

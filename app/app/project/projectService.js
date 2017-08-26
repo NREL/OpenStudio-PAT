@@ -247,8 +247,29 @@ export class Project {
         vm.analysisID = vm.pat.analysisID ? vm.pat.analysisID : vm.analysisID;
         vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
         vm.remoteSettings = vm.pat.remoteSettings ? vm.pat.remoteSettings : vm.remoteSettings;
-        vm.filesToInclude = vm.pat.filesToInclude ? vm.pat.filesToInclude : vm.filesToInclude;
         vm.serverScripts = vm.pat.serverScripts ? vm.pat.serverScripts : vm.serverScripts;
+
+        // filesToInclude
+        // convert paths to platform-specific delimiters
+        _.forEach(vm.pat.filesToInclude, (file) => {
+          let path_parts = [];
+          // first check for no leading dots (current directory)
+          if (file.dirToInclude.substring(0, 2) != '..')
+            path_parts.push(file.dirToInclude);
+          else {
+            path_parts = _.split(file.dirToInclude, '/');
+            if (path_parts.length == 1) {
+              // split again with other delimiter
+              path_parts = _.split(file.dirToInclude, '\\');
+              if (path_parts.length == 1) {
+                path_parts = _.split(file.dirToInclude, '\\\\');
+              }
+            }
+          }
+          file.dirToInclude = path.join.apply(this, path_parts);
+          if (vm.Message.showDebug()) vm.$log.debug('new file to include path: ', file.dirToInclude);
+        });
+        vm.filesToInclude = vm.pat.filesToInclude ? vm.pat.filesToInclude : vm.filesToInclude;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
@@ -611,6 +632,7 @@ export class Project {
 
     // MEASURE DETAILS
     let measure_count = 0;
+    let analysis_variables = 0;
     _.forEach(vm.measures, (measure) => {
       // ONLY INCLUDE if measure has options set AND if at least 1 option is added to a DA
       let measureAdded = false;
@@ -729,6 +751,9 @@ export class Project {
             const valArr = [];
             let option_id;
 
+            // update total analysis variable count
+            analysis_variables += 1;
+
             _.forEach(vm.designAlternatives, (da) => {
               const dpMatch = _.find(vm.datapoints, {name: da.name});
               // do this for entire workflow or if matching datapoint is selected
@@ -841,6 +866,16 @@ export class Project {
         vm.osa.analysis.problem.workflow.push(m);
       } // end if measure has options or is used
     });
+
+    if (analysis_variables == 0){
+      // error: must have at least one variable to run a PAT analysis
+
+      vm.$log.error('You need at least 1 variable in order to run a PAT analysis.');
+      vm.osaErrors.push(`You need at least 1 variable set on the analysis tab in order to run the analysis.`);
+
+    }
+
+
   }
 
   exportAlgorithmic() {
@@ -853,6 +888,12 @@ export class Project {
     _.forEach(vm.algorithmSettings, (setting) => {
       vm.osa.analysis.problem.algorithm[_.snakeCase(setting.name)] = setting.value;
     });
+
+    // ensure # of levels is at least 2 for Morris algorithm
+    if (vm.samplingMethod.id === 'morris' && vm.osa.analysis.problem.algorithm.levels < 2){
+      vm.$log.error('This algorithm\'s \'levels\' setting (defined on the analysis tab) needs a value of at least 2 to run successfully');
+      vm.osaErrors.push('This algorithm\'s \'levels\' setting (defined on the analysis tab) needs a value of at least 2 to run successfully');
+    }
 
     // OUTPUTS
     let groupFlag = false;
@@ -1052,6 +1093,7 @@ export class Project {
       // });
     }
   }
+
 
   makeDiscreteValuesArray(discreteVariables) {
     const vm = this;
@@ -1623,7 +1665,16 @@ export class Project {
       open: true,
       remoteType: vm.remoteTypes[1],
       remoteServerURL: null,
-      aws: {},
+      aws: {
+        connected: false,
+        cluster_name: '',
+        server_instance_type: '',
+        worker_instance_type: '',
+        user_id: '',
+        worker_node_number: 0,
+        aws_tags: [],
+        openstudio_server_version: ''
+      },
       credentials: {yamlFilename: null, accessKey: null, region: 'us-east-1'}
     });
     if (vm.Message.showDebug()) vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
@@ -1706,11 +1757,18 @@ export class Project {
 
     if (dns) {
       vm.$log.info('PING: ', dns);
-      vm.$http.get(vm.fixURL(dns)).then(response => {
+      vm.$http.get(vm.fixURL(dns) + '/status.json').then(response => {
         // send json to run controller
         vm.$log.info('Cluster RUNNING at: ', dns);
         vm.$log.info('JSON response: ', response);
-        deferred.resolve(dns);
+        if (response.data.status.awake) {
+          deferred.resolve(dns);
+        } else {
+          // error
+          vm.$log.info('Cluster not running: did not get expected status response');
+          deferred.reject();
+        }
+
       }, () => {
         vm.$log.info('Cluster TERMINATED at: ', dns);
         deferred.reject();
@@ -2126,12 +2184,12 @@ export class Project {
     }, {
       name: 'levels',
       displayName: 'Levels',
-      description: 'Positive integer (if individual, total simulations is this times each variable)',
+      description: 'Positive integer (if individual, total simulations is this times each variable). Must be at least 2.',
       defaultValue: 2,
       type:'number'
     }, {
       name: 'grid_jump',
-      displayName: 'Levels',
+      displayName: 'Grid Jump',
       description: 'Integer specifying the number of levels that are increased/decreased for computing the elementary effects',
       defaultValue: 1,
       type:'number'
