@@ -2597,7 +2597,7 @@ export class Project {
       type:'number'
     }, {
       name: 'factr',
-      displayName: 'Failed F Value',
+      displayName: 'Factr',
       description: 'Tolerance on delta_F',
       defaultValue: 450360000000000,
       type:'number'
@@ -2609,7 +2609,7 @@ export class Project {
       type:'number'
     }, {
       name: 'r_genoud_debug_flag',
-      displayName: 'Failed F Value',
+      displayName: 'Debug Flag',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 1,
       type:'number'
