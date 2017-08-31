@@ -50,6 +50,11 @@
                   <div id="stdRef" class="normal-text" ng-if="remoteSettings.aws.openstudio_server_version && remoteSettings.aws.openstudio_server_version.standards">{{remoteSettings.aws.openstudio_server_version.standards.ref}}</div>
                 </div>
               </div>
+              <div class="row pad-bot-20" ng-if="remoteSettings.aws.cluster_name">
+                <div class="col-sm-10">
+                  <label for="amiNotes" class="run-label pad-right-5" translate>run.remote.AMINotes</label> <span id="amiNotes" class="normal-text">{{remoteSettings.aws.openstudio_server_version.notes}}</span>
+                </div>
+              </div>
               <div class="row pad-bot-10" ng-if="remoteSettings.aws.cluster_name">
                 <div class="col-sm-6">
                   <label for="serverInstanceType" class="run-label" translate>run.remote.serverInstanceType</label>

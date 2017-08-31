@@ -76,14 +76,21 @@ export class RunController {
       vm.$scope.clusterData = vm.Project.readClusterFile(vm.$scope.remoteSettings.aws.cluster_name);
     }
 
-    // get OpenStudio Version (for defaulting AMIs)
+    // get OpenStudio Version (for defaulting AMIs) - strip out sha
     vm.package_openstudio_version = vm.OsServer.getOpenStudioVersion();
     if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Version: ', vm.package_openstudio_version);
+    let package_os = vm.package_openstudio_version.substring(0, vm.package_openstudio_version.lastIndexOf("."));
+    if (vm.Message.showDebug()) vm.$log.debug('PACKAGE OS VERSION: ', package_os);
 
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
     if (vm.Message.showDebug()) vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
     if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Server Versions: ', vm.$scope.osServerVersions);
+
+    // get default AMI for this openstudio version
+    vm.$scope.defaultAMI = _.find(vm.$scope.osServerVersions, {name: package_os});
+    if (vm.Message.showDebug()) vm.$log.debug('DEFAULT AMI: ', vm.$scope.defaultAMI);
+
     vm.$scope.serverInstanceTypes = vm.Project.getServerInstanceTypes();
     vm.$scope.workerInstanceTypes = vm.Project.getWorkerInstanceTypes();
     // only valid region is us-east-1 for now
@@ -510,7 +517,8 @@ export class RunController {
       vm.$scope.remoteSettings.aws.worker_node_number = clusterFile.worker_node_number ? clusterFile.worker_node_number : 0;
       vm.$scope.remoteSettings.aws.aws_tags = []; // leave empty for now
       if (vm.Message.showDebug()) vm.$log.debug('server versions: ', vm.$scope.osServerVersions);
-      vm.$scope.remoteSettings.openstudio_server_version = '';
+
+      vm.$scope.remoteSettings.aws.openstudio_server_version = vm.$scope.defaultAMI;  // default AMI selection based on openstudio version
       if (clusterFile.openstudio_server_version) {
         const match = _.find(vm.$scope.osServerVersions, {name: clusterFile.openstudio_server_version});
         if (vm.Message.showDebug()) vm.$log.debug('AMI match: ', match);
@@ -521,6 +529,7 @@ export class RunController {
     }
     else {
       // clear out
+      if (vm.Message.showDebug()) vm.$log.debug('clearing out remote settings');
       vm.$scope.remoteSettings.aws = {
         connected: false,
         cluster_name: '',
@@ -528,9 +537,9 @@ export class RunController {
         worker_instance_type: '',
         user_id: '',
         worker_node_number: 0,
-        aws_tags: [],
-        openstudio_server_version: ''
+        aws_tags: []
       };
+      vm.$scope.remoteSettings.aws.openstudio_server_version = vm.$scope.defaultAMI;
 
     }
 

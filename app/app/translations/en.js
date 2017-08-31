@@ -459,6 +459,7 @@ export default {
     'for': 'for',
     remote: {
       osServerVersion: 'AMI Name',
+      AMINotes: 'AMI Notes',
       osVersion: 'OpenStudio Version',
       standardsRef: 'Standards Ref',
       connect: 'Connect',
