@@ -53,16 +53,16 @@
        <label>ID</label> {{analysisID}}
     </div>
     <div class="col-sm-3 tab-text">
-      <label translate>run.totalDatapoints</label> {{datapoints.length}}
+      <label translate>run.totalDatapoints</label> {{datapointsStatus.length}}
     </div>
     <div class="col-sm-3 tab-text">
-      <label translate>run.queued</label> {{numDatapointsByType('queued')}}
+      <label translate>run.queued</label> {{numDatapointsStatusByType('queued')}}
     </div>
     <div class="col-sm-3 tab-text">
-      <label translate>run.started</label> {{numDatapointsByType('started')}}
+      <label translate>run.started</label> {{numDatapointsStatusByType('started')}}
     </div>
     <div class="col-sm-3 tab-text">
-      <label translate>run.completed</label> {{numDatapointsByType('completed')}}
+      <label translate>run.completed</label> {{numDatapointsStatusByType('completed')}}
     </div>
   </div>
 </div>
@@ -213,7 +213,7 @@
       </uib-accordion>
     </div>
   </div>
-  <div class="row" ng-if="datapoints.length > numberDPsToDisplay">
+  <div class="row" ng-if="datapointsStatus.length > numberDPsToDisplay">
     <div class="col-sm-12 tab-text pad-bot-10">
       <translate>run.truncated</translate>
     </div>

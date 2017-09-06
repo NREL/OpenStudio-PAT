@@ -154,6 +154,10 @@ export class RunController {
       return _.filter(vm.$scope.datapoints, {status: type}).length;
     };
 
+    vm.$scope.numDatapointsStatusByType = function(type) {
+      return _.filter(vm.$scope.datapointsStatus, {status: type}).length;
+    };
+
     vm.$scope.resultsExist = function () {
       if (vm.Message.showDebug()) vm.$log.debug('RESULTS EXIST? ', vm.Project.algorithmResultsDownloaded());
       return vm.Project.algorithmResultsDownloaded();
@@ -1128,6 +1132,7 @@ export class RunController {
         vm.$log.info('update datapoints succeeded: ', response2);
         // refresh datapoints
         vm.$scope.datapoints = vm.Project.getDatapoints();
+        vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
         // download reports
         vm.OsServer.downloadReports().then(() => {
           if (vm.Message.showDebug()) vm.$log.debug('downloaded all available reports');
