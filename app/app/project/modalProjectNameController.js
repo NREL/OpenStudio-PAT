@@ -48,7 +48,7 @@ export class ModalProjectNameController {
     //   noWhitespace = vm.$scope.name.replace(/\s/g, '');
     // }
 
-    if (vm.$scope.name == 'pat') {
+    if (vm.$scope.name.toLowerCase() == 'pat') {
       vm.$translate('toastr.projectNameError').then(translation => {
         vm.toastr.error(translation);
       });
