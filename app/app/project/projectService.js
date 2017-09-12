@@ -600,6 +600,13 @@ export class Project {
       if (!selectedOnly || (_.get(dpMatch, 'selected'))) {
         const da_hash = {};
         da_hash.name = da.name;
+
+        // check validity of DA
+        if (/[.$\u20AC\xA3]/.test(da_hash.name)){
+          vm.$log.error('illegal character detected in design alternative name: ', da_hash.name);
+          vm.osaErrors.push(`illegal character detected in design alternative name: ${da_hash.name}`);
+        }
+
         da_hash.description = da.description;
         // add if other seed
         if (da.seedModel != vm.defaultSeed) {
