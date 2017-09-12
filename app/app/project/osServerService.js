@@ -1156,6 +1156,7 @@ export class OsServer {
           if (dp_match != -1) {
             // merge
             _.merge(datapoints[dp_match], datapoint);
+
             if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH (by ID)! New dp: ', datapoints[dp_match]);
           } else {
             // match by name
@@ -1163,6 +1164,7 @@ export class OsServer {
             if (dp_match2 != -1) {
               // merge
               _.merge(datapoints[dp_match2], datapoint);
+
               if (vm.Message.showDebug()) vm.$log.debug('DATAPOINT MATCH (by Name)! New dp: ', datapoints[dp_match2]);
             } else {
               // append datapoint to array

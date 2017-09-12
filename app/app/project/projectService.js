@@ -563,18 +563,34 @@ export class Project {
     vm.osa.analysis.problem.analysis_type = null;
 
     // go through measures and don't include those that are set to None across all DAs
+    let selectedDAs = [];
+    if (!selectedOnly) {
+      selectedDAs = vm.designAlternatives;
+    } else {
+      _.forEach(vm.designAlternatives, (da) => {
+        const dpMatch = _.find(vm.datapoints, {name: da.name});
+        // do this for entire workflow or if matching datapoint is selected
+        if (_.get(dpMatch, 'selected')) {
+          selectedDAs.push(da);
+        }
+      });
+    }
+
     const included_measures = [];
     _.forEach(vm.measures, (measure) => {
       let used = false;
-      _.forEach(vm.designAlternatives, (da) => {
-        if (da[measure.name] !== 'None'){
+      _.forEach(selectedDAs, (da) => {
+        if (da[measure.name] !== 'None') {
           used = true;
         }
       });
-      if (used){
+      if (used) {
         included_measures.push(measure.name);
       }
     });
+
+    if (vm.Message.showDebug()) vm.$log.debug('included measures:  ', included_measures);
+
 
     // DESIGN ALTERNATIVES ARRAY
     vm.osa.analysis.problem.design_alternatives = [];
