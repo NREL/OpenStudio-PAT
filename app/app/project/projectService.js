@@ -626,6 +626,13 @@ export class Project {
             // increment count
             measure_count += 1;
             option.name = da[measure.name];
+
+            // check validity of option name
+            if (/[.$\u20AC\xA3]/.test(option.name)){
+              vm.$log.error('illegal character detected in option name: ', option.name);
+              vm.osaErrors.push(`illegal character detected in option name: ${option.name}`);
+            }
+
             if (option.name == 'None' || !option.name) {
               // use measure name/desc if no option
               option.name = measure.name;
@@ -641,10 +648,14 @@ export class Project {
             options.push(option);
           }
         });
+
         da_hash.options = options;
         vm.osa.analysis.problem.design_alternatives.push(da_hash);
       }
     });
+
+    // remove duplicates from osaErrors array
+    vm.osaErrors =  _.uniq(vm.osaErrors);
 
     // MEASURE DETAILS
     let measure_count = 0;
