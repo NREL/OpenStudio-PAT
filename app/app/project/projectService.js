@@ -603,8 +603,8 @@ export class Project {
 
         // check validity of DA
         if (/[.$\u20AC\xA3]/.test(da_hash.name)){
-          vm.$log.error('illegal character detected in design alternative name: ', da_hash.name);
-          vm.osaErrors.push(`illegal character detected in design alternative name: ${da_hash.name}`);
+          vm.$log.error('illegal character (.$€£) detected in design alternative name: ', da_hash.name);
+          vm.osaErrors.push(`illegal character (.$€£) detected in design alternative name: ${da_hash.name}`);
         }
 
         da_hash.description = da.description;
@@ -636,8 +636,8 @@ export class Project {
 
             // check validity of option name
             if (/[.$\u20AC\xA3]/.test(option.name)){
-              vm.$log.error('illegal character detected in option name: ', option.name);
-              vm.osaErrors.push(`illegal character detected in option name: ${option.name}`);
+              vm.$log.error('illegal character (.$€£) detected in option name: ', option.name);
+              vm.osaErrors.push(`illegal character (.$€£) detected in option name: ${option.name}`);
             }
 
             if (option.name == 'None' || !option.name) {
