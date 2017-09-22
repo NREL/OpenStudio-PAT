@@ -96,7 +96,7 @@ export class SetProject {
 
       if (!_.isEmpty(result)) {
         let projectDir = jetpack.cwd(result[0]);
-        if (vm.Message.showDebug()) vm.$log.debug('projectDir', projectDir);
+        if (vm.Message.showDebug()) vm.$log.debug('projectDir.path(): ', projectDir.path());
         // Check that path is not in a PAT project subdirectory
         let count = 0;
         const maxDirectoriesToCheck = 5;
