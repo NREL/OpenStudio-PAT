@@ -135,8 +135,47 @@ export class SetProject {
             const newZip = vm.Project.projectName + '.zip';
             const newJson = vm.Project.projectName + '.json';
             // Note "rename" provides no return
-            jetpack.rename(oldZip, newZip);
-            jetpack.rename(oldJson, newJson);
+            if (vm.Message.showDebug()) vm.$log.error('preparing to jet rename');
+            if (vm.Message.showDebug()) vm.$log.error('oldZip', oldZip);
+            if (vm.Message.showDebug()) vm.$log.error('oldJson', oldJson);
+            if (vm.Message.showDebug()) vm.$log.error('newZip', newZip);
+            if (vm.Message.showDebug()) vm.$log.error('newJson', newJson);
+
+            // The project may not have been run; it may not have these files.
+            // If these files are missing, jetpack.rename will fail ungracefully
+            if (jetpack.exists(oldZip) == 'file') {
+              if (vm.Message.showDebug()) vm.$log.error(oldZip + ' is in project, and is being renamed to ' + newZip + '.');
+              jetpack.rename(oldZip, newZip);
+            }
+            else if (jetpack.exists(oldZip) == 'dir') {
+              vm.$log.error(oldZip + ' is a directory, and not a file.');
+            }
+            else if (jetpack.exists(oldZip) == 'other') {
+              vm.$log.error(oldZip + ' is an unknown type.');
+            }
+            else if (jetpack.exists(oldZip) == false) {
+              if (vm.Message.showDebug()) vm.$log.error(oldZip + ' is not in project.');
+            }
+            else {
+              vm.$log.error('jetpack.exists(' + oldZip + ') generated an unhandled return.');
+            }
+
+            if (jetpack.exists(oldJson) == 'file') {
+              if (vm.Message.showDebug()) vm.$log.error(oldJson + ' is in project, and is being renamed to ' + newJson + '.');
+              jetpack.rename(oldJson, newJson);
+            }
+            else if (jetpack.exists(oldJson) == 'dir') {
+              vm.$log.error(oldJson + ' is a directory, and not a file.');
+            }
+            else if (jetpack.exists(oldJson) == 'other') {
+              vm.$log.error(oldJson + ' is an unknown type.');
+            }
+            else if (jetpack.exists(oldJson) == false) {
+              if (vm.Message.showDebug()) vm.$log.error(oldJson + ' is not in project.');
+            }
+            else {
+              vm.$log.error('jetpack.exists(' + oldJson + ') generated an unhandled return.');
+            }
 
             // set project Variables
             vm.setProjectVariables(projectDir);
