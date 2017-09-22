@@ -227,7 +227,7 @@ export class DesignAlternativesController {
     if (matchIndex > -1) {
       const dp = vm.datapoints[matchIndex];
       // remove localResults and delete datapoint
-      if (!_.isNil(dp.id)){
+      if (!_.isNil(dp.id)) {
         vm.jetpack.remove(vm.Project.getProjectLocalResultsDir().path(dp.id));
       }
       vm.datapoints.splice(matchIndex, 1);

@@ -39,6 +39,11 @@ export default {
     heading: 'Avertissement de projet imbriqué',
     blurb: 'Un fichier pat.json a été trouvé dans votre chemin de projet. Vous ne pouvez pas imbriquer un projet PAT dans un autre projet PAT. Veuillez choisir un autre emplacement pour votre projet PAT actuel.'
   },
+  saveAsInfo: {
+    title: 'ParametricAnalysisTool',
+    heading: 'SaveAs Information',
+    blurb: 'A new server is now starting for your new project. Please be patient as this may take several minutes, depending on your computer. This dialog will close automatically once the server is fully started.'
+  },
   whitespaceWarning: {
     title: 'Outil d\'analyse paramétrique',
     heading: 'Avertissement d\'espace blanc',
@@ -124,7 +129,9 @@ export default {
     noCluster: 'No cluster selected. Cannot start/connect to AWS',
     objFunctionGroupError: 'This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully',
     numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully',
-    projectNameError: 'Project cannot be named PAT'
+    projectNameError: 'Project cannot be named PAT',
+    saveAsServerStartInProgress: 'Unable to "Save As" while server is starting. Please try again, once the server has fully started.',
+    newServerStarted: 'New server started.'
   },
   analysis: {
     title: 'Analyse',

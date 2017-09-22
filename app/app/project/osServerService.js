@@ -1220,7 +1220,7 @@ export class OsServer {
         promises.push(promise);
       });
     } else {
-      if (vm.datapointsStatus.length <= vm.numberDPsToDisplay){
+      if (vm.datapointsStatus.length <= vm.numberDPsToDisplay) {
         if (vm.Message.showDebug()) vm.$log.debug('HERE: algorithmic - small project');
         // algorithmic, just get datapoint.json, not osw
         _.forEach(vm.datapointsStatus, (dp) => {
@@ -1255,10 +1255,10 @@ export class OsServer {
         if (vm.Message.showDebug()) vm.$log.debug('**DATAPOINTS**: ', datapoints);
       } else {
         if (vm.Message.showDebug()) vm.$log.debug('Too many datapoints...using datapointStatus instead');
-          // too many datapoints:  use datapointStatus only
+        // too many datapoints:  use datapointStatus only
         const newDPs = [];
 
-        for (var i=0; i < vm.numberDPsToDisplay; i++) {
+        for (var i = 0; i < vm.numberDPsToDisplay; i++) {
 
           const datapoint = vm.datapointsStatus[i];
           const dp_match = _.findIndex(datapoints, {id: datapoint.id});
@@ -1400,7 +1400,7 @@ export class OsServer {
 
     _.forEach(datapoints, dp => {
       // download only non-downloaded results
-      if (!dp.downloaded_results){
+      if (!dp.downloaded_results) {
         const promise = vm.downloadResults(dp);
         promises.push(promise);
       }
@@ -1425,7 +1425,7 @@ export class OsServer {
     // assume filename is data_point.zip so we don't have to ping the datapoint.json
     let filename = 'data_point.zip';
     const file = _.find(datapoint.result_files, {type: 'Data Point'});
-    if (file){
+    if (file) {
       filename = file.attachment_file_name;
     }
 
@@ -1466,7 +1466,7 @@ export class OsServer {
     const datapoints = vm.Project.getDatapoints();
 
     _.forEach(datapoints, dp => {
-      if (!dp.downloaded_osm){
+      if (!dp.downloaded_osm) {
         // download only the ones not yet downloaded
         const promise = vm.downloadOSM(dp);
         promises.push(promise);
@@ -1491,14 +1491,14 @@ export class OsServer {
 
     let filename = 'in.osm';
     const file = _.find(datapoint.result_files, {type: 'OpenStudio Model'});
-    if (file){
+    if (file) {
       filename = file.attachment_file_name;
     }
 
     const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
     const params = {filename: filename};
     const config = {params: params, headers: {Accept: 'application/json'}};
-    if (vm.Message.showDebug())  vm.$log.info('Download OSM URL: ', reportUrl);
+    if (vm.Message.showDebug()) vm.$log.info('Download OSM URL: ', reportUrl);
     vm.$http.get(reportUrl, config).then(response => {
       // write file and set downloaded flag
       vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, filename), response.data);
