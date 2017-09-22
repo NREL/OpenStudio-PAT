@@ -55,6 +55,7 @@ export default {
     start: 'Démarrer le serveur local',
     stop: 'Arrêter le serveur local',
     ping: 'Requête Ping au Serveur et définir l\'état',
+    viewServer: 'View Local Server',
     noProject: 'Vous devez d\'abord ouvrir un projet'
   },
   setMeasuresDir: {
@@ -71,6 +72,7 @@ export default {
     measureAddedError: 'Measure added to project, but unable to compute arguments',
     measureNameAlreadyAdded: 'Cannot add measure: measure names must be unique and there is already a measure with this name added to the project',
     measureDuplicated: 'Measure duplicated!',
+    measureDuplicatedError: 'Error duplicating measure',
     downloadingMeasure: 'Downloading measure from the BCL...',
     measureDownloaded: 'Measure downloaded!',
     measureDownloadedError: 'Measure download error',
@@ -131,6 +133,7 @@ export default {
     addMeasureOption: 'Ajouter une option de mesure',
     checkAll: 'Cocher pour rendre tous les arguments variables',
     checkForUpdates: 'Rechercher des mises à jour',
+    viewAlgorithmReference: 'View Algorithm Documentation',
     columns: {
       argumentName: 'Nom de l\'argument',
       shortName: 'Nom court',
@@ -170,6 +173,7 @@ export default {
       doe: 'conception d\'expériences',
       preFlight: 'PreFlight',
       singleRun: 'Passage Unique',
+      sobol: 'Sobol',
       repeatRun: 'Passages Multiples',
       baselinePerturbation: 'Perturbation de la base de référence'
     },
@@ -455,6 +459,7 @@ export default {
     'for': 'pour',
     remote: {
       osServerVersion: 'Nom AMI',
+      AMINotes: 'AMI Notes',
       osVersion: 'Version d\'OpenStudio',
       standardsRef: 'Normes Ref',
       connect: 'Relier',
