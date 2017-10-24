@@ -175,7 +175,9 @@ export default {
       singleRun: 'Single Run',
       sobol: 'Sobol',
       repeatRun: 'Repeat Run',
-      baselinePerturbation: 'Baseline Perturbation'
+      baselinePerturbation: 'Baseline Perturbation',
+      ga: 'Genetic Algorithm (GA)',
+      gaisl: 'Island Parallel Genetic Algorithm (GAISL)'
     },
     algorithmic: {
       helpAlgorithmSettings: 'These settings control the manner in which the given algorithm is executed. Please see each attribute for further details.',

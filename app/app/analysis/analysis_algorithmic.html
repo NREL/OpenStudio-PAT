@@ -17,7 +17,7 @@
 
         <div class="row pad-bot-10">
           <div class="col-sm-6">
-            <div ng-repeat="option in algorithmSettings" ng-if="$even">
+            <div ng-repeat="option in algorithmSettings" ng-if="$index < (algorithmSettings.length / 2)">
               <div class="row pad-bot-10">
                 <div class="col-sm-12">
                   <label class="medium-label" for="{{option.name}}">{{option.displayName}}</label>
@@ -32,7 +32,7 @@
             </div>
           </div>
           <div class="col-sm-6">
-            <div ng-repeat="option in algorithmSettings" ng-if="$odd">
+            <div ng-repeat="option in algorithmSettings" ng-if="$index >= (algorithmSettings.length / 2)">
               <div class="row pad-bot-10">
                 <div class="col-sm-12">
                   <label class="medium-label" for="{{option.name}}">{{option.displayName}}</label>

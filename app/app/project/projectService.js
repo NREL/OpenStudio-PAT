@@ -2691,6 +2691,184 @@ export class Project {
       type:'number'
     }];
 
+    opts.ga = [{
+      name: 'popsize',
+      displayName: 'Population Size',
+      description: 'Size of initial population',
+      defaultValue: 28,
+      type:'number'
+    }, {
+      name: 'run',
+      displayName: 'Run',
+      description: 'Number of consecutive generations without any improvement in the best fitness value before the GA is stopped',
+      defaultValue: 2,
+      type: 'number'
+    }, {
+      name: 'maxFitness',
+      displayName: 'maxFitness',
+      description: 'Upper bound on the fitness function after that the GA search is interrupted',
+      defaultValue: 1.0,
+      type: 'number'
+    }, {
+      name: 'pcrossover',
+      displayName: 'pcrossover',
+      description: 'Probability of crossover between pairs of chromosomes. Typically a large value',
+      defaultValue: 0.8,
+      type: 'number'
+    }, {
+      name: 'pmutation',
+      displayName: 'pmutation',
+      description: 'Probability of mutation in a parent chromosome. Usually a small probability',
+      defaultValue: 0.1,
+      type: 'number'
+    }, {
+      name: 'elitism',
+      displayName: 'elitism',
+      description: 'Number of best fitness individuals to survive at each generation',
+      defaultValue: 0.05,
+      type: 'number'
+    }, {
+      name: 'maxiter',
+      displayName: 'maxiter',
+      description: 'Maximum number of iterations to run before the GA search is halted',
+      defaultValue: 10,
+      type: 'number'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski',
+      type:'string'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'exit_on_guideline_14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 42,
+      type:'number'
+    }];
+
+    opts.gaisl = [{
+      name: 'popsize',
+      displayName: 'Population Size',
+      description: 'Size of initial population',
+      defaultValue: 28,
+      type:'number'
+    }, {
+      name: 'run',
+      displayName: 'Run',
+      description: 'Number of consecutive generations without any improvement in the best fitness value before the GA is stopped',
+      defaultValue: 2,
+      type: 'number'
+    }, {
+      name: 'maxFitness',
+      displayName: 'maxFitness',
+      description: 'Upper bound on the fitness function after that the GA search is interrupted',
+      defaultValue: 1.0,
+      type: 'number'
+    }, {
+      name: 'pcrossover',
+      displayName: 'pcrossover',
+      description: 'Probability of crossover between pairs of chromosomes. Typically a large value',
+      defaultValue: 0.8,
+      type: 'number'
+    }, {
+      name: 'pmutation',
+      displayName: 'pmutation',
+      description: 'Probability of mutation in a parent chromosome. Usually a small probability',
+      defaultValue: 0.1,
+      type: 'number'
+    }, {
+      name: 'elitism',
+      displayName: 'elitism',
+      description: 'Number of best fitness individuals to survive at each generation',
+      defaultValue: 0.05,
+      type: 'number'
+    }, {
+      name: 'maxiter',
+      displayName: 'maxiter',
+      description: 'Maximum number of iterations to run before the GA search is halted',
+      defaultValue: 10,
+      type: 'number'
+    }, {
+      name: 'numIslands',
+      displayName: 'numIslands',
+      description: 'Integer value specifying the number of islands to be used in a ring topology in which each island is connected unidirectionally with another island',
+      defaultValue: 4,
+      type: 'number'
+    }, {
+      name: 'migrationRate',
+      displayName: 'migrationRate',
+      description: 'Value in range 0-1 providing the proportion of individuals that should migrate between the islands',
+      defaultValue: 0.1,
+      type: 'number'
+    }, {
+      name: 'migrationInterval',
+      displayName: 'migrationInterval',
+      description: 'Integer value specifying the number of iterations at which exchange of individuals takes place',
+      defaultValue: 10,
+      type: 'number'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski',
+      type:'string'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'exit_on_guideline_14',
+      displayName: 'Exit on Guideline 14?',
+      description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'max_queued_jobs',
+      displayName: 'Max Queued Jobs',
+      description: 'Integer specifying the maximum number of queued jobs',
+      defaultValue: 42,
+      type:'number'
+    }];
+
     opts.single_run = [{
       name: 'failed_f_value',
       displayName: 'Failed F Value',
@@ -3028,6 +3206,14 @@ export class Project {
       id: 'spea_nrel',
       name: 'analysis.type.spea2',
       link: 'https://cran.r-project.org/web/packages/nsga2R/nsga2R.pdf'
+    }, {
+      id: 'ga',
+      name: 'analysis.type.ga',
+      link: 'https://cran.r-project.org/web/packages/GA/GA.pdf'
+    }, {
+      id: 'gaisl',
+      name: 'analysis.type.gaisl',
+      link: 'https://cran.r-project.org/web/packages/GA/GA.pdf'
     }];
   }
 
