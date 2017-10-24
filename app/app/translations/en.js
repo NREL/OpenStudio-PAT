@@ -39,6 +39,11 @@ export default {
     heading: 'Nested Project Warning',
     blurb: 'A pat.json file was found in your project path. You cannot nest a PAT project in another PAT project. Please choose another location for you current PAT project.'
   },
+  saveAsInfo: {
+    title: 'ParametricAnalysisTool',
+    heading: 'SaveAs Information',
+    blurb: 'A new server is now starting for your new project. Please be patient as this may take several minutes, depending on your computer. This dialog will close automatically once the server is fully started.'
+  },
   whitespaceWarning: {
     title: 'ParametricAnalysisTool',
     heading: 'Whitespace Warning',
@@ -83,9 +88,9 @@ export default {
     updatingMeasureProject: 'Updating measure in your project!',
     designAltNameError: 'Cannot change design alternative name:  selected name is not unique',
     startLocalServer: 'Starting Local Server...this make take a while',
+    localStartInProgressBeforeStop: 'Local Server start is in progress for this project, and must complete before it can be stopped...this may take a few minutes',
     connectedServer: 'Connected to server!',
     connectedServerError: 'Error: server did not start',
-    localStartInProgressBeforeStop: 'Local Server start is in progress for this project, and must complete before it can be stopped...this may take a few minutes',
     stopLocalServer: 'Stopping Local Server...this make take a while',
     stoppedServer: 'Server stopped successfully!',
     stoppedServerError: 'Error: server could not be stopped',
@@ -124,7 +129,9 @@ export default {
     noCluster: 'No cluster selected. Cannot start/connect to AWS',
     objFunctionGroupError: 'This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully',
     numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully',
-    projectNameError: 'Project cannot be named PAT'
+    projectNameError: 'Project cannot be named PAT',
+    saveAsServerStartInProgress: 'Unable to "Save As" while server is starting. Please try again, once the server has fully started.',
+    newServerStarted: 'New server started.'
   },
   analysis: {
     title: 'Analysis',

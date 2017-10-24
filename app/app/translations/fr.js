@@ -39,6 +39,11 @@ export default {
     heading: 'Avertissement de projet imbriqué',
     blurb: 'Un fichier pat.json a été trouvé dans votre chemin de projet. Vous ne pouvez pas imbriquer un projet PAT dans un autre projet PAT. Veuillez choisir un autre emplacement pour votre projet PAT actuel.'
   },
+  saveAsInfo: {
+    title: 'ParametricAnalysisTool',
+    heading: 'SaveAs Information',
+    blurb: 'A new server is now starting for your new project. Please be patient as this may take several minutes, depending on your computer. This dialog will close automatically once the server is fully started.'
+  },
   whitespaceWarning: {
     title: 'Outil d\'analyse paramétrique',
     heading: 'Avertissement d\'espace blanc',
@@ -55,6 +60,7 @@ export default {
     start: 'Démarrer le serveur local',
     stop: 'Arrêter le serveur local',
     ping: 'Requête Ping au Serveur et définir l\'état',
+    viewServer: 'View Local Server',
     noProject: 'Vous devez d\'abord ouvrir un projet'
   },
   setMeasuresDir: {
@@ -71,6 +77,7 @@ export default {
     measureAddedError: 'Measure added to project, but unable to compute arguments',
     measureNameAlreadyAdded: 'Cannot add measure: measure names must be unique and there is already a measure with this name added to the project',
     measureDuplicated: 'Measure duplicated!',
+    measureDuplicatedError: 'Error duplicating measure',
     downloadingMeasure: 'Downloading measure from the BCL...',
     measureDownloaded: 'Measure downloaded!',
     measureDownloadedError: 'Measure download error',
@@ -122,7 +129,9 @@ export default {
     noCluster: 'No cluster selected. Cannot start/connect to AWS',
     objFunctionGroupError: 'This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully',
     numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully',
-    projectNameError: 'Project cannot be named PAT'
+    projectNameError: 'Project cannot be named PAT',
+    saveAsServerStartInProgress: 'Unable to "Save As" while server is starting. Please try again, once the server has fully started.',
+    newServerStarted: 'New server started.'
   },
   analysis: {
     title: 'Analyse',
@@ -131,6 +140,7 @@ export default {
     addMeasureOption: 'Ajouter une option de mesure',
     checkAll: 'Cocher pour rendre tous les arguments variables',
     checkForUpdates: 'Rechercher des mises à jour',
+    viewAlgorithmReference: 'View Algorithm Documentation',
     columns: {
       argumentName: 'Nom de l\'argument',
       shortName: 'Nom court',
@@ -170,6 +180,7 @@ export default {
       doe: 'conception d\'expériences',
       preFlight: 'PreFlight',
       singleRun: 'Passage Unique',
+      sobol: 'Sobol',
       repeatRun: 'Passages Multiples',
       baselinePerturbation: 'Perturbation de la base de référence'
     },
@@ -455,6 +466,7 @@ export default {
     'for': 'pour',
     remote: {
       osServerVersion: 'Nom AMI',
+      AMINotes: 'AMI Notes',
       osVersion: 'Version d\'OpenStudio',
       standardsRef: 'Normes Ref',
       connect: 'Relier',

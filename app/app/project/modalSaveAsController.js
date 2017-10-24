@@ -25,52 +25,14 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-export class Message {
-  constructor($q, $log) {
+export class ModalSaveAsController {
+
+  constructor($log, $uibModalInstance, Message) {
     'ngInject';
+
     const vm = this;
-    vm.$q = $q;
     vm.$log = $log;
-
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebugMessages = false;
-    if (vm.showDebugMessages) vm.$log.info('showDebugMessages = ', vm.showDebugMessages);
-
-    vm.showInfoMessages = true;
-    if (vm.showInfoMessages) vm.$log.info('showInfoMessages = ', vm.showInfoMessages);
-
-    vm.showErrorMessages = true;
-    if (vm.showErrorMessages) vm.$log.info('showErrorMessages = ', vm.showErrorMessages);
-  }
-
-  showDebug() {
-    const vm = this;
-    return vm.showDebugMessages;
-  }
-
-  setShowDebug(show) {
-    const vm = this;
-    vm.showDebugMessages = show;
-    vm.$log.info('showDebugMessages = ', vm.showDebugMessages);
-  }
-
-  showInfo() {
-    const vm = this;
-    return vm.showInfoMessages;
-  }
-
-  setShowInfog(show) {
-    const vm = this;
-    vm.showInfoMessages = show;
-  }
-
-  showError() {
-    const vm = this;
-    return vm.showErrorMessages;
-  }
-
-  setShowError(show) {
-    const vm = this;
-    vm.showErrorMessages = show;
+    vm.$uibModalInstance = $uibModalInstance;
+    vm.Message = Message;
   }
 }
