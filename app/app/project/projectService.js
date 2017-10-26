@@ -252,17 +252,17 @@ export class Project {
         // filesToInclude
         // convert paths to platform-specific delimiters
         _.forEach(vm.pat.filesToInclude, (file) => {
+          let path_parts = [];
           if (!_.isNil(file.dirToInclude) && !_.isNil(file.unpackDirName)){
-            path_parts = [];
             // first check for no leading dots (current directory)
-            if (file.dirToInclude.substring(0, 2) != '..')
+            if (file.dirToInclude.substring(0, 2) !== '..')
               path_parts.push(file.dirToInclude);
             else {
               path_parts = _.split(file.dirToInclude, '/');
-              if (path_parts.length == 1) {
+              if (path_parts.length === 1) {
                 // split again with other delimiter
                 path_parts = _.split(file.dirToInclude, '\\');
-                if (path_parts.length == 1) {
+                if (path_parts.length === 1) {
                   path_parts = _.split(file.dirToInclude, '\\\\');
                 }
               }
