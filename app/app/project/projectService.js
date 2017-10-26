@@ -252,22 +252,24 @@ export class Project {
         // filesToInclude
         // convert paths to platform-specific delimiters
         _.forEach(vm.pat.filesToInclude, (file) => {
-          let path_parts = [];
-          // first check for no leading dots (current directory)
-          if (file.dirToInclude.substring(0, 2) != '..')
-            path_parts.push(file.dirToInclude);
-          else {
-            path_parts = _.split(file.dirToInclude, '/');
-            if (path_parts.length == 1) {
-              // split again with other delimiter
-              path_parts = _.split(file.dirToInclude, '\\');
+          if (!_.isNil(file.dirToInclude) && !_.isNil(file.unpackDirName)){
+            path_parts = [];
+            // first check for no leading dots (current directory)
+            if (file.dirToInclude.substring(0, 2) != '..')
+              path_parts.push(file.dirToInclude);
+            else {
+              path_parts = _.split(file.dirToInclude, '/');
               if (path_parts.length == 1) {
-                path_parts = _.split(file.dirToInclude, '\\\\');
+                // split again with other delimiter
+                path_parts = _.split(file.dirToInclude, '\\');
+                if (path_parts.length == 1) {
+                  path_parts = _.split(file.dirToInclude, '\\\\');
+                }
               }
             }
+            file.dirToInclude = path.join.apply(this, path_parts);
+            if (vm.Message.showDebug()) vm.$log.debug('new file to include path: ', file.dirToInclude);
           }
-          file.dirToInclude = path.join.apply(this, path_parts);
-          if (vm.Message.showDebug()) vm.$log.debug('new file to include path: ', file.dirToInclude);
         });
         vm.filesToInclude = vm.pat.filesToInclude ? vm.pat.filesToInclude : vm.filesToInclude;
       }
