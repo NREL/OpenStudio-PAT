@@ -271,7 +271,12 @@ export class Project {
             if (vm.Message.showDebug()) vm.$log.debug('new file to include path: ', file.dirToInclude);
           }
         });
-        vm.filesToInclude = vm.pat.filesToInclude ? vm.pat.filesToInclude : vm.filesToInclude;
+        vm.filesToInclude = vm.pat.filesToInclude ? vm.pat.filesToInclude config = {
+          'ruby_path': '/Applications/OpenStudio-2.3.0/ParametricAnalysisTool.app/Contents/Resources/ruby/bin/ruby',
+          'cli_path': '/Applications/OpenStudio-2.3.0/ParametricAnalysisTool.app/Contents/Resources/OpenStudio-server/bin/openstudio_meta',
+          'ruby_lib_path': '/Applications/OpenStudio-2.3.0/ParametricAnalysisTool.app/Contents/Resources/OpenStudio/Ruby',
+          'server_url': 'http://192.168.99.100:8080/'
+        } : vm.filesToInclude;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
@@ -2215,19 +2220,25 @@ export class Project {
       name: 'r',
       displayName: 'r',
       description: 'Integer giving the number of repetitions of the design',
-      defaultValue: 2,
+      defaultValue: 10,
       type:'number'
     }, {
-      name: 'levels',
-      displayName: 'Levels',
-      description: 'Positive integer (if individual, total simulations is this times each variable). Must be at least 2.',
-      defaultValue: 2,
+      name: 'r2',
+      displayName: 'r2',
+      description: 'Integer giving the size of the (bigger) population in which is extracted the design, for the space-filling improvement by (Campolongo et al. 2007).  r2 > r',
+      defaultValue: 20,
       type:'number'
+    }, {
+        name: 'levels',
+        displayName: 'Levels',
+        description: 'Positive integer (if individual, total simulations is this times each variable). Must be at least 2.',
+        defaultValue: 4,
+        type:'number'
     }, {
       name: 'grid_jump',
       displayName: 'Grid Jump',
       description: 'Integer specifying the number of levels that are increased/decreased for computing the elementary effects',
-      defaultValue: 1,
+      defaultValue: 10,
       type:'number'
     }, {
       name: 'type',
