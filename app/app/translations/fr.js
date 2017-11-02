@@ -182,7 +182,10 @@ export default {
       singleRun: 'Passage Unique',
       sobol: 'Sobol',
       repeatRun: 'Passages Multiples',
-      baselinePerturbation: 'Perturbation de la base de référence'
+      baselinePerturbation: 'Perturbation de la base de référence',
+      ga: 'Genetic Algorithm (GA)',
+      gaisl: 'Island Parallel Genetic Algorithm (GAISL)',
+      fast99:'Fast99'
     },
     algorithmic: {
       helpAlgorithmSettings: 'These settings control the manner in which the given algorithm is executed. Please see each attribute for further details.', // TODO

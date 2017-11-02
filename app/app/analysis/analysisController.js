@@ -122,6 +122,9 @@ export class AnalysisController {
         case 'morris':
         case 'sobol':
         case 'doe':
+        case 'fast99':
+        case 'ga':
+        case 'gaisl':
         case 'single_run':
         case 'repeat_run':
           distributions = ['Uniform', 'Triangle', 'Normal', 'LogNormal'];
@@ -1235,7 +1238,7 @@ export class AnalysisController {
   showDiscreteVariables() {
     const vm = this;
     //if (vm.Message.showDebug()) vm.$log.debug('In showDiscreteVariables');
-    if (_.includes(['nsga_nrel', 'lhs', 'preflight', 'morris', 'sobol', 'doe', 'diag', 'baseline_perturbation'], vm.$scope.selectedSamplingMethod.id)) {
+    if (_.includes(['nsga_nrel', 'ga', 'gaisl', 'fast99', 'lhs', 'preflight', 'morris', 'sobol', 'doe', 'diag', 'baseline_perturbation'], vm.$scope.selectedSamplingMethod.id)) {
       vm.$scope.showDiscreteVariables = true;
     } else {
       vm.$scope.showDiscreteVariables = false;

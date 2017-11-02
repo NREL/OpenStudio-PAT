@@ -253,10 +253,10 @@ export class OutputsController {
         }
       };
 
-      // add objective function groups for SPEA, NSGA, and Morris only
+      // add objective function groups for certain algorithms only
       if (vm.Message.showDebug()) vm.$log.debug('sampling method: ', vm.$scope.selectedSamplingMethod);
 
-      if (['nsga_nrel', 'spea_nrel', 'morris', 'sobol'].indexOf(vm.$scope.selectedSamplingMethod.id) != -1) {
+      if (['nsga_nrel', 'spea_nrel', 'morris', 'sobol', 'fast99', 'ga', 'gaisl'].indexOf(vm.$scope.selectedSamplingMethod.id) != -1) {
         if (vm.Message.showDebug()) vm.$log.debug('adding objective function group column');
         const ofg = {
           name: 'obj_function_group',

@@ -271,12 +271,7 @@ export class Project {
             if (vm.Message.showDebug()) vm.$log.debug('new file to include path: ', file.dirToInclude);
           }
         });
-        vm.filesToInclude = vm.pat.filesToInclude ? vm.pat.filesToInclude config = {
-          'ruby_path': '/Applications/OpenStudio-2.3.0/ParametricAnalysisTool.app/Contents/Resources/ruby/bin/ruby',
-          'cli_path': '/Applications/OpenStudio-2.3.0/ParametricAnalysisTool.app/Contents/Resources/OpenStudio-server/bin/openstudio_meta',
-          'ruby_lib_path': '/Applications/OpenStudio-2.3.0/ParametricAnalysisTool.app/Contents/Resources/OpenStudio/Ruby',
-          'server_url': 'http://192.168.99.100:8080/'
-        } : vm.filesToInclude;
+        vm.filesToInclude = vm.pat.filesToInclude ? vm.pat.filesToInclude : vm.filesToInclude;
       }
     } else {
       vm.$log.error('No project selected...cannot initialize project');
@@ -938,7 +933,7 @@ export class Project {
 
     // OUTPUTS
     let groupFlag = false;
-    if (['nsga_nrel', 'spea_nrel', 'morris', 'sobol'].indexOf(vm.samplingMethod.id) != -1) {
+    if (['nsga_nrel', 'spea_nrel', 'morris', 'sobol', 'fast99', 'ga', 'gaisl'].indexOf(vm.samplingMethod.id) != -1) {
       // this sampling method supports groups
       groupFlag = true;
     }
@@ -2970,6 +2965,50 @@ export class Project {
       type:'number'
     }];
 
+    opts.fast99 = [{
+      name: 'n',
+      displayName: 'n',
+      description: 'Integer giving the sample size, i.e. the length of the discretization of the s-space',
+      defaultValue: 66,
+      type:'number'
+    }, {
+      name: 'M',
+      displayName: 'M',
+      description: 'integer specifying the interference parameter, i.e. the number of harmonics to sum in the Fourier series decomposition',
+      defaultValue: 4,
+      type:'number'
+    }, {
+      name: 'norm_type',
+      displayName: 'Norm Type',
+      description: 'Options: minkowski, maximum, euclidean, binary, manhattan',
+      defaultValue: 'minkowski',
+      type:'string'
+    }, {
+      name: 'p_power',
+      displayName: 'P Power',
+      description: 'Lp norm power (must be non-negative)',
+      defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'failed_f_value',
+      displayName: 'Failed F Value',
+      description: 'Return Value for F(x) if F fails',
+      defaultValue: 1e18,
+      type:'number'
+    }, {
+      name: 'debug_messages',
+      displayName: 'Debug Messages',
+      description: 'Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Seed',
+      defaultValue: null,
+      type:'number'
+    }];
+
     opts.spea_nrel = [{
       name: 'number_of_samples',
       displayName: 'Number of Samples',
@@ -3227,6 +3266,10 @@ export class Project {
       id: 'gaisl',
       name: 'analysis.type.gaisl',
       link: 'https://cran.r-project.org/web/packages/GA/GA.pdf'
+    }, {
+      id: 'fast99',
+      name: 'analysis.type.fast99',
+      link: 'https://cran.r-project.org/web/packages/sensitivity/sensitivity.pdf'
     }];
   }
 
