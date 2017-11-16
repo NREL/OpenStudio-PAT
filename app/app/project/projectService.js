@@ -2125,6 +2125,12 @@ export class Project {
       description: 'Options: \'true\' or \'false\'',
       defaultValue: 'true',
       type: 'string'
+    }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
+      type:'number'
     }];
 
     opts.diag = [{
@@ -2144,6 +2150,12 @@ export class Project {
       displayName: 'Run Baseline?',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 1,
+      type:'number'
+    }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
       type:'number'
     }, {
       name: 'failed_f_value',
@@ -2172,6 +2184,12 @@ export class Project {
       defaultValue: 2,
       type:'number'
     }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
+      type:'number'
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
@@ -2196,6 +2214,12 @@ export class Project {
       displayName: 'Number of Samples',
       description: 'Positive integer (if individual, total simulations is this times each variable)',
       defaultValue: 5,
+      type:'number'
+    }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
       type:'number'
     }, {
       name: 'failed_f_value',
@@ -2252,6 +2276,12 @@ export class Project {
       displayName: 'pPower',
       description: 'Options: Lp norm power (must be non-negative)',
       defaultValue: 2,
+      type:'number'
+    }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
       type:'number'
     }, {
       name: 'failed_f_value',
@@ -2334,6 +2364,12 @@ export class Project {
       defaultValue: 0,
       type:'number'
     }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
+      type:'number'
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
@@ -2354,7 +2390,7 @@ export class Project {
     }];
 
     opts.optim = [{
-      name: 'epsilon_gradient',
+      name: 'epsilongradient',
       displayName: 'Epsilon Gradient',
       description: 'Epsilon in gradient calculation',
       defaultValue: 1e-4,
@@ -2394,6 +2430,12 @@ export class Project {
       displayName: 'Exit on Guideline 14?',
       description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
       defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
       type:'number'
     }, {
       name: 'failed_f_value',
@@ -2445,6 +2487,12 @@ export class Project {
       description: 'Options: true or false',
       defaultValue: 'true',
       type:'string'
+    }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
+      type:'number'
     }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
@@ -2556,6 +2604,12 @@ export class Project {
       defaultValue: 0,
       type:'number'
     }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
+      type:'number'
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
@@ -2580,6 +2634,12 @@ export class Project {
       displayName: 'Number of Runs',
       description: 'Positive integer (if individual, total simulations is this times each variable)',
       defaultValue: 30,
+      type:'number'
+    }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
       type:'number'
     }, {
       name: 'failed_f_value',
@@ -2626,7 +2686,7 @@ export class Project {
       defaultValue: 0.01,
       type:'number'
     }, {
-      name: 'epsilon_gradient',
+      name: 'epsilongradient',
       displayName: 'Epsilon Gradient',
       description: 'epsilon in gradient calculation',
       defaultValue: 0.01,
@@ -2678,6 +2738,12 @@ export class Project {
       displayName: 'Exit on Guideline 14?',
       description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
       defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
       type:'number'
     }, {
       name: 'failed_f_value',
@@ -2758,6 +2824,12 @@ export class Project {
       displayName: 'Exit on Guideline 14?',
       description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
       defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
       type:'number'
     }, {
       name: 'failed_f_value',
@@ -2858,6 +2930,12 @@ export class Project {
       defaultValue: 0,
       type:'number'
     }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
+      type:'number'
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
@@ -2878,6 +2956,12 @@ export class Project {
     }];
 
     opts.single_run = [{
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
+      type:'number'
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
@@ -2946,6 +3030,12 @@ export class Project {
       defaultValue: 2,
       type:'number'
     }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
+      type:'number'
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
@@ -2990,6 +3080,12 @@ export class Project {
       defaultValue: 2,
       type:'number'
     }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
+      type:'number'
+    }, {
       name: 'failed_f_value',
       displayName: 'Failed F Value',
       description: 'Return Value for F(x) if F fails',
@@ -3000,12 +3096,6 @@ export class Project {
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
       defaultValue: 0,
-      type:'number'
-    }, {
-      name: 'seed',
-      displayName: 'Seed',
-      description: 'Seed',
-      defaultValue: null,
       type:'number'
     }];
 
@@ -3068,6 +3158,12 @@ export class Project {
       displayName: 'Exit on Guideline 14?',
       description: 'Options: O (off), 1 (both electric and gas), 2 (just electric), 3 (just gas)',
       defaultValue: 0,
+      type:'number'
+    }, {
+      name: 'seed',
+      displayName: 'Seed',
+      description: 'Integer seed for random number generator',
+      defaultValue: null,
       type:'number'
     }, {
       name: 'failed_f_value',
