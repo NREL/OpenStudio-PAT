@@ -1942,6 +1942,13 @@ export class Project {
         memory: '122 GiB',
         storage: '12 x 2000 GB',
         cost: '$2.76/hr'
+      },
+      {
+        name: 'd2.8xlarge',
+        cpus: '36',
+        memory: '244 GiB',
+        storage: '24 x 2000 GB',
+        cost: '$5.52/hr'
       }
     ];
   }
@@ -2020,25 +2027,39 @@ export class Project {
         cost: '$0.85/hr'
       },
       {
-        name: 'i2.xlarge',
+        name: 'd2.xlarge',
         cpus: '4',
         memory: '30.5 GiB',
         storage: '1 x 800 GB',
         cost: '$1.71/hr'
       },
       {
-        name: 'i2.2xlarge',
-        cpus: '8',
-        memory: '61 GiB',
-        storage: '2 x 800 GB',
-        cost: '$1.71/hr'
+        name: 'd2.xlarge',
+        cpus: '4',
+        memory: '30.5 GiB',
+        storage: '3 x 2000 GB',
+        cost: '$0.69/hr'
       },
       {
-        name: 'i2.4xlarge',
+        name: 'd2.2xlarge',
+        cpus: '8',
+        memory: '61 GiB',
+        storage: '6 x 2000 GB',
+        cost: '$1.38/hr'
+      },
+      {
+        name: 'd2.4xlarge',
         cpus: '16',
         memory: '122 GiB',
-        storage: '4 x 800 GB',
-        cost: '$3.41/hr'
+        storage: '12 x 2000 GB',
+        cost: '$2.76/hr'
+      },
+      {
+        name: 'd2.8xlarge',
+        cpus: '36',
+        memory: '244 GiB',
+        storage: '24 x 2000 GB',
+        cost: '$5.52/hr'
       }
     ];
   }
