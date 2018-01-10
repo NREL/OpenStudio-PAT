@@ -1085,6 +1085,15 @@ export class Project {
             // if discrete or pivot, make values and weights array (unless integer_sequence)
             if ((arg.inputs.variableSetting == 'Pivot' || arg.inputs.variableSetting == 'Discrete') && arg.inputs.distribution != 'Integer Sequence') {
               const valArr = vm.makeDiscreteValuesArray(arg.inputs.discreteVariables);
+
+              // check that discrete values are unique
+              const tempVals = _.map(valArr, 'value');
+              const tempUniqVals = _.uniq(tempVals);
+              if (tempVals.length != tempUniqVals.length) {
+                vm.$log.error(`Discrete variable values must all be unique in measure: ${measure.display_name}, variable: ${v.display_name}`);
+                vm.osaErrors.push(`Discrete variable values must all be unique in measure: ${measure.display_name}, variable: ${v.display_name}`);
+              }
+
               v.uncertainty_description.attributes.push({name: 'discrete', values_and_weights: valArr});
             }
 
