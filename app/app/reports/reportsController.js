@@ -56,15 +56,15 @@ export class ReportsController {
 
     // get algorithmic results
     vm.selectedAnalysisType = vm.Project.getAnalysisType();
-    vm.$scope.algorithmic_results = [];
-    vm.$scope.algorithmic_metadata = [];
+    vm.algorithmic_results = [];
+    vm.algorithmic_metadata = [];
     if (vm.selectedAnalysisType == 'Algorithmic') {
       // load results
-      vm.$scope.algorithmic_results = vm.Project.loadAlgorithmicResults('results');
-      vm.$scope.algorithmic_metadata = vm.Project.loadAlgorithmicResults('metadata');
+      vm.algorithmic_results = vm.Project.loadAlgorithmicResults('results');
+      vm.algorithmic_metadata = vm.Project.loadAlgorithmicResults('metadata');
     }
-    if (vm.Message.showDebug()) vm.$log.debug('Algorithmic RESULTS: ', vm.$scope.algorithmic_results);
-    if (vm.Message.showDebug()) vm.$log.debug('Algorithmic METADATA: ', vm.$scope.algorithmic_metadata);
+    if (vm.Message.showDebug()) vm.$log.debug('Algorithmic RESULTS: ', vm.algorithmic_results);
+    if (vm.Message.showDebug()) vm.$log.debug('Algorithmic METADATA: ', vm.algorithmic_metadata);
 
     // preload.js path depends on environment.  we need full path to file
     vm.$scope.preloadPath = `file://${app.getAppPath()}/scripts/preload.js`;
