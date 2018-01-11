@@ -232,22 +232,32 @@ export class RunController {
           dp.id = dp.name;
         }
       });
-      // ensure there is one datapoint per DA
-      _.forEach(alternatives, (alt) => {
-        if (!_.find(vm.$scope.datapoints, {name: alt.name})) {
-          // add empty datapoint to array
-          vm.$scope.datapoints.push({name: alt.name, id: alt.name, run: false, modified: false});
-        }
-      });
 
-      // remove algorithmic points if there are some
-      _.forEachRight(vm.$scope.datapoints, (dp, key) => {
-        const index = _.findIndex(alternatives, {name: dp.name});
-        if (index == -1) {
-          // remove
-          vm.$scope.datapoints.splice(key, 1);
+      // ensure there is one datapoint per DA, delete datapoints not matching a DA, and reorder to match DA order
+      vm.tempDPs = [];
+      _.forEach(alternatives, (alt) => {
+        const match = _.find(vm.$scope.datapoints, {name: alt.name});
+        if (_.isUndefined(match)) {
+          // add empty datapoint to array
+          vm.tempDPs.push({name: alt.name, id: alt.name, run: false, modified: false});
+        } else {
+          // add back to array
+          vm.tempDPs.push(match);
         }
       });
+      // resave to datapoints
+      vm.Project.setDatapoints(vm.tempDPs);
+      vm.$scope.datapoints = vm.Project.getDatapoints();
+
+      // // remove algorithmic points if there are some
+      // _.forEachRight(vm.$scope.datapoints, (dp, key) => {
+      //   const index = _.findIndex(alternatives, {name: dp.name});
+      //   if (index == -1) {
+      //     // remove
+      //     vm.$scope.datapoints.splice(key, 1);
+      //   }
+      // });
+
     } else {
       // algorithmic: remove manual points if there are some
       _.forEachRight(alternatives, (alt) => {
@@ -257,7 +267,6 @@ export class RunController {
           vm.$scope.datapoints.splice(index, 1);
         }
       });
-
     }
 
     if (vm.Message.showDebug()) vm.$log.debug("Datapoints after SetUp: ", vm.$scope.datapoints);
