@@ -669,6 +669,7 @@ export class Project {
     // MEASURE DETAILS
     let measure_count = 0;
     let analysis_variables = 0;
+    let atLeastOneSkip = false;
     _.forEach(vm.measures, (measure) => {
       // ONLY INCLUDE if measure has options set AND if at least 1 option is added to a DA
       let measureAdded = false;
@@ -760,6 +761,7 @@ export class Project {
 
         // need a __SKIP__ argument
         if (_.includes(vars, true)) {
+          atLeastOneSkip = true;
           const v = vm.makeSkip(measure);
 
           const valArr = [];
@@ -903,14 +905,13 @@ export class Project {
       } // end if measure has options or is used
     });
 
-    if (analysis_variables == 0){
+    if (analysis_variables == 0 && !atLeastOneSkip){
       // error: must have at least one variable to run a PAT analysis
 
-      vm.$log.error('You need at least 1 variable in order to run a PAT analysis.');
-      vm.osaErrors.push(`You need at least 1 variable set on the analysis tab in order to run the analysis.`);
+      vm.$log.error(`You need at least 1 variable set on the analysis tab or 1 measure set to 'None' in a design alternative in order to run an analysis`);
+      vm.osaErrors.push(`You need at least 1 variable set on the analysis tab or 1 measure set to 'None' in a design alternative in order to run an analysis`);
 
     }
-
 
   }
 
