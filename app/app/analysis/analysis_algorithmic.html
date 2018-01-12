@@ -425,44 +425,46 @@
                       <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
                     </div>
                   </div>
-                  <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                    <div class="row pad-bot-10">
-                      <div class="col-sm-6">
-                        <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
-                          <input class="form-control" type="number" ng-model="discreteVariable.value"
-                                 ng-change="analysis.setIsModified()">
+                  <div ng-if="argument.inputs.distribution == 'Discrete'">
+                    <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                      <div class="row pad-bot-10">
+                        <div class="col-sm-6">
+                          <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                            <input class="form-control" type="number" ng-model="discreteVariable.value"
+                                   ng-change="analysis.setIsModified()">
+                          </div>
+                          <div ng-if="argument.type == 'String'">
+                            <input class="form-control" type="text" ng-model="discreteVariable.value"
+                                   ng-change="analysis.setIsModified()">
+                          </div>
+                          <div ng-if="argument.type == 'Boolean'">
+                            <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
+                          </div>
+                          <div ng-if="argument.type == 'Choice'">
+                            <select class="form-control"
+                                    ng-options="value for value in argument.choice_display_names"
+                                    ng-init="discreteVariable.value = discreteVariable.value || argument.choice_display_names[0]"
+                                    ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
+                          </div>
                         </div>
-                        <div ng-if="argument.type == 'String'">
-                          <input class="form-control" type="text" ng-model="discreteVariable.value"
-                                 ng-change="analysis.setIsModified()">
+                        <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                          <input class="form-control" type="number" min="0" max="1" step="0.1"
+                                 ng-change="analysis.setIsModified()"
+                                 ng-model="discreteVariable.weight">
                         </div>
-                        <div ng-if="argument.type == 'Boolean'">
-                          <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
+                        <div class="col-sm-2 pad-top-5">
+                          <span class="glyphicon glyphicon-remove-sign black-button header-text"
+                                ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
+                                aria-label="Delete Value"></span>
                         </div>
-                        <div ng-if="argument.type == 'Choice'">
-                          <select class="form-control"
-                                  ng-options="value for value in argument.choice_display_names"
-                                  ng-init="discreteVariable.value = discreteVariable.value || argument.choice_display_names[0]"
-                                  ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
-                        </div>
-                      </div>
-                      <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                        <input class="form-control" type="number" min="0" max="1" step="0.1"
-                               ng-change="analysis.setIsModified()"
-                               ng-model="discreteVariable.weight">
-                      </div>
-                      <div class="col-sm-2 pad-top-5">
-                        <span class="glyphicon glyphicon-remove-sign black-button header-text"
-                              ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
-                              aria-label="Delete Value"></span>
                       </div>
                     </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
-                      <button type="button" class="btn btn-success"
-                              ng-click="analysis.addDiscreteVariable(argument)"><span
-                        class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                    <div class="row">
+                      <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
+                        <button type="button" class="btn btn-success"
+                                ng-click="analysis.addDiscreteVariable(argument)"><span
+                          class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -651,7 +653,7 @@
             <div class="col-sm-4"
                  ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
               <div class="row"
-                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"
+                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">
                 <!-- pivots only -->
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
@@ -731,44 +733,46 @@
                       <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
                     </div>
                   </div>
-                  <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                    <div class="row pad-bot-10">
-                      <div class="col-sm-6">
-                        <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
-                          <input class="form-control" type="number" ng-model="discreteVariable.value"
-                                 ng-change="analysis.setIsModified()">
+                  <div ng-if="argument.inputs.distribution == 'Discrete'">
+                    <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                      <div class="row pad-bot-10">
+                        <div class="col-sm-6">
+                          <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                            <input class="form-control" type="number" ng-model="discreteVariable.value"
+                                   ng-change="analysis.setIsModified()">
+                          </div>
+                          <div ng-if="argument.type == 'String'">
+                            <input class="form-control" type="text" ng-model="discreteVariable.value"
+                                   ng-change="analysis.setIsModified()">
+                          </div>
+                          <div ng-if="argument.type == 'Boolean'">
+                            <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
+                          </div>
+                          <div ng-if="argument.type == 'Choice'">
+                            <select class="form-control"
+                                    ng-options="value for value in argument.choice_display_names"
+                                    ng-init="discreteVariable.value = discreteVariable.value || argument.choice_display_names[0]"
+                                    ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
+                          </div>
                         </div>
-                        <div ng-if="argument.type == 'String'">
-                          <input class="form-control" type="text" ng-model="discreteVariable.value"
-                                 ng-change="analysis.setIsModified()">
+                        <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                          <input class="form-control" type="number" min="0" max="1" step="0.1"
+                                 ng-change="analysis.setIsModified()"
+                                 ng-model="discreteVariable.weight">
                         </div>
-                        <div ng-if="argument.type == 'Boolean'">
-                          <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
+                        <div class="col-sm-2 pad-top-5">
+                          <span class="glyphicon glyphicon-remove-sign black-button header-text"
+                                ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
+                                aria-label="Delete Value"></span>
                         </div>
-                        <div ng-if="argument.type == 'Choice'">
-                          <select class="form-control"
-                                  ng-options="value for value in argument.choice_display_names"
-                                  ng-init="discreteVariable.value = discreteVariable.value || argument.choice_display_names[0]"
-                                  ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
-                        </div>
-                      </div>
-                      <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                        <input class="form-control" type="number" min="0" max="1" step="0.1"
-                               ng-change="analysis.setIsModified()"
-                               ng-model="discreteVariable.weight">
-                      </div>
-                      <div class="col-sm-2 pad-top-5">
-                        <span class="glyphicon glyphicon-remove-sign black-button header-text"
-                              ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
-                              aria-label="Delete Value"></span>
                       </div>
                     </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
-                      <button type="button" class="btn btn-success"
-                              ng-click="analysis.addDiscreteVariable(argument)"><span
-                        class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                    <div class="row">
+                      <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
+                        <button type="button" class="btn btn-success"
+                                ng-click="analysis.addDiscreteVariable(argument)"><span
+                          class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                      </div>
                     </div>
                   </div>
                 </div>
@@ -957,7 +961,7 @@
             <div class="col-sm-4"
                  ng-show="argument.inputs.variableSetting == 'Pivot' || argument.inputs.variableSetting == 'Discrete'">
               <div class="row"
-                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">"
+                   ng-show="argument.inputs.variableSetting == 'Pivot' && analysis.$scope.showDiscreteDistributions">
                 <!-- pivots only -->
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
@@ -1037,44 +1041,46 @@
                       <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
                     </div>
                   </div>
-                  <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
-                    <div class="row pad-bot-10">
-                      <div class="col-sm-6">
-                        <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
-                          <input class="form-control" type="number" ng-model="discreteVariable.value"
-                                 ng-change="analysis.setIsModified()">
+                  <div ng-if="argument.inputs.distribution == 'Discrete'">
+                    <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
+                      <div class="row pad-bot-10">
+                        <div class="col-sm-6">
+                          <div ng-if="(argument.type == 'Double' || argument.type == 'Integer')">
+                            <input class="form-control" type="number" ng-model="discreteVariable.value"
+                                   ng-change="analysis.setIsModified()">
+                          </div>
+                          <div ng-if="argument.type == 'String'">
+                            <input class="form-control" type="text" ng-model="discreteVariable.value"
+                                   ng-change="analysis.setIsModified()">
+                          </div>
+                          <div ng-if="argument.type == 'Boolean'">
+                            <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
+                          </div>
+                          <div ng-if="argument.type == 'Choice'">
+                            <select class="form-control"
+                                    ng-options="value for value in argument.choice_display_names"
+                                    ng-init="discreteVariable.value = discreteVariable.value || argument.choice_display_names[0]"
+                                    ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
+                          </div>
                         </div>
-                        <div ng-if="argument.type == 'String'">
-                          <input class="form-control" type="text" ng-model="discreteVariable.value"
-                                 ng-change="analysis.setIsModified()">
+                        <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
+                          <input class="form-control" type="number" min="0" max="1" step="0.1"
+                                 ng-change="analysis.setIsModified()"
+                                 ng-model="discreteVariable.weight">
                         </div>
-                        <div ng-if="argument.type == 'Boolean'">
-                          <checkbox ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></checkbox>
+                        <div class="col-sm-2 pad-top-5">
+                          <span class="glyphicon glyphicon-remove-sign black-button header-text"
+                                ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
+                                aria-label="Delete Value"></span>
                         </div>
-                        <div ng-if="argument.type == 'Choice'">
-                          <select class="form-control"
-                                  ng-options="value for value in argument.choice_display_names"
-                                  ng-init="discreteVariable.value = discreteVariable.value || argument.choice_display_names[0]"
-                                  ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
-                        </div>
-                      </div>
-                      <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
-                        <input class="form-control" type="number" min="0" max="1" step="0.1"
-                               ng-change="analysis.setIsModified()"
-                               ng-model="discreteVariable.weight">
-                      </div>
-                      <div class="col-sm-2 pad-top-5">
-                        <span class="glyphicon glyphicon-remove-sign black-button header-text"
-                              ng-click="analysis.deleteValue(argument, $index)" aria-hidden="true"
-                              aria-label="Delete Value"></span>
                       </div>
                     </div>
-                  </div>
-                  <div class="row">
-                    <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
-                      <button type="button" class="btn btn-success"
-                              ng-click="analysis.addDiscreteVariable(argument)"><span
-                        class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                    <div class="row">
+                      <div class="col-sm-4" ng-class="{'pad-top-25': argument.inputs.discreteVariables.length == 0}">
+                        <button type="button" class="btn btn-success"
+                                ng-click="analysis.addDiscreteVariable(argument)"><span
+                          class="glyphicon glyphicon-plus" aria-hidden="true"></span></button>
+                      </div>
                     </div>
                   </div>
                 </div>
