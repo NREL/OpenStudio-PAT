@@ -2170,13 +2170,15 @@ export class Project {
       description: 'Options: diagonal',
       defaultValue: 'diagonal',
       type: 'string'
-    }, {
-      name: 'number_of_samples',
-      displayName: 'Number of Samples',
-      description: 'Positive integer (if individual, total simulations is this times each variable)',
-      defaultValue: 2,
-      type:'number'
-    }, {
+    },
+    //   {
+    //   name: 'number_of_samples',
+    //   displayName: 'Number of Samples',
+    //   description: 'Positive integer (if individual, total simulations is this times each variable)',
+    //   defaultValue: 2,
+    //   type:'number'
+    // },
+      {
       name: 'run_baseline',
       displayName: 'Run Baseline?',
       description: 'Options: 1 or 0 (True or False)',
