@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
- *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *  OpenStudio(R), Copyright (c) 2008-2018, Alliance for Sustainable Energy, LLC. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  *  following conditions are met:
@@ -79,7 +79,7 @@ export class RunController {
     // get OpenStudio Version (for defaulting AMIs) - strip out sha
     vm.package_openstudio_version = vm.OsServer.getOpenStudioVersion();
     if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Version: ', vm.package_openstudio_version);
-    let package_os = vm.package_openstudio_version.substring(0, vm.package_openstudio_version.lastIndexOf("."));
+    let package_os = vm.package_openstudio_version.substring(0, vm.package_openstudio_version.lastIndexOf('.'));
     if (vm.Message.showDebug()) vm.$log.debug('PACKAGE OS VERSION: ', package_os);
 
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
@@ -221,7 +221,7 @@ export class RunController {
       let uniqDBs = _.uniqBy(vm.$scope.datapoints, 'name');
       // if (vm.Message.showDebug()) vm.$log.debug('UNIQUE DBS: ', uniqDBs);
       if (uniqDBs.length !== vm.$scope.datapoints.length) {
-        if (vm.Message.showDebug()) vm.$log.debug("Datapoint duplicates found! This is caused by an older/corrupted PAT project.  To fix this issue, datapoints will be cleared.  Datapoints: ", vm.$scope.datapoints);
+        if (vm.Message.showDebug()) vm.$log.debug('Datapoint duplicates found! This is caused by an older/corrupted PAT project.  To fix this issue, datapoints will be cleared.  Datapoints: ', vm.$scope.datapoints);
         vm.Project.setDatapoints([]);
         vm.$scope.datapoints = vm.Project.getDatapoints();
       }
@@ -269,7 +269,7 @@ export class RunController {
       });
     }
 
-    if (vm.Message.showDebug()) vm.$log.debug("Datapoints after SetUp: ", vm.$scope.datapoints);
+    if (vm.Message.showDebug()) vm.$log.debug('Datapoints after SetUp: ', vm.$scope.datapoints);
   }
 
   remoteTypeChange() {
@@ -1079,7 +1079,7 @@ export class RunController {
           vm.getStatus = true;
           const runLoop = () => {
             vm.analysisLoop().finally(() => {
-              if (vm.getStatus)  {
+              if (vm.getStatus) {
                 vm.$timeout(runLoop, 20000);
               }
             });

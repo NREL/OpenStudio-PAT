@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
- *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *  OpenStudio(R), Copyright (c) 2008-2018, Alliance for Sustainable Energy, LLC. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  *  following conditions are met:
@@ -59,7 +59,7 @@ export class DependencyManager {
 
     vm.tempDir = jetpack.cwd(app.getPath('temp'));
     if (vm.Message.showDebug()) vm.$log.debug('TEMPDIR HERE: ', app.getPath('temp'));
-    vm.src = jetpack.cwd(app.getAppPath() + "/Resources/");
+    vm.src = jetpack.cwd(app.getAppPath() + '/Resources/');
     if (vm.Message.showDebug()) vm.$log.debug('src:', vm.src.path());
   }
 

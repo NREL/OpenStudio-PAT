@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
- *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *  OpenStudio(R), Copyright (c) 2008-2018, Alliance for Sustainable Energy, LLC. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  *  following conditions are met:
@@ -101,8 +101,8 @@ export class ReportsController {
     wv.attr('preload', vm.$scope.preloadPath);
 
     // Set the default project report to the summary table
-    if (_.find(vm.$scope.projectReports, {name: "Summary Table"})) {
-      var defReport = _.find(vm.$scope.projectReports, {name: "Summary Table"});
+    if (_.find(vm.$scope.projectReports, {name: 'Summary Table'})) {
+      var defReport = _.find(vm.$scope.projectReports, {name: 'Summary Table'});
       vm.$scope.selectedReportName = defReport.name;
       vm.$scope.selectedReportURL = defReport.url;
       wv.attr('src', vm.$scope.selectedReportURL);
