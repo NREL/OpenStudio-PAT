@@ -1,0 +1,36 @@
+stages:
+- build
+
+build:windows:
+  variables:
+    CI_DEBUG_TRACE: "true"
+  stage: build
+  only:
+  - develop
+  tags:
+  - windows
+  script:
+  - npm install
+  - bower install
+  - npm run release
+  artifacts:
+    expire_in: 1 day
+    paths:
+    - PAT/build/
+
+build:mac:
+  variables:
+    CI_DEBUG_TRACE: "true"
+  stage: build
+  only:
+  - develop  
+  tags:
+  - mac
+  script:
+  - npm install
+  - bower install
+  - npm run release
+  artifacts:
+    expire_in: 1 day
+    paths:
+    - PAT/build/
