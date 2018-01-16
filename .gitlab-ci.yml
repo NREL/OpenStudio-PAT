@@ -1,5 +1,7 @@
 stages:
 - build
+- lint
+- package
 
 build:windows:
   variables:
@@ -12,11 +14,6 @@ build:windows:
   script:
   - npm install
   - bower install
-  - npm run release
-  artifacts:
-    expire_in: 1 day
-    paths:
-    - PAT/build/
 
 build:mac:
   variables:
@@ -29,8 +26,57 @@ build:mac:
   script:
   - npm install
   - bower install
+
+lint:windows:
+  variables:
+    CI_DEBUG_TRACE: "true"
+  stage: lint
+  only:
+  - develop
+  tags:
+  - windows
+  script:
+  - npm install gulp
+  - gulp lint
+
+lint:mac:
+  variables:
+    CI_DEBUG_TRACE: "true"
+  stage: lint
+  only:
+  - develop  
+  tags:
+  - mac
+  script:
+  - npm install gulp
+  - gulp lint
+
+package:windows:
+  variables:
+    CI_DEBUG_TRACE: "true"
+  stage: package
+  only:
+  - develop
+  tags:
+  - windows
+  script:
   - npm run release
   artifacts:
     expire_in: 1 day
     paths:
-    - PAT/build/
+    - /node_modules/electron/dist/electron.exe
+
+package:mac:
+  variables:
+    CI_DEBUG_TRACE: "true"
+  stage: package
+  only:
+  - develop  
+  tags:
+  - mac
+  script:
+  - npm run release
+  artifacts:
+    expire_in: 1 day
+    paths:
+    - /node_modules/electron/dist/Electron
