@@ -37,14 +37,14 @@
       ng-if="row.entity.type=='String' && (col.colDef.field == 'option_1'  && row.entity.variable == false) && !row.entity.specialRowId"
       ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" type="text"
       ng-class="'colt' + col.uid"
-      ui-grid-editor ng-model="MODEL_COL_FIELD">
+      ui-grid-editor ng-model="MODEL_COL_FIELD" ng-trim="false">
     <input
       ng-if="row.entity.type=='String' && (col.colDef.field != 'option_1' || (col.colDef.field == 'option_1'  && row.entity.variable == true)) && !row.entity.specialRowId"
       type="text" ng-class="'colt' + col.uid"
-      ui-grid-editor ng-model="MODEL_COL_FIELD">
+      ui-grid-editor ng-model="MODEL_COL_FIELD" ng-trim="false">
 
     <input ng-if="row.entity.type=='String' && row.entity.specialRowId=='optionName'" type="text"
-           ng-class="'colt' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD">
+           ng-class="'colt' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD" ng-trim="false">
     <input ng-if="row.entity.type=='String' && row.entity.specialRowId=='optionDescription'" type="text"
            ng-class="'colt' + col.uid" ui-grid-editor ng-model="MODEL_COL_FIELD"
            ng-init="grid.appScope.analysis.editOptionDescription(col,row)"

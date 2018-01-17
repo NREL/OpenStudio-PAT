@@ -366,6 +366,11 @@ select {
   text-align: center;border-right: 0px;box-shadow: -1px 1px #d4d4d4
 }
 
+/* this allows no trim of whitespace at front or end of strings in editable grid cells */
+.ui-grid-cell-contents {
+  white-space: pre !important; /*nowrap by default*/
+}
+
 /* TODO: Something is wrong, fix this later */
 .input-group > select + .input-group-btn > button {
   height: 34px;
