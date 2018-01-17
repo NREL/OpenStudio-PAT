@@ -26,6 +26,7 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import {remote} from 'electron';
+import openport from 'openport';
 const {app} = remote;
 
 export class MeasureManager {
@@ -47,7 +48,8 @@ export class MeasureManager {
     vm.spawn = require('child_process').spawn;
     vm.cliPath = DependencyManager.getPath('PAT_OS_CLI_PATH');
 
-    vm.url = 'http://localhost:1234';
+    vm.url = 'http://localhost';
+    vm.port = 1234;
 
     // measure Manager ready promise
     vm.mmReadyDeferred = vm.$q.defer();
@@ -61,50 +63,65 @@ export class MeasureManager {
 
   startMeasureManager() {
     const vm = this;
-    vm.$log.info('Start Measure Manager Server: ', vm.cliPath);
-    vm.cli = vm.spawn(vm.cliPath, ['measure', '-s']);
-    vm.cli.stdout.on('data', (data) => {
-      if (vm.Message.showDebug()) vm.$log.debug(`MeasureManager: ${data}`);
-      // check that the mm was started correctly: resolve readyDeferred
-      const str = data.toString();
-      if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
-        if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
-        vm.mmReadyDeferred.resolve();
-      }
-      // TODO: THIS IS TEMPORARY (windows):
-      else if (str.indexOf('Only one usage of each socket address') !== -1) {
-        if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
-        vm.mmReadyDeferred.resolve();
-      }
-      // TODO: THIS IS TEMPORARY (mac):
-      else if (str.indexOf('Error: Address already in use') !== -1) {
-        if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
-        vm.mmReadyDeferred.resolve();
-      }
 
-    });
-    vm.cli.stderr.on('data', (data) => {
-      vm.$log.info(`MeasureManager: ${data}`);
-      // check that the mm was started correctly: resolve readyDeferred
-      const str = data.toString();
-      if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
-        if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
-        vm.mmReadyDeferred.resolve();
+    // find an open port
+    openport.find(
+      {
+        startingPort: 3100,
+        endingPort: 3500,
+        avoid: [3500]
+      },
+      function(err, port) {
+        if(err) { vm.$log.error('Error locating an open port for measure manager.'); return; }
+        vm.port = port;
+        vm.$log.info("Measure Manager port: ", vm.port);
+
+        vm.$log.info('Start Measure Manager Server: ', vm.cliPath, ' measure -s ', vm.port);
+        vm.cli = vm.spawn(vm.cliPath, ['measure', '-s', vm.port]);
+        vm.cli.stdout.on('data', (data) => {
+          if (vm.Message.showDebug()) vm.$log.debug(`MeasureManager: ${data}`);
+          // check that the mm was started correctly: resolve readyDeferred
+          const str = data.toString();
+          if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
+            if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
+            vm.mmReadyDeferred.resolve();
+          }
+          // TODO: THIS IS TEMPORARY (windows):
+          else if (str.indexOf('Only one usage of each socket address') !== -1) {
+            if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
+            vm.mmReadyDeferred.resolve();
+          }
+          // TODO: THIS IS TEMPORARY (mac):
+          else if (str.indexOf('Error: Address already in use') !== -1) {
+            if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
+            vm.mmReadyDeferred.resolve();
+          }
+
+        });
+        vm.cli.stderr.on('data', (data) => {
+          vm.$log.info(`MeasureManager: ${data}`);
+          // check that the mm was started correctly: resolve readyDeferred
+          const str = data.toString();
+          if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
+            if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
+            vm.mmReadyDeferred.resolve();
+          }
+          // TODO: THIS IS TEMPORARY (windows):
+          else if (str.indexOf('Only one usage of each socket address') !== -1) {
+            if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
+            vm.mmReadyDeferred.resolve();
+          }
+          // TODO: THIS IS TEMPORARY (mac):
+          else if (str.indexOf('Error: Address already in use') !== -1) {
+            if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
+            vm.mmReadyDeferred.resolve();
+          }
+        });
+        vm.cli.on('close', (code) => {
+          vm.$log.info(`Measure Manager exited with code ${code}`);
+        });
       }
-      // TODO: THIS IS TEMPORARY (windows):
-      else if (str.indexOf('Only one usage of each socket address') !== -1) {
-        if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
-        vm.mmReadyDeferred.resolve();
-      }
-      // TODO: THIS IS TEMPORARY (mac):
-      else if (str.indexOf('Error: Address already in use') !== -1) {
-        if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
-        vm.mmReadyDeferred.resolve();
-      }
-    });
-    vm.cli.on('close', (code) => {
-      vm.$log.info(`Measure Manager exited with code ${code}`);
-    });
+    );
   }
 
   stopMeasureManager() {
@@ -131,7 +148,7 @@ export class MeasureManager {
     if (vm.Message.showDebug()) vm.$log.debug('MeasureManager::createNewMeasure');
 
     if (vm.Message.showDebug()) vm.$log.debug('MeasureManager::createNewMeasure params: ', params);
-    vm.$http.post(vm.url + '/create_measure', params)
+    vm.$http.post(`${vm.url}:${vm.port}/create_measure`, params)
       .success((data, status, headers, config) => {
         vm.$log.info('MeasureManager::createNewMeasure reply: ', data);
         deferred.resolve(data);
@@ -163,7 +180,7 @@ export class MeasureManager {
     const deferred = vm.$q.defer();
 
     if (vm.Message.showDebug()) vm.$log.debug('params one more time: ', params);
-    vm.$http.post(vm.url + '/duplicate_measure', params)
+    vm.$http.post(`${vm.url}:${vm.port}/duplicate_measure`, params)
       .success((data, status, headers, config) => {
         vm.$log.info('Measure Manager reply: ', data);
         deferred.resolve(data);
@@ -189,7 +206,7 @@ export class MeasureManager {
 
     const deferred = vm.$q.defer();
 
-    vm.$http.post(vm.url + '/update_measures', params)
+    vm.$http.post(`${vm.url}:${vm.port}/update_measures`, params)
       .success((data, status, headers, config) => {
         vm.$log.info('updateMeasures Success!, status: ', status);
         // if (vm.Message.showDebug()) vm.$log.debug('Measure Manager reply: ', data);
@@ -207,7 +224,7 @@ export class MeasureManager {
   getMyMeasuresDir() {
     const vm = this;
     const deferred = vm.$q.defer();
-    vm.$http.get(vm.url, {
+    vm.$http.get(`${vm.url}:${vm.port}`, {
       params: {}
     })
       .success((data, status, headers, config) => {
@@ -225,7 +242,7 @@ export class MeasureManager {
     const vm = this;
     const deferred = vm.$q.defer();
     const params = {my_measures_dir: path};
-    vm.$http.post(vm.url + '/set', params)
+    vm.$http.post(`${vm.url}:${vm.port}/set`, params)
       .success((data, status, headers, config) => {
         vm.$log.info('Measure Manager setMyMeasuresDir Success!, status: ', status);
         deferred.resolve(data);
@@ -242,7 +259,7 @@ export class MeasureManager {
     const vm = this;
     const deferred = vm.$q.defer();
     const params = {};
-    vm.$http.post(vm.url + '/bcl_measures', params)
+    vm.$http.post(`${vm.url}:${vm.port}/bcl_measures`, params)
       .success((data, status, headers, config) => {
         vm.$log.info('Measure Manager bcl_measures Success!, status: ', status);
         deferred.resolve(data);
@@ -260,7 +277,7 @@ export class MeasureManager {
     const deferred = vm.$q.defer();
     const params = {uid: uid};
 
-    vm.$http.post(vm.url + '/download_bcl_measure', params)
+    vm.$http.post(`${vm.url}:${vm.port}/download_bcl_measure`, params)
       .success((data, status, headers, config) => {
         vm.$log.info('Measure Manager download_bcl_measure Success!, status: ', status);
         vm.$log.info('Data: ', data);
@@ -289,7 +306,7 @@ export class MeasureManager {
     if (vm.Message.showDebug()) vm.$log.debug('computeArguments params', params);
     const deferred = vm.$q.defer();
 
-    vm.$http.post(vm.url + '/compute_arguments', params)
+    vm.$http.post(`${vm.url}:${vm.port}/compute_arguments`, params)
       .success((data, status, headers, config) => {
         vm.$log.info('computeArguments Success!, status: ', status);
         // if (vm.Message.showDebug()) vm.$log.debug('Measure Manager reply: ', data);
