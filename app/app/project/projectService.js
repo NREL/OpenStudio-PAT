@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
- *  OpenStudio(R), Copyright (c) 2008-2017, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *  OpenStudio(R), Copyright (c) 2008-2018, Alliance for Sustainable Energy, LLC. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  *  following conditions are met:
@@ -664,7 +664,7 @@ export class Project {
     });
 
     // remove duplicates from osaErrors array
-    vm.osaErrors =  _.uniq(vm.osaErrors);
+    vm.osaErrors = _.uniq(vm.osaErrors);
 
     // MEASURE DETAILS
     let measure_count = 0;
@@ -908,8 +908,8 @@ export class Project {
     if (analysis_variables == 0 && !atLeastOneSkip){
       // error: must have at least one variable to run a PAT analysis
 
-      vm.$log.error(`You need at least 1 variable set on the analysis tab or 1 measure set to 'None' in a design alternative in order to run an analysis`);
-      vm.osaErrors.push(`You need at least 1 variable set on the analysis tab or 1 measure set to 'None' in a design alternative in order to run an analysis`);
+      vm.$log.error('You need at least 1 variable set on the analysis tab or 1 measure set to \'None\' in a design alternative in order to run an analysis');
+      vm.osaErrors.push('You need at least 1 variable set on the analysis tab or 1 measure set to \'None\' in a design alternative in order to run an analysis');
 
     }
 
@@ -1280,7 +1280,7 @@ export class Project {
       const measureName = out.measure_name;
       if (_.includes(out.name, measureClassName + '.')){
         // this is the old way, rip it out to maintain backwards compatibility
-        out.name = out.name.replace(measureClassName + '.', "");
+        out.name = out.name.replace(measureClassName + '.', '');
       }
 
       if (!_.startsWith(out.name, measureName + '.')){
@@ -3529,7 +3529,7 @@ export class Project {
 
   getAlgorithmResultsPath() {
     const vm = this;
-    return  vm.getProjectLocalResultsDir().path('results.csv');
+    return vm.getProjectLocalResultsDir().path('results.csv');
   }
 
   getAlgorithmResultsMetadataPath() {
