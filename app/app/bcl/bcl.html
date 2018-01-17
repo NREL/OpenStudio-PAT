@@ -85,6 +85,10 @@
             <p class="normal-text">{{modal.selected.description}}</p>
             <h4 translate>bcl.aside.modelerDescription</h4>
             <p class="normal-text">{{modal.selected.modelerDescription}}</p>
+            <div ng-if="modal.selected.error">
+              <h4 translate>bcl.aside.error</h4>
+              <p class="normal-text red-text">{{modal.selected.error}}</p>
+            </div>
             <h4 translate>bcl.aside.tags</h4>
             <p class="normal-text">{{modal.selected.tags}}</p>
             <h4 translate>bcl.aside.attributes</h4>

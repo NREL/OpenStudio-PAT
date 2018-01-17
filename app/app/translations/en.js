@@ -254,6 +254,7 @@ export default {
       maxCompatibleVersion: 'Max Compatible Version',
       minCompatibleVersion: 'Min Compatible Version',
       modelerDescription: 'Modeler Description',
+      error: 'Error',
       tags: 'Tags'
     },
     category: {
