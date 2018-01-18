@@ -664,7 +664,7 @@ export class ModalBclController {
         if (project_measure.arguments.length > 0) {
           exampleArgForOptions = project_measure.arguments[0];
         }
-
+        // remove non-existing arguments
         _.forEachRight(project_measure.arguments, (arg, index) => {
           if (_.isUndefined(arg.specialRowId)) {
             const match = _.find(measure.arguments, {name: arg.name});
@@ -675,9 +675,16 @@ export class ModalBclController {
           }
         });
         // then add/merge (at argument level)
-        _.forEach(newMeasure.arguments, (arg) => {
-          const match = _.find(project_measure.arguments, {name: arg.name});
-          if (_.isUndefined(match)) {
+        const newArgs = [];
+        // first add in specialRows
+        _.forEach(project_measure.arguments, (arg) => {
+          if (angular.isDefined(arg.specialRowId)){
+            newArgs.push(arg);
+          }
+        });
+        _.forEach(newMeasure.arguments, (arg, index) => {
+          const matchIndex = _.findIndex(project_measure.arguments, {name: arg.name});
+          if (matchIndex == -1) {
 
             // set up default_values for existing options
             _.forEach(_.keys(exampleArgForOptions), (key) => {
@@ -690,14 +697,20 @@ export class ModalBclController {
             arg.variable = false;
 
             // if (vm.Message.showDebug()) vm.$log.debug('adding argument: ', arg.name);
-            project_measure.arguments.push(arg);
+            // add it at the correct place in the array
+            newArgs.push(arg);
 
           } else {
             // if (vm.Message.showDebug()) vm.$log.debug('merging argument: ', arg.name);
-            _.merge(match, arg);
+            _.merge(project_measure.arguments[matchIndex], arg);
+            // remove and reInsert at correct location
+            newArgs.push(project_measure.arguments[matchIndex]);
+
             // if (vm.Message.showDebug()) vm.$log.debug('merged match: ', match);
           }
         });
+        // copy new, reordered arguments
+        project_measure.arguments = newArgs;
         // save display_name and name so it is not overwritten, in case it is a duplicate measure instance
         const display_name = project_measure.display_name;
         const name = project_measure.name;
