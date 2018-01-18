@@ -659,6 +659,12 @@ export class ModalBclController {
       // remove arguments that no longer exist (by name) (in reverse) (except for special display args)
       if (vm.Message.showDebug()) vm.$log.debug('Project Measures to Update: ', project_measures);
       _.forEach(project_measures, (project_measure) => {
+        // grab 1st argument to see what options already exists
+        let exampleArgForOptions = {};
+        if (project_measure.arguments.length > 0) {
+          exampleArgForOptions = project_measure.arguments[0];
+        }
+
         _.forEachRight(project_measure.arguments, (arg, index) => {
           if (_.isUndefined(arg.specialRowId)) {
             const match = _.find(measure.arguments, {name: arg.name});
@@ -672,8 +678,20 @@ export class ModalBclController {
         _.forEach(newMeasure.arguments, (arg) => {
           const match = _.find(project_measure.arguments, {name: arg.name});
           if (_.isUndefined(match)) {
+
+            // set up default_values for existing options
+            _.forEach(_.keys(exampleArgForOptions), (key) => {
+              if (_.startsWith(key, 'option_')) {
+                // create an option with default value
+                arg[key] = arg.hasOwnProperty('default_value') ? arg.default_value : null;
+              }
+            });
+            // add variable key and default to false
+            arg.variable = false;
+
             // if (vm.Message.showDebug()) vm.$log.debug('adding argument: ', arg.name);
             project_measure.arguments.push(arg);
+
           } else {
             // if (vm.Message.showDebug()) vm.$log.debug('merging argument: ', arg.name);
             _.merge(match, arg);
@@ -683,9 +701,10 @@ export class ModalBclController {
         // save display_name and name so it is not overwritten, in case it is a duplicate measure instance
         const display_name = project_measure.display_name;
         const name = project_measure.name;
-        // remove arguments and merge rest with project_measure
+        // remove arguments and options and merge rest with project_measure
         const measure_copy = angular.copy(measure);
         delete measure_copy.arguments;
+        delete measure_copy.options;
         delete measure_copy.open;
         _.assignIn(project_measure, measure_copy);
         project_measure.display_name = display_name;
@@ -695,6 +714,9 @@ export class ModalBclController {
           vm.toastr.success(translation);
         });
       });
+
+      // save pretty options just in case
+      vm.Project.savePrettyOptions();
 
       vm.$scope.updateInProgress = false;
       deferred.resolve();

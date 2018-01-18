@@ -226,9 +226,12 @@ export class AnalysisController {
       },
       //enableCellEdit: true
       cellEditableCondition: $scope => {
+        // find 1st option (might not be option_1)
+        const minKey = vm.getFirstOptionId($scope.row.entity);
+
         if (!_.isNil($scope.row.entity.specialRowId)) {
           return true;
-        } else if ($scope.col.colDef.name == 'option_1') {
+        } else if ($scope.col.colDef.name == minKey) {
           return true;
         } else {
           return $scope.row.entity.variable;
@@ -327,6 +330,14 @@ export class AnalysisController {
               if (vm.Message.showDebug()) vm.$log.debug('colDef: ', colDef);
               vm.updateDatapoints(measure, colDef.name, rowEntity);
 
+              // double check that you are really allowed to change this cell (in the case of non-variable arguments)
+              if (_.startsWith(colDef.name, 'option_') && !rowEntity.variable && vm.getFirstOptionId(rowEntity) != colDef.name) {
+                vm.$log.error(`Cannot change cell to value: ${newValue}. ${rowEntity.name} is not a variable.  Setting value to first option's value.`);
+                // TODO: need a user toastr here?
+                // set to value of firstOption
+                let firstOptionId = vm.getFirstOptionId(rowEntity);
+                rowEntity[colDef.name] = rowEntity[firstOptionId];
+              }
             }
           });
         }
@@ -551,12 +562,6 @@ export class AnalysisController {
       else if (argument.specialRowId === 'optionDescription') {
         argument[opt.field] = opt.display_name + ' Description: ' + measure.description;
       }
-      else if (_.isUndefined(argument.variable)) {
-        argument.variable = false;
-      }
-      else if (!argument.variable) {
-        argument[opt.field] = argument.option_1;
-      }
     });
 
     vm.$scope.gridOptions[measure.instanceId].columnDefs.push(opt);
@@ -564,6 +569,32 @@ export class AnalysisController {
     vm.Project.savePrettyOptions();
 
     return opt;
+  }
+
+  addDefaultArguments(measure, option) {
+    const vm = this;
+
+    let firstOptId = null;
+    // determine which one is the first option
+    if (measure.options && measure.options.length > 0) {
+      firstOptId = measure.options[0].id;
+    }
+    _.forEach(measure.arguments, (argument) => {
+
+      // first ensure variable field exists
+      if (_.isUndefined(argument.variable)) {
+        argument.variable = false;
+      }
+
+      // default value
+      argument[option.field] = !_.isNil(argument.default_value) ? argument.default_value : '';
+
+      // check if argument
+      if (!argument.variable) {
+        // argument: use first option's value, or default value if no first option
+        argument[option.field] = !_.isNil(firstOptId) ? argument[firstOptId] : argument[option.field];
+      }
+    });
   }
 
   deleteSelectedOption(measure) { // TODO is this dead code? Evan
@@ -645,15 +676,13 @@ export class AnalysisController {
             return k.indexOf('option_') !== -1;
           });
           for (let j = 1; j < optionKeys.length; j++) {
-            //if (vm.Message.showDebug()) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[j]]);
-            //if (vm.Message.showDebug()) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[0]]);
+            // reset all option argument values to first option's value
             measure.arguments[i][optionKeys[j]] = measure.arguments[i][optionKeys[0]];
           }
           break;
         }
       }
     }
-    //vm.$scope.$broadcast('uiGridEventEndCellEdit'); Note: this causes page to jump to bottom, and is visually unacceptable (Evan)
   }
 
   allVariableCheckboxesChanged(row, col) {
@@ -680,13 +709,11 @@ export class AnalysisController {
           return k.indexOf('option_') !== -1;
         });
         for (let j = 1; j < optionKeys.length; j++) {
-          //if (vm.Message.showDebug()) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[j]]);
-          //if (vm.Message.showDebug()) vm.$log.debug('measure.arguments[i][optionKeys[j]]: ', measure.arguments[i][optionKeys[0]]);
+          // reset all option argument values to first option's value
           measure.arguments[i][optionKeys[j]] = measure.arguments[i][optionKeys[0]];
         }
       }
     }
-    //vm.$scope.$broadcast('uiGridEventEndCellEdit'); Note: this causes page to jump to bottom, and is visually unacceptable (Evan)
   }
 
   // Toggle all variable checkboxes
@@ -706,17 +733,6 @@ export class AnalysisController {
       });
     }
     vm.allVariableCheckboxesChanged(row, col);
-  }
-
-  addDefaultArguments(measure, option) {
-    const vm = this;
-    vm.setIsModified();
-    // TODO: add logic related to whether an arg is variable or not (if not, use option1's value in subsequent options)
-    _.forEach(measure.arguments, (argument) => {
-      // use default value, otherwise leave blank
-      // TODO: blank or nil? (for optional arguments)
-      argument[option.field] = !_.isNil(argument.default_value) ? argument.default_value : '';
-    });
   }
 
   editOptionDescription(col, row) {
@@ -1437,6 +1453,27 @@ export class AnalysisController {
       });
     }
   }
+
+  getFirstOptionId(gridRowEntity) {
+
+    const optionKeys = _.filter(_.keys(gridRowEntity), (k) => {
+      return k.indexOf('option_') !== -1;
+    });
+
+    let min = 1000000;
+    let minKey = 'option_1';
+    _.forEach(optionKeys, (key) => {
+      const theNum = parseInt(key.replace('option_', ''));
+      if (theNum < min) {
+        min = theNum;
+        minKey = key;
+      }
+    });
+
+    return minKey;
+
+  }
+
 
   getScriptHelp(scriptType) {
     const vm = this;
