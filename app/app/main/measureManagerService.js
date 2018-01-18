@@ -79,7 +79,12 @@ export class MeasureManager {
         vm.$log.info('Start Measure Manager Server: ', vm.cliPath, ' measure -s ', vm.port);
         vm.cli = vm.spawn(vm.cliPath, ['measure', '-s', vm.port]);
         vm.cli.stdout.on('data', (data) => {
-          if (vm.Message.showDebug()) vm.$log.debug(`MeasureManager: ${data}`);
+          if (data.indexOf('[utilities.bcl') !== -1) {
+            // this is probably an error, display it in red
+            vm.$log.error(`MeasureManager WARNING: ${data}`);
+          } else {
+            if (vm.Message.showDebug()) vm.$log.debug(`MeasureManager: ${data}`);
+          }
           // check that the mm was started correctly: resolve readyDeferred
           const str = data.toString();
           if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
@@ -208,7 +213,7 @@ export class MeasureManager {
 
     vm.$http.post(`${vm.url}:${vm.port}/update_measures`, params)
       .success((data, status, headers, config) => {
-        vm.$log.info('updateMeasures Success!, status: ', status);
+        vm.$log.info('updateMeasures Success!');
         // if (vm.Message.showDebug()) vm.$log.debug('Measure Manager reply: ', data);
         deferred.resolve(data);
       })
