@@ -350,7 +350,7 @@
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
-                          ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
+                          ng-options="distribution as distribution for distribution in getDiscreteDistributions(argument.type)"
                           ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
@@ -425,7 +425,7 @@
                       <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
                     </div>
                   </div>
-                  <div ng-if="argument.inputs.distribution == 'Discrete'">
+                  <div ng-if="(argument.inputs.distribution == 'Discrete' && argument.inputs.variableSetting == 'Pivot') || argument.inputs.variableSetting == 'Discrete'">
                     <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
                       <div class="row pad-bot-10">
                         <div class="col-sm-6">
@@ -658,7 +658,7 @@
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
-                          ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
+                          ng-options="distribution as distribution for distribution in getDiscreteDistributions(argument.type)"
                           ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
@@ -733,7 +733,7 @@
                       <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
                     </div>
                   </div>
-                  <div ng-if="argument.inputs.distribution == 'Discrete'">
+                  <div ng-if="(argument.inputs.distribution == 'Discrete' && argument.inputs.variableSetting == 'Pivot') || argument.inputs.variableSetting == 'Discrete'">
                     <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
                       <div class="row pad-bot-10">
                         <div class="col-sm-6">
@@ -966,7 +966,7 @@
                 <div class="col-sm-4">
                   <label class="normal-text" translate>analysis.algorithmic.grid.distribution</label>
                   <select class="form-control"
-                          ng-options="distribution as distribution for distribution in getDiscreteDistributions()"
+                          ng-options="distribution as distribution for distribution in getDiscreteDistributions(argument.type)"
                           ng-model="argument.inputs.distribution" ng-change="analysis.setIsModified()"></select>
                 </div>
                 <div class="col-sm-4" ng-if="argument.inputs.distribution == 'Integer Sequence'">
@@ -1041,7 +1041,7 @@
                       <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
                     </div>
                   </div>
-                  <div ng-if="argument.inputs.distribution == 'Discrete'">
+                  <div ng-if="(argument.inputs.distribution == 'Discrete' && argument.inputs.variableSetting == 'Pivot') || argument.inputs.variableSetting == 'Discrete'">
                     <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
                       <div class="row pad-bot-10">
                         <div class="col-sm-6">

@@ -135,13 +135,18 @@ export class AnalysisController {
       return distributions;
     };
 
-    vm.$scope.getDiscreteDistributions = function () {
+    vm.$scope.getDiscreteDistributions = function (argumentType) {
       //if (vm.Message.showDebug()) vm.$log.debug('In get Discrete Distributions');
       let distributions = [];
       switch (vm.$scope.selectedSamplingMethod.id) {
         case 'diag':
         case 'lhs':
-          distributions = ['Discrete', 'Integer Sequence'];
+          if( argumentType == 'Double' || argumentType == 'Integer'){
+            distributions = ['Discrete', 'Integer Sequence'];
+          } else {
+            // can't select integer sequence for non-numeric inputs
+            distributions = ['Discrete'];
+          }
           break;
         default:
           distributions = ['Discrete'];
