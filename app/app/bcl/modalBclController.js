@@ -440,6 +440,8 @@ export class ModalBclController {
     const dirName = _.last(dirNames);
     // overwrite if measure is already in project folder
     vm.jetpack.copy(measure.measure_dir, vm.projectDir.path(dirName), {overwrite: true});
+    // remove tests/output directory from projectDir copy if it exists (bloat)
+    vm.jetpack.remove(vm.projectDir.path(dirName, 'tests', 'output'));
 
     // add to project measures
     measure.addedToProject = true;
