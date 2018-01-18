@@ -53,13 +53,17 @@ export class ModalDuplicateMeasureController {
     // Find a unique measure_dir
     let count = 0;
     let displayName = vm.newDisplayName;
+    // dirname is sometimes UpperCamelCase, other times it is snake_case.  Check both, but set new measure to snake_case
     let measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
+    let measureDirUCC = vm.Project.getMeasuresDir().path(_.startCase(displayName).replace(/\s+/g, ''));
     if (vm.Message.showDebug()) vm.$log.debug('measureDir: ', measureDir);
-    while (vm.jetpack.exists(measureDir)) {
-      count++;
-      displayName = vm.newDisplayName + count.toString();
-      measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
-      if (vm.Message.showDebug()) vm.$log.debug('measureDir: ', measureDir);
+    
+    while (vm.jetpack.exists(measureDir) || vm.jetpack.exists(measureDirUCC)) {
+        count++;
+        displayName = vm.newDisplayName + count.toString();
+        measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
+        measureDirUCC = vm.Project.getMeasuresDir().path(_.startCase(displayName).replace(/\s+/g, ''));
+        if (vm.Message.showDebug()) vm.$log.debug('measureDir: ', measureDir);
     }
 
     const params = {
