@@ -50,20 +50,30 @@ export class ModalDuplicateMeasureController {
     if (vm.Message.showDebug()) vm.$log.debug('Duplicate Measure measure: ', vm.measure);
     //const oldMeasureDir = vm.measure.measure_dir;
 
-    // Find a unique measure_dir
+    // Find a unique measure_dir (& unique name?)
     let count = 0;
     let displayName = vm.newDisplayName;
     // dirname is sometimes UpperCamelCase, other times it is snake_case.  Check both, but set new measure to snake_case
     let measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
     let measureDirUCC = vm.Project.getMeasuresDir().path(_.startCase(displayName).replace(/\s+/g, ''));
     if (vm.Message.showDebug()) vm.$log.debug('measureDir: ', measureDir);
-    
+
     while (vm.jetpack.exists(measureDir) || vm.jetpack.exists(measureDirUCC)) {
         count++;
         displayName = vm.newDisplayName + count.toString();
         measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
         measureDirUCC = vm.Project.getMeasuresDir().path(_.startCase(displayName).replace(/\s+/g, ''));
         if (vm.Message.showDebug()) vm.$log.debug('measureDir: ', measureDir);
+    }
+
+    // extra check to ensure that the new name (which will be a snake_case version of displayName) doesn't match the old name.  If so, increment.
+    // The expectation is that users would go in and fix the names to what they actually want in the newly duplicated measure
+    if (_.snakeCase(displayName) === vm.measure.name) {
+      // edge case caused by bad directory naming
+      // increment one more time
+      count ++;
+      displayName = vm.newDisplayName + count.toString();
+      measureDir = vm.Project.getMeasuresDir().path(_.snakeCase(displayName));
     }
 
     const params = {
