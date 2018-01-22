@@ -386,13 +386,11 @@ export class Project {
     if (vm.Message.showDebug()) vm.$log.debug('in Project computeMeasureArguments()');
     let osmPath;
     if (_.isNil(vm.seedDir)) {
-      vm.$log.error('vm.seedDir is undefined. Unable to compute measure arguments.');
-      deferred.reject('vm.seedDir isNil');
-      return deferred.promise;
+      vm.$log.warn('vm.seedDir is undefined. Computing measure arguments with empty seed model.');
+      osmPath = null;
     } else if (_.isNil(measure.seed)) {
-      vm.$log.error('measure.seed is undefined. Unable to compute measure arguments.');
-      deferred.reject('measure.seed isNil');
-      return deferred.promise;
+      vm.$log.warn('measure.seed is undefined. Computing measure arguments with empty seed model.');
+      osmPath = null;
     } else {
       osmPath = vm.seedDir.path(measure.seed);
     }
