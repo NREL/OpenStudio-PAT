@@ -28,6 +28,7 @@
 import {shell} from 'electron';
 import jetpack from 'fs-jetpack';
 import YAML from 'yamljs';
+import VersionCompare from 'version_compare';
 
 export class RunController {
 
@@ -48,6 +49,7 @@ export class RunController {
     vm.$translate = $translate;
     vm.shell = shell;
     vm.jetpack = jetpack;
+    vm.VersionCompare = VersionCompare;
     vm.$sce = $sce;
     vm.Message = Message;
 
@@ -82,14 +84,23 @@ export class RunController {
     let package_os = vm.package_openstudio_version.substring(0, vm.package_openstudio_version.lastIndexOf('.'));
     if (vm.Message.showDebug()) vm.$log.debug('PACKAGE OS VERSION: ', package_os);
 
-    vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
-    if (vm.Message.showDebug()) vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
     if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Server Versions: ', vm.$scope.osServerVersions);
 
     // get default AMI for this openstudio version
     vm.$scope.defaultAMI = _.find(vm.$scope.osServerVersions, {name: package_os});
     if (vm.Message.showDebug()) vm.$log.debug('DEFAULT AMI: ', vm.$scope.defaultAMI);
+
+    // modify osServerVersions to include disable tag
+    const amiMinVersion = _.first(vm.$scope.defaultAMI.name.split('-'));
+    _.forEach(vm.$scope.osServerVersions, (v) => {
+      v.recommend = (vm.VersionCompare.gt(_.first(v.name.split('-')), amiMinVersion)) ? ' -- Not Recommended' : '';
+    });
+
+    if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Server Versions: ', vm.$scope.osServerVersions);
+
+    vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
+    if (vm.Message.showDebug()) vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);
 
     vm.$scope.serverInstanceTypes = vm.Project.getServerInstanceTypes();
     vm.$scope.workerInstanceTypes = vm.Project.getWorkerInstanceTypes();
