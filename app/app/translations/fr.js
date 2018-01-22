@@ -358,6 +358,10 @@ export default {
       updateLocalLibButton: 'Mettre à jour la bibliothèque locale',
       updateLocalLibOnlyButton: 'Mettre à jour uniquement la bibliothèque locale',
       updateBothButton: 'Mettre à jour la bibliothèque locale et le projet'
+    },
+    displayErrors: {
+      title: 'Manager de Mesures - Avertissements et Erreurs',
+      viewErrors: 'Afficher les Erreurs'
     }
   },
   designAlts: {

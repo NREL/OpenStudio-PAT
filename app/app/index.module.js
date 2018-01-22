@@ -48,6 +48,7 @@ import {ModalSaveAsController} from '../app/project/modalSaveAsController';
 import {ModalWhitespaceWarningController} from '../app/project/modalWhitespaceWarningController';
 import {ModalDuplicateMeasureController} from '../app/bcl/modalDuplicateMeasureController';
 import {ModalCreateNewMeasureController} from '../app/bcl/modalCreateNewMeasureController';
+import {ModalDisplayErrorsController} from '../app/bcl/modalDisplayErrorsController';
 import {ModalUpdateMeasureController} from '../app/bcl/modalUpdateMeasureController';
 import {ModalViewReportController} from '../app/run/modalViewReportController';
 import {ModalClearResultsController} from '../app/run/modalClearResultsController';
@@ -93,6 +94,7 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalSetMeasuresDirController', ModalSetMeasuresDirController)
   .controller('ModalDuplicateMeasureController', ModalDuplicateMeasureController)
   .controller('ModalCreateNewMeasureController', ModalCreateNewMeasureController)
+  .controller('ModalDisplayErrorsController', ModalDisplayErrorsController)
   .controller('ModalUpdateMeasureController', ModalUpdateMeasureController)
   .controller('ModalViewReportController', ModalViewReportController)
   .controller('ModalSelectOutputsController', ModalSelectOutputsController)

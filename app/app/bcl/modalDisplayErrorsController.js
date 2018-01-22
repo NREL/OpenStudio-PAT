@@ -25,69 +25,24 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-export class Message {
-  constructor($q, $log) {
+
+export class ModalDisplayErrorsController {
+
+  constructor($log, $uibModalInstance, $scope, Message, errors) {
     'ngInject';
+
     const vm = this;
-    vm.$q = $q;
     vm.$log = $log;
-    vm.measureManagerErrors = [];
+    vm.$uibModalInstance = $uibModalInstance;
+    vm.$scope = $scope;
+    vm.errors = errors;
+    vm.Message = Message;
 
-    // This bool is used to reduce the number of debug messages given the typical, non-developer user
-    vm.showDebugMessages = false;
-    if (vm.showDebugMessages) vm.$log.info('showDebugMessages = ', vm.showDebugMessages);
-
-    vm.showInfoMessages = true;
-    if (vm.showInfoMessages) vm.$log.info('showInfoMessages = ', vm.showInfoMessages);
-
-    vm.showErrorMessages = true;
-    if (vm.showErrorMessages) vm.$log.info('showErrorMessages = ', vm.showErrorMessages);
   }
 
-  showDebug() {
+  ok() {
     const vm = this;
-    return vm.showDebugMessages;
-  }
-
-  setShowDebug(show) {
-    const vm = this;
-    vm.showDebugMessages = show;
-    vm.$log.info('showDebugMessages = ', vm.showDebugMessages);
-  }
-
-  showInfo() {
-    const vm = this;
-    return vm.showInfoMessages;
-  }
-
-  setShowInfog(show) {
-    const vm = this;
-    vm.showInfoMessages = show;
-  }
-
-  showError() {
-    const vm = this;
-    return vm.showErrorMessages;
-  }
-
-  setShowError(show) {
-    const vm = this;
-    vm.showErrorMessages = show;
-  }
-
-  getMeasureManagerErrors() {
-    const vm = this;
-    return vm.measureManagerErrors;
-  }
-
-  resetMeasureManagerErrors() {
-    const vm = this;
-    vm.measureManagerErrors.splice(0,vm.measureManagerErrors.length);
-  }
-
-  appendMeasureManagerError(error) {
-    const vm = this;
-    vm.measureManagerErrors.push(error);
+    vm.$uibModalInstance.close();
   }
 
 }

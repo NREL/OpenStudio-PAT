@@ -358,6 +358,10 @@ export default {
       updateLocalLibButton: 'Update Local Library',
       updateLocalLibOnlyButton: 'Update Local Library Only',
       updateBothButton: 'Update Local Library and Project'
+    },
+    displayErrors: {
+      title: 'Measure Manager Warnings and Errors',
+      viewErrors: 'View Measure Manager Errors'
     }
   },
   designAlts: {

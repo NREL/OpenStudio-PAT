@@ -1,5 +1,12 @@
 <div class="modal-header">
-  <h3 class="modal-title" translate>bcl.title</h3>
+  <div class="row">
+    <div class="col-sm-11">
+      <h3 class="modal-title" translate>bcl.title</h3>
+    </div>
+    <div class="col-sm-1" ng-if="mmErrors.length > 0" class="normal-text">
+      <button type="button" class="btn btn-warning pull-right" ng-click="modal.displayMMerrors()"><span class="glyphicon glyphicon-exclamation-sign" aria-hidden="true"></span></button>
+    </div>
+  </div>
 </div>
 <div class="modal-body">
 

@@ -53,6 +53,8 @@ export class ModalBclController {
     vm.MeasureManager = MeasureManager;
     vm.Message = Message;
 
+    vm.$scope.mmErrors = vm.Message.getMeasureManagerErrors();
+
     vm.selected = null;
     vm.keyword = '';
 
@@ -886,4 +888,23 @@ export class ModalBclController {
     return deferred.promise;
   }
 
+  displayMMerrors() {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('ModalBCL::displayMMerrors');
+
+    const deferred = vm.$q.defer();
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalDisplayErrorsController',
+      controllerAs: 'modal',
+      templateUrl: 'app/bcl/display_errors.html',
+      windowClass: 'wide-modal',
+      resolve: {
+        errors: function() {
+          return vm.$scope.mmErrors;
+        }
+      }
+    });
+
+  }
 }

@@ -80,6 +80,7 @@ export class BCL {
     vm.libMeasures.local = [];
 
     // my measures
+    vm.Message.resetMeasureManagerErrors();
     vm.checkForUpdates();
 
     // local and online BCL
@@ -93,6 +94,7 @@ export class BCL {
   getMeasures() {
     const vm = this;
 
+    vm.Message.resetMeasureManagerErrors();
     const promise1 = vm.checkForUpdates();
     const promise2 = vm.checkForUpdatesLocalBcl();
 

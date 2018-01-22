@@ -53,6 +53,8 @@ export class AnalysisController {
     vm.$translate = $translate;
     vm.Message = Message;
 
+    vm.$scope.mmErrors = vm.Message.getMeasureManagerErrors();
+
     vm.analysisTypes = vm.Project.getAnalysisTypes();
     vm.$scope.seeds = vm.Project.getSeeds();
     vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
@@ -1478,7 +1480,6 @@ export class AnalysisController {
     return minKey;
 
   }
-
 
   getScriptHelp(scriptType) {
     const vm = this;

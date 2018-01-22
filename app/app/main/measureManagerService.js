@@ -79,10 +79,21 @@ export class MeasureManager {
         vm.$log.info('Start Measure Manager Server: ', vm.cliPath, ' measure -s ', vm.port);
         vm.cli = vm.spawn(vm.cliPath, ['measure', '-s', vm.port]);
         vm.cli.stdout.on('data', (data) => {
-          if (data.indexOf('[utilities.bcl') !== -1) {
-            // this is probably an error, display it in red
-            vm.$log.error(`MeasureManager WARNING: ${data}`);
-          } else {
+          // record errors
+          if (data.indexOf('<0>') !== -1) {
+            // WARNING
+            vm.$log.warn(`MeasureManager WARNING: ${data}`);
+            vm.Message.appendMeasureManagerError({type: 'warning', data: data.toString()});
+          } else if (data.indexOf('<1>') !== -1) {
+            // ERROR
+            vm.$log.error(`MeasureManager ERROR: ${data}`);
+            vm.Message.appendMeasureManagerError({type: 'error', data: data.toString()});
+          } else if(data.indexOf('<2>') !== -1) {
+            // ERROR
+            vm.$log.error(`MeasureManager ERROR: ${data}`);
+            vm.Message.appendMeasureManagerError({type: 'fatal', data: data.toString()});
+          }
+          else {
             if (vm.Message.showDebug()) vm.$log.debug(`MeasureManager: ${data}`);
           }
           // check that the mm was started correctly: resolve readyDeferred
@@ -150,6 +161,10 @@ export class MeasureManager {
   createNewMeasure(params) {
     const vm = this;
     const deferred = vm.$q.defer();
+
+    // reset MeasureManagerErrors when a new action
+    vm.Message.resetMeasureManagerErrors();
+
     if (vm.Message.showDebug()) vm.$log.debug('MeasureManager::createNewMeasure');
 
     if (vm.Message.showDebug()) vm.$log.debug('MeasureManager::createNewMeasure params: ', params);
@@ -184,6 +199,9 @@ export class MeasureManager {
     const vm = this;
     const deferred = vm.$q.defer();
 
+    // reset MeasureManagerErrors when a new action
+    vm.Message.resetMeasureManagerErrors();
+
     if (vm.Message.showDebug()) vm.$log.debug('params one more time: ', params);
     vm.$http.post(`${vm.url}:${vm.port}/duplicate_measure`, params)
       .success((data, status, headers, config) => {
@@ -204,12 +222,12 @@ export class MeasureManager {
   updateMeasures(measurePath) {
 
     const vm = this;
+    const deferred = vm.$q.defer();
+
     // fix path for windows
     const newMeasurePath = measurePath.replace(/\\/g, '/'); // Evan: how to normalize the path
     const params = {measures_dir: newMeasurePath};
     if (vm.Message.showDebug()) vm.$log.debug('PARAMS: ', params);
-
-    const deferred = vm.$q.defer();
 
     vm.$http.post(`${vm.url}:${vm.port}/update_measures`, params)
       .success((data, status, headers, config) => {
@@ -247,6 +265,10 @@ export class MeasureManager {
     const vm = this;
     const deferred = vm.$q.defer();
     const params = {my_measures_dir: path};
+
+    // reset MeasureManagerErrors when a new action
+    vm.Message.resetMeasureManagerErrors();
+
     vm.$http.post(`${vm.url}:${vm.port}/set`, params)
       .success((data, status, headers, config) => {
         vm.$log.info('Measure Manager setMyMeasuresDir Success!, status: ', status);
@@ -264,6 +286,7 @@ export class MeasureManager {
     const vm = this;
     const deferred = vm.$q.defer();
     const params = {};
+
     vm.$http.post(`${vm.url}:${vm.port}/bcl_measures`, params)
       .success((data, status, headers, config) => {
         vm.$log.info('Measure Manager bcl_measures Success!, status: ', status);
@@ -281,6 +304,9 @@ export class MeasureManager {
     const vm = this;
     const deferred = vm.$q.defer();
     const params = {uid: uid};
+
+    // reset MeasureManagerErrors when a new action
+    vm.Message.resetMeasureManagerErrors();
 
     vm.$http.post(`${vm.url}:${vm.port}/download_bcl_measure`, params)
       .success((data, status, headers, config) => {
@@ -302,6 +328,10 @@ export class MeasureManager {
   // Expects a measurePath.  and osmPath if evaluating against a specific model
   computeArguments(measurePath, osmPath = null) {
     const vm = this;
+    const deferred = vm.$q.defer();
+
+    // reset MeasureManagerErrors when a new action
+    vm.Message.resetMeasureManagerErrors();
 
     // TODO: is there a situation where we want to use an empty model even though we have a seed model defined?
     if (!osmPath) {
@@ -309,7 +339,6 @@ export class MeasureManager {
     }
     const params = {measure_dir: measurePath, osm_path: osmPath};
     if (vm.Message.showDebug()) vm.$log.debug('computeArguments params', params);
-    const deferred = vm.$q.defer();
 
     vm.$http.post(`${vm.url}:${vm.port}/compute_arguments`, params)
       .success((data, status, headers, config) => {
