@@ -198,12 +198,18 @@ export class BCL {
           let bclChangedDate = null;
           let localVersionModified = null;
           if (angular.isDefined(bclMatch)) {
-            // for now compare the 'changed' date from the BCL search API to the version_modified from measureManager updateMeasure
+            // first check if versionIDs match. Don't update if they match
             bclChangedDate = vm.Project.makeDate(bclMatch.changed);
             localVersionModified = vm.Project.makeDate(measure.version_modified);
-            if (bclChangedDate > localVersionModified) {
-              // bcl update
-              measure.bcl_update = true;
+            if (vm.Message.showDebug()) vm.$log.debug('bclChangedDate: ', bclChangedDate, ' localVersionModified: ', localVersionModified);
+
+            if (bclMatch.version_id !== measure.version_id){
+              // if versionIDs don't match, compare the 'changed' date from the BCL search API to the version_modified from measureManager updateMeasure
+              // TODO: use version_modified on BCL when that is there.  BCL_changed might not be equal to version_modified (if measure was uploaded at a later date), so not super reliable.
+              if (bclChangedDate > localVersionModified) {
+                // bcl update
+                measure.bcl_update = true;
+              }
             }
           }
 

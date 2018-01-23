@@ -611,17 +611,23 @@ export class ModalBclController {
         vm.toastr.success(translation);
       });
 
-      if (updateProject) {
-        vm.updateProjectMeasure(measure).then(() => {
+      // reload local BCL via MM so there is no longer an update for this measure?
+      vm.BCL.checkForUpdatesLocalBcl().then(() => {
+        if (updateProject) {
+          vm.updateProjectMeasure(measure).then(() => {
+            vm.$scope.updateInProgress = false;
+            deferred.resolve();
+          });
+        } else {
+          // restore status (in case didn't update measure in project)
+          measure.status = originalStatus;
           vm.$scope.updateInProgress = false;
           deferred.resolve();
-        });
-      } else {
-        // restore status (in case didn't update measure in project)
-        measure.status = originalStatus;
-        vm.$scope.updateInProgress = false;
-        deferred.resolve();
-      }
+        }
+      }, () => {
+        if (vm.Message.showDebug()) vm.$log.debug('Error checking for local BCL updates...');
+      });
+
     });
 
     return deferred.promise;
