@@ -338,7 +338,7 @@ export class AnalysisController {
               vm.updateDatapoints(measure, colDef.name, rowEntity);
 
               // double check that you are really allowed to change this cell (in the case of non-variable arguments)
-              if (_.startsWith(colDef.name, 'option_') && !rowEntity.variable && vm.getFirstOptionId(rowEntity) != colDef.name) {
+              if (_.startsWith(colDef.name, 'option_') && !rowEntity.variable && vm.getFirstOptionId(rowEntity) != colDef.name && !rowEntity.specialRowId) {
                 vm.$log.error(`Cannot change cell to value: ${newValue}. ${rowEntity.name} is not a variable.  Setting value to first option's value.`);
                 // TODO: need a user toastr here?
                 // set to value of firstOption
