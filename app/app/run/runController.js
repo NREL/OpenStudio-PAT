@@ -92,9 +92,9 @@ export class RunController {
     if (vm.Message.showDebug()) vm.$log.debug('DEFAULT AMI: ', vm.$scope.defaultAMI);
 
     // modify osServerVersions to include disable tag
-    const amiMinVersion = _.first(vm.$scope.defaultAMI.name.split('-'));
+    const amiMinVersion = _.head(vm.$scope.defaultAMI.name.split('-'));
     _.forEach(vm.$scope.osServerVersions, (v) => {
-      v.recommend = (vm.VersionCompare.gt(_.first(v.name.split('-')), amiMinVersion)) ? ' -- Not Recommended' : '';
+      v.recommend = (vm.VersionCompare.gt(_.head(v.name.split('-')), amiMinVersion)) ? ' -- Not Recommended' : '';
     });
 
     if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Server Versions: ', vm.$scope.osServerVersions);

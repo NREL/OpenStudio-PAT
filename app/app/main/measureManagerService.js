@@ -74,7 +74,7 @@ export class MeasureManager {
       function(err, port) {
         if(err) { vm.$log.error('Error locating an open port for measure manager.'); return; }
         vm.port = port;
-        vm.$log.info("Measure Manager port: ", vm.port);
+        vm.$log.info('Measure Manager port: ', vm.port);
 
         vm.$log.info('Start Measure Manager Server: ', vm.cliPath, ' measure -s ', vm.port);
         vm.cli = vm.spawn(vm.cliPath, ['measure', '-s', vm.port]);

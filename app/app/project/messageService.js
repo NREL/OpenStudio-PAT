@@ -82,7 +82,7 @@ export class Message {
 
   resetMeasureManagerErrors() {
     const vm = this;
-    vm.measureManagerErrors.splice(0,vm.measureManagerErrors.length);
+    vm.measureManagerErrors.splice(0, vm.measureManagerErrors.length);
   }
 
   appendMeasureManagerError(error) {
