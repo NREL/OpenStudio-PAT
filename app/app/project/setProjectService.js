@@ -521,6 +521,9 @@ export class SetProject {
 
     // BCL service variables
     vm.BCL.resetProjectVariables();
+
+    // reset OsServer service
+    vm.OsServer.initializeServer();
   }
 
   warnCloudRunning(type) {

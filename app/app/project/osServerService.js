@@ -49,8 +49,6 @@ export class OsServer {
     vm.$translate = $translate;
     vm.toastr = toastr;
 
-    vm.numberDPsToDisplay = vm.Project.getNumberDPsToDisplay();
-
     // set number of workers
     vm.numCores = os.cpus().length;
     vm.numWorkers = 1;
@@ -59,26 +57,6 @@ export class OsServer {
     }
     vm.$log.info('Number of cores: ', vm.numCores);
     vm.$log.info('Number of workers set to: ', vm.numWorkers);
-
-    // to run meta_cli
-    vm.exec = require('child_process').exec;
-
-    vm.serverStatuses = {local: 'stopped', remote: 'stopped'};  // started, stopped, error?
-    vm.analysisStatus = '';  // '', started, in progress, completed, error
-    vm.analysisRunningFlag = false;
-    vm.progress = {amount: 0, message: ''};
-    vm.isDone = true;
-    vm.analysisChangedFlag = false;
-
-    // store these in Project service so they can be exported
-    // vm.analysisID = null;
-    // vm.datapoints = [];
-    vm.datapointsStatus = [];
-
-    vm.disabledButtons = false;  // display run or cancel button
-
-    vm.localServerURL = 'http://localhost:8080';  // default URL.  will be reset when starting server
-    vm.selectedServerURL = vm.resetSelectedServerURL();
 
     const src = jetpack.cwd(app.getPath('userData'));
     if (vm.Message.showDebug()) vm.$log.debug('src.path(): ', src.path());
@@ -94,9 +72,33 @@ export class OsServer {
     vm.perlEXEPath = DependencyManager.getPath('PERL_EXE_PATH');
     vm.osrayPath = DependencyManager.getPath('OS_RAYPATH');
 
+    vm.initializeServer();
+
     vm.package_openstudio_version = '';
     vm.setOpenStudioVersion();
 
+    // store these in Project service so they can be exported
+    // vm.analysisID = null;
+    // vm.datapoints = [];
+
+  }
+
+  initializeServer() {
+    const vm = this;
+    vm.numberDPsToDisplay = vm.Project.getNumberDPsToDisplay();
+    vm.localServerURL = 'http://localhost:8080';  // default URL.  will be reset when starting server
+    vm.serverStatuses = {local: 'stopped', remote: 'stopped'};  // started, stopped, error?
+    vm.analysisStatus = '';  // '', started, in progress, completed, error
+    vm.analysisRunningFlag = false;
+    vm.progress = {amount: 0, message: ''};
+    vm.isDone = true;
+    vm.analysisChangedFlag = false;
+    vm.datapointsStatus = [];
+    vm.disabledButtons = false;  // display run or cancel button
+
+    vm.selectedServerURL = vm.resetSelectedServerURL();
+    // to run meta_cli
+    vm.exec = require('child_process').exec;
     vm.localServerChild = null;
     vm.remoteServerChild = null;
 
@@ -111,7 +113,6 @@ export class OsServer {
     vm.remoteStartDeferred = vm.$q.defer();
     // remote stop
     vm.remoteStopInProgress = false;
-
   }
 
   isServerReady() {
