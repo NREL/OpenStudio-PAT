@@ -21,8 +21,5 @@ build:windows:
   stage: build
   tags:
     - windows
-  before_script:
-    - npm install
-    - '"node_modules\.bin\bower.cmd" install'
   script:
-    - npm run release
+    - npm install && node_modules\.bin\bower.cmd install && npm run release
