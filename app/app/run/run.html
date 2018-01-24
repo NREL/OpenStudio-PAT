@@ -135,17 +135,19 @@
 
               <div class="col-sm-2">
                 <div class="row">
-                        <div class="col-sm-4">
-                    <img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.downloaded_reports != true" />
+                  <div class="col-sm-4">
+                    <div ng-if="datapointsStatus.length <= numberDPsToDisplay"> <!-- do not display reports icon for project with large # datapoints -->
+                      <img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.downloaded_reports != true" />
 
-                    <div class="btn-group" uib-dropdown auto-close="always" ng-show="datapoint.downloaded_reports">
-                      <button id="datapoint_{{datapoint.id}}_reports" type="button" class="btn view-report-button" uib-dropdown-toggle ng-disabled="disabled" ng-click="$event.preventDefault();$event.stopPropagation();">
-                        <img ng-src="assets/images/ReportingMeasure_icon.png"  alt="View Reports for datapoint {{datapoint.name}}">
-                        <span class="caret"></span>
-                      </button>
-                      <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="datapoint_{{datapoint.id}}_reports">
-                        <li role="menuitem" ng-repeat="result in datapoint.result_files | filter:filterReports"><a href="#" ng-click="$event.preventDefault(); $event.stopPropagation();run.viewReportModal(datapoint, result.attachment_file_name);">{{result.attachment_file_name}}</a></li>
-                      </ul>
+                      <div class="btn-group" uib-dropdown auto-close="always" ng-show="datapoint.downloaded_reports">
+                        <button id="datapoint_{{datapoint.id}}_reports" type="button" class="btn view-report-button" uib-dropdown-toggle ng-disabled="disabled" ng-click="$event.preventDefault();$event.stopPropagation();">
+                          <img ng-src="assets/images/ReportingMeasure_icon.png"  alt="View Reports for datapoint {{datapoint.name}}">
+                          <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="datapoint_{{datapoint.id}}_reports">
+                          <li role="menuitem" ng-repeat="result in datapoint.result_files | filter:filterReports"><a href="#" ng-click="$event.preventDefault(); $event.stopPropagation();run.viewReportModal(datapoint, result.attachment_file_name);">{{result.attachment_file_name}}</a></li>
+                        </ul>
+                      </div>
                     </div>
                   </div>
                   <div class="col-sm-3">
