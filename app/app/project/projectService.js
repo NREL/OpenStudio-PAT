@@ -1448,6 +1448,7 @@ export class Project {
     vm.pat = {};
     vm.pat.projectName = vm.projectName;
     vm.pat.projectDir = vm.projectDir.path();
+    vm.pat.analysisName = vm.analysisName;
     vm.pat.seed = vm.defaultSeed;
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
