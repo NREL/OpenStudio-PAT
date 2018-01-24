@@ -25,6 +25,14 @@
    </div>
   </div>
 </div>
+
+<div class="row">
+  <div class="col-sm-6 pad-bot-20">
+    <label for="analysisName" class="run-label" translate>run.analysisName</label>
+    <input class="form-control" id="analysisName" type="text" ng-model="analysisName" ng-change="run.setAnalysisName()"/>
+  </div>
+</div>
+
 <div ng-if="selectedRunType.name == 'remote'" ng-include="'app/run/remote.html'"></div>
 
 <div ng-show="selectedRunType.name == 'local'" class="row pad-bot-20">

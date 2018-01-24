@@ -54,6 +54,7 @@ export class RunController {
     vm.Message = Message;
 
     vm.$scope.numberDPsToDisplay = vm.Project.getNumberDPsToDisplay();
+    vm.$scope.analysisName = vm.Project.getAnalysisName();
 
     vm.runTypes = vm.Project.getRunTypes();
     vm.$scope.selectedRunType = vm.Project.getRunType();
@@ -198,6 +199,13 @@ export class RunController {
       return !isSkipped;
     };
 
+  }
+
+  setAnalysisName() {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug(`Setting analysis name to: ${vm.$scope.analysisName}`);
+    vm.Project.setAnalysisName(vm.$scope.analysisName);
+    vm.$scope.analysisName = vm.Project.getAnalysisName();
   }
 
   formatEplusErr(errorText) {

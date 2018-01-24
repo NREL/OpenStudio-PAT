@@ -232,6 +232,7 @@ export class Project {
           vm.designAlternatives = [];
         }
 
+        vm.analysisName = vm.pat.analysisName ? vm.pat.analysisName : vm.projectName;
         vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
         vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
         vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
@@ -439,6 +440,20 @@ export class Project {
     if (vm.Message.showDebug()) vm.$log.debug('In Project::exportOSA');
     if (vm.Message.showDebug()) vm.$log.debug('SelectedOnly? ', selectedOnly);
 
+    vm.osa = {};
+    vm.osa.analysis = {};
+    vm.osa.analysis.display_name = vm.analysisName;
+    vm.osa.analysis.name = vm.analysisName;
+
+    console.error("ANALYSIS NAME: ", vm.analysisName);
+
+    if (/[.$\u20AC\xA3]/.test(vm.osa.analysis.name)){
+      vm.$log.error('illegal character (.$€£) detected in analysis name: ', vm.osa.analysis.name);
+      vm.osaErrors.push(`illegal character (.$€£) detected in analysis name: ${vm.osa.analysis.name}`);
+    }
+
+    if (vm.Message.showDebug()) vm.$log.debug(`Creating OSA for analysis named ${vm.analysisName}`);
+
     // first export common data
     vm.exportCommon();
 
@@ -457,11 +472,11 @@ export class Project {
       vm.exportScripts();
 
       // write to file
-      const filename = vm.projectDir.path(vm.projectName + '.json');
+      const filename = vm.projectDir.path(vm.analysisName + '.json');
       vm.jetpack.write(filename, vm.osa);
       if (vm.Message.showDebug()) vm.$log.debug('Project OSA file exported to ' + filename);
 
-      const output = fs.createWriteStream(vm.projectDir.path(vm.projectName + '.zip'));
+      const output = fs.createWriteStream(vm.projectDir.path(vm.analysisName + '.zip'));
       const archive = vm.archiver('zip');
 
       output.on('close', function () {
@@ -524,10 +539,6 @@ export class Project {
   exportCommon() {
 
     const vm = this;
-    vm.osa = {};
-    vm.osa.analysis = {};
-    vm.osa.analysis.display_name = vm.projectName;
-    vm.osa.analysis.name = vm.projectName;
 
     // these are all empty for manual / initialized for algorithmic
     vm.osa.analysis.output_variables = [];
@@ -1524,6 +1535,16 @@ export class Project {
   getProjectName() {
     const vm = this;
     return vm.projectName;
+  }
+
+  getAnalysisName() {
+    const vm = this;
+    return vm.analysisName;
+  }
+
+  setAnalysisName(name) {
+    const vm = this;
+    vm.analysisName = name;
   }
 
   setProjectName(name) {

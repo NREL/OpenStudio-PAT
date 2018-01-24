@@ -429,6 +429,7 @@ export default {
     runSelected: 'Exécuter sélectionné',
     pleaseWait: 'Please wait...',
     selectAll: 'Tout sélectionner',
+    analysisName: 'Nom de l\'analyse',
     clearSelections: 'Effacer les sélections',
     algorithmicOnCloud: 'Algorithmic analyses cannot be run locally.  Select \'Run on Cloud\' from the dropdown above to run this analysis remotely.',
     viewServer: 'Afficher le serveur',
