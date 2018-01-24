@@ -1,14 +1,17 @@
 {
+  "name": "OpenStudio-PAT",
+  "version": "2.0.2",
   "devDependencies": {
     "asar": "~0.10.0",
     "babel-core": "~6.7.5",
     "babel-eslint": "~6.0.0",
     "babel-preset-es2015-loose-rollup": "~7.0.0",
+    "bower": "~1.8.2",
     "browser-sync": "~2.13.0",
     "browser-sync-spa": "~1.0.3",
     "chalk": "~1.1.1",
     "del": "~2.2.0",
-    "electron": "~1.7.5",
+    "electron": "^1.7.11",
     "eslint-plugin-angular": "~1.0.0",
     "eslint-plugin-lodash": "~1.5.1",
     "estraverse": "~4.2.0",
@@ -68,8 +71,8 @@
   },
   "scripts": {
     "postinstall": "cd app && npm install",
-    "build": "gulp build",
-    "release": "gulp release --env=production",
+    "build": "./node_modules/.bin/gulp build",
+    "release": "./node_modules/.bin/gulp release --env=production",
     "start": "node ./tasks/start",
     "start:dist": "node ./tasks/start --env=production",
     "test": "node ./tasks/start --env=test"
