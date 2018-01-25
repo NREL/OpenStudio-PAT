@@ -811,7 +811,7 @@ export class Project {
                   // when set to 'None', sub a value of the right type
                   if (vm.Message.showDebug()) vm.$log.debug('default_value for this arg: ', arg.default_value);
                   let the_value = arg.default_value;
-                  if (!the_value) {
+                  if (_.isNil(the_value)) {
                     // if no default value, use first option value, otherwise set to None
                     the_value = !_.isNil(arg.option_1) ? arg.option_1 : 'None';
                     if (vm.Message.showDebug()) vm.$log.debug('option1 value for this arg: ', arg.option_1);
