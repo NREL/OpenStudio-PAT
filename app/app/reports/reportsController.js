@@ -129,9 +129,9 @@ export class ReportsController {
     };
 
     // Uncomment this to view webview developer tools to debug project reports
-    // if (vm.env != 'production') {
-    //   vm.openWebViewDevTools();
-    // }
+    if (vm.env != 'production') {
+      vm.openWebViewDevTools();
+    }
 
     //pass data into webview when dom is ready
     angular.element(document).ready(function () {
@@ -154,8 +154,8 @@ export class ReportsController {
     const vm = this;
     var wv = document.getElementById('wv');
     wv.executeJavaScript(`setReportDir(${JSON.stringify(vm.reportDirPath)});`);
-    wv.executeJavaScript(`setData(${JSON.stringify(vm.testResults)});`);
     wv.executeJavaScript(`setAlgorithmicData(${JSON.stringify(vm.algorithmic_metadata)}, ${JSON.stringify(vm.algorithmic_results)});`);
+    wv.executeJavaScript(`setData(${JSON.stringify(vm.testResults)});`);
   }
 
 }

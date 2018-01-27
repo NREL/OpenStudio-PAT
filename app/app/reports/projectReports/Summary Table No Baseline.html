@@ -1,0 +1,254 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Summary Table No Baseline</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js"></script>
+</head>
+<body>
+
+<div ng-app="myApp">
+
+  <div ng-controller="MyAppCtrl">
+
+    <h1>Summary Table No Baseline</h1>
+    <ul>
+      <li class="alert alert-warning" ng-repeat="warn in renderWarns">{{ warn }}</li>
+    </ul>
+    <table class="table-bordered table-condensed">
+      <tr>
+        <th>Name</th>
+        <th>Energy Use Intensity <br> (kBtu/ft2-yr)</th>
+        <th>Peak Electric Demand <br> (kW)</th>
+        <th>Electricity <br> (kWh)</th>
+        <th>Natural Gas <br> (Million Btu)</th>
+        <th>District Cooling <br> (Million Btu)</th>
+        <th>District Heating <br> (Million Btu)</th>
+        <th>First Year Capital Cost <br> ($)</th>
+        <th>Annual Utility Cost <br> ($)</th>
+        <th>Total LCC <br> ($)</th>
+      </tr>
+      <tr ng-repeat="run in resultsWithInfo">
+        <td>{{ run.name }}</td>
+        <td>{{ run.eui | number:1}}</td>
+        <td>{{ run.peak_electric_demand_ip | number:1}}</td>
+        <td>{{ run.electricity_ip | number:1}}</td>
+        <td>{{ run.natural_gas_ip | number:1}}</td>
+        <td>{{ run.district_cooling_cooling_ip | number:1}}</td>
+        <td>{{ run.district_heating_ip | number:1}}</td>
+        <td>{{ run.first_year_cap_cost | number:1}}</td>
+        <td>{{ run.ann_util_cost | number:1}}</td>
+        <td>{{ run.total_lcc | number:1}}</td>
+      </tr>
+    </table>
+  </div>
+
+</div>
+
+<script type="text/javascript">
+
+  console.info("Loaded Summary Table.html script");
+
+  angular.module('myApp', [])
+    .controller('MyAppCtrl', function ($scope) {
+
+
+      // Subset of runs with results to show
+      $scope.resultsWithInfo = [];
+
+      // Show any issues
+      $scope.renderWarns = [];
+
+      // Warn user that this report doesn't work in Algorithmic mode
+      var algorithmic = null;
+      var max_plot = 500
+      $scope.setupAfterAlgorithmicResultsAvailable = function () {
+        if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
+          algorithmic = true;
+
+          // limit datapoints to max_plot (+ 1 used in if statement and -1 message because of empty last object in algorithmic_results
+          if ($scope.algorithm_results.length > max_plot + 1) {
+            $scope.renderWarns.push("Ony ploting " + max_plot + " algorhtimic dataopints out of " + ($scope.algorithm_results.length - 1) + ".");
+            $scope.algorithm_results = $scope.algorithm_results.slice(0,max_plot)
+          }
+
+          // Set the energy results properties of each run
+          _.forEach($scope.algorithm_results, function (run) {
+
+            if (run.name === "") {
+              return
+            }
+
+            // warn and skip of datapoint is missing openstudio_results
+            if (!(run.hasOwnProperty('openstudio_results.total_site_eui'))){
+              $scope.renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
+              return
+            }
+
+            // EUI
+            //run.eui = 5;
+            run.eui = run["openstudio_results.total_site_eui"];
+
+            // Peak Electric Demand
+            run.peak_electric_demand_ip = run["openstudio_results.annual_peak_electric_demand"];
+
+            // Electricity Consumption
+            run.electricity_ip = run["openstudio_results.electricity_ip"];
+
+            // Natural Gas Consumption
+            run.natural_gas_ip = run["openstudio_results.natural_gas_ip"];
+
+            //District Cooling Consumption
+            run.district_cooling_cooling_ip = run["openstudio_results.district_cooling_cooling_ip"];
+
+            // District Heating Consumption
+            run.district_heating_ip = run["openstudio_results.district_heating_ip"];
+
+            // First Year Capital Cost
+            run.first_year_cap_cost = run["openstudio_results.first_year_capital_cost"];
+
+            // Annual Utility Cost
+            run.ann_util_cost = run["openstudio_results.annual_utility_cost"];
+
+            // Total LCC
+            run.total_lcc = run["openstudio_results.total_lifecycle_cost"];
+
+            console.log(run.name);
+            console.log(run);
+            $scope.resultsWithInfo.push(run);
+
+          });
+
+        }
+      };
+
+      // Set up some additional data properties after the results
+      // are passed in.
+      $scope.setupAfterResultsAvailable = function () {
+
+        if (algorithmic) {
+          return;
+        } else {
+
+          var renderWarns = [];
+
+          // Set the energy results properties of each run
+          _.forEach($scope.results, function (run) {
+
+            // Get the OpenStudio Results measure, which contains the results
+            var reportMeasure = null;
+            _(run.steps).forEach(function (step) {
+              if (step.hasOwnProperty('result')) {
+                if (step.result.measure_uid == "a25386cd-60e4-46bc-8b11-c755f379d916") {
+                  reportMeasure = step;
+                }
+              }
+            });
+            if (!reportMeasure) {
+              renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Make sure the results exist
+            if (!reportMeasure.hasOwnProperty('result')){
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Make sure the results have data
+            var vals = reportMeasure.result.step_values;
+            if (vals.length == 0){
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Make sure the EUI element exists to ensure measure was run
+            if (!_.find(vals, {'name': "eui"})) {
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // EUI
+            run.eui = _.find(vals, {'name': "eui"}).value;
+
+            // Peak Electric Demand
+            run.peak_electric_demand_ip = _.find(vals, {'name': "annual_peak_electric_demand"}).value;
+
+            // Electricity Consumption
+            run.electricity_ip = _.find(vals, {'name': "electricity_ip"}).value;
+
+            // Natural Gas Consumption
+            run.natural_gas_ip = _.find(vals, {'name': "natural_gas_ip"}).value;
+
+            //District Cooling Consumption
+            run.district_cooling_cooling_ip = _.find(vals, {'name': "district_cooling_cooling_ip"}).value;
+
+            // District Heating Consumption
+            run.district_heating_ip = _.find(vals, {'name': "district_heating_ip"}).value;
+
+            // First Year Capital Cost
+            run.first_year_cap_cost = _.find(vals, {'name': "first_year_capital_cost"}).value;
+
+            // Annual Utility Cost
+            run.ann_util_cost = _.find(vals, {'name': "annual_utility_cost"}).value;
+
+            // Total LCC
+            run.total_lcc = _.find(vals, {'name': "total_lifecycle_cost"}).value;
+
+            console.log(run.name);
+            console.log(run);
+            $scope.resultsWithInfo.push(run);
+
+          });
+
+          // Show a unique set of warnings
+          $scope.renderWarns = _.uniq(renderWarns);
+
+        }
+
+      };
+
+    });
+
+  // set $scope.reportDir element in the report's controller from PAT project directory
+  function setReportDir(reportDir) {
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    console.log("Inside setReportDir");
+    $scope.$apply(function () {
+      console.log("reportDir = " + reportDir);
+      $scope.reportDir = reportDir;
+    });
+  }
+
+  // set $scope.results element in the controller above from PAT data
+  function setData(data) {
+    console.log('Setting results variable to: ', data);
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    $scope.$apply(function () {
+      $scope.results = data;
+      $scope.setupAfterResultsAvailable();
+    });
+  }
+
+  function setAlgorithmicData(metadata, results) {
+    console.log('Setting algorithmic results variable to: ', results);
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    $scope.$apply(function () {
+      $scope.algorithm_results = results;
+      $scope.algorithm_metadata = metadata;
+      $scope.setupAfterAlgorithmicResultsAvailable();
+    });
+  }
+
+</script>
+
+</body>
+</html>
