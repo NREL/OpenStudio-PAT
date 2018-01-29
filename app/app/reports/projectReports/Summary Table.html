@@ -154,14 +154,14 @@
 
       // gather data for Algorithmic analysis
       var algorithmic = null;
-      var max_plot = 500
+      var max_plot = 500;
       $scope.setupAfterAlgorithmicResultsAvailable = function () {
         if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
           algorithmic = true;
 
           // limit datapoints to max_plot (+ 1 used in if statement and -1 message because of empty last object in algorithmic_results
           if ($scope.algorithm_results.length > max_plot + 1) {
-            $scope.renderWarns.push("Ony ploting " + max_plot + " algorhtimic dataopints out of " + ($scope.algorithm_results.length - 1) + ".");
+            $scope.renderWarns.push("Ony plotting " + max_plot + " algorhtimic dataopints out of " + ($scope.algorithm_results.length - 1) + ".");
             $scope.algorithm_results = $scope.algorithm_results.slice(0,max_plot)
           }
 
