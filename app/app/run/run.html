@@ -29,7 +29,13 @@
 <div class="row">
   <div class="col-sm-6 pad-bot-20">
     <label for="analysisName" class="run-label" translate>run.analysisName</label>
-    <input class="form-control" id="analysisName" type="text" ng-model="analysisName" ng-change="run.setAnalysisName()"/>
+    <div class="input-group">
+      <input class="form-control" id="analysisName" type="text" ng-model="analysisName" ng-change="run.setAnalysisName()" ng-readonly="!unlockStatus" />
+      <div class="input-group-addon">
+        <span ng-if="!unlockStatus" class="input-group-text glyphicon glyphicon-pencil black-button" aria-hidden="true" aria-label="unlock edit measure name feature" data-toggle="tooltip" title="Edit Analysis Name" ng-click="run.toggleUnlock();"></span>
+        <span ng-if="unlockStatus" class=" input-group-text glyphicon glyphicon-lock red-button" aria-hidden="true" aria-label="lock edit measure name feature" data-toggle="tooltip" title="Lock Analysis Name" ng-click="run.toggleUnlock();"></span>
+      </div>
+    </div>
   </div>
 </div>
 

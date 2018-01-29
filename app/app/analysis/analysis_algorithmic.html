@@ -206,8 +206,17 @@
           </span>
         </uib-accordion-heading>
         <div class="button-div">
-          <div class="row">
-            <div class="col-sm-12">
+          <div class="row normal-text">
+            <div class="col-sm-4">
+              <div class="input-group">
+                <input type="text" id="measure.name" class='form-control' ng-model="measure.display_name" aria-label="measure name" ng-readonly="!measure.unlockStatus">
+                <div class="input-group-addon">
+                  <span ng-if="!measure.unlockStatus" class="input-group-text glyphicon glyphicon-pencil black-button" aria-hidden="true" aria-label="unlock edit measure name feature" data-toggle="tooltip" title="Edit Measure Name" ng-click="analysis.unlockEdit(measure);"></span>
+                  <span ng-if="measure.unlockStatus" class=" input-group-text glyphicon glyphicon-lock red-button" aria-hidden="true" aria-label="lock edit measure name feature" data-toggle="tooltip" title="Lock Measure Name" ng-click="analysis.lockEdit(measure);"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-8">
               <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
                 <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasure</translate>
               </button>
@@ -513,8 +522,17 @@
           </span>
         </uib-accordion-heading>
         <div class="button-div">
-          <div class="row">
-            <div class="col-sm-12">
+          <div class="row normal-text">
+            <div class="col-sm-4">
+              <div class="input-group">
+                <input type="text" id="measure.name" class='form-control' ng-model="measure.display_name" aria-label="measure name" ng-readonly="!measure.unlockStatus">
+                <div class="input-group-addon">
+                  <span ng-if="!measure.unlockStatus" class="input-group-text glyphicon glyphicon-pencil black-button" aria-hidden="true" aria-label="unlock edit measure name feature" data-toggle="tooltip" title="Edit Measure Name" ng-click="analysis.unlockEdit(measure);"></span>
+                  <span ng-if="measure.unlockStatus" class=" input-group-text glyphicon glyphicon-lock red-button" aria-hidden="true" aria-label="lock edit measure name feature" data-toggle="tooltip" title="Lock Measure Name" ng-click="analysis.lockEdit(measure);"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-8">
               <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
                 <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasure</translate>
               </button>
@@ -821,8 +839,17 @@
           </span>
         </uib-accordion-heading>
         <div class="button-div">
-          <div class="row">
-            <div class="col-sm-12">
+          <div class="row normal-text">
+            <div class="col-sm-4">
+              <div class="input-group">
+                <input type="text" id="measure.name" class='form-control' ng-model="measure.display_name" aria-label="measure name" ng-readonly="!measure.unlockStatus">
+                <div class="input-group-addon">
+                  <span ng-if="!measure.unlockStatus" class="input-group-text glyphicon glyphicon-pencil black-button" aria-hidden="true" aria-label="unlock edit measure name feature" data-toggle="tooltip" title="Edit Measure Name" ng-click="analysis.unlockEdit(measure);"></span>
+                  <span ng-if="measure.unlockStatus" class=" input-group-text glyphicon glyphicon-lock red-button" aria-hidden="true" aria-label="lock edit measure name feature" data-toggle="tooltip" title="Lock Measure Name" ng-click="analysis.lockEdit(measure);"></span>
+                </div>
+              </div>
+            </div>
+            <div class="col-sm-8">
               <button type="button" class="btn btn-success" ng-click="analysis.duplicateMeasureAndOption(measure)">
                 <span class="glyphicon glyphicon-duplicate" aria-hidden="true"></span> <translate>analysis.duplicateMeasure</translate>
               </button>

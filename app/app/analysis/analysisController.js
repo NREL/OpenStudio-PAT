@@ -1501,5 +1501,16 @@ export class AnalysisController {
       return 'Error, unsupported script type';
     }
   }
+
+  unlockEdit(measure){
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('in UnlockEdit measure');
+    measure.unlockStatus = true;
+  }
+
+  lockEdit(measure){
+    const vm = this;
+    measure.unlockStatus = false;
+  }
 }
 

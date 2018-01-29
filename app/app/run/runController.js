@@ -55,6 +55,7 @@ export class RunController {
 
     vm.$scope.numberDPsToDisplay = vm.Project.getNumberDPsToDisplay();
     vm.$scope.analysisName = vm.Project.getAnalysisName();
+    vm.$scope.unlockStatus = false;
 
     vm.runTypes = vm.Project.getRunTypes();
     vm.$scope.selectedRunType = vm.Project.getRunType();
@@ -206,6 +207,11 @@ export class RunController {
     if (vm.Message.showDebug()) vm.$log.debug(`Setting analysis name to: ${vm.$scope.analysisName}`);
     vm.Project.setAnalysisName(vm.$scope.analysisName);
     vm.$scope.analysisName = vm.Project.getAnalysisName();
+  }
+
+  toggleUnlock() {
+    const vm = this;
+    vm.$scope.unlockStatus = !vm.$scope.unlockStatus;
   }
 
   formatEplusErr(errorText) {
