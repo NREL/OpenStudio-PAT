@@ -131,134 +131,215 @@
       $scope.renderWarns = [];
 
       // Update the baseline based on the selected name
+      // todo - update this to work with manual or algorithmic
       $scope.updateBaseline = function () {
-        _.forEach($scope.results, function (run) {
-          if (run.name == $scope.baseline_name) {
-            $scope.baseline = run;
-            console.log('Changed baseline to ' + $scope.baseline.name);
+
+        if (algorithmic) {
+          _.forEach($scope.algorithm_results, function (run) {
+            if (run.name == $scope.baseline_name) {
+              $scope.baseline = run;
+              console.log('Changed baseline to ' + $scope.baseline.name);
+            }
+          });
+        } else {
+          _.forEach($scope.results, function (run) {
+            if (run.name == $scope.baseline_name) {
+              $scope.baseline = run;
+              console.log('Changed baseline to ' + $scope.baseline.name);
+            }
+          });
+        }
+
+      };
+
+      // gather data for Algorithmic analysis
+      var algorithmic = null;
+      var max_plot = 500
+      $scope.setupAfterAlgorithmicResultsAvailable = function () {
+        if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
+          algorithmic = true;
+
+          // limit datapoints to max_plot (+ 1 used in if statement and -1 message because of empty last object in algorithmic_results
+          if ($scope.algorithm_results.length > max_plot + 1) {
+            $scope.renderWarns.push("Ony ploting " + max_plot + " algorhtimic dataopints out of " + ($scope.algorithm_results.length - 1) + ".");
+            $scope.algorithm_results = $scope.algorithm_results.slice(0,max_plot)
           }
-        });
+
+          // Set the energy results properties of each run
+          _.forEach($scope.algorithm_results, function (run) {
+
+            if (run.name === "") {
+              return
+            }
+
+            // warn and skip of datapoint is missing openstudio_results
+            if (!(run.hasOwnProperty('openstudio_results.total_site_eui'))){
+              $scope.renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
+              return
+            }
+
+            // EUI
+            //run.eui = 5;
+            run.eui = run["openstudio_results.total_site_eui"];
+
+            // Peak Electric Demand
+            run.peak_electric_demand_ip = run["openstudio_results.annual_peak_electric_demand"];
+
+            // Electricity Consumption
+            run.electricity_ip = run["openstudio_results.electricity_ip"];
+
+            // Natural Gas Consumption
+            run.natural_gas_ip = run["openstudio_results.natural_gas_ip"];
+
+            //District Cooling Consumption
+            run.district_cooling_cooling_ip = run["openstudio_results.district_cooling_cooling_ip"];
+
+            // District Heating Consumption
+            run.district_heating_ip = run["openstudio_results.district_heating_ip"];
+
+            // First Year Capital Cost
+            run.first_year_cap_cost = run["openstudio_results.first_year_capital_cost"];
+
+            // Annual Utility Cost
+            run.ann_util_cost = run["openstudio_results.annual_utility_cost"];
+
+            // Total LCC
+            run.total_lcc = run["openstudio_results.total_lifecycle_cost"];
+
+            console.log(run.name);
+            console.log(run);
+            $scope.resultsWithInfo.push(run);
+
+          });
+
+          // Make the comparison point the first run to start
+          if ($scope.resultsWithInfo.length > 0) {
+            $scope.baseline = $scope.resultsWithInfo.reverse()[0];
+            $scope.baseline_name = $scope.baseline.name;
+          }
+
+        }
       };
 
       // Set up some additional data properties after the results
       // are passed in.
       $scope.setupAfterResultsAvailable = function () {
 
-        var renderWarns = [];
 
-        // Get the unique measure counts
-        // based on unique name + argument values.
-        var measureCounts = {};
-        var numAlts = 0;
-        _.forEach($scope.results, function (run) {
-          numAlts += 1;
-          _.forEach(run.steps, function (step) {
-            // Make sure the results exist
-            if (!step.hasOwnProperty('result')){
+        if (algorithmic) {
+          return;
+        } else {
+
+          var renderWarns = [];
+
+          // Get the unique measure counts
+          // based on unique name + argument values.
+          var measureCounts = {};
+          var numAlts = 0;
+          _.forEach($scope.results, function (run) {
+            numAlts += 1;
+            _.forEach(run.steps, function (step) {
+              // Make sure the results exist
+              if (!step.hasOwnProperty('result')){
+                return;
+              }
+              var idPlusArgs = step.result.measure_uid + JSON.stringify(step.arguments);
+              step.idPlusArgs = idPlusArgs;
+              if (measureCounts[idPlusArgs]) {
+                measureCounts[idPlusArgs] += 1;
+              } else {
+                measureCounts[idPlusArgs] = 1;
+              }
+            });
+          });
+          console.info("There are results for " + numAlts + " runs");
+
+          // Set the measure_names property of each run
+          _.forEach($scope.results, function (run) {
+            run.measure_names = measureNames(run, measureCounts, numAlts);
+          });
+
+          // Set the energy results properties of each run
+          _.forEach($scope.results, function (run) {
+
+            // Get the OpenStudio Results measure, which contains the results
+            var reportMeasure = null;
+            _(run.steps).forEach(function (step) {
+              if (step.hasOwnProperty('result')) {
+                if (step.result.measure_uid == "a25386cd-60e4-46bc-8b11-c755f379d916") {
+                  reportMeasure = step;
+                }
+              }
+            });
+            if (!reportMeasure) {
+              renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
               return;
             }
-            var idPlusArgs = step.result.measure_uid + JSON.stringify(step.arguments);
-            step.idPlusArgs = idPlusArgs;
-            if (measureCounts[idPlusArgs]) {
-              measureCounts[idPlusArgs] += 1;
-            } else {
-              measureCounts[idPlusArgs] = 1;
+
+            // Make sure the results exist
+            if (!reportMeasure.hasOwnProperty('result')){
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
             }
-          });
-        });
-        console.info("There are results for " + numAlts + " runs");
 
-        // Set the measure_names property of each run
-        _.forEach($scope.results, function (run) {
-          run.measure_names = measureNames(run, measureCounts, numAlts);
-        });
-
-        // Set the energy results properties of each run
-        _.forEach($scope.results, function (run) {
-
-          // Get the OpenStudio Results measure, which contains the results
-          var reportMeasure = null;
-          _(run.steps).forEach(function (step) {
-            if (step.hasOwnProperty('result')) {
-              if (step.result.measure_uid == "a25386cd-60e4-46bc-8b11-c755f379d916") {
-                reportMeasure = step;
-              }
+            // Make sure the results have data
+            var vals = reportMeasure.result.step_values;
+            if (vals.length == 0){
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
             }
+
+            // Make sure the EUI element exists to ensure measure was run
+            if (!_.find(vals, {'name': "eui"})) {
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            run.eui = _.find(vals, {'name': "eui"}).value;
+
+            // Peak Electric Demand
+            run.peak_electric_demand_ip = _.find(vals, {'name': "annual_peak_electric_demand"}).value;
+
+            // Electricity Consumption
+            run.electricity_ip = _.find(vals, {'name': "electricity_ip"}).value;
+
+            // Natural Gas Consumption
+            run.natural_gas_ip = _.find(vals, {'name': "natural_gas_ip"}).value;
+
+            //District Cooling Consumption
+            run.district_cooling_cooling_ip = _.find(vals, {'name': "district_cooling_cooling_ip"}).value;
+
+            // District Heating Consumption
+            run.district_heating_ip = _.find(vals, {'name': "district_heating_ip"}).value;
+
+            // First Year Capital Cost
+            run.first_year_cap_cost = _.find(vals, {'name': "first_year_capital_cost"}).value;
+
+            // Annual Utility Cost
+            run.ann_util_cost = _.find(vals, {'name': "annual_utility_cost"}).value;
+
+            // Total LCC
+            run.total_lcc = _.find(vals, {'name': "total_lifecycle_cost"}).value;
+
+            console.log(run.name);
+            console.log(run);
+            $scope.resultsWithInfo.push(run);
+
           });
-          if (!reportMeasure) {
-            renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
-            return;
+
+          // Make the comparison point the first run to start
+          if ($scope.resultsWithInfo.length > 0) {
+            $scope.baseline = $scope.resultsWithInfo.reverse()[0];
+            $scope.baseline_name = $scope.baseline.name;
           }
 
-          // Make sure the results exist
-          if (!reportMeasure.hasOwnProperty('result')){
-            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
-            return;
-          }
+          // Show a unique set of warnings
+          _.forEach(_.uniq(renderWarns), function (warn) {
+            $scope.renderWarns.push(warn);
+          });
 
-          // Make sure the results have data
-          var vals = reportMeasure.result.step_values;
-          if (vals.length == 0){
-            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
-            return;
-          }
-
-          // Make sure the EUI element exists to ensure measure was run
-          if (!_.find(vals, {'name': "eui"})) {
-            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
-            return;
-          }
-
-          run.eui = _.find(vals, {'name': "eui"}).value;
-
-          // Peak Electric Demand
-          run.peak_electric_demand_ip = _.find(vals, {'name': "annual_peak_electric_demand"}).value;
-
-          // Electricity Consumption
-          run.electricity_ip = _.find(vals, {'name': "electricity_ip"}).value;
-
-          // Natural Gas Consumption
-          run.natural_gas_ip = _.find(vals, {'name': "natural_gas_ip"}).value;
-
-          //District Cooling Consumption
-          run.district_cooling_cooling_ip = _.find(vals, {'name': "district_cooling_cooling_ip"}).value;
-
-          // District Heating Consumption
-          run.district_heating_ip = _.find(vals, {'name': "district_heating_ip"}).value;
-
-          // First Year Capital Cost
-          run.first_year_cap_cost = _.find(vals, {'name': "first_year_capital_cost"}).value;
-
-          // Annual Utility Cost
-          run.ann_util_cost = _.find(vals, {'name': "annual_utility_cost"}).value;
-
-          // Total LCC
-          run.total_lcc = _.find(vals, {'name': "total_lifecycle_cost"}).value;
-
-          console.log(run.name);
-          console.log(run);
-          $scope.resultsWithInfo.push(run);
-
-        });
-
-        // Make the comparison point the first run to start
-        if ($scope.resultsWithInfo.length > 0) {
-          $scope.baseline = $scope.resultsWithInfo.reverse()[0];
-          $scope.baseline_name = $scope.baseline.name;
         }
 
-        // Show a unique set of warnings
-        _.forEach(_.uniq(renderWarns), function (warn) {
-          $scope.renderWarns.push(warn);
-        });
-
-      };
-
-      // Warn user that this report doesn't work in Algorithmic mode
-      $scope.setupAfterAlgorithmicResultsAvailable = function () {
-        if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
-          $scope.renderWarns.push("This report will only work with Analysis Type = Manual.");
-        }
       };
 
     });
@@ -325,8 +406,8 @@
     var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
     var $scope = angular.element(controllerElement).scope();
     $scope.$apply(function () {
-      $scope.algorithm_results = metadata;
-      $scope.algorithm_metadata = results;
+      $scope.algorithm_results = results;
+      $scope.algorithm_metadata = metadata;
       $scope.setupAfterAlgorithmicResultsAvailable();
     });
   }
