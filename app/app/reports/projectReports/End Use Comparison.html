@@ -59,6 +59,13 @@
       if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
         algorithmic = true;
 
+        $scope.renderWarns.push("This report will only work with Analysis Type = Manual.");
+        return
+
+        // this report is only legible up to about 50 datapoints.
+        // not with the trouble for user to even setup all the end use output variables
+        // I have disabled it for algorithmic for now but if warning and return above are removed it will still run
+
         // limit datapoints to max_plot (+ 1 used in if statement and -1 message because of empty last object in algorithmic_results
         if ($scope.algorithm_results.length > max_plot + 1) {
           $scope.renderWarns.push("Ony plotting " + max_plot + " algorhtimic dataopints out of " + ($scope.algorithm_results.length - 1) + ".");

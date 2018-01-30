@@ -66,14 +66,16 @@
 
       // gather data for Algorithmic analysis
       var algorithmic = null;
-      var max_plot = 500;
+      var max_plot = 300;
       $scope.setupAfterAlgorithmicResultsAvailable = function () {
         if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
           algorithmic = true;
 
+          var renderWarns = [];
+
           // limit datapoints to max_plot (+ 1 used in if statement and -1 message because of empty last object in algorithmic_results
           if ($scope.algorithm_results.length > max_plot + 1) {
-            $scope.renderWarns.push("Ony plotting " + max_plot + " algorhtimic dataopints out of " + ($scope.algorithm_results.length - 1) + ".");
+            renderWarns.push("Ony plotting " + max_plot + " algorhtimic dataopints out of " + ($scope.algorithm_results.length - 1) + ".");
             $scope.algorithm_results = $scope.algorithm_results.slice(0,max_plot)
           }
 
@@ -86,43 +88,83 @@
 
             // warn and skip of datapoint is missing openstudio_results
             if (!(run.hasOwnProperty('openstudio_results.total_site_eui'))){
-              $scope.renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
+              renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
               return
             }
 
             // EUI
-            //run.eui = 5;
-            run.eui = run["openstudio_results.total_site_eui"];
+            if (!run.hasOwnProperty('openstudio_results.total_site_eui')){
+              renderWarns.push("Enable total_site_eui output variable in OpenStudio Results to populate Energy Use Intensity Column.");
+            } else {
+              run.eui = run["openstudio_results.total_site_eui"];
+            }
 
             // Peak Electric Demand
-            run.peak_electric_demand_ip = run["openstudio_results.annual_peak_electric_demand"];
+            if (!run.hasOwnProperty('openstudio_results.annual_peak_electric_demand')){
+              renderWarns.push("Enable annual_peak_electric_demand output variable in OpenStudio Results to populate Peak Electricity Column.");
+            } else {
+              run.peak_electric_demand_ip = run["openstudio_results.annual_peak_electric_demand"];
+            }
 
             // Electricity Consumption
-            run.electricity_ip = run["openstudio_results.electricity_ip"];
+            if (!run.hasOwnProperty('openstudio_results.electricity_ip')){
+              renderWarns.push("Enable electricity_ip output variable in OpenStudio Results to populate Electricity Consumption Column.");
+            } else {
+              run.electricity_ip = run["openstudio_results.electricity_ip"];
+            }
 
             // Natural Gas Consumption
-            run.natural_gas_ip = run["openstudio_results.natural_gas_ip"];
+            if (!run.hasOwnProperty('openstudio_results.natural_gas_ip')){
+              renderWarns.push("Enable natural_gas_ip output variable in OpenStudio Results to populate Natural Gas Column.");
+            } else {
+              run.natural_gas_ip = run["openstudio_results.natural_gas_ip"];
+            }
 
             //District Cooling Consumption
-            run.district_cooling_cooling_ip = run["openstudio_results.district_cooling_cooling_ip"];
+            if (!run.hasOwnProperty('openstudio_results.district_cooling_cooling_ip')){
+              renderWarns.push("Enable district_cooling_cooling_ip output variable in OpenStudio Results to populate District Cooling Column.");
+            } else {
+              run.district_cooling_cooling_ip = run["openstudio_results.district_cooling_cooling_ip"];
+            }
 
             // District Heating Consumption
-            run.district_heating_ip = run["openstudio_results.district_heating_ip"];
+            if (!run.hasOwnProperty('openstudio_results.district_heating_ip')){
+              renderWarns.push("Enable district_heating_ip output variable in OpenStudio Results to populate District Heating Column.");
+            } else {
+              run.district_heating_ip = run["openstudio_results.district_heating_ip"];
+            }
 
             // First Year Capital Cost
-            run.first_year_cap_cost = run["openstudio_results.first_year_capital_cost"];
+            if (!run.hasOwnProperty('openstudio_results.first_year_capital_cost')){
+              renderWarns.push("Enable first_year_capital_cost output variable in OpenStudio Results to populate First Year Capital Cost Column.");
+            } else {
+              run.first_year_cap_cost = run["openstudio_results.first_year_capital_cost"];
+            }
 
             // Annual Utility Cost
-            run.ann_util_cost = run["openstudio_results.annual_utility_cost"];
+            if (!run.hasOwnProperty('openstudio_results.annual_utility_cost')){
+              renderWarns.push("Enable annual_utility_cost output variable in OpenStudio Results to populate Annual Utility Cost Column.");
+            } else {
+              run.ann_util_cost = run["openstudio_results.annual_utility_cost"];
+            }
 
             // Total LCC
             run.total_lcc = run["openstudio_results.total_lifecycle_cost"];
+
+            if (!run.hasOwnProperty('openstudio_results.total_lifecycle_cost')){
+              renderWarns.push("Enable total_lifecycle_cost output variable in OpenStudio Results to populate Total Lifecycle Cost Column.");
+            } else {
+              run.total_lcc = run["openstudio_results.total_lifecycle_cost"];
+            }
 
             console.log(run.name);
             console.log(run);
             $scope.resultsWithInfo.push(run);
 
           });
+
+          // Show a unique set of warnings
+          $scope.renderWarns = _.uniq(renderWarns);
 
         }
       };
