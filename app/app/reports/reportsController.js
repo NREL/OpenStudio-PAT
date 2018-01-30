@@ -129,9 +129,9 @@ export class ReportsController {
     };
 
     // Uncomment this to view webview developer tools to debug project reports
-    if (vm.env != 'production') {
-      vm.openWebViewDevTools();
-    }
+    //if (vm.env != 'production') {
+    //  vm.openWebViewDevTools();
+    //}
 
     //pass data into webview when dom is ready
     angular.element(document).ready(function () {
