@@ -13,7 +13,7 @@ build:mac:
     - mac
   before_script:
     - npm install
-    - ./node_modules/.bin/bower install
+    - npm run bower
   script:
     - npm run release
 
@@ -22,4 +22,6 @@ build:windows:
   tags:
     - windows
   script:
-    - npm install && node_modules\.bin\bower.cmd install && npm run release
+    - npm install
+    - npm run bower
+    - npm run release'
