@@ -89,17 +89,18 @@ export class RunController {
     vm.$scope.osServerVersions = vm.Project.getOsServerVersions();
     if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Server Versions: ', vm.$scope.osServerVersions);
 
-    // get default AMI for this openstudio version
+    // get default AMI for this openstudio version (if found)
     vm.$scope.defaultAMI = _.find(vm.$scope.osServerVersions, {name: package_os});
     if (vm.Message.showDebug()) vm.$log.debug('DEFAULT AMI: ', vm.$scope.defaultAMI);
 
-    // modify osServerVersions to include disable tag
-    const amiMinVersion = _.head(vm.$scope.defaultAMI.name.split('-'));
-    _.forEach(vm.$scope.osServerVersions, (v) => {
-      v.recommend = (vm.VersionCompare.gt(_.head(v.name.split('-')), amiMinVersion)) ? ' -- Not Recommended' : '';
-    });
-
-    if (vm.Message.showDebug()) vm.$log.debug('OpenStudio Server Versions: ', vm.$scope.osServerVersions);
+    if (_.isUndefined(vm.$scope.defaultAMI) || _.isUndefined(vm.$scope.defaultAMI.name)) vm.$log.error(`No default AMI found for package OS version: ${package_os}`);
+    else {
+      // modify osServerVersions to include disable tag
+      const amiMinVersion = _.head(vm.$scope.defaultAMI.name.split('-'));
+      _.forEach(vm.$scope.osServerVersions, (v) => {
+        v.recommend = (vm.VersionCompare.gt(_.head(v.name.split('-')), amiMinVersion)) ? ' -- Not Recommended' : '';
+      });
+    }
 
     vm.$scope.remoteTypes = vm.Project.getRemoteTypes();
     if (vm.Message.showDebug()) vm.$log.debug('Selected Remote Type: ', vm.$scope.remoteSettings.remoteType);

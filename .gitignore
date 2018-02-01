@@ -2,6 +2,7 @@ node_modules
 *.log
 .DS_Store
 Thumbs.db
+.python-version
 
 /.idea/
 /.tmp/
