@@ -241,7 +241,10 @@ export default {
         selectAll: 'Select All',
         deselectAll: 'Deselect All'
       },
-      modalEditOptionDescription: 'Edit Option Description'
+      modalEditOptionDescription: 'Edit Option Description',
+      modalEditModelDependentChoiceArg: 'Edit Model-Dependent Choice Argument',
+      modalEditChoiceEnum: 'Select from Choices List',
+      modalEditChoiceText: 'Enter Custom Choice'
     }
   },
   bcl: {

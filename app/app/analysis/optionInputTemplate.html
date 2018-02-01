@@ -1,13 +1,25 @@
 <div>
   <form name="inputForm">
-    <select ng-if="row.entity.type=='Choice' && col.colDef.field == grid.appScope.analysis.getFirstOptionId(row.entity) && row.entity.variable == false" ng-class="'colt' + col.uid"
+    <select ng-if="!row.entity.model_dependent && row.entity.type=='Choice' && col.colDef.field == grid.appScope.analysis.getFirstOptionId(row.entity) && row.entity.variable == false" ng-class="'colt' + col.uid"
             ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" ui-grid-edit-dropdown
             ng-model="MODEL_COL_FIELD"
             ng-options="field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray"></select>
-    <select ng-if="row.entity.type=='Choice' && (col.colDef.field != grid.appScope.analysis.getFirstOptionId(row.entity) ||  (col.colDef.field == grid.appScope.analysis.getFirstOptionId(row.entity)  && row.entity.variable == true))" ng-class="'colt' + col.uid"
+    <select ng-if="!row.entity.model_dependent && row.entity.type=='Choice' && (col.colDef.field != grid.appScope.analysis.getFirstOptionId(row.entity) ||  (col.colDef.field == grid.appScope.analysis.getFirstOptionId(row.entity)  && row.entity.variable == true))" ng-class="'colt' + col.uid"
             ui-grid-edit-dropdown
             ng-model="MODEL_COL_FIELD"
             ng-options="field[editDropdownIdLabel] as field[editDropdownValueLabel] CUSTOM_FILTERS for field in editDropdownOptionsArray"></select>
+
+    <input  ng-if="row.entity.model_dependent && row.entity.type=='Choice' && col.colDef.field == grid.appScope.analysis.getFirstOptionId(row.entity) && row.entity.variable == false" ng-class="'colt' + col.uid"
+            type="text" ng-change="grid.appScope.analysis.onGridChoiceChange(row.entity.type,col,row)" ui-grid-editor
+            ng-model="MODEL_COL_FIELD"
+            ng-init="grid.appScope.analysis.editModelDependentChoiceArg(col,row)"
+            ng-click="grid.appScope.analysis.editModelDependentChoiceArg(col,row)">
+    <input type="text" ng-if="row.entity.model_dependent && row.entity.type=='Choice' && (col.colDef.field != grid.appScope.analysis.getFirstOptionId(row.entity) ||  (col.colDef.field == grid.appScope.analysis.getFirstOptionId(row.entity)  && row.entity.variable == true))" ng-class="'colt' + col.uid"
+           type="text" ui-grid-editor
+            ng-model="MODEL_COL_FIELD"
+            ng-init="grid.appScope.analysis.editModelDependentChoiceArg(col,row)"
+            ng-click="grid.appScope.analysis.editModelDependentChoiceArg(col,row)">
+
 
     <input ng-if="row.entity.type=='Boolean' && col.colDef.field == grid.appScope.analysis.getFirstOptionId(row.entity) && row.entity.variable == false"
            type="checkbox" ng-class="'colt' + col.uid" ui-grid-checkbox

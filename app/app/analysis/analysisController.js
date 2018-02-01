@@ -742,6 +742,53 @@ export class AnalysisController {
     vm.allVariableCheckboxesChanged(row, col);
   }
 
+  editModelDependentChoiceArg(col, row){
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('Analysis::editModelDependentChoiceArg');
+
+    const field = col.colDef.field;
+    if (vm.Message.showDebug()) vm.$log.debug('FIELD: ', field);
+    const instanceId = col.colDef.instanceId;
+    const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
+
+    // TODO: FIND ARGUMENT
+    if (vm.Message.showDebug()) vm.$log.debug('ROW: ', row);
+    argument = _.find(measure.arguments, {name: row.entity.name});
+
+    // find current value
+    const argValue = argument[field];
+
+    //
+    // const deferred = vm.$q.defer();
+    //
+    // // open modal for user to select options.
+    // const modalInstance = vm.$uibModal.open({
+    //   backdrop: 'static',
+    //   controller: 'ModalEditModelDependentChoiceArgController',
+    //   controllerAs: 'modal',
+    //   templateUrl: 'app/analysis/edit_md_choice_arg.html',
+    //   //windowClass: 'wide-modal',
+    //   resolve: {
+    //     params: function () {
+    //       return {
+    //         argValue: argValue
+    //       };
+    //     }
+    //   }
+    // });
+    //
+    // modalInstance.result.then((newValue) => {
+    //   argument[field] = newValue;
+    //   deferred.resolve();
+    // }, () => {
+    //   // Modal canceled
+    //   deferred.reject();
+    // });
+    //
+    // return deferred.promise;
+
+  }
+
   editOptionDescription(col, row) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('Analysis::editOptionDescription');

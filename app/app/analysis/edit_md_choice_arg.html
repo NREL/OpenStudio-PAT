@@ -1,0 +1,29 @@
+<div class="modal-header">
+  <h3 class="modal-title" translate>analysis.manual.modalEditModelDependentChoiceArg</h3>
+</div>
+
+<div class="modal-body">
+  <div class="row pad-bot-10">
+    <div class="col-sm-12">
+
+      <div class="btn-group">
+        <label class="btn btn-primary" ng-model="inputType" uib-btn-radio="'enum'" translate>analysis.manual.modalEditChoiceEnum</label>
+        <label class="btn btn-primary" ng-model="inputType" uib-btn-radio="'free'" translate>analysis.manual.modalEditChoiceText</label>
+      </div>
+
+      <div ng-if="inputType == 'enum'">
+        SHOW ENUM
+      </div>
+
+      <div ng-if="inputType == 'free'">
+        SHOW CUSTOM INPUT
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
+  <button type="button" class="btn btn-warning" ng-click="modal.cancel()">Cancel</button>
+</div>
