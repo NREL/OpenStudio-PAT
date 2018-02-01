@@ -3,24 +3,30 @@
 </div>
 
 <div class="modal-body">
-  <div class="row pad-bot-10">
+  <div class="row pad-bot-10 pad-top-10">
     <div class="col-sm-12">
-
       <div class="btn-group">
-        <label class="btn btn-primary" ng-model="inputType" uib-btn-radio="'enum'" translate>analysis.manual.modalEditChoiceEnum</label>
-        <label class="btn btn-primary" ng-model="inputType" uib-btn-radio="'free'" translate>analysis.manual.modalEditChoiceText</label>
+        <label class="btn btn-primary" ng-model="modal.inputType" uib-btn-radio="'enum'" translate>analysis.manual.modalEditChoiceEnum</label>
+        <label class="btn btn-primary" ng-model="modal.inputType" uib-btn-radio="'free'" translate>analysis.manual.modalEditChoiceText</label>
       </div>
-
-      <div ng-if="inputType == 'enum'">
-        SHOW ENUM
-      </div>
-
-      <div ng-if="inputType == 'free'">
-        SHOW CUSTOM INPUT
-      </div>
-
     </div>
   </div>
+
+  <div class="row pad-bot-10 pad-top-10">
+    <div class="col-sm-12">
+      <div ng-if="modal.inputType == 'enum'">
+        <label class="normal-text" for="enum" translate>analysis.manual.modalEditChoiceValue</label>
+        <select id="enum" class="form-control"
+                ng-options="item for item in modal.choiceList"
+                ng-model="modal.argValue"></select>
+      </div>
+      <div ng-if="modal.inputType == 'free'">
+        <label class="normal-text" for="custom" translate>analysis.manual.modalEditChoiceValue</label>
+        <input class="form-control" type="text" id="custom" ng-model="modal.argValue">
+      </div>
+    </div>
+  </div>
+
 </div>
 
 <div class="modal-footer">

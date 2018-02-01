@@ -214,6 +214,7 @@ export default {
       serverScripts: 'Scripts de serveur',
       serverScriptsMessage: 'Si votre analyse nécessite des scripts d\'initialisation ou de finalisation de serveur et de travailleur, ajoutez-les ici. Notez que ces scripts ne s\'exécutent pas sur un serveur local; Ils ne peuvent être exécutés que sur un serveur cloud.',
       warning: 'Le paramètre de variable sélectionné n\'est pas valide pour cet algorithme. La variable sera traitée comme un argument statique lors de l\'exécution de la simulation.',
+      modelDependentCustom: 'Ou valeur personalisée (a préseance)',
       grid: {
         max: 'Max',
         min: 'Min',
@@ -244,7 +245,8 @@ export default {
       modalEditOptionDescription: 'Modifier la description de l\'option',
       modalEditModelDependentChoiceArg: 'Modifier l\'argument dépendant du modèle',
       modalEditChoiceEnum: 'liste d\'options',
-      modalEditChoiceText: 'option personalisé'
+      modalEditChoiceText: 'option personalisée',
+      modalEditChoiceValue: 'Valeur de l\'argument'
     }
   },
   bcl: {

@@ -213,6 +213,7 @@ export default {
       addArg: 'Add Argument',
       serverScripts: 'Server Scripts',
       serverScriptsMessage: 'If your analysis requires server and worker initialization or finalization scripts, add them here.  Note that these scripts will not run on a local server; they can only be run on a cloud server.',
+      modelDependentCustom: 'Or custom value (takes precedence)',
       warning: 'The selected variable setting is invalid for this algorithm.  The variable will be treated as a static argument when running the simulation.',
       grid: {
         max: 'Max',
@@ -244,7 +245,8 @@ export default {
       modalEditOptionDescription: 'Edit Option Description',
       modalEditModelDependentChoiceArg: 'Edit Model-Dependent Choice Argument',
       modalEditChoiceEnum: 'Select from Choices List',
-      modalEditChoiceText: 'Enter Custom Choice'
+      modalEditChoiceText: 'Enter Custom Choice',
+      modalEditChoiceValue: 'Argument Value'
     }
   },
   bcl: {

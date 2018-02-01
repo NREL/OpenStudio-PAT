@@ -751,41 +751,45 @@ export class AnalysisController {
     const instanceId = col.colDef.instanceId;
     const measure = _.find(vm.$scope.measures, {instanceId: instanceId});
 
-    // TODO: FIND ARGUMENT
-    if (vm.Message.showDebug()) vm.$log.debug('ROW: ', row);
-    argument = _.find(measure.arguments, {name: row.entity.name});
+    // find argument and choices
+    const argument = _.find(measure.arguments, {name: row.entity.name});
+    const choiceList = argument.choice_display_names;
 
     // find current value
     const argValue = argument[field];
+    const inputType = argument['inputType' + field.replace('option', '')];
 
-    //
-    // const deferred = vm.$q.defer();
-    //
-    // // open modal for user to select options.
-    // const modalInstance = vm.$uibModal.open({
-    //   backdrop: 'static',
-    //   controller: 'ModalEditModelDependentChoiceArgController',
-    //   controllerAs: 'modal',
-    //   templateUrl: 'app/analysis/edit_md_choice_arg.html',
-    //   //windowClass: 'wide-modal',
-    //   resolve: {
-    //     params: function () {
-    //       return {
-    //         argValue: argValue
-    //       };
-    //     }
-    //   }
-    // });
-    //
-    // modalInstance.result.then((newValue) => {
-    //   argument[field] = newValue;
-    //   deferred.resolve();
-    // }, () => {
-    //   // Modal canceled
-    //   deferred.reject();
-    // });
-    //
-    // return deferred.promise;
+    const deferred = vm.$q.defer();
+
+    // open modal for user to select options.
+    const modalInstance = vm.$uibModal.open({
+      backdrop: 'static',
+      controller: 'ModalEditModelDependentChoiceArgController',
+      controllerAs: 'modal',
+      templateUrl: 'app/analysis/edit_md_choice_arg.html',
+      //windowClass: 'wide-modal',
+      resolve: {
+        params: function () {
+          return {
+            argValue: argValue,
+            choiceList: choiceList,
+            inputType: inputType
+          };
+        }
+      }
+    });
+
+    modalInstance.result.then((newValueArr) => {
+      argument[field] = newValueArr[1];
+      argument['inputType' + field.replace('option', '')] = newValueArr[0];
+      if (vm.Message.showDebug()) vm.$log.debug('new argument: ', argument);
+      deferred.resolve();
+    }, () => {
+      // Modal canceled
+      deferred.reject();
+    });
+
+    return deferred.promise;
 
   }
 

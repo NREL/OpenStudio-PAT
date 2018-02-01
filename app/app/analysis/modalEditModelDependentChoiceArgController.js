@@ -31,26 +31,29 @@ export class ModalEditModelDependentChoiceArgController {
     'ngInject';
 
     const vm = this;
+    vm.$scope = $scope;
     vm.$uibModalInstance = $uibModalInstance;
     vm.$log = $log;
     vm.params = params;
-    $scope.argValue = vm.params.argValue;
-    $scope.inputType = 'enum';
+    vm.argValue = vm.params.argValue;
+    vm.choiceList = vm.params.choiceList;
+    vm.inputType = vm.params.inputType;
+
+    if (_.isNil(vm.inputType)){
+      vm.inputType = 'enum';
+    }
+
   }
 
   ok() {
     const vm = this;
     // send value based on inputType?
-    vm.$uibModalInstance.close($scope.argValue);
-
+    vm.$uibModalInstance.close([vm.inputType, vm.argValue]);
   }
 
   cancel() {
     const vm = this;
     vm.$uibModalInstance.dismiss('cancel');
   }
-
-
-
 }
 
