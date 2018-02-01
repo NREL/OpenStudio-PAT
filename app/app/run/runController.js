@@ -93,8 +93,9 @@ export class RunController {
     vm.$scope.defaultAMI = _.find(vm.$scope.osServerVersions, {name: package_os});
     if (vm.Message.showDebug()) vm.$log.debug('DEFAULT AMI: ', vm.$scope.defaultAMI);
 
-    if (_.isUndefined(vm.$scope.defaultAMI) || _.isUndefined(vm.$scope.defaultAMI.name)) vm.$log.error(`No default AMI found for package OS version: ${package_os}`);
-    else {
+    if (!_.has(vm.$scope.defaultAMI, 'name')){
+      vm.$log.warn(`No default AMI found for package OS version: ${package_os}`);
+    } else {
       // modify osServerVersions to include disable tag
       const amiMinVersion = _.head(vm.$scope.defaultAMI.name.split('-'));
       _.forEach(vm.$scope.osServerVersions, (v) => {
