@@ -415,7 +415,6 @@
                     <input class="form-control" type="text" ng-model="argument.inputs.minimum"
                            ng-change="analysis.setIsModified()">
                   </div>
-
                 </div>
                 <div class="col-sm-4">
                   <input class="form-control" type="number" ng-model="argument.inputs.maximum"
@@ -449,7 +448,7 @@
                       <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
                     </div>
                   </div>
-                  <div ng-if="(argument.inputs.distribution == 'Discrete' && argument.inputs.variableSetting == 'Pivot') || argument.inputs.variableSetting == 'Discrete'">
+                  <div ng-if="(argument.inputs.distribution != 'Integer Sequence' && argument.inputs.variableSetting == 'Pivot') || argument.inputs.variableSetting == 'Discrete'">
                     <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
                       <div class="row pad-bot-10">
                         <div class="col-sm-6">
@@ -635,6 +634,11 @@
                       ng-options="name as name for name in argument.choice_display_names"
                       ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"
                       ng-change="analysis.setIsModified()"></select>
+              <div ng-if="argument.model_dependent == true && argument.type == 'Choice'">
+                <label class="normal-text" translate>analysis.algorithmic.modelDependentCustom</label>
+                <input class="form-control" type="text" ng-model="argument.inputs.default_value"
+                       ng-change="analysis.setIsModified()">
+              </div>
               <input class="form-control" type="text" ng-model="argument.inputs.default_value"
                      ng-change="analysis.setIsModified()"
                      ng-if="argument.type == 'String'">
@@ -742,7 +746,11 @@
                           ng-options="choice for choice in argument.choice_display_names"
                           ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'"
                           ng-change="analysis.setIsModified()"></select>
-
+                  <div ng-if="argument.model_dependent == true && argument.type == 'Choice'">
+                    <label class="normal-text" translate>analysis.algorithmic.modelDependentCustom</label>
+                    <input class="form-control" type="text" ng-model="argument.inputs.minimum"
+                           ng-change="analysis.setIsModified()">
+                  </div>
                 </div>
                 <div class="col-sm-4">
                   <input class="form-control" type="number" ng-model="argument.inputs.maximum"
@@ -758,6 +766,11 @@
                           ng-options="choice for choice in argument.choice_display_names"
                           ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'"
                           ng-change="analysis.setIsModified()"></select>
+                  <div ng-if="argument.model_dependent == true && argument.type == 'Choice'">
+                    <label class="normal-text" translate>analysis.algorithmic.modelDependentCustom</label>
+                    <input class="form-control" type="text" ng-model="argument.inputs.maximum"
+                           ng-change="analysis.setIsModified()">
+                  </div>
                 </div>
               </div>
               <div class="row">
@@ -771,7 +784,7 @@
                       <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
                     </div>
                   </div>
-                  <div ng-if="(argument.inputs.distribution == 'Discrete' && argument.inputs.variableSetting == 'Pivot') || argument.inputs.variableSetting == 'Discrete'">
+                  <div ng-if="(argument.inputs.distribution != 'Integer Sequence' && argument.inputs.variableSetting == 'Pivot') || argument.inputs.variableSetting == 'Discrete'">
                     <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
                       <div class="row pad-bot-10">
                         <div class="col-sm-6">
@@ -791,6 +804,11 @@
                                     ng-options="value for value in argument.choice_display_names"
                                     ng-init="discreteVariable.value = discreteVariable.value || argument.choice_display_names[0]"
                                     ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
+                            <div ng-if="argument.model_dependent == true && argument.type == 'Choice'">
+                              <label class="normal-text" translate>analysis.algorithmic.modelDependentCustom</label>
+                              <input class="form-control" type="text" ng-model="discreteVariable.value"
+                                     ng-change="analysis.setIsModified()">
+                            </div>
                           </div>
                         </div>
                         <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
@@ -952,6 +970,12 @@
                       ng-options="name as name for name in argument.choice_display_names"
                       ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"
                       ng-change="analysis.setIsModified()"></select>
+              <div ng-if="argument.model_dependent == true && argument.type == 'Choice'">
+                <label class="normal-text" translate>analysis.algorithmic.modelDependentCustom</label>
+                <input class="form-control" type="text" ng-model="argument.inputs.default_value"
+                       ng-change="analysis.setIsModified()">
+              </div>
+
               <input class="form-control" type="text" ng-model="argument.inputs.default_value"
                      ng-change="analysis.setIsModified()"
                      ng-if="argument.type == 'String'">
@@ -1059,7 +1083,11 @@
                           ng-options="choice for choice in argument.choice_display_names"
                           ng-model="argument.inputs.minimum" ng-if="argument.type == 'Choice'"
                           ng-change="analysis.setIsModified()"></select>
-
+                  <div ng-if="argument.model_dependent == true && argument.type == 'Choice'">
+                    <label class="normal-text" translate>analysis.algorithmic.modelDependentCustom</label>
+                    <input class="form-control" type="text" ng-model="argument.inputs.minimum"
+                           ng-change="analysis.setIsModified()">
+                  </div>
                 </div>
                 <div class="col-sm-4">
                   <input class="form-control" type="number" ng-model="argument.inputs.maximum"
@@ -1075,6 +1103,11 @@
                           ng-options="choice for choice in argument.choice_display_names"
                           ng-model="argument.inputs.maximum" ng-if="argument.type == 'Choice'"
                           ng-change="analysis.setIsModified()"></select>
+                  <div ng-if="argument.model_dependent == true && argument.type == 'Choice'">
+                    <label class="normal-text" translate>analysis.algorithmic.modelDependentCustom</label>
+                    <input class="form-control" type="text" ng-model="argument.inputs.maximum"
+                           ng-change="analysis.setIsModified()">
+                  </div>
                 </div>
               </div>
               <div class="row">
@@ -1088,7 +1121,7 @@
                       <label class="normal-text" translate>analysis.algorithmic.grid.weight</label>
                     </div>
                   </div>
-                  <div ng-if="(argument.inputs.distribution == 'Discrete' && argument.inputs.variableSetting == 'Pivot') || argument.inputs.variableSetting == 'Discrete'">
+                  <div ng-if="(argument.inputs.distribution != 'Integer Sequence' && argument.inputs.variableSetting == 'Pivot') || argument.inputs.variableSetting == 'Discrete'">
                     <div ng-repeat="discreteVariable in argument.inputs.discreteVariables">
                       <div class="row pad-bot-10">
                         <div class="col-sm-6">
@@ -1108,6 +1141,11 @@
                                     ng-options="value for value in argument.choice_display_names"
                                     ng-init="discreteVariable.value = discreteVariable.value || argument.choice_display_names[0]"
                                     ng-model="discreteVariable.value" ng-change="analysis.setIsModified()"></select>
+                            <div ng-if="argument.model_dependent == true && argument.type == 'Choice'">
+                              <label class="normal-text" translate>analysis.algorithmic.modelDependentCustom</label>
+                              <input class="form-control" type="text" ng-model="discreteVariable.value"
+                                     ng-change="analysis.setIsModified()">
+                            </div>
                           </div>
                         </div>
                         <div class="col-sm-4" ng-show="argument.inputs.variableSetting != 'Pivot'">
