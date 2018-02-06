@@ -77,7 +77,7 @@
             <li ng-repeat="measure_name in run.measure_names">{{ measure_name }}</li>
           </ul>
         </td>
-        <td>{{ baseline.eui - run.eui | number:1}} <br> {{ 100*(baseline.eui - run.eui)/baseline.eui | number:0}}%</td>
+        <td>{{ baseline.eui - run.eui | number:1}} <br> {{ calculateEuiReductionPercentage(baseline.eui, run.eui) | number:0}}%</td>
         <td>{{ baseline.peak_electric_demand_ip - run.peak_electric_demand_ip | number:1}} <br> {{
           100*(baseline.peak_electric_demand_ip - run.peak_electric_demand_ip)/baseline.peak_electric_demand_ip |
           number:0}}%
@@ -129,6 +129,10 @@
 
       // Show any issues
       $scope.renderWarns = [];
+
+      $scope.calculateEuiReductionPercentage = function (baseline_eui, run_eui) {
+        return (100*(baseline_eui - run_eui)/baseline_eui );
+      };
 
       // Update the baseline based on the selected name
       // todo - update this to work with manual or algorithmic
