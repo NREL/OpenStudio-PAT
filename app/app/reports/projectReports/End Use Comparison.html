@@ -56,11 +56,13 @@
     var algorithmic = null;
     var max_plot = 50;
     $scope.setupAfterAlgorithmicResultsAvailable = function () {
+
+      var renderWarns = [];
       if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
         algorithmic = true;
 
-        $scope.renderWarns.push("This report will only work with Analysis Type = Manual.");
-        return
+        renderWarns.push("This report will only work with Analysis Type = Manual.");
+        return;
 
         // this report is only legible up to about 50 datapoints.
         // not with the trouble for user to even setup all the end use output variables
@@ -68,7 +70,7 @@
 
         // limit datapoints to max_plot (+ 1 used in if statement and -1 message because of empty last object in algorithmic_results
         if ($scope.algorithm_results.length > max_plot + 1) {
-          $scope.renderWarns.push("Ony plotting " + max_plot + " algorhtimic dataopints out of " + ($scope.algorithm_results.length - 1) + ".");
+          renderWarns.push("Ony plotting " + max_plot + " algorithmic datapoints out of " + ($scope.algorithm_results.length - 1) + ".");
           $scope.algorithm_results = $scope.algorithm_results.slice(0,max_plot)
         }
 
@@ -91,20 +93,20 @@
             "Water Systems",
             "Refrigeration",
             "Generators"
-          ]
+          ];
           var newData = [];
 
           // Set the energy results properties of each run
           _.forEach($scope.algorithm_results, function (run) {
 
             if (run.name === "") {
-              return
+              return;
             }
 
             // warn and skip of datapoint is missing openstudio_results
             if (!(run.hasOwnProperty('openstudio_results.total_site_eui'))){
-              $scope.renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
-              return
+              renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
+              return;
             }
 
             // Populate an object with the end use data
@@ -126,7 +128,6 @@
 
           });
 
-
           console.log('finish fuel: ', fuel);
 
           // Add this datapoint to the overall set
@@ -143,6 +144,11 @@
 
         console.log('finish both fuels?');
 
+        // Show a unique set of warnings  (dup ng-repeat)
+        _.forEach(_.uniq(renderWarns), (warn) => {
+          if (_.isUndefined(_.find($scope.renderWarns, warn)))
+            $scope.renderWarns.push(warn);
+        });
       }
     };
 
@@ -245,17 +251,13 @@
 
         });
 
-        // Show a unique set of warnings
-        _.forEach(_.uniq(renderWarns), function (warn) {
-          $scope.renderWarns.push(warn);
-
-
+        // Show a unique set of warnings  (no dup ng-repeat)
+        _.forEach(_.uniq(renderWarns), (warn) => {
+          if (_.isUndefined(_.find($scope.renderWarns, warn)))
+            $scope.renderWarns.push(warn);
         });
-
       }
-
     };
-
   });
 
   // Angular directive to create a stacked bar chart

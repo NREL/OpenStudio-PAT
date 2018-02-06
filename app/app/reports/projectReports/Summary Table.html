@@ -164,7 +164,7 @@
 
           // limit datapoints to max_plot (+ 1 used in if statement and -1 message because of empty last object in algorithmic_results
           if ($scope.algorithm_results.length > max_plot + 1) {
-            renderWarns.push("Ony plotting " + max_plot + " algorhtimic dataopints out of " + ($scope.algorithm_results.length - 1) + ".");
+            renderWarns.push("Ony plotting " + max_plot + " algorithmic datapoints out of " + ($scope.algorithm_results.length - 1) + ".");
             $scope.algorithm_results = $scope.algorithm_results.slice(0,max_plot)
           }
 
@@ -246,8 +246,8 @@
               run.total_lcc = run["openstudio_results.total_lifecycle_cost"];
             }
 
-            console.log(run.name);
-            console.log(run);
+            //console.log(run.name);
+            //console.log(run);
             $scope.resultsWithInfo.push(run);
 
           });
