@@ -77,13 +77,13 @@
             <li ng-repeat="measure_name in run.measure_names">{{ measure_name }}</li>
           </ul>
         </td>
-        <td>{{ baseline.eui - run.eui | number:1}} <br> {{ calculateEuiReductionPercentage(baseline.eui, run.eui) | number:0}}%</td>
+        <td>{{ baseline.eui - run.eui | number:1}} <br> {{ calculateReductionPercentage(baseline.eui, run.eui) | number:0}}%</td>
         <td>{{ baseline.peak_electric_demand_ip - run.peak_electric_demand_ip | number:1}} <br> {{
           100*(baseline.peak_electric_demand_ip - run.peak_electric_demand_ip)/baseline.peak_electric_demand_ip |
           number:0}}%
         </td>
-        <td>{{ baseline.electricity_ip - run.electricity_ip | number:1}} <br> {{ 100*(baseline.electricity_ip -
-          run.electricity_ip)/baseline.electricity_ip | number:0}}%
+        <td>{{ baseline.electricity_ip - run.electricity_ip | number:1}} <br> {{
+          calculateReductionPercentage(baseline.electricity_ip, run.electricity_ip) | number:0}}%
         </td>
         <td>{{ baseline.natural_gas_ip - run.natural_gas_ip | number:1}} <br> {{ 100*(baseline.natural_gas_ip -
           run.natural_gas_ip)/baseline.natural_gas_ip | number:0}}%
@@ -130,8 +130,8 @@
       // Show any issues
       $scope.renderWarns = [];
 
-      $scope.calculateEuiReductionPercentage = function (baseline_eui, run_eui) {
-        return (100*(baseline_eui - run_eui)/baseline_eui );
+      $scope.calculateReductionPercentage = function (baseline_val, run_val) {
+        return (100*(baseline_val - run_val)/(Math.abs(baseline_val)) );
       };
 
       // Update the baseline based on the selected name
