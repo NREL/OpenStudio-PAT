@@ -54,7 +54,7 @@ export class ModalSelectOutputsController {
 
   ok() {
     const vm = this;
-    // add/remote Outputs to analysisOutputs
+    // add/remove Outputs to analysisOutputs
     _.forEach(vm.$scope.measure.outputs, (output) => {
       if (output.checked && !_.find(vm.$scope.measure.analysisOutputs, {display_name: output.display_name})){
         // add

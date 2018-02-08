@@ -437,6 +437,9 @@ export class ModalBclController {
     // prevent user from closing modal until measure is done getting added
     vm.$scope.addInProgress = true;
 
+    // prompt to save project
+    vm.Project.setModified(true);
+
     // copy on disk
     const dirNames = _.split(measure.measure_dir, '/');
     const dirName = _.last(dirNames);
@@ -574,7 +577,7 @@ export class ModalBclController {
   editMeasure(measure) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('in EDIT MEASURE function');
-    console.log(measure.measure_dir + '/measure.rb');
+    if (vm.Message.showDebug()) vm.$log.debug(measure.measure_dir + '/measure.rb');
     // show toastr for 2 seconds then open file
     vm.$translate('toastr.openMeasure').then( translation => {
       vm.toastr.info(translation, {
@@ -638,6 +641,9 @@ export class ModalBclController {
     const vm = this;
     const deferred = vm.$q.defer();
     if (vm.Message.showDebug()) vm.$log.debug('in UPDATE PROJECT MEASURE function');
+
+    // prompt project save
+    vm.Project.setModified(true);
 
     // unset 'update' status on original measure
     measure.status = '';
@@ -719,6 +725,25 @@ export class ModalBclController {
             // if (vm.Message.showDebug()) vm.$log.debug('merged match: ', match);
           }
         });
+        // clean up outputs: keep userDefinedOutputs as is.
+        project_measure.outputs = newMeasure.outputs;
+
+        // check that names in analysisOutputs match either something in userDefinedOutputs or in outputs
+        _.forEachRight(project_measure.analysisOutputs, (out, index) => {
+          if (_.isUndefined(_.find(project_measure.outputs, {name: out.name})) && _.isUndefined(_.find(project_measure.userDefinedOutputs, {name: out.name}))) {
+            // doesn't exist in either, remove output
+            project_measure.analysisOutputs.splice(index, 1);
+          }
+        });
+
+        // review outputs, add 'checked' key to match what's in analysisOutputs
+        _.forEach(project_measure.outputs, (out) => {
+          const match = _.find(project_measure.analysisOutputs, {name: out.name});
+          if (match) {
+            out.checked = match.checked;
+          }
+        });
+
         // copy new, reordered arguments
         project_measure.arguments = newArgs;
         // save display_name and name so it is not overwritten, in case it is a duplicate measure instance
@@ -729,6 +754,7 @@ export class ModalBclController {
         delete measure_copy.arguments;
         delete measure_copy.options;
         delete measure_copy.open;
+        delete measure_copy.outputs;
         _.assignIn(project_measure, measure_copy);
         project_measure.display_name = display_name;
         project_measure.name = name;

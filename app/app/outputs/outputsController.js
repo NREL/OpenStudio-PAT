@@ -329,6 +329,7 @@ export class OutputsController {
       const measure = _.find(vm.$scope.measures, {name: vm.$scope.addMeasure.measure.name});
       if (measure) {
         measure.outputMeasure = true;
+        measure.open = true;
         vm.setOutputMeasures();
         vm.initializeGrids();
       }
