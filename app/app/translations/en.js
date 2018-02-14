@@ -260,6 +260,7 @@ export default {
       minCompatibleVersion: 'Min Compatible Version',
       modelerDescription: 'Modeler Description',
       error: 'Error',
+      group: 'Group',
       tags: 'Tags'
     },
     category: {

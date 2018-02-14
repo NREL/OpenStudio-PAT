@@ -446,6 +446,7 @@ export class BCL {
       //displayName: (input.measure.display_name && input.measure.display_name != '') ? input.measure.display_name : input.measure.name,
       display_name: (input.measure.display_name && input.measure.display_name != '') ? input.measure.display_name : input.measure.name,
       short_name: _.result(input, 'measure.short_name'),
+      group: _.result(input, 'measure.group'),
       description: _.result(input, 'measure.description'),
       modeler_description: _.result(input, 'measure.modeler_description'),
       arguments: measureArguments,
