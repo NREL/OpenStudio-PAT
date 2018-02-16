@@ -22,6 +22,5 @@ build:windows:
   tags:
     - windows
   script:
-    - npm install
-    - npm run bower
-    - npm run release'
+    - node C:\ci-utilities\cli.js install-dependencies .
+    - npm run release
