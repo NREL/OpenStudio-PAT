@@ -449,7 +449,7 @@ export class RunController {
     if (vm.Message.showDebug()) vm.$log.debug('in Large Download Modal');
     if (vm.Message.showDebug()) vm.$log.debug(vm.$scope.datapoints.length, vm.$scope.numberDPsToDisplay);
 
-    if (vm.$scope.datapoints.length > vm.$scope.numberDPsToDisplay){
+    if (vm.$scope.datapointsStatus.length > vm.$scope.numberDPsToDisplay){
       // large download
       const modalInstance = vm.$uibModal.open({
         backdrop: 'static',
@@ -1269,12 +1269,12 @@ export class RunController {
     vm.OsServer.downloadAllResults().then(() => {
       vm.toastr.clear();
       vm.$translate('toastr.downloadedAllResults').then(translation => {
-        vm.toastr.success(translation);
+        vm.toastr.success(translation, {timeOut:0, extendedTimeOut: 0, hideMethod: 'noop', closeButton: true, tapToDismiss: false});
       });
     }, () => {
       vm.toastr.clear();
       vm.$translate('toastr.downloadedAllResultsError').then(translation => {
-        vm.toastr.error(translation);
+        vm.toastr.error(translation, {timeOut:0, extendedTimeOut: 0, hideMethod: 'noop', closeButton: true, tapToDismiss: false});
       });
     });
   }
@@ -1301,12 +1301,12 @@ export class RunController {
     vm.OsServer.downloadAllOSMs().then(() => {
       vm.toastr.clear();
       vm.$translate('toastr.downloadedAllOsm').then(translation => {
-        vm.toastr.success(translation);
+        vm.toastr.success(translation, {timeOut:0, extendedTimeOut: 0, hideMethod: 'noop', closeButton: true, tapToDismiss: false});
       });
     }, () => {
       vm.toastr.clear();
       vm.$translate('toastr.downloadedAllOsmError').then(translation => {
-        vm.toastr.error(translation);
+        vm.toastr.error(translation, {timeOut:0, extendedTimeOut: 0, hideMethod: 'noop', closeButton: true, tapToDismiss: false});
       });
     });
   }

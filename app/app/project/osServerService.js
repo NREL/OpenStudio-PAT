@@ -1399,13 +1399,28 @@ export class OsServer {
 
     const datapoints = vm.Project.getDatapoints();
 
-    _.forEach(datapoints, dp => {
-      // download only non-downloaded results
-      if (!dp.downloaded_results) {
-        const promise = vm.downloadResults(dp);
-        promises.push(promise);
-      }
-    });
+    // try out this way for large projects
+    if (vm.datapointsStatus.length > vm.Project.getNumberDPsToDisplay()){
+      const largeProject = true;
+      _.forEach(vm.datapointsStatus, dp => {
+        // download only non-downloaded results so you can call this function again in case of errors
+        if (!dp.downloaded_results) {
+          // find DP to udpate run tab
+          let dpForResult = _.find(datapoints, {id: dp.id});
+          const promise = vm.downloadResults(dp, largeProject, dpForResult);
+          promises.push(promise);
+        }
+      });
+
+    } else {
+      _.forEach(datapoints, dp => {
+        // download only non-downloaded results
+        if (!dp.downloaded_results) {
+          const promise = vm.downloadResults(dp);
+          promises.push(promise);
+        }
+      });
+    }
 
     vm.$q.all(promises).then(() => {
       vm.$log.info('All Datapoint results zip files downloaded');
@@ -1419,15 +1434,18 @@ export class OsServer {
   }
 
   // download data_point.zip
-  downloadResults(datapoint) {
+  downloadResults(datapoint, largeProject = false, dpForResult = undefined) {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    // assume filename is data_point.zip so we don't have to ping the datapoint.json
+    // assume filename is data_point.zip for large projects
     let filename = 'data_point.zip';
-    const file = _.find(datapoint.result_files, {type: 'Data Point'});
-    if (file) {
-      filename = file.attachment_file_name;
+    let file = undefined;
+    if (!largeProject){
+      file = _.find(datapoint.result_files, {type: 'Data Point'});
+      if (file) {
+        filename = file.attachment_file_name;
+      }
     }
 
     const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
@@ -1448,6 +1466,11 @@ export class OsServer {
       vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, filename), buf);
       if (file) file.downloaded = true;
       datapoint.downloaded_results = true;
+
+      if (largeProject && angular.isDefined(dpForResult)){
+        dpForResult.downloaded_results = true;
+      }
+
       vm.Project.setModified(true);
       deferred.resolve();
     }, error => {
@@ -1466,13 +1489,27 @@ export class OsServer {
 
     const datapoints = vm.Project.getDatapoints();
 
-    _.forEach(datapoints, dp => {
-      if (!dp.downloaded_osm) {
-        // download only the ones not yet downloaded
-        const promise = vm.downloadOSM(dp);
-        promises.push(promise);
-      }
-    });
+    if (vm.datapointsStatus.length > vm.Project.getNumberDPsToDisplay()){
+      // large project
+      const largeProject = true;
+      _.forEach(vm.datapointsStatus, dp => {
+        if (!dp.downloaded_osm) {
+          // download only the ones not yet downloaded
+          // find DP to udpate run tab
+          let dpForResult = _.find(datapoints, {id: dp.id});
+          const promise = vm.downloadOSM(dp, largeProject, dpForResult);
+          promises.push(promise);
+        }
+      });
+    } else {
+      _.forEach(datapoints, dp => {
+        if (!dp.downloaded_osm) {
+          // download only the ones not yet downloaded
+          const promise = vm.downloadOSM(dp);
+          promises.push(promise);
+        }
+      });
+    }
 
     vm.$q.all(promises).then(() => {
       vm.$log.info('All OSMs downloaded');
@@ -1486,14 +1523,18 @@ export class OsServer {
   }
 
   // download data_point.zip
-  downloadOSM(datapoint) {
+  downloadOSM(datapoint, largeProject = false, dpForResult = undefined) {
     const vm = this;
     const deferred = vm.$q.defer();
 
+    // assume filename is in.osm for large projects
     let filename = 'in.osm';
-    const file = _.find(datapoint.result_files, {type: 'OpenStudio Model'});
-    if (file) {
-      filename = file.attachment_file_name;
+    let file = undefined;
+    if (!largeProject){
+      file = _.find(datapoint.result_files, {type: 'OpenStudio Model'});
+      if (file) {
+        filename = file.attachment_file_name;
+      }
     }
 
     const reportUrl = vm.selectedServerURL + '/data_points/' + datapoint.id + '/download_result_file';
@@ -1505,6 +1546,10 @@ export class OsServer {
       vm.jetpack.write(vm.Project.getProjectLocalResultsDir().path(datapoint.id, filename), response.data);
       if (file) file.downloaded = true;
       datapoint.downloaded_osm = true;
+
+      if (largeProject && angular.isDefined(dpForResult)){
+        dpForResult.downloaded_osm = true;
+      }
       vm.Project.setModified(true);
       deferred.resolve();
     }, error => {

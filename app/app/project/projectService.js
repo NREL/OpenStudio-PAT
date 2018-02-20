@@ -445,8 +445,6 @@ export class Project {
     vm.osa.analysis.display_name = vm.analysisName;
     vm.osa.analysis.name = vm.analysisName;
 
-    console.error("ANALYSIS NAME: ", vm.analysisName);
-
     if (/[.$\u20AC\xA3]/.test(vm.osa.analysis.name)){
       vm.$log.error('illegal character (.$€£) detected in analysis name: ', vm.osa.analysis.name);
       vm.osaErrors.push(`illegal character (.$€£) detected in analysis name: ${vm.osa.analysis.name}`);
