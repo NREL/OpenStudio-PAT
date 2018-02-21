@@ -195,9 +195,11 @@
 
       // Warn user that this report doesn't work in Algorithmic mode
       $scope.setupAfterAlgorithmicResultsAvailable = function () {
+
         if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
           $scope.renderWarns.push("This report will only work with Analysis Type = Manual.");
         }
+        $scope.renderWarns = _.uniq($scope.renderWarns);
       };
 
       // Move the design alternative up one position

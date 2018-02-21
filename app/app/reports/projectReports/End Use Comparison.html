@@ -51,114 +51,213 @@
     // Show any issues
     $scope.renderWarns = [];
 
+
+    // gather data for Algorithmic analysis
+    var algorithmic = null;
+    var max_plot = 50;
+    $scope.setupAfterAlgorithmicResultsAvailable = function () {
+
+      var renderWarns = [];
+      if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
+        algorithmic = true;
+
+        renderWarns.push("This report will only work with Analysis Type = Manual.");
+        return;
+
+        // this report is only legible up to about 50 datapoints.
+        // not with the trouble for user to even setup all the end use output variables
+        // I have disabled it for algorithmic for now but if warning and return above are removed it will still run
+
+        // limit datapoints to max_plot (+ 1 used in if statement and -1 message because of empty last object in algorithmic_results
+        if ($scope.algorithm_results.length > max_plot + 1) {
+          renderWarns.push("Ony plotting " + max_plot + " algorithmic datapoints out of " + ($scope.algorithm_results.length - 1) + ".");
+          $scope.algorithm_results = $scope.algorithm_results.slice(0,max_plot)
+        }
+
+        // Populate arrays of data for electricity and gas by end use
+        var fuels = ['end_use_electricity_', 'end_use_natural_gas_'];
+        _.forEach(fuels, function (fuel) {
+
+          var elecEndUseDataColsKeys = [
+            "Heating",
+            "Cooling",
+            "Interior Lighting",
+            "Exterior Lighting",
+            "Interior Equipment",
+            "Exterior Equipment",
+            "Fans",
+            "Pumps",
+            "Heat Rejection",
+            "Humidification",
+            "Heat Recovery",
+            "Water Systems",
+            "Refrigeration",
+            "Generators"
+          ];
+          var newData = [];
+
+          // Set the energy results properties of each run
+          _.forEach($scope.algorithm_results, function (run) {
+
+            if (run.name === "") {
+              return;
+            }
+
+            // warn and skip of datapoint is missing openstudio_results
+            if (!(run.hasOwnProperty('openstudio_results.total_site_eui'))){
+              renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Populate an object with the end use data
+            var data = {};
+            data.name = run.name;
+            var tot = 0.0;
+            _.forEach(elecEndUseDataColsKeys, function (key) {
+              // Define the data header
+              var header = key.toLowerCase().replace(' ', '_');
+              var lookup = "openstudio_results." + fuel + header;
+              var val =  parseFloat(run[lookup]);
+              data[header] = val;
+              console.log('What is the problem still: ', run.name + fuel + header + val);
+              tot += val;
+            });
+            data.total = tot;
+
+            newData.push(data);
+
+          });
+
+          console.log('finish fuel: ', fuel);
+
+          // Add this datapoint to the overall set
+          //$scope.elecEndUseData.push(data);
+          switch (fuel){
+            case 'end_use_electricity_':
+              $scope.elecEndUseData = newData;
+
+            case 'end_use_natural_gas_':
+              $scope.gasEndUseData = newData;
+          }
+
+        });
+
+        console.log('finish both fuels?');
+
+        // Show a unique set of warnings  (dup ng-repeat)
+        _.forEach(_.uniq(renderWarns), (warn) => {
+          if (_.isUndefined(_.find($scope.renderWarns, warn)))
+            $scope.renderWarns.push(warn);
+        });
+      }
+    };
+
     // Set up some additional data properties after the results
     // are passed in.
     $scope.setupAfterResultsAvailable = function () {
 
-      var renderWarns = [];
 
-      console.debug('In setupAfterResultsAvailable');
+      if (algorithmic) {
+        return;
+      } else {
 
-      // Populate arrays of data for electricity and gas by end use
-      var fuels = ['end_use_electricity_', 'end_use_natural_gas_'];
-      _.forEach(fuels, function (fuel) {
+        var renderWarns = [];
 
-        var elecEndUseDataColsKeys = [
-          "Heating",
-          "Cooling",
-          "Interior Lighting",
-          "Exterior Lighting",
-          "Interior Equipment",
-          "Exterior Equipment",
-          "Fans",
-          "Pumps",
-          "Heat Rejection",
-          "Humidification",
-          "Heat Recovery",
-          "Water Systems",
-          "Refrigeration",
-          "Generators"
-        ]
-        var newData = [];
-        _.forEach($scope.results, function (run) {
+        console.debug('In setupAfterResultsAvailable');
 
-          // Get the OpenStudio Results measure, which contains the results
-          var reportMeasure = null;
-          _(run.steps).forEach(function (step) {
-            if (step.hasOwnProperty('result')) {
-              if (step.result.measure_uid == "a25386cd-60e4-46bc-8b11-c755f379d916") {
-                reportMeasure = step;
+        // Populate arrays of data for electricity and gas by end use
+        var fuels = ['end_use_electricity_', 'end_use_natural_gas_'];
+        _.forEach(fuels, function (fuel) {
+
+          var elecEndUseDataColsKeys = [
+            "Heating",
+            "Cooling",
+            "Interior Lighting",
+            "Exterior Lighting",
+            "Interior Equipment",
+            "Exterior Equipment",
+            "Fans",
+            "Pumps",
+            "Heat Rejection",
+            "Humidification",
+            "Heat Recovery",
+            "Water Systems",
+            "Refrigeration",
+            "Generators"
+          ]
+          var newData = [];
+          _.forEach($scope.results, function (run) {
+
+            // Get the OpenStudio Results measure, which contains the results
+            var reportMeasure = null;
+            _(run.steps).forEach(function (step) {
+              if (step.hasOwnProperty('result')) {
+                if (step.result.measure_uid == "a25386cd-60e4-46bc-8b11-c755f379d916") {
+                  reportMeasure = step;
+                }
               }
+            });
+            if (!reportMeasure) {
+              renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
+              return;
             }
+
+            // Make sure the results exist
+            if (!reportMeasure.hasOwnProperty('result')){
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Make sure the results have data
+            var vals = reportMeasure.result.step_values;
+            if (vals.length == 0){
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Make sure the EUI element exists to ensure measure was run
+            if (!_.find(vals, {'name': "eui"})) {
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Populate an object with the end use data
+            var data = {};
+            data.name = run.name;
+            var tot = 0.0;
+            _.forEach(elecEndUseDataColsKeys, function (key) {
+              // Define the data header
+              var header = key.toLowerCase().replace(' ', '_');
+              var lookup = fuel + header;
+              var val = _.find(vals, {'name': lookup}).value;
+              data[header] = val;
+              tot += val;
+            });
+            data.total = tot;
+
+            newData.push(data);
+
           });
-          if (!reportMeasure) {
-            renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
-            return;
+
+          // Add this datapoint to the overall set
+          //$scope.elecEndUseData.push(data);
+          switch (fuel){
+            case 'end_use_electricity_':
+              $scope.elecEndUseData = newData;
+
+            case 'end_use_natural_gas_':
+              $scope.gasEndUseData = newData;
           }
-
-          // Make sure the results exist
-          if (!reportMeasure.hasOwnProperty('result')){
-            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
-            return;
-          }
-
-          // Make sure the results have data
-          var vals = reportMeasure.result.step_values;
-          if (vals.length == 0){
-            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
-            return;
-          }
-
-          // Make sure the EUI element exists to ensure measure was run
-          if (!_.find(vals, {'name': "eui"})) {
-            renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
-            return;
-          }
-
-          // Populate an object with the end use data
-          var data = {};
-          data.name = run.name;
-          var tot = 0.0;
-          _.forEach(elecEndUseDataColsKeys, function (key) {
-            // Define the data header
-            var header = key.toLowerCase().replace(' ', '_');
-            var lookup = fuel + header;
-            var val = _.find(vals, {'name': lookup}).value;
-            data[header] = val;
-            tot += val;
-          });
-          data.total = tot;
-
-          newData.push(data);
 
         });
 
-        // Add this datapoint to the overall set
-        //$scope.elecEndUseData.push(data);
-        switch (fuel){
-          case 'end_use_electricity_':
-            $scope.elecEndUseData = newData;
-
-          case 'end_use_natural_gas_':
-            $scope.gasEndUseData = newData;
-        }
-
-      });
-
-      // Show a unique set of warnings
-      _.forEach(_.uniq(renderWarns), function (warn) {
-        $scope.renderWarns.push(warn);
-      });
-
-    };
-
-    // Warn user that this report doesn't work in Algorithmic mode
-    $scope.setupAfterAlgorithmicResultsAvailable = function () {
-      if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
-        $scope.renderWarns.push("This report will only work with Analysis Type = Manual.");
+        // Show a unique set of warnings  (no dup ng-repeat)
+        _.forEach(_.uniq(renderWarns), (warn) => {
+          if (_.isUndefined(_.find($scope.renderWarns, warn)))
+            $scope.renderWarns.push(warn);
+        });
       }
     };
-
   });
 
   // Angular directive to create a stacked bar chart
@@ -343,11 +442,12 @@
   }
 
   function setAlgorithmicData(metadata, results) {
+    console.log('Setting algorithmic results variable to: ', results);
     var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
     var $scope = angular.element(controllerElement).scope();
     $scope.$apply(function () {
-      $scope.algorithm_results = metadata;
-      $scope.algorithm_metadata = results;
+      $scope.algorithm_results = results;
+      $scope.algorithm_metadata = metadata;
       $scope.setupAfterAlgorithmicResultsAvailable();
     });
   }

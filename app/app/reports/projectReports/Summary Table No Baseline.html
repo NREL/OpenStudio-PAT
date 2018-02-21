@@ -2,7 +2,7 @@
 <html>
 <head>
   <meta charset="utf-8">
-  <title>Something</title>
+  <title>Summary Table No Baseline</title>
   <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
   <meta name="description" content="">
   <meta name="viewport" content="width=device-width">
@@ -16,97 +16,34 @@
 
   <div ng-controller="MyAppCtrl">
 
-    <h1>Summary Table</h1>
+    <h1>Summary Table No Baseline</h1>
     <ul>
       <li class="alert alert-warning" ng-repeat="warn in renderWarns">{{ warn }}</li>
     </ul>
     <table class="table-bordered table-condensed">
       <tr>
         <th>Name</th>
-        <th>Measures</th>
         <th>Energy Use Intensity <br> (kBtu/ft2-yr)</th>
         <th>Peak Electric Demand <br> (kW)</th>
-        <th>Electricity Consumption <br> (kWh)</th>
-        <th>Natural Gas Consumption <br> (Million Btu)</th>
-        <th>District Cooling Consumption <br> (Million Btu)</th>
-        <th>District Heating Consumption <br> (Million Btu)</th>
+        <th>Electricity <br> (kWh)</th>
+        <th>Natural Gas <br> (Million Btu)</th>
+        <th>District Cooling <br> (Million Btu)</th>
+        <th>District Heating <br> (Million Btu)</th>
         <th>First Year Capital Cost <br> ($)</th>
         <th>Annual Utility Cost <br> ($)</th>
-        <th></th>
         <th>Total LCC <br> ($)</th>
-      </tr>
-      <tr>
-        <td><select ng-model="baseline_name" ng-change="updateBaseline()">
-          <option ng-repeat="run in resultsWithInfo">{{run.name}}</option>
-        </select>
-        </td>
-        <td>
-          <ul>
-            <li ng-repeat="measure_name in baseline.measure_names">{{ measure_name }}</li>
-          </ul>
-        </td>
-        <td>{{ baseline.eui | number:1}}</td>
-        <td>{{ baseline.peak_electric_demand_ip | number:1}}</td>
-        <td>{{ baseline.electricity_ip | number:1}}</td>
-        <td>{{ baseline.natural_gas_ip | number:1}}</td>
-        <td>{{ baseline.district_cooling_cooling_ip | number:1}}</td>
-        <td>{{ baseline.district_heating_ip | number:1}}</td>
-        <td>{{ baseline.first_year_cap_cost | number:0}}</td>
-        <td>{{ baseline.ann_util_cost | number:0}}</td>
-        <td></td>
-        <td>{{ baseline.total_lcc | number:0}}</td>
-      </tr>
-      <tr>
-        <th>Name</th>
-        <th>Measures</th>
-        <th>Energy Use Intensity Reduction <br> (kBtu/ft2-yr)</th>
-        <th>Peak Electric Demand Reduction <br> (kW)</th>
-        <th>Electricity Savings <br> (kWh)</th>
-        <th>Natural Gas Savings <br> (Million Btu)</th>
-        <th>District Cooling Savings <br> (Million Btu)</th>
-        <th>District Heating Savings <br> (Million Btu)</th>
-        <th>First Year Capital Cost Increase <br> ($)</th>
-        <th>Annual Utility Cost Savings <br> ($)</th>
-        <th>Simple Payback <br> (years)</th>
-        <th>Total LCC Savings <br> ($)</th>
       </tr>
       <tr ng-repeat="run in resultsWithInfo">
         <td>{{ run.name }}</td>
-        <td>
-          <ul>
-            <li ng-repeat="measure_name in run.measure_names">{{ measure_name }}</li>
-          </ul>
-        </td>
-        <td>{{ baseline.eui - run.eui | number:1}} <br> {{ calculateReductionPercentage(baseline.eui, run.eui) | number:0}}%</td>
-        <td>{{ baseline.peak_electric_demand_ip - run.peak_electric_demand_ip | number:1}} <br> {{
-          100*(baseline.peak_electric_demand_ip - run.peak_electric_demand_ip)/baseline.peak_electric_demand_ip |
-          number:0}}%
-        </td>
-        <td>{{ baseline.electricity_ip - run.electricity_ip | number:1}} <br> {{
-          calculateReductionPercentage(baseline.electricity_ip, run.electricity_ip) | number:0}}%
-        </td>
-        <td>{{ baseline.natural_gas_ip - run.natural_gas_ip | number:1}} <br> {{ 100*(baseline.natural_gas_ip -
-          run.natural_gas_ip)/baseline.natural_gas_ip | number:0}}%
-        </td>
-        <td>{{ baseline.district_cooling_cooling_ip - run.district_cooling_cooling_ip | number:1}} <br> {{
-          100*(baseline.district_cooling_cooling_ip -
-          run.district_cooling_cooling_ip)/baseline.district_cooling_cooling_ip | number:0}}%
-        </td>
-        <td>{{ baseline.district_heating_ip - run.district_heating_ip | number:1}} <br> {{
-          100*(baseline.district_heating_ip - run.district_heating_ip)/baseline.district_heating_ip | number:0}}%
-        </td>
-        <td>{{ run.first_year_cap_cost - baseline.first_year_cap_cost | number:1}} <br> {{
-          100*(run.first_year_cap_cost - baseline.first_year_cap_cost)/baseline.first_year_cap_cost | number:0}}%
-        </td>
-        <td>{{ baseline.ann_util_cost - run.ann_util_cost | number:0}} <br> {{ 100*(baseline.ann_util_cost -
-          run.ann_util_cost)/baseline.ann_util_cost | number:0}}%
-        </td>
-        <td>{{ (run.first_year_cap_cost - baseline.first_year_cap_cost) / (baseline.ann_util_cost - run.ann_util_cost) |
-          number:1}}
-        </td>
-        <td>{{ baseline.total_lcc - run.total_lcc | number:0}} <br> {{ 100*(baseline.total_lcc -
-          run.total_lcc)/baseline.total_lcc | number:0}}%
-        </td>
+        <td>{{ run.eui | number:1}}</td>
+        <td>{{ run.peak_electric_demand_ip | number:1}}</td>
+        <td>{{ run.electricity_ip | number:1}}</td>
+        <td>{{ run.natural_gas_ip | number:1}}</td>
+        <td>{{ run.district_cooling_cooling_ip | number:1}}</td>
+        <td>{{ run.district_heating_ip | number:1}}</td>
+        <td>{{ run.first_year_cap_cost | number:1}}</td>
+        <td>{{ run.ann_util_cost | number:1}}</td>
+        <td>{{ run.total_lcc | number:1}}</td>
       </tr>
     </table>
   </div>
@@ -120,41 +57,12 @@
   angular.module('myApp', [])
     .controller('MyAppCtrl', function ($scope) {
 
-      // Create variables for the baseline
-      $scope.baseline_name = "";
-      $scope.baseline = "";
 
       // Subset of runs with results to show
       $scope.resultsWithInfo = [];
 
       // Show any issues
       $scope.renderWarns = [];
-
-      $scope.calculateReductionPercentage = function (baseline_val, run_val) {
-        return (100*(baseline_val - run_val)/(Math.abs(baseline_val)) );
-      };
-
-      // Update the baseline based on the selected name
-      // todo - update this to work with manual or algorithmic
-      $scope.updateBaseline = function () {
-
-        if (algorithmic) {
-          _.forEach($scope.algorithm_results, function (run) {
-            if (run.name == $scope.baseline_name) {
-              $scope.baseline = run;
-              console.log('Changed baseline to ' + $scope.baseline.name);
-            }
-          });
-        } else {
-          _.forEach($scope.results, function (run) {
-            if (run.name == $scope.baseline_name) {
-              $scope.baseline = run;
-              console.log('Changed baseline to ' + $scope.baseline.name);
-            }
-          });
-        }
-
-      };
 
       // gather data for Algorithmic analysis
       var algorithmic = null;
@@ -164,7 +72,6 @@
           algorithmic = true;
 
           var renderWarns = [];
-
 
           // limit datapoints to max_plot (+ 1 used in if statement and -1 message because of empty last object in algorithmic_results
           if ($scope.algorithm_results.length > max_plot + 1) {
@@ -250,17 +157,11 @@
               run.total_lcc = run["openstudio_results.total_lifecycle_cost"];
             }
 
-            //console.log(run.name);
-            //console.log(run);
+            console.log(run.name);
+            console.log(run);
             $scope.resultsWithInfo.push(run);
 
           });
-
-          // Make the comparison point the first run to start
-          if ($scope.resultsWithInfo.length > 0) {
-            $scope.baseline = $scope.resultsWithInfo.reverse()[0];
-            $scope.baseline_name = $scope.baseline.name;
-          }
 
           // Show a unique set of warnings
           $scope.renderWarns = _.uniq(renderWarns);
@@ -272,39 +173,11 @@
       // are passed in.
       $scope.setupAfterResultsAvailable = function () {
 
-
         if (algorithmic) {
           return;
         } else {
 
           var renderWarns = [];
-
-          // Get the unique measure counts
-          // based on unique name + argument values.
-          var measureCounts = {};
-          var numAlts = 0;
-          _.forEach($scope.results, function (run) {
-            numAlts += 1;
-            _.forEach(run.steps, function (step) {
-              // Make sure the results exist
-              if (!step.hasOwnProperty('result')){
-                return;
-              }
-              var idPlusArgs = step.result.measure_uid + JSON.stringify(step.arguments);
-              step.idPlusArgs = idPlusArgs;
-              if (measureCounts[idPlusArgs]) {
-                measureCounts[idPlusArgs] += 1;
-              } else {
-                measureCounts[idPlusArgs] = 1;
-              }
-            });
-          });
-          console.info("There are results for " + numAlts + " runs");
-
-          // Set the measure_names property of each run
-          _.forEach($scope.results, function (run) {
-            run.measure_names = measureNames(run, measureCounts, numAlts);
-          });
 
           // Set the energy results properties of each run
           _.forEach($scope.results, function (run) {
@@ -342,6 +215,7 @@
               return;
             }
 
+            // EUI
             run.eui = _.find(vals, {'name': "eui"}).value;
 
             // Peak Electric Demand
@@ -374,58 +248,14 @@
 
           });
 
-          // Make the comparison point the first run to start
-          if ($scope.resultsWithInfo.length > 0) {
-            $scope.baseline = $scope.resultsWithInfo.reverse()[0];
-            $scope.baseline_name = $scope.baseline.name;
-          }
-
           // Show a unique set of warnings
-          _.forEach(_.uniq(renderWarns), function (warn) {
-            $scope.renderWarns.push(warn);
-          });
+          $scope.renderWarns = _.uniq(renderWarns);
 
         }
 
       };
 
     });
-
-  // returns a list of the user-entered measure names for
-  // a given design alternative.  Does not include
-  function measureNames(alternative, measureCounts, numAlts) {
-    var names = [];
-
-    _(alternative.steps).forEach(function (step) {
-
-      // skip measures that were set to "none,"
-      // (which sets __SKIP__ argument to true)
-      if (step.arguments.__SKIP__) {
-        console.log("Not including " + step.name + " because it was skipped.");
-        return;
-      }
-
-      // skip reporting measures
-      if (step.measure_type == 'ReportingMeasure') {
-        console.log("Not including " + step.name + " because it is a reporting Measure.");
-        return;
-      }
-
-      // skip always-run measures
-      if (measureCounts[step.idPlusArgs] == numAlts) {
-        console.log("Not including " + step.name + " because it is an always-run Measure.");
-        return;
-      }
-
-      if (step.name) {
-        names.push(step.name);
-      }
-
-    });
-
-    return names;
-
-  }
 
   // set $scope.reportDir element in the report's controller from PAT project directory
   function setReportDir(reportDir) {
@@ -450,6 +280,7 @@
   }
 
   function setAlgorithmicData(metadata, results) {
+    console.log('Setting algorithmic results variable to: ', results);
     var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
     var $scope = angular.element(controllerElement).scope();
     $scope.$apply(function () {
