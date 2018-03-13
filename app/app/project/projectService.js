@@ -1329,12 +1329,19 @@ export class Project {
     argument.value_type = vm.convertType(arg.type);
     argument.default_value = arg.default_value;
     if (vm.analysisType == 'Manual') {
+      // get first option
+      let optionKeys = [];
+      const keys = Object.keys(arg);
+      optionKeys = _.filter(keys, (k) => {
+        return k.indexOf('option_') !== -1;
+      });
+
       if (arg.required) {
-        argument.value = !_.isNil(arg.option_1) ? arg.option_1 : arg.default_value;
+        argument.value = optionKeys.length > 0 ? arg[optionKeys[0]] : arg.default_value;
       } else {
         // if optional and empty string (''), set to null (it was probably set to '' artificially by analysis controller
         // TODO might have to fix this - check if can handle this in OSA
-        argument.value = arg.option_1 === '' || _.isNil(arg.option_1) ? null : arg.option_1;
+        argument.value = optionKeys.length > 0 && (arg[optionKeys[0]] === '' || _.isNil(arg[optionKeys[0]])) ? null : arg[optionKeys[0]];
       }
     } else {
       if (arg.required){
