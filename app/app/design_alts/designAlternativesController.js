@@ -183,7 +183,7 @@ export class DesignAlternativesController {
       if (vm.Message.showDebug()) vm.$log.debug(optionsArr);
       vm.$scope.gridOptions.columnDefs.push({
         name: measure.name,
-        displayName: measure.displayName,
+        displayName: measure.display_name,
         minWidth: 100,
         editableCellTemplate: 'ui-grid/dropdownEditor',
         editDropdownIdLabel: 'name',
