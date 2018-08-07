@@ -1117,11 +1117,20 @@ export class AnalysisController {
     if (!_.isEmpty(result)) {
       const scriptPath = result[0];
       if (vm.Message.showDebug()) vm.$log.debug('script path:', scriptPath);
-      const scriptFilename = scriptPath.replace(/^.*[\\\/]/, '');
+      let scriptFilename = scriptPath.replace(/^.*[\\\/]/, '');  // old name
+      // rename to initialize.sh or finalize.sh
+      if (_.includes(type, 'initialization')) {
+        scriptFilename = 'initialize.sh';
+      } else {
+        scriptFilename = 'finalize.sh';
+      }
       // ensure appropriate folders exist
-      vm.jetpack.dir(vm.Project.getProjectDir().path('scripts', type));
-      // copy/overwrite
-      vm.jetpack.copy(scriptPath, vm.Project.getProjectDir().path('scripts', type, scriptFilename), {overwrite: true});
+      // before: scripts folder, inner server_initialization, server_finalization, worker_initialization, worker_finalization
+      // updated to: scripts/analysis and scripts/data_point
+      const newType = _.includes(type, 'server') ? 'analysis' : 'data_point';
+      vm.jetpack.dir(vm.Project.getProjectDir().path('scripts', newType));
+      // copy/overwrite, change the name
+      vm.jetpack.copy(scriptPath, vm.Project.getProjectDir().path('scripts', newType, scriptFilename), {overwrite: true});
       if (vm.Message.showDebug()) vm.$log.debug('Script filename: ', scriptFilename);
       // update project
       vm.$scope.serverScripts[type].file = scriptFilename;

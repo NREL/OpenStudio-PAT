@@ -505,8 +505,9 @@ export class Project {
       // add server scripts (if they exist)
       _.forEach(vm.serverScripts, (script, type) => {
         if (script.file) {
+          const newType = _.includes(type, 'server') ? 'analysis' : 'data_point';
           archive.bulk([
-            {expand: true, cwd: vm.projectDir.path('scripts', type), src: ['**'], dest: 'scripts/' + type}
+            {expand: true, cwd: vm.projectDir.path('scripts', newType), src: ['**'], dest: 'scripts/' + newType}
           ]);
         }
       });
@@ -1417,7 +1418,8 @@ export class Project {
         // create argument file
         let argFilename = script.file.substr(0, script.file.lastIndexOf('.')) || script.file;
         argFilename = argFilename + '.args';
-        vm.jetpack.write(vm.projectDir.path('scripts', type, argFilename), script.arguments);
+        const newType = _.includes(type, 'server') ? 'analysis' : 'data_point';
+        vm.jetpack.write(vm.projectDir.path('scripts', newType, argFilename), script.arguments);
       }
     });
   }
