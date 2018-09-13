@@ -32,6 +32,11 @@
     "platform": "darwin",
     "arch": "x64",
     "type": "ruby"
+  }, {
+    "name": "ruby-2.2.4-linux.tar.gz",
+    "platform": "linux",
+    "arch": "x64",
+    "type": "ruby"
   }],
   "mongo": [{
     "name": "mongodb-3.2.5-win32.tar.gz",
@@ -41,6 +46,11 @@
   }, {
     "name": "mongodb-3.6.3-darwin.tar.gz",
     "platform": "darwin",
+    "arch": "x64",
+    "type": "mongo"
+  }, {
+    "name": "mongodb-linux-x86_64-3.2.5.tgz",
+    "platform": "linux",
     "arch": "x64",
     "type": "mongo"
   }],
@@ -63,6 +73,11 @@
   }, {
     "name": "OpenStudio-server-b7df23d15e-darwin.tar.gz",
     "platform": "darwin",
+    "arch": "x64",
+    "type": "OpenStudio-server"
+  }, {
+    "name": "OpenStudio-server-c629d77ff1-linux.tar.gz",
+    "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio-server"
   }]
