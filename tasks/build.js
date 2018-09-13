@@ -157,11 +157,20 @@ gulp.task('download-deps', function () {
     const fileInfo = _.find(manifest[depend], {platform: platform});
     const fileName = fileInfo.name;
 
-    return progress(request({uri: manifest.endpoint + fileName, timeout: 5000}))
+    if( fileName.includes("http") ) {
+      // Already a URI
+      var uri = fileName;
+      var destName = fileName.replace(/^.*[\\\/]/, '');
+    } else {
+      // Need to concat endpoint (AWS) with the fileName
+      var uri = manifest.endpoint + fileName;
+      var destName = fileName;
+    }
+    return progress(request({uri: uri, timeout: 5000}))
       .on('progress', state => {
         console.log(`Downloading ${depend}, ${(state.percentage * 100).toFixed(0)}%`);
       })
-      .pipe(source(fileName))
+      .pipe(source(destName))
       .pipe(gulp.dest(destination));
   });
 
@@ -172,6 +181,12 @@ gulp.task('extract-deps', ['download-deps'], function () {
   var tasks = dependencies.map(depend => {
     const fileInfo = _.find(manifest[depend], {platform: platform});
     const fileName = fileInfo.name;
+
+    if( fileName.includes("http") ) {
+      var destName = fileName.replace(/^.*[\\\/]/, '');
+    } else {
+      var destName = fileName;
+    }
 
     return gulp.src(path.join(destination, fileName))
       .pipe(decompress())
@@ -185,6 +200,12 @@ gulp.task('remove-deps-tar', ['extract-deps'], function () {
   var tasks = dependencies.map(depend => {
     const fileInfo = _.find(manifest[depend], {platform: platform});
     const fileName = fileInfo.name;
+
+    if( fileName.includes("http") ) {
+      var destName = fileName.replace(/^.*[\\\/]/, '');
+    } else {
+      var destName = fileName;
+    }
 
     return gulp.src(path.join(destination, fileName), {read: false})
       .pipe(clean());
