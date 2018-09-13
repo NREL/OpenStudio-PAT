@@ -33,7 +33,7 @@
     "arch": "x64",
     "type": "ruby"
   }, {
-    "name": "ruby-2.2.4-linux.tar.gz",
+    "name": "http://openstudio-resources.s3.amazonaws.com/dependencies/ruby_2_2_4_linux_static.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "ruby"
@@ -49,7 +49,7 @@
     "arch": "x64",
     "type": "mongo"
   }, {
-    "name": "mongodb-linux-x86_64-3.2.5.tgz",
+    "name": "http://downloads.mongodb.org/linux/mongodb-linux-x86_64-3.2.5.tgz",
     "platform": "linux",
     "arch": "x64",
     "type": "mongo"
