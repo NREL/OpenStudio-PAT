@@ -2734,6 +2734,12 @@ export class Project {
       defaultValue: 2,
       type:'number'
     }, {
+      name: 'bfgs',
+      displayName: 'BFGS',
+      description: 'Use Bounded Gradient Search. Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }, {
       name: 'bfgsburnin',
       displayName: 'BFGS burn in',
       description: 'The number of generations which are run before the BFGS is ﬁrst used',
