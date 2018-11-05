@@ -2317,7 +2317,7 @@ export class Project {
       name: 'grid_jump',
       displayName: 'Grid Jump',
       description: 'Integer specifying the number of levels that are increased/decreased for computing the elementary effects',
-      defaultValue: 10,
+      defaultValue: 2,
       type:'number'
     }, {
       name: 'type',
