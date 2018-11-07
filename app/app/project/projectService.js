@@ -931,7 +931,13 @@ export class Project {
     vm.osa.analysis.problem.analysis_type = vm.samplingMethod.id.toLowerCase();
     vm.osa.analysis.problem.algorithm = {};
     _.forEach(vm.algorithmSettings, (setting) => {
-      vm.osa.analysis.problem.algorithm[_.snakeCase(setting.name)] = setting.value;
+      if (setting.name === 'r2'){
+        // exception
+        vm.osa.analysis.problem.algorithm[setting.name] = setting.value;
+      }
+      else {
+        vm.osa.analysis.problem.algorithm[_.snakeCase(setting.name)] = setting.value;
+      }
     });
 
     // ensure # of levels is at least 2 for Morris algorithm
