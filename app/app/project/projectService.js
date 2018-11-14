@@ -963,6 +963,15 @@ export class Project {
         tempOutputs.push(out);
       });
     });
+
+    // Output short names must be unique or server errors out
+    let tt = angular.copy(tempOutputs);
+    let tt_uniq = _.uniqBy(tt, 'short_name');
+    if (tt_uniq.length != tt.length) {
+      vm.$log.error('Output short names must be unique. Please correct on the Outputs tab.');
+      vm.osaErrors.push('Output short names must be unique. Please correct on the Outputs tab.');
+    }
+
     if (groupFlag) {
       tempOutputs = _.sortBy(tempOutputs, ['obj_function_group']);
       // check objective function groups number for algorithms
