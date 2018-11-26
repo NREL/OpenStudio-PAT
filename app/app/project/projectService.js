@@ -2365,6 +2365,13 @@ export class Project {
       defaultValue: 1000000000000000000,
       type:'number'
     }, {
+      name: 'check_boundary',
+      displayName: 'check_boundary',
+      description: 'Force variables to respect mins/maxes. Options: 1 or 0 (True or False)',
+      defaultValue: 0,
+      type:'number'
+    }
+    , {
       name: 'debug_messages',
       displayName: 'Debug Messages',
       description: 'Options: 1 or 0 (True or False)',
