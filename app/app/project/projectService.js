@@ -1933,25 +1933,11 @@ export class Project {
     const vm = this;
     vm.serverInstanceTypes = [
       {
-        name: 'm3.xlarge',
-        cpus: '4',
-        memory: '15 GiB',
-        storage: '2 x 40 GB',
-        cost: '$0.28/hr'
-      },
-      {
         name: 'm3.2xlarge',
         cpus: '8',
         memory: '30 GiB',
         storage: '2 x 80 GB',
         cost: '$0.56/hr'
-      },
-      {
-        name: 'c3.xlarge',
-        cpus: '4',
-        memory: '7.5 GiB',
-        storage: '2 x 40 GB',
-        cost: '$0.21/hr'
       },
       {
         name: 'c3.2xlarge',
@@ -1973,13 +1959,6 @@ export class Project {
         memory: '60 GiB',
         storage: '2 x 320 GB',
         cost: '$1.68/hr'
-      },
-      {
-        name: 'd2.xlarge',
-        cpus: '4',
-        memory: '30.5 GiB',
-        storage: '3 x 2000 GB',
-        cost: '$0.69/hr'
       },
       {
         name: 'd2.2xlarge',
