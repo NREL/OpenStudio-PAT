@@ -272,13 +272,12 @@
                ng-repeat="argument in measure.arguments">
             <div class="col-sm-2 normal-text pad-top-25">
               {{argument.display_name}}
+              <span class="badge badge-info" title="{{analysis.getArgumentDescription(argument)}}">&nbsp;?&nbsp;</span>
             </div>
-
             <div class="col-sm-2 pad-top-25">
               <input class="form-control" type="text" ng-model="argument.display_name_short"
                      ng-mouseover="argument.display_name_short" ng-change="analysis.setIsModified()">
             </div>
-
             <div class="col-sm-2 pad-top-25">
               <div class="row">
                 <div class="col-sm-9">
@@ -608,6 +607,7 @@
                ng-repeat="argument in measure.arguments">
             <div class="col-sm-2 normal-text pad-top-25">
               {{argument.display_name}}
+              <span class="badge badge-info" title="{{analysis.getArgumentDescription(argument)}}">&nbsp;?&nbsp;</span>
             </div>
 
             <div class="col-sm-2 pad-top-25">
@@ -944,6 +944,7 @@
                ng-repeat="argument in measure.arguments">
             <div class="col-sm-2 normal-text pad-top-25">
               {{argument.display_name}}
+              <span class="badge badge-info" title="{{analysis.getArgumentDescription(argument)}}">&nbsp;?&nbsp;</span>
             </div>
 
             <div class="col-sm-2 pad-top-25">
