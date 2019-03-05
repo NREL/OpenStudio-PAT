@@ -1261,6 +1261,22 @@ export class AnalysisController {
     vm.Project.setModified(true);
   }
 
+  getArgumentDescription(argument) {
+    // ? hover on argument display names in algorithmic mode
+    let desc = '';
+    if (!_.isEmpty(argument.description))
+      desc = argument.description;
+    if (!_.isEmpty(argument.units)){
+      if (desc != '')
+        desc = desc + '<br/>';
+      desc = desc + ' Units: ' + argument.units;
+    }
+    if (_.isEmpty(desc)){
+      desc = 'No description is available for this argument'
+    }
+    return desc;
+  }
+
   addDiscreteVariable(argument) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In addDiscreteVariable');
