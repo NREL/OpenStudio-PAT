@@ -60,8 +60,8 @@
       var renderWarns = [];
       if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
         algorithmic = true;
-
         renderWarns.push("This report will only work with Analysis Type = Manual.");
+        $scope.renderWarns = renderWarns;
         return;
 
         // this report is only legible up to about 50 datapoints.
@@ -146,9 +146,9 @@
 
         // Show a unique set of warnings  (dup ng-repeat)
         _.forEach(_.uniq(renderWarns), (warn) => {
-          if (_.isUndefined(_.find($scope.renderWarns, warn)))
-            $scope.renderWarns.push(warn);
+          $scope.renderWarns.push(warn);
         });
+        $scope.renderWarns = _.uniq($scope.renderWarns);
       }
     };
 
@@ -253,9 +253,9 @@
 
         // Show a unique set of warnings  (no dup ng-repeat)
         _.forEach(_.uniq(renderWarns), (warn) => {
-          if (_.isUndefined(_.find($scope.renderWarns, warn)))
-            $scope.renderWarns.push(warn);
+          $scope.renderWarns.push(warn);
         });
+        $scope.renderWarns = _.uniq($scope.renderWarns);
       }
     };
   });
