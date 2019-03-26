@@ -23,7 +23,7 @@
     "type": "mongo"
   }],
   "openstudioServer": [{
-    "name": "OpenStudio-server-df38463eac-win32.tar.gz",
+    "name": "OpenStudio-server-7853254b70-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "OpenStudio-server"
