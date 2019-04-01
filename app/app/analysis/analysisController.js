@@ -1272,7 +1272,7 @@ export class AnalysisController {
       desc = desc + ' Units: ' + argument.units;
     }
     if (_.isEmpty(desc)){
-      desc = 'No description is available for this argument'
+      desc = 'No description is available for this argument';
     }
     return desc;
   }
