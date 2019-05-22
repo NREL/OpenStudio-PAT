@@ -403,6 +403,17 @@
               annualConsumption[fuelType] = output.value;
             }
           });
+          // time-of-use (tou) periods
+          _(fuelTypes).forEach(function (fuelType) {
+            for (var tou_pd = 1; tou_pd < 10; tou_pd++) {
+              var touPeriodName = fuelType + "_tou_" + tou_pd
+              output = _.find(vals, {'name': "annual_consumption_" + fuelType + "_tou_" + tou_pd});
+              if (output) {
+                annualConsumption[touPeriodName] = output.value;
+              }
+            }
+          });
+
           alt.results.annual.consumption = annualConsumption;
 
           // annual demand
