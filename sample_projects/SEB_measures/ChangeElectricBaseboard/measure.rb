@@ -56,8 +56,8 @@ class ChangeElectricBaseboard < OpenStudio::Ruleset::ModelUserScript
       #nom_cap = OpenStudio::OptionalDouble.new(nom_cap)
       zone.setEfficiency(base_eff)
       zone.setNominalCapacity(nom_cap)
-      runner.registerInfo("Changing the base_eff to #{zone.getEfficiency} ")
-      runner.registerInfo("Changing the nominal capacity to #{zone.getNominalCapacity} ")
+      runner.registerInfo("Changing the base_eff to #{zone.efficiency} ")
+      runner.registerInfo("Changing the nominal capacity to #{zone.nominalCapacity} ")
       
     end
 

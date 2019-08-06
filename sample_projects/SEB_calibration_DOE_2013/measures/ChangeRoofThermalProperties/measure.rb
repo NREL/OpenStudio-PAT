@@ -189,8 +189,8 @@ class ChangeRoofThermalProperties < OpenStudio::Ruleset::ModelUserScript
         new_construction.setLayer(lay_index, new_layer)
         #calculate properties of new layer and output nice names
         final_r_val[con_index][lay_index] = new_construction.layers[lay_index].to_OpaqueMaterial.get.thermalResistance if layer.to_OpaqueMaterial.is_initialized
-        final_sol_abs[con_index] = new_construction.layers[lay_index].to_StandardOpaqueMaterial.get.getSolarAbsorptance.value if lay_index == 0 && layer.to_StandardOpaqueMaterial.is_initialized
-        final_thm_mass[con_index][lay_index] = new_construction.layers[lay_index].to_StandardOpaqueMaterial.get.getDensity.value if layer.to_StandardOpaqueMaterial.is_initialized
+        final_sol_abs[con_index] = new_construction.layers[lay_index].to_StandardOpaqueMaterial.get.solarAbsorptance if lay_index == 0 && layer.to_StandardOpaqueMaterial.is_initialized
+        final_thm_mass[con_index][lay_index] = new_construction.layers[lay_index].to_StandardOpaqueMaterial.get.density if layer.to_StandardOpaqueMaterial.is_initialized
         final_r_val_d[con_index][lay_index] = neat_numbers(final_r_val[con_index][lay_index])
         final_sol_abs_d[con_index] = neat_numbers(final_sol_abs[con_index]) if lay_index == 0 && layer.to_StandardOpaqueMaterial.is_initialized
         final_thm_mass_d[con_index][lay_index] = neat_numbers(final_thm_mass[con_index][lay_index]) if layer.to_StandardOpaqueMaterial.is_initialized
