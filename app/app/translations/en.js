@@ -141,6 +141,7 @@ export default {
     checkAll: 'Check to make all arguments variable',
     checkForUpdates: 'Check for Updates',
     cliDebug: 'CLI --debug flag',
+    cliVerbose: 'CLI --verbose flag',
     viewAlgorithmReference: 'View Algorithm Documentation',
     columns: {
       argumentName: 'Argument Name',
