@@ -56,8 +56,8 @@ export class Project {
 
     vm.analysisTypes = ['Manual', 'Algorithmic'];
 
-    vm.cliDebugTypes = [{value: false, label: 'false'}, {value: true, label: 'true'}];
-    vm.cliVerboseTypes = [{value: false, label: 'false'}, {value: true, label: 'true'}];
+    vm.cliDebugTypes = [{value: "", label: 'false'}, {value: "--debug", label: 'true'}];
+    vm.cliVerboseTypes = [{value: "", label: 'false'}, {value: "--verbose", label: 'true'}];
 
     vm.numberDPsToDisplay = 150;
 
@@ -167,8 +167,8 @@ export class Project {
     vm.setServerScripts();
 
     vm.analysisType = 'Manual';
-    vm.cliDebug = false;
-    vm.cliVerbose = false;
+    vm.cliDebug = "";
+    vm.cliVerbose = "";
     vm.reportType = 'Calibration Report';
     vm.samplingMethod = vm.samplingMethods.length > 0 ? vm.samplingMethods[0] : null;
     vm.runType = vm.runTypes[0];

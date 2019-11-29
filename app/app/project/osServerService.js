@@ -832,9 +832,9 @@ export class OsServer {
     // TODO: catch what analysis type it is
 
     if (vm.platform == 'win32')
-      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getAnalysistName()}.json" "${vm.selectedServerURL}"`;
+      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis ${vm.project.cliDebug} ${vm.project.cliVerbose} --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getAnalysistName()}.json" "${vm.selectedServerURL}"`;
     else
-      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis --debug --verbose --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getAnalysisName()}.json" "${vm.selectedServerURL}"`;
+      vm.runAnalysisCommand = `"${vm.rubyPath}" "${vm.metaCLIPath}" run_analysis ${vm.project.cliDebug} ${vm.project.cliVerbose} --ruby-lib-path="${vm.openstudioBindingsDirPath}" "${vm.Project.projectDir.path()}/${vm.Project.getAnalysisName()}.json" "${vm.selectedServerURL}"`;
     vm.$log.info('run analysis command: ', vm.runAnalysisCommand);
 
     const full_command = vm.runAnalysisCommand + ' -a ' + analysis_param.toLowerCase();
