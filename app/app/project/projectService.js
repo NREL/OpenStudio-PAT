@@ -56,6 +56,8 @@ export class Project {
 
     vm.analysisTypes = ['Manual', 'Algorithmic'];
 
+    vm.cliDebugTypes = [{value: false, label: 'false'}, {value: true, label: 'true'}];
+
     vm.numberDPsToDisplay = 150;
 
     vm.reportTypes = [{
@@ -88,6 +90,7 @@ export class Project {
     vm.clusters = [];
     vm.modified = false;
     vm.analysisType = null;
+    vm.cliDebug = null;
     vm.reportType = null;
     vm.runType = vm.runTypes[0];
     vm.samplingMethod = vm.samplingMethods[0];
@@ -162,6 +165,7 @@ export class Project {
     vm.setServerScripts();
 
     vm.analysisType = 'Manual';
+    vm.cliDebug = false;
     vm.reportType = 'Calibration Report';
     vm.samplingMethod = vm.samplingMethods.length > 0 ? vm.samplingMethods[0] : null;
     vm.runType = vm.runTypes[0];
@@ -234,6 +238,7 @@ export class Project {
 
         vm.analysisName = vm.pat.analysisName ? vm.pat.analysisName : vm.projectName;
         vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
+        vm.cliDebug = vm.pat.cliDebug ? vm.pat.cliDebug : vm.cliDebug;
         vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
         vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
         vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
@@ -1474,6 +1479,7 @@ export class Project {
     vm.pat.seed = vm.defaultSeed;
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
+    vm.pat.cliDebug = vm.cliDebug;
     vm.pat.dirToInclude = vm.dirToInclude;
     vm.pat.dirToUnpackTo = vm.dirToUnpackTo;
     vm.pat.remoteSettings = angular.copy(vm.remoteSettings);
@@ -2125,6 +2131,16 @@ export class Project {
   getAnalysisType() {
     const vm = this;
     return vm.analysisType;
+  }
+
+  setCliDebug(name) {
+    const vm = this;
+    vm.cliDebug = name;
+  }  
+
+  getCliDebug() {
+    const vm = this;
+    return vm.cliDebug;
   }
 
   getFilesToInclude() {
@@ -3438,6 +3454,11 @@ export class Project {
   getAnalysisTypes() {
     const vm = this;
     return vm.analysisTypes;
+  }
+
+  getCliDebugTypes() {
+    const vm = this;
+    return vm.cliDebugTypes;
   }
 
   setReportType(name) {

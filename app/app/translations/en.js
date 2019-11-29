@@ -140,6 +140,7 @@ export default {
     addMeasureOption: 'Add Measure Option',
     checkAll: 'Check to make all arguments variable',
     checkForUpdates: 'Check for Updates',
+    cliDebug: 'CLI --debug flag',
     viewAlgorithmReference: 'View Algorithm Documentation',
     columns: {
       argumentName: 'Argument Name',
