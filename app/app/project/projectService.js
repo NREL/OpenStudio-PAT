@@ -56,8 +56,8 @@ export class Project {
 
     vm.analysisTypes = ['Manual', 'Algorithmic'];
 
-    vm.cliDebugTypes = [{value: "", label: 'false'}, {value: "--debug", label: 'true'}];
-    vm.cliVerboseTypes = [{value: "", label: 'false'}, {value: "--verbose", label: 'true'}];
+    vm.cliDebugTypes = [{value: '', label: 'false'}, {value: '--debug', label: 'true'}];
+    vm.cliVerboseTypes = [{value: '', label: 'false'}, {value: '--verbose', label: 'true'}];
 
     vm.numberDPsToDisplay = 150;
 
@@ -167,8 +167,8 @@ export class Project {
     vm.setServerScripts();
 
     vm.analysisType = 'Manual';
-    vm.cliDebug = "";
-    vm.cliVerbose = "";
+    vm.cliDebug = '';
+    vm.cliVerbose = '';
     vm.reportType = 'Calibration Report';
     vm.samplingMethod = vm.samplingMethods.length > 0 ? vm.samplingMethods[0] : null;
     vm.runType = vm.runTypes[0];
@@ -561,7 +561,9 @@ export class Project {
     vm.osa.analysis.weather_file.file_type = 'EPW';
     vm.osa.analysis.weather_file.path = './weather/' + vm.defaultWeatherFile;
     vm.osa.analysis.file_format_version = 1;
-
+    // add CLI args to OSA
+    vm.osa.analysis.cli_debug = vm.cliDebug;
+    vm.osa.analysis.cli_verbose = vm.cliVerbose;
     // server scripts (will only work on the cloud, but always put in OSA?)
     vm.osa.analysis.server_scripts = {};
     _.forEach(vm.serverScripts, (script, type) => {
