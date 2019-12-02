@@ -56,24 +56,6 @@
       </div>
     </div>
   </div>
-  <div class="row">
-    <div class="col-sm-4 pad-bot-20">
-      <label class="medium-label" translate>analysis.cliDebug</label>
-      <div class="input-group">
-        <select class="form-control inline form-control-smaller-width"
-              ng-options="o.value as o.label for o in analysis.cliDebugTypes" ng-model="cliDebug"
-              ng-change="analysis.setCliDebug()"></select>
-      </div>
-    </div>
-    <div class="col-sm-4 pad-bot-20">
-      <label class="medium-label" translate>analysis.cliVerbose</label>
-      <div class="input-group">
-        <select class="form-control inline form-control-smaller-width"
-              ng-options="o.value as o.label for o in analysis.cliVerboseTypes" ng-model="cliVerbose"
-              ng-change="analysis.setCliVerbose()"></select>
-      </div>
-    </div>
-  </div>
 </div>
 
 <div ng-if="selectedAnalysisType == 'Manual'" ng-include="'app/analysis/analysis_manual.html'"></div>
