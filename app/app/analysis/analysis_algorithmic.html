@@ -2,6 +2,7 @@
   <div class="row">
     <div class="col-sm-4 pad-bot-20">
       <label class="medium-label" translate>analysis.cliDebug</label>
+      <span class="badge badge-info" title="{{'analysis.algorithmic.helpCLIDebug' | translate}}">&nbsp;?&nbsp;</span>
       <div class="input-group">
         <select class="form-control inline form-control-smaller-width"
               ng-options="o.value as o.label for o in analysis.cliDebugTypes" ng-model="cliDebug"
@@ -10,6 +11,7 @@
     </div>
     <div class="col-sm-4 pad-bot-20">
       <label class="medium-label" translate>analysis.cliVerbose</label>
+      <span class="badge badge-info" title="{{'analysis.algorithmic.helpCLIVerbose' | translate}}">&nbsp;?&nbsp;</span>
       <div class="input-group">
         <select class="form-control inline form-control-smaller-width"
               ng-options="o.value as o.label for o in analysis.cliVerboseTypes" ng-model="cliVerbose"
