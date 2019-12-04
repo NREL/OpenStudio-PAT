@@ -1,0 +1,3 @@
+openstudio --bundle /var/oscli/Gemfile --bundle_path /var/oscli/gems --verbose run --workflow "/mnt/openstudio/analysis_cb7e2eac-8fbd-4749-8e6f-1b2f1f8b09db/data_point_45b0cc06-36ac-4640-8d1f-a962bb97fa18/data_point.osw" --debug
+
+docker run -v ${pwd}:/var/simdata/openstudio nrel/openstudio:3-prerelease-rc2-2.8.1 /var/simdata/openstudio/test/bin/docker-run.sh
