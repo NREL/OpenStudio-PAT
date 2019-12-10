@@ -12,7 +12,7 @@
         "display_name": "electricity_ip",
         "display_name_short": "electricity_ip",
         "metadata_id": null,
-        "name": "OpenStudioResults.electricity_ip",
+        "name": "openstudio_results.electricity_ip",
         "visualize": false,
         "export": true,
         "variable_type": "double"
@@ -26,7 +26,7 @@
         "display_name": "natural_gas_ip",
         "display_name_short": "natural_gas_ip",
         "metadata_id": null,
-        "name": "OpenStudioResults.natural_gas_ip",
+        "name": "openstudio_results.natural_gas_ip",
         "visualize": false,
         "export": true,
         "variable_type": "double"
@@ -40,7 +40,7 @@
         "display_name": "eui",
         "display_name_short": "eui",
         "metadata_id": null,
-        "name": "OpenStudioResults.eui",
+        "name": "openstudio_results.eui",
         "visualize": false,
         "export": true,
         "variable_type": "double"
@@ -55,7 +55,7 @@
         "display_name": "electricity_consumption_actual",
         "display_name_short": "electricity_consumption_actual",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.electricity_consumption_actual",
+        "name": "calibration_reports_enhanced_20.electricity_consumption_actual",
         "visualize": false,
         "export": true,
         "variable_type": "double"
@@ -70,7 +70,7 @@
         "display_name": "electricity_consumption_modeled",
         "display_name_short": "electricity_consumption_modeled",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.electricity_consumption_modeled",
+        "name": "calibration_reports_enhanced_20.electricity_consumption_modeled",
         "visualize": false,
         "export": true,
         "variable_type": "double"
@@ -85,7 +85,7 @@
         "display_name": "electricity_consumption_cvrmse",
         "display_name_short": "electricity_consumption_cvrmse",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.electricity_consumption_cvrmse",
+        "name": "calibration_reports_enhanced_20.electricity_consumption_cvrmse",
         "visualize": true,
         "export": true,
         "variable_type": "double"
@@ -100,7 +100,7 @@
         "display_name": "electricity_consumption_nmbe",
         "display_name_short": "electricity_consumption_nmbe",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.electricity_consumption_nmbe",
+        "name": "calibration_reports_enhanced_20.electricity_consumption_nmbe",
         "visualize": true,
         "export": true,
         "variable_type": "double"
@@ -115,7 +115,7 @@
         "display_name": "electricity_rmse",
         "display_name_short": "electricity_rmse",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.electricity_rmse",
+        "name": "calibration_reports_enhanced_20.electricity_rmse",
         "visualize": false,
         "export": true,
         "variable_type": "double"
@@ -130,7 +130,7 @@
         "display_name": "natural_gas_consumption_actual",
         "display_name_short": "natural_gas_consumption_actual",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.natural_gas_consumption_actual",
+        "name": "calibration_reports_enhanced_20.natural_gas_consumption_actual",
         "visualize": false,
         "export": true,
         "variable_type": "double"
@@ -145,7 +145,7 @@
         "display_name": "natural_gas_consumption_modeled",
         "display_name_short": "natural_gas_consumption_modeled",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.natural_gas_consumption_modeled",
+        "name": "calibration_reports_enhanced_20.natural_gas_consumption_modeled",
         "visualize": false,
         "export": true,
         "variable_type": "double"
@@ -160,7 +160,7 @@
         "display_name": "natural_gas_consumption_cvrmse",
         "display_name_short": "natural_gas_consumption_cvrmse",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.natural_gas_consumption_cvrmse",
+        "name": "calibration_reports_enhanced_20.natural_gas_consumption_cvrmse",
         "visualize": true,
         "export": true,
         "variable_type": "double"
@@ -175,7 +175,7 @@
         "display_name": "natural_gas_consumption_nmbe",
         "display_name_short": "natural_gas_consumption_nmbe",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.natural_gas_consumption_nmbe",
+        "name": "calibration_reports_enhanced_20.natural_gas_consumption_nmbe",
         "visualize": true,
         "export": true,
         "variable_type": "double"
@@ -190,7 +190,7 @@
         "display_name": "natural_gas_rmse",
         "display_name_short": "natural_gas_rmse",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.natural_gas_rmse",
+        "name": "calibration_reports_enhanced_20.natural_gas_rmse",
         "visualize": false,
         "export": true,
         "variable_type": "double"
@@ -204,7 +204,7 @@
         "display_name": "electricity_cvrmse_within_limit",
         "display_name_short": "electricity_cvrmse_within_limit",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.electricity_cvrmse_within_limit",
+        "name": "calibration_reports_enhanced_20.electricity_cvrmse_within_limit",
         "visualize": true,
         "export": true,
         "variable_type": "double"
@@ -218,7 +218,7 @@
         "display_name": "electricity_nmbe_within_limit",
         "display_name_short": "electricity_nmbe_within_limit",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.electricity_nmbe_within_limit",
+        "name": "calibration_reports_enhanced_20.electricity_nmbe_within_limit",
         "visualize": true,
         "export": true,
         "variable_type": "double"
@@ -232,7 +232,7 @@
         "display_name": "natural_gas_cvrmse_within_limit",
         "display_name_short": "natural_gas_cvrmse_within_limit",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.natural_gas_cvrmse_within_limit",
+        "name": "calibration_reports_enhanced_20.natural_gas_cvrmse_within_limit",
         "visualize": true,
         "export": true,
         "variable_type": "double"
@@ -246,7 +246,7 @@
         "display_name": "natural_gas_nmbe_within_limit",
         "display_name_short": "natural_gas_nmbe_within_limit",
         "metadata_id": null,
-        "name": "CalibrationReportsEnhanced20.natural_gas_nmbe_within_limit",
+        "name": "calibration_reports_enhanced_20.natural_gas_nmbe_within_limit",
         "visualize": true,
         "export": true,
         "variable_type": "double"
@@ -260,7 +260,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "AddMonthlyJSONUtilityData",
           "measure_definition_directory": "./measures/AddMonthlyJSONUtilityData",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/AddMonthlyJSONUtilityData",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\AddMonthlyJSONUtilityData",
           "measure_definition_display_name": "AddMonthlyJSONUtilityData",
           "measure_definition_name": "add_monthly_json_utility_data",
           "measure_definition_name_xml": null,
@@ -332,7 +332,7 @@
               "display_name_short": "remove_existing_data",
               "name": "remove_existing_data",
               "value_type": "boolean",
-              "default_value": true,
+              "default_value": false,
               "value": true
             },
             {
@@ -340,7 +340,7 @@
               "display_name_short": "set_runperiod",
               "name": "set_runperiod",
               "value_type": "boolean",
-              "default_value": true,
+              "default_value": false,
               "value": true
             }
           ],
@@ -353,7 +353,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "AddMonthlyJSONUtilityData",
           "measure_definition_directory": "./measures/AddMonthlyJSONUtilityData",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/AddMonthlyJSONUtilityData",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\AddMonthlyJSONUtilityData",
           "measure_definition_display_name": "AddMonthlyJSONUtilityData 2",
           "measure_definition_name": "add_monthly_json_utility_data_2",
           "measure_definition_name_xml": null,
@@ -446,7 +446,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "ReduceSpaceInfiltrationByPercentage",
           "measure_definition_directory": "./measures/ReduceSpaceInfiltrationByPercentage",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/ReduceSpaceInfiltrationByPercentage",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\ReduceSpaceInfiltrationByPercentage",
           "measure_definition_display_name": "ReduceSpaceInfiltrationByPercentage",
           "measure_definition_name": "reduce_space_infiltration_by_percentage",
           "measure_definition_name_xml": null,
@@ -539,7 +539,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "ReduceLightingLoadsByPercentage",
           "measure_definition_directory": "./measures/ReduceLightingLoadsByPercentage",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/ReduceLightingLoadsByPercentage",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\ReduceLightingLoadsByPercentage",
           "measure_definition_display_name": "Reduce Lighting Loads by Percentage",
           "measure_definition_name": "reduce_lighting_loads_by_percentage",
           "measure_definition_name_xml": null,
@@ -595,7 +595,7 @@
               "display_name_short": "demo_cost_initial_const",
               "name": "demo_cost_initial_const",
               "value_type": "boolean",
-              "default_value": true,
+              "default_value": false,
               "value": true
             },
             {
@@ -632,7 +632,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "ReduceElectricEquipmentLoadsByPercentage",
           "measure_definition_directory": "./measures/ReduceElectricEquipmentLoadsByPercentage",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/ReduceElectricEquipmentLoadsByPercentage",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\ReduceElectricEquipmentLoadsByPercentage",
           "measure_definition_display_name": "Reduce Electric Equipment Loads by Percentage",
           "measure_definition_name": "reduce_electric_equipment_loads_by_percentage",
           "measure_definition_name_xml": null,
@@ -725,7 +725,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "SetGasBurnerEfficiencyDiag",
           "measure_definition_directory": "./measures/SetGasBurnerEfficiencyDiag",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/SetGasBurnerEfficiencyDiag",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\SetGasBurnerEfficiencyDiag",
           "measure_definition_display_name": "Set Gas Burner Efficiency",
           "measure_definition_name": "set_gas_burner_efficiency_diag",
           "measure_definition_name_xml": null,
@@ -834,7 +834,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "SetCOPforSingleSpeedDXCoolingUnits",
           "measure_definition_directory": "./measures/SetCOPforSingleSpeedDXCoolingUnits",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/SetCOPforSingleSpeedDXCoolingUnits",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\SetCOPforSingleSpeedDXCoolingUnits",
           "measure_definition_display_name": "Set COP for Single Speed DX Cooling Units",
           "measure_definition_name": "set_co_pfor_single_speed_dx_cooling_units",
           "measure_definition_name_xml": null,
@@ -935,7 +935,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "ImproveFanBeltEfficiency",
           "measure_definition_directory": "./measures/ImproveFanBeltEfficiency",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/ImproveFanBeltEfficiency",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\ImproveFanBeltEfficiency",
           "measure_definition_display_name": "Improve Fan Belt Efficiency",
           "measure_definition_name": "improve_fan_belt_efficiency",
           "measure_definition_name_xml": null,
@@ -1044,7 +1044,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "AdjustThermostatSetpointsByDegrees",
           "measure_definition_directory": "./measures/AdjustThermostatSetpointsByDegrees",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/AdjustThermostatSetpointsByDegrees",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\AdjustThermostatSetpointsByDegrees",
           "measure_definition_display_name": "Adjust Thermostat Setpoints by Degrees",
           "measure_definition_name": "adjust_thermostat_setpoints_by_degrees",
           "measure_definition_name_xml": null,
@@ -1089,7 +1089,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "ChangeExteriorWallThermalProperties",
           "measure_definition_directory": "./measures/ChangeExteriorWallThermalProperties",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/ChangeExteriorWallThermalProperties",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\ChangeExteriorWallThermalProperties",
           "measure_definition_display_name": "Change Exterior Wall Thermal Properties",
           "measure_definition_name": "change_exterior_wall_thermal_properties",
           "measure_definition_name_xml": null,
@@ -1134,7 +1134,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "ChangeRoofThermalProperties",
           "measure_definition_directory": "./measures/ChangeRoofThermalProperties",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/ChangeRoofThermalProperties",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\ChangeRoofThermalProperties",
           "measure_definition_display_name": "Change Roof Thermal Properties",
           "measure_definition_name": "change_roof_thermal_properties",
           "measure_definition_name_xml": null,
@@ -1179,7 +1179,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "ChangeElectricBaseboard",
           "measure_definition_directory": "./measures/ChangeElectricBaseboard",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/ChangeElectricBaseboard",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\ChangeElectricBaseboard",
           "measure_definition_display_name": "Change Electric Baseboard",
           "measure_definition_name": "change_electric_baseboard",
           "measure_definition_name_xml": null,
@@ -1216,7 +1216,7 @@
           "measure_type": "ReportingMeasure",
           "measure_definition_class_name": "OpenStudioResults",
           "measure_definition_directory": "./measures/f8e23017-894d-4bdf-977f-37e3961e6f42",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/f8e23017-894d-4bdf-977f-37e3961e6f42",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\f8e23017-894d-4bdf-977f-37e3961e6f42",
           "measure_definition_display_name": "OpenStudio Results",
           "measure_definition_name": "openstudio_results",
           "measure_definition_name_xml": null,
@@ -1405,7 +1405,7 @@
           "measure_type": "ReportingMeasure",
           "measure_definition_class_name": "CalibrationReportsEnhanced20",
           "measure_definition_directory": "./measures/CalibrationReportsEnhanced20",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/SEB/SEB_calibration_SingleRun_2013/measures/CalibrationReportsEnhanced20",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-fmu\\sample_projects\\SEB_calibration_SingleRun_2013\\measures\\CalibrationReportsEnhanced20",
           "measure_definition_display_name": "Calibration Reports Enhanced",
           "measure_definition_name": "calibration_reports_enhanced_20",
           "measure_definition_name_xml": null,
@@ -1454,9 +1454,15 @@
         }
       ],
       "algorithm": {
+        "seed": null,
         "failed_f_value": 1000000000000000000,
         "debug_messages": 1,
-        "objective_functions": []
+        "objective_functions": [
+          "calibration_reports_enhanced_20.electricity_consumption_cvrmse",
+          "calibration_reports_enhanced_20.electricity_consumption_nmbe",
+          "calibration_reports_enhanced_20.natural_gas_consumption_cvrmse",
+          "calibration_reports_enhanced_20.natural_gas_consumption_nmbe"
+        ]
       },
       "analysis_type": "single_run"
     },
@@ -1469,6 +1475,8 @@
       "path": "./weather/SRRL_2013AMY_60min.epw"
     },
     "file_format_version": 1,
+    "cli_debug": "",
+    "cli_verbose": "",
     "server_scripts": {}
   }
 }

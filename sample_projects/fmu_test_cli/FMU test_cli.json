@@ -2,7 +2,37 @@
   "analysis": {
     "display_name": "FMU test CLI",
     "name": "FMU test CLI",
-    "output_variables": [],
+    "output_variables": [
+      {
+        "objective_function": false,
+        "objective_function_index": null,
+        "objective_function_target": null,
+        "objective_function_group": null,
+        "scaling_factor": null,
+        "display_name": "electricity_ip",
+        "display_name_short": "electricity_ip",
+        "metadata_id": null,
+        "name": "OpenStudioResults.electricity_ip",
+        "visualize": false,
+        "export": true,
+        "variable_type": "double"
+      },
+      {
+        "units": "%",
+        "objective_function": true,
+        "objective_function_index": 0,
+        "objective_function_target": 0,
+        "objective_function_group": null,
+        "scaling_factor": null,
+        "display_name": "electricity_consumption_cvrmse",
+        "display_name_short": "electricity_consumption_cvrmse",
+        "metadata_id": null,
+        "name": "CalibrationReportsEnhanced20.electricity_consumption_cvrmse",
+        "visualize": true,
+        "export": true,
+        "variable_type": "double"
+      }
+    ],
     "problem": {
       "workflow": [],
       "algorithm": {
@@ -22,6 +52,8 @@
       "path": "./weather/SRRL_2013AMY_60min.epw"
     },
     "file_format_version": 1,
+    "cli_debug": "",
+    "cli_verbose": "",
     "server_scripts": {
       "worker_initialization": "./scripts/worker_initialization/initialize.sh"
     }
