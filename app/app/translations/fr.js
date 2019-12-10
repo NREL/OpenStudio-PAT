@@ -140,8 +140,8 @@ export default {
     addMeasureOption: 'Ajouter une option de mesure',
     checkAll: 'Cocher pour rendre tous les arguments variables',
     checkForUpdates: 'Rechercher des mises à jour',
-    cliDebug: 'CLI --deboguer',
-    cliVerbose: 'CLI --verbeuse',
+    cliDebug: 'CLI --débogueur',
+    cliVerbose: 'CLI --mode-verbeuse',
     viewAlgorithmReference: 'View Algorithm Documentation',
     columns: {
       argumentName: 'Nom de l\'argument',
@@ -192,8 +192,8 @@ export default {
     algorithmic: {
       helpAlgorithmSettings: 'These settings control the manner in which the given algorithm is executed. Please see each attribute for further details.', // TODO
       helpAdditionalAnalysisFiles: '', // TODO
-      helpCLIDebug: 'j\'aimerais vraiment du fromage.',
-      helpCLIVerbose: 'oui le fromage est bon.',
+      helpCLIDebug: 'Ce bouton est utilisé pour activer et désactiver le débogueur pour l\'interface de ligne de commande OpenStudio (CLI) qui est utilisée pour exécuter la simulation. Si le bouton est en mode \'TRUE\', cela peut créer de gros fichiers de points de données de simulation et dégrader les performances d\'exécution.',
+      helpCLIVerbose: 'Ce bouton est utilisé pour activer et désactiver la sortie verbeuse de l\'interface de ligne de commande OpenStudio (CLI) qui est utilisée pour exécuter la simulation. Si le bouton est en mode \'TRUE\', cet indicateur peut être utilisé pour imprimer des informations supplémentaires pour le débogage.',
       helpSeverScripts: 'For advanced use only; not required for general use of the application. If your analysis requires server and worker initialization or finalization scripts, add them here. Note that these scripts will not run on a local server; they can only be run on a cloud server.', // TODO
       helpServerInitialization: 'A shell script that runs before the analysis is begun. If this script fails the analysis will be automatically set to a completed failed state.', // TODO
       helpServerFinalization: 'A shell script that runs after the analysis has finished, but before the analysis flag is set to completed. This script is run even if the analysis has failed.', // TODO
