@@ -56,8 +56,13 @@ export class AnalysisController {
     vm.$scope.mmErrors = vm.Message.getMeasureManagerErrors();
 
     vm.analysisTypes = vm.Project.getAnalysisTypes();
+    vm.cliDebugTypes = vm.Project.getCliDebugTypes();
+    vm.cliVerboseTypes = vm.Project.getCliVerboseTypes();
     vm.$scope.seeds = vm.Project.getSeeds();
     vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
+
+    vm.$scope.cliDebug = vm.Project.getCliDebug();
+    vm.$scope.cliVerbose = vm.Project.getCliVerbose();
 
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
@@ -1004,6 +1009,20 @@ export class AnalysisController {
     const vm = this;
     vm.setIsModified();
     vm.Project.setDefaultWeatherFile(vm.$scope.defaultWeatherFile);
+  }
+
+  setCliDebug() {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In setCliDebug in analysis');
+    vm.setIsModified();
+    vm.Project.setCliDebug(vm.$scope.cliDebug);
+  }
+
+  setCliVerbose() {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In setCliVerbose in analysis');
+    vm.setIsModified();
+    vm.Project.setCliVerbose(vm.$scope.cliVerbose);
   }
 
   setType() {
