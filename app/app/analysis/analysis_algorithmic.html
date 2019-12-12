@@ -1,5 +1,10 @@
 <div class="gray-top">
   <div class="row">
+    <div class="col-sm-12 pad-bot-10">
+      <label class="medium-label" translate>analysis.advancedArguments</label>
+    </div>
+  </div>
+  <div class="row">
     <div class="col-sm-4 pad-bot-20">
       <label class="medium-label" translate>analysis.cliDebug</label>
       <span class="badge badge-info" title="{{'analysis.algorithmic.helpCLIDebug' | translate}}">&nbsp;?&nbsp;</span>
@@ -17,6 +22,23 @@
               ng-options="o.value as o.label for o in analysis.cliVerboseTypes" ng-model="cliVerbose"
               ng-change="analysis.setCliVerbose()"></select>
       </div>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-4 pad-bot-20">
+      <label class="medium-label" translate>analysis.timeoutWorkflow</label>
+      <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutWorkflow' | translate}}">&nbsp;?&nbsp;</span>
+      <input class="form-control" type="number" ng-model="timeoutWorkflow" ng-change="analysis.setTimeoutWorkflow()">
+    </div>
+    <div class="col-sm-4 pad-bot-20">
+      <label class="medium-label" translate>analysis.timeoutInitWorker</label>
+      <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutInitWorker' | translate}}">&nbsp;?&nbsp;</span>
+      <input class="form-control" type="number" ng-model="timeoutInitWorker" ng-change="analysis.setTimeoutInitWorker()">
+    </div>
+    <div class="col-sm-4 pad-bot-20">
+      <label class="medium-label" translate>analysis.timeoutUploadResults</label>
+      <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutUploadResults' | translate}}">&nbsp;?&nbsp;</span>
+      <input class="form-control" type="number" ng-model="timeoutUploadResults" ng-change="analysis.setTimeoutUploadResults()">
     </div>
   </div>
 </div>
