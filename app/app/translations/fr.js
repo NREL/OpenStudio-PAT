@@ -140,8 +140,12 @@ export default {
     addMeasureOption: 'Ajouter une option de mesure',
     checkAll: 'Cocher pour rendre tous les arguments variables',
     checkForUpdates: 'Rechercher des mises à jour',
+    advancedArguments: 'Advanced CLI and OS-Server Timeout Arguments',
     cliDebug: 'CLI --débogueur',
     cliVerbose: 'CLI --mode-verbeuse',
+    timeoutWorkflow: 'Run Workflow Timeout (seconds)',
+    timeoutInitWorker: 'Initialize Worker Timeout (seconds)',
+    timeoutUploadResults: 'Upload Results Timeout (seconds)',
     viewAlgorithmReference: 'View Algorithm Documentation',
     columns: {
       argumentName: 'Nom de l\'argument',
@@ -194,6 +198,9 @@ export default {
       helpAdditionalAnalysisFiles: '', // TODO
       helpCLIDebug: 'Ce bouton est utilisé pour activer et désactiver le débogueur pour l\'interface de ligne de commande OpenStudio (CLI) qui est utilisée pour exécuter la simulation. Si le bouton est en mode \'TRUE\', cela peut créer de gros fichiers de points de données de simulation et dégrader les performances d\'exécution.',
       helpCLIVerbose: 'Ce bouton est utilisé pour activer et désactiver la sortie verbeuse de l\'interface de ligne de commande OpenStudio (CLI) qui est utilisée pour exécuter la simulation. Si le bouton est en mode \'TRUE\', cet indicateur peut être utilisé pour imprimer des informations supplémentaires pour le débogage.',
+      helpTimeoutWorkflow: 'This argument sets when the submitted workflow will timeout.  This will halt the workflow and return an error if the runtime of the workflow exceeds this argument.',
+      helpTimeoutUploadResults: 'This argument sets how long the Server should wait for results to be uploaded from the Workers to the Server node.  This will halt the workflow and return an error if the file transfer of the results exceeds this argument.',
+      helpTimeoutInitWorker: 'This argument sets when the initialization of the Workers will timeout.  This will halt the workflow and return an error if transfering the analysis.zip file from the Server to the Worker exceeds this argument.',
       helpSeverScripts: 'For advanced use only; not required for general use of the application. If your analysis requires server and worker initialization or finalization scripts, add them here. Note that these scripts will not run on a local server; they can only be run on a cloud server.', // TODO
       helpServerInitialization: 'A shell script that runs before the analysis is begun. If this script fails the analysis will be automatically set to a completed failed state.', // TODO
       helpServerFinalization: 'A shell script that runs after the analysis has finished, but before the analysis flag is set to completed. This script is run even if the analysis has failed.', // TODO
