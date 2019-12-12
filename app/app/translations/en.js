@@ -154,6 +154,7 @@ export default {
       variableSettings: 'Variable Settings'
     },
     defaultSeedModel: 'Default Seed Model',
+    defaultSSP: 'Default SSP',
     defaultWeatherFile: 'Default Weather File',
     deleteLastOption: 'Delete Last Option',
     duplicateMeasure: 'Duplicate Measure',

@@ -59,6 +59,7 @@ export class AnalysisController {
     vm.cliDebugTypes = vm.Project.getCliDebugTypes();
     vm.cliVerboseTypes = vm.Project.getCliVerboseTypes();
     vm.$scope.seeds = vm.Project.getSeeds();
+    vm.$scope.ssps = vm.Project.getSSPs();
     vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
 
     vm.$scope.cliDebug = vm.Project.getCliDebug();
@@ -68,6 +69,7 @@ export class AnalysisController {
     vm.$scope.timeoutInitWorker = vm.Project.getTimeoutInitWorker();
 
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
+    vm.$scope.defaultSSP = vm.Project.getDefaultSSP();
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
     vm.$scope.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.$scope.filesToInclude = vm.Project.getFilesToInclude();
@@ -1008,6 +1010,13 @@ export class AnalysisController {
     });
   }
 
+  setSSP() {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In Analysis::setSSP');
+    vm.setIsModified();
+    vm.Project.setDefaultSSP(vm.$scope.defaultSSP);
+  }
+
   setWeatherFile() {
     const vm = this;
     vm.setIsModified();
@@ -1240,6 +1249,34 @@ export class AnalysisController {
       }, error => {
         if (vm.Message.showDebug()) vm.$log.debug('ERROR in computeAllMeasureArguments: ', error);
       });
+    }
+  }
+
+  selectSSP() {
+    const vm = this;
+    vm.setIsModified();
+    // TODO: set defaultPath
+    const result = vm.dialog.showOpenDialog({
+      title: 'Select SSP Model',
+      filters: [
+        {name: 'SSP Models', extensions: ['ssp']}
+      ],
+      properties: ['openFile']
+    });
+
+    if (!_.isEmpty(result)) {
+      // copy and select the file
+      const sspModelPath = result[0];
+      if (vm.Message.showDebug()) vm.$log.debug('SSP Model:', sspModelPath);
+      const sspModelFilename = sspModelPath.replace(/^.*[\\\/]/, '');
+      vm.jetpack.copy(sspModelPath, vm.Project.getProjectDir().path('ssps/' + sspModelFilename), {overwrite: true});
+      if (vm.Message.showDebug()) vm.$log.debug('SSP Model name: ', sspModelFilename);
+      // update ssps
+      vm.Project.setSSPs();
+      vm.Project.setSSPsDropdownOptions();
+      vm.$scope.ssps = vm.Project.getSSPs();
+      vm.$scope.defaultSSP = sspModelFilename;
+      vm.Project.setDefaultSSP(vm.$scope.defaultSSP);
     }
   }
 

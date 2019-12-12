@@ -56,6 +56,20 @@
       </div>
     </div>
   </div>
+  <div class="row">
+    <div class="col-sm-4 pad-bot-20">
+      <label class="medium-label" translate>analysis.defaultSSP</label>
+      <div class="input-group">
+        <select class="form-control" ng-options="ssp as ssp for ssp in ssps" ng-model="defaultSSP"
+                ng-change="analysis.setSSP()"></select>
+        <!--<span class="input-group-addon"><span class="badge badge-info">&nbsp;?&nbsp;</span></span>-->
+        <span class="input-group-btn">
+          <button class="btn btn-default" type="button" ng-click="analysis.selectSSP()"><span
+            class="glyphicon glyphicon-folder-open"></span></button>
+        </span>
+      </div>
+    </div>
+  </div>
 </div>
 
 <div ng-if="selectedAnalysisType == 'Manual'" ng-include="'app/analysis/analysis_manual.html'"></div>

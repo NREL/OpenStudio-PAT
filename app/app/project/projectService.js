@@ -112,9 +112,12 @@ export class Project {
     vm.logsDir = null;
     vm.projectMeasuresDir = null;
     vm.seedDir = null;
+    vm.sspDir = null;
     vm.weatherDir = null;
     vm.seeds = [];
+    vm.ssps = [];
     vm.defaultSeed = null;
+    vm.defaultSSP = null;
     vm.weatherFiles = [];
     vm.defaultWeatherFile = null;
     vm.algorithmSettings = [];
@@ -157,14 +160,19 @@ export class Project {
   setDefaults() {
     const vm = this;
     vm.seeds = [];
+    vm.ssps = [];
     vm.weatherFiles = [];
     vm.setSeeds();
+    vm.setSSPs();
     vm.setWeatherFiles();
     vm.defaultSeed = vm.seeds.length > 0 ? vm.seeds[0] : null;
+    vm.defaultSSP = vm.ssps.length > 0 ? vm.ssps[0] : null;
     vm.defaultWeatherFile = vm.weatherFiles.length > 0 ? vm.weatherFiles[0] : null;
     vm.seedsDropdownArr = [];
+    vm.sspsDropdownArr = [];
     vm.weatherFilesDropdownArr = [];
     vm.setSeedsDropdownOptions();
+    vm.setSSPsDropdownOptions();
     vm.setWeatherFilesDropdownOptions();
     vm.filesToInclude = [];
     vm.setServerScripts();
@@ -254,6 +262,7 @@ export class Project {
         vm.timeoutInitWorker = vm.pat.timeoutInitWorker ? vm.pat.timeoutInitWorker : vm.timeoutInitWorker;
         vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
         vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
+        vm.defaultSSP = vm.pat.ssp ? vm.pat.ssp : vm.defaultSSP;
         vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
         if (vm.Message.showDebug()) vm.$log.debug('vm.algorithmSettings: ', vm.algorithmSettings);
         if (vm.Message.showDebug()) vm.$log.debug('vm.pat.algorithmSettings: ', vm.pat.algorithmSettings);
@@ -517,6 +526,10 @@ export class Project {
       ]);
 
       archive.bulk([
+        {expand: true, cwd: vm.sspDir.path(), src: ['**'], dest: 'ssps/'}
+      ]);
+
+      archive.bulk([
         {expand: true, cwd: vm.weatherDir.path(), src: ['**'], dest: 'weather/'}
       ]);
 
@@ -566,6 +579,9 @@ export class Project {
     vm.osa.analysis.seed = {};
     vm.osa.analysis.seed.file_type = 'OSM';
     vm.osa.analysis.seed.path = './seeds/' + vm.defaultSeed;
+    vm.osa.analysis.ssp = {};
+    vm.osa.analysis.ssp.file_type = 'SSP';
+    vm.osa.analysis.ssp.path = './ssps/' + vm.defaultSSP;
     vm.osa.analysis.weather_file = {};
     vm.osa.analysis.weather_file.file_type = 'EPW';
     vm.osa.analysis.weather_file.path = './weather/' + vm.defaultWeatherFile;
@@ -1496,6 +1512,7 @@ export class Project {
     vm.pat.projectDir = vm.projectDir.path();
     vm.pat.analysisName = vm.analysisName;
     vm.pat.seed = vm.defaultSeed;
+    vm.pat.ssp = vm.defaultSSP;
     vm.pat.weatherFile = vm.defaultWeatherFile;
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
     vm.pat.cliDebug = vm.cliDebug;
@@ -1657,6 +1674,7 @@ export class Project {
     vm.logsDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/logs'));
     vm.projectMeasuresDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/measures'));
     vm.seedDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/seeds'));
+    vm.sspDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/ssps'));
     vm.weatherDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/weather'));
 
     // initializeProject will also create the basic folder structure, if it is missing
@@ -1729,6 +1747,11 @@ export class Project {
   getSeedDir() {
     const vm = this;
     return vm.seedDir;
+  }
+
+  getSSPDir() {
+    const vm = this;
+    return vm.sspDir;
   }
 
   getWeatherDir() {
@@ -3554,6 +3577,16 @@ export class Project {
     return vm.defaultSeed;
   }
 
+  setDefaultSSP(name) {
+    const vm = this;
+    vm.defaultSSP = name;
+  }
+
+  getDefaultSSP() {
+    const vm = this;
+    return vm.defaultSSP;
+  }
+
   setDefaultWeatherFile(name) {
     const vm = this;
     vm.defaultWeatherFile = name;
@@ -3567,6 +3600,11 @@ export class Project {
   getSeeds() {
     const vm = this;
     return vm.seeds;
+  }
+
+  getSSPs() {
+    const vm = this;
+    return vm.ssps;
   }
 
   getWeatherFiles() {
@@ -3587,6 +3625,23 @@ export class Project {
       else vm.$log.error('The seeds directory (%s) does not exist', vm.seedDir.cwd());
     } else {
       if (vm.Message.showDebug()) vm.$log.debug('There is no seed directory defined (project not selected?)');
+    }
+
+  }
+
+  setSSPs() {
+    const vm = this;
+
+    if (angular.isDefined(vm.sspDir)) {
+      if (vm.jetpack.exists(vm.sspDir.cwd())) {
+        vm.ssps = vm.sspDir.find('.', {matching: '*.ssp'}, 'relativePath');
+        _.forEach(vm.ssps, (ssp, index) => {
+          vm.ssps[index] = _.replace(ssp, './', '');
+        });
+      }
+      else vm.$log.error('The ssps directory (%s) does not exist', vm.sspDir.cwd());
+    } else {
+      if (vm.Message.showDebug()) vm.$log.debug('There is no ssp directory defined (project not selected?)');
     }
 
   }
@@ -3613,6 +3668,16 @@ export class Project {
     vm.setSeeds();
     _.forEach(vm.seeds, (seed) => {
       vm.seedsDropdownArr.push({id: seed, name: seed});
+    });
+
+  }
+
+  setSSPsDropdownOptions() {
+    const vm = this;
+    vm.sspsDropdownArr = [];
+    vm.setSSPs();
+    _.forEach(vm.ssps, (ssp) => {
+      vm.sspsDropdownArr.push({id: ssp, name: ssp});
     });
 
   }
@@ -3670,6 +3735,11 @@ export class Project {
   getSeedsDropdownArr() {
     const vm = this;
     return vm.seedsDropdownArr;
+  }
+
+  getSSPsDropdownArr() {
+    const vm = this;
+    return vm.sspsDropdownArr;
   }
 
   getWeatherFilesDropdownArr() {
