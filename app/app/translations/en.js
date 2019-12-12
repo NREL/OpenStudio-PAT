@@ -140,7 +140,7 @@ export default {
     addMeasureOption: 'Add Measure Option',
     checkAll: 'Check to make all arguments variable',
     checkForUpdates: 'Check for Updates',
-	advancedArguments: 'Advanced CLI and OS-Server Timeout Arguments',
+    advancedArguments: 'Advanced CLI and OS-Server Timeout Arguments',
     cliDebug: 'CLI --debug',
     cliVerbose: 'CLI --verbose',
     timeoutWorkflow: 'Run Workflow Timeout (seconds)',

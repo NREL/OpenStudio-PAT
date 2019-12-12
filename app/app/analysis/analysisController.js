@@ -64,8 +64,8 @@ export class AnalysisController {
     vm.$scope.cliDebug = vm.Project.getCliDebug();
     vm.$scope.cliVerbose = vm.Project.getCliVerbose();
     vm.$scope.timeoutWorkflow = vm.Project.getTimeoutWorkflow();
-	vm.$scope.timeoutUploadResults = vm.Project.getTimeoutUploadResults();
-	vm.$scope.timeoutInitWorker = vm.Project.getTimeoutInitWorker();
+    vm.$scope.timeoutUploadResults = vm.Project.getTimeoutUploadResults();
+    vm.$scope.timeoutInitWorker = vm.Project.getTimeoutInitWorker();
 
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
