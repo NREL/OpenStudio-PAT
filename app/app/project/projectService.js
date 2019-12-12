@@ -93,6 +93,7 @@ export class Project {
     vm.analysisType = null;
     vm.cliDebug = null;
     vm.cliVerbose = null;
+    vm.timeoutWorkflow = null;
     vm.reportType = null;
     vm.runType = vm.runTypes[0];
     vm.samplingMethod = vm.samplingMethods[0];
@@ -169,6 +170,7 @@ export class Project {
     vm.analysisType = 'Manual';
     vm.cliDebug = '';
     vm.cliVerbose = '';
+    vm.timeoutWorkflow = 28800;
     vm.reportType = 'Calibration Report';
     vm.samplingMethod = vm.samplingMethods.length > 0 ? vm.samplingMethods[0] : null;
     vm.runType = vm.runTypes[0];
@@ -243,6 +245,7 @@ export class Project {
         vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
         vm.cliDebug = vm.pat.cliDebug ? vm.pat.cliDebug : vm.cliDebug;
         vm.cliVerbose = vm.pat.cliVerbose ? vm.pat.cliVerbose : vm.cliVerbose;
+        vm.timeoutWorkflow = vm.pat.timeoutWorkflow ? vm.pat.timeoutWorkflow : vm.timeoutWorkflow;
         vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
         vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
         vm.defaultWeatherFile = vm.pat.weatherFile ? vm.pat.weatherFile : vm.defaultWeatherFile;
@@ -564,6 +567,8 @@ export class Project {
     // add CLI args to OSA
     vm.osa.analysis.cli_debug = vm.cliDebug;
     vm.osa.analysis.cli_verbose = vm.cliVerbose;
+    // add timeout args to OSA
+    vm.osa.analysis.run_workflow_timeout = vm.timeoutWorkflow;
     // server scripts (will only work on the cloud, but always put in OSA?)
     vm.osa.analysis.server_scripts = {};
     _.forEach(vm.serverScripts, (script, type) => {
@@ -1487,6 +1492,7 @@ export class Project {
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
     vm.pat.cliDebug = vm.cliDebug;
     vm.pat.cliVerbose = vm.cliVerbose;
+    vm.pat.timeoutWorkflow = vm.timeoutWorkflow;
     vm.pat.dirToInclude = vm.dirToInclude;
     vm.pat.dirToUnpackTo = vm.dirToUnpackTo;
     vm.pat.remoteSettings = angular.copy(vm.remoteSettings);
@@ -2158,6 +2164,16 @@ export class Project {
   getCliVerbose() {
     const vm = this;
     return vm.cliVerbose;
+  }
+
+  setTimeoutWorkflow(name) {
+    const vm = this;
+    vm.timeoutWorkflow = name;
+  }
+
+  getTimeoutWorkflow() {
+    const vm = this;
+    return vm.timeoutWorkflow;
   }
 
   getFilesToInclude() {

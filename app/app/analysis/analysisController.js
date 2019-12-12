@@ -63,6 +63,7 @@ export class AnalysisController {
 
     vm.$scope.cliDebug = vm.Project.getCliDebug();
     vm.$scope.cliVerbose = vm.Project.getCliVerbose();
+    vm.$scope.timeoutWorkflow = vm.Project.getTimeoutWorkflow();
 
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
@@ -1023,6 +1024,13 @@ export class AnalysisController {
     if (vm.Message.showDebug()) vm.$log.debug('In setCliVerbose in analysis');
     vm.setIsModified();
     vm.Project.setCliVerbose(vm.$scope.cliVerbose);
+  }
+
+  setTimeoutWorkflow() {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In setTimeoutWorkflow in analysis');
+    vm.setIsModified();
+    vm.Project.setTimeoutWorkflow(vm.$scope.timeoutWorkflow);
   }
 
   setType() {

@@ -19,6 +19,13 @@
       </div>
     </div>
   </div>
+  <div class="row">
+    <div class="col-sm-4 pad-bot-20">
+      <label class="medium-label" translate>analysis.timeoutWorkflow</label>
+      <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutWorkflow' | translate}}">&nbsp;?&nbsp;</span>
+      <input class="form-control" type="number" ng-model="timeoutWorkflow" ng-change="analysis.setTimeoutWorkflow()">
+    </div>
+  </div>
 </div>
 <div class="row">
   <div class="col-sm-12">
