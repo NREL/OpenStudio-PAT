@@ -22,9 +22,10 @@ result = simulate_ssp(ssp_filename, stop_time=12960000, step_size=600)
 show_plot=True
 
 if show_plot:
-    print("Plotting results...")
-    dir, _ = os.path.split(ssp_filename)
-    save_name = dir + 'ssp.png'
+    dir, _ = os.path.split(run_dir)
+    save_name = dir + '/ssp.png'
+    print("Plotting results in directory:",save_name)
+    print("run_dir:",run_dir)
     plot_result(result, names=['time', 'space.TRooMea'], window_title=ssp_filename, filename=save_name)
 
 print('result: ', result)
