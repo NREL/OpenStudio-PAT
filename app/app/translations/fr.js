@@ -142,11 +142,16 @@ export default {
     checkForUpdates: 'Rechercher des mises à jour',
     advancedArguments: 'Arguments avancés de délai pour CLI et OS-Server',
     helpAdvancedArguments: 'Cette section contient les arguments avancés pour le CLI et OS-Server',
+    fmuArguments: 'FMU Timeout Arguments',
+    helpFmuArguments: 'This accordion contains the FMU settings',
     cliDebug: 'CLI --débogueur',
     cliVerbose: 'CLI --mode-verbeuse',
     timeoutWorkflow: 'Run Workflow Timeout (seconds)',
     timeoutInitWorker: 'Initialize Worker Timeout (seconds)',
     timeoutUploadResults: 'Upload Results Timeout (seconds)',
+    fmuStartTime: 'FMU Start Time (seconds)',
+    fmuStopTime: 'FMU Stop Time (seconds)',
+    fmuTimeStep: 'FMU Time Step (seconds)',
     viewAlgorithmReference: 'View Algorithm Documentation',
     columns: {
       argumentName: 'Nom de l\'argument',
@@ -197,6 +202,9 @@ export default {
     algorithmic: {
       helpAlgorithmSettings: 'These settings control the manner in which the given algorithm is executed. Please see each attribute for further details.', // TODO
       helpAdditionalAnalysisFiles: '', // TODO
+      helpFmuStartTime: 'FMU Start Time (s)',
+      helpFmuStopTime: 'FMU Stop Time (s)',
+      helpFmuTimeStep: 'FMU Time Step (s)',
       helpCLIDebug: 'Ce bouton est utilisé pour activer et désactiver le débogueur pour l\'interface de ligne de commande OpenStudio (CLI) qui est utilisée pour exécuter la simulation. Si le bouton est en mode \'TRUE\', cela peut créer de gros fichiers de points de données de simulation et dégrader les performances d\'exécution.',
       helpCLIVerbose: 'Ce bouton est utilisé pour activer et désactiver la sortie verbeuse de l\'interface de ligne de commande OpenStudio (CLI) qui est utilisée pour exécuter la simulation. Si le bouton est en mode \'TRUE\', cet indicateur peut être utilisé pour imprimer des informations supplémentaires pour le débogage.',
       helpTimeoutWorkflow: 'This argument sets when the submitted workflow will timeout.  This will halt the workflow and return an error if the runtime of the workflow exceeds this argument.',

@@ -96,6 +96,9 @@ export class Project {
     vm.timeoutWorkflow = null;
     vm.timeoutUploadResults = null;
     vm.timeoutInitWorker = null;
+    vm.fmuStartTime = null;
+    vm.fmuStopTime = null;
+    vm.fmuTimeStep = null;
     vm.reportType = null;
     vm.runType = vm.runTypes[0];
     vm.samplingMethod = vm.samplingMethods[0];
@@ -183,6 +186,9 @@ export class Project {
     vm.timeoutWorkflow = 28800;
     vm.timeoutUploadResults = 28800;
     vm.timeoutInitWorker = 28800;
+    vm.fmuStartTime = 0;
+    vm.fmuStopTime = 86400;
+    vm.fmuTimeStep = 600;
     vm.reportType = 'Calibration Report';
     vm.samplingMethod = vm.samplingMethods.length > 0 ? vm.samplingMethods[0] : null;
     vm.runType = vm.runTypes[0];
@@ -260,6 +266,9 @@ export class Project {
         vm.timeoutWorkflow = vm.pat.timeoutWorkflow ? vm.pat.timeoutWorkflow : vm.timeoutWorkflow;
         vm.timeoutUploadResults = vm.pat.timeoutUploadResults ? vm.pat.timeoutUploadResults : vm.timeoutUploadResults;
         vm.timeoutInitWorker = vm.pat.timeoutInitWorker ? vm.pat.timeoutInitWorker : vm.timeoutInitWorker;
+        vm.fmuStartTime = vm.pat.fmuStartTime ? vm.pat.fmuStartTime : vm.fmuStartTime;
+        vm.fmuStopTime = vm.pat.fmuStopTime ? vm.pat.fmuStopTime : vm.fmuStopTime;
+        vm.fmuTimeStep = vm.pat.fmuTimeStep ? vm.pat.fmuTimeStep : vm.fmuTimeStep;
         vm.samplingMethod = vm.pat.samplingMethod ? vm.pat.samplingMethod : vm.samplingMethod;
         vm.defaultSeed = vm.pat.seed ? vm.pat.seed : vm.defaultSeed;
         vm.defaultSSP = vm.pat.ssp ? vm.pat.ssp : vm.defaultSSP;
@@ -593,6 +602,10 @@ export class Project {
     vm.osa.analysis.run_workflow_timeout = vm.timeoutWorkflow;
     vm.osa.analysis.upload_results_timeout = vm.timeoutUploadResults;
     vm.osa.analysis.initialize_worker_timeout = vm.timeoutInitWorker;
+    // add FMU args to OSA
+    vm.osa.analysis.fmu_start_time = vm.fmuStartTime;
+    vm.osa.analysis.fmu_stop_time = vm.fmuStopTime;
+    vm.osa.analysis.fmu_time_step = vm.fmuTimeStep;
     // server scripts (will only work on the cloud, but always put in OSA?)
     vm.osa.analysis.server_scripts = {};
     _.forEach(vm.serverScripts, (script, type) => {
@@ -1520,6 +1533,9 @@ export class Project {
     vm.pat.timeoutWorkflow = vm.timeoutWorkflow;
     vm.pat.timeoutUploadResults = vm.timeoutUploadResults;
     vm.pat.timeoutInitWorker = vm.timeoutInitWorker;
+    vm.pat.fmuStartTime = vm.fmuStartTime;
+    vm.pat.fmuStopTime = vm.fmuStopTime;
+    vm.pat.fmuTimeStep = vm.fmuTimeStep;
     vm.pat.dirToInclude = vm.dirToInclude;
     vm.pat.dirToUnpackTo = vm.dirToUnpackTo;
     vm.pat.remoteSettings = angular.copy(vm.remoteSettings);
@@ -2227,6 +2243,36 @@ export class Project {
   getTimeoutInitWorker() {
     const vm = this;
     return vm.timeoutInitWorker;
+  }
+
+  setFmuStartTime(name) {
+    const vm = this;
+    vm.fmuStartTime = name;
+  }
+
+  getFmuStartTime() {
+    const vm = this;
+    return vm.fmuStartTime;
+  }
+
+  setFmuStopTime(name) {
+    const vm = this;
+    vm.fmuStopTime = name;
+  }
+
+  getFmuStopTime() {
+    const vm = this;
+    return vm.fmuStopTime;
+  }
+
+  setFmuTimeStep(name) {
+    const vm = this;
+    vm.fmuTimeStep = name;
+  }
+
+  getFmuTimeStep() {
+    const vm = this;
+    return vm.fmuTimeStep;
   }
 
   getFilesToInclude() {

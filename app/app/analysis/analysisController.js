@@ -67,6 +67,9 @@ export class AnalysisController {
     vm.$scope.timeoutWorkflow = vm.Project.getTimeoutWorkflow();
     vm.$scope.timeoutUploadResults = vm.Project.getTimeoutUploadResults();
     vm.$scope.timeoutInitWorker = vm.Project.getTimeoutInitWorker();
+    vm.$scope.fmuStartTime = vm.Project.getFmuStartTime();
+    vm.$scope.fmuStopTime = vm.Project.getFmuStopTime();
+    vm.$scope.fmuTimeStep = vm.Project.getFmuTimeStep();
 
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
     vm.$scope.defaultSSP = vm.Project.getDefaultSSP();
@@ -1056,6 +1059,27 @@ export class AnalysisController {
     if (vm.Message.showDebug()) vm.$log.debug('In setTimeoutInitWorker in analysis');
     vm.setIsModified();
     vm.Project.setTimeoutInitWorker(vm.$scope.timeoutInitWorker);
+  }
+
+  setFmuStartTime() {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In setFmuStartTime in analysis');
+    vm.setIsModified();
+    vm.Project.setFmuStartTime(vm.$scope.fmuStartTime);
+  }
+
+  setFmuStopTime() {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In setFmuStopTime in analysis');
+    vm.setIsModified();
+    vm.Project.setFmuStopTime(vm.$scope.fmuStopTime);
+  }
+
+  setFmuTimeStep() {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In setFmuTimeStep in analysis');
+    vm.setIsModified();
+    vm.Project.setFmuTimeStep(vm.$scope.fmuTimeStep);
   }
 
   setType() {

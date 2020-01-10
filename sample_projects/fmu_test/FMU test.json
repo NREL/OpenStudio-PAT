@@ -31,6 +31,9 @@
     "run_workflow_timeout": 28800,
     "upload_results_timeout": 28800,
     "initialize_worker_timeout": 28800,
+    "fmu_start_time": 0,
+    "fmu_stop_time": 86400,
+    "fmu_time_step": 600,
     "server_scripts": {
       "worker_initialization": "./scripts/worker_initialization/initialize.sh"
     }
