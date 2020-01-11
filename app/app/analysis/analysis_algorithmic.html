@@ -16,7 +16,7 @@
             <div class="input-group">
               <select class="form-control inline form-control-smaller-width"
                     ng-options="o.value as o.label for o in analysis.cliDebugTypes" ng-model="cliDebug"
-                    ng-change="analysis.setCliDebug()"></select>
+                    ng-change="analysis.setCliDebug(cliDebug)"></select>
             </div>
           </div>
           <div class="col-sm-4 pad-bot-20">
@@ -25,7 +25,7 @@
             <div class="input-group">
               <select class="form-control inline form-control-smaller-width"
                     ng-options="o.value as o.label for o in analysis.cliVerboseTypes" ng-model="cliVerbose"
-                    ng-change="analysis.setCliVerbose()"></select>
+                    ng-change="analysis.setCliVerbose(cliVerbose)"></select>
             </div>
           </div>
         </div>
@@ -33,17 +33,17 @@
           <div class="col-sm-4 pad-bot-20">
             <label class="medium-label" translate>analysis.timeoutWorkflow</label>
             <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutWorkflow' | translate}}">&nbsp;?&nbsp;</span>
-            <input class="form-control" type="number" ng-model="timeoutWorkflow" ng-change="analysis.setTimeoutWorkflow()">
+            <input class="form-control" type="number" ng-model="timeoutWorkflow" ng-change="analysis.setTimeoutWorkflow(timeoutWorkflow)">
           </div>
           <div class="col-sm-4 pad-bot-20">
             <label class="medium-label" translate>analysis.timeoutInitWorker</label>
             <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutInitWorker' | translate}}">&nbsp;?&nbsp;</span>
-            <input class="form-control" type="number" ng-model="timeoutInitWorker" ng-change="analysis.setTimeoutInitWorker()">
+            <input class="form-control" type="number" ng-model="timeoutInitWorker" ng-change="analysis.setTimeoutInitWorker(timeoutInitWorker)">
           </div>
           <div class="col-sm-4 pad-bot-20">
             <label class="medium-label" translate>analysis.timeoutUploadResults</label>
             <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutUploadResults' | translate}}">&nbsp;?&nbsp;</span>
-            <input class="form-control" type="number" ng-model="timeoutUploadResults" ng-change="analysis.setTimeoutUploadResults()">
+            <input class="form-control" type="number" ng-model="timeoutUploadResults" ng-change="analysis.setTimeoutUploadResults(timeoutUploadResults)">
           </div>
         </div>
       </uib-accordion-group>
