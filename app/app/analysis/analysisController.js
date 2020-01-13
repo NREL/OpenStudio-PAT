@@ -1070,23 +1070,26 @@ export class AnalysisController {
     vm.Project.setTimeoutInitWorker(vm.$scope.timeoutInitWorker);
   }
 
-  setFmuStartTime() {
+  setFmuStartTime(value) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In setFmuStartTime in analysis');
+    vm.$scope.fmuStartTime = value;
     vm.setIsModified();
     vm.Project.setFmuStartTime(vm.$scope.fmuStartTime);
   }
 
-  setFmuStopTime() {
+  setFmuStopTime(value) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In setFmuStopTime in analysis');
+    vm.$scope.fmuStopTime = value;
     vm.setIsModified();
     vm.Project.setFmuStopTime(vm.$scope.fmuStopTime);
   }
 
-  setFmuTimeStep() {
+  setFmuTimeStep(value) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In setFmuTimeStep in analysis');
+    vm.$scope.fmuTimeStep = value;
     vm.setIsModified();
     vm.Project.setFmuTimeStep(vm.$scope.fmuTimeStep);
   }

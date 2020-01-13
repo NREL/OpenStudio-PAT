@@ -13,17 +13,17 @@
           <div class="col-sm-4 pad-bot-20">
             <label class="medium-label" translate>analysis.fmuStartTime</label>
             <span class="badge badge-info" title="{{'analysis.algorithmic.helpFmuStartTime' | translate}}">&nbsp;?&nbsp;</span>
-            <input class="form-control" type="number" ng-model="fmuStartTime" ng-change="analysis.setFmuStartTime()">
+            <input class="form-control" type="number" ng-model="fmuStartTime" ng-change="analysis.setFmuStartTime(fmuStartTime)">
           </div>
           <div class="col-sm-4 pad-bot-20">
             <label class="medium-label" translate>analysis.fmuStopTime</label>
             <span class="badge badge-info" title="{{'analysis.algorithmic.helpFmuStopTime' | translate}}">&nbsp;?&nbsp;</span>
-            <input class="form-control" type="number" ng-model="fmuStopTime" ng-change="analysis.setFmuStopTime()">
+            <input class="form-control" type="number" ng-model="fmuStopTime" ng-change="analysis.setFmuStopTime(fmuStopTime)">
           </div>
           <div class="col-sm-4 pad-bot-20">
             <label class="medium-label" translate>analysis.fmuTimeStep</label>
             <span class="badge badge-info" title="{{'analysis.algorithmic.helpFmuTimeStep' | translate}}">&nbsp;?&nbsp;</span>
-            <input class="form-control" type="number" ng-model="fmuTimeStep" ng-change="analysis.setFmuTimeStep()">
+            <input class="form-control" type="number" ng-model="fmuTimeStep" ng-change="analysis.setFmuTimeStep(fmuTimeStep)">
           </div>
         </div>
       </uib-accordion-group>

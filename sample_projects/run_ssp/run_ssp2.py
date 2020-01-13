@@ -14,11 +14,14 @@ from fmpy.util import plot_result
 #mo_file = "/var/oscli/clones/openstudio-workflow/lib/openstudio/workflow/jobs/HelloWorld.mo"
 ssp_filename = sys.argv[1]
 run_dir = sys.argv[2] + '/FMU'
+fmu_start_time = int(sys.argv[3])
+fmu_stop_time = int(sys.argv[4])
+fmu_time_step = int(sys.argv[5])
 os.mkdir(run_dir)
 os.chdir(run_dir)
 print("os.getcwd():", os.getcwd())
 print("Simulating %s..." % ssp_filename)
-result = simulate_ssp(ssp_filename, stop_time=86400, step_size=60)
+result = simulate_ssp(ssp_filename, start_time=fmu_start_time, stop_time=fmu_stop_time, step_size=fmu_time_step)
 
 show_plot=True
 
