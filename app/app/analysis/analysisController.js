@@ -66,6 +66,7 @@ export class AnalysisController {
     vm.$scope.timeoutWorkflow = vm.Project.getTimeoutWorkflow();
     vm.$scope.timeoutUploadResults = vm.Project.getTimeoutUploadResults();
     vm.$scope.timeoutInitWorker = vm.Project.getTimeoutInitWorker();
+    if (vm.Message.showDebug()) vm.$log.debug('timeout value: ', vm.$scope.timeoutWorkflow);
 
     vm.$scope.defaultSeed = vm.Project.getDefaultSeed();
     vm.$scope.defaultWeatherFile = vm.Project.getDefaultWeatherFile();
@@ -78,7 +79,7 @@ export class AnalysisController {
     _.forEach(vm.$scope.measures, (measure) => {
       if (_.isNil(measure.seed)) measure.seed = vm.$scope.defaultSeed;
     });
-    if (vm.Message.showDebug()) if (vm.Message.showDebug()) vm.$log.debug('****ANALYSIS TAB****');
+    if (vm.Message.showDebug()) vm.$log.debug('****ANALYSIS TAB****');
     if (vm.Message.showDebug()) vm.$log.debug('ANALYSIS MEASURES RETRIEVED: ', vm.$scope.measures);
 
     vm.$scope.osMeasures = [];
@@ -1014,37 +1015,45 @@ export class AnalysisController {
     vm.Project.setDefaultWeatherFile(vm.$scope.defaultWeatherFile);
   }
 
-  setCliDebug() {
+  setCliDebug(value) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In setCliDebug in analysis');
+    vm.$scope.cliDebug = value;
     vm.setIsModified();
+    if (vm.Message.showDebug()) vm.$log.debug('Setting CLIDebug to: ', vm.$scope.cliDebug);
     vm.Project.setCliDebug(vm.$scope.cliDebug);
   }
 
-  setCliVerbose() {
+  setCliVerbose(value) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In setCliVerbose in analysis');
+    vm.$scope.cliVerbose = value;
     vm.setIsModified();
     vm.Project.setCliVerbose(vm.$scope.cliVerbose);
   }
 
-  setTimeoutWorkflow() {
+  setTimeoutWorkflow(value) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In setTimeoutWorkflow in analysis');
     vm.setIsModified();
+    vm.$scope.timeoutWorkflow = value;
+    if (vm.Message.showDebug()) vm.$log.debug('Setting timeoutWorkflow to: ', vm.$scope.timeoutWorkflow);
+    if (vm.Message.showDebug()) vm.$log.debug(vm.$scope.timeoutWorkflow);
     vm.Project.setTimeoutWorkflow(vm.$scope.timeoutWorkflow);
   }
 
-  setTimeoutUploadResults() {
+  setTimeoutUploadResults(value) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In setTimeoutUploadResults in analysis');
+    vm.$scope.timeoutUploadResults = value;
     vm.setIsModified();
     vm.Project.setTimeoutUploadResults(vm.$scope.timeoutUploadResults);
   }
 
-  setTimeoutInitWorker() {
+  setTimeoutInitWorker(value) {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('In setTimeoutInitWorker in analysis');
+    vm.$scope.timeoutInitWorker = value;
     vm.setIsModified();
     vm.Project.setTimeoutInitWorker(vm.$scope.timeoutInitWorker);
   }
