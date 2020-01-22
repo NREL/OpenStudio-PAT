@@ -63,10 +63,10 @@ function replace_gem_in_files (){
 # Find the location of the existing Gemfile based on the contents of the RUBYLIB env variable
 echo $(which openstudio)
 # You can't call openstudio here since it will load the Server's Gemfile
-# echo $(openstudio openstudio_version)
+#echo $(openstudio openstudio_version)
 for x in $(printenv RUBYLIB | tr ":" "\n")
 do
-  if [[ $x =~ .*[Oo]pen[Ss]tudio-[0-9]*\.[0-9]*\.[0-9]*(-rc[0-9]*)?*(-pre[0-9]*)?/Ruby ]]; then
+  if [[ $x =~ .*[Oo]pen[Ss]tudio-[0-9]*\.[0-9]*\.[0-9]*(-beta[0-9]*)?*(-rc[0-9]*)?*(-pre[0-9]*)?/Ruby ]]; then
     GEMFILE_DIR=$x
     continue
   fi
