@@ -151,7 +151,7 @@ echo "***Running bundle install with version $LOCAL_BUNDLER_VERSION in $(which b
 if [ -f Gemfile.lock ]; then
   rm Gemfile.lock
 fi
-bundle '_'$LOCAL_BUNDLER_VERSION'_' install --path gems --verbose
+bundle '_'$LOCAL_BUNDLER_VERSION'_' install --path gems --verbose --retry 10 --full-index
 
 # Note that the bundle has been updated
 echo >> $GEMFILEUPDATE
