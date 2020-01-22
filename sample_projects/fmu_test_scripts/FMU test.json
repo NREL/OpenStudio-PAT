@@ -1,0 +1,41 @@
+{
+  "analysis": {
+    "display_name": "FMU test",
+    "name": "FMU test",
+    "output_variables": [],
+    "problem": {
+      "workflow": [],
+      "algorithm": {
+        "seed": null,
+        "failed_f_value": 1000000000000000000,
+        "debug_messages": 1,
+        "objective_functions": []
+      },
+      "analysis_type": "single_run"
+    },
+    "seed": {
+      "file_type": "OSM",
+      "path": "./seeds/SEB4_baseboard.osm"
+    },
+    "ssp": {
+      "file_type": "SSP",
+      "path": "./ssps/dc-test.ssp"
+    },
+    "weather_file": {
+      "file_type": "EPW",
+      "path": "./weather/SRRL_2013AMY_60min.epw"
+    },
+    "file_format_version": 1,
+    "cli_debug": "",
+    "cli_verbose": "",
+    "run_workflow_timeout": 28800,
+    "upload_results_timeout": 28800,
+    "initialize_worker_timeout": 28800,
+    "fmu_start_time": 0,
+    "fmu_stop_time": 86400,
+    "fmu_time_step": 60,
+    "server_scripts": {
+      "worker_initialization": "./scripts/worker_initialization/initialize.sh"
+    }
+  }
+}
