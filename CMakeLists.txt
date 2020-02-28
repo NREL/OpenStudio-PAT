@@ -66,21 +66,18 @@ elseif(WIN32)
   )
 endif()
 
-install(FILES "${CMAKE_SOURCE_DIR}//license.txt" DESTINATION .)
-install(FILES "${CMAKE_SOURCE_DIR}//copyright.txt" DESTINATION .)
+install(FILES "${CMAKE_SOURCE_DIR}/license.txt" DESTINATION .)
+install(FILES "${CMAKE_SOURCE_DIR}/copyright.txt" DESTINATION .)
 
 set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW packages")
+set(CPACK_PACKAGE_INSTALL_DIRECTORY "ParametricAnalysisTool-${PROJECT_VERSION}")
 if(APPLE)
+  set(CPACK_IFW_TARGET_DIRECTORY "/Applications/${CPACK_PACKAGE_INSTALL_DIRECTORY}/")
   set(CPACK_BINARY_STGZ OFF CACHE BOOL "Enable to build STGZ packages")
   set(CPACK_BINARY_TGZ OFF CACHE BOOL "Enable to build TGZ packages")
 elseif(WIN32)
   set(CPACK_IFW_TARGET_DIRECTORY "C:/${CPACK_PACKAGE_INSTALL_DIRECTORY}")
   set(CPACK_BINARY_NSIS OFF CACHE BOOL "Enable to build NSIS packages")
-endif()
-include(CPack)
-include(CPackIFW)
-if(NOT CPACK_IFW_BINARYCREATOR_EXECUTABLE)
-  message(WARNING "QtIFW not found in PATH")
 endif()
 
 set(CPACK_PACKAGE_VENDOR "National Renewable Energy Laboratory")
@@ -93,6 +90,11 @@ set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://www.openstudio.net")
 set(CPACK_PACKAGE_FILE_NAME "${CMAKE_PROJECT_NAME}-${PROJECT_VERSION}-${CMAKE_SYSTEM_NAME}")
 set(CPACK_PACKAGE_CONTACT "openstudio@nrel.gov")
 
+include(CPack)
+include(CPackIFW)
+if(NOT CPACK_IFW_BINARYCREATOR_EXECUTABLE)
+  message(WARNING "QtIFW not found in PATH")
+endif()
 
 cpack_add_component(PAT
   DISPLAY_NAME "Parametric Analysis Tool"
@@ -103,8 +105,3 @@ cpack_ifw_configure_component(PAT
   SCRIPT "${CMAKE_SOURCE_DIR}/install_operations.qs"
   REQUIRES_ADMIN_RIGHTS
 )
-
-if(APPLE)
-elseif(WIN32)
-  set(CPACK_PACKAGE_INSTALL_DIRECTORY "openstudio-${OpenStudio_VERSION}")
-endif()

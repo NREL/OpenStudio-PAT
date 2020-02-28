@@ -4,4 +4,4 @@ cmd /C "${NPM_COMMAND}" install --msvs_version=2013
 cmd /C "${NPM_COMMAND}" install bower
 cmd /C "${CMAKE_CURRENT_BINARY_DIR}/OpenStudio-PAT/node_modules/.bin/bower" install
 cmd /C "${NPM_COMMAND}" run release
-"${CMAKE_CURRENT_BINARY_DIR}/OpenStudio-PAT/node_modules/.bin/gulp" install-deps --exclude=openstudio --prefix="${CMAKE_CURRENT_BINARY_DIR}/OpenStudio-PAT/tmp/pat"
+"${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" install-deps --exclude=openstudio --prefix="${CMAKE_SOURCE_DIR}/tmp/pat"

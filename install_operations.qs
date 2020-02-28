@@ -10,8 +10,8 @@ function Component() {
     if (kernel == "winnt") {
       component.addOperation("CreateShortcut", "@TargetDir@/ParametricAnalysisTool.exe", "@StartMenuDir@/Parametric Analysis Tool.lnk");
     } else if (kernel == "darwin") {
-      // var exePath = installer.value("TargetDir") + "/bin/install_utility";
-      // component.addElevatedOperation("Execute", "chmod", "-R", "a+w", "@TargetDir@/ParametricAnalysisTool.app/Contents/Resources/OpenStudio-server");
+      var exePath = installer.value("TargetDir") + "/bin/install_utility";
+      component.addElevatedOperation("Execute", "chmod", "-R", "a+w", "@TargetDir@/ParametricAnalysisTool.app/Contents/Resources/OpenStudio-server");
     }
   }
 }
