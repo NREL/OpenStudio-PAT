@@ -1,25 +1,56 @@
-<div class="gray-top">
-  <div class="row">
-    <div class="col-sm-4 pad-bot-20">
-      <label class="medium-label" translate>analysis.cliDebug</label>
-      <span class="badge badge-info" title="{{'analysis.algorithmic.helpCLIDebug' | translate}}">&nbsp;?&nbsp;</span>
-      <div class="input-group">
-        <select class="form-control inline form-control-smaller-width"
-              ng-options="o.value as o.label for o in analysis.cliDebugTypes" ng-model="cliDebug"
-              ng-change="analysis.setCliDebug()"></select>
-      </div>
-    </div>
-    <div class="col-sm-4 pad-bot-20">
-      <label class="medium-label" translate>analysis.cliVerbose</label>
-      <span class="badge badge-info" title="{{'analysis.algorithmic.helpCLIVerbose' | translate}}">&nbsp;?&nbsp;</span>
-      <div class="input-group">
-        <select class="form-control inline form-control-smaller-width"
-              ng-options="o.value as o.label for o in analysis.cliVerboseTypes" ng-model="cliVerbose"
-              ng-change="analysis.setCliVerbose()"></select>
-      </div>
-    </div>
+<div class="row">
+  <div class="col-sm-12">
+    <uib-accordion close-others="false">
+      <uib-accordion-group class="algorithm-custom" is-open="advancedArguments.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button"
+             ng-class="{'glyphicon-chevron-down': advancedArguments.open, 'glyphicon-chevron-right': !advancedArguments.open}"></i>
+          <translate>analysis.advancedArguments</translate>
+          <span class="badge badge-info" title="{{'analysis.helpAdvancedArguments' | translate}}">&nbsp;?&nbsp;</span>
+        </uib-accordion-heading>
+
+        <div class="row pad-bot-10">
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.cliDebug</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpCLIDebug' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.cliDebugTypes" ng-model="cliDebug"
+                    ng-change="analysis.setCliDebug(cliDebug)"></select>
+            </div>
+          </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.cliVerbose</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpCLIVerbose' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.cliVerboseTypes" ng-model="cliVerbose"
+                    ng-change="analysis.setCliVerbose(cliVerbose)"></select>
+            </div>
+          </div>
+        </div>
+        <div class="row pad-bot-10">
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.timeoutWorkflow</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutWorkflow' | translate}}">&nbsp;?&nbsp;</span>
+            <input class="form-control" type="number" ng-model="timeoutWorkflow" ng-change="analysis.setTimeoutWorkflow(timeoutWorkflow)">
+          </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.timeoutInitWorker</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutInitWorker' | translate}}">&nbsp;?&nbsp;</span>
+            <input class="form-control" type="number" ng-model="timeoutInitWorker" ng-change="analysis.setTimeoutInitWorker(timeoutInitWorker)">
+          </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.timeoutUploadResults</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutUploadResults' | translate}}">&nbsp;?&nbsp;</span>
+            <input class="form-control" type="number" ng-model="timeoutUploadResults" ng-change="analysis.setTimeoutUploadResults(timeoutUploadResults)">
+          </div>
+        </div>
+      </uib-accordion-group>
+    </uib-accordion>
   </div>
 </div>
+
 <div class="row">
   <div class="col-sm-12">
     <uib-accordion close-others="false">
