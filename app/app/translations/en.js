@@ -132,7 +132,7 @@ export default {
     projectNameError: 'Project cannot be named PAT',
     saveAsServerStartInProgress: 'Unable to "Save As" while server is starting. Please try again, once the server has fully started.',
     newServerStarted: 'New server started.',
-    deprecationWarning: 'Deprecation Warning: as of version 3.1 the Amazon Cloud Remote Server option will be removed. Remote servers should be launched outside of PAT via Helm chart and Kubernetes.'
+    deprecationWarning: 'Deprecation warning: version 3.1 of PAT will not include the Amazon Cloud Remote Server option. Please review the OpenStudio Server 3.0.0 release notes for additional details related to cloud deployment.'
   },
   analysis: {
     title: 'Analysis',
