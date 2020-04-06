@@ -21,7 +21,7 @@ os.mkdir(run_dir)
 os.chdir(run_dir)
 print("os.getcwd():", os.getcwd())
 print("Simulating %s..." % ssp_filename)
-result = simulate_ssp(ssp_filename, start_time=fmu_start_time, stop_time=fmu_stop_time, step_size=fmu_time_step)
+result = simulate_ssp(ssp_filename, start_time=fmu_start_time, stop_time=fmu_stop_time, step_size=fmu_time_step, run_dir=run_dir)
 
 show_plot=True
 
