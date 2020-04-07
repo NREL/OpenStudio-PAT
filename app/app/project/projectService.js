@@ -188,6 +188,8 @@ export class Project {
     vm.analysisID = '';
     vm.datapoints = [];
 
+    vm.deprecationWarningShown = false;
+
     // TODO: still need these?
     vm.rubyMD5 = '';
     vm.mongoMD5 = '';
@@ -1603,6 +1605,16 @@ export class Project {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('Project setProjectName name:', name);
     vm.projectName = name;
+  }
+
+  getDeprecationWarningShown() {
+    const vm = this;
+    return vm.deprecationWarningShown;
+  }
+
+  setDeprecationWarningShown(){
+    const vm = this;
+    vm.deprecationWarningShown = true;
   }
 
   getProjectDir() {
