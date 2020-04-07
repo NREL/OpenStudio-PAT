@@ -96,42 +96,42 @@ var signApp = function () {
   }
 };
 
-var packToDmgFile = function () {
-  var deferred = Q.defer();
-
-  var appdmg = require('appdmg');
-  var dmgName = manifest.name + '_' + manifest.version + '.dmg';
-
-  // Prepare appdmg config
-  var dmgManifest = projectDir.read('resources/osx/appdmg.json');
-  dmgManifest = utils.replace(dmgManifest, {
-    productName: manifest.productName,
-    appPath: finalAppDir.path(),
-    dmgIcon: projectDir.path("resources/osx/dmg-icon.icns"),
-    dmgBackground: projectDir.path("resources/osx/dmg-background.png")
-  });
-  tmpDir.write('appdmg.json', dmgManifest);
-
-  // Delete DMG file with this name if already exists
-  releasesDir.remove(dmgName);
-
-  gulpUtil.log('Packaging to DMG file...');
-
-  var readyDmgPath = releasesDir.path(dmgName);
-  appdmg({
-    source: tmpDir.path('appdmg.json'),
-    target: readyDmgPath
-  })
-    .on('error', function (err) {
-      console.error(err);
-    })
-    .on('finish', function () {
-      gulpUtil.log('DMG file ready!', readyDmgPath);
-      deferred.resolve();
-    });
-
-  return deferred.promise;
-};
+// var packToDmgFile = function () {
+//   var deferred = Q.defer();
+//
+//   var appdmg = require('appdmg');
+//   var dmgName = manifest.name + '_' + manifest.version + '.dmg';
+//
+//   // Prepare appdmg config
+//   var dmgManifest = projectDir.read('resources/osx/appdmg.json');
+//   dmgManifest = utils.replace(dmgManifest, {
+//     productName: manifest.productName,
+//     appPath: finalAppDir.path(),
+//     dmgIcon: projectDir.path('resources/osx/dmg-icon.icns'),
+//     dmgBackground: projectDir.path('resources/osx/dmg-background.png')
+//   });
+//   tmpDir.write('appdmg.json', dmgManifest);
+//
+//   // Delete DMG file with this name if already exists
+//   releasesDir.remove(dmgName);
+//
+//   gulpUtil.log('Packaging to DMG file...');
+//
+//   var readyDmgPath = releasesDir.path(dmgName);
+//   appdmg({
+//     source: tmpDir.path('appdmg.json'),
+//     target: readyDmgPath
+//   })
+//     .on('error', function (err) {
+//       console.error(err);
+//     })
+//     .on('finish', function () {
+//       gulpUtil.log('DMG file ready!', readyDmgPath);
+//       deferred.resolve();
+//     });
+//
+//   return deferred.promise;
+// };
 
 var cleanClutter = function () {
   return tmpDir.removeAsync('.');
