@@ -45,12 +45,12 @@
     "type": "mongo"
   }],
   "openstudio": [{
-    "name": "OpenStudio-3.0.0-rc2+c1a45f4753-Windows.tar.gz",
+    "name": "OpenStudio-3.0.0-rc2-Windows.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.0.0-rc2+c1a45f4753-Darwin.tar.gz",
+    "name": "OpenStudio-3.0.0-rc2-Darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "openstudio"
