@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
- *  OpenStudio(R), Copyright (c) 2008-2018, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *  OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  *  following conditions are met:
@@ -201,6 +201,8 @@ export class Project {
 
     vm.analysisID = '';
     vm.datapoints = [];
+
+    vm.deprecationWarningShown = false;
 
     // TODO: still need these?
     vm.rubyMD5 = '';
@@ -1636,6 +1638,16 @@ export class Project {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('Project setProjectName name:', name);
     vm.projectName = name;
+  }
+
+  getDeprecationWarningShown() {
+    const vm = this;
+    return vm.deprecationWarningShown;
+  }
+
+  setDeprecationWarningShown(){
+    const vm = this;
+    vm.deprecationWarningShown = true;
   }
 
   getProjectDir() {

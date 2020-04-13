@@ -1,34 +1,67 @@
 {
-  "endpoint": "https://openstudio-resources.s3.amazonaws.com/pat-dependencies2/",
+  "endpoint": "https://openstudio-resources.s3.amazonaws.com/pat-dependencies3/",
+  "energyplus": [{
+    "name": "EnergyPlus-9.3.0-win32.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "energyplus"
+  }, {
+    "name": "EnergyPlus-9.3.0-darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "energyplus"
+  }],
+  "perl": [{
+    "name": "perl-5.16.2-win32.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "perl"
+  }, {
+    "name": "ruby-5.16.2-darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "perl"
+  }],
   "ruby": [{
-    "name": "ruby-2.2.4-win32.tar.gz",
+    "name": "ruby-2.5.1-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "ruby"
   }, {
-    "name": "ruby-2.2.4-darwin.tar.gz",
+    "name": "ruby-2.5.5-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "ruby"
   }],
   "mongo": [{
-    "name": "mongodb-3.2.5-win32.tar.gz",
+    "name": "mongodb-3.6.3-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "mongo"
   }, {
-    "name": "mongodb-3.2.5-darwin.tar.gz",
+    "name": "mongodb-3.6.3-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "mongo"
   }],
+  "openstudio": [{
+    "name": "OpenStudio-3.0.0-rc2-Windows.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "openstudio"
+  }, {
+    "name": "OpenStudio-3.0.0-rc2-Darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "openstudio"
+  }],
   "openstudioServer": [{
-    "name": "OpenStudio-server-7507122e75-win32.tar.gz",
+    "name": "OpenStudio-server-b7df23d15e-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-7507122e75-darwin.tar.gz",
+    "name": "OpenStudio-server-b7df23d15e-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"

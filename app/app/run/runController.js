@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
- *  OpenStudio(R), Copyright (c) 2008-2018, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *  OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  *  following conditions are met:
@@ -326,6 +326,17 @@ export class RunController {
 
     // if switching to remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
+      
+      // Deprecation Warning (show once per session)
+      vm.deprecationWarning = vm.Project.getDeprecationWarningShown();
+      if (vm.deprecationWarning == false) {
+        // show
+        vm.$translate('toastr.deprecationWarning').then(translation => {
+          vm.toastr.warning(translation, {closeButton: true, timeOut: 0, extendedTimeOut: 0});
+        });
+        vm.Project.setDeprecationWarningShown();
+      }
+
       vm.$scope.clusters = vm.Project.getClusters();
       vm.resetClusterSettings();
       vm.checkIfClusterIsRunning();

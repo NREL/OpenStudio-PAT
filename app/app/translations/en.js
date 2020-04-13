@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
- *  OpenStudio(R), Copyright (c) 2008-2018, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *  OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  *  following conditions are met:
@@ -131,7 +131,8 @@ export default {
     numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully',
     projectNameError: 'Project cannot be named PAT',
     saveAsServerStartInProgress: 'Unable to "Save As" while server is starting. Please try again, once the server has fully started.',
-    newServerStarted: 'New server started.'
+    newServerStarted: 'New server started.',
+    deprecationWarning: 'Deprecation warning: version 3.1 of PAT will not include the Amazon Cloud Remote Server option. Please review the OpenStudio Server 3.0.0 release notes for additional details related to cloud deployment.'
   },
   analysis: {
     title: 'Analysis',
@@ -225,15 +226,15 @@ export default {
       selectDir: 'Select Directory',
       addDir: 'Add Directory',
       dirToUnpackTo: 'Directory Name to Unpack to on Server',
-      server_initialization: 'Server Initialization Script',
-      server_finalization: 'Server Finalization Script',
-      worker_initialization: 'Worker Initialization Script',
-      worker_finalization: 'Worker Finalization Script',
+      server_initialization: 'Analysis Initialization Script',
+      server_finalization: 'Analysis Finalization Script',
+      worker_initialization: 'Datapoint Initialization Script',
+      worker_finalization: 'Datapoint Finalization Script',
       selectScript: 'Select Script File',
       args: 'Script Arguments',
       addArg: 'Add Argument',
       serverScripts: 'Server Scripts',
-      serverScriptsMessage: 'If your analysis requires server and worker initialization or finalization scripts, add them here.  Note that these scripts will not run on a local server; they can only be run on a cloud server.',
+      serverScriptsMessage: 'If your analysis requires analysis and datapoint initialization or finalization scripts, add them here.  Note that these scripts will not run on a local server; they can only be run on a cloud server.',
       modelDependentCustom: 'Or custom value (takes precedence)',
       warning: 'The selected variable setting is invalid for this algorithm.  The variable will be treated as a static argument when running the simulation.',
       grid: {

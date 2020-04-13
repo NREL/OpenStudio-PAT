@@ -1,5 +1,5 @@
 /***********************************************************************************************************************
- *  OpenStudio(R), Copyright (c) 2008-2018, Alliance for Sustainable Energy, LLC. All rights reserved.
+ *  OpenStudio(R), Copyright (c) 2008-2020, Alliance for Sustainable Energy, LLC. All rights reserved.
  *
  *  Redistribution and use in source and binary forms, with or without modification, are permitted provided that the
  *  following conditions are met:
@@ -131,7 +131,8 @@ export default {
     numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully',
     projectNameError: 'Project cannot be named PAT',
     saveAsServerStartInProgress: 'Unable to "Save As" while server is starting. Please try again, once the server has fully started.',
-    newServerStarted: 'New server started.'
+    newServerStarted: 'New server started.',
+    deprecationWarning: 'Avertissement de dépréciation: la version 3.1 de PAT n\'inclura pas l\'option Amazon Cloud Remote Server. Veuillez consulter les notes de mise à jour du OpenStudio Server 3.0.0 pour des détails additionels sur le déploiement en nuage.'
   },
   analysis: {
     title: 'Analyse',
@@ -224,10 +225,10 @@ export default {
       selectDir: 'Sélectionner un répertoire',
       addDir: 'Ajouter un répertoire',
       dirToUnpackTo: 'Nom du répertoire à décompresser sur le serveur',
-      server_initialization: 'Script d\'initialisation du serveur',
-      server_finalization: 'Script de finalisation du serveur',
-      worker_initialization: 'Script d\'initialisation des travailleurs',
-      worker_finalization: 'Script de finalisation des travailleurs',
+      server_initialization: 'Script d\'initialisation de l\'analyse',
+      server_finalization: 'Script de finalisation de l\'analyse',
+      worker_initialization: 'Script d\'initialisation des points de données',
+      worker_finalization: 'Script de finalisation des points de données',
       selectScript: 'Sélectionner un fichier de script',
       args: 'Arguments de script',
       addArg: 'Ajouter Argument',
