@@ -34,7 +34,7 @@
     "type": "ruby"
   }],
   "mongo": [{
-    "name": "mongodb-3.6.3-win32.tar.gz",
+    "name": "mongodb-3.2.5-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "mongo"
