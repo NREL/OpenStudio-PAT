@@ -201,7 +201,7 @@ class XcelEDATariffSelectionandModelSetup < OpenStudio::Ruleset::WorkspaceUserSc
     fuel_oil_1_escalation_string = "
     LifeCycleCost:UsePriceEscalation,
       U.S. Avg  Commercial-Distillate Oil,    !- Name
-      FuelOil#1,                              !- Resource
+      FuelOilNo1,                              !- Resource
       2011,                                   !- Escalation Start Year
       January,                                !- Escalation Start Month
       0.9714,                                 !- Year Escalation 1
@@ -242,7 +242,7 @@ class XcelEDATariffSelectionandModelSetup < OpenStudio::Ruleset::WorkspaceUserSc
     fuel_oil_2_escalation_string = "  
     LifeCycleCost:UsePriceEscalation,
       U.S. Avg  Commercial-Residual Oil,      !- Name
-      FuelOil#2,                              !- Resource
+      FuelOilNo2,                              !- Resource
       2011,                                   !- Escalation Start Year
       January,                                !- Escalation Start Month
       0.8469,                                 !- Year Escalation 1

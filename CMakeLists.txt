@@ -39,7 +39,7 @@ if(APPLE)
     COMMAND "${NPM_COMMAND}" install WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "${NPM_COMMAND}" run bower WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "${NPM_COMMAND}" run release WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    COMMAND "${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" install-deps --exclude=openstudio --prefix="tmp/ParametricAnalysisTool.app/Contents/Resources/" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMAND "${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" install-deps --prefix="tmp/ParametricAnalysisTool.app/Contents/Resources/" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   )
 elseif(WIN32)
   set(PAT_PRODUCT_FILE "${CMAKE_SOURCE_DIR}/tmp/pat/ParametricAnalysisTool.exe")

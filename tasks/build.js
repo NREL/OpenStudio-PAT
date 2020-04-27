@@ -131,7 +131,7 @@ gulp.task('manifest', function () {
 var argv = require('yargs').argv;
 
 let destination = path.join(conf.paths.dist, '..', 'depend');
-let dependencies = ['ruby', 'mongo', 'openstudioServer'];
+let dependencies = ['openstudio', 'energyplus', 'ruby', 'mongo', 'openstudioServer'];
 
 if (argv.prefix) {
   destination = argv.prefix;

@@ -84,9 +84,9 @@ export class DependencyManager {
         prefixPath = jetpack.cwd(app.getPath('exe'), '..');
 
         if (name == 'PAT_OS_CLI_PATH') {
-          return prefixPath.path('..', 'bin/openstudio' + exeExt);
+          return prefixPath.path('OpenStudio/bin/openstudio' + exeExt);
         } else if (name == 'PAT_OS_BINDING_PATH') {
-          return prefixPath.path('..', 'Ruby/openstudio' + bindingExt);
+          return prefixPath.path('OpenStudio/Ruby/openstudio' + bindingExt);
         } else if (name == 'PAT_OS_META_CLI_PATH') {
           return prefixPath.path('OpenStudio-server/bin/openstudio_meta');
         } else if (name == 'PAT_RUBY_PATH') {
@@ -94,7 +94,7 @@ export class DependencyManager {
         } else if (name == 'PAT_MONGO_PATH') {
           return prefixPath.path('mongo/bin/mongod' + exeExt);
         } else if (name == 'ENERGYPLUS_EXE_PATH') {
-          return prefixPath.path('..', 'EnergyPlus/energyplus' + exeExt);
+          return prefixPath.path('EnergyPlus/energyplus' + exeExt);
         } else if (name == 'perlEXEPath') {
           return prefixPath.path('Perl/perl/bin/perl' + exeExt);
         } else if (name == 'OS_RAYPATH') {
