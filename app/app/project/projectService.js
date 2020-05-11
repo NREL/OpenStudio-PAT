@@ -510,25 +510,33 @@ export class Project {
 
       archive.pipe(output);
 
-      archive.bulk([
-        {expand: true, cwd: vm.projectMeasuresDir.path(), src: ['**'], dest: 'measures/'}
-      ]);
+      archive.glob('**/*', {
+        cwd: vm.projectMeasuresDir.path()
+      }, {
+        prefix: 'measures'
+      });
 
-      archive.bulk([
-        {expand: true, cwd: vm.seedDir.path(), src: ['**'], dest: 'seeds/'}
-      ]);
+      archive.glob('**/*', {
+        cwd: vm.seedDir.path()
+      }, {
+        prefix: 'seeds'
+      });
 
-      archive.bulk([
-        {expand: true, cwd: vm.weatherDir.path(), src: ['**'], dest: 'weather/'}
-      ]);
+      archive.glob('**/*', {
+        cwd: vm.weatherDir.path()
+      }, {
+        prefix: 'weather'
+      });
 
       // add server scripts (if they exist)
       _.forEach(vm.serverScripts, (script, type) => {
         if (script.file) {
           const newType = _.includes(type, 'server') ? 'analysis' : 'data_point';
-          archive.bulk([
-            {expand: true, cwd: vm.projectDir.path('scripts', newType), src: ['**'], dest: 'scripts/' + newType}
-          ]);
+          archive.glob('**/*', {
+            cwd: vm.projectDir.path('scripts', newType)
+          }, {
+            prefix: 'scripts/' + newType
+          });
         }
       });
 
@@ -542,9 +550,11 @@ export class Project {
           }
           const absPath = path.resolve(vm.projectDir.path(), file.dirToInclude);
           if (vm.Message.showDebug()) vm.$log.debug('RESOLVED PATH: ', absPath, ' unpack DIR: ', file.unpackDirName);
-          archive.bulk([
-            {expand: true, cwd: absPath, src: ['**'], dest: 'lib/' + file.unpackDirName}
-          ]);
+          archive.glob('**/*', {
+            cwd: absPath
+          }, {
+            prefix: 'lib/' + file.unpackDirName
+          });
         }
       });
 
