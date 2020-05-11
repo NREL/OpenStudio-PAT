@@ -7,7 +7,7 @@
   "author": "National Renewable Energy Laboratory",
   "main": "background.js",
   "dependencies": {
-    "angular": "~1.5.5",
+    "angular": "~1.7.9",
     "archiver": "~4.0.1",
     "adm-zip": "~0.4.7",
     "fs-jetpack": "~0.9.2",
