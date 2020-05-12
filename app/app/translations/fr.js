@@ -132,7 +132,8 @@ export default {
     projectNameError: 'Project cannot be named PAT',
     saveAsServerStartInProgress: 'Unable to "Save As" while server is starting. Please try again, once the server has fully started.',
     newServerStarted: 'New server started.',
-    deprecationWarning: 'Avertissement de dépréciation: la version 3.1 de PAT n\'inclura pas l\'option Amazon Cloud Remote Server. Veuillez consulter les notes de mise à jour du OpenStudio Server 3.0.0 pour des détails additionels sur le déploiement en nuage.'
+    deprecationWarning: 'Avertissement de dépréciation: la version 3.1 de PAT n\'inclura pas l\'option Amazon Cloud Remote Server. Veuillez consulter les notes de mise à jour du OpenStudio Server 3.0.0 pour des détails additionels sur le déploiement en nuage.',
+    noMoreLocalServerDefaultStart: 'Local Server ne démarre plus automatiquement.  Si vous désirez utiliser Local Server, il peut être démarrer manuellement dans le menu Server Tools.'
   },
   analysis: {
     title: 'Analyse',
