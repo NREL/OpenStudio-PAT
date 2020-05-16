@@ -13,7 +13,7 @@ var os = require('os');
 var decompress = require('gulp-decompress');
 var clean = require('gulp-clean');
 var merge = require('merge-stream');
-
+var rename = require("gulp-rename");
 
 var $ = require('gulp-load-plugins')({
   pattern: ['gulp-*', 'main-bower-files', 'del', 'lazypipe', 'streamify']
@@ -157,11 +157,23 @@ gulp.task('download-deps', function () {
     const fileInfo = _.find(manifest[depend], {platform: platform});
     const fileName = fileInfo.name;
 
-    return progress(request({uri: manifest.endpoint + fileName, timeout: 5000}))
+    // Note JM 2018-09-13: Allow other resources in case AWS isn't up to date
+    // and for easier testing of new deps
+    if( fileName.includes("http") ) {
+      // Already a URI
+      var uri = fileName;
+      var destName = fileName.replace(/^.*[\\\/]/, '');
+    } else {
+      // Need to concat endpoint (AWS) with the fileName
+      var uri = manifest.endpoint + fileName;
+      var destName = fileName;
+    }
+
+    return progress(request({uri: uri, timeout: 5000}))
       .on('progress', state => {
         console.log(`Downloading ${depend}, ${(state.percentage * 100).toFixed(0)}%`);
       })
-      .pipe(source(fileName))
+      .pipe(source(destName))
       .pipe(gulp.dest(destination));
   });
 
@@ -173,10 +185,23 @@ gulp.task('extract-deps', ['download-deps'], function () {
     const fileInfo = _.find(manifest[depend], {platform: platform});
     const fileName = fileInfo.name;
 
-    return gulp.src(path.join(destination, fileName))
-      .pipe(decompress())
-      .pipe(gulp.dest(destination));
-  });
+    if( fileName.includes("http") ) {
+      var destName = fileName.replace(/^.*[\\\/]/, '');
+    } else {
+      var destName = fileName;
+    }
+
+    // Note JM 2018-0913:
+    // Usually deps are properly zipped to that the extracted root folder
+    // is adequately named, but when using absolute http:// resources (not
+    // packaged specifically by us), we must rename to ensure it's correct
+    var properName = fileInfo.type;
+
+    // What we do is to extract to properName and remove the leading (root)
+    // directory level
+    return gulp.src(path.join(destination, destName))
+      .pipe( decompress({strip: 1}) )
+      .pipe(gulp.dest(path.join(destination, properName)));  });
 
   return merge(tasks);
 });
@@ -185,6 +210,12 @@ gulp.task('remove-deps-tar', ['extract-deps'], function () {
   var tasks = dependencies.map(depend => {
     const fileInfo = _.find(manifest[depend], {platform: platform});
     const fileName = fileInfo.name;
+
+    if( fileName.includes("http") ) {
+      var destName = fileName.replace(/^.*[\\\/]/, '');
+    } else {
+      var destName = fileName;
+    }
 
     return gulp.src(path.join(destination, fileName), {read: false})
       .pipe(clean());
@@ -195,7 +226,3 @@ gulp.task('remove-deps-tar', ['extract-deps'], function () {
 
 gulp.task('install-deps', ['remove-deps-tar'], function () {
 });
-
-
-
-

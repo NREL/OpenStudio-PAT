@@ -10,6 +10,11 @@
     "platform": "darwin",
     "arch": "x64",
     "type": "energyplus"
+  }, {
+    "name": "https://github.com/NREL/EnergyPlus/releases/download/v9.3.0/EnergyPlus-9.3.0-baff08990c-Linux-x86_64.tar.gz",
+    "platform": "linux",
+    "arch": "x64",
+    "type": "energyplus"
   }],
   "perl": [{
     "name": "perl-5.16.2-win32.tar.gz",
@@ -32,6 +37,11 @@
     "platform": "darwin",
     "arch": "x64",
     "type": "ruby"
+  }, {
+    "name": "ruby-2.5.5-linux.tar.gz",
+    "platform": "linux",
+    "arch": "x64",
+    "type": "ruby"
   }],
   "mongo": [{
     "name": "mongodb-3.2.5-win32.tar.gz",
@@ -41,6 +51,11 @@
   }, {
     "name": "mongodb-3.6.3-darwin.tar.gz",
     "platform": "darwin",
+    "arch": "x64",
+    "type": "mongo"
+  }, {
+    "name": "http://downloads.mongodb.org/linux/mongodb-linux-x86_64-3.6.3.tgz",
+    "platform": "linux",
     "arch": "x64",
     "type": "mongo"
   }],
@@ -54,6 +69,11 @@
     "platform": "darwin",
     "arch": "x64",
     "type": "openstudio"
+  }, {
+    "name": "https://github.com/NREL/OpenStudio/releases/download/v3.0.0/OpenStudio-3.0.0+1c9617fa4e-Linux.tar.gz",
+    "platform": "linux",
+    "arch": "x64",
+    "type": "openstudio"
   }],
   "openstudioServer": [{
     "name": "OpenStudio-server-b7df23d15e-win32.tar.gz",
@@ -63,6 +83,11 @@
   }, {
     "name": "OpenStudio-server-b7df23d15e-darwin.tar.gz",
     "platform": "darwin",
+    "arch": "x64",
+    "type": "OpenStudio-server"
+  }, {
+    "name": "OpenStudio-server-a43d33438a-linux.tar.gz",
+    "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio-server"
   }]

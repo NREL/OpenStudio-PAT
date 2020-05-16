@@ -74,8 +74,10 @@ export class DependencyManager {
     if (os.platform() == 'win32') {
       exeExt = '.exe';
     }
-    let bindingExt = '.bundle';
+    let bindingExt = '.bundle'; // darwin
     if (os.platform() == 'win32') {
+      bindingExt = '.so';
+    } else if (os.platform() == 'linux') {
       bindingExt = '.so';
     }
 
