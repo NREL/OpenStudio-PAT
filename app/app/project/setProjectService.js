@@ -130,8 +130,10 @@ export class SetProject {
           //   });
           // }
 
-          // Open modal dialog to wait, while new server starts
-          const modalInstance = vm.saveAsModal();
+          // user warning: local server no longer starts by default
+          vm.$translate('toastr.noMoreLocalServerDefaultStart').then(translation => {
+            vm.toastr.warning(translation);
+          });
 
           vm.OsServer.stopServer('local').then(response => {
             vm.Project.setProjectName(vm.newProjectName);  // this is taken care of my setProjectVariables. remove?
@@ -197,25 +199,10 @@ export class SetProject {
             });
             vm.$state.transitionTo('analysis', {}, {reload: true});
 
-            // start server at new location
-            vm.$translate('toastr.startLocalServer').then(translation => {
-              vm.toastr.info(translation);
-            });
-            vm.OsServer.startServer().then(response => {
-              modalInstance.close();
+            deferred.resolve('resolve');
+            return deferred.promise;
 
-              vm.$translate('toastr.newServerStarted').then(translation => {
-                vm.toastr.info(translation);
-              });
-
-              if (vm.Message.showDebug()) vm.$log.debug('OsServer.startServer() response:response: ', response);
-              if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
-
-              deferred.resolve('resolve');
-              return deferred.promise;
-            });
           }, () => {
-            modalInstance.close();
 
             vm.$log.error('The command stopServer returned an error. Unable to set new project name and start new local server.');
             vm.$log.error('Please try to "Save As" again. If this problem persists, please reboot your computer to ensure the original Pat server completely shut down.');
@@ -283,6 +270,11 @@ export class SetProject {
           //   });
           // }
 
+          // user warning: local server no longer starts by default
+          vm.$translate('toastr.noMoreLocalServerDefaultStart').then(translation => {
+            vm.toastr.warning(translation);
+          });
+
           // force stop local server
           vm.OsServer.stopServer('local').then(response => {
             vm.$log.info('SetProjectService::stop server: local server stopped');
@@ -305,14 +297,14 @@ export class SetProject {
             // For now: selected local run type and start local server
             vm.Project.setRunType(vm.Project.getRunTypes()[0]);
             // start local server at new location
-            vm.$translate('toastr.startLocalServer').then(translation => {
-              vm.toastr.info(translation);
-            });
-            vm.OsServer.startServer().then(response => {
-              if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
-              if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
-              if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
-            });
+            // vm.$translate('toastr.startLocalServer').then(translation => {
+            //   vm.toastr.info(translation);
+            // });
+            // vm.OsServer.startServer().then(response => {
+            //   if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
+            //   if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
+            //   if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+            // });
 
           }, () => {
             vm.$log.info('stop server errored, but setting project anyway');
@@ -389,6 +381,12 @@ export class SetProject {
       }
 
       if (fileExists) {
+
+        // user warning: local server no longer starts by default
+        vm.$translate('toastr.noMoreLocalServerDefaultStart').then(translation => {
+          vm.toastr.warning(translation);
+        });
+
         // wait until server is stopped and new project set before closing modal
         if (vm.Message.showDebug()) vm.$log.debug('fileExists!');
         vm.OsServer.stopServer('local').then(response => {
@@ -404,17 +402,17 @@ export class SetProject {
           deferred.resolve('resolve');
 
           // Only start server if local server is selected?
-          // For now: selected local run type and start local server
-          vm.Project.setRunType(vm.Project.getRunTypes()[0]);
+          // New: don't reset run type or start local server
+          // vm.Project.setRunType(vm.Project.getRunTypes()[0]);
           // start local server at new location
-          vm.$translate('toastr.startLocalServer').then(translation => {
-            vm.toastr.info(translation);
-          });
-          vm.OsServer.startServer().then(response => {
-            if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
-            if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
-            if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
-          });
+          // vm.$translate('toastr.startLocalServer').then(translation => {
+          //   vm.toastr.info(translation);
+          // });
+          // vm.OsServer.startServer().then(response => {
+          //   if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
+          //   if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
+          //   if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+          // });
 
         }, () => {
           vm.$log.info('stop server errored, but setting project anyway');

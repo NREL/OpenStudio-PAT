@@ -915,8 +915,13 @@ export class OsServer {
         vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_local ' + '\"' + vm.Project.projectDir.path() + '\"';
         vm.$log.info('stop server command: ', vm.stopServerCommand);
 
+        // do nothing if server is stopped and start is not in progress
+        if (!vm.serverStartInProgress && vm.getServerStatus('local') == 'stopped') {
+          // resolve
+          deferred.resolve('Server is already stopped');
+        }
         // if server is in process of starting, wait to start before stopping
-        if (vm.serverStartInProgress) {
+        else if (vm.serverStartInProgress) {
           // wait until server starts before stopping it
           vm.$translate('toastr.localStartInProgressBeforeStop').then(translation => {
             vm.toastr.info(translation, {timeOut: 600000});
@@ -982,6 +987,7 @@ export class OsServer {
           });
         } else {
           // server start is not in progress
+
           const child = vm.exec(vm.stopServerCommand,
             (error, stdout, stderr) => {
               console.log('THE PROCESS TERMINATED');
