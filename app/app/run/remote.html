@@ -221,5 +221,6 @@
   <div class="col-sm-3 col-sm-offset-1">
     <button type="button" class="btn btn-info" ng-if="selectedAnalysisType == 'Algorithmic' && analysisStatus == 'completed' && resultsExist()" ng-click="run.viewAlgorithmResults()" translate>run.viewAlgorithmResults</button>
     <button type="button" class="btn btn-info" ng-if="selectedAnalysisType == 'Algorithmic' && analysisStatus == 'completed' && !resultsExist()" ng-click="run.downloadAlgorithmResults()" translate>run.downloadAlgorithmResults</button>
+    <button type="button" class="btn btn-info pull-right" ng-click="run.exportOSA()" translate>run.exportOSA</button>
   </div>
 </div>

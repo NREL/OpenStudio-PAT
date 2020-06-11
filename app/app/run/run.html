@@ -49,6 +49,7 @@
     <button type="button" class="btn btn-success" ng-if="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
     <button type="button" class="btn btn-success" ng-if="!disabledButtons && atLeastOneSelected()" ng-click="run.warnBeforeDelete('selected')" translate>run.runSelected</button>
     <button type="button" class="btn btn-danger" ng-if="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
+    <button type="button" class="btn btn-info pull-right" ng-click="run.exportOSA()" translate>run.exportOSA</button>
   </div>
 </div>
 
