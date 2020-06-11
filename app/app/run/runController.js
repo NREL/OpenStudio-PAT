@@ -326,7 +326,7 @@ export class RunController {
 
     // if switching to remote and amazon is selected, ping cluster
     if (vm.$scope.selectedRunType.name == 'remote' && vm.$scope.remoteSettings.remoteType == 'Amazon Cloud') {
-      
+
       // Deprecation Warning (show once per session)
       vm.deprecationWarning = vm.Project.getDeprecationWarningShown();
       if (vm.deprecationWarning == false) {
@@ -1053,6 +1053,30 @@ export class RunController {
     vm.$scope.datapoints = vm.Project.getDatapoints();
     if (vm.Message.showDebug()) vm.$log.debug('DATAPOINTS AFTER DELETE: ', vm.$scope.datapoints);
     vm.$scope.datapointsStatus = vm.OsServer.getDatapointsStatus();
+  }
+
+  exportOSA(selectedOnly = false) {
+    const vm = this;
+
+    // 2: make OSA and zip file
+    vm.Project.exportOSA(selectedOnly).then(() => {
+
+      // OSA and zip exported to project folder
+      vm.$translate('toastr.exportedOSA').then(translation => {
+        vm.toastr.success(translation);
+      });
+
+    }, (errors) => {
+      // error exporting OSA
+      vm.$log.error('Error(s) exporting OSA');
+
+      // display errors in modal
+      vm.osaErrorsModal(errors);
+
+    });
+
+    return true;
+
   }
 
   runWorkflow(selectedOnly = false) {
