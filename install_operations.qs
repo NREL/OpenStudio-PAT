@@ -12,7 +12,6 @@ function Component() {
     } else if (kernel == "darwin") {
       var exePath = installer.value("TargetDir") + "/bin/install_utility";
       component.addElevatedOperation("Execute", "chmod", "-R", "a+w", "@TargetDir@/ParametricAnalysisTool.app/Contents/Resources/OpenStudio-server");
-    }
     } else if (kernel == "linux") {
       component.addElevatedOperation("Execute", "mkdir", "@TargetDir@/opt/Resources/OpenStudio-server/server/tmp");
       component.addElevatedOperation("Execute", "chmod", "-R", "777", "@TargetDir@/opt/Resources/OpenStudio-server/server/tmp");
