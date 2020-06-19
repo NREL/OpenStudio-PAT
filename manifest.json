@@ -76,7 +76,7 @@
     "type": "OpenStudio"
   }],
   "openstudioServer": [{
-    "name": "OpenStudio-server-7853254b70-win32.tar.gz",
+    "name": "OpenStudio-server-f1b8acbc52-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "OpenStudio-server"
