@@ -59,6 +59,11 @@ export class Project {
     vm.cliDebugTypes = [{value: '', label: 'false'}, {value: '--debug', label: 'true'}];
     vm.cliVerboseTypes = [{value: '', label: 'false'}, {value: '--verbose', label: 'true'}];
 
+    vm.downloadReportsTypes = [{value: false, label: 'false'}, {value: true, label: 'true'}];
+    vm.downloadOSMTypes = [{value: false, label: 'false'}, {value: true, label: 'true'}];
+    vm.downloadOSWTypes = [{value: false, label: 'false'}, {value: true, label: 'true'}];
+    vm.downloadZIPTypes = [{value: false, label: 'false'}, {value: true, label: 'true'}];
+
     vm.numberDPsToDisplay = 150;
 
     vm.reportTypes = [{
@@ -93,6 +98,10 @@ export class Project {
     vm.analysisType = null;
     vm.cliDebug = null;
     vm.cliVerbose = null;
+    vm.downloadReports = null;
+    vm.downloadOSW = null;
+    vm.downloadOSM = null;
+    vm.downloadZIP = null;
     vm.timeoutWorkflow = null;
     vm.timeoutUploadResults = null;
     vm.timeoutInitWorker = null;
@@ -172,6 +181,10 @@ export class Project {
     vm.analysisType = 'Manual';
     vm.cliDebug = '';
     vm.cliVerbose = '';
+    vm.downloadReports = true;
+    vm.downloadOSW = true;
+    vm.downloadOSM = true;
+    vm.downloadZIP = true;
     vm.timeoutWorkflow = 28800;
     vm.timeoutUploadResults = 28800;
     vm.timeoutInitWorker = 28800;
@@ -251,6 +264,10 @@ export class Project {
         vm.analysisType = vm.pat.analysis_type ? vm.pat.analysis_type : vm.analysisType;
         vm.cliDebug = vm.pat.cliDebug ? vm.pat.cliDebug : vm.cliDebug;
         vm.cliVerbose = vm.pat.cliVerbose ? vm.pat.cliVerbose : vm.cliVerbose;
+        vm.downloadReports = vm.pat.downloadReports ? vm.pat.downloadReports : vm.downloadReports;
+        vm.downloadOSW = vm.pat.downloadOSW ? vm.pat.downloadOSW : vm.downloadOSW;
+        vm.downloadOSM = vm.pat.downloadOSM ? vm.pat.downloadOSM : vm.downloadOSM;
+        vm.downloadZIP = vm.pat.downloadZIP ? vm.pat.downloadZIP : vm.downloadZIP;
         vm.timeoutWorkflow = vm.pat.timeoutWorkflow ? vm.pat.timeoutWorkflow : vm.timeoutWorkflow;
         vm.timeoutUploadResults = vm.pat.timeoutUploadResults ? vm.pat.timeoutUploadResults : vm.timeoutUploadResults;
         vm.timeoutInitWorker = vm.pat.timeoutInitWorker ? vm.pat.timeoutInitWorker : vm.timeoutInitWorker;
@@ -585,6 +602,11 @@ export class Project {
     // add CLI args to OSA
     vm.osa.analysis.cli_debug = vm.cliDebug;
     vm.osa.analysis.cli_verbose = vm.cliVerbose;
+    // add Server Download Args
+    vm.osa.analysis.download_reports = vm.downloadReports;
+    vm.osa.analysis.download_osw = vm.downloadOSW;
+    vm.osa.analysis.download_osm = vm.downloadOSM;
+    vm.osa.analysis.download_zip = vm.downloadZIP;
     // add timeout args to OSA
     vm.osa.analysis.run_workflow_timeout = vm.timeoutWorkflow;
     vm.osa.analysis.upload_results_timeout = vm.timeoutUploadResults;
@@ -1512,6 +1534,10 @@ export class Project {
     vm.pat.analysis_type = vm.analysisType; // eslint-disable-line camelcase
     vm.pat.cliDebug = vm.cliDebug;
     vm.pat.cliVerbose = vm.cliVerbose;
+    vm.pat.downloadReports = vm.downloadReports;
+    vm.pat.downloadOSW = vm.downloadOSW;
+    vm.pat.downloadOSM = vm.downloadOSM;
+    vm.pat.downloadZIP = vm.downloadZIP;
     vm.pat.timeoutWorkflow = vm.timeoutWorkflow;
     vm.pat.timeoutUploadResults = vm.timeoutUploadResults;
     vm.pat.timeoutInitWorker = vm.timeoutInitWorker;
@@ -2196,6 +2222,46 @@ export class Project {
   getCliVerbose() {
     const vm = this;
     return vm.cliVerbose;
+  }
+
+  setDownloadReports(name) {
+    const vm = this;
+    vm.downloadReports = name;
+  }
+
+  getDownloadReports() {
+    const vm = this;
+    return vm.downloadReports;
+  }
+
+  setDownloadOSW(name) {
+    const vm = this;
+    vm.downloadOSW = name;
+  }
+
+  getDownloadOSW() {
+    const vm = this;
+    return vm.downloadOSW;
+  }
+
+  setDownloadOSM(name) {
+    const vm = this;
+    vm.downloadOSM = name;
+  }
+
+  getDownloadOSM() {
+    const vm = this;
+    return vm.downloadOSM;
+  }
+
+  setDownloadZIP(name) {
+    const vm = this;
+    vm.downloadZIP = name;
+  }
+
+  getDownloadZIP() {
+    const vm = this;
+    return vm.downloadZIP;
   }
 
   setTimeoutWorkflow(name) {
@@ -3549,6 +3615,26 @@ export class Project {
   getCliVerboseTypes() {
     const vm = this;
     return vm.cliVerboseTypes;
+  }
+
+  getDownloadReportsTypes() {
+    const vm = this;
+    return vm.downloadReportsTypes;
+  }
+
+  getDownloadOSWTypes() {
+    const vm = this;
+    return vm.downloadOSWTypes;
+  }
+
+  getDownloadOSMTypes() {
+    const vm = this;
+    return vm.downloadOSMTypes;
+  }
+
+  getDownloadZIPTypes() {
+    const vm = this;
+    return vm.downloadZIPTypes;
   }
 
   setReportType(name) {
