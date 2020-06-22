@@ -58,11 +58,19 @@ export class AnalysisController {
     vm.analysisTypes = vm.Project.getAnalysisTypes();
     vm.cliDebugTypes = vm.Project.getCliDebugTypes();
     vm.cliVerboseTypes = vm.Project.getCliVerboseTypes();
+    vm.downloadReportsTypes = vm.Project.getDownloadReportsTypes();
+    vm.downloadOSWTypes = vm.Project.getDownloadOSWTypes();
+    vm.downloadOSMTypes = vm.Project.getDownloadOSMTypes();
+    vm.downloadZIPTypes = vm.Project.getDownloadZIPTypes();
     vm.$scope.seeds = vm.Project.getSeeds();
     vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
 
     vm.$scope.cliDebug = vm.Project.getCliDebug();
     vm.$scope.cliVerbose = vm.Project.getCliVerbose();
+    vm.$scope.downloadReports = vm.Project.getDownloadReports();
+    vm.$scope.downloadOSW = vm.Project.getDownloadOSW();
+    vm.$scope.downloadOSM = vm.Project.getDownloadOSM();
+    vm.$scope.downloadZIP = vm.Project.getDownloadZIP();
     vm.$scope.timeoutWorkflow = vm.Project.getTimeoutWorkflow();
     vm.$scope.timeoutUploadResults = vm.Project.getTimeoutUploadResults();
     vm.$scope.timeoutInitWorker = vm.Project.getTimeoutInitWorker();
@@ -1030,6 +1038,42 @@ export class AnalysisController {
     vm.$scope.cliVerbose = value;
     vm.setIsModified();
     vm.Project.setCliVerbose(vm.$scope.cliVerbose);
+  }
+
+  setDownloadReports(value) {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In setDownloadReports in analysis');
+    vm.$scope.downloadReports = value;
+    vm.setIsModified();
+    if (vm.Message.showDebug()) vm.$log.debug('Setting DownloadReports to: ', vm.$scope.downloadReports);
+    vm.Project.setDownloadReports(vm.$scope.downloadReports);
+  }
+
+  setDownloadOSW(value) {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In setDownloadOSW in analysis');
+    vm.$scope.downloadOSW = value;
+    vm.setIsModified();
+    if (vm.Message.showDebug()) vm.$log.debug('Setting DownloadOSW to: ', vm.$scope.downloadOSW);
+    vm.Project.setDownloadOSW(vm.$scope.downloadOSW);
+  }
+
+  setDownloadOSM(value) {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In setDownloadOSM in analysis');
+    vm.$scope.downloadOSM = value;
+    vm.setIsModified();
+    if (vm.Message.showDebug()) vm.$log.debug('Setting DownloadOSM to: ', vm.$scope.downloadOSM);
+    vm.Project.setDownloadOSM(vm.$scope.downloadOSM);
+  }
+
+  setDownloadZIP(value) {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In setDownloadZIP in analysis');
+    vm.$scope.downloadZIP = value;
+    vm.setIsModified();
+    if (vm.Message.showDebug()) vm.$log.debug('Setting DownloadZIP to: ', vm.$scope.downloadZIP);
+    vm.Project.setDownloadZIP(vm.$scope.downloadZIP);
   }
 
   setTimeoutWorkflow(value) {

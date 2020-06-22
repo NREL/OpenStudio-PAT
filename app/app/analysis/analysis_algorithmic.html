@@ -28,6 +28,44 @@
                     ng-change="analysis.setCliVerbose(cliVerbose)"></select>
             </div>
           </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.downloadZIP</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpDownloadZIP' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.downloadZIPTypes" ng-model="downloadZIP"
+                    ng-change="analysis.setDownloadZIP(downloadZIP)"></select>
+            </div>
+          </div>
+        </div>
+        <div class="row pad-bot-10">
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.downloadOSW</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpDownloadOSW' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.downloadOSWTypes" ng-model="downloadOSW"
+                    ng-change="analysis.setDownloadOSW(downloadOSW)"></select>
+            </div>
+          </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.downloadOSM</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpDownloadOSM' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.downloadOSMTypes" ng-model="downloadOSM"
+                    ng-change="analysis.setDownloadOSM(downloadOSM)"></select>
+            </div>
+          </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.downloadReports</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpDownloadReports' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.downloadReportsTypes" ng-model="downloadReports"
+                    ng-change="analysis.setDownloadReports(downloadReports)"></select>
+            </div>
+          </div>
         </div>
         <div class="row pad-bot-10">
           <div class="col-sm-4 pad-bot-20">

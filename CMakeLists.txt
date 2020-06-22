@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14.0)
 cmake_policy(SET CMP0048 NEW)
 
-project(ParametricAnalysisTool VERSION 3.0.0)
+project(ParametricAnalysisTool VERSION 3.0.1)
 
 find_package(Git)
 
@@ -33,7 +33,17 @@ option(BUILD_PACKAGE "Build package" ON)
 
 find_program(NPM_COMMAND npm)
 
-if(APPLE)
+
+if(UNIX AND NOT APPLE)
+  add_custom_target(PAT ALL
+    COMMAND "${NPM_COMMAND}" install WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMAND "${NPM_COMMAND}" run bower WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMAND "${NPM_COMMAND}" run release WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMAND "${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" install-deps --prefix="tmp/pat_${CMAKE_PROJECT_VERSION}/opt/Resources/" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMAND "mkdir" "-p" "${CMAKE_SOURCE_DIR}/tmp/pat_${CMAKE_PROJECT_VERSION}/opt/Resources/OpenStudio-server/server/tmp"
+    COMMAND "chmod" "777" "${CMAKE_SOURCE_DIR}/tmp/pat_${CMAKE_PROJECT_VERSION}/opt/Resources/OpenStudio-server/server/tmp"
+  )
+elseif(APPLE)
   # set(PAT_PRODUCT_FILE "${CMAKE_SOURCE_DIR}/tmp/ParametricAnalysisTool.app/Contents/MacOS/ParametricAnalysisTool")
   add_custom_target(PAT ALL
     COMMAND "${NPM_COMMAND}" install WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
@@ -54,7 +64,13 @@ elseif(WIN32)
   )
 endif()
 
-if(APPLE)
+
+if(UNIX AND NOT APPLE)
+  install(DIRECTORY "${CMAKE_SOURCE_DIR}/tmp/pat_${CMAKE_PROJECT_VERSION}" DESTINATION .
+    USE_SOURCE_PERMISSIONS
+    COMPONENT PAT
+  )
+elseif(APPLE)
   install(DIRECTORY "${CMAKE_SOURCE_DIR}/tmp/ParametricAnalysisTool.app" DESTINATION .
     USE_SOURCE_PERMISSIONS
     COMPONENT PAT
@@ -71,7 +87,12 @@ install(FILES "${CMAKE_SOURCE_DIR}/copyright.txt" DESTINATION .)
 
 set(CPACK_BINARY_IFW ON CACHE BOOL "Enable to build IFW packages")
 set(CPACK_PACKAGE_INSTALL_DIRECTORY "ParametricAnalysisTool-${PROJECT_VERSION}")
-if(APPLE)
+
+if(UNIX AND NOT APPLE)
+  set(CPACK_IFW_TARGET_DIRECTORY "/usr/local/${CPACK_PACKAGE_INSTALL_DIRECTORY}/")
+  set(CPACK_SET_DESTDIR ON)
+  set(CPACK_INSTALL_PREFIX "/usr/local/${CPACK_PACKAGE_INSTALL_DIRECTORY}/")
+elseif(APPLE)
   set(CPACK_IFW_TARGET_DIRECTORY "/Applications/${CPACK_PACKAGE_INSTALL_DIRECTORY}/")
   set(CPACK_BINARY_STGZ OFF CACHE BOOL "Enable to build STGZ packages")
   set(CPACK_BINARY_TGZ OFF CACHE BOOL "Enable to build TGZ packages")
