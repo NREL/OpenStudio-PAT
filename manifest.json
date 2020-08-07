@@ -81,7 +81,7 @@
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-f1b8acbc52-darwin.tar.gz",
+    "name": "OpenStudio-server-f1b8acbc52-patch-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"
