@@ -60,7 +60,7 @@
     "type": "mongo"
   }],
   "openstudio": [{
-    "name": "OpenStudio-3.1.0-rc2-Windows.tar.gz",
+    "name": "OpenStudio-3.1.0-rc3-Windows.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "openstudio"
