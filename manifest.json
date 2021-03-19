@@ -44,17 +44,17 @@
     "type": "ruby"
   }],
   "mongo": [{
-    "name": "mongodb-3.2.5-win32.tar.gz",
+    "name": "mongodb-4.4.2-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "mongo"
   }, {
-    "name": "mongodb-3.6.3-darwin.tar.gz",
+    "name": "mongodb-4.4.2-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "mongo"
   }, {
-    "name": "mongodb-3.6.3-linux.tar.gz",
+    "name": "mongodb-4.4.2-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "mongo"
