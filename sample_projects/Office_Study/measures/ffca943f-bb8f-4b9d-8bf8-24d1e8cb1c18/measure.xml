@@ -1,0 +1,123 @@
+<measure xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="http://bcl.nrel.gov/xsd/measures/version/1.0.xsd">
+ <schema_version>3.0</schema_version>
+ <name>add_rooftop_pv</name>
+ <uid>34550614-0c87-44db-9252-0ca0915b1e64</uid>
+ <version_id>ffca943f-bb8f-4b9d-8bf8-24d1e8cb1c18</version_id>
+ <version_modified>20161012T191957Z</version_modified>
+ <xml_checksum>178163B6</xml_checksum>
+ <class_name>AddRooftopPV</class_name>
+ <display_name>Add Rooftop PV</display_name>
+ <description>This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV</description>
+ <modeler_description>The fraction of surface containing PV will not only set the PV properties, but will also change the transmittance value for the shading surface. This allows the measure to avoid attempting to layout the panels. Simple PV will be used to model the PV.</modeler_description>
+ <arguments>
+  <argument>
+   <name>fraction_of_surface</name>
+   <display_name>Fraction of Surface Area with Active Solar Cells</display_name>
+   <units>fraction</units>
+   <type>Double</type>
+   <required>true</required>
+   <model_dependent>false</model_dependent>
+   <default_value>0.75</default_value>
+  </argument>
+  <argument>
+   <name>cell_efficiency</name>
+   <display_name>Cell Efficiency</display_name>
+   <units>fraction</units>
+   <type>Double</type>
+   <required>true</required>
+   <model_dependent>false</model_dependent>
+   <default_value>0.18</default_value>
+  </argument>
+  <argument>
+   <name>inverter_efficiency</name>
+   <display_name>Inverter Efficiency</display_name>
+   <units>fraction</units>
+   <type>Double</type>
+   <required>true</required>
+   <model_dependent>false</model_dependent>
+   <default_value>0.98</default_value>
+  </argument>
+ </arguments>
+ <tags>
+  <tag>Onsite Power Generation.Photovoltaic</tag>
+ </tags>
+ <attributes>
+  <attribute>
+   <name>Measure Type</name>
+   <value>ModelMeasure</value>
+   <datatype>string</datatype>
+  </attribute>
+  <attribute>
+   <name>Intended Software Tool</name>
+   <value>Apply Measure Now</value>
+   <datatype>string</datatype>
+  </attribute>
+  <attribute>
+   <name>Intended Software Tool</name>
+   <value>OpenStudio Application</value>
+   <datatype>string</datatype>
+  </attribute>
+  <attribute>
+   <name>Intended Software Tool</name>
+   <value>Parametric Analysis Tool</value>
+   <datatype>string</datatype>
+  </attribute>
+  <attribute>
+   <name>Intended Software Tool</name>
+   <value>Analysis Spreadsheet</value>
+   <datatype>string</datatype>
+  </attribute>
+  <attribute>
+   <name>Intended Use Case</name>
+   <value>Model Articulation</value>
+   <datatype>string</datatype>
+  </attribute>
+  <attribute>
+   <name>Intended Use Case</name>
+   <value>New Construction EE</value>
+   <datatype>string</datatype>
+  </attribute>
+  <attribute>
+   <name>Intended Use Case</name>
+   <value>Retrofit EE</value>
+   <datatype>string</datatype>
+  </attribute>
+ </attributes>
+ <files>
+  <file>
+   <filename>pv_test_input.osm</filename>
+   <filetype>osm</filetype>
+   <usage_type>test</usage_type>
+   <checksum>AB14A2B3</checksum>
+  </file>
+  <file>
+   <filename>os_lib_helper_methods.rb</filename>
+   <filetype>rb</filetype>
+   <usage_type>resource</usage_type>
+   <checksum>A6430141</checksum>
+  </file>
+  <file>
+   <filename>os_lib_schedules.rb</filename>
+   <filetype>rb</filetype>
+   <usage_type>resource</usage_type>
+   <checksum>C4185CAA</checksum>
+  </file>
+  <file>
+   <version>
+    <software_program>OpenStudio</software_program>
+    <identifier>1.9.0</identifier>
+    <min_compatible>1.9.0</min_compatible>
+   </version>
+   <filename>measure.rb</filename>
+   <filetype>rb</filetype>
+   <usage_type>script</usage_type>
+   <checksum>CF290DDF</checksum>
+  </file>
+  <file>
+   <filename>add_rooftop_pv_test.rb</filename>
+   <filetype>rb</filetype>
+   <usage_type>test</usage_type>
+   <checksum>039F06FA</checksum>
+  </file>
+ </files>
+</measure>

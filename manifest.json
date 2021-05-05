@@ -1,0 +1,94 @@
+{
+  "endpoint": "https://openstudio-resources.s3.amazonaws.com/pat-dependencies3/",
+  "energyplus": [{
+    "name": "EnergyPlus-9.5.0-win32.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "energyplus"
+  }, {
+    "name": "EnergyPlus-9.5.0-darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "energyplus"
+  }, {
+    "name": "EnergyPlus-9.5.0-linux.tar.gz",
+    "platform": "linux",
+    "arch": "x64",
+    "type": "energyplus"
+  }],
+  "perl": [{
+    "name": "perl-5.16.2-win32.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "perl"
+  }, {
+    "name": "ruby-5.16.2-darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "perl"
+  }],
+  "ruby": [{
+    "name": "ruby-2.7.2-win32.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "ruby"
+  }, {
+    "name": "ruby-2.7.2-darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "ruby"
+  }, {
+    "name": "ruby-2.7.2-linux.tar.gz",
+    "platform": "linux",
+    "arch": "x64",
+    "type": "ruby"
+  }],
+  "mongo": [{
+    "name": "mongodb-4.4.2-win32.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "mongo"
+  }, {
+    "name": "mongodb-4.4.2-darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "mongo"
+  }, {
+    "name": "mongodb-4.4.2-linux.tar.gz",
+    "platform": "linux",
+    "arch": "x64",
+    "type": "mongo"
+  }],
+  "openstudio": [{
+    "name": "OpenStudio-3.2.0-Windows.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "openstudio"
+  }, {
+    "name": "OpenStudio-3.2.0-Darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "openstudio"
+  }, {
+    "name": "OpenStudio-3.2.0-Linux.tar.gz",
+    "platform": "linux",
+    "arch": "x64",
+    "type": "OpenStudio"
+  }],
+  "openstudioServer": [{
+    "name": "OpenStudio-server-c7397ad3ca-win32.tar.gz",
+    "platform": "win32",
+    "arch": "x64",
+    "type": "OpenStudio-server"
+  }, {
+    "name": "OpenStudio-server-c7397ad3ca-darwin.tar.gz",
+    "platform": "darwin",
+    "arch": "x64",
+    "type": "OpenStudio-server"
+  }, {
+    "name": "OpenStudio-server-c7397ad3ca-linux.tar.gz",
+    "platform": "linux",
+    "arch": "x64",
+    "type": "OpenStudio-server"
+  }]
+}

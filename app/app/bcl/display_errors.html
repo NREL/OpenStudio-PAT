@@ -1,0 +1,13 @@
+<div class="modal-header">
+  <h3 class="modal-title" translate>bcl.displayErrors.title</h3>
+</div>
+
+<div class="modal-body">
+  <div ng-repeat="item in modal.errors" class="normal-text pad-bot-10">
+    <span class="bold" ng-class="{'red-text': item.type != 'warning', 'orange-text': item.type == 'warning'}">{{item.type.charAt(0).toUpperCase() + item.type.slice(1);}}</span> {{item.data}}
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
+</div>

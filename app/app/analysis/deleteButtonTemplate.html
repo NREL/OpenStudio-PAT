@@ -1,0 +1,6 @@
+<div ng-if="row.entity.specialRowId == 'optionDelete'">
+  <span class="badge black-badge margin-left-5 margin-right-5" ng-click="$event.preventDefault(); $event.stopPropagation();grid.appScope.analysis.deleteOption(col);">
+    <span class="glyphicon glyphicon-remove"></span>
+  </span>
+</div>
+<div ng-if="row.entity.specialRowId != 'optionDelete'" class="ui-grid-cell-contents" title="TOOLTIP">{{COL_FIELD}}</div>

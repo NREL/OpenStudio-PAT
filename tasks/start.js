@@ -1,67 +1,107 @@
 'use strict';
 
 var Q = require('q');
-var electron = require('electron-prebuilt');
-var pathUtil = require('path');
+var electron = require('electron');
+var path = require('path');
 var childProcess = require('child_process');
 var kill = require('tree-kill');
+var util = require('util');
+var conf = require('./conf');
 var utils = require('./utils');
+
+var env = utils.getEnvName();
 var watch;
 
-var gulpPath = pathUtil.resolve('./node_modules/.bin/gulp');
+var browserSync = require('browser-sync').create();
+var browserSyncSpa = require('browser-sync-spa');
+
+browserSync.use(browserSyncSpa({selector: '[ng-app]'}));
+function browserSyncInit(baseDir) {
+
+  var routes = null;
+  if (baseDir === conf.paths.src || (util.isArray(baseDir) && baseDir.indexOf(conf.paths.src) !== -1)) {
+    routes = {
+      '/bower_components': 'bower_components'
+    };
+  }
+
+  var server = {
+    baseDir: baseDir,
+    routes: routes
+  };
+
+  browserSync.init({
+    browser: 'default',
+    files: [
+      path.join(conf.paths.tmp, '/serve/app/index.css'),
+      path.join(conf.paths.tmp, '/serve/app/index.module.js'),
+      path.join(conf.paths.tmp, '/serve/app/templateCacheHtml.js')
+    ],
+    open: false,
+    server: server,
+    startPath: '/',
+    ui: false,
+    watchOptions: {
+      awaitWriteFinish: true,
+      ignoreInitial: true
+    }
+  });
+}
+
+var gulpPath = path.resolve('./node_modules/.bin/gulp');
 if (process.platform === 'win32') {
-    gulpPath += '.cmd';
+  gulpPath += '.cmd';
 }
 
 var runBuild = function () {
-    var deferred = Q.defer();
+  var deferred = Q.defer();
 
-    var build = childProcess.spawn(gulpPath, [
-        'build',
-        '--env=' + utils.getEnvName(),
-        '--color'
-    ], {
-        stdio: 'inherit'
-    });
+  var build = childProcess.spawn(gulpPath, [
+    'build',
+    '--env=' + env,
+    '--color'
+  ], {
+    stdio: 'inherit'
+  });
 
-    build.on('close', function (code) {
-        deferred.resolve();
-    });
+  build.on('close', function (/*code*/) {
+    deferred.resolve();
+  });
 
-    return deferred.promise;
+  return deferred.promise;
 };
 
 var runGulpWatch = function () {
-    watch = childProcess.spawn(gulpPath, [
-        'watch',
-        '--env=' + utils.getEnvName(),
-        '--color'
-    ], {
-        stdio: 'inherit'
-    });
+  watch = childProcess.spawn(gulpPath, [
+    'watch',
+    '--env=' + env,
+    '--color'
+  ], {
+    stdio: 'inherit'
+  });
 
-    watch.on('close', function (code) {
-        // Gulp watch exits when error occured during build.
-        // Just respawn it then.
-        runGulpWatch();
-    });
+  watch.on('close', function (/*code*/) {
+    // Gulp watch exits when error occurred during build.
+    // Just respawn it then.
+    runGulpWatch();
+  });
 };
 
 var runApp = function () {
-    var app = childProcess.spawn(electron, ['./build'], {
-        stdio: 'inherit'
-    });
+  if (env == 'development') browserSyncInit([path.join(conf.paths.tmp, '/serve'), conf.paths.src]);
+  var app = childProcess.spawn(electron, ['./build'], {
+    stdio: 'inherit'
+  });
 
-    app.on('close', function (code) {
-        // User closed the app. Kill the host process.
-        kill(watch.pid, 'SIGKILL', function () {
-            process.exit();
-        });
+  app.on('close', function (/*code*/) {
+    // User closed the app. Kill the host process.
+    kill(watch.pid, 'SIGKILL', function () {
+      process.exit();
     });
+  });
 };
 
-runBuild()
-.then(function () {
-    //runGulpWatch();
-    runApp();
+runBuild().then(function () {
+  runGulpWatch();
+  runApp();
 });

@@ -1,13 +1,15 @@
 <!doctype html>
-<html ng-app="102Es6" ng-strict-di>
+<html ng-app="PAT" ng-strict-di>
   <head>
     <meta charset="utf-8">
-    <title>102Es6</title>
+    <title>ParametricAnalysisTool</title>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width">
-    <!-- Place favicon.ico and apple-touch-icon.png in the root directory -->
-
     <!-- build:css({.tmp/serve,src}) styles/vendor.css -->
+    <!-- inject:bootstrap -->
+    <!-- bootstrap css files will be automatically insert here -->
+    <!-- endinject -->
     <!-- bower:css -->
     <!-- run `gulp inject` to automatically populate bower styles dependencies -->
     <!-- endbower -->
@@ -20,11 +22,9 @@
     <!-- endbuild -->
   </head>
   <body>
-    <!--[if lt IE 10]>
-      <p class="browsehappy">You are using an <strong>outdated</strong> browser. Please <a href="http://browsehappy.com/">upgrade your browser</a> to improve your experience.</p>
-    <![endif]-->
-
-    <div ui-view></div>
+    <nav ng-include="'app/nav/nav.html'"></nav>
+    <main ui-view class="container-fluid" style="margin-left:41px;"></main>
+    <footer ng-include="'app/status_bar/statusBar.html'"></footer>
 
     <!-- build:js(src) scripts/vendor.js -->
     <!-- bower:js -->
@@ -33,9 +33,15 @@
     <!-- endbuild -->
 
     <!-- build:js({.tmp/serve,.tmp/partials}) scripts/app.js -->
+    <!-- inject:browsersync -->
+    <!-- browsersync_helper will be added if env is development -->
+    <!-- endinject -->
+
     <!-- inject:js -->
     <!-- js files will be automatically insert here -->
     <!-- endinject -->
+
+    <script type="text/javascript" src="https://unpkg.com/default-passive-events"/>
 
     <!-- inject:partials -->
     <!-- angular templates will be automatically converted in js and inserted here -->

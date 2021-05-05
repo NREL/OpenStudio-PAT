@@ -1,0 +1,459 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Something</title>
+  <meta http-equiv="X-UA-Compatible" content="IE=edge"/>
+  <meta name="description" content="">
+  <meta name="viewport" content="width=device-width">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/lodash.js/4.17.2/lodash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/angular.js/1.5.8/angular.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.min.js"></script>
+</head>
+<body>
+
+<div ng-app="myApp">
+
+  <div ng-controller="MyAppCtrl">
+
+    <h1>End Use Comparison</h1>
+
+    <ul>
+      <li class="alert alert-warning" ng-repeat="warn in renderWarns">{{ warn }}</li>
+    </ul>
+
+    <h2>Electricity Consumption (kWh)</h2>
+
+    <d3ng-stackedenduse data="elecEndUseData"></d3ng-stackedenduse>
+
+    <h2>Natural Gas Consumption (therms)</h2>
+
+    <d3ng-stackedenduse data="gasEndUseData"></d3ng-stackedenduse>
+
+  </div>
+
+</div>
+
+<script type="text/javascript">
+
+  console.info("Loaded End Use Comparison.html script");
+
+  var myApp = angular.module('myApp', []);
+
+  myApp.controller('MyAppCtrl', function ($scope) {
+
+    // Create a CSV of the standard data
+    $scope.elecEndUseData = [];
+    $scope.gasEndUseData = [];
+    console.debug('In the controller');
+
+    // Show any issues
+    $scope.renderWarns = [];
+
+
+    // gather data for Algorithmic analysis
+    var algorithmic = null;
+    var max_plot = 50;
+    $scope.setupAfterAlgorithmicResultsAvailable = function () {
+
+      var renderWarns = [];
+      if ( $scope.algorithm_results.length > 0 || $scope.algorithm_metadata.length > 0 ) {
+        algorithmic = true;
+        renderWarns.push("This report will only work with Analysis Type = Manual.");
+        $scope.renderWarns = renderWarns;
+        return;
+
+        // this report is only legible up to about 50 datapoints.
+        // not with the trouble for user to even setup all the end use output variables
+        // I have disabled it for algorithmic for now but if warning and return above are removed it will still run
+
+        // limit datapoints to max_plot (+ 1 used in if statement and -1 message because of empty last object in algorithmic_results
+        if ($scope.algorithm_results.length > max_plot + 1) {
+          renderWarns.push("Ony plotting " + max_plot + " algorithmic datapoints out of " + ($scope.algorithm_results.length - 1) + ".");
+          $scope.algorithm_results = $scope.algorithm_results.slice(0,max_plot)
+        }
+
+        // Populate arrays of data for electricity and gas by end use
+        var fuels = ['end_use_electricity_', 'end_use_natural_gas_'];
+        _.forEach(fuels, function (fuel) {
+
+          var elecEndUseDataColsKeys = [
+            "Heating",
+            "Cooling",
+            "Interior Lighting",
+            "Exterior Lighting",
+            "Interior Equipment",
+            "Exterior Equipment",
+            "Fans",
+            "Pumps",
+            "Heat Rejection",
+            "Humidification",
+            "Heat Recovery",
+            "Water Systems",
+            "Refrigeration",
+            "Generators"
+          ];
+          var newData = [];
+
+          // Set the energy results properties of each run
+          _.forEach($scope.algorithm_results, function (run) {
+
+            if (run.name === "") {
+              return;
+            }
+
+            // warn and skip of datapoint is missing openstudio_results
+            if (!(run.hasOwnProperty('openstudio_results.total_site_eui'))){
+              renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Populate an object with the end use data
+            var data = {};
+            data.name = run.name;
+            var tot = 0.0;
+            _.forEach(elecEndUseDataColsKeys, function (key) {
+              // Define the data header
+              var header = key.toLowerCase().replace(' ', '_');
+              var lookup = "openstudio_results." + fuel + header;
+              var val =  parseFloat(run[lookup]);
+              data[header] = val;
+              console.log('What is the problem still: ', run.name + fuel + header + val);
+              tot += val;
+            });
+            data.total = tot;
+
+            newData.push(data);
+
+          });
+
+          console.log('finish fuel: ', fuel);
+
+          // Add this datapoint to the overall set
+          //$scope.elecEndUseData.push(data);
+          switch (fuel){
+            case 'end_use_electricity_':
+              $scope.elecEndUseData = newData;
+
+            case 'end_use_natural_gas_':
+              $scope.gasEndUseData = newData;
+          }
+
+        });
+
+        console.log('finish both fuels?');
+
+        // Show a unique set of warnings  (dup ng-repeat)
+        _.forEach(_.uniq(renderWarns), (warn) => {
+          $scope.renderWarns.push(warn);
+        });
+        $scope.renderWarns = _.uniq($scope.renderWarns);
+      }
+    };
+
+    // Set up some additional data properties after the results
+    // are passed in.
+    $scope.setupAfterResultsAvailable = function () {
+
+
+      if (algorithmic) {
+        return;
+      } else {
+
+        var renderWarns = [];
+
+        console.debug('In setupAfterResultsAvailable');
+
+        // Populate arrays of data for electricity and gas by end use
+        var fuels = ['end_use_electricity_', 'end_use_natural_gas_'];
+        _.forEach(fuels, function (fuel) {
+
+          var elecEndUseDataColsKeys = [
+            "Heating",
+            "Cooling",
+            "Interior Lighting",
+            "Exterior Lighting",
+            "Interior Equipment",
+            "Exterior Equipment",
+            "Fans",
+            "Pumps",
+            "Heat Rejection",
+            "Humidification",
+            "Heat Recovery",
+            "Water Systems",
+            "Refrigeration",
+            "Generators"
+          ]
+          var newData = [];
+          _.forEach($scope.results, function (run) {
+
+            // Get the OpenStudio Results measure, which contains the results
+            var reportMeasure = null;
+            _(run.steps).forEach(function (step) {
+              if (step.hasOwnProperty('result')) {
+                if (step.result.measure_uid == "a25386cd-60e4-46bc-8b11-c755f379d916") {
+                  reportMeasure = step;
+                }
+              }
+            });
+            if (!reportMeasure) {
+              renderWarns.push("The OpenStudio Results measure was not included in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Make sure the results exist
+            if (!reportMeasure.hasOwnProperty('result')){
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Make sure the results have data
+            var vals = reportMeasure.result.step_values;
+            if (vals.length == 0){
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Make sure the EUI element exists to ensure measure was run
+            if (!_.find(vals, {'name': "eui"})) {
+              renderWarns.push("The OpenStudio Results measure was not run in " + run.name + ", cannot show results.");
+              return;
+            }
+
+            // Populate an object with the end use data
+            var data = {};
+            data.name = run.name;
+            var tot = 0.0;
+            _.forEach(elecEndUseDataColsKeys, function (key) {
+              // Define the data header
+              var header = key.toLowerCase().replace(' ', '_');
+              var lookup = fuel + header;
+              var val = _.find(vals, {'name': lookup}).value;
+              data[header] = val;
+              tot += val;
+            });
+            data.total = tot;
+
+            newData.push(data);
+
+          });
+
+          // Add this datapoint to the overall set
+          //$scope.elecEndUseData.push(data);
+          switch (fuel){
+            case 'end_use_electricity_':
+              $scope.elecEndUseData = newData;
+
+            case 'end_use_natural_gas_':
+              $scope.gasEndUseData = newData;
+          }
+
+        });
+
+        // Show a unique set of warnings  (no dup ng-repeat)
+        _.forEach(_.uniq(renderWarns), (warn) => {
+          $scope.renderWarns.push(warn);
+        });
+        $scope.renderWarns = _.uniq($scope.renderWarns);
+      }
+    };
+  });
+
+  // Angular directive to create a stacked bar chart
+  // comparing the end uses across models.
+  myApp.directive('d3ngStackedenduse', function () {
+
+    // constants
+    var total_width = 960;
+    var total_height = 500;
+
+    var margin = {top: 20, right: 120, bottom: 60, left: 40},
+      width = total_width - margin.left - margin.right,
+      height = total_height - margin.top - margin.bottom;
+
+    return {
+      restrict: 'E',
+      terminal: true,
+      scope: {
+        data: '='
+      },
+      link: function (scope, element, attrs) {
+
+        scope.$watch('data', function (newData, oldData) {
+
+          console.debug('In the directive');
+
+          var data = newData;
+
+          // return nothing if the data isn't available yet
+          if (data.length == 0) {
+            console.info("Data is not ready yet, not creating a chart.");
+            return;
+          }
+
+          // set up initial svg object
+          var svg = d3.select(element[0])
+            .append("svg")
+            .attr("width", total_width)
+            .attr("height", total_height);
+
+          var g = svg.append("g").attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+          var x = d3.scaleBand()
+            .rangeRound([0, width])
+            .padding(0.1)
+            .align(0.1);
+
+          var y = d3.scaleLinear()
+            .rangeRound([height, 0]);
+
+          var z = d3.scaleOrdinal()
+            .range(["#EF1C21", "#0071BD", "#F7DF10", "#DEC310", "#4A4D4A", "#B5B2B5", "#FF79AD", "#632C94", "#F75921", "#293094", "#CE5921", "#FFB239", "#29AAE7", "#8CC739"]);
+
+          // TODO figure out how to get these out dynamically
+          var stackKeys = [
+            "heating",
+            "cooling",
+            "interior_lighting",
+            "exterior_lighting",
+            "interior_equipment",
+            "exterior_equipment",
+            "fans",
+            "pumps",
+            "heat_rejection",
+            "humidification",
+            "heat_recovery",
+            "water_systems",
+            "refrigeration",
+            "generators"
+          ]
+
+          var stack = d3.stack()
+            .keys(stackKeys)
+            .order(d3.stackOrderReverse)
+            .offset(d3.stackOffsetNone);
+
+          var series = stack(data);
+
+          x.domain(data.map(function (d) {
+            return d.name;
+          }));
+          y.domain([0, d3.max(data, function (d) {
+            return d.total;
+          })]).nice();
+          z.domain(stackKeys);
+
+          g.selectAll(".serie")
+            .data(series)
+            .enter().append("g")
+            .attr("class", "serie")
+            .attr("fill", function (d) {
+              return z(d.key);
+            })
+            .selectAll("rect")
+            .data(function (d) {
+              return d;
+            })
+            .enter().append("rect")
+            .attr("x", function (d) {
+              return x(d.data.name);
+            })
+            .attr("y", function (d) {
+              return y(d[1]);
+            })
+            .attr("height", function (d) {
+              return y(d[0]) - y(d[1]);
+            })
+            .attr("width", x.bandwidth());
+
+          g.append("g")
+            .attr("class", "axis axis--x")
+            .attr("transform", "translate(0," + height + ")")
+            .call(d3.axisBottom(x));
+
+          // rotate text on x axis
+          g.selectAll(".axis--x text")
+            .attr("transform", function (d) {
+              return "translate(" + this.getBBox().height * -2 + "," + this.getBBox().height + ")rotate(-45)";
+            });
+
+          g.append("g")
+            .attr("class", "axis axis--y")
+            .call(d3.axisLeft(y).ticks(10, "s"))
+            .append("text")
+            .attr("x", 2)
+            .attr("y", y(y.ticks(10).pop()))
+            .attr("dy", "0.35em")
+            .attr("text-anchor", "start")
+            .attr("fill", "#000")
+
+          var legend = g.selectAll(".legend")
+            .data(stackKeys)
+            .enter().append("g")
+            .attr("class", "legend")
+            .attr("transform", function (d, i) {
+              return "translate(30," + i * 20 + ")";
+            })
+            .style("font", "10px sans-serif");
+
+          legend.append("rect")
+            .attr("x", width - 24)
+            .attr("width", 18)
+            .attr("height", 18)
+            .attr("fill", z);
+
+          legend.append("text")
+            .attr("x", width)
+            .attr("y", 9)
+            .attr("dy", ".35em")
+            .attr("text-anchor", "start")
+            .text(function (d) {
+              return d.replace('_', ' ');
+            });
+
+        });
+
+      }
+    }
+  });
+
+  // set $scope.reportDir element in the report's controller from PAT project directory
+  function setReportDir(reportDir) {
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    console.log("Inside setReportDir");
+    $scope.$apply(function () {
+      console.log("reportDir = " + reportDir);
+      $scope.reportDir = reportDir;
+    });
+  }
+
+  // set $scope.results element in the controller above from PAT data
+  function setData(data) {
+    console.log('Setting results variable to: ', data);
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    $scope.$apply(function () {
+      $scope.results = data;
+      console.debug('In setData');
+      $scope.setupAfterResultsAvailable();
+    });
+  }
+
+  function setAlgorithmicData(metadata, results) {
+    console.log('Setting algorithmic results variable to: ', results);
+    var controllerElement = document.querySelector('div[ng-controller="MyAppCtrl"]');
+    var $scope = angular.element(controllerElement).scope();
+    $scope.$apply(function () {
+      $scope.algorithm_results = results;
+      $scope.algorithm_metadata = metadata;
+      $scope.setupAfterAlgorithmicResultsAvailable();
+    });
+  }
+
+
+</script>
+
+</body>
+</html>

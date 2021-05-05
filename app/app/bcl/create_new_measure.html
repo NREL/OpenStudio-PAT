@@ -1,0 +1,59 @@
+<div class="modal-header">
+  <h3 class="modal-title" translate>bcl.createNewMeasure.title</h3>
+</div>
+
+<div class="modal-body">
+  <div class="row pad-bot-10">
+    <div class="col-sm-12">
+      <label class="normal-text" for="displayName" translate>bcl.createNewMeasure.name</label>
+      <input class="form-control" type="text" id="displayName" ng-model="modal.newDisplayName">
+    </div>
+  </div>
+  <div class="row pad-bot-10">
+    <div class="col-sm-12">
+      <label class="normal-text" for="desc" translate>bcl.createNewMeasure.description</label>
+      <textarea class="form-control"  id="desc" ng-model="modal.newDescription"></textarea>
+    </div>
+  </div>
+  <div class="row pad-bot-10">
+    <div class="col-sm-12">
+      <label class="normal-text" id="modelerDesc" translate>bcl.createNewMeasure.modelerDescription</label>
+      <textarea class="form-control" id="modelerDesc" ng-model="modal.newModelerDescription"></textarea>
+    </div>
+  </div>
+  <div class="row pad-bot-10">
+    <div class="col-sm-12">
+      <label class="normal-text" for="measureType" translate>bcl.createNewMeasure.measureType</label>
+      <select id="measureType" class="form-control"
+              ng-options="type for type in modal.measureTypes"
+              ng-model="modal.measureType"></select>
+    </div>
+  </div>
+  <div class="row">
+    <div class="col-sm-6">
+      <label class="normal-text" for="taxonomy" translate>bcl.createNewMeasure.taxonomy</label>
+    </div>
+  </div>
+  <div class="row pad-bot-20">
+    <div class="col-sm-6">
+      <select id="taxonomy" class="form-control"
+              ng-options="taxonomy for taxonomy in modal.taxonomies"
+              ng-change="modal.getTaxonomyChildren(modal.taxonomy)"
+              ng-model="modal.taxonomy"></select>
+      </div>
+    <div class="col-sm-6">
+      <select class="form-control"
+              ng-options="child for child in modal.$scope.children"
+              ng-change="modal.makeMeasureTags()"
+              ng-model="modal.$scope.child"></select>
+
+    </div>
+  </div>
+</div>
+
+<div class="modal-footer">
+  <button type="button" class="btn btn-primary" ng-click="modal.ok()" ng-disabled="modal.newDisplayName.length==0"
+          translate>bcl.createNewMeasure.createMeasure
+  </button>
+  <button type="button" class="btn btn-warning" ng-click="modal.cancel()">Cancel</button>
+</div>

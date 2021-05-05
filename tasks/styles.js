@@ -4,29 +4,29 @@ var path = require('path');
 var gulp = require('gulp');
 var conf = require('./conf');
 
-//var browserSync = require('browser-sync');
-
 var $ = require('gulp-load-plugins')();
 
 var wiredep = require('wiredep').stream;
-var _ = require('lodash');
 
-gulp.task('styles', function() {
+gulp.task('styles', function () {
   return buildStyles();
 });
 
-var buildStyles = function() {
+var buildStyles = function () {
   var sassOptions = {
-    style: 'expanded'
+    outputStyle: 'expanded',
+    precision: 8
   };
 
   var injectFiles = gulp.src([
     path.join(conf.paths.src, '/app/**/*.scss'),
-    path.join('!' + conf.paths.src, '/app/index.scss')
-  ], { read: false });
+    path.join('!' + conf.paths.src, '/app/bootstrap.scss'),
+    path.join('!' + conf.paths.src, '/app/index.scss'),
+    path.join('!' + conf.paths.src, '/app/styles/**/*')
+  ], {read: false});
 
   var injectOptions = {
-    transform: function(filePath) {
+    transform: function (filePath) {
       filePath = filePath.replace(conf.paths.src + '/app/', '');
       return '@import "' + filePath + '";';
     },
@@ -35,15 +35,26 @@ var buildStyles = function() {
     addRootSlash: false
   };
 
+  var bootstrapFilter = $.filter('**/bootstrap.scss', {restore: true});
+  var indexFilter = $.filter('**/index.scss', {restore: true});
 
   return gulp.src([
-    path.join(conf.paths.src, '/app/index.scss')
-  ])
-    .pipe($.inject(injectFiles, injectOptions))
-    .pipe(wiredep(_.extend({}, conf.wiredep)))
-    .pipe($.sourcemaps.init())
+      path.join(conf.paths.src, '/app/bootstrap.scss'),
+      path.join(conf.paths.src, '/app/index.scss')
+    ])
+    .pipe(bootstrapFilter)
+    .pipe(wiredep(conf.wiredep))
     .pipe($.sass(sassOptions)).on('error', conf.errorHandler('Sass'))
-    .pipe($.autoprefixer()).on('error', conf.errorHandler('Autoprefixer'))
+    .pipe(bootstrapFilter.restore)
+    .pipe(indexFilter)
+    .pipe($.sourcemaps.init())
+    .pipe($.inject(injectFiles, injectOptions))
+    .pipe($.sass(sassOptions)).on('error', conf.errorHandler('Sass'))
+    .pipe($.autoprefixer({
+      browsers: ['last 2 Chrome versions'],
+      cascade: false
+    })).on('error', conf.errorHandler('Autoprefixer'))
     .pipe($.sourcemaps.write())
+    .pipe(indexFilter.restore)
     .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app/')));
 };

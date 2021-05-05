@@ -1,0 +1,139 @@
+<measure>
+  <schema_version>3.0</schema_version>
+  <name>add_monthly_json_utility_data</name>
+  <uid>6da969e0-4256-49bf-9607-26504cc3d423</uid>
+  <version_id>cb687d6c-6ee1-4488-800b-8bdce34214ce</version_id>
+  <version_modified>20170320T192149Z</version_modified>
+  <xml_checksum>9064277D</xml_checksum>
+  <class_name>AddMonthlyJSONUtilityData</class_name>
+  <display_name>AddMonthlyJSONUtilityData</display_name>
+  <description>Reads in json format and adds utility data</description>
+  <modeler_description>Minimum interval for utility data is one day</modeler_description>
+  <arguments>
+    <argument>
+      <name>json</name>
+      <display_name>Path to JSON</display_name>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+    </argument>
+    <argument>
+      <name>variable_name</name>
+      <display_name>Variable name</display_name>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Electric Bill</default_value>
+    </argument>
+    <argument>
+      <name>fuel_type</name>
+      <display_name>Fuel Type</display_name>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>Electricity</default_value>
+    </argument>
+    <argument>
+      <name>consumption_unit</name>
+      <display_name>Consumption Unit</display_name>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>kWh</default_value>
+    </argument>
+    <argument>
+      <name>data_key_name</name>
+      <display_name>data key name</display_name>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>tot_kwh</default_value>
+    </argument>
+    <argument>
+      <name>start_date</name>
+      <display_name>Start date</display_name>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+    </argument>
+    <argument>
+      <name>end_date</name>
+      <display_name>End date</display_name>
+      <type>String</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+    </argument>
+    <argument>
+      <name>remove_existing_data</name>
+      <display_name>remove existing Utility Bill data</display_name>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>false</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>set_runperiod</name>
+      <display_name>Set RunPeriod in model</display_name>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>false</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+  </arguments>
+  <outputs/>
+  <provenances/>
+  <tags>
+    <tag>Economics.Life Cycle Cost Analysis</tag>
+  </tags>
+  <attributes>
+    <attribute>
+      <name>Measure Type</name>
+      <value>ModelMeasure</value>
+      <datatype>string</datatype>
+    </attribute>
+    <attribute>
+      <name>Uses SketchUp API</name>
+      <value>false</value>
+      <datatype>boolean</datatype>
+    </attribute>
+  </attributes>
+  <files>
+    <file>
+      <filename>AddMonthlyJSONUtilityData_Test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>E0E8A1D9</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.3.3</identifier>
+        <min_compatible>1.3.3</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>895FF86A</checksum>
+    </file>
+  </files>
+</measure>

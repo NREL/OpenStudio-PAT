@@ -1,0 +1,26 @@
+stages:
+  - build
+
+cache:
+  paths:
+    - app/node_modules/
+    - bower_components/
+    - node_modules/
+
+build:mac:
+  stage: build
+  tags:
+    - mac
+  before_script:
+    - npm install
+    - npm run bower
+  script:
+    - npm run release
+
+build:windows:
+  stage: build
+  tags:
+    - windows
+  script:
+    - node C:\ci-utilities\cli.js install-dependencies .
+    - npm run release

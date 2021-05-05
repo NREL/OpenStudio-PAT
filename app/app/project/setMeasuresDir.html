@@ -1,0 +1,22 @@
+<div class="modal-header">
+  <h3 class="modal-title" translate>setMeasuresDir.title</h3>
+</div>
+
+<div class="modal-body">
+  <div class="row pad-bot-20">
+    <div class="col-sm-12 modal-text" >
+      <label class="medium-label" translate>setMeasuresDir.measuresDir</label>
+      <div class="input-group">
+        <input type="text" disabled="true" class="form-control"  ng-model="currentDir" />
+        <span class="input-group-btn">
+        <button class="btn btn-default" type="button" ng-click="modal.selectDir()"><span class="glyphicon glyphicon-folder-open"></span></button>
+      </span>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal-footer">
+    <button type="button" class="btn btn-primary" ng-click="modal.ok()" translate>OK</button>
+    <button type="button" class="btn btn-warning" ng-click="modal.cancel()" translate>Cancel</button>
+  </div>
+</div>

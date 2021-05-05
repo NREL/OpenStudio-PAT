@@ -1,0 +1,23 @@
+<div class="ui-grid-cell-contents">
+  <div ng-if="row.entity.location != 'bcl'">
+    <div class="btn-group" dropdown>
+      <button type="button" class="btn btn-xs btn-default dropdown-toggle" aria-haspopup="true" aria-expanded="false">
+        <span class="glyphicon glyphicon-pencil library-grid-button" aria-label="Editing Options"></span>
+        <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu" role="menu">
+        <li ng-if="row.entity.location == 'my'">
+          <a ng-href="" ng-click="grid.appScope.modal.editMeasure(row.entity);" translate>bcl.edit</a>
+        </li>
+        <li>
+          <a ng-href="" ng-click="grid.appScope.modal.copyAndEditMeasure(row.entity); $event.stopPropagation();" translate>bcl.editAndCopy</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <div ng-if="row.entity.location == 'bcl'">
+    <span class="glyphicon glyphicon-download library-grid-button" aria-hidden="true" aria-label="Download Measure from BCL"></span>
+  </div>
+</div>
+
+

@@ -1,0 +1,869 @@
+{
+  "analysis": {
+    "display_name": "Office_Study",
+    "name": "Office_Study",
+    "output_variables": [
+      {
+        "objective_function": true,
+        "objective_function_index": 0,
+        "objective_function_target": 0,
+        "objective_function_group": null,
+        "scaling_factor": null,
+        "display_name": "net_site_energy",
+        "display_name_short": "net_site_energy",
+        "metadata_id": null,
+        "name": "OpenStudioResults.net_site_energy",
+        "visualize": true,
+        "export": true,
+        "variable_type": "double"
+      }
+    ],
+    "problem": {
+      "workflow": [
+        {
+          "name": "create_doe_prototype_building",
+          "display_name": "Create DOE Prototype Building",
+          "measure_type": "RubyMeasure",
+          "measure_definition_class_name": "CreateDOEPrototypeBuilding",
+          "measure_definition_directory": "./measures/2c6d68ea-2acb-4774-85ab-d77de08d77bd",
+          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_Study/measures/2c6d68ea-2acb-4774-85ab-d77de08d77bd",
+          "measure_definition_display_name": "Create DOE Prototype Building",
+          "measure_definition_name": "create_doe_prototype_building",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "be90fd0b-a651-467a-bc8d-29d310b0f937",
+          "measure_definition_version_uuid": "3e572e0e-1ce2-4019-96cb-f7d4c72abf06",
+          "uuid": "be90fd0b-a651-467a-bc8d-29d310b0f937",
+          "version_uuid": "3e572e0e-1ce2-4019-96cb-f7d4c72abf06",
+          "description": "Creates the DOE Reference Building Models as starting points for other analyses.",
+          "taxonomy": "Whole Building.Space Types",
+          "arguments": [
+            {
+              "display_name": "Template.",
+              "display_name_short": "template",
+              "name": "template",
+              "value_type": "string",
+              "default_value": "90.1-2010",
+              "value": "90.1-2010"
+            },
+            {
+              "display_name": "Climate Zone.",
+              "display_name_short": "climate_zone",
+              "name": "climate_zone",
+              "value_type": "string",
+              "default_value": "ASHRAE 169-2006-2A",
+              "value": "ASHRAE 169-2006-5B"
+            },
+            {
+              "display_name": "Climate File (NECB only)",
+              "display_name_short": "epw_file",
+              "name": "epw_file",
+              "value_type": "string",
+              "default_value": "Not Applicable",
+              "value": "Not Applicable"
+            }
+          ],
+          "variables": [
+            {
+              "argument": {
+                "display_name": "Building Type.",
+                "display_name_short": "building_type",
+                "name": "building_type",
+                "value_type": "string",
+                "default_value": "SmallOffice",
+                "value": "SmallOffice",
+                "choice_display_names": [
+                  "SecondarySchool",
+                  "PrimarySchool",
+                  "SmallOffice",
+                  "MediumOffice",
+                  "LargeOffice",
+                  "SmallHotel",
+                  "LargeHotel",
+                  "Warehouse",
+                  "RetailStandalone",
+                  "RetailStripmall",
+                  "QuickServiceRestaurant",
+                  "FullServiceRestaurant",
+                  "MidriseApartment",
+                  "HighriseApartment",
+                  "Hospital",
+                  "Outpatient"
+                ]
+              },
+              "display_name": "Building Type.",
+              "display_name_short": "building_type",
+              "variable_type": "pivot",
+              "units": "",
+              "minimum": "SmallOffice",
+              "maximum": "SmallOffice",
+              "static_value": "SmallOffice",
+              "uuid": "",
+              "version_uuid": "",
+              "pivot": true,
+              "uncertainty_description": {
+                "type": "discrete",
+                "attributes": [
+                  {
+                    "name": "discrete",
+                    "values_and_weights": [
+                      {
+                        "value": "SmallOffice",
+                        "weight": 0.2
+                      },
+                      {
+                        "value": "MediumOffice",
+                        "weight": 0.2
+                      },
+                      {
+                        "value": "SecondarySchool",
+                        "weight": 0.2
+                      },
+                      {
+                        "value": "RetailStripmall",
+                        "weight": 0.2
+                      },
+                      {
+                        "value": "MidriseApartment",
+                        "weight": 0.2
+                      }
+                    ]
+                  },
+                  {
+                    "name": "lower_bounds",
+                    "value": "SmallOffice"
+                  },
+                  {
+                    "name": "upper_bounds",
+                    "value": "SmallOffice"
+                  },
+                  {
+                    "name": "modes",
+                    "value": "SmallOffice"
+                  },
+                  {
+                    "name": "delta_x",
+                    "value": "SmallOffice"
+                  },
+                  {
+                    "name": "stddev",
+                    "value": "SmallOffice"
+                  }
+                ]
+              },
+              "workflow_index": 0
+            }
+          ],
+          "workflow_index": 0
+        },
+        {
+          "name": "reduce_lighting_loads_by_percentage",
+          "display_name": "Reduce Lighting Loads by Percentage",
+          "measure_type": "RubyMeasure",
+          "measure_definition_class_name": "ReduceLightingLoadsByPercentage",
+          "measure_definition_directory": "./measures/5f7379ac-ef47-4415-a5a0-4ae44a65c463",
+          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_Study/measures/5f7379ac-ef47-4415-a5a0-4ae44a65c463",
+          "measure_definition_display_name": "Reduce Lighting Loads by Percentage",
+          "measure_definition_name": "reduce_lighting_loads_by_percentage",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "d37b7ed5-887a-4d1f-b304-259462eadbe9",
+          "measure_definition_version_uuid": "be97fedc-0d2f-4d4e-a548-f39d2b0b986b",
+          "uuid": "d37b7ed5-887a-4d1f-b304-259462eadbe9",
+          "version_uuid": "be97fedc-0d2f-4d4e-a548-f39d2b0b986b",
+          "description": "The lighting system in this building uses more power per area than is required with the latest lighting technologies.  Replace the lighting system with a newer, more efficient lighting technology.  Newer technologies provide the same amount of light but use less energy in the process.",
+          "taxonomy": "Electric Lighting.Lighting Equipment",
+          "arguments": [
+            {
+              "display_name": "Apply the Measure to a Specific Space Type or to the Entire Model.",
+              "display_name_short": "space_type",
+              "name": "space_type",
+              "value_type": "string",
+              "default_value": "*Entire Building*",
+              "value": "*Entire Building*"
+            },
+            {
+              "display_name": "Increase in Material and Installation Cost for Lighting per Floor Area (%).",
+              "display_name_short": "material_and_installation_cost",
+              "name": "material_and_installation_cost",
+              "value_type": "double",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "Increase in Demolition Costs for Lighting per Floor Area (%).",
+              "display_name_short": "demolition_cost",
+              "name": "demolition_cost",
+              "value_type": "double",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "Years Until Costs Start (whole years).",
+              "display_name_short": "years_until_costs_start",
+              "name": "years_until_costs_start",
+              "value_type": "integer",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "Demolition Costs Occur During Initial Construction?",
+              "display_name_short": "demo_cost_initial_const",
+              "name": "demo_cost_initial_const",
+              "value_type": "boolean",
+              "default_value": false,
+              "value": false
+            },
+            {
+              "display_name": "Expected Life (whole years).",
+              "display_name_short": "expected_life",
+              "name": "expected_life",
+              "value_type": "integer",
+              "default_value": 15,
+              "value": 15
+            },
+            {
+              "display_name": "Increase O & M Costs for Lighting per Floor Area (%).",
+              "display_name_short": "om_cost",
+              "name": "om_cost",
+              "value_type": "double",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "O & M Frequency (whole years).",
+              "display_name_short": "om_frequency",
+              "name": "om_frequency",
+              "value_type": "integer",
+              "default_value": 1,
+              "value": 1
+            }
+          ],
+          "variables": [
+            {
+              "argument": {
+                "display_name": "Lighting Power Reduction (%).",
+                "display_name_short": "lighting_power_reduction_percent",
+                "name": "lighting_power_reduction_percent",
+                "value_type": "double",
+                "default_value": 30,
+                "value": 30
+              },
+              "display_name": "Lighting Power Reduction (%).",
+              "display_name_short": "lighting_power_reduction_percent",
+              "variable_type": "variable",
+              "units": "",
+              "minimum": 0,
+              "maximum": 60,
+              "static_value": 30,
+              "uuid": "",
+              "version_uuid": "",
+              "variable": true,
+              "uncertainty_description": {
+                "type": "discrete",
+                "attributes": [
+                  {
+                    "name": "discrete",
+                    "values_and_weights": [
+                      {
+                        "value": 0,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 30,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 60,
+                        "weight": 0.33
+                      }
+                    ]
+                  },
+                  {
+                    "name": "lower_bounds",
+                    "value": 0
+                  },
+                  {
+                    "name": "upper_bounds",
+                    "value": 60
+                  },
+                  {
+                    "name": "modes",
+                    "value": 30
+                  },
+                  {
+                    "name": "delta_x",
+                    "value": 30
+                  },
+                  {
+                    "name": "stddev",
+                    "value": 10
+                  }
+                ]
+              },
+              "workflow_index": 0
+            }
+          ],
+          "workflow_index": 1
+        },
+        {
+          "name": "reduce_electric_equipment_loads_by_percentage_diag",
+          "display_name": "Reduce Electric Equipment Loads by Percentage",
+          "measure_type": "RubyMeasure",
+          "measure_definition_class_name": "ReduceElectricEquipmentLoadsByPercentageDiag",
+          "measure_definition_directory": "./measures/ReduceElectricEquipmentLoadsByPercentageDiag",
+          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_Study/measures/ReduceElectricEquipmentLoadsByPercentageDiag",
+          "measure_definition_display_name": "Reduce Electric Equipment Loads by Percentage",
+          "measure_definition_name": "reduce_electric_equipment_loads_by_percentage_diag",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "428bba5b-84c3-4c4c-a94d-88a5f59f51ee",
+          "measure_definition_version_uuid": "d79b6424-5611-4f01-a3f4-2468f95bcb50",
+          "uuid": "428bba5b-84c3-4c4c-a94d-88a5f59f51ee",
+          "version_uuid": "d79b6424-5611-4f01-a3f4-2468f95bcb50",
+          "description": "Reduce electric equipment loads. This will affect equipment that have a, power, power per area (LPD), or power per person value. This can be applied to the entire building or a specific space type. A positive percentage represents an increase electric equipment power, while a negative percentage can be used for an increase in electric equipment power.",
+          "taxonomy": "Equipment.Electric Equipment",
+          "arguments": [
+            {
+              "display_name": "Run Measure",
+              "display_name_short": "run_measure",
+              "name": "run_measure",
+              "value_type": "integer",
+              "default_value": 1,
+              "value": 1
+            },
+            {
+              "display_name": "Apply the Measure to a Specific Space Type or to the Entire Model.",
+              "display_name_short": "space_type",
+              "name": "space_type",
+              "value_type": "string",
+              "default_value": "*Entire Building*",
+              "value": "*Entire Building*"
+            },
+            {
+              "display_name": "Increase in Material and Installation Cost for Electric Equipment per Floor Area (%).",
+              "display_name_short": "material_and_installation_cost",
+              "name": "material_and_installation_cost",
+              "value_type": "double",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "Increase in Demolition Costs for Electric Equipment per Floor Area (%).",
+              "display_name_short": "demolition_cost",
+              "name": "demolition_cost",
+              "value_type": "double",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "Years Until Costs Start (whole years).",
+              "display_name_short": "years_until_costs_start",
+              "name": "years_until_costs_start",
+              "value_type": "integer",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "Demolition Costs Occur During Initial Construction?",
+              "display_name_short": "demo_cost_initial_const",
+              "name": "demo_cost_initial_const",
+              "value_type": "boolean",
+              "default_value": false,
+              "value": false
+            },
+            {
+              "display_name": "Expected Life (whole years).",
+              "display_name_short": "expected_life",
+              "name": "expected_life",
+              "value_type": "integer",
+              "default_value": 15,
+              "value": 15
+            },
+            {
+              "display_name": "Increase O & M Costs for Electric Equipment per Floor Area (%).",
+              "display_name_short": "om_cost",
+              "name": "om_cost",
+              "value_type": "double",
+              "default_value": 0,
+              "value": 0
+            },
+            {
+              "display_name": "O & M Frequency (whole years).",
+              "display_name_short": "om_frequency",
+              "name": "om_frequency",
+              "value_type": "integer",
+              "default_value": 1,
+              "value": 1
+            }
+          ],
+          "variables": [
+            {
+              "argument": {
+                "display_name": "Electric Equipment Power Reduction (%).",
+                "display_name_short": "elecequip_power_reduction_percent",
+                "name": "elecequip_power_reduction_percent",
+                "value_type": "double",
+                "default_value": 30,
+                "value": 30
+              },
+              "display_name": "Electric Equipment Power Reduction (%).",
+              "display_name_short": "elecequip_power_reduction_percent",
+              "variable_type": "variable",
+              "units": "",
+              "minimum": 0,
+              "maximum": 30,
+              "static_value": 30,
+              "uuid": "",
+              "version_uuid": "",
+              "variable": true,
+              "uncertainty_description": {
+                "type": "discrete",
+                "attributes": [
+                  {
+                    "name": "discrete",
+                    "values_and_weights": [
+                      {
+                        "value": 0,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 15,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 30,
+                        "weight": 0.33
+                      }
+                    ]
+                  },
+                  {
+                    "name": "lower_bounds",
+                    "value": 0
+                  },
+                  {
+                    "name": "upper_bounds",
+                    "value": 30
+                  },
+                  {
+                    "name": "modes",
+                    "value": 15
+                  },
+                  {
+                    "name": "delta_x",
+                    "value": 30
+                  },
+                  {
+                    "name": "stddev",
+                    "value": 10
+                  }
+                ]
+              },
+              "workflow_index": 0
+            }
+          ],
+          "workflow_index": 2
+        },
+        {
+          "name": "add_rooftop_pv",
+          "display_name": "Add Rooftop PV",
+          "measure_type": "RubyMeasure",
+          "measure_definition_class_name": "AddRooftopPV",
+          "measure_definition_directory": "./measures/ffca943f-bb8f-4b9d-8bf8-24d1e8cb1c18",
+          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_Study/measures/ffca943f-bb8f-4b9d-8bf8-24d1e8cb1c18",
+          "measure_definition_display_name": "Add Rooftop PV",
+          "measure_definition_name": "add_rooftop_pv",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "34550614-0c87-44db-9252-0ca0915b1e64",
+          "measure_definition_version_uuid": "ffca943f-bb8f-4b9d-8bf8-24d1e8cb1c18",
+          "uuid": "34550614-0c87-44db-9252-0ca0915b1e64",
+          "version_uuid": "ffca943f-bb8f-4b9d-8bf8-24d1e8cb1c18",
+          "description": "This measure will create new shading surface geometry above the roof for each thermal zone inyour model where the surface azmith falls within the user specified range. Arguments are exposed for panel efficiency, inverter efficiency, and the fraction of each roof surface that has PV",
+          "taxonomy": "Onsite Power Generation.Photovoltaic",
+          "arguments": [
+            {
+              "display_name": "Inverter Efficiency",
+              "display_name_short": "inverter_efficiency",
+              "name": "inverter_efficiency",
+              "value_type": "double",
+              "default_value": 0.98,
+              "value": 0.98
+            }
+          ],
+          "variables": [
+            {
+              "argument": {
+                "display_name": "Fraction of Surface Area with Active Solar Cells",
+                "display_name_short": "fraction_of_surface",
+                "name": "fraction_of_surface",
+                "value_type": "double",
+                "default_value": 0.75,
+                "value": 0.75
+              },
+              "display_name": "Fraction of Surface Area with Active Solar Cells",
+              "display_name_short": "fraction_of_surface",
+              "variable_type": "variable",
+              "units": "",
+              "minimum": 0,
+              "maximum": 0.75,
+              "static_value": 0.75,
+              "uuid": "",
+              "version_uuid": "",
+              "variable": true,
+              "uncertainty_description": {
+                "type": "discrete",
+                "attributes": [
+                  {
+                    "name": "discrete",
+                    "values_and_weights": [
+                      {
+                        "value": 0,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 0.375,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 0.75,
+                        "weight": 0.33
+                      }
+                    ]
+                  },
+                  {
+                    "name": "lower_bounds",
+                    "value": 0
+                  },
+                  {
+                    "name": "upper_bounds",
+                    "value": 0.75
+                  },
+                  {
+                    "name": "modes",
+                    "value": 0.375
+                  },
+                  {
+                    "name": "delta_x",
+                    "value": 0.75
+                  },
+                  {
+                    "name": "stddev",
+                    "value": 0.15
+                  }
+                ]
+              },
+              "workflow_index": 0
+            },
+            {
+              "argument": {
+                "display_name": "Cell Efficiency",
+                "display_name_short": "cell_efficiency",
+                "name": "cell_efficiency",
+                "value_type": "double",
+                "default_value": 0.18,
+                "value": 0.18
+              },
+              "display_name": "Cell Efficiency",
+              "display_name_short": "cell_efficiency",
+              "variable_type": "variable",
+              "units": "fraction",
+              "minimum": 0.1,
+              "maximum": 0.25,
+              "static_value": 0.18,
+              "uuid": "",
+              "version_uuid": "",
+              "variable": true,
+              "uncertainty_description": {
+                "type": "discrete",
+                "attributes": [
+                  {
+                    "name": "discrete",
+                    "values_and_weights": [
+                      {
+                        "value": 0.1,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 0.175,
+                        "weight": 0.33
+                      },
+                      {
+                        "value": 0.25,
+                        "weight": 0.33
+                      }
+                    ]
+                  },
+                  {
+                    "name": "lower_bounds",
+                    "value": 0.1
+                  },
+                  {
+                    "name": "upper_bounds",
+                    "value": 0.25
+                  },
+                  {
+                    "name": "modes",
+                    "value": 0.175
+                  },
+                  {
+                    "name": "delta_x",
+                    "value": 0.18
+                  },
+                  {
+                    "name": "stddev",
+                    "value": 0.05
+                  }
+                ]
+              },
+              "workflow_index": 1
+            }
+          ],
+          "workflow_index": 3
+        },
+        {
+          "name": "xcel_eda_tariff_selectionand_model_setup",
+          "display_name": "XcelEDATariffSelectionandModelSetup",
+          "measure_type": "EnergyPlusMeasure",
+          "measure_definition_class_name": "XcelEDATariffSelectionandModelSetup",
+          "measure_definition_directory": "./measures/3ccda33f-1aea-4d7e-a6dc-5113b7ce6719",
+          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_Study/measures/3ccda33f-1aea-4d7e-a6dc-5113b7ce6719",
+          "measure_definition_display_name": "XcelEDATariffSelectionandModelSetup",
+          "measure_definition_name": "xcel_eda_tariff_selectionand_model_setup",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "c5ab60e9-b8e5-4653-a502-5ed030f1335d",
+          "measure_definition_version_uuid": "f02788ca-7e8a-4b37-884e-24cb549511c1",
+          "uuid": "c5ab60e9-b8e5-4653-a502-5ed030f1335d",
+          "version_uuid": "f02788ca-7e8a-4b37-884e-24cb549511c1",
+          "description": "Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program.",
+          "taxonomy": "Economics.Life Cycle Cost Analysis",
+          "arguments": [
+            {
+              "display_name": "Select an Electricity Tariff.",
+              "display_name_short": "elec_tar",
+              "name": "elec_tar",
+              "value_type": "string",
+              "default_value": "Secondary General",
+              "value": "Commercial"
+            },
+            {
+              "display_name": "Select a Gas Tariff.",
+              "display_name_short": "gas_tar",
+              "name": "gas_tar",
+              "value_type": "string",
+              "default_value": "Large CG",
+              "value": "Small CG"
+            }
+          ],
+          "variables": [],
+          "workflow_index": 4
+        },
+        {
+          "name": "openstudio_results",
+          "display_name": "OpenStudio Results",
+          "measure_type": "ReportingMeasure",
+          "measure_definition_class_name": "OpenStudioResults",
+          "measure_definition_directory": "./measures/f8e23017-894d-4bdf-977f-37e3961e6f42",
+          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_Study/measures/f8e23017-894d-4bdf-977f-37e3961e6f42",
+          "measure_definition_display_name": "OpenStudio Results",
+          "measure_definition_name": "openstudio_results",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "a25386cd-60e4-46bc-8b11-c755f379d916",
+          "measure_definition_version_uuid": "da614836-d8cb-47c0-9107-e70ad3e64faa",
+          "uuid": "a25386cd-60e4-46bc-8b11-c755f379d916",
+          "version_uuid": "da614836-d8cb-47c0-9107-e70ad3e64faa",
+          "description": "This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data.",
+          "taxonomy": "Reporting.QAQC",
+          "arguments": [
+            {
+              "display_name": "Model Summary",
+              "display_name_short": "building_summary_section",
+              "name": "building_summary_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Annual Overview",
+              "display_name_short": "annual_overview_section",
+              "name": "annual_overview_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Monthly Overview",
+              "display_name_short": "monthly_overview_section",
+              "name": "monthly_overview_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Utility Bills/Rates",
+              "display_name_short": "utility_bills_rates_section",
+              "name": "utility_bills_rates_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Envelope",
+              "display_name_short": "envelope_section_section",
+              "name": "envelope_section_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Space Type Breakdown",
+              "display_name_short": "space_type_breakdown_section",
+              "name": "space_type_breakdown_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Space Type Summary",
+              "display_name_short": "space_type_details_section",
+              "name": "space_type_details_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Interior Lighting Summary",
+              "display_name_short": "interior_lighting_section",
+              "name": "interior_lighting_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Plug Loads Summary",
+              "display_name_short": "plug_loads_section",
+              "name": "plug_loads_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Exterior Lighting",
+              "display_name_short": "exterior_light_section",
+              "name": "exterior_light_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Water Use Equipment",
+              "display_name_short": "water_use_section",
+              "name": "water_use_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "HVAC Load Profiles",
+              "display_name_short": "hvac_load_profile",
+              "name": "hvac_load_profile",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Zone Conditions",
+              "display_name_short": "zone_condition_section",
+              "name": "zone_condition_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Zone Overview",
+              "display_name_short": "zone_summary_section",
+              "name": "zone_summary_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Zone Equipment Detail",
+              "display_name_short": "zone_equipment_detail_section",
+              "name": "zone_equipment_detail_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Air Loops Detail",
+              "display_name_short": "air_loops_detail_section",
+              "name": "air_loops_detail_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Plant Loops Detail",
+              "display_name_short": "plant_loops_detail_section",
+              "name": "plant_loops_detail_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Outdoor Air",
+              "display_name_short": "outdoor_air_section",
+              "name": "outdoor_air_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Cash Flow",
+              "display_name_short": "cost_summary_section",
+              "name": "cost_summary_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Site and Source Summary",
+              "display_name_short": "source_energy_section",
+              "name": "source_energy_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            },
+            {
+              "display_name": "Schedule Overview",
+              "display_name_short": "schedules_overview_section",
+              "name": "schedules_overview_section",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
+            }
+          ],
+          "variables": [],
+          "workflow_index": 5
+        }
+      ],
+      "algorithm": {
+        "experiment_type": "full_factorial",
+        "number_of_samples": 3,
+        "failed_f_value": 1000000000000000000,
+        "debug_messages": 0,
+        "objective_functions": [
+          "OpenStudioResults.net_site_energy"
+        ]
+      },
+      "analysis_type": "doe"
+    },
+    "seed": {
+      "file_type": "OSM",
+      "path": "./seeds/empty.osm"
+    },
+    "weather_file": {
+      "file_type": "EPW",
+      "path": "./weather/USA_CO_Golden-NREL.724666_TMY3.epw"
+    },
+    "file_format_version": 1,
+    "server_scripts": {}
+  }
+}

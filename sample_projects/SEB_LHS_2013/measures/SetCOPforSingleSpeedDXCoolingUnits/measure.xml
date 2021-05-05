@@ -1,0 +1,162 @@
+<measure>
+  <schema_version>3.0</schema_version>
+  <name>set_co_pfor_single_speed_dx_cooling_units</name>
+  <uid>4a737582-b5fc-477a-89e9-f8501af13b10</uid>
+  <version_id>306dc9a7-0126-4461-b76a-9e130cf0870c</version_id>
+  <version_modified>20170320T192151Z</version_modified>
+  <xml_checksum>9E2537CD</xml_checksum>
+  <class_name>SetCOPforSingleSpeedDXCoolingUnits</class_name>
+  <display_name>Set COP for Single Speed DX Cooling Units</display_name>
+  <description>This measure will find single speed DX cooling units in the model and will alter the Rated COP to a specified value. It can be run on a single or all air loops in the model.</description>
+  <modeler_description>Loop through air loops in the building and find and change the COP of any OS:Coil:Cooling:DX:SingleSpeed objects you find. Note the pre-adjusted COP and also the name of the loop. For the starting condition note the range of COP values for the units, and for the final condition do the same, to confirm that they were all changed.</modeler_description>
+  <arguments>
+    <argument>
+      <name>object</name>
+      <display_name>Choose an Air Loop with a single speed DX Cooling Unit to Alter.</display_name>
+      <type>Choice</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>*All Air Loops*</default_value>
+      <choices>
+        <choice>
+          <value>{0b02397b-eb72-4998-b607-eacc8a387e5b}</value>
+          <display_name>*All Air Loops*</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>cop</name>
+      <display_name>Rated COP</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>4</default_value>
+    </argument>
+    <argument>
+      <name>remove_costs</name>
+      <display_name>Remove Baseline Costs From Effected Cooling Coil DX Single Speed Units?</display_name>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>true</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>material_cost</name>
+      <display_name>Material and Installation Costs per Cooling Coil DX Single Speed Unit ($).</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>demolition_cost</name>
+      <display_name>Demolition Costs per Cooling Coil DX Single Speed Unit ($).</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>years_until_costs_start</name>
+      <display_name>Years Until Costs Start (whole years).</display_name>
+      <type>Integer</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>demo_cost_initial_const</name>
+      <display_name>Demolition Costs Occur During Initial Construction?</display_name>
+      <type>Boolean</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>false</default_value>
+      <choices>
+        <choice>
+          <value>true</value>
+          <display_name>true</display_name>
+        </choice>
+        <choice>
+          <value>false</value>
+          <display_name>false</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>expected_life</name>
+      <display_name>Expected Life (whole years).</display_name>
+      <type>Integer</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>20</default_value>
+    </argument>
+    <argument>
+      <name>om_cost</name>
+      <display_name>O &amp; M Costs per Cooling Coil DX Single Speed Unit ($).</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>om_frequency</name>
+      <display_name>O &amp; M Frequency (whole years).</display_name>
+      <type>Integer</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1</default_value>
+    </argument>
+  </arguments>
+  <outputs/>
+  <provenances/>
+  <tags>
+    <tag>HVAC.Cooling</tag>
+  </tags>
+  <attributes>
+    <attribute>
+      <name>Measure Type</name>
+      <value>ModelMeasure</value>
+      <datatype>string</datatype>
+    </attribute>
+    <attribute>
+      <name>Uses SketchUp API</name>
+      <value>false</value>
+      <datatype>boolean</datatype>
+    </attribute>
+  </attributes>
+  <files>
+    <file>
+      <filename>0320_ModelWithHVAC_01.osm</filename>
+      <filetype>osm</filetype>
+      <usage_type>test</usage_type>
+      <checksum>049F3417</checksum>
+    </file>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>0.10.2</identifier>
+        <min_compatible>0.10.2</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>080FF27A</checksum>
+    </file>
+    <file>
+      <filename>SetCOPforSingleSpeedDXCoolingUnits_Test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>401534CC</checksum>
+    </file>
+  </files>
+</measure>

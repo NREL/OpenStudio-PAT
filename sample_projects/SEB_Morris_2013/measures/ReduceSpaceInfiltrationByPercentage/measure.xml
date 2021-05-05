@@ -1,0 +1,122 @@
+<measure>
+  <schema_version>3.0</schema_version>
+  <name>reduce_space_infiltration_by_percentage</name>
+  <uid>d8161857-8b77-4e1a-a76c-ae5deab7c1e0</uid>
+  <version_id>29be5e7f-a965-4305-8617-97c59a710c19</version_id>
+  <version_modified>20170320T192151Z</version_modified>
+  <xml_checksum>EACB548E</xml_checksum>
+  <class_name>ReduceSpaceInfiltrationByPercentage</class_name>
+  <display_name>ReduceSpaceInfiltrationByPercentage</display_name>
+  <description>This measure will reduce space infiltration rates by the requested percentage. A cost per square foot of building area can be added to the model.</description>
+  <modeler_description>This can be run across a space type or the entire building. Costs will be associated with the building. If infiltration objects are removed at a later date, the costs will remain.</modeler_description>
+  <arguments>
+    <argument>
+      <name>space_type</name>
+      <display_name>Apply the Measure to a Specific Space Type or to the Entire Model.</display_name>
+      <type>Choice</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>*Entire Building*</default_value>
+      <choices>
+        <choice>
+          <value>{a9fc29ed-336a-4030-b5c6-92bb176ac96e}</value>
+          <display_name>*Entire Building*</display_name>
+        </choice>
+      </choices>
+    </argument>
+    <argument>
+      <name>space_infiltration_reduction_percent</name>
+      <display_name>Space Infiltration Power Reduction (%).</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>30</default_value>
+    </argument>
+    <argument>
+      <name>constant_coefficient</name>
+      <display_name>Constant Coefficient.</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1</default_value>
+    </argument>
+    <argument>
+      <name>temperature_coefficient</name>
+      <display_name>Temperature Coefficient.</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>wind_speed_coefficient</name>
+      <display_name>Wind Speed Coefficient.</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>wind_speed_squared_coefficient</name>
+      <display_name>Wind Speed Squared Coefficient.</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>material_and_installation_cost</name>
+      <display_name>Increase in Material and Installation Costs for Building per Affected Floor Area ($/ft^2).</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>om_cost</name>
+      <display_name>O &amp; M Costs for Construction per Affected Floor Area ($/ft^2).</display_name>
+      <type>Double</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>0</default_value>
+    </argument>
+    <argument>
+      <name>om_frequency</name>
+      <display_name>O &amp; M Frequency (whole years).</display_name>
+      <type>Integer</type>
+      <required>true</required>
+      <model_dependent>false</model_dependent>
+      <default_value>1</default_value>
+    </argument>
+  </arguments>
+  <outputs/>
+  <provenances/>
+  <tags>
+    <tag>Envelope.Infiltration</tag>
+  </tags>
+  <attributes>
+    <attribute>
+      <name>Measure Type</name>
+      <value>ModelMeasure</value>
+      <datatype>string</datatype>
+    </attribute>
+    <attribute>
+      <name>Uses SketchUp API</name>
+      <value>false</value>
+      <datatype>boolean</datatype>
+    </attribute>
+  </attributes>
+  <files>
+    <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.0.5</identifier>
+        <min_compatible>1.0.5</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>9A19772C</checksum>
+    </file>
+  </files>
+</measure>

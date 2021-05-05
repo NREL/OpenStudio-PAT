@@ -1,0 +1,4 @@
+<div ng-controller="StatusBarController as statusBar">
+  <span class="glyphicon glyphicon-refresh glyphicon-spin" ng-class="{hidden: !statusBar.showLoading}"></span>
+  <span id="status">{{statusBar.status}}</span>
+</div>

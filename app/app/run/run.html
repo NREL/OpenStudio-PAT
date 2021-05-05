@@ -1,0 +1,253 @@
+<div class="row">
+  <div class="col-sm-1 pad-bot-10">
+    <h4 translate>run.title</h4>
+  </div>
+  <div class="col-sm-2 pad-bot-20 pad-top-5 align-middle">
+    <select id="runType" class="form-control" ng-options="type.displayName for type in run.runTypes track by type.name" ng-model="selectedRunType" ng-disabled="analysisStatus == 'starting' || analysisStatus == 'in progress'" ng-change="run.warnCloudRunning('runtype', '{{selectedRunType}}')"></select>
+  </div>
+  <div ng-if="selectedRunType.name == 'local'" class="inline">
+    <div class="col-sm-5 pad-bot-20 pad-top-10 align-middle">
+      <div class="tab-text">Server Status&nbsp;
+        <span ng-show="serverStatuses[selectedRunType.name]=='started'" class="glyphicon glyphicon-ok green-button" aria-label="started"></span>
+        <span ng-show="serverStatuses[selectedRunType.name]!='started'" class="glyphicon glyphicon-remove red-button" aria-label="stopped"></span>
+      </div>
+    </div>
+  </div>
+    <div ng-if="selectedRunType.name == 'remote'" class="inline">
+      <div class="col-sm-5 pad-bot-20 pad-top-5 align-middle">
+        <div class="tab-text">Server Status&nbsp;
+          <img ng-src="assets/images/cloudConnected.png" ng-show="serverStatuses[selectedRunType.name]=='started'" alt="started" />
+          <img ng-src="assets/images/cloudDisconnected.png" ng-show="serverStatuses[selectedRunType.name]!='started' && !run.OsServer.getRemoteStartInProgress()" alt="stopped" />
+          <img ng-src="assets/images/cloudConnecting.png" ng-show="run.OsServer.getRemoteStartInProgress()" alt="connecting" />
+        </div>
+      </div>
+    </div>
+   </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-6 pad-bot-20">
+    <label for="analysisName" class="run-label" translate>run.analysisName</label>
+    <div class="input-group">
+      <input class="form-control" id="analysisName" type="text" ng-model="analysisName" ng-change="run.setAnalysisName()" ng-readonly="!unlockStatus" />
+      <div class="input-group-addon">
+        <span ng-if="!unlockStatus" class="input-group-text glyphicon glyphicon-pencil black-button" aria-hidden="true" aria-label="unlock edit measure name feature" data-toggle="tooltip" title="Edit Analysis Name" ng-click="run.toggleUnlock();"></span>
+        <span ng-if="unlockStatus" class=" input-group-text glyphicon glyphicon-lock red-button" aria-hidden="true" aria-label="lock edit measure name feature" data-toggle="tooltip" title="Lock Analysis Name" ng-click="run.toggleUnlock();"></span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div ng-if="selectedRunType.name == 'remote'" ng-include="'app/run/remote.html'"></div>
+
+<div ng-show="selectedRunType.name == 'local'" class="row pad-bot-20">
+  <div class="col-sm-12 normal-text pad-left-25" ng-if="selectedAnalysisType == 'Algorithmic'">
+    <span class="glyphicon glyphicon-warning-sign red-button big-text"></span>&nbsp;&nbsp;<translate>run.algorithmicOnCloud</translate>
+  </div>
+  <div class="col-sm-12" ng-if="selectedAnalysisType != 'Algorithmic'">
+    <button type="button" class="btn btn-success" ng-if="!disabledButtons" ng-click="run.warnBeforeDelete('run')" translate>run.runEntireWorkflow</button>
+    <button type="button" class="btn btn-success" ng-if="!disabledButtons && atLeastOneSelected()" ng-click="run.warnBeforeDelete('selected')" translate>run.runSelected</button>
+    <button type="button" class="btn btn-danger" ng-if="disabledButtons" ng-click="run.cancelRun()" translate>run.cancelRun</button>
+    <button type="button" class="btn btn-info pull-right" ng-click="run.exportOSA()" translate>run.exportOSA</button>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-sm-12">
+    <uib-progressbar class="progress-striped active" type="success" value="progress.amount">{{progress.message}}</uib-progressbar>
+  </div>
+</div>
+
+<div ng-show="analysisID != undefined && analysisStatus != ''">
+  <div class="row row-borders">
+    <div class="col-sm-4 tab-text">
+      <label>Analysis Status</label> {{analysisStatus}}
+    </div>
+    <div class="col-sm-6 tab-text">
+       <label>ID</label> {{analysisID}}
+    </div>
+    <div class="col-sm-3 tab-text">
+      <label translate>run.totalDatapoints</label> {{datapointsStatus.length}}
+    </div>
+    <div class="col-sm-3 tab-text">
+      <label translate>run.queued</label> {{numDatapointsStatusByType('queued')}}
+    </div>
+    <div class="col-sm-3 tab-text">
+      <label translate>run.started</label> {{numDatapointsStatusByType('started')}}
+    </div>
+    <div class="col-sm-3 tab-text">
+      <label translate>run.completed</label> {{numDatapointsStatusByType('completed')}}
+    </div>
+  </div>
+</div>
+
+<div class="row pad-bot-10" ng-if="!disabledButtons && selectedAnalysisType != 'Algorithmic'">
+  <div class="col-sm-12">
+    <button type="button" class="btn btn-primary" ng-if="!allSelected() && datapoints.length > 0" ng-click="run.selectAll(true)" translate>run.selectAll</button>
+    <button type="button" class="btn btn-primary" ng-if="allSelected() && datapoints.length > 0" ng-click="run.selectAll(false)" translate>run.clearSelections</button>
+  </div>
+</div>
+
+<div ng-if="datapoints.length > 0" class="run-datapoints">
+  <div class="row datapoint-header">
+    <div class="col-sm-2">Name</div>
+    <div class="col-sm-4">
+      <div class="row">
+        <div class="col-sm-5">Last Run</div>
+        <div class="col-sm-3">Run Time</div>
+        <div class="col-sm-4">Status</div>
+      </div>
+    </div>
+    <div class="col-sm-1">NAs</div>
+    <div class="col-sm-1">Warnings</div>
+    <div class="col-sm-1">Errors</div>
+    <div class="col-sm-1"><span class="badge white-badge dp-badge" ng-click="$event.preventDefault(); $event.stopPropagation();run.clearAllDatapoints()">C</span> All</div>
+    <div class="col-sm-2">
+      <div class="row">
+        <div class="col-sm-4">
+        </div>
+        <div class="col-sm-3 pad-left-5">
+          <img ng-src="assets/images/osmcloud_white.png" alt="Download all OSMs" ng-click="run.largeDownloadModal('osm');"/>
+        </div>
+
+        <div class="col-sm-4">
+          <img ng-src="assets/images/resultcloud_white.png" alt="Download all Results" ng-click="run.largeDownloadModal('results');" />
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-sm-12">
+      <uib-accordion close-others="false">
+        <uib-accordion-group ng-repeat="datapoint in datapoints | limitTo : numberDPsToDisplay track by datapoint.id" id="{{datapoint.id}}" is-open="datapoint.open">
+          <uib-accordion-heading>
+            <div class="row datapoint-header pad-top-10">
+              <div class="col-sm-2">
+                <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
+                <checkbox ng-model="datapoint.selected" id="{{datapoint.name}}" class="btn-default" ng-if="selectedAnalysisType != 'Algorithmic'" ng-click="$event.preventDefault(); $event.stopPropagation();"></checkbox>
+                <span ng-if="datapoint.name">{{datapoint.name}}</span><span ng-if="datapoint.name == undefined && datapoint.id">{{datapoint.id}}</span>
+              </div>
+              <div class="col-sm-4">
+                <div class="row">
+                  <div class="col-sm-5"><span class="middle">{{run.Project.formatDate(datapoint.updated_at)}}</span>
+                    <span ng-if="datapoint.modified" class="glyphicon glyphicon-exclamation-sign orange-button big-icon middle" aria-label="datapoint modified and must be rerun"></span>
+                  </div>
+                  <div class="col-sm-3 middle pad-top-5">{{run.getRunTime(datapoint.started_at, datapoint.completed_at)}}</div>
+                  <div class="col-sm-4">
+                    <span ng-if="datapoint.completed_status" ng-class="{'green-text': datapoint.completed_status == 'Success', 'red-text': datapoint.completed_status == 'Fail'}">{{datapoint.status}}<br/>{{datapoint.completed_status}}</span>
+                    <span ng-if="!datapoint.completed_status && datapoint.status_message" ng-class="{'green-text': datapoint.status_message.includes('normal'), 'red-text': datapoint.status_message == 'datapoint failure'}">{{datapoint.status}}<br/>{{datapoint.status_message}}</span>
+                    <span ng-if="!datapoint.completed_status && !datapoint.status_message">{{datapoint.status}}</span>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-sm-1 pad-top-10">{{run.calculateNAs(datapoint)}}</div>
+              <div class="col-sm-1 pad-top-10"><span class="badge orange-badge square-badge dp-badge">{{run.calculateWarnings(datapoint)}}</span></div>
+              <div class="col-sm-1 pad-top-10"><span class="badge red-badge square-badge dp-badge">{{run.calculateErrors(datapoint)}}</span></div>
+              <div class="col-sm-1 pad-top-10">&nbsp;&nbsp;<span class="badge orange-badge dp-badge" ng-click="$event.preventDefault();$event.stopPropagation();run.clearDatapoint(datapoint)">&nbsp;C&nbsp;</span></div>
+
+              <div class="col-sm-2">
+                <div class="row">
+                  <div class="col-sm-4">
+                    <div>
+                    <!--<div ng-if="datapointsStatus.length <= numberDPsToDisplay"> &lt;!&ndash; do not display reports icon for project with large # datapoints &ndash;&gt;-->
+                      <img ng-src="assets/images/ReportingMeasure_icon_grayed.png" alt="Datapoint Still Running" ng-show="datapoint.downloaded_reports != true" />
+
+                      <div class="btn-group" uib-dropdown auto-close="always" ng-show="datapoint.downloaded_reports">
+                        <button id="datapoint_{{datapoint.id}}_reports" type="button" class="btn view-report-button" uib-dropdown-toggle ng-disabled="disabled" ng-click="$event.preventDefault();$event.stopPropagation();">
+                          <img ng-src="assets/images/ReportingMeasure_icon.png"  alt="View Reports for datapoint {{datapoint.name}}">
+                          <span class="caret"></span>
+                        </button>
+                        <ul class="dropdown-menu" uib-dropdown-menu role="menu" aria-labelledby="datapoint_{{datapoint.id}}_reports">
+                          <li role="menuitem" ng-repeat="result in datapoint.result_files | filter:filterReports"><a href="#" ng-click="$event.preventDefault(); $event.stopPropagation();run.viewReportModal(datapoint, result.attachment_file_name);">{{result.attachment_file_name}}</a></li>
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-sm-3">
+                    <img ng-src="assets/images/osmcloud_blue.png" alt="Download OSM for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatuses[selectedRunType.name] == 'started' && !datapoint.downloaded_osm" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadOSM(datapoint)"/>
+                    <span class="glyphicon glyphicon-ok-sign green-button big-cell" ng-show="datapoint.status == 'completed' && datapoint.downloaded_osm"></span>
+                  </div>
+                  <div class="col-sm-4 pad-left-25">
+                    <img ng-src="assets/images/resultcloud_blue.png" alt="Download Results for datapoint {{datapoint.name}}" ng-show="datapoint.status == 'completed' && serverStatuses[selectedRunType.name] == 'started' && !datapoint.downloaded_results" ng-click="$event.preventDefault(); $event.stopPropagation();run.downloadResults(datapoint)"/>
+                    <span class="glyphicon glyphicon-ok-sign green-button big-cell" ng-show="datapoint.status == 'completed' && datapoint.downloaded_results"></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+           <!-- <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': datapoint.open, 'glyphicon-chevron-right': !datapoint.open}"></i>
+            {{datapoint.name}} - status: {{datapoint.status}} - {{datapoint.status_message}}-->
+          </uib-accordion-heading>
+          <div class="run-measures">
+            <div class="panel panel-default full-width no-border">
+              <div class="panel-body run-measures">
+                <div class="row">
+                  <div class="col-sm-6 datapoint-id-display">Datapoint ID: {{datapoint.id}}</div>
+                </div>
+                <uib-accordion close-others="false">
+                  <uib-accordion-group ng-repeat="step in datapoint.steps | filter:filterSkipped" id="{{datapoint.id}}-{{step.name}}" is-open="step.open">
+                    <uib-accordion-heading>
+                      <div class="row measure-accordion pad-bot-10">
+                        <div class="col-sm-6 bold">{{step.name}}</div>
+                      </div>
+                      <div class="row measure-accordion">
+                        <div class="col-sm-2"></div>
+                        <div class="col-sm-1">{{run.Project.formatDate(step.result.started_at)}}</div>
+                        <div class="col-sm-1">{{run.getRunTime(step.result.started_at, step.result.completed_at)}}</div>
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-1"><span ng-if="step.step_result == 'NotApplicable'">NA</span></div>
+                        <div class="col-sm-1"><span class="badge orange-badge square-badge" ng-if="step.result">{{step.result.step_warnings.length}}</span></div>
+                        <div class="col-sm-1"><span class="badge red-badge square-badge" ng-if="step.result">{{step.result.step_errors.length}}</span></div>
+                        <div class="col-sm-1"></div>
+                        <div class="col-sm-3"></div>
+                      </div>
+                    </uib-accordion-heading>
+                    <div class="measure-accordion-body">
+                      <label>Initial Condition: </label> {{step.result.step_initial_condition}}<br/>
+                      <label>Final Condition: </label> {{step.result.step_final_condition}}<br/>
+                      <div ng-repeat="item in step.result.step_errors track by $index"><span class="red-text">Error: </span>{{item}}</div>
+                      <div ng-repeat="item in step.result.step_warnings track by $index"><span class="orange-text">Warning: </span>{{item}}</div>
+                      <div ng-repeat="item in step.result.step_info track by $index"><span class="green-text">Info: </span>{{item}}</div>
+                    </div>
+                  </uib-accordion-group>
+                  <uib-accordion-group ng-if="datapoint.eplusout_err">
+                    <uib-accordion-heading>
+                      <div class="row measure-accordion pad-bot-10">
+                        <div class="col-sm-6 bold">EnergyPlus Results</div>
+                      </div>
+                    </uib-accordion-heading>
+                    <div class="measure-accordion-body">
+                      <div ng-bind-html="run.formatEplusErr(datapoint.eplusout_err)">
+                      </div>
+                    </div>
+                  </uib-accordion-group>
+                </uib-accordion>
+              </div>
+            </div>
+          </div>
+        </uib-accordion-group>
+      </uib-accordion>
+    </div>
+  </div>
+  <div class="row" ng-if="datapointsStatus.length > numberDPsToDisplay">
+    <div class="col-sm-12 tab-text pad-bot-10">
+      <translate>run.truncated</translate>
+    </div>
+    <div class="col-sm-12">
+      <button type="button" class="btn btn-primary" ng-show="serverStatuses[selectedRunType.name] == 'started'" ng-click="run.viewServer()" translate>run.viewServer</button>
+    </div>
+  </div>
+
+  <hr class="gray-line">
+  <div class="row" ng-if="atLeastOneModified()">
+    <div class="col-sm-12">
+      <span class="glyphicon glyphicon-exclamation-sign orange-button big-icon middle" aria-label="datapoint modified and must be rerun"></span>
+      <span class="small-text pad-left-5 middle" translate>run.modifiedDP</span>
+    </div>
+  </div>
+</div>
+
+
+
