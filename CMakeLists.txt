@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.14.0)
 cmake_policy(SET CMP0048 NEW)
 
-project(ParametricAnalysisTool VERSION 3.2.0)
+project(ParametricAnalysisTool VERSION 3.2.1)
 
 find_package(Git)
 
@@ -92,8 +92,8 @@ if(UNIX AND NOT APPLE)
   set(CPACK_IFW_TARGET_DIRECTORY "/usr/local/${CPACK_PACKAGE_INSTALL_DIRECTORY}/")
   set(CPACK_SET_DESTDIR ON)
   set(CPACK_INSTALL_PREFIX "/usr/local/${CPACK_PACKAGE_INSTALL_DIRECTORY}/")
-  # ruby on ubuntu (18.04) uses libqdbm14
-  set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqdbm14")
+  # ruby on ubuntu (18.04) uses libqdbm14 and rails uses nodejs for js runtime
+  set(CPACK_DEBIAN_PACKAGE_DEPENDS "libqdbm14,nodejs")
 elseif(APPLE)
   set(CPACK_IFW_TARGET_DIRECTORY "/Applications/${CPACK_PACKAGE_INSTALL_DIRECTORY}/")
   set(CPACK_BINARY_STGZ OFF CACHE BOOL "Enable to build STGZ packages")
