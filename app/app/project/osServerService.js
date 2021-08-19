@@ -288,12 +288,7 @@ export class OsServer {
       // set to URL in remoteSettings (external or cloud)
       const rs = vm.Project.getRemoteSettings();
       vm.$log.info('REMOTE SETTINGS: ', rs);
-      if (rs.remoteType == 'Existing Remote Server') {
-        vm.selectedServerURL = rs.remoteServerURL;
-      } else {
-        vm.selectedServerURL = null;
-      }
-
+      vm.selectedServerURL = rs.remoteServerURL;
     }
     vm.$log.info('Selected Server URL set to: ', vm.selectedServerURL);
   }
@@ -402,10 +397,13 @@ export class OsServer {
     const serverType = vm.Project.getRunType().name;
     const remoteSettings = vm.Project.getRemoteSettings();
 
+    vm.$log.info("SERVER TYPE: ", serverType);
+    vm.$log.info("REMOTE SETTINGS: ", remoteSettings);
+
     if (serverType == 'local') {
       // in case server didn't shut down correctly before
       vm.getLocalServerUrlFromFile();
-    } else if (remoteSettings.remoteType == 'Existing Remote Server') {
+    } else {
       // remote
       vm.resetSelectedServerURL();
     }
@@ -480,6 +478,7 @@ export class OsServer {
         // remote server
         vm.$log.info('Starting Remote Server');
         if (vm.remoteStartInProgress) {
+          vm.$log.info("hi1");
           if (vm.Message.showDebug()) vm.$log.debug('***Remote Server is already in the process of starting...waiting on serverStartDeferred to resolve');
           vm.isRemoteReady().then((response) => {
             if (vm.Message.showDebug()) vm.$log.debug('Server is started!');
@@ -489,6 +488,7 @@ export class OsServer {
             deferred.reject(error);
           });
         } else {
+           vm.$log.info("hi2");
           vm.remoteProgressStart();
           vm.remoteServer().then(response => {
             if (vm.Message.showDebug()) vm.$log.debug('OsServerService::StartServer: setting server to started');
@@ -513,221 +513,22 @@ export class OsServer {
 
   remoteServer() {
     const vm = this;
+    vm.$log.info("remoteserver1");
     if (vm.Message.showDebug()) vm.$log.debug('***** In osServerService::remoteServer() *****');
     const deferred = vm.$q.defer();
     const serverType = vm.Project.getRunType().name;
-
-    // check remote type
-    if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server') {
-      // Existing Remote Server
-      // ping URL to see if started
-      vm.pingServer().then(response => {
-        if (vm.Message.showDebug()) vm.$log.debug('Existing Remote Server Connected');
-        deferred.resolve(response);
-      }, error => {
-        vm.$log.error('Cannot connect to Existing Remote Server at specified URL: ', error);
-        deferred.reject(error);
-      });
-    } else {
-      // amazon cloud
-      vm.remoteSettings = vm.Project.getRemoteSettings();
-      vm.$log.info('Starting Amazon Cloud');
-      vm.$log.info('in OSServerService::remoteServer, remoteSettings: ', vm.remoteSettings);
-
-      if (!vm.remoteSettings.credentials || !vm.remoteSettings.credentials.yamlFilename) {
-        // must select credentials
-        deferred.reject('No Credentials');
-      } else {
-        // initialize potentially missing variables
-        vm.remoteSettings.aws.server = vm.remoteSettings.aws.server ? vm.remoteSettings.aws.server : {};
-        vm.remoteSettings.aws.server.dns = vm.remoteSettings.aws.server.dns ? vm.remoteSettings.aws.server.dns : null;
-
-        // see if cluster is running
-        vm.Project.pingCluster(vm.remoteSettings.aws.cluster_name).then((dns) => {
-          // cluster running, connect with DNS
-          vm.remoteSettings.aws.cluster_status = 'running';  // cluster is running
-          vm.$log.info('Connecting to existing cluster running at: ', dns);
-          vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" ' + vm.Project.fixURL(dns);
-          vm.$log.info('Start Server Command: ', vm.startServerCommand);
-
-          vm.remoteServerChild = vm.exec(vm.startServerCommand,
-            (error, stdout, stderr) => {
-              if (vm.Message.showDebug()) vm.$log.debug('exit code: ', vm.remoteServerChild.exitCode);
-              if (vm.Message.showDebug()) vm.$log.debug('child: ', vm.remoteServerChild);
-              if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
-              if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
-
-              if (vm.remoteServerChild.exitCode == 0) {
-                // SUCCESS
-                if (vm.Message.showDebug()) vm.$log.debug('CLOUD SERVER CONNECTION SUCCESS');
-
-                // set vm.selectedServerURL
-                // check what serverType is before setting selectedServerURL
-                vm.$log.info('Current run type set to: ', vm.Project.getRunType().name);
-                if (vm.Project.getRunType().name == 'remote') {
-                  vm.$log.info('Setting selectedServerURl to: ', vm.Project.fixURL(dns));
-                  vm.setSelectedServerURL(vm.Project.fixURL(dns));
-                }
-                vm.connectCluster();
-                //vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
-                deferred.resolve(vm.remoteServerChild);
-
-              } else {
-                vm.$log.error('CLOUD SERVER CONNECTION ERROR');
-                if (error !== null) {
-                  console.log('exec error:', error);
-                }
-                // delete cluster file
-                vm.jetpack.remove(vm.Project.getProjectClustersDir().path(vm.remoteSettings.aws.cluster_name));
-                deferred.reject(error);
-              }
-            });
-
-          console.log(`Child pid: ${vm.remoteServerChild.pid}`);
-
-          vm.remoteServerChild.on('close', (code, signal) => {
-            console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
-          });
-
-          vm.remoteServerChild.on('disconnect', (code, signal) => {
-            console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
-          });
-
-          vm.remoteServerChild.on('exit', (code, signal) => {
-            console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
-            if (code == 0) {
-              vm.$log.info('Server connected');
-              if (vm.Project.getRunType().name == 'remote') {
-                vm.$log.info('Setting selectedServerURL to: ', vm.Project.fixURL(dns));
-                vm.setSelectedServerURL(vm.Project.fixURL(dns));
-              }
-              vm.connectCluster();
-              //vm.remoteSettings.aws.connected = true; // PAT is connected to the cluster
-              deferred.resolve('success');
-            } else {
-              vm.$log.error('Server failed to connect');
-              deferred.reject('error');
-            }
-            return deferred.promise;
-          });
-
-          vm.remoteServerChild.on('error', (code, signal) => {
-            console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
-          });
-
-          vm.remoteServerChild.on('message', (code, signal) => {
-            console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
-          });
-
-        }, () => {
-          // cluster terminated or new, connect with file
-
-          // remove folder from clusters in case it exists (since cluster isn't on)
-          vm.jetpack.remove(vm.Project.getProjectClustersDir().path(vm.remoteSettings.aws.cluster_name));
-
-          // make sure file is saved
-          vm.Project.saveClusterToFile();
-          if (vm.Message.showDebug()) vm.$log.debug('Connecting to terminated/new cluster');
-          vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_remote  --debug -p \"' + vm.Project.projectDir.path() + '\" -s \"' + vm.Project.projectDir.path(vm.remoteSettings.aws.cluster_name + '_cluster.json') + '\" aws';
-          vm.$log.info('Start Server Command: ', vm.startServerCommand);
-
-          const envCopy = vm.setAwsEnvVars();
-
-
-          vm.remoteServerChild = vm.exec(vm.startServerCommand, {env: envCopy},
-            (error, stdout, stderr) => {
-              if (vm.Message.showDebug()) vm.$log.debug('exit code: ', vm.remoteServerChild.exitCode);
-              if (vm.Message.showDebug()) vm.$log.debug('child: ', vm.remoteServerChild);
-              if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
-              if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
-
-              if (vm.remoteServerChild.exitCode == 0) {
-                // SUCCESS
-                if (vm.Message.showDebug()) vm.$log.debug('CLOUD SERVER START SUCCESS');
-
-                // get DNS and set server
-                const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
-                vm.connectCluster();
-                if (vm.Project.getRunType().name == 'remote') {
-                  if (vm.Message.showDebug()) vm.$log.debug('Setting selectedServerURL to : ', vm.Project.fixURL(newDNS));
-                  vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
-                }
-                deferred.resolve(vm.remoteServerChild);
-
-              } else {
-                vm.$log.error('CLOUD SERVER START ERROR');
-                if (error !== null) {
-                  console.log('exec error:', error);
-                }
-                vm.jetpack.remove(vm.Project.getProjectClustersDir().path(vm.remoteSettings.aws.cluster_name));
-                deferred.reject(error);
-              }
-            });
-
-          console.log(`Child pid: ${vm.remoteServerChild.pid}`);
-
-          vm.remoteServerChild.on('close', (code, signal) => {
-            console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
-          });
-
-          vm.remoteServerChild.on('disconnect', (code, signal) => {
-            console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
-          });
-
-          vm.remoteServerChild.on('exit', (code, signal) => {
-            console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
-            if (code == 0) {
-              if (vm.Message.showDebug()) vm.$log.debug('Server started');
-              // get DNS and set server
-              const newDNS = vm.Project.getDNSFromFile(vm.remoteSettings.aws.cluster_name);
-              if (vm.Project.getRunType().name == 'remote') {
-                vm.$log.info('Setting selectedServerURL to :', vm.Project.fixURL(newDNS));
-                vm.setSelectedServerURL(vm.Project.fixURL(newDNS));
-              }
-              vm.connectCluster();
-              deferred.resolve('success');
-            } else {
-              vm.$log.error('Server failed to start');
-              deferred.reject('error');
-            }
-            return deferred.promise;
-          });
-
-          vm.remoteServerChild.on('error', (code, signal) => {
-            console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
-          });
-
-          vm.remoteServerChild.on('message', (code, signal) => {
-            console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
-          });
-        });
-      }
-    }
+     vm.$log.info("pinging remote server...");
+    // ping URL to see if started
+    vm.pingServer().then(response => {
+      if (vm.Message.showDebug()) vm.$log.debug('Existing Remote Server Connected');
+      deferred.resolve(response);
+    }, error => {
+      vm.$log.error('Cannot connect to Existing Remote Server at specified URL: ', error);
+      deferred.reject(error);
+    });
 
     return deferred.promise;
   }
-
-  setAwsEnvVars() {
-    const vm = this;
-    vm.remoteSettings = vm.Project.getRemoteSettings();
-    // need aws credentials as ENV vars
-    if (vm.Message.showDebug()) vm.$log.debug('PROCESS.ENV: ', process.env);
-    // need to set all other vars from process.env
-    const envCopy = angular.copy(process.env);
-
-    // open file, set truncatedAccessKey
-    const yamlStr = vm.jetpack.read(vm.Project.getAwsDir().path(vm.remoteSettings.credentials.yamlFilename + '.yml'));
-    let yamlData = YAML.parse(yamlStr);
-
-    envCopy['AWS_ACCESS_KEY'] = yamlData.accessKey;
-    envCopy['AWS_SECRET_KEY'] = yamlData.secretKey;
-    envCopy['AWS_DEFAULT_REGION'] = vm.remoteSettings.credentials.region;
-
-    yamlData = null;
-
-    return envCopy;
-  }
-
 
   localServer() {
 
@@ -1023,42 +824,7 @@ export class OsServer {
           vm.setSelectedServerURL(null);
           deferred.resolve('Server Disconnected');
 
-        } else {
-          // cloud: terminate server
-          vm.setRemoteStopInProgress(true);
-          vm.$log.info('Terminating AWS cluster');
-          // use cluster.json file in clusters/ folder to terminate
-          vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_remote ' + '\"' + vm.Project.getProjectClustersDir().path(vm.Project.getRemoteSettings().aws.cluster_name, vm.Project.getRemoteSettings().aws.cluster_name + '.json') + '\"';
-          vm.$log.info('stop server command: ', vm.stopServerCommand);
-          const envCopy = vm.setAwsEnvVars();
-          const child = vm.exec(vm.stopServerCommand, {env: envCopy},
-            (error, stdout, stderr) => {
-              console.log('THE PROCESS TERMINATED');
-              if (vm.Message.showDebug()) vm.$log.debug('exit code: ', child.exitCode);
-              if (vm.Message.showDebug()) vm.$log.debug('child: ', child);
-              if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
-              if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
-
-              if (child.exitCode == 0) {
-                // SUCCESS
-                vm.$log.info('Cloud Server Terminated');
-                vm.setServerStatus(serverType, 'stopped');
-                vm.disconnectCluster();
-                vm.setRemoteStopInProgress(false);
-                deferred.resolve(child);
-
-              } else {
-                if (error !== null) {
-                  console.log('exec error: ', error);
-                }
-                vm.setRemoteStopInProgress(false);
-                vm.jetpack.remove(vm.Project.getProjectClustersDir().path(vm.remoteSettings.aws.cluster_name));
-                deferred.reject(error);
-              }
-            });
-
-          //deferred.resolve();
-        }
+        } 
       }
     } else {
       // Server already stopped
@@ -1066,24 +832,6 @@ export class OsServer {
     }
 
     return deferred.promise;
-  }
-
-  disconnectCluster() {
-    const vm = this;
-    vm.remoteSettings = vm.Project.getRemoteSettings();
-    vm.remoteSettings.aws.cluster_status = 'terminated';
-    vm.remoteSettings.aws.connected = false;
-    // delete cluster directory completely
-    vm.jetpack.remove(vm.Project.getProjectClustersDir().path(vm.remoteSettings.aws.cluster_name));
-    vm.$log.info('Cluster Terminated and Disconnected');
-  }
-
-  connectCluster() {
-    const vm = this;
-    vm.remoteSettings = vm.Project.getRemoteSettings();
-    vm.remoteSettings.aws.cluster_status = 'running';
-    vm.remoteSettings.aws.connected = true;
-    vm.$log.info('Cluster Started and Connected');
   }
 
   localServerCleanup() {

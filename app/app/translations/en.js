@@ -133,7 +133,6 @@ export default {
     projectNameError: 'Project cannot be named PAT',
     saveAsServerStartInProgress: 'Unable to "Save As" while server is starting. Please try again, once the server has fully started.',
     newServerStarted: 'New server started.',
-    deprecationWarning: 'Deprecation warning: version 3.1 of PAT will not include the Amazon Cloud Remote Server option. Please review the OpenStudio Server 3.0.0 release notes for additional details related to cloud deployment.',
     noMoreLocalServerDefaultStart: 'Local Server no longer start by default.  You can start Local Server manually from the Server Tools menu.'
   },
   analysis: {
@@ -482,11 +481,6 @@ export default {
       setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?',
       rerunSelectedMessage: 'Running a new analysis will delete your local results for the selected datapoints.  Are you sure you want to continue?'
     },
-    modalAwsWarning: {
-      title: 'PAT Cloud Support with Amazon EC2',
-      message: 'The user assumes all responsibility for orphaned EC2 processes.  It is strongly recommended that you monitor EC2 cloud usage in the Amazon AWS Console to avoid any unwanted charges.',
-      agree: 'I agree'
-    },
     modalLargeDownload: {
       title: 'Large Number of Datapoints to Download',
       message: 'You are attempting to download a large number of files from the server.  This may freeze the PAT application and some files may not download.  Save your project and proceed at your own risk.'
@@ -494,12 +488,6 @@ export default {
     modalOsaErrors: {
       title: 'OSA Errors',
       message: 'The following errors were encountered while generating the OSA and must be fixed before the project can be run successfully.'
-    },
-    modalCloudRunning: {
-      title: 'Cloud Cluster is Running',
-      message: 'You are still connected to AWS. Terminate the cluster?',
-      terminate: 'Terminate',
-      keep: 'Keep Cluster Running'
     },
     viewReport: 'View Report',
     'for': 'for',
@@ -514,45 +502,7 @@ export default {
       start: 'Start',
       serverURL: 'Existing Server URL',
       serverType: 'Remote Server Type',
-      serverSettings: 'Remote Server Settings',
-      serverInstanceNote: 'Note: The server requires 4 nodes for non-worker processes',
-      serverInstanceType: 'Server Instance Type',
-      workerInstanceType: 'Worker Instance Type',
-      awsCredentials: 'AWS Credentials',
-      selectAws: 'Select AWS credentials to use',
-      newAwsCredentials: 'New',
-      awsAccessKey: 'Access Key',
-      awsRegion: 'Region',
-      cpus: 'CPUs',
-      cost: 'Cost',
-      memory: 'Memory',
-      storage: 'Storage',
-      numberOfWorkers: 'Number of Workers',
-      clusterText: 'Select a cluster or make a new one',
-      selectCluster: 'Clusters',
-      runningClusters: 'Running clusters',
-      or: 'or',
-      newCluster: 'New Cluster',
-      newClusterName: 'New Cluster Name',
-      awsUserID: 'AWS UserID',
-      saveCluster: 'Save Cluster Settings',
-      status: 'Cluster Status',
-      viewAws: 'View AWS Console',
-      awsServerDetails: 'AWS Server Details',
-      serverPrivateKey: 'Server Private Key File',
-      workerPrivateKey: 'Workers Private Key File',
-      serverDNS: 'Server DNS',
-      workerDNS: 'Workers DNS'
-    },
-    modalNewCluster: {
-      title: 'New Cluster',
-      name: 'Cluster Name'
-    },
-    modalNewAwsCredentials: {
-      title: 'New AWS Credentials',
-      name: 'Name',
-      accessKey: 'Access Key',
-      secretKey: 'Secret Key'
+      serverSettings: 'Existing Remote Server'
     }
   },
   statusBar: {
