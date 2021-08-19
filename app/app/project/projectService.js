@@ -3143,6 +3143,15 @@ export class Project {
       const match = _.find(vm.algorithmOptions[algorithm.id], {name: setting.name});
       if (!match) {
         vm.algorithmSettings.splice(key, 1);
+      } else {
+        // enum?
+        if (match.description.includes("Options:")){
+          // check that options are valid
+          if (!match.description.includes(setting.value)) {
+            // reset string
+            setting.value = match.defaultValue;
+          } 
+        } 
       }
     });
 
