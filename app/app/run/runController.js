@@ -481,6 +481,14 @@ export class RunController {
     const vm = this;
     const deferred = vm.$q.defer();
 
+    // make sure analysis is not in progress
+    if (['starting', 'started', 'in progress', 'queued'].includes(vm.$scope.analysisStatus)) {
+      vm.$translate('toastr.disconnectRemoteBeforeAnalysisDone').then(translation => {
+        vm.toastr.error(translation);
+      });
+      return;
+    }
+
     vm.OsServer.stopServer(force).then(response => {
       if (vm.Message.showDebug()) vm.$log.debug('Run::stopServer response: ', response);
       if (vm.Message.showDebug()) vm.$log.debug('***** ', vm.$scope.selectedRunType.name, ' Server Stopped *****');

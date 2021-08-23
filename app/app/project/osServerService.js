@@ -88,7 +88,7 @@ export class OsServer {
     vm.numberDPsToDisplay = vm.Project.getNumberDPsToDisplay();
     vm.localServerURL = 'http://localhost:8080';  // default URL.  will be reset when starting server
     vm.serverStatuses = {local: 'stopped', remote: 'stopped'};  // started, stopped, error?
-    vm.analysisStatus = '';  // '', started, in progress, completed, error
+    vm.analysisStatus = '';  // '', starting, started, in progress, queued, completed, error, canceled
     vm.analysisRunningFlag = false;
     vm.progress = {amount: 0, message: ''};
     vm.isDone = true;
@@ -817,14 +817,13 @@ export class OsServer {
         }
 
       } else {
-        if (vm.Project.getRemoteSettings().remoteType == 'Existing Remote Server') {
-          // remote server
-          vm.$log.info('Stopping Existing Remote Server');
-          vm.setServerStatus(serverType, 'stopped');
-          vm.setSelectedServerURL(null);
-          deferred.resolve('Server Disconnected');
+        
+        // remote server
+        vm.$log.info('Stopping Existing Remote Server');
+        vm.setServerStatus(serverType, 'stopped');
+        vm.setSelectedServerURL(null);
+        deferred.resolve('Server Disconnected');
 
-        } 
       }
     } else {
       // Server already stopped
