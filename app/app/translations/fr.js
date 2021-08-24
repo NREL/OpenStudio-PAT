@@ -105,7 +105,7 @@ export default {
     disconnectedRemote: 'Disconnected from remote server',
     disconnectRemoteBeforeAnalysisDone: 'Error disconnecting from remote server: Analysis is in progress. Cancel the analysis or wait for it to complete before disconnecting',
     disconnectedRemoteError: 'Could not disconnect from remote server',
-    terminatedClusterError: 'Could not terminate AWS cluster...check the AWS console',
+    helmInfo: 'You can now deploy an OpenStudio Server instance to AWS, Google, and Azure. Visit https://github.com/NREL/openstudio-server-helm to learn more.',
     downloadedResults: 'Results downloaded!',
     downloadedResultsError: 'Error downloading Results file',
     downloadedAllResults: 'All Results downloaded!',

@@ -104,7 +104,7 @@ export default {
     disconnectRemoteBeforeAnalysisDone: 'Error disconnecting from remote server: Analysis is in progress. Cancel the analysis or wait for it to complete before disconnecting',
     disconnectedRemote: 'Disconnected from remote server',
     disconnectedRemoteError: 'Could not disconnect from remote server',
-    terminatedClusterError: 'Could not terminate AWS cluster...check the AWS console',
+    helmInfo: 'You can now deploy an OpenStudio Server instance to AWS, Google, and Azure. Visit https://github.com/NREL/openstudio-server-helm to learn more.',
     downloadedResults: 'Results downloaded!',
     downloadedResultsError: 'Error downloading Results file',
     downloadedAllResults: 'All Results downloaded!',
@@ -117,8 +117,6 @@ export default {
     downloadingOSMsWarning: 'Downloading OSMs for all datapoints...this may take several minutes',
     exportedOSA: 'OSA and files zip exported to project directory',
     prepareExit: 'Preparing to exit...',
-
-   
     objFunctionGroupError: 'This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully',
     numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully',
     projectNameError: 'Project cannot be named PAT',

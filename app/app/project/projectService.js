@@ -197,7 +197,7 @@ export class Project {
     vm.analysisID = '';
     vm.datapoints = [];
 
-    vm.deprecationWarningShown = false;
+    vm.helmInfoShown = false;
 
     // TODO: still need these?
     vm.rubyMD5 = '';
@@ -1639,14 +1639,14 @@ export class Project {
     vm.projectName = name;
   }
 
-  getDeprecationWarningShown() {
+  getHelmInfoShown() {
     const vm = this;
-    return vm.deprecationWarningShown;
+    return vm.helmInfoShown;
   }
 
-  setDeprecationWarningShown(){
+  setHelmInfoShown(){
     const vm = this;
-    vm.deprecationWarningShown = true;
+    vm.helmInfoShown = true;
   }
 
   getProjectDir() {

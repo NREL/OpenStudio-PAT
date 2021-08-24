@@ -270,6 +270,17 @@ export class RunController {
 
     // if switching to local, reset connection setting for remote type
     vm.$scope.serverStatuses.remote = 'stopped';
+
+    if (vm.$scope.selectedRunType.name == 'remote') {
+      vm.helmInfo = vm.Project.getHelmInfoShown();
+      if (vm.helmInfo == false) {
+        // show
+        vm.$translate('toastr.helmInfo').then(translation => {
+          vm.toastr.info(translation, {closeButton: true, timeOut: 0, extendedTimeOut: 0});
+        });
+        vm.Project.setHelmInfoShown();
+      }
+    }
   }
 
   viewServer() {
