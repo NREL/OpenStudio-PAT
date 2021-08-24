@@ -1236,7 +1236,12 @@ export class AnalysisController {
 
   deleteScript(type) {
     const vm = this;
+    // also delete from disk (.sh and .args file)
+    const newType = _.includes(type, 'server') ? 'analysis' : 'data_point';
+    vm.jetpack.remove(vm.Project.getProjectDir().path('scripts', newType, vm.$scope.serverScripts[type].file));
+    vm.jetpack.remove(vm.Project.getProjectDir().path('scripts', newType, _.replace(vm.$scope.serverScripts[type].file, '.sh', '.args')));
     vm.$scope.serverScripts[type].file = null;
+ 
   }
 
   addScriptArgument(type) {
