@@ -387,7 +387,10 @@
               <select class="form-control"
                       ng-options="name as name for name in argument.choice_display_names"
                       ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"
-                      ng-change="analysis.setIsModified()"></select>
+                      ng-change="analysis.setIsModified()">
+                      <option value="" ng-if="argument.required == false"></option>
+                      </select>
+                      
               <div ng-if="argument.model_dependent == true && argument.type == 'Choice'">
                 <label class="normal-text" translate>analysis.algorithmic.modelDependentCustom</label>
                 <input class="form-control" type="text" ng-model="argument.inputs.default_value"
@@ -724,7 +727,9 @@
               <select class="form-control"
                       ng-options="name as name for name in argument.choice_display_names"
                       ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"
-                      ng-change="analysis.setIsModified()"></select>
+                      ng-change="analysis.setIsModified()">
+                        <option value="" ng-if="argument.required == false"></option>
+                      </select>
               <div ng-if="argument.model_dependent == true && argument.type == 'Choice'">
                 <label class="normal-text" translate>analysis.algorithmic.modelDependentCustom</label>
                 <input class="form-control" type="text" ng-model="argument.inputs.default_value"
@@ -1061,7 +1066,9 @@
               <select class="form-control"
                       ng-options="name as name for name in argument.choice_display_names"
                       ng-model="argument.inputs.default_value" ng-if="argument.type == 'Choice'"
-                      ng-change="analysis.setIsModified()"></select>
+                      ng-change="analysis.setIsModified()">
+                      <option value="" ng-if="argument.required == false"></option>
+                      </select>
               <div ng-if="argument.model_dependent == true && argument.type == 'Choice'">
                 <label class="normal-text" translate>analysis.algorithmic.modelDependentCustom</label>
                 <input class="form-control" type="text" ng-model="argument.inputs.default_value"

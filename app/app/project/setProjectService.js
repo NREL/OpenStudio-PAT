@@ -138,8 +138,8 @@ export class SetProject {
           vm.OsServer.stopServer('local').then(response => {
             vm.Project.setProjectName(vm.newProjectName);  // this is taken care of my setProjectVariables. remove?
             projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
-            vm.$log.info('SetProjectService::stop server: server stopped');
-            vm.$log.info('OsServer.stopServer() response: ', response);
+            if (vm.Message.showDebug()) vm.$log.info('SetProjectService::stop server: server stopped');
+            if (vm.Message.showDebug()) vm.$log.info('OsServer.stopServer() response: ', response);
 
             // for saveAs: copy old project's folder structure to new location (from, to)
             vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
@@ -280,10 +280,11 @@ export class SetProject {
             vm.$log.info('SetProjectService::stop server: local server stopped');
             vm.$log.info('response: ', response);
 
-            vm.Project.setProjectName(vm.newProjectName); // this is taken care of my setProjectVariables. remove?
+            vm.Project.setProjectName(vm.newProjectName); 
             projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
 
             // set project Variables
+            // vm.Project.setAnalysisName(vm.Project.projectName);
             vm.setProjectVariables(projectDir);
 
             vm.$state.transitionTo('analysis', {}, {reload: true});
@@ -311,6 +312,7 @@ export class SetProject {
             vm.Project.setProjectName(vm.newProjectName);  // this is taken care of my setProjectVariables. remove?
             projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
             // set project Variables anyway
+            // vm.Project.setAnalysisName(vm.Project.projectName);
             vm.setProjectVariables(projectDir);
 
             vm.$state.transitionTo('analysis', {}, {reload: true});
@@ -390,8 +392,8 @@ export class SetProject {
         // wait until server is stopped and new project set before closing modal
         if (vm.Message.showDebug()) vm.$log.debug('fileExists!');
         vm.OsServer.stopServer('local').then(response => {
-          vm.$log.info('SetProjectService::stop server: server stopped');
-          vm.$log.info('response: ', response);
+          if (vm.Message.showDebug()) vm.$log.info('SetProjectService::stop server: server stopped');
+          if (vm.Message.showDebug()) vm.$log.info('response: ', response);
 
           // set project Variables
           vm.setProjectVariables(projectDir);
@@ -535,52 +537,12 @@ export class SetProject {
     if (vm.Message.showDebug()) vm.$log.debug('**** In setProjectService::warnCloudRunning ****');
     if (vm.Message.showDebug()) vm.$log.debug('runType: ', runType);
     if (vm.Message.showDebug()) vm.$log.debug('remoteSettings: ', remoteSettings);
-    if (runType.name == 'remote' && remoteSettings.remoteType == 'Amazon Cloud' && remoteSettings.aws && remoteSettings.aws.connected) {
-
-      const modalInstance = vm.$uibModal.open({
-        backdrop: 'static',
-        controller: 'ModalCloudRunningController',
-        controllerAs: 'modal',
-        templateUrl: 'app/run/cloudRunning.html'
-      });
-
-      modalInstance.result.then(() => {
-        // stop server
-        vm.OsServer.stopServer().then(() => {
-          // go to new/open
-          if (type == 'new') {
-            vm.newProject();
-          } else {
-            vm.openProject();
-          }
-
-        }, () => {
-          // go to new/open anyway
-          if (type == 'new') {
-            vm.newProject();
-          } else {
-            vm.openProject();
-          }
-        });
-
-      }, () => {
-
-        //deferred.reject();
-        // go to new/open
-        if (type == 'new') {
-          vm.newProject();
-        } else {
-          vm.openProject();
-        }
-
-      });
+    
+    // go to new/open
+    if (type == 'new') {
+      vm.newProject();
     } else {
-      // go to new/open
-      if (type == 'new') {
-        vm.newProject();
-      } else {
-        vm.openProject();
-      }
+      vm.openProject();
     }
   }
 

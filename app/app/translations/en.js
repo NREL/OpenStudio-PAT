@@ -99,16 +99,12 @@ export default {
     projectSaved: 'Project saved!',
     clusterSaved: 'Cluster details saved!',
     connectingCloud: 'Connecting to the cloud...this may take a few minutes',
-    startingCloud: 'Starting cloud cluster...this may take up to 10 minutes',
-    connectedCloud: 'Connected to AWS!',
-    startedCloud: 'AWS server started!',
     connectedRemote: 'Connected to remote server!',
     connectedRemoteError: 'Error connecting to existing remote server',
-    terminatingCluster: 'Terminating cloud clusters',
-    terminatedCluster: 'Successfully terminated AWS cluster!  You should double check that the servers were terminated in the AWS Console',
+    disconnectRemoteBeforeAnalysisDone: 'Error disconnecting from remote server: Analysis is in progress. Cancel the analysis or wait for it to complete before disconnecting',
     disconnectedRemote: 'Disconnected from remote server',
     disconnectedRemoteError: 'Could not disconnect from remote server',
-    terminatedClusterError: 'Could not terminate AWS cluster...check the AWS console',
+    helmInfo: 'You can now deploy an OpenStudio Server instance to AWS, Google, and Azure. Visit https://github.com/NREL/openstudio-server-helm to learn more.',
     downloadedResults: 'Results downloaded!',
     downloadedResultsError: 'Error downloading Results file',
     downloadedAllResults: 'All Results downloaded!',
@@ -119,21 +115,13 @@ export default {
     downloadedAllOsmError: 'Error downloading OSMs',
     downloadingResultsWarning: 'Downloading Results for all datapoints...this may take several minutes',
     downloadingOSMsWarning: 'Downloading OSMs for all datapoints...this may take several minutes',
-    connectCredentialsError: 'Error connecting to AWS - No AWS Credentials Selected',
-    startCredentialsError: 'Error starting AWS server - No AWS Credentials Selected',
-    connectedCloudError: 'Error connecting to AWS',
-    startedCloudError: 'Error starting AWS server',
     exportedOSA: 'OSA and files zip exported to project directory',
     prepareExit: 'Preparing to exit...',
-    amisError: 'Cannot retrieve OpenStudio Server Versions',
-    noYaml: 'No AWS credentials selected. Cannot start/connect to AWS',
-    noCluster: 'No cluster selected. Cannot start/connect to AWS',
     objFunctionGroupError: 'This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully',
     numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully',
     projectNameError: 'Project cannot be named PAT',
     saveAsServerStartInProgress: 'Unable to "Save As" while server is starting. Please try again, once the server has fully started.',
     newServerStarted: 'New server started.',
-    deprecationWarning: 'Deprecation warning: version 3.1 of PAT will not include the Amazon Cloud Remote Server option. Please review the OpenStudio Server 3.0.0 release notes for additional details related to cloud deployment.',
     noMoreLocalServerDefaultStart: 'Local Server no longer start by default.  You can start Local Server manually from the Server Tools menu.'
   },
   analysis: {
@@ -482,11 +470,6 @@ export default {
       setRunTypeMessage: 'Selecting a new run type will delete your local results.  Are you sure you want to continue?',
       rerunSelectedMessage: 'Running a new analysis will delete your local results for the selected datapoints.  Are you sure you want to continue?'
     },
-    modalAwsWarning: {
-      title: 'PAT Cloud Support with Amazon EC2',
-      message: 'The user assumes all responsibility for orphaned EC2 processes.  It is strongly recommended that you monitor EC2 cloud usage in the Amazon AWS Console to avoid any unwanted charges.',
-      agree: 'I agree'
-    },
     modalLargeDownload: {
       title: 'Large Number of Datapoints to Download',
       message: 'You are attempting to download a large number of files from the server.  This may freeze the PAT application and some files may not download.  Save your project and proceed at your own risk.'
@@ -494,12 +477,6 @@ export default {
     modalOsaErrors: {
       title: 'OSA Errors',
       message: 'The following errors were encountered while generating the OSA and must be fixed before the project can be run successfully.'
-    },
-    modalCloudRunning: {
-      title: 'Cloud Cluster is Running',
-      message: 'You are still connected to AWS. Terminate the cluster?',
-      terminate: 'Terminate',
-      keep: 'Keep Cluster Running'
     },
     viewReport: 'View Report',
     'for': 'for',
@@ -514,45 +491,7 @@ export default {
       start: 'Start',
       serverURL: 'Existing Server URL',
       serverType: 'Remote Server Type',
-      serverSettings: 'Remote Server Settings',
-      serverInstanceNote: 'Note: The server requires 4 nodes for non-worker processes',
-      serverInstanceType: 'Server Instance Type',
-      workerInstanceType: 'Worker Instance Type',
-      awsCredentials: 'AWS Credentials',
-      selectAws: 'Select AWS credentials to use',
-      newAwsCredentials: 'New',
-      awsAccessKey: 'Access Key',
-      awsRegion: 'Region',
-      cpus: 'CPUs',
-      cost: 'Cost',
-      memory: 'Memory',
-      storage: 'Storage',
-      numberOfWorkers: 'Number of Workers',
-      clusterText: 'Select a cluster or make a new one',
-      selectCluster: 'Clusters',
-      runningClusters: 'Running clusters',
-      or: 'or',
-      newCluster: 'New Cluster',
-      newClusterName: 'New Cluster Name',
-      awsUserID: 'AWS UserID',
-      saveCluster: 'Save Cluster Settings',
-      status: 'Cluster Status',
-      viewAws: 'View AWS Console',
-      awsServerDetails: 'AWS Server Details',
-      serverPrivateKey: 'Server Private Key File',
-      workerPrivateKey: 'Workers Private Key File',
-      serverDNS: 'Server DNS',
-      workerDNS: 'Workers DNS'
-    },
-    modalNewCluster: {
-      title: 'New Cluster',
-      name: 'Cluster Name'
-    },
-    modalNewAwsCredentials: {
-      title: 'New AWS Credentials',
-      name: 'Name',
-      accessKey: 'Access Key',
-      secretKey: 'Secret Key'
+      serverSettings: 'Existing Remote Server'
     }
   },
   statusBar: {

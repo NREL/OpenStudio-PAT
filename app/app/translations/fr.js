@@ -100,15 +100,12 @@ export default {
     clusterSaved: 'Cluster details saved!',
     connectingCloud: 'Connecting to the cloud...this may take a few minutes',
     startingCloud: 'Starting cloud cluster...this may take up to 10 minutes',
-    connectedCloud: 'Connected to AWS!',
-    startedCloud: 'AWS server started!',
     connectedRemote: 'Connected to remote server!',
     connectedRemoteError: 'Error connecting to existing remote server',
-    terminatingCluster: 'Terminating cloud clusters',
-    terminatedCluster: 'Successfully terminated AWS cluster!  You should double check that the servers were terminated in the AWS Console',
     disconnectedRemote: 'Disconnected from remote server',
+    disconnectRemoteBeforeAnalysisDone: 'Error disconnecting from remote server: Analysis is in progress. Cancel the analysis or wait for it to complete before disconnecting',
     disconnectedRemoteError: 'Could not disconnect from remote server',
-    terminatedClusterError: 'Could not terminate AWS cluster...check the AWS console',
+    helmInfo: 'You can now deploy an OpenStudio Server instance to AWS, Google, and Azure. Visit https://github.com/NREL/openstudio-server-helm to learn more.',
     downloadedResults: 'Results downloaded!',
     downloadedResultsError: 'Error downloading Results file',
     downloadedAllResults: 'All Results downloaded!',
@@ -119,15 +116,8 @@ export default {
     downloadedAllOsmError: 'Error downloading OSMs',
     downloadingResultsWarning: 'Downloading Results for all datapoints...this may take several minutes',
     downloadingOSMsWarning: 'Downloading OSMs for all datapoints...this may take several minutes',
-    connectCredentialsError: 'Error connecting to AWS - No AWS Credentials Selected',
-    startCredentialsError: 'Error starting AWS server - No AWS Credentials Selected',
-    connectedCloudError: 'Error connecting to AWS',
-    startedCloudError: 'Error starting AWS server',
     exportedOSA: 'OSA et zip exportés au répertoire qui contient le projet',
     prepareExit: 'Preparing to exit...',
-    amisError: 'Cannot retrieve OpenStudio Server Versions',
-    noYaml: 'No AWS credentials selected. Cannot start/connect to AWS',
-    noCluster: 'No cluster selected. Cannot start/connect to AWS',
     objFunctionGroupError: 'This algorithm needs at least 2 objective function groups defined on the outputs tab to run successfully',
     numberVariablesError: 'This algorithm needs at least 2 variables defined on the analysis tab to run successfully',
     projectNameError: 'Project cannot be named PAT',
@@ -482,11 +472,6 @@ export default {
       setRunTypeMessage: 'La sélection d\'un nouveau type d\'exécution supprimera vos résultats locaux. êtes-vous sûr de vouloir continuer?',
       rerunSelectedMessage: 'L\'exécution d\'une nouvelle analyse supprimera vos résultats locaux pour les points de données selectionés. Êtes-vous sûr de vouloir continuer?'
     },
-    modalAwsWarning: {
-      title: 'PAT Cloud Support with Amazon EC2',
-      message: 'The user assumes all responsibility for orphaned EC2 processes.  It is strongly recommended that you monitor EC2 cloud usage in the Amazon AWS Console to avoid any unwanted charges.',
-      agree: 'I agree'
-    },
     modalLargeDownload: {
       title: 'Large Number of Files to Download',
       message: 'You are attempting to download a large number of files from the server.  This may freeze the PAT application and some files may not download.  Save your project and proceed at your own risk.'
@@ -495,17 +480,9 @@ export default {
       title: 'OSA Errors',
       message: 'The following errors were encountered while generating the OSA and must be fixed before the project can be run successfully.'
     },
-    modalCloudRunning: {
-      title: 'Cloud cluster est en cours d\'exécution',
-      message: 'Vous êtes toujours connecté à AWS. Terminer le cluster?',
-      terminate: 'Mettre fin',
-      keep: 'Gardez le cluster en cours d\'exécution'
-    },
     viewReport: 'Voir le rapport',
     'for': 'pour',
     remote: {
-      osServerVersion: 'Nom AMI',
-      AMINotes: 'AMI Notes',
       osVersion: 'Version d\'OpenStudio',
       standardsRef: 'Normes Ref',
       connect: 'Relier',
@@ -514,45 +491,7 @@ export default {
       start: 'Début',
       serverURL: 'URL du serveur existant',
       serverType: 'Type de serveur distant',
-      serverSettings: 'Paramètres du serveur distant',
-      serverInstanceNote: 'Remarque: Le serveur requiert 4 noeuds pour les processus non-travailleurs',
-      serverInstanceType: 'Type d\'instance de serveur',
-      workerInstanceType: 'Type d\'instance du travailleur',
-      awsCredentials: 'Identifiants d\'AWS',
-      selectAws: 'Sélectionnez les identifiants AWS à utiliser',
-      newAwsCredentials: 'Nouveau',
-      awsAccessKey: 'Clef d\'accès',
-      awsRegion: 'Région',
-      cpus: 'CPU',
-      cost: 'Coût',
-      memory: 'Mémoire',
-      storage: 'Espace de rangement',
-      numberOfWorkers: 'Nombre de travailleurs',
-      clusterText: 'Sélectionner un cluster ou en créer un nouveau',
-      selectCluster: 'Clusters',
-      runningClusters: 'Clusters en cours d\'exécution',
-      or: 'ou',
-      newCluster: 'Nouveau cluster',
-      newClusterName: 'Nouveau nom du cluster',
-      awsUserID: 'ID utilisateur AWS',
-      saveCluster: 'Enregistrer les paramètres du cluster',
-      status: 'État du cluster',
-      viewAws: 'Afficher la console AWS',
-      awsServerDetails: 'AWS Server Détails',
-      serverPrivateKey: 'Fichier de clé privée du serveur',
-      workerPrivateKey: 'Fichier des clés privées des travailleurs',
-      serverDNS: 'DNS du serveur',
-      workerDNS: 'Travailleurs DNS'
-    },
-    modalNewCluster: {
-      title: 'Nouveau cluster',
-      name: 'Nom du cluster'
-    },
-    modalNewAwsCredentials: {
-      title: 'Nouvelles identifiant AWS',
-      name: 'Nom',
-      accessKey: 'Clef d\'accès',
-      secretKey: 'Clef secrète'
+      serverSettings: 'Paramètres du serveur distant'
     }
   },
   statusBar: {

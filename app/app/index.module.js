@@ -58,12 +58,8 @@ import {ModalSelectOptionsController} from '../app/analysis/modalSelectOptionsCo
 import {ModalEditOptionDescriptionController} from '../app/analysis/modalEditOptionDescriptionController';
 import {ModalEditModelDependentChoiceArgController} from '../app/analysis/modalEditModelDependentChoiceArgController';
 import {ModalDeleteMeasureController} from '../app/analysis/modalDeleteMeasureController';
-import {ModalNewClusterController} from '../app/run/modalNewClusterController';
-import {ModalNewAwsCredentialsController} from '../app/run/modalNewAwsCredentialsController';
-import {ModalAwsWarningController} from '../app/run/modalAwsWarningController';
 import {ModalLargeDownloadController} from '../app/run/modalLargeDownloadController';
 import {ModalOsaErrorsController} from '../app/run/modalOsaErrorsController';
-import {ModalCloudRunningController} from '../app/run/modalCloudRunningController';
 import {NavController} from '../app/nav/navController';
 import {OsServer} from '../app/project/osServerService';
 import {OutputsController} from '../app/outputs/outputsController';
@@ -105,12 +101,8 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .controller('ModalDeleteMeasureController', ModalDeleteMeasureController)
   .controller('ModalClearResultsController', ModalClearResultsController)
   .controller('ModalClearDatapointController', ModalClearDatapointController)
-  .controller('ModalNewClusterController', ModalNewClusterController)
-  .controller('ModalNewAwsCredentialsController', ModalNewAwsCredentialsController)
-  .controller('ModalAwsWarningController', ModalAwsWarningController)
   .controller('ModalLargeDownloadController', ModalLargeDownloadController)
   .controller('ModalOsaErrorsController', ModalOsaErrorsController)
-  .controller('ModalCloudRunningController', ModalCloudRunningController)
   .controller('AnalysisController', AnalysisController)
   .controller('DesignAlternativesController', DesignAlternativesController)
   .controller('OutputsController', OutputsController)

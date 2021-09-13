@@ -85,13 +85,8 @@ export class Project {
 
     vm.samplingMethods = vm.setSamplingMethods();
     vm.runTypes = vm.setRunTypes();
-    vm.remoteTypes = vm.setRemoteTypes();
     vm.algorithmOptions = vm.setAlgorithmOptions();
     vm.resetRemoteSettings();
-    vm.setOsServerVersions();
-    vm.setServerInstanceTypes();
-    vm.setWorkerInstanceTypes();
-    vm.setAwsRegions();
 
     vm.clusters = [];
     vm.modified = false;
@@ -178,6 +173,7 @@ export class Project {
     vm.filesToInclude = [];
     vm.setServerScripts();
 
+    vm.analysisName = vm.getProjectName();
     vm.analysisType = 'Manual';
     vm.cliDebug = '';
     vm.cliVerbose = '';
@@ -201,7 +197,7 @@ export class Project {
     vm.analysisID = '';
     vm.datapoints = [];
 
-    vm.deprecationWarningShown = false;
+    vm.helmInfoShown = false;
 
     // TODO: still need these?
     vm.rubyMD5 = '';
@@ -1643,14 +1639,14 @@ export class Project {
     vm.projectName = name;
   }
 
-  getDeprecationWarningShown() {
+  getHelmInfoShown() {
     const vm = this;
-    return vm.deprecationWarningShown;
+    return vm.helmInfoShown;
   }
 
-  setDeprecationWarningShown(){
+  setHelmInfoShown(){
     const vm = this;
-    vm.deprecationWarningShown = true;
+    vm.helmInfoShown = true;
   }
 
   getProjectDir() {
@@ -1814,33 +1810,11 @@ export class Project {
     vm.runType = type;
   }
 
-  getRemoteTypes() {
-    const vm = this;
-    return vm.remoteTypes;
-  }
-
-  setRemoteTypes() {
-    return ['Existing Remote Server', 'Amazon Cloud'];
-    //return ['Existing Remote Server'];
-  }
-
   resetRemoteSettings() {
     const vm = this;
     vm.setRemoteSettings({
       open: true,
-      remoteType: vm.remoteTypes[1],
-      remoteServerURL: null,
-      aws: {
-        connected: false,
-        cluster_name: '',
-        server_instance_type: '',
-        worker_instance_type: '',
-        user_id: '',
-        worker_node_number: 0,
-        aws_tags: [],
-        openstudio_server_version: ''
-      },
-      credentials: {yamlFilename: null, accessKey: null, region: 'us-east-1'}
+      remoteServerURL: null
     });
     if (vm.Message.showDebug()) vm.$log.debug('Remote settings reset to: ', vm.getRemoteSettings());
   }
@@ -1855,343 +1829,12 @@ export class Project {
     return vm.remoteSettings;
   }
 
-  // always get from disk and extract unique name
-  getAwsYamlFiles() {
-    const vm = this;
-    vm.awsYamlFiles = [];
-    const files = vm.jetpack.find(vm.awsDir.path(), {matching: '*.yml'});
-    _.forEach(files, file => {
-      vm.awsYamlFiles.push(_.replace(_.last(_.split(file, path.sep)), '.yml', ''));
-    });
-    return vm.awsYamlFiles;
-  }
-
-  // always get from disk and extract unique name
-  getClusters() {
-    const vm = this;
-    vm.clusters = {running: [], all: []};
-    const tempClusters = vm.jetpack.find(vm.projectDir.path(), {matching: '*_cluster.json'});
-    _.forEach(tempClusters, cluster => {
-      if (vm.Message.showDebug()) vm.$log.debug('CLUSTER: ', cluster);
-      //const clusterFile = vm.jetpack.read(cluster);
-      let clusterName = _.last(_.split(cluster, path.sep));
-      clusterName = _.replace(clusterName, '_cluster.json', '');
-      vm.clusters.all.push(clusterName);
-      // PING (by name)
-      vm.pingCluster(clusterName).then(() => {
-        // running
-        vm.clusters.running.push(clusterName);
-      }, () => {
-        // terminated
-      });
-    });
-
-    vm.$log.info('Cluster files found: ', vm.clusters);
-    return vm.clusters;
-  }
-
-  getDNSFromFile(clusterName) {
-    const vm = this;
-    let dns = null;
-    if (clusterName && vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
-      const clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName, clusterName + '.json'), 'json');
-      vm.$log.info('Cluster File Data: ', clusterData);
-      if (clusterData && clusterData.server && clusterData.server.dns) {
-        dns = clusterData.server.dns;
-      }
-    }
-    return dns;
-  }
-
-  // todo: used?
-  readClusterFile(clusterName) {
-    const vm = this;
-    let clusterData = {};
-    if (clusterName && vm.jetpack.exists(vm.projectClustersDir.path(clusterName, clusterName + '.json'))) {
-      clusterData = vm.jetpack.read(vm.projectClustersDir.path(clusterName, clusterName + '.json'), 'json');
-    }
-    return clusterData;
-  }
-
-  pingCluster(clusterName) {
-    const vm = this;
-    const deferred = vm.$q.defer();
-    if (vm.Message.showDebug()) vm.$log.debug('Locating config file for cluster: ', clusterName);
-
-    const dns = vm.getDNSFromFile(clusterName);
-
-    if (dns) {
-      vm.$log.info('PING: ', dns);
-      vm.$http.get(vm.fixURL(dns) + '/status.json').then(response => {
-        // send json to run controller
-        vm.$log.info('Cluster RUNNING at: ', dns);
-        vm.$log.info('JSON response: ', response);
-        if (response.data.status.awake) {
-          deferred.resolve(dns);
-        } else {
-          // error
-          vm.$log.info('Cluster not running: did not get expected status response');
-          deferred.reject();
-        }
-
-      }, () => {
-        vm.$log.info('Cluster TERMINATED at: ', dns);
-        deferred.reject();
-      });
-    } else {
-      // nothing to ping
-      vm.$log.info('No DNS to ping for this cluster');
-      deferred.reject();
-    }
-
-    return deferred.promise;
-  }
-
   fixURL(url) {
     // if http:// is missing from URL, $http actions won't work
     if (url.indexOf('http://') == -1 && url.indexOf('https://') == -1) {
       url = 'http://' + url;
     }
     return url;
-  }
-
-  getOsServerVersions() {
-    const vm = this;
-    return vm.osServerVersions;
-  }
-
-  saveClusterToFile() {
-    const vm = this;
-    if (vm.Message.showDebug()) vm.$log.debug('FILE DATA: ', vm.remoteSettings.aws);
-    // copy and clean up what you don't need
-    const cluster = angular.copy(vm.remoteSettings.aws);
-    cluster.server_instance_type = cluster.server_instance_type ? cluster.server_instance_type.name : '';
-    cluster.worker_instance_type = cluster.worker_instance_type ? cluster.worker_instance_type.name : '';
-    cluster.openstudio_server_version = cluster.openstudio_server_version ? cluster.openstudio_server_version.name : '';
-    // TODO: make sure worker number is a number
-    // this is hard-coded
-    cluster.ami_lookup_version = 3;
-    vm.jetpack.write(vm.getProjectDir().path(vm.remoteSettings.aws.cluster_name + '_cluster.json'), cluster);
-  }
-
-  setOsServerVersions() {
-    const vm = this;
-    const deferred = vm.$q.defer();
-    vm.osServerVersions = [];
-    const amiURL = 'http://s3.amazonaws.com/openstudio-resources/server/api/v3/amis.json';
-    const headers = {};
-    headers['Cache-Control'] = 'no-cache';
-    headers['Pragma'] = 'no-cache';
-    headers['If-Modified-Since'] = 'Mon, 26 Jul 1997 05:00:00 GMT';
-    const config = {headers: headers};
-    vm.$http.get(amiURL, config).then(response => {
-      if (response.data && response.data.builds) {
-        vm.$log.info('OPENSTUDIO SERVER AMIS: ', response.data.builds);
-        _.forEach(response.data.builds, version => {
-          vm.osServerVersions.push(version);
-        });
-      }
-      vm.$log.info('OS Server Versions: ', vm.osServerVersions);
-      deferred.resolve(vm.osServerVersions);
-
-    }, error => {
-      vm.$log.error('Error retrieving the OsServerVersions: ', error);
-      vm.$translate('toastr.amisError').then(translation => {
-        vm.toastr.error(translation);
-      });
-      deferred.reject();
-
-    });
-
-    return deferred.promise;
-  }
-
-  setServerInstanceTypes() {
-    const vm = this;
-    vm.serverInstanceTypes = [
-      {
-        name: 'm3.2xlarge',
-        cpus: '8',
-        memory: '30 GiB',
-        storage: '2 x 80 GB',
-        cost: '$0.56/hr'
-      },
-      {
-        name: 'c3.2xlarge',
-        cpus: '8',
-        memory: '15 GiB',
-        storage: '2 x 80 GB',
-        cost: '	$0.42/hr'
-      },
-      {
-        name: 'c3.4xlarge',
-        cpus: '16',
-        memory: '30 GiB',
-        storage: '2 x 160 GB',
-        cost: '$0.84/hr'
-      },
-      {
-        name: 'c3.8xlarge',
-        cpus: '32',
-        memory: '60 GiB',
-        storage: '2 x 320 GB',
-        cost: '$1.68/hr'
-      },
-      {
-        name: 'd2.2xlarge',
-        cpus: '8',
-        memory: '61 GiB',
-        storage: '6 x 2000 GB',
-        cost: '$1.38/hr'
-      },
-      {
-        name: 'd2.4xlarge',
-        cpus: '16',
-        memory: '122 GiB',
-        storage: '12 x 2000 GB',
-        cost: '$2.76/hr'
-      },
-      {
-        name: 'd2.8xlarge',
-        cpus: '36',
-        memory: '244 GiB',
-        storage: '24 x 2000 GB',
-        cost: '$5.52/hr'
-      }
-    ];
-  }
-
-  setWorkerInstanceTypes() {
-    const vm = this;
-    vm.workerInstanceTypes = [
-      {
-        name: 'm3.medium',
-        cpus: '1',
-        memory: '3.75 GiB',
-        storage: '1 x 4 GB',
-        cost: '$0.07/hr'
-      },
-      {
-        name: 'm3.large',
-        cpus: '2',
-        memory: '7.5 GiB',
-        storage: '1 x 32 GB',
-        cost: '$0.14/hr'
-      },
-      {
-        name: 'm3.xlarge',
-        cpus: '4',
-        memory: '15 GiB',
-        storage: '2 x 40 GB',
-        cost: '$0.28/hr'
-      },
-      {
-        name: 'm3.2xlarge',
-        cpus: '8',
-        memory: '30 GiB',
-        storage: '2 x 80 GB',
-        cost: '$0.56/hr'
-      },
-      {
-        name: 'c3.large',
-        cpus: '2',
-        memory: '3.75 GiB',
-        storage: '2 x 16 GB',
-        cost: '$0.11/hr'
-      },
-      {
-        name: 'c3.xlarge',
-        cpus: '4',
-        memory: '7.5 GiB',
-        storage: '2 x 40 GB',
-        cost: '$0.21/hr'
-      },
-      {
-        name: 'c3.2xlarge',
-        cpus: '8',
-        memory: '15 GiB',
-        storage: '2 x 80 GB',
-        cost: '$0.42/hr'
-      },
-      {
-        name: 'c3.4xlarge',
-        cpus: '16',
-        memory: '30 GiB',
-        storage: '2 x 160 GB',
-        cost: '$0.84/hr'
-      },
-      {
-        name: 'c3.8xlarge',
-        cpus: '32',
-        memory: '60 GiB',
-        storage: '2 x 320 GB',
-        cost: '$1.68/hr'
-      },
-      {
-        name: 'r3.large',
-        cpus: '2',
-        memory: '15.25 GiB',
-        storage: '1 x 32 GB',
-        cost: '$0.85/hr'
-      },
-      {
-        name: 'd2.xlarge',
-        cpus: '4',
-        memory: '30.5 GiB',
-        storage: '1 x 800 GB',
-        cost: '$1.71/hr'
-      },
-      {
-        name: 'd2.xlarge',
-        cpus: '4',
-        memory: '30.5 GiB',
-        storage: '3 x 2000 GB',
-        cost: '$0.69/hr'
-      },
-      {
-        name: 'd2.2xlarge',
-        cpus: '8',
-        memory: '61 GiB',
-        storage: '6 x 2000 GB',
-        cost: '$1.38/hr'
-      },
-      {
-        name: 'd2.4xlarge',
-        cpus: '16',
-        memory: '122 GiB',
-        storage: '12 x 2000 GB',
-        cost: '$2.76/hr'
-      },
-      {
-        name: 'd2.8xlarge',
-        cpus: '36',
-        memory: '244 GiB',
-        storage: '24 x 2000 GB',
-        cost: '$5.52/hr'
-      }
-    ];
-  }
-
-  getServerInstanceTypes() {
-    const vm = this;
-    return vm.serverInstanceTypes;
-  }
-
-  getWorkerInstanceTypes() {
-    const vm = this;
-    return vm.workerInstanceTypes;
-  }
-
-  setAwsRegions() {
-    const vm = this;
-    vm.awsRegions = [
-      'us-east-1', 'us-east-2', 'us-west-1', 'us-west-2', 'ap-northeast-2', 'ap-southeast-1', 'ap-southeast-2', 'ap-northeast-1', 'eu-central-1', 'eu-west-1'
-    ];
-  }
-
-  getAwsRegions() {
-    const vm = this;
-    return vm.awsRegions;
   }
 
   setAnalysisType(name) {
@@ -3500,6 +3143,15 @@ export class Project {
       const match = _.find(vm.algorithmOptions[algorithm.id], {name: setting.name});
       if (!match) {
         vm.algorithmSettings.splice(key, 1);
+      } else {
+        // enum?
+        if (match.description.includes("Options:")){
+          // check that options are valid
+          if (!match.description.includes(setting.value)) {
+            // reset string
+            setting.value = match.defaultValue;
+          } 
+        } 
       }
     });
 

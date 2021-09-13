@@ -12,7 +12,7 @@ If you find a bug, you can help us by [submitting an issue](https://github.com/N
 PAT is an electron app.
 
 * Install the following and make sure they are in your path:
-	* node
+	* node v8
 	* npm
 	* bower
 	* gulp

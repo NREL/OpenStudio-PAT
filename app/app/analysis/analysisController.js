@@ -1236,7 +1236,12 @@ export class AnalysisController {
 
   deleteScript(type) {
     const vm = this;
+    // also delete from disk (.sh and .args file)
+    const newType = _.includes(type, 'server') ? 'analysis' : 'data_point';
+    vm.jetpack.remove(vm.Project.getProjectDir().path('scripts', newType, vm.$scope.serverScripts[type].file));
+    vm.jetpack.remove(vm.Project.getProjectDir().path('scripts', newType, _.replace(vm.$scope.serverScripts[type].file, '.sh', '.args')));
     vm.$scope.serverScripts[type].file = null;
+ 
   }
 
   addScriptArgument(type) {
@@ -1522,8 +1527,8 @@ export class AnalysisController {
         arg.display_name_short = arg.display_name_short ? arg.display_name_short : arg.name;
         if (!arg.inputs) arg.inputs = {};
         // name and displayName should be already defined
-        arg.inputs.relationship = _.isNil(arg.inputs.relationship) ? null : arg.inputs.relationship; // TODO: what is this?
-        arg.inputs.choiceDisplayNames = _.isNil(arg.choice_display_names) ? [] : arg.choice_display_names;  // TODO: what is this?
+        arg.inputs.relationship = _.isNil(arg.inputs.relationship) ? null : arg.inputs.relationship; 
+        arg.inputs.choiceDisplayNames = _.isNil(arg.choice_display_names) ? [] : arg.choice_display_names;  
         arg.inputs.variableSetting = _.isNil(arg.inputs.variableSetting) ? 'Argument' : arg.inputs.variableSetting;
         if (arg.inputs.variableSetting == 'Discrete' || arg.inputs.variableSetting == 'Pivot') {
           arg.inputs.distribution = _.isNil(arg.inputs.distribution) ? 'Discrete' : arg.inputs.distribution;
@@ -1543,7 +1548,7 @@ export class AnalysisController {
             } else if (arg.type == 'String') {
               defaultValue = '';
             } else if (arg.type == 'Choice') {
-              if (!_.isNil(arg.choice_display_names && arg.choice_display_names.length)) {
+              if (!_.isNil(arg.choice_display_names) && arg.choice_display_names.length && arg.required) {
                 defaultValue = arg.choice_display_names[0];
               } else {
                 defaultValue = '';
