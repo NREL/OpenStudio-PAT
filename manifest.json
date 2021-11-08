@@ -60,33 +60,33 @@
     "type": "mongo"
   }],
   "openstudio": [{
-    "name": "OpenStudio-3.3.0-rc2-Windows.tar.gz",
+    "name": "OpenStudio-3.3.0-Windows.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.3.0-rc2-Darwin.tar.gz",
+    "name": "OpenStudio-3.3.0-Darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.3.0-rc2-Linux.tar.gz",
+    "name": "OpenStudio-3.3.0-Linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio"
   }],
   "openstudioServer": [{
-    "name": "OpenStudio-server-617379c0f4-win32.tar.gz",
+    "name": "OpenStudio-server-c4fd9d771b-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-617379c0f4-darwin.tar.gz",
+    "name": "OpenStudio-server-c4fd9d771b-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-617379c0f4-linux.tar.gz",
+    "name": "OpenStudio-server-c4fd9d771b-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio-server"
