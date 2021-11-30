@@ -1,7 +1,7 @@
 Parametric Analysis Tool (PAT)
 ==============
 
-The Parametric Analysis Tool (PAT) is part of the OpenStudio collection of software tools.  It is included in the [OpenStudio installer](https://www.openstudio.net/downloads).
+The Parametric Analysis Tool (PAT) is part of the OpenStudio collection of software tools.  
 
 For more information and documentation on OpenStudio, visit the [OpenStudio website](https://www.openstudio.net/) or the [OpenStudio GitHub](https://github.com/NREL/OpenStudio) repo.  User support is available via the community moderated question and answer resource [unmethours.com](https://unmethours.com/questions/).
 
