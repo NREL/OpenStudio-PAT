@@ -43,7 +43,7 @@
     "gulp-uglify": "~1.5.1",
     "gulp-useref": "~3.0.5",
     "gulp-util": "~3.0.6",
-    "karma": "~0.13.10",
+    "karma": "~6.3.14",
     "karma-coverage": "~0.5.2",
     "karma-jasmine": "~0.3.6",
     "karma-ng-html2js-preprocessor": "~0.2.0",
