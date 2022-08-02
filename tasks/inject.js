@@ -10,7 +10,9 @@ var $ = require('gulp-load-plugins')();
 var wiredep = require('wiredep').stream;
 var _ = require('lodash');
 
-gulp.task('partials', function () {
+const { styles } = require('./styles');
+
+function partials() {
   return gulp.src(path.join(conf.paths.src, '/app/**/*.html'))
     .pipe($.sort())
     .pipe($.htmlmin({
@@ -26,9 +28,9 @@ gulp.task('partials', function () {
       root: 'app'
     }))
     .pipe(gulp.dest(conf.paths.tmp + '/serve/app/'));
-});
+}
 
-gulp.task('inject', ['partials', 'scripts', 'styles'], function () {
+function finalizeInject() {
   var injectAppStyles = gulp.src([
     path.join(conf.paths.tmp, '/serve/app/**/*.css'),
     path.join('!' + conf.paths.tmp, '/serve/app/**/bootstrap.css')
@@ -59,4 +61,7 @@ gulp.task('inject', ['partials', 'scripts', 'styles'], function () {
 
   return stream.pipe(wiredep(conf.wiredep))
     .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve')));
-});
+}
+
+exports.partials = partials;
+exports.inject = gulp.series(gulp.parallel(partials, styles), finalizeInject);
