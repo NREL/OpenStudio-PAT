@@ -33,13 +33,7 @@ var copyRuntime = function () {
 };
 
 var packageBuiltApp = function () {
-  var deferred = Q.defer();
-
-  asar.createPackage(projectDir.path('build'), readyAppDir.path('resources/app.asar'), function () {
-    deferred.resolve();
-  });
-
-  return deferred.promise;
+  return asar.createPackage(projectDir.path('build'), readyAppDir.path('resources/app.asar'));
 };
 
 var packageReports = function () {
