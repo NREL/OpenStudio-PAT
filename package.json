@@ -22,7 +22,7 @@
     "gulp-clean": "^0.3.2",
     "gulp-csso": "~1.1.0",
     "gulp-debug": "~2.1.2",
-    "gulp-decompress": "^2.0.1",
+    "gulp-decompress": "~3.0.0",
     "gulp-eslint": "~2.0.0",
     "gulp-filter": "3.0.1",
     "gulp-flatten": "~0.2.0",
