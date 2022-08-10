@@ -10,7 +10,8 @@ var conf = require('./conf');
 var utils = require('./utils');
 var _ = require('lodash');
 var os = require('os');
-var decompress = require('gulp-decompress');
+var zlib = require('zlib');
+var tar = require('tar-fs');
 var gulpClean = require('gulp-clean');
 var merge = require('merge-stream');
 var rename = require("gulp-rename");
@@ -204,11 +205,26 @@ function extractDeps() {
 
     // What we do is to extract to properName and remove the leading (root)
     // directory level
-    return gulp.src(path.join(destination, destName))
-      .pipe( decompress({strip: 1}) )
-      .pipe(gulp.dest(path.join(destination, properName)));  });
+    const properDestinationDir = path.join(destination, properName);
+    jetpack.remove(properDestinationDir);
+    return jetpack.createReadStream(path.join(destination, destName))
+      .pipe(zlib.createGunzip())
+      .pipe(tar.extract(properDestinationDir, {
+        strip: 1,
+        // There is a bug in tar-fs where, because stripped files & directories
+        // are given an empty header.name, having multiple stripped items
+        // results in having multiple headers with the same (empty) name,
+        // causing the extraction to either fail or hang.
+        //
+        // We avoid this issue by ignoring stripped items (ie, items with empty names)
+        ignore: (__, header) => {
+          return header.name.length === 0;
+        }
+      }));
+  });
 
-  return merge(tasks);
+  const tasksAsPromises = tasks.map(task => new Promise((resolve, reject) => task.on('finish', resolve).on('error', reject)));
+  return Promise.all(tasksAsPromises);
 }
 
 function cleanDeps() {
