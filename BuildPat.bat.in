@@ -1,7 +1,7 @@
 set PATH=%PATH%;${GIT_DIR}
-setx GYP_MSVS_VERSION 2019
-cmd /C "${NPM_COMMAND}" config set msvs_version 2019 -g
-cmd /C "${NPM_COMMAND}" install --msvs_version=2019
+setx GYP_MSVS_VERSION 2022
+cmd /C "${NPM_COMMAND}" config set msvs_version 2022 -g
+cmd /C "${NPM_COMMAND}" install --msvs_version=2022
 cmd /C "${NPM_COMMAND}" install bower
 cmd /C "${CMAKE_SOURCE_DIR}/node_modules/.bin/bower" install
 cmd /C "${NPM_COMMAND}" run release

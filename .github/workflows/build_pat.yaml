@@ -32,8 +32,8 @@ jobs:
           MACOSX_DEPLOYMENT_TARGET: 10.15
           SDKROOT: /Applications/Xcode_11.7.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
           DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
-        - name: Windows_2019
-          os: windows-2019
+        - name: Windows_2022
+          os: windows-2022
           node-version: 18
           allow_failure: false
 
@@ -89,7 +89,7 @@ jobs:
       run: |
         echo "Using vcvarsall to initialize the development environment"
         call vcvarsall.bat x64
-        cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release ..
+        cmake -G "Visual Studio 17 2022" -A x64 -DCMAKE_BUILD_TYPE=Release ..
         cmake --build . --target package -j 2
       
     - name: Configure CMake & build (Linux)
