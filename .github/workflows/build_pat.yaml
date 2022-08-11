@@ -1,0 +1,127 @@
+name: Build_PAT
+
+on:
+  pull_request:
+    branches:
+      -  '*'
+  push:
+    branches:
+      -  '*'
+    tags:
+      - '*' 
+
+jobs:
+  pat_build:
+    name: Build ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    continue-on-error: ${{ matrix.allow_failure }}
+    strategy:
+      # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
+      fail-fast: false
+      matrix:
+        name: [Ubuntu, macOS, Windows_2019]
+        include:
+        - name: Ubuntu
+          os: ubuntu-18.04
+          node-version: 18
+          allow_failure: false
+        - name: macOS
+          os: macos-10.15
+          node-version: 18
+          allow_failure: false
+          MACOSX_DEPLOYMENT_TARGET: 10.15
+          SDKROOT: /Applications/Xcode_11.7.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+          DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
+        - name: Windows_2019
+          os: windows-2019
+          node-version: 18
+          allow_failure: false
+
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Set up Node ${{ matrix.node-version }}
+      uses: actions/setup-node@v3
+      with:
+        python-version: ${{ matrix.node-version }}
+
+    - name: Install System dependencies
+      shell: bash
+      run: |
+        set -x
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt update
+          sudo apt install cmake
+        elif [ "$RUNNER_OS" == "macOS" ]; then
+          curl -L -O https://download.qt.io/official_releases/qt-installer-framework/4.3.0/QtInstallerFramework-macOS-x64-4.3.0.dmg
+          hdiutil attach -mountpoint ./qtfiw_installer QtInstallerFramework-macOS-x64-4.3.0.dmg
+          echo "ls ./qtfiw_installer"
+          sudo ./qtfiw_installer/QtInstallerFramework-macOS-x64-4.3.0.app/Contents/MacOS/QtInstallerFramework-macOS-x64-4.3.0 --verbose --script ./ci/install_script_qtifw.qs
+          ls ~/Qt/QtIFW-4.3.0 || true
+          echo "~/Qt/QtIFW-4.3.0/bin/" >> $GITHUB_PATH
+          echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.MACOSX_DEPLOYMENT_TARGET }} >> $GITHUB_ENV  
+          # echo CMAKE_MACOSX_DEPLOYMENT_TARGET='-DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET' >> $GITHUB_ENV
+        elif [ "$RUNNER_OS" == "Windows" ]; then
+          curl -L -O https://download.qt.io/official_releases/qt-installer-framework/4.3.0/QtInstallerFramework-windows-x86-4.3.0.exe
+          ./QtInstallerFramework-windows-x86-4.3.0.exe --verbose --script ./ci/install_script_qtifw.qs
+          dir "C:/Qt/"
+          echo "C:/Qt/QtIFW-4.3.0/bin" >> $GITHUB_PATH
+          #echo "Setting CMAKE_GENERATOR options equivalent to ='-G \"Visual Studio 16 2019\" -A x64'"
+          #echo CMAKE_GENERATOR='Visual Studio 16 2019' >> $GITHUB_ENV
+          #echo CMAKE_GENERATOR_PLATFORM=x64 >> $GITHUB_ENV
+          # C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise
+          MSVC_DIR=$(cmd.exe /c "vswhere -products * -requires Microsoft.Component.MSBuild -property installationPath -latest")
+          echo "Latest is: $MSVC_DIR"
+          echo "MSVC_DIR=$MSVC_DIR" >> $GITHUB_ENV
+          # add folder containing vcvarsall.bat
+          echo "$MSVC_DIR\VC\Auxiliary\Build" >> $GITHUB_PATH
+        fi;
+
+    - name: Create Build Directory
+      run: cmake -E make_directory ./build/
+
+
+    - name: Configure CMake & build (Windows)
+      working-directory: ./build
+      if: runner.os == 'Windows'
+      shell: cmd
+      run: |
+        echo "Using vcvarsall to initialize the development environment"
+        call vcvarsall.bat x64
+        cmake -G "Visual Studio 16 2019" -A x64 -DCMAKE_BUILD_TYPE=Release ..
+        cmake --build . --target package -j 2
+      
+    - name: Configure CMake & build (Linux)
+      working-directory: ./build
+      if: runner.os == 'Linux'
+      shell: bash
+      run: |
+        set -x
+        cmake -DCMAKE_BUILD_TYPE=Release \
+              -DCPACK_BINARY_DEB=ON \
+              -DCPACK_BINARY_IFW=OFF \
+              -DCPACK_BINARY_TGZ=OFF \
+              -DCPACK_BINARY_TZ=OFF \
+              -DCPACK_BINARY_STGZ=OFF \
+              -DCPACK_BINARY_TBZ2=OFF \
+              ../
+        cmake --build . --target package -j 2
+
+    - name: Configure CMake & build (macOS)
+      working-directory: ./build
+      if: runner.os == 'macOS'
+      shell: bash
+      run: |
+        set -x
+        cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
+               -DCMAKE_BUILD_TYPE=Release \
+              ../
+        cmake --build . --target package -j 2
+
+    - name: Save artifact
+      uses: actions/upload-artifact@v2
+      with:
+        path: ./build/ParametricAnalysisTool-*
+
+  
