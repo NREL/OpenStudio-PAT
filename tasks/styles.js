@@ -53,6 +53,7 @@ function styles() {
     })).on('error', conf.errorHandler('Autoprefixer'))
     .pipe($.sourcemaps.write())
     .pipe(indexFilter.restore)
+    .pipe($.flatten())
     .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app/')));
 }
 

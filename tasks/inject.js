@@ -60,6 +60,7 @@ function finalizeInject() {
   }
 
   return stream.pipe(wiredep(conf.wiredep))
+    .pipe($.flatten())
     .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve')));
 }
 

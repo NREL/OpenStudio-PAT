@@ -26,11 +26,13 @@ var $ = require('gulp-load-plugins')({
 function background() {
   return gulp.src(path.join(conf.paths.tmp, '/serve/app/background.js'))
   .pipe($.uglify()).on('error', conf.errorHandler('Uglify background.js'))
+  .pipe($.flatten())
   .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
 }
 
 function preload() {
   return gulp.src(path.join(conf.paths.src, '/app/reports/preload.js'))
+    .pipe($.flatten())
     .pipe(gulp.dest(path.join(conf.paths.dist, '/scripts')));
 }
 
@@ -40,6 +42,7 @@ function finalizeHtml() {
   var cssFilter = $.filter('**/*.css', {restore: true});
 
   return gulp.src(path.join(conf.paths.tmp, '/serve/*.html'))
+    .pipe($.flatten())
     .pipe($.useref({}, $.lazypipe().pipe($.sourcemaps.init, {loadMaps: true})))
     .pipe(jsFilter)
     .pipe($.ngAnnotate())
@@ -90,6 +93,11 @@ function other() {
     path.join('!' + conf.paths.src, '/**/*.{html,css,js,scss}')
   ])
     .pipe($.filter(file => file.stat.isFile()))
+    .pipe(rename(p => {
+      if (p.dirname.startsWith(conf.paths.src)) {
+        p.dirname = p.dirname.substring(conf.paths.src.length)
+      }
+    }))
     .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
 }
 
