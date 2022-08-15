@@ -1,6 +1,7 @@
 'use strict';
 
 var gulp = require('gulp');
+var flatten = require('gulp-flatten');
 var utils = require('./utils');
 var conf = require('./conf');
 var path = require('path');
@@ -15,6 +16,7 @@ var releaseForOs = {
 
 function reports() {
   return gulp.src(path.join(conf.paths.src, 'app/reports/projectReports/*.html'))
+    .pipe(flatten())
     .pipe(gulp.dest(conf.paths.dist));
 }
 
