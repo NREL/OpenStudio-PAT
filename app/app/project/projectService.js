@@ -28,12 +28,10 @@
 import jetpack from 'fs-jetpack';
 //import os from 'os';
 import path from 'path';
-import {remote} from 'electron';
+import { app, dialog } from '@electron/remote';
 import jsZip from 'jszip';
 import fs from 'fs';
 import archiver from 'archiver';
-
-const {app, dialog} = remote;
 
 export class Project {
   constructor($q, $log, $http, $uibModal, MeasureManager, $sce, Message, toastr, $translate) {

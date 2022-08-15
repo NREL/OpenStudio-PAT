@@ -26,9 +26,7 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-//const {shell} = require('electron');
-import {remote} from 'electron';
-const {shell} = remote;
+import { shell } from '@electron/remote';
 
 export class ModalBclController {
 

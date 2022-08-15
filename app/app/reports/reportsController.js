@@ -28,10 +28,8 @@
 import jetpack from 'fs-jetpack';
 import os from 'os';
 import path from 'path';
-import {remote} from 'electron';
+import { app } from '@electron/remote';
 import { getEnv } from '../../env';
-
-const {app} = remote;
 export class ReportsController {
 
   constructor($log, Project, $scope, Message) {

@@ -34,6 +34,8 @@ import { app } from 'electron';
 import createWindow from './electron/window';
 import { getEnv } from './env';
 
+require('@electron/remote/main').initialize();
+
 app.on('ready', () => {
 
   const mainWindow = createWindow('main', {
@@ -42,6 +44,7 @@ app.on('ready', () => {
     webPreferences: {
       enableRemoteModule: true,
       nodeIntegration: true,
+      contextIsolation: false,
       webviewTag: true,
       webSecurity: false // Disable the same-origin policy when using http
     }

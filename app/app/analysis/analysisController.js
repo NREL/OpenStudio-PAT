@@ -26,10 +26,9 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-import {remote} from 'electron';
+import { dialog } from '@electron/remote';
 import {shell} from 'electron';
 import path from 'path';
-const {dialog} = remote;
 
 export class AnalysisController {
 

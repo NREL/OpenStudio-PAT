@@ -26,11 +26,9 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-import {remote} from 'electron';
+import { dialog } from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
-
-const {dialog} = remote;
 
 export class SetProject {
   constructor($q, $log, $state, $uibModal, Project, OsServer, BCL, $translate, toastr, Message) {
