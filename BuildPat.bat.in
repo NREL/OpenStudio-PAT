@@ -1,8 +1,11 @@
 set PATH=%PATH%;${GIT_DIR}
+set BUILD_DIR=%cd%
 setx GYP_MSVS_VERSION 2022
-cmd /C "${NPM_COMMAND}" config set msvs_version 2022 -g
-cmd /C "${NPM_COMMAND}" install --msvs_version=2022
-cmd /C "${NPM_COMMAND}" install bower
+
+cd ${CMAKE_SOURCE_DIR}
+cmd /C "${NPM_COMMAND}" config set msvs_version 2022 --location=global
+cmd /C "${NPM_COMMAND}" ci --msvs_version=2022
 cmd /C "${CMAKE_SOURCE_DIR}/node_modules/.bin/bower" install
 cmd /C "${NPM_COMMAND}" run release
 "${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" installDeps --prefix="${CMAKE_SOURCE_DIR}/tmp/pat"
+cd %BUILD_DIR%
