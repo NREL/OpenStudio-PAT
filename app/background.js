@@ -40,6 +40,7 @@ app.on('ready', () => {
     width: 1000,
     height: 600,
     webPreferences: {
+      enableRemoteModule: true,
       nodeIntegration: true,
       webviewTag: true,
       webSecurity: false // Disable the same-origin policy when using http
