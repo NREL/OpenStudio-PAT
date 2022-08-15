@@ -859,7 +859,7 @@ export class RunController {
 
   viewAlgorithmResults() {
     const vm = this;
-    vm.shell.openItem(vm.Project.getAlgorithmResultsPath());
+    vm.shell.openPath(vm.Project.getAlgorithmResultsPath());
   }
 
   downloadResults(datapoint) {

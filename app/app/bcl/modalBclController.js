@@ -583,7 +583,7 @@ export class ModalBclController {
       vm.toastr.info(translation, {
         timeOut: 3000, onHidden: function () {
           //if (vm.Message.showDebug()) vm.$log.debug('Opening measure file');
-          vm.shell.openItem(measure.measure_dir + '/measure.rb');
+          vm.shell.openPath(measure.measure_dir + '/measure.rb');
         }
       });
     });
