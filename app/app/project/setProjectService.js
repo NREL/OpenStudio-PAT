@@ -89,134 +89,134 @@ export class SetProject {
       if (vm.Message.showDebug()) vm.$log.debug('openModal() response:', response);
 
       // pop modal to allow user to navigate to project parent folder
-      const result = vm.dialog.showOpenDialog({
+      vm.dialog.showOpenDialog({
         title: 'Choose New ParametricAnalysisTool Project Folder',
         properties: ['openDirectory']
-      });
-
-      if (!_.isEmpty(result)) {
-        let projectDir = jetpack.cwd(result[0]);
-        if (vm.Message.showDebug()) vm.$log.debug('projectDir.path(): ', projectDir.path());
-        // Check that path is not in a PAT project subdirectory
-        let count = 0;
-        const maxDirectoriesToCheck = 5;
-        let fileExists = false;
-        let atRoot = false;
-        let currentDir = projectDir;
-        while (!fileExists && !atRoot && count < maxDirectoriesToCheck) {
-          const fullFilename = currentDir.path('pat.json');
-          if (vm.Message.showDebug()) vm.$log.debug('checking for ', fullFilename);
-          const file = vm.jetpack.read(fullFilename);
-          if (typeof file !== 'undefined') {
-            fileExists = true;
-            vm.nestedProjectModal().then(() => {
-            });
-            vm.$log.info('Found what appears to be a PAT project at ', currentDir.path());
-            deferred.reject('rejected');
+      }).then(result => {
+        if (!_.isEmpty(result.filePaths)) {
+          let projectDir = jetpack.cwd(result.filePaths[0]);
+          if (vm.Message.showDebug()) vm.$log.debug('projectDir.path(): ', projectDir.path());
+          // Check that path is not in a PAT project subdirectory
+          let count = 0;
+          const maxDirectoriesToCheck = 5;
+          let fileExists = false;
+          let atRoot = false;
+          let currentDir = projectDir;
+          while (!fileExists && !atRoot && count < maxDirectoriesToCheck) {
+            const fullFilename = currentDir.path('pat.json');
+            if (vm.Message.showDebug()) vm.$log.debug('checking for ', fullFilename);
+            const file = vm.jetpack.read(fullFilename);
+            if (typeof file !== 'undefined') {
+              fileExists = true;
+              vm.nestedProjectModal().then(() => {
+              });
+              vm.$log.info('Found what appears to be a PAT project at ', currentDir.path());
+              deferred.reject('rejected');
+            }
+            currentDir = jetpack.cwd(currentDir.path('..'));
+            const tempDir = jetpack.cwd(currentDir.path('..'));
+            if (currentDir.path() === tempDir.path()) {
+              atRoot = true;
+            }
+            count += 1;
           }
-          currentDir = jetpack.cwd(currentDir.path('..'));
-          const tempDir = jetpack.cwd(currentDir.path('..'));
-          if (currentDir.path() === tempDir.path()) {
-            atRoot = true;
-          }
-          count += 1;
-        }
 
-        if (!fileExists) {
+          if (!fileExists) {
 
-          // if (projectDir.path().indexOf(' ') >= 0) {
-          //   // tell user to expect trouble
-          //   vm.whitespaceModal().then(response => {
-          //   });
-          // }
+            // if (projectDir.path().indexOf(' ') >= 0) {
+            //   // tell user to expect trouble
+            //   vm.whitespaceModal().then(response => {
+            //   });
+            // }
 
-          // user warning: local server no longer starts by default
-          vm.$translate('toastr.noMoreLocalServerDefaultStart').then(translation => {
-            vm.toastr.warning(translation);
-          });
-
-          vm.OsServer.stopServer('local').then(response => {
-            vm.Project.setProjectName(vm.newProjectName);  // this is taken care of my setProjectVariables. remove?
-            projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
-            if (vm.Message.showDebug()) vm.$log.info('SetProjectService::stop server: server stopped');
-            if (vm.Message.showDebug()) vm.$log.info('OsServer.stopServer() response: ', response);
-
-            // for saveAs: copy old project's folder structure to new location (from, to)
-            vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
-
-            // rename project's json and zip files, if they exist
-            const oldZip = projectDir.path(oldProjectName + '.zip');
-            const oldJson = projectDir.path(oldProjectName + '.json');
-            const newZip = vm.Project.projectName + '.zip';
-            const newJson = vm.Project.projectName + '.json';
-            // Note "rename" provides no return
-            if (vm.Message.showDebug()) vm.$log.debug('preparing to jet rename');
-            if (vm.Message.showDebug()) vm.$log.debug('oldZip', oldZip);
-            if (vm.Message.showDebug()) vm.$log.debug('oldJson', oldJson);
-            if (vm.Message.showDebug()) vm.$log.debug('newZip', newZip);
-            if (vm.Message.showDebug()) vm.$log.debug('newJson', newJson);
-
-            // The project may not have been run; it may not have these files.
-            // If these files are missing, jetpack.rename will fail ungracefully
-            if (jetpack.exists(oldZip) == 'file') {
-              if (vm.Message.showDebug()) vm.$log.debug(oldZip + ' is in project, and is being renamed to ' + newZip + '.');
-              jetpack.rename(oldZip, newZip);
-            }
-            else if (jetpack.exists(oldZip) == 'dir') {
-              vm.$log.error(oldZip + ' is a directory, and not a file.');
-            }
-            else if (jetpack.exists(oldZip) == 'other') {
-              vm.$log.error(oldZip + ' is an unknown type.');
-            }
-            else if (jetpack.exists(oldZip) == false) {
-              if (vm.Message.showDebug()) vm.$log.debug(oldZip + ' is not in project.');
-            }
-            else {
-              vm.$log.error('jetpack.exists(' + oldZip + ') generated an unhandled return.');
-            }
-
-            if (jetpack.exists(oldJson) == 'file') {
-              if (vm.Message.showDebug()) vm.$log.debug(oldJson + ' is in project, and is being renamed to ' + newJson + '.');
-              jetpack.rename(oldJson, newJson);
-            }
-            else if (jetpack.exists(oldJson) == 'dir') {
-              vm.$log.error(oldJson + ' is a directory, and not a file.');
-            }
-            else if (jetpack.exists(oldJson) == 'other') {
-              vm.$log.error(oldJson + ' is an unknown type.');
-            }
-            else if (jetpack.exists(oldJson) == false) {
-              if (vm.Message.showDebug()) vm.$log.debug(oldJson + ' is not in project.');
-            }
-            else {
-              vm.$log.error('jetpack.exists(' + oldJson + ') generated an unhandled return.');
-            }
-
-            // set project Variables
-            vm.setProjectVariables(projectDir);
-            vm.$translate('toastr.projectSaved').then(translation => {
-              vm.toastr.success(translation);
+            // user warning: local server no longer starts by default
+            vm.$translate('toastr.noMoreLocalServerDefaultStart').then(translation => {
+              vm.toastr.warning(translation);
             });
-            vm.$state.transitionTo('analysis', {}, {reload: true});
 
-            deferred.resolve('resolve');
-            return deferred.promise;
+            vm.OsServer.stopServer('local').then(response => {
+              vm.Project.setProjectName(vm.newProjectName);  // this is taken care of my setProjectVariables. remove?
+              projectDir = jetpack.cwd(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
+              if (vm.Message.showDebug()) vm.$log.info('SetProjectService::stop server: server stopped');
+              if (vm.Message.showDebug()) vm.$log.info('OsServer.stopServer() response: ', response);
 
-          }, () => {
+              // for saveAs: copy old project's folder structure to new location (from, to)
+              vm.jetpack.copy(vm.Project.projectDir.path(), projectDir.path());
 
-            vm.$log.error('The command stopServer returned an error. Unable to set new project name and start new local server.');
-            vm.$log.error('Please try to "Save As" again. If this problem persists, please reboot your computer to ensure the original Pat server completely shut down.');
+              // rename project's json and zip files, if they exist
+              const oldZip = projectDir.path(oldProjectName + '.zip');
+              const oldJson = projectDir.path(oldProjectName + '.json');
+              const newZip = vm.Project.projectName + '.zip';
+              const newJson = vm.Project.projectName + '.json';
+              // Note "rename" provides no return
+              if (vm.Message.showDebug()) vm.$log.debug('preparing to jet rename');
+              if (vm.Message.showDebug()) vm.$log.debug('oldZip', oldZip);
+              if (vm.Message.showDebug()) vm.$log.debug('oldJson', oldJson);
+              if (vm.Message.showDebug()) vm.$log.debug('newZip', newZip);
+              if (vm.Message.showDebug()) vm.$log.debug('newJson', newJson);
 
-            deferred.reject('rejected');
-            return deferred.promise;
-          });
+              // The project may not have been run; it may not have these files.
+              // If these files are missing, jetpack.rename will fail ungracefully
+              if (jetpack.exists(oldZip) == 'file') {
+                if (vm.Message.showDebug()) vm.$log.debug(oldZip + ' is in project, and is being renamed to ' + newZip + '.');
+                jetpack.rename(oldZip, newZip);
+              }
+              else if (jetpack.exists(oldZip) == 'dir') {
+                vm.$log.error(oldZip + ' is a directory, and not a file.');
+              }
+              else if (jetpack.exists(oldZip) == 'other') {
+                vm.$log.error(oldZip + ' is an unknown type.');
+              }
+              else if (jetpack.exists(oldZip) == false) {
+                if (vm.Message.showDebug()) vm.$log.debug(oldZip + ' is not in project.');
+              }
+              else {
+                vm.$log.error('jetpack.exists(' + oldZip + ') generated an unhandled return.');
+              }
+
+              if (jetpack.exists(oldJson) == 'file') {
+                if (vm.Message.showDebug()) vm.$log.debug(oldJson + ' is in project, and is being renamed to ' + newJson + '.');
+                jetpack.rename(oldJson, newJson);
+              }
+              else if (jetpack.exists(oldJson) == 'dir') {
+                vm.$log.error(oldJson + ' is a directory, and not a file.');
+              }
+              else if (jetpack.exists(oldJson) == 'other') {
+                vm.$log.error(oldJson + ' is an unknown type.');
+              }
+              else if (jetpack.exists(oldJson) == false) {
+                if (vm.Message.showDebug()) vm.$log.debug(oldJson + ' is not in project.');
+              }
+              else {
+                vm.$log.error('jetpack.exists(' + oldJson + ') generated an unhandled return.');
+              }
+
+              // set project Variables
+              vm.setProjectVariables(projectDir);
+              vm.$translate('toastr.projectSaved').then(translation => {
+                vm.toastr.success(translation);
+              });
+              vm.$state.transitionTo('analysis', {}, {reload: true});
+
+              deferred.resolve('resolve');
+              return deferred.promise;
+
+            }, () => {
+
+              vm.$log.error('The command stopServer returned an error. Unable to set new project name and start new local server.');
+              vm.$log.error('Please try to "Save As" again. If this problem persists, please reboot your computer to ensure the original Pat server completely shut down.');
+
+              deferred.reject('rejected');
+              return deferred.promise;
+            });
+          }
+        } else {
+          deferred.reject('rejected');
         }
-      } else {
-        deferred.reject('rejected');
         return deferred.promise;
-      }
+      });
     });
-    deferred.reject('rejected');
+
     return deferred.promise;
   }
 
@@ -230,73 +230,155 @@ export class SetProject {
       if (vm.Message.showDebug()) vm.$log.debug('newProject response:', response);
 
       // pop modal to allow user to navigate to project parent folder
-      const result = vm.dialog.showOpenDialog({
+      vm.dialog.showOpenDialog({
         title: 'Choose New ParametricAnalysisTool Project Folder',
         properties: ['openDirectory']
-      });
+      }).then(result => {
+        if (!_.isEmpty(result.filePaths)) {
+          let projectDir = jetpack.cwd(result.filePaths[0]);
+          // Check that path is not in a PAT project subdirectory
+          let count = 0;
+          const maxDirectoriesToCheck = 5;
+          let fileExists = false;
+          let atRoot = false;
+          let currentDir = projectDir;
+          while (!fileExists && !atRoot && count < maxDirectoriesToCheck) {
+            const fullFilename = currentDir.path('pat.json');
+            if (vm.Message.showDebug()) vm.$log.debug('checking for ', fullFilename);
+            const file = vm.jetpack.read(fullFilename);
+            if (typeof file !== 'undefined') {
+              fileExists = true;
+              vm.nestedProjectModal().then(() => {
+              });
+              vm.$log.info('Found what appears to be a PAT project at ', currentDir.path());
+              deferred.reject('rejected');
+            }
+            currentDir = jetpack.cwd(currentDir.path('..'));
+            const tempDir = jetpack.cwd(currentDir.path('..'));
+            if (currentDir.path() === tempDir.path()) {
+              atRoot = true;
+            }
+            count += 1;
+          }
 
-      if (!_.isEmpty(result)) {
-        let projectDir = jetpack.cwd(result[0]);
-        // Check that path is not in a PAT project subdirectory
-        let count = 0;
-        const maxDirectoriesToCheck = 5;
-        let fileExists = false;
-        let atRoot = false;
-        let currentDir = projectDir;
-        while (!fileExists && !atRoot && count < maxDirectoriesToCheck) {
-          const fullFilename = currentDir.path('pat.json');
-          if (vm.Message.showDebug()) vm.$log.debug('checking for ', fullFilename);
-          const file = vm.jetpack.read(fullFilename);
-          if (typeof file !== 'undefined') {
-            fileExists = true;
-            vm.nestedProjectModal().then(() => {
+          if (!fileExists) {
+
+            // if (projectDir.path().indexOf(' ') >= 0) {
+            //   // tell user to expect trouble
+            //   vm.whitespaceModal().then(response => {
+            //   });
+            // }
+
+            // user warning: local server no longer starts by default
+            vm.$translate('toastr.noMoreLocalServerDefaultStart').then(translation => {
+              vm.toastr.warning(translation);
             });
-            vm.$log.info('Found what appears to be a PAT project at ', currentDir.path());
-            deferred.reject('rejected');
+
+            // force stop local server
+            vm.OsServer.stopServer('local').then(response => {
+              vm.$log.info('SetProjectService::stop server: local server stopped');
+              vm.$log.info('response: ', response);
+
+              vm.Project.setProjectName(vm.newProjectName);
+              projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
+
+              // set project Variables
+              // vm.Project.setAnalysisName(vm.Project.projectName);
+              vm.setProjectVariables(projectDir);
+
+              vm.$state.transitionTo('analysis', {}, {reload: true});
+
+              vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
+
+              // Only start server if local server is selected?
+              // For now: selected local run type and start local server
+              vm.Project.setRunType(vm.Project.getRunTypes()[0]);
+              // start local server at new location
+              // vm.$translate('toastr.startLocalServer').then(translation => {
+              //   vm.toastr.info(translation);
+              // });
+              // vm.OsServer.startServer().then(response => {
+              //   if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
+              //   if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
+              //   if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
+              // });
+
+              // resolve promise
+              deferred.resolve('resolve');
+              return deferred.promise;
+            }, () => {
+              vm.$log.info('stop server errored, but setting project anyway');
+              vm.Project.setProjectName(vm.newProjectName);  // this is taken care of my setProjectVariables. remove?
+              projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
+              // set project Variables anyway
+              // vm.Project.setAnalysisName(vm.Project.projectName);
+              vm.setProjectVariables(projectDir);
+
+              vm.$state.transitionTo('analysis', {}, {reload: true});
+
+              vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
+
+              deferred.reject('rejected');
+              return deferred.promise;
+            });
           }
-          currentDir = jetpack.cwd(currentDir.path('..'));
-          const tempDir = jetpack.cwd(currentDir.path('..'));
-          if (currentDir.path() === tempDir.path()) {
-            atRoot = true;
-          }
-          count += 1;
+        } else {
+          deferred.reject('rejected');
         }
+        return deferred.promise;
+      });
+    });
 
-        if (!fileExists) {
+    return deferred.promise;
+  }
 
-          // if (projectDir.path().indexOf(' ') >= 0) {
-          //   // tell user to expect trouble
-          //   vm.whitespaceModal().then(response => {
-          //   });
-          // }
+  openProject() {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('openProject');
+    const deferred = vm.$q.defer();
+
+    vm.dialog.showOpenDialog({
+      title: 'Open ParametricAnalysisTool Project',
+      properties: ['openDirectory']
+    }).then(result => {
+      if (!_.isEmpty(result.filePaths)) {
+        const projectDir = jetpack.cwd(result.filePaths[0]);
+        if (vm.Message.showDebug()) vm.$log.debug('PAT Project dir path:', projectDir.path());
+
+        // if (projectDir.path().indexOf(' ') >= 0) {
+        //   // tell user to expect trouble
+        //   vm.whitespaceModal().then(response => {
+        //   });
+        // }
+
+        const fullFilename = projectDir.path('pat.json');
+
+        // projectDir must contain "pat.json"
+        if (vm.Message.showDebug()) vm.$log.debug('checking for ', fullFilename);
+        const file = vm.jetpack.read(fullFilename);
+        //if (vm.Message.showDebug()) vm.$log.debug('file: ', file);
+        if (typeof file !== 'undefined') {
+          if (vm.Message.showDebug()) vm.$log.debug(fullFilename, ' found');
 
           // user warning: local server no longer starts by default
           vm.$translate('toastr.noMoreLocalServerDefaultStart').then(translation => {
             vm.toastr.warning(translation);
           });
 
-          // force stop local server
+          // wait until server is stopped and new project set before closing modal
+          if (vm.Message.showDebug()) vm.$log.debug('fileExists!');
           vm.OsServer.stopServer('local').then(response => {
-            vm.$log.info('SetProjectService::stop server: local server stopped');
-            vm.$log.info('response: ', response);
-
-            vm.Project.setProjectName(vm.newProjectName); 
-            projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
+            if (vm.Message.showDebug()) vm.$log.info('SetProjectService::stop server: server stopped');
+            if (vm.Message.showDebug()) vm.$log.info('response: ', response);
 
             // set project Variables
-            // vm.Project.setAnalysisName(vm.Project.projectName);
             vm.setProjectVariables(projectDir);
 
             vm.$state.transitionTo('analysis', {}, {reload: true});
 
-            vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
-
-            // resolve promise
-            deferred.resolve('resolve');
-
             // Only start server if local server is selected?
-            // For now: selected local run type and start local server
-            vm.Project.setRunType(vm.Project.getRunTypes()[0]);
+            // New: don't reset run type or start local server
+            // vm.Project.setRunType(vm.Project.getRunTypes()[0]);
             // start local server at new location
             // vm.$translate('toastr.startLocalServer').then(translation => {
             //   vm.toastr.info(translation);
@@ -307,128 +389,53 @@ export class SetProject {
             //   if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
             // });
 
+            // resolve promise
+            deferred.resolve('resolve');
+            return deferred.promise;
           }, () => {
             vm.$log.info('stop server errored, but setting project anyway');
-            vm.Project.setProjectName(vm.newProjectName);  // this is taken care of my setProjectVariables. remove?
-            projectDir = jetpack.dir(path.resolve(projectDir.path() + '/' + vm.Project.projectName));
             // set project Variables anyway
-            // vm.Project.setAnalysisName(vm.Project.projectName);
             vm.setProjectVariables(projectDir);
 
             vm.$state.transitionTo('analysis', {}, {reload: true});
 
-            vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
-
             deferred.reject('rejected');
-          });
-        }
-      } else {
-        deferred.reject('rejected');
-      }
-    });
-    return deferred.promise;
-  }
-
-  openProject() {
-    const vm = this;
-    if (vm.Message.showDebug()) vm.$log.debug('openProject');
-    const deferred = vm.$q.defer();
-
-    const result = vm.dialog.showOpenDialog({
-      title: 'Open ParametricAnalysisTool Project',
-      properties: ['openDirectory']
-    });
-
-    if (!_.isEmpty(result)) {
-      const projectDir = jetpack.cwd(result[0]);
-      if (vm.Message.showDebug()) vm.$log.debug('PAT Project dir path:', projectDir.path());
-
-      // if (projectDir.path().indexOf(' ') >= 0) {
-      //   // tell user to expect trouble
-      //   vm.whitespaceModal().then(response => {
-      //   });
-      // }
-
-      const fullFilename = projectDir.path('pat.json');
-
-      // projectDir must contain "pat.json"
-      let fileExists = false;
-      if (vm.Message.showDebug()) vm.$log.debug('checking for ', fullFilename);
-      const file = vm.jetpack.read(fullFilename);
-      //if (vm.Message.showDebug()) vm.$log.debug('file: ', file);
-      if (typeof file !== 'undefined') {
-        if (vm.Message.showDebug()) vm.$log.debug(fullFilename, ' found');
-        fileExists = true;
-      } else {
-        if (vm.Message.showDebug()) vm.$log.debug(fullFilename, ' not found');
-        const allOSPs = vm.jetpack.find(projectDir.path(), {matching: '*.osp', recursive: false});
-        if (allOSPs.length > 0) {
-          if (vm.Message.showDebug()) vm.$log.debug('found osp in openProject');
-          if (vm.Message.showDebug()) vm.$log.debug('path: ', projectDir.path());
-          vm.dialog.showMessageBox({
-            type: 'info',
-            buttons: ['OK'],
-            title: 'Open ParametricAnalysisTool Project',
-            message: 'It appears you are trying to open a first-generation ParametricAnalysisTool project, and we are unable to translate it automatically to the new format for you.'
+            return deferred.promise;
           });
         } else {
-          vm.$log.error('could not find pat.json in openProject');
-          vm.dialog.showMessageBox({
-            type: 'info',
-            buttons: ['OK'],
-            title: 'Open ParametricAnalysisTool Project',
-            message: 'This is not a valid ParametricAnalysisTool project, as it has no file named "pat.json".'
-          });
+          if (vm.Message.showDebug()) vm.$log.debug(fullFilename, ' not found');
+          const allOSPs = vm.jetpack.find(projectDir.path(), {matching: '*.osp', recursive: false});
+          if (allOSPs.length > 0) {
+            if (vm.Message.showDebug()) vm.$log.debug('found osp in openProject');
+            if (vm.Message.showDebug()) vm.$log.debug('path: ', projectDir.path());
+            vm.dialog.showMessageBox({
+              type: 'info',
+              buttons: ['OK'],
+              title: 'Open ParametricAnalysisTool Project',
+              message: 'It appears you are trying to open a first-generation ParametricAnalysisTool project, and we are unable to translate it automatically to the new format for you.'
+            }).then(() => {
+              deferred.reject('rejected');
+              return deferred.promise;
+            });
+          } else {
+            vm.$log.error('could not find pat.json in openProject');
+            vm.dialog.showMessageBox({
+              type: 'info',
+              buttons: ['OK'],
+              title: 'Open ParametricAnalysisTool Project',
+              message: 'This is not a valid ParametricAnalysisTool project, as it has no file named "pat.json".'
+            }).then(() => {
+              deferred.reject('rejected');
+              return deferred.promise;
+            });
+          }
         }
-      }
-
-      if (fileExists) {
-
-        // user warning: local server no longer starts by default
-        vm.$translate('toastr.noMoreLocalServerDefaultStart').then(translation => {
-          vm.toastr.warning(translation);
-        });
-
-        // wait until server is stopped and new project set before closing modal
-        if (vm.Message.showDebug()) vm.$log.debug('fileExists!');
-        vm.OsServer.stopServer('local').then(response => {
-          if (vm.Message.showDebug()) vm.$log.info('SetProjectService::stop server: server stopped');
-          if (vm.Message.showDebug()) vm.$log.info('response: ', response);
-
-          // set project Variables
-          vm.setProjectVariables(projectDir);
-
-          vm.$state.transitionTo('analysis', {}, {reload: true});
-
-          // resolve promise
-          deferred.resolve('resolve');
-
-          // Only start server if local server is selected?
-          // New: don't reset run type or start local server
-          // vm.Project.setRunType(vm.Project.getRunTypes()[0]);
-          // start local server at new location
-          // vm.$translate('toastr.startLocalServer').then(translation => {
-          //   vm.toastr.info(translation);
-          // });
-          // vm.OsServer.startServer().then(response => {
-          //   if (vm.Message.showDebug()) vm.$log.debug('setProjectService::start server: server started');
-          //   if (vm.Message.showDebug()) vm.$log.debug('response: ', response);
-          //   if (vm.Message.showDebug()) vm.$log.debug('OsServer serverStatus: ', vm.OsServer.getServerStatus());
-          // });
-
-        }, () => {
-          vm.$log.info('stop server errored, but setting project anyway');
-          // set project Variables anyway
-          vm.setProjectVariables(projectDir);
-
-          vm.$state.transitionTo('analysis', {}, {reload: true});
-
-          deferred.reject('rejected');
-        });
       } else {
         deferred.reject('rejected');
       }
-    }
+      return deferred.promise;
+    });
+
     return deferred.promise;
   }
 

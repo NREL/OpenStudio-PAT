@@ -30,10 +30,11 @@ const {dialog} = remote;
 
 export class ModalSetMeasuresDirController {
 
-  constructor($log, $scope, $uibModalInstance, MeasureManager, $translate, toastr, Project, Message) {
+  constructor($q, $log, $scope, $uibModalInstance, MeasureManager, $translate, toastr, Project, Message) {
     'ngInject';
 
     const vm = this;
+    vm.$q = $q;
     vm.$uibModalInstance = $uibModalInstance;
     vm.$log = $log;
     vm.$scope = $scope;
@@ -49,16 +50,25 @@ export class ModalSetMeasuresDirController {
 
   selectDir() {
     const vm = this;
-    const result = vm.dialog.showOpenDialog({
+    if (vm.Message.showDebug()) vm.$log.debug('selectDir');
+    const deferred = vm.$q.defer();
+
+    vm.dialog.showOpenDialog({
       title: 'Select MyMeasures Dir',
       properties: ['openDirectory']
+    }).then(result => {
+      if (!_.isEmpty(result.filePaths)) {
+        // copy and select the file
+        vm.$scope.currentDir = result.filePaths[0];
+        if (vm.Message.showDebug()) vm.$log.debug('New Dir:', vm.$scope.currentDir);
+        deferred.resolve();
+      } else {
+        deferred.reject();
+      }
+      return deferred.promise;
     });
 
-    if (!_.isEmpty(result)) {
-      // copy and select the file
-      vm.$scope.currentDir = result[0];
-      if (vm.Message.showDebug()) vm.$log.debug('New Dir:', vm.$scope.currentDir);
-    }
+    return deferred.promise;
   }
 
 

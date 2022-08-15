@@ -14,6 +14,8 @@ var tmpDir;
 var finalAppDir;
 var manifest;
 
+const ELECTRON_HELPER_SUFFIXES = ['', ' (GPU)', ' (Plugin)', ' (Renderer)'];
+
 var init = function () {
   projectDir = jetpack;
   tmpDir = projectDir.dir('./tmp', {empty: true});
@@ -53,11 +55,12 @@ var finalize = function () {
   finalAppDir.write('Contents/Info.plist', info);
 
   // Prepare Info.plist of Helper apps
-  [''].forEach(function (helper_suffix) {
-    info = projectDir.read(`resources/osx/helper_apps/Info${helper_suffix}.plist`);
+  ELECTRON_HELPER_SUFFIXES.forEach(function (helper_suffix) {
+    info = projectDir.read('resources/osx/helper_apps/Info.plist');
     info = utils.replace(info, {
       productName: manifest.productName,
-      identifier: manifest.identifier
+      identifier: manifest.identifier,
+      helperSuffix: helper_suffix
     });
     finalAppDir.write(`Contents/Frameworks/Electron Helper${helper_suffix}.app/Contents/Info.plist`, info);
   });
@@ -70,7 +73,7 @@ var finalize = function () {
 
 var renameApp = function () {
   // Rename helpers
-  [''].forEach(function (helper_suffix) {
+  ELECTRON_HELPER_SUFFIXES.forEach(function (helper_suffix) {
     finalAppDir.rename(
       `Contents/Frameworks/Electron Helper${helper_suffix}.app/Contents/MacOS/Electron Helper${helper_suffix}`,
       `${manifest.productName} Helper${helper_suffix}`
