@@ -29,6 +29,6 @@
 
 import jetpack from 'fs-jetpack';
 
-const env = jetpack.cwd(__dirname).read('env.json', 'json');
-
-export default env;
+export function getEnv(appPath) {
+  return jetpack.cwd(appPath).read('env.json', 'json');
+}

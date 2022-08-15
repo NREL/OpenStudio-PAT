@@ -29,7 +29,7 @@ import jetpack from 'fs-jetpack';
 import os from 'os';
 import path from 'path';
 import {remote} from 'electron';
-import env from '../../env';
+import { getEnv } from '../../env';
 
 const {app} = remote;
 export class ReportsController {
@@ -43,7 +43,7 @@ export class ReportsController {
     vm.$log = $log;
     vm.$scope = $scope;
     vm.Project = Project;
-    vm.env = env;
+    vm.env = getEnv(app.getAppPath());
     vm.preloadPath = 'file://';
     vm.reportDir = Project.getProjectDir();
     vm.reportDirPath = path.resolve(vm.reportDir.path());

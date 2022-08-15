@@ -283,7 +283,7 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
   }];
 
   if (process.platform === 'darwin') {
-    const name = app.getName();
+    const name = app.name;
     template.unshift({
       label: name,
       submenu: [{

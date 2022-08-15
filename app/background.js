@@ -32,7 +32,7 @@
 
 import { app } from 'electron';
 import createWindow from './electron/window';
-import env from './env';
+import { getEnv } from './env';
 
 app.on('ready', () => {
 
@@ -46,6 +46,7 @@ app.on('ready', () => {
     }
   });
 
+  const env = getEnv(app.getAppPath());
   if (env.name === 'test') {
     mainWindow.loadURL('file://' + __dirname + '/spec.html');
   } else if (env.name === 'development') {
