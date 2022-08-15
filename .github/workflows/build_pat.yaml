@@ -22,7 +22,7 @@ jobs:
         name: [Ubuntu, macOS, Windows_2022]
         include:
         - name: Ubuntu
-          os: ubuntu-18.04
+          os: ubuntu-22.04
           node-version: 18
           allow_failure: false
         - name: macOS
