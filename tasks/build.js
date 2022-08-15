@@ -14,7 +14,7 @@ var zlib = require('zlib');
 var tar = require('tar-fs');
 var gulpClean = require('gulp-clean');
 var merge = require('merge-stream');
-var rename = require("gulp-rename");
+var rename = require('gulp-rename');
 
 const { inject } = require('./inject');
 const { scripts } = require('./scripts');

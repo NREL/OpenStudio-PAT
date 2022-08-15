@@ -6,6 +6,7 @@ var conf = require('./conf');
 var utils = require('./utils');
 
 var $ = require('gulp-load-plugins')();
+var rename = require('gulp-rename');
 
 var wiredep = require('wiredep').stream;
 var _ = require('lodash');
@@ -13,7 +14,13 @@ var _ = require('lodash');
 const { styles } = require('./styles');
 
 function partials() {
+  const parentDirs = path.join(conf.paths.src, '/app/');
   return gulp.src(path.join(conf.paths.src, '/app/**/*.html'))
+    .pipe(rename(p => {
+      if (p.dirname.startsWith(parentDirs)) {
+        p.dirname = p.dirname.substring(parentDirs.length);
+      }
+    }))
     .pipe($.sort())
     .pipe($.htmlmin({
       collapseBooleanAttributes: true,
