@@ -11,7 +11,7 @@
     "browser-sync-spa": "~1.0.3",
     "chalk": "~1.1.1",
     "del": "~2.2.0",
-    "electron": "~14.2.9",
+    "electron": "~20.0.1",
     "eslint-plugin-angular": "~1.0.0",
     "eslint-plugin-lodash": "~1.5.1",
     "estraverse": "~4.2.0",
