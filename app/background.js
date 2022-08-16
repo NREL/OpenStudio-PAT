@@ -34,7 +34,8 @@ import { app } from 'electron';
 import createWindow from './electron/window';
 import { getEnv } from './env';
 
-require('@electron/remote/main').initialize();
+const remoteMain = require('@electron/remote/main');
+remoteMain.initialize();
 
 app.on('ready', () => {
 
@@ -42,13 +43,13 @@ app.on('ready', () => {
     width: 1000,
     height: 600,
     webPreferences: {
-      enableRemoteModule: true,
       nodeIntegration: true,
       contextIsolation: false,
       webviewTag: true,
       webSecurity: false // Disable the same-origin policy when using http
     }
   });
+  remoteMain.enable(mainWindow.webContents);
 
   const env = getEnv(app.getAppPath());
   if (env.name === 'test') {
