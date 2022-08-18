@@ -20,7 +20,7 @@ const { inject } = require('./inject');
 const { scripts } = require('./scripts');
 
 var $ = require('gulp-load-plugins')({
-  pattern: ['gulp-*', 'main-bower-files', 'del', 'lazypipe', 'streamify']
+  pattern: ['gulp-*', 'del', 'lazypipe', 'streamify']
 });
 
 function background() {
@@ -51,7 +51,7 @@ function finalizeHtml() {
     .pipe($.sourcemaps.write('maps'))
     .pipe(jsFilter.restore)
     .pipe(cssFilter)
-    .pipe($.replace('../../bower_components/bootstrap-sass/assets/fonts/bootstrap/', '../fonts/'))
+    .pipe($.replace('../../app/node_modules/bootstrap-sass/assets/fonts/bootstrap/', '../fonts/'))
     .pipe($.replace(/url\('ui-grid.(.+?)'\)/g, 'url(\'../fonts/ui-grid.$1\')'))
     .pipe($.rev())
     .pipe($.csso())
@@ -77,11 +77,13 @@ function finalizeHtml() {
 
 const html = gulp.series(scripts, gulp.parallel(background, preload, inject), finalizeHtml);
 
-// Only applies for fonts from bower dependencies
+// Only applies for fonts from bootstrap-sass & angular-ui-grid modules
 // Custom fonts are handled by the "other" task
 function fonts() {
-  return gulp.src($.mainBowerFiles())
-    .pipe($.filter('**/*.{eot,svg,ttf,woff,woff2}'))
+  const NPM_FONT_DIRS = ['bootstrap-sass', 'angular-ui-grid'];
+  const FONT_EXTENSIONS_GLOB = '/**/*.{eot,svg,ttf,woff,woff2}';
+
+  return gulp.src(NPM_FONT_DIRS.map(fontDir => utils.mapNpmFilePath(`${fontDir}${FONT_EXTENSIONS_GLOB}`)))
     .pipe($.flatten())
     .pipe(gulp.dest(path.join(conf.paths.dist, '/fonts/')));
 }
@@ -95,7 +97,7 @@ function other() {
     .pipe($.filter(file => file.stat.isFile()))
     .pipe(rename(p => {
       if (p.dirname.startsWith(conf.paths.src)) {
-        p.dirname = p.dirname.substring(conf.paths.src.length)
+        p.dirname = p.dirname.substring(conf.paths.src.length);
       }
     }))
     .pipe(gulp.dest(path.join(conf.paths.dist, '/')));

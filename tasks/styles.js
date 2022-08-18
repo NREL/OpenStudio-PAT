@@ -3,11 +3,12 @@
 var path = require('path');
 var gulp = require('gulp');
 var conf = require('./conf');
+var utils = require('./utils');
 
 var $ = require('gulp-load-plugins')();
 const sass = require('gulp-sass')(require('sass'));
 
-var wiredep = require('wiredep').stream;
+const BOOTSTRAP_SASS_FILE_PATH = 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 
 function styles() {
   var sassOptions = {
@@ -23,13 +24,19 @@ function styles() {
   ], {read: false});
 
   var injectOptions = {
-    transform: function (filePath) {
-      filePath = filePath.replace(conf.paths.src + '/app/', '');
-      return '@import "' + filePath + '";';
-    },
-    starttag: '// injector',
-    endtag: '// endinjector',
-    addRootSlash: false
+    ignorePath: [path.join(conf.paths.src, '/app')],
+    addRootSlash: false,
+    starttag: '/* inject */'
+  };
+
+  const npmInjectFiles = gulp.src([
+    utils.mapNpmFilePath(BOOTSTRAP_SASS_FILE_PATH)
+  ], { read: false });
+
+  const npmInjectOptions = {
+    ...injectOptions,
+    ignorePath: [conf.paths.src],
+    addPrefix: '..'
   };
 
   var bootstrapFilter = $.filter('**/bootstrap.scss', {restore: true});
@@ -40,7 +47,7 @@ function styles() {
       path.join(conf.paths.src, '/app/index.scss')
     ])
     .pipe(bootstrapFilter)
-    .pipe(wiredep(conf.wiredep))
+    .pipe($.inject(npmInjectFiles, npmInjectOptions))
     .pipe(sass(sassOptions)).on('error', conf.errorHandler('Sass'))
     .pipe(bootstrapFilter.restore)
     .pipe(indexFilter)

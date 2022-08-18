@@ -21,7 +21,7 @@ function browserSyncInit(baseDir) {
   var routes = null;
   if (baseDir === conf.paths.src || (util.isArray(baseDir) && baseDir.indexOf(conf.paths.src) !== -1)) {
     routes = {
-      '/bower_components': 'bower_components'
+      '/app/node_modules': 'app/node_modules'
     };
   }
 

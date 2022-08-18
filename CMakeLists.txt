@@ -37,7 +37,6 @@ find_program(NPM_COMMAND npm)
 if(UNIX AND NOT APPLE)
   add_custom_target(PAT ALL
     COMMAND "${NPM_COMMAND}" install WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    COMMAND "${NPM_COMMAND}" run bower WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "${NPM_COMMAND}" run release WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" installDeps --prefix="tmp/pat_${CMAKE_PROJECT_VERSION}/opt/Resources/" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "mkdir" "-p" "${CMAKE_SOURCE_DIR}/tmp/pat_${CMAKE_PROJECT_VERSION}/opt/Resources/OpenStudio-server/server/tmp"
@@ -47,7 +46,6 @@ elseif(APPLE)
   # set(PAT_PRODUCT_FILE "${CMAKE_SOURCE_DIR}/tmp/ParametricAnalysisTool.app/Contents/MacOS/ParametricAnalysisTool")
   add_custom_target(PAT ALL
     COMMAND "${NPM_COMMAND}" install WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    COMMAND "${NPM_COMMAND}" run bower WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "${NPM_COMMAND}" run release WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" installDeps --prefix="tmp/ParametricAnalysisTool.app/Contents/Resources/" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   )

@@ -2,7 +2,9 @@
 
 var argv = require('yargs').argv;
 var os = require('os');
+var path = require('path');
 var jetpack = require('fs-jetpack');
+var conf = require('./conf');
 
 var env = argv.env || 'development';
 
@@ -38,3 +40,5 @@ module.exports.getElectronVersion = function () {
   var manifest = jetpack.read(__dirname + '/../package.json', 'json');
   return manifest.devDependencies['electron'].substring(1);
 };
+
+module.exports.mapNpmFilePath = filePath => path.join(conf.paths.src, '/node_modules/', filePath);
