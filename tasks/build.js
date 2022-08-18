@@ -10,32 +10,39 @@ var conf = require('./conf');
 var utils = require('./utils');
 var _ = require('lodash');
 var os = require('os');
-var decompress = require('gulp-decompress');
-var clean = require('gulp-clean');
+var zlib = require('zlib');
+var tar = require('tar-fs');
+var gulpClean = require('gulp-clean');
 var merge = require('merge-stream');
-var rename = require("gulp-rename");
+var rename = require('gulp-rename');
+
+const { inject } = require('./inject');
+const { scripts } = require('./scripts');
 
 var $ = require('gulp-load-plugins')({
   pattern: ['gulp-*', 'main-bower-files', 'del', 'lazypipe', 'streamify']
 });
 
-gulp.task('background', ['scripts'], function () {
-  gulp.src(path.join(conf.paths.tmp, '/serve/app/background.js'))
-    .pipe($.uglify()).on('error', conf.errorHandler('Uglify background.js'))
-    .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
-});
+function background() {
+  return gulp.src(path.join(conf.paths.tmp, '/serve/app/background.js'))
+  .pipe($.uglify()).on('error', conf.errorHandler('Uglify background.js'))
+  .pipe($.flatten())
+  .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
+}
 
-gulp.task('preload', ['scripts'], function () {
-  gulp.src(path.join(conf.paths.src, '/app/reports/preload.js'))
+function preload() {
+  return gulp.src(path.join(conf.paths.src, '/app/reports/preload.js'))
+    .pipe($.flatten())
     .pipe(gulp.dest(path.join(conf.paths.dist, '/scripts')));
-});
+}
 
-gulp.task('html', ['background', 'preload', 'inject', 'partials'], function () {
+function finalizeHtml() {
   var htmlFilter = $.filter('*.html', {restore: true});
   var jsFilter = $.filter('**/*.js', {restore: true});
   var cssFilter = $.filter('**/*.css', {restore: true});
 
   return gulp.src(path.join(conf.paths.tmp, '/serve/*.html'))
+    .pipe($.flatten())
     .pipe($.useref({}, $.lazypipe().pipe($.sourcemaps.init, {loadMaps: true})))
     .pipe(jsFilter)
     .pipe($.ngAnnotate())
@@ -66,38 +73,50 @@ gulp.task('html', ['background', 'preload', 'inject', 'partials'], function () {
       title: path.join(conf.paths.dist, '/'),
       showFiles: true
     }));
-});
+}
+
+const html = gulp.series(scripts, gulp.parallel(background, preload, inject), finalizeHtml);
 
 // Only applies for fonts from bower dependencies
 // Custom fonts are handled by the "other" task
-gulp.task('fonts', function () {
+function fonts() {
   return gulp.src($.mainBowerFiles())
     .pipe($.filter('**/*.{eot,svg,ttf,woff,woff2}'))
     .pipe($.flatten())
     .pipe(gulp.dest(path.join(conf.paths.dist, '/fonts/')));
-});
+}
 
-gulp.task('other', function () {
+function other() {
   return gulp.src([
     path.join(conf.paths.src, '/**/*'),
     path.join('!' + conf.paths.src, '/node_modules/**/*'),
     path.join('!' + conf.paths.src, '/**/*.{html,css,js,scss}')
   ])
     .pipe($.filter(file => file.stat.isFile()))
+    .pipe(rename(p => {
+      if (p.dirname.startsWith(conf.paths.src)) {
+        p.dirname = p.dirname.substring(conf.paths.src.length)
+      }
+    }))
     .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
-});
+}
 
-gulp.task('nodeModules', function () {
+function nodeModules() {
   return gulp.src(path.join(conf.paths.src, '/node_modules/**/*'), {base: conf.paths.src})
     .pipe($.filter(file => file.stat.isFile()))
     .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
-});
+}
 
-gulp.task('clean', function () {
+function clean() {
   return $.del([path.join(conf.paths.dist, '/'), path.join(conf.paths.tmp, '/')]);
-});
+}
 
-gulp.task('build', ['html', 'fonts', 'nodeModules', 'other', 'environment'], function () {
+function environment() {
+  var configFile = 'config/env_' + utils.getEnvName() + '.json';
+  return jetpack.copyAsync(configFile, path.join(conf.paths.dist, '/env.json'), {overwrite: true});
+}
+
+function finalizeBuild() {
   // Finalize
   var manifest = jetpack.read(path.join(__dirname, '..', conf.paths.src, 'package.json'), 'json');
 
@@ -114,17 +133,12 @@ gulp.task('build', ['html', 'fonts', 'nodeModules', 'other', 'environment'], fun
       break;
   }
 
-  jetpack.write(path.join(__dirname, '..', conf.paths.dist, 'package.json'), manifest);
-});
+  return jetpack.writeAsync(path.join(__dirname, '..', conf.paths.dist, 'package.json'), manifest);
+}
 
-gulp.task('environment', function () {
-  var configFile = 'config/env_' + utils.getEnvName() + '.json';
-  jetpack.copy(configFile, path.join(conf.paths.dist, '/env.json'), {overwrite: true});
-});
-
-gulp.task('manifest', function () {
+function copyManifest() {
   jetpack.copy('manifest.json', path.join(conf.paths.dist, '/manifest.json'), {overwrite: true});
-});
+}
 
 // Binary dependency management
 
@@ -147,7 +161,7 @@ const manifest = jetpack.read('manifest.json', 'json');
 const platform = os.platform();
 const arch = os.arch();
 
-gulp.task('download-deps', function () {
+function downloadDeps() {
 
   // List the dependencies to download here
   // These should correspond to keys in the manifest
@@ -178,9 +192,9 @@ gulp.task('download-deps', function () {
   });
 
   return merge(tasks);
-});
+}
 
-gulp.task('extract-deps', ['download-deps'], function () {
+function extractDeps() {
   var tasks = dependencies.map(depend => {
     const fileInfo = _.find(manifest[depend], {platform: platform});
     const fileName = fileInfo.name;
@@ -199,14 +213,29 @@ gulp.task('extract-deps', ['download-deps'], function () {
 
     // What we do is to extract to properName and remove the leading (root)
     // directory level
-    return gulp.src(path.join(destination, destName))
-      .pipe( decompress({strip: 1}) )
-      .pipe(gulp.dest(path.join(destination, properName)));  });
+    const properDestinationDir = path.join(destination, properName);
+    jetpack.remove(properDestinationDir);
+    return jetpack.createReadStream(path.join(destination, destName))
+      .pipe(zlib.createGunzip())
+      .pipe(tar.extract(properDestinationDir, {
+        strip: 1,
+        // There is a bug in tar-fs where, because stripped files & directories
+        // are given an empty header.name, having multiple stripped items
+        // results in having multiple headers with the same (empty) name,
+        // causing the extraction to either fail or hang.
+        //
+        // We avoid this issue by ignoring stripped items (ie, items with empty names)
+        ignore: (__, header) => {
+          return header.name.length === 0;
+        }
+      }));
+  });
 
-  return merge(tasks);
-});
+  const tasksAsPromises = tasks.map(task => new Promise((resolve, reject) => task.on('finish', resolve).on('error', reject)));
+  return Promise.all(tasksAsPromises);
+}
 
-gulp.task('remove-deps-tar', ['extract-deps'], function () {
+function cleanDeps() {
   var tasks = dependencies.map(depend => {
     const fileInfo = _.find(manifest[depend], {platform: platform});
     const fileName = fileInfo.name;
@@ -218,11 +247,13 @@ gulp.task('remove-deps-tar', ['extract-deps'], function () {
     }
 
     return gulp.src(path.join(destination, fileName), {read: false})
-      .pipe(clean());
+      .pipe(gulpClean());
   });
 
   return merge(tasks);
-});
+}
 
-gulp.task('install-deps', ['remove-deps-tar'], function () {
-});
+exports.build = gulp.series(gulp.parallel(html, fonts, nodeModules, other, environment), finalizeBuild);
+exports.clean = clean;
+exports.copyManifest = copyManifest;
+exports.installDeps = gulp.series(downloadDeps, extractDeps, cleanDeps);

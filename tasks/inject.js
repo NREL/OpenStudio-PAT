@@ -6,12 +6,21 @@ var conf = require('./conf');
 var utils = require('./utils');
 
 var $ = require('gulp-load-plugins')();
+var rename = require('gulp-rename');
 
 var wiredep = require('wiredep').stream;
 var _ = require('lodash');
 
-gulp.task('partials', function () {
+const { styles } = require('./styles');
+
+function partials() {
+  const parentDirs = path.join(conf.paths.src, '/app/');
   return gulp.src(path.join(conf.paths.src, '/app/**/*.html'))
+    .pipe(rename(p => {
+      if (p.dirname.startsWith(parentDirs)) {
+        p.dirname = p.dirname.substring(parentDirs.length);
+      }
+    }))
     .pipe($.sort())
     .pipe($.htmlmin({
       collapseBooleanAttributes: true,
@@ -26,9 +35,9 @@ gulp.task('partials', function () {
       root: 'app'
     }))
     .pipe(gulp.dest(conf.paths.tmp + '/serve/app/'));
-});
+}
 
-gulp.task('inject', ['partials', 'scripts', 'styles'], function () {
+function finalizeInject() {
   var injectAppStyles = gulp.src([
     path.join(conf.paths.tmp, '/serve/app/**/*.css'),
     path.join('!' + conf.paths.tmp, '/serve/app/**/bootstrap.css')
@@ -58,5 +67,9 @@ gulp.task('inject', ['partials', 'scripts', 'styles'], function () {
   }
 
   return stream.pipe(wiredep(conf.wiredep))
+    .pipe($.flatten())
     .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve')));
-});
+}
+
+exports.partials = partials;
+exports.inject = gulp.series(gulp.parallel(partials, styles), finalizeInject);

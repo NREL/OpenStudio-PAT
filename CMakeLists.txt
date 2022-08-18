@@ -39,7 +39,7 @@ if(UNIX AND NOT APPLE)
     COMMAND "${NPM_COMMAND}" install WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "${NPM_COMMAND}" run bower WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "${NPM_COMMAND}" run release WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    COMMAND "${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" install-deps --prefix="tmp/pat_${CMAKE_PROJECT_VERSION}/opt/Resources/" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMAND "${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" installDeps --prefix="tmp/pat_${CMAKE_PROJECT_VERSION}/opt/Resources/" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "mkdir" "-p" "${CMAKE_SOURCE_DIR}/tmp/pat_${CMAKE_PROJECT_VERSION}/opt/Resources/OpenStudio-server/server/tmp"
     COMMAND "chmod" "777" "${CMAKE_SOURCE_DIR}/tmp/pat_${CMAKE_PROJECT_VERSION}/opt/Resources/OpenStudio-server/server/tmp"
   )
@@ -49,7 +49,7 @@ elseif(APPLE)
     COMMAND "${NPM_COMMAND}" install WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "${NPM_COMMAND}" run bower WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
     COMMAND "${NPM_COMMAND}" run release WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
-    COMMAND "${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" install-deps --prefix="tmp/ParametricAnalysisTool.app/Contents/Resources/" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
+    COMMAND "${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" installDeps --prefix="tmp/ParametricAnalysisTool.app/Contents/Resources/" WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}"
   )
 elseif(WIN32)
   set(PAT_PRODUCT_FILE "${CMAKE_SOURCE_DIR}/tmp/pat/ParametricAnalysisTool.exe")

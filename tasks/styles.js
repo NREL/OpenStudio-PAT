@@ -5,14 +5,11 @@ var gulp = require('gulp');
 var conf = require('./conf');
 
 var $ = require('gulp-load-plugins')();
+const sass = require('gulp-sass')(require('sass'));
 
 var wiredep = require('wiredep').stream;
 
-gulp.task('styles', function () {
-  return buildStyles();
-});
-
-var buildStyles = function () {
+function styles() {
   var sassOptions = {
     outputStyle: 'expanded',
     precision: 8
@@ -44,17 +41,20 @@ var buildStyles = function () {
     ])
     .pipe(bootstrapFilter)
     .pipe(wiredep(conf.wiredep))
-    .pipe($.sass(sassOptions)).on('error', conf.errorHandler('Sass'))
+    .pipe(sass(sassOptions)).on('error', conf.errorHandler('Sass'))
     .pipe(bootstrapFilter.restore)
     .pipe(indexFilter)
     .pipe($.sourcemaps.init())
     .pipe($.inject(injectFiles, injectOptions))
-    .pipe($.sass(sassOptions)).on('error', conf.errorHandler('Sass'))
+    .pipe(sass(sassOptions)).on('error', conf.errorHandler('Sass'))
     .pipe($.autoprefixer({
       browsers: ['last 2 Chrome versions'],
       cascade: false
     })).on('error', conf.errorHandler('Autoprefixer'))
     .pipe($.sourcemaps.write())
     .pipe(indexFilter.restore)
+    .pipe($.flatten())
     .pipe(gulp.dest(path.join(conf.paths.tmp, '/serve/app/')));
-};
+}
+
+exports.styles = styles;

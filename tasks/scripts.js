@@ -23,13 +23,13 @@ var eslint = function (fix) {
     //.pipe($.eslint.failAfterError());
 };
 
-gulp.task('lint', function () {
+function lint() {
   return eslint();
-});
+}
 
-gulp.task('lint:fix', function () {
+function lintFix() {
   return eslint(true);
-});
+}
 
 var bundle = function (src, dest) {
   var deferred = Q.defer();
@@ -86,10 +86,7 @@ var compileScripts = function () {
   return Q.all(promises);
 };
 
-gulp.task('scripts', ['lint'], function () {
-  return compileScripts();
-});
-
-gulp.task('scripts:watch', function () {
-  return compileScripts();
-});
+exports.lint = lint;
+exports.lintFix = lintFix;
+exports.scripts = gulp.series(lint, compileScripts);
+exports.scriptsWatch = compileScripts;

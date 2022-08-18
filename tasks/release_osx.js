@@ -35,13 +35,7 @@ var cleanupRuntime = function () {
 };
 
 var packageBuiltApp = function () {
-  var deferred = Q.defer();
-
-  asar.createPackage(projectDir.path('build'), finalAppDir.path('Contents/Resources/app.asar'), function () {
-    deferred.resolve();
-  });
-
-  return deferred.promise;
+  return asar.createPackage(projectDir.path('build'), finalAppDir.path('Contents/Resources/app.asar'));
 };
 
 var packageReports = function () {
