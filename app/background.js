@@ -37,6 +37,8 @@ import { getEnv } from './env';
 const remoteMain = require('@electron/remote/main');
 remoteMain.initialize();
 
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
+
 app.on('ready', () => {
 
   const mainWindow = createWindow('main', {
