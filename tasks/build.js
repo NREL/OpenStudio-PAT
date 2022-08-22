@@ -51,7 +51,7 @@ function finalizeHtml() {
     .pipe($.sourcemaps.write('maps'))
     .pipe(jsFilter.restore)
     .pipe(cssFilter)
-    .pipe($.replace('../../app/node_modules/bootstrap-sass/assets/fonts/bootstrap/', '../fonts/'))
+    .pipe($.replace('../node_modules/bootstrap-sass/assets/fonts/bootstrap/', '../fonts/'))
     .pipe($.replace(/url\('ui-grid.(.+?)'\)/g, 'url(\'../fonts/ui-grid.$1\')'))
     .pipe($.rev())
     .pipe($.csso())
