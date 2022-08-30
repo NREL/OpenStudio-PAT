@@ -20,12 +20,12 @@ const { inject } = require('./inject');
 const { scripts } = require('./scripts');
 
 var $ = require('gulp-load-plugins')({
-  pattern: ['gulp-*', 'del', 'lazypipe', 'streamify']
+  pattern: ['gulp-*', 'lazypipe', 'streamify']
 });
 
-function background() {
+async function background() {
   return gulp.src(path.join(conf.paths.tmp, '/serve/app/background.js'))
-  .pipe($.uglify()).on('error', conf.errorHandler('Uglify background.js'))
+  .pipe($.uglify()).on('error', await conf.errorHandler('Uglify background.js'))
   .pipe($.flatten())
   .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
 }
@@ -36,18 +36,19 @@ function preload() {
     .pipe(gulp.dest(path.join(conf.paths.dist, '/scripts')));
 }
 
-function finalizeHtml() {
-  var htmlFilter = $.filter('*.html', {restore: true});
-  var jsFilter = $.filter('**/*.js', {restore: true});
-  var cssFilter = $.filter('**/*.css', {restore: true});
+async function finalizeHtml() {
+  const htmlFilter = $.filter('*.html', {restore: true});
+  const jsFilter = $.filter('**/*.js', {restore: true});
+  const cssFilter = $.filter('**/*.css', {restore: true});
+  const notSourceMapFilter = $.filter(['**', '!*.map'], {restore: true});
 
-  return gulp.src(path.join(conf.paths.tmp, '/serve/*.html'))
+  return gulp.src(path.join(conf.paths.tmp, '/serve/*.html'), { base: conf.paths.dist })
     .pipe($.flatten())
     .pipe($.useref({}, $.lazypipe().pipe($.sourcemaps.init, {loadMaps: true})))
     .pipe(jsFilter)
     .pipe($.ngAnnotate())
     .pipe($.rev())
-    .pipe($.uglify()).on('error', conf.errorHandler('Uglify'))
+    .pipe($.uglify()).on('error', await conf.errorHandler('Uglify'))
     .pipe($.sourcemaps.write('maps'))
     .pipe(jsFilter.restore)
     .pipe(cssFilter)
@@ -57,7 +58,9 @@ function finalizeHtml() {
     .pipe($.csso())
     .pipe($.sourcemaps.write('maps'))
     .pipe(cssFilter.restore)
+    .pipe(notSourceMapFilter)
     .pipe($.revReplace())
+    .pipe(notSourceMapFilter.restore)
     .pipe(htmlFilter)
     .pipe($.htmlmin({
       collapseBooleanAttributes: true,
@@ -109,8 +112,9 @@ function nodeModules() {
     .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
 }
 
-function clean() {
-  return $.del([path.join(conf.paths.dist, '/'), path.join(conf.paths.tmp, '/')]);
+async function clean() {
+  const { deleteAsync } = await import('del');
+  return deleteAsync([path.join(conf.paths.dist, '/'), path.join(conf.paths.tmp, '/')]);
 }
 
 function environment() {
@@ -187,7 +191,7 @@ function downloadDeps() {
 
     return progress(request({uri: uri, timeout: 5000}))
       .on('progress', state => {
-        console.log(`Downloading ${depend}, ${(state.percentage * 100).toFixed(0)}%`);
+        console.log(`Downloading ${depend}, ${(state.percent * 100).toFixed(0)}%`);
       })
       .pipe(source(destName))
       .pipe(gulp.dest(destination));

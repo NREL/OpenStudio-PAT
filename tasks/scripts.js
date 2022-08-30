@@ -4,6 +4,7 @@ var path = require('path');
 var gulp = require('gulp');
 var Q = require('q');
 var jetpack = require('fs-jetpack');
+var through2 = require('through2');
 var conf = require('./conf');
 var utils = require('./utils');
 var $ = require('gulp-load-plugins')();
@@ -19,7 +20,7 @@ var eslint = function (fix) {
     ], {base: '.'})
     .pipe($.eslint({fix: fix}))
     .pipe($.eslint.format())
-    .pipe(fix ? gulp.dest('.') : $.util.noop());
+    .pipe(fix ? gulp.dest('.') : through2.obj());
     //.pipe($.eslint.failAfterError());
 };
 

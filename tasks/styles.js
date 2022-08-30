@@ -10,7 +10,7 @@ const sass = require('gulp-sass')(require('sass'));
 
 const BOOTSTRAP_SASS_FILE_PATH = 'bootstrap-sass/assets/stylesheets/_bootstrap.scss';
 
-function styles() {
+async function styles() {
   var sassOptions = {
     outputStyle: 'expanded',
     precision: 8
@@ -48,16 +48,15 @@ function styles() {
     ])
     .pipe(bootstrapFilter)
     .pipe($.inject(npmInjectFiles, npmInjectOptions))
-    .pipe(sass(sassOptions)).on('error', conf.errorHandler('Sass'))
+    .pipe(sass(sassOptions)).on('error', await conf.errorHandler('Sass'))
     .pipe(bootstrapFilter.restore)
     .pipe(indexFilter)
     .pipe($.sourcemaps.init())
     .pipe($.inject(injectFiles, injectOptions))
-    .pipe(sass(sassOptions)).on('error', conf.errorHandler('Sass'))
+    .pipe(sass(sassOptions)).on('error', await conf.errorHandler('Sass'))
     .pipe($.autoprefixer({
-      browsers: ['last 2 Chrome versions'],
       cascade: false
-    })).on('error', conf.errorHandler('Autoprefixer'))
+    })).on('error', await conf.errorHandler('Autoprefixer'))
     .pipe($.sourcemaps.write())
     .pipe(indexFilter.restore)
     .pipe($.flatten())
