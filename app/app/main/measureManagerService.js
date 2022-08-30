@@ -25,9 +25,7 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-import {remote} from 'electron';
 import openport from 'openport';
-const {app} = remote;
 
 export class MeasureManager {
   constructor($log, $http, $q, DependencyManager, Message) {

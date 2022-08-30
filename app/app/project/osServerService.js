@@ -26,8 +26,7 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-import {remote} from 'electron';
-const {app} = remote;
+import { app } from '@electron/remote';
 import path from 'path';
 import os from 'os';
 import AdmZip from 'adm-zip';
@@ -1212,7 +1211,7 @@ export class OsServer {
 
       // extract dir and save to disk in local measures directory
       // convert arraybuffer to node buffer
-      const buf = new Buffer(new Uint8Array(response.data));
+      const buf = new Buffer.from(new Uint8Array(response.data));
       if (vm.Message.showDebug()) vm.$log.debug('buffer');
 
       // save

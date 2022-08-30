@@ -32,7 +32,12 @@
 
 import { app } from 'electron';
 import createWindow from './electron/window';
-import env from './env';
+import { getEnv } from './env';
+
+const remoteMain = require('@electron/remote/main');
+remoteMain.initialize();
+
+process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
 
 app.on('ready', () => {
 
@@ -40,10 +45,15 @@ app.on('ready', () => {
     width: 1000,
     height: 600,
     webPreferences: {
+      nodeIntegration: true,
+      contextIsolation: false,
+      webviewTag: true,
       webSecurity: false // Disable the same-origin policy when using http
     }
   });
+  remoteMain.enable(mainWindow.webContents);
 
+  const env = getEnv(app.getAppPath());
   if (env.name === 'test') {
     mainWindow.loadURL('file://' + __dirname + '/spec.html');
   } else if (env.name === 'development') {

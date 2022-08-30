@@ -5,7 +5,7 @@
 	<key>CFBundleIdentifier</key>
 	<string>{{identifier}}.helper</string>
 	<key>CFBundleName</key>
-	<string>{{productName}} Helper</string>
+	<string>{{productName}} Helper{{helperSuffix}}</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>DTSDKName</key>

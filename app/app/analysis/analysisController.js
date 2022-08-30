@@ -26,10 +26,9 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-import {remote} from 'electron';
+import { dialog } from '@electron/remote';
 import {shell} from 'electron';
 import path from 'path';
-const {dialog} = remote;
 
 export class AnalysisController {
 
@@ -1173,18 +1172,25 @@ export class AnalysisController {
 
   selectDirToInclude(file) {
     const vm = this;
+    const deferred = vm.$q.defer();
 
-    const result = vm.dialog.showOpenDialog({
+    vm.dialog.showOpenDialog({
       title: 'Select Directory To Include',
       properties: ['openDirectory']
+    }).then(result => {
+      if (!_.isEmpty(result.filePaths)) {
+        if (vm.Message.showDebug()) vm.$log.debug(' result.filePaths[0]:', result.filePaths[0]);
+        if (vm.Message.showDebug()) vm.$log.debug('path relative to project: ', vm.path.relative(vm.Project.getProjectDir().path(), result.filePaths[0]));
+        file.dirToInclude = vm.path.relative(vm.Project.getProjectDir().path(), result.filePaths[0]);
+        vm.setIsModified();
+        deferred.resolve();
+      } else {
+        deferred.reject();
+      }
+      return deferred.promise;
     });
 
-    if (!_.isEmpty(result)) {
-      if (vm.Message.showDebug()) vm.$log.debug(' result[0]:', result[0]);
-      if (vm.Message.showDebug()) vm.$log.debug('path relative to project: ', vm.path.relative(vm.Project.getProjectDir().path(), result[0]));
-      file.dirToInclude = vm.path.relative(vm.Project.getProjectDir().path(), result[0]);
-      vm.setIsModified();
-    }
+    return deferred.promise;
   }
 
   addDirToInclude() {
@@ -1205,33 +1211,41 @@ export class AnalysisController {
 
   selectScript(type) {
     const vm = this;
-    const result = vm.dialog.showOpenDialog({
+    const deferred = vm.$q.defer();
+
+    vm.dialog.showOpenDialog({
       title: 'Select Script',
       properties: ['openFile']
+    }).then(result => {
+      if (!_.isEmpty(result.filePaths)) {
+        const scriptPath = result.filePaths[0];
+        if (vm.Message.showDebug()) vm.$log.debug('script path:', scriptPath);
+        let scriptFilename = scriptPath.replace(/^.*[\\\/]/, '');  // old name
+        // rename to initialize.sh or finalize.sh
+        if (_.includes(type, 'initialization')) {
+          scriptFilename = 'initialize.sh';
+        } else {
+          scriptFilename = 'finalize.sh';
+        }
+        // ensure appropriate folders exist
+        // before: scripts folder, inner server_initialization, server_finalization, worker_initialization, worker_finalization
+        // updated to: scripts/analysis and scripts/data_point
+        const newType = _.includes(type, 'server') ? 'analysis' : 'data_point';
+        vm.jetpack.dir(vm.Project.getProjectDir().path('scripts', newType));
+        // copy/overwrite, change the name
+        vm.jetpack.copy(scriptPath, vm.Project.getProjectDir().path('scripts', newType, scriptFilename), {overwrite: true});
+        if (vm.Message.showDebug()) vm.$log.debug('Script filename: ', scriptFilename);
+        // update project
+        vm.$scope.serverScripts[type].file = scriptFilename;
+        vm.setIsModified();
+        deferred.resolve();
+      } else {
+        deferred.reject();
+      }
+      return deferred.promise;
     });
 
-    if (!_.isEmpty(result)) {
-      const scriptPath = result[0];
-      if (vm.Message.showDebug()) vm.$log.debug('script path:', scriptPath);
-      let scriptFilename = scriptPath.replace(/^.*[\\\/]/, '');  // old name
-      // rename to initialize.sh or finalize.sh
-      if (_.includes(type, 'initialization')) {
-        scriptFilename = 'initialize.sh';
-      } else {
-        scriptFilename = 'finalize.sh';
-      }
-      // ensure appropriate folders exist
-      // before: scripts folder, inner server_initialization, server_finalization, worker_initialization, worker_finalization
-      // updated to: scripts/analysis and scripts/data_point
-      const newType = _.includes(type, 'server') ? 'analysis' : 'data_point';
-      vm.jetpack.dir(vm.Project.getProjectDir().path('scripts', newType));
-      // copy/overwrite, change the name
-      vm.jetpack.copy(scriptPath, vm.Project.getProjectDir().path('scripts', newType, scriptFilename), {overwrite: true});
-      if (vm.Message.showDebug()) vm.$log.debug('Script filename: ', scriptFilename);
-      // update project
-      vm.$scope.serverScripts[type].file = scriptFilename;
-      vm.setIsModified();
-    }
+    return deferred.promise;
   }
 
   deleteScript(type) {
@@ -1261,73 +1275,91 @@ export class AnalysisController {
 
   selectSeedModel() {
     const vm = this;
+    const deferred = vm.$q.defer();
+
     vm.setIsModified();
     // TODO: set defaultPath
-    const result = vm.dialog.showOpenDialog({
+    vm.dialog.showOpenDialog({
       title: 'Select Seed Model',
       filters: [
         {name: 'OpenStudio Models', extensions: ['osm']}
       ],
       properties: ['openFile']
+    }).then(result => {
+      if (!_.isEmpty(result.filePaths)) {
+        // copy and select the file
+        const seedModelPath = result.filePaths[0];
+        if (vm.Message.showDebug()) vm.$log.debug('Seed Model:', seedModelPath);
+        const seedModelFilename = seedModelPath.replace(/^.*[\\\/]/, '');
+        vm.jetpack.copy(seedModelPath, vm.Project.getProjectDir().path('seeds/' + seedModelFilename), {overwrite: true});
+        if (vm.Message.showDebug()) vm.$log.debug('Seed Model name: ', seedModelFilename);
+        // update seeds
+        vm.Project.setSeeds();
+        vm.Project.setSeedsDropdownOptions();
+        vm.$scope.seeds = vm.Project.getSeeds();
+        vm.$scope.defaultSeed = seedModelFilename;
+        vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
+        _.forEach(vm.$scope.measures, (measure) => {
+          measure.seed = vm.$scope.defaultSeed;
+        });
+        vm.Project.setMeasuresAndOptions(vm.$scope.measures);
+        vm.Project.savePrettyOptions();
+        // recompute model-dependent measure arguments when resetting seed
+        vm.Project.computeAllMeasureArguments().then(() => {
+          if (vm.Message.showDebug()) vm.$log.debug('computeAllMeasureArgs success!');
+          vm.$scope.measures = vm.Project.getMeasuresAndOptions();
+          vm.resetAllChoiceArgumentSelections();
+          vm.initializeTab();
+          return deferred.promise;
+        }, error => {
+          if (vm.Message.showDebug()) vm.$log.debug('ERROR in computeAllMeasureArguments: ', error);
+          return deferred.promise;
+        });
+        deferred.resolve();
+      } else {
+        deferred.reject();
+      }
+      return deferred.promise;
     });
 
-    if (!_.isEmpty(result)) {
-      // copy and select the file
-      const seedModelPath = result[0];
-      if (vm.Message.showDebug()) vm.$log.debug('Seed Model:', seedModelPath);
-      const seedModelFilename = seedModelPath.replace(/^.*[\\\/]/, '');
-      vm.jetpack.copy(seedModelPath, vm.Project.getProjectDir().path('seeds/' + seedModelFilename), {overwrite: true});
-      if (vm.Message.showDebug()) vm.$log.debug('Seed Model name: ', seedModelFilename);
-      // update seeds
-      vm.Project.setSeeds();
-      vm.Project.setSeedsDropdownOptions();
-      vm.$scope.seeds = vm.Project.getSeeds();
-      vm.$scope.defaultSeed = seedModelFilename;
-      vm.Project.setDefaultSeed(vm.$scope.defaultSeed);
-      _.forEach(vm.$scope.measures, (measure) => {
-        measure.seed = vm.$scope.defaultSeed;
-      });
-      vm.Project.setMeasuresAndOptions(vm.$scope.measures);
-      vm.Project.savePrettyOptions();
-      // recompute model-dependent measure arguments when resetting seed
-      vm.Project.computeAllMeasureArguments().then(() => {
-        if (vm.Message.showDebug()) vm.$log.debug('computeAllMeasureArgs success!');
-        vm.$scope.measures = vm.Project.getMeasuresAndOptions();
-        vm.resetAllChoiceArgumentSelections();
-        vm.initializeTab();
-      }, error => {
-        if (vm.Message.showDebug()) vm.$log.debug('ERROR in computeAllMeasureArguments: ', error);
-      });
-    }
+    return deferred.promise;
   }
 
   selectWeatherFile() {
     const vm = this;
+    const deferred = vm.$q.defer();
+
     vm.setIsModified();
     // TODO: set defaultPath
-    const result = vm.dialog.showOpenDialog({
+    vm.dialog.showOpenDialog({
       title: 'Select Weather File',
       filters: [
         {name: 'Weather Files', extensions: ['epw']}
       ],
       properties: ['openFile']
+    }).then(result => {
+      if (!_.isEmpty(result.filePaths)) {
+        // copy and select the file
+        const weatherFilePath = result.filePaths[0];
+        if (vm.Message.showDebug()) vm.$log.debug('Weather File:', weatherFilePath);
+        const weatherFilename = weatherFilePath.replace(/^.*[\\\/]/, '');
+        // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
+        vm.jetpack.copy(weatherFilePath, vm.Project.getProjectDir().path('weather/' + weatherFilename));
+        if (vm.Message.showDebug()) vm.$log.debug('Weather file name: ', weatherFilename);
+        // update seeds
+        vm.Project.setWeatherFiles();
+        vm.Project.setWeatherFilesDropdownOptions();
+        vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
+        vm.$scope.defaultWeatherFile = weatherFilename;
+        vm.Project.setDefaultWeatherFile(vm.$scope.defaultWeatherFile);
+        deferred.resolve();
+      } else {
+        deferred.reject();
+      }
+      return deferred.promise;
     });
 
-    if (!_.isEmpty(result)) {
-      // copy and select the file
-      const weatherFilePath = result[0];
-      if (vm.Message.showDebug()) vm.$log.debug('Weather File:', weatherFilePath);
-      const weatherFilename = weatherFilePath.replace(/^.*[\\\/]/, '');
-      // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
-      vm.jetpack.copy(weatherFilePath, vm.Project.getProjectDir().path('weather/' + weatherFilename));
-      if (vm.Message.showDebug()) vm.$log.debug('Weather file name: ', weatherFilename);
-      // update seeds
-      vm.Project.setWeatherFiles();
-      vm.Project.setWeatherFilesDropdownOptions();
-      vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
-      vm.$scope.defaultWeatherFile = weatherFilename;
-      vm.Project.setDefaultWeatherFile(vm.$scope.defaultWeatherFile);
-    }
+    return deferred.promise;
   }
 
   // move measure 'up' or 'down'

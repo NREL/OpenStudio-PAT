@@ -27,8 +27,7 @@
  **********************************************************************************************************************/
 /*global bootlint*/
 
-import {remote} from 'electron';
-const {app, Menu, shell} = remote;
+import { app, getGlobal, Menu, shell } from '@electron/remote';
 
 export function runBlock($rootScope, $state, $window, $document, $translate, toastr, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log, Message) {
   'ngInject';
@@ -36,8 +35,8 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
   let exitReady = false;
 
   $window.onbeforeunload = e => {
-    console.log('EXIT BUTTON CLICKED?: ', remote.getGlobal('exitClicked'));
-    if (!exitReady && remote.getGlobal('exitClicked')) {
+    console.log('EXIT BUTTON CLICKED?: ', getGlobal('exitClicked'));
+    if (!exitReady && getGlobal('exitClicked')) {
       try {
         // only if project is set
         if (Project.getProjectDir() != null) {
@@ -283,7 +282,7 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
   }];
 
   if (process.platform === 'darwin') {
-    const name = app.getName();
+    const name = app.name;
     template.unshift({
       label: name,
       submenu: [{

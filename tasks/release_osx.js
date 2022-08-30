@@ -14,6 +14,8 @@ var tmpDir;
 var finalAppDir;
 var manifest;
 
+const ELECTRON_HELPER_SUFFIXES = ['', ' (GPU)', ' (Plugin)', ' (Renderer)'];
+
 var init = function () {
   projectDir = jetpack;
   tmpDir = projectDir.dir('./tmp', {empty: true});
@@ -53,13 +55,14 @@ var finalize = function () {
   finalAppDir.write('Contents/Info.plist', info);
 
   // Prepare Info.plist of Helper apps
-  [' EH', ' NP', ''].forEach(function (helper_suffix) {
-    info = projectDir.read('resources/osx/helper_apps/Info' + helper_suffix + '.plist');
+  ELECTRON_HELPER_SUFFIXES.forEach(function (helper_suffix) {
+    info = projectDir.read('resources/osx/helper_apps/Info.plist');
     info = utils.replace(info, {
       productName: manifest.productName,
-      identifier: manifest.identifier
+      identifier: manifest.identifier,
+      helperSuffix: helper_suffix
     });
-    finalAppDir.write('Contents/Frameworks/Electron Helper' + helper_suffix + '.app/Contents/Info.plist', info);
+    finalAppDir.write(`Contents/Frameworks/Electron Helper${helper_suffix}.app/Contents/Info.plist`, info);
   });
 
   // Copy icon
@@ -70,9 +73,15 @@ var finalize = function () {
 
 var renameApp = function () {
   // Rename helpers
-  [' Helper EH', ' Helper NP', ' Helper'].forEach(function (helper_suffix) {
-    finalAppDir.rename('Contents/Frameworks/Electron' + helper_suffix + '.app/Contents/MacOS/Electron' + helper_suffix, manifest.productName + helper_suffix);
-    finalAppDir.rename('Contents/Frameworks/Electron' + helper_suffix + '.app', manifest.productName + helper_suffix + '.app');
+  ELECTRON_HELPER_SUFFIXES.forEach(function (helper_suffix) {
+    finalAppDir.rename(
+      `Contents/Frameworks/Electron Helper${helper_suffix}.app/Contents/MacOS/Electron Helper${helper_suffix}`,
+      `${manifest.productName} Helper${helper_suffix}`
+      );
+    finalAppDir.rename(
+      `Contents/Frameworks/Electron Helper${helper_suffix}.app`,
+      `${manifest.productName} Helper${helper_suffix}.app`
+      );
   });
   // Rename application
   finalAppDir.rename('Contents/MacOS/Electron', manifest.productName);
