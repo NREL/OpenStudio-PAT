@@ -25,9 +25,8 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-import {remote} from 'electron';
+import { app, getCurrentWindow, Menu, MenuItem } from '@electron/remote';
 import jetpack from 'fs-jetpack';
-const {app, Menu, MenuItem} = remote;
 
 const env = jetpack.cwd(app.getAppPath()).read('env.json', 'json');
 
@@ -73,14 +72,14 @@ const env = jetpack.cwd(app.getAppPath()).read('env.json', 'json');
     e.preventDefault();
     if (env.name == 'development') {
       rightClickPosition = {x: e.x, y: e.y};
-      remote.getCurrentWindow().inspectElement(rightClickPosition.x, rightClickPosition.y);
+      getCurrentWindow().inspectElement(rightClickPosition.x, rightClickPosition.y);
     }
 
     // Set the default context menu (cut, copy, paste) in all input textarea fields elements
     switch (e.target.nodeName) {
       case 'TEXTAREA':
       case 'INPUT':
-        textMenu.popup(remote.getCurrentWindow());
+        textMenu.popup(getCurrentWindow());
         break;
     }
   }, false);

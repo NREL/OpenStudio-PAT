@@ -16,7 +16,7 @@ var browserSync = require('browser-sync').create();
 var browserSyncSpa = require('browser-sync-spa');
 
 browserSync.use(browserSyncSpa({selector: '[ng-app]'}));
-function browserSyncInit(baseDir) {
+function browserSyncInit(baseDir, callback) {
 
   var routes = null;
   if (baseDir === conf.paths.src || (util.isArray(baseDir) && baseDir.indexOf(conf.paths.src) !== -1)) {
@@ -45,7 +45,7 @@ function browserSyncInit(baseDir) {
       awaitWriteFinish: true,
       ignoreInitial: true
     }
-  });
+  }, callback);
 }
 
 var gulpPath = path.resolve('./node_modules/.bin/gulp');
@@ -87,8 +87,7 @@ var runGulpWatch = function () {
   });
 };
 
-var runApp = function () {
-  if (env == 'development') browserSyncInit([path.join(conf.paths.tmp, '/serve'), conf.paths.src]);
+var runElectronApp = function () {
   var app = childProcess.spawn(electron, ['./build'], {
     stdio: 'inherit'
   });
@@ -99,6 +98,12 @@ var runApp = function () {
       process.exit();
     });
   });
+};
+
+var runApp = function () {
+  env == 'development'
+    ? browserSyncInit([path.join(conf.paths.tmp, '/serve'), conf.paths.src], runElectronApp)
+    : runElectronApp();
 };
 
 runBuild().then(function () {

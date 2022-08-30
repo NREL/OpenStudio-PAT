@@ -26,9 +26,7 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-//const {shell} = require('electron');
-import {remote} from 'electron';
-const {shell} = remote;
+import { shell } from '@electron/remote';
 
 export class ModalBclController {
 
@@ -583,7 +581,7 @@ export class ModalBclController {
       vm.toastr.info(translation, {
         timeOut: 3000, onHidden: function () {
           //if (vm.Message.showDebug()) vm.$log.debug('Opening measure file');
-          vm.shell.openItem(measure.measure_dir + '/measure.rb');
+          vm.shell.openPath(measure.measure_dir + '/measure.rb');
         }
       });
     });

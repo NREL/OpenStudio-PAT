@@ -114,8 +114,9 @@ jobs:
       shell: bash
       run: |
         set -x
-        cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=10.15 \
-               -DCMAKE_BUILD_TYPE=Release \
+        cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=11 \
+              -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
+              -DCMAKE_BUILD_TYPE=Release \
               ../
         cmake --build . --target package -j 2
 

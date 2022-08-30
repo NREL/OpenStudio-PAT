@@ -560,7 +560,7 @@ export class BCL {
   //   vm.$http.get(url, {responseType: 'arraybuffer'}).then(response => {
   //     //extract dir and save to disk in local measures directory
   //     // convert arraybuffer to node buffer
-  //     const buf = new Buffer(new Uint8Array(response.data));
+  //     const buf = new Buffer.from(new Uint8Array(response.data));
   //     const zip = new vm.AdmZip(buf);
   //     // extract to location (and overwrite)
   //     zip.extractAllTo(vm.Project.getMeasuresDir().path() + '/', true);
