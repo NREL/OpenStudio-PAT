@@ -26,7 +26,8 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 // Electron
-import contextMenu from '../electron/context_menu'; // eslint-disable-line no-unused-vars
+import { contextMenu } from '../electron/context_menu';
+contextMenu();
 
 import {config} from './index.config';
 import {routerConfig} from './index.route';

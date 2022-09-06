@@ -781,6 +781,10 @@ export class Project {
         });
         //}
 
+        // VARIABLES
+        let var_count = 0;
+        m.variables = [];
+
         // ARGUMENTS
         m.arguments = [];
         // This portion only has arguments that don't have the variable box checked
@@ -814,10 +818,6 @@ export class Project {
             }
           }
         });
-
-        // VARIABLES
-        let var_count = 0;
-        m.variables = [];
 
         // need a __SKIP__ argument
         if (_.includes(vars, true)) {

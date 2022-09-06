@@ -28,12 +28,10 @@
 import { app } from '@electron/remote';
 import jetpack from 'fs-jetpack';
 import AdmZip from 'adm-zip';
-import https from 'https';
 import os from 'os';
-import path from 'path';
-import url from 'url';
-const env = jetpack.cwd(app.getAppPath()).read('env.json', 'json');
-const manifest = jetpack.cwd(app.getAppPath()).read('manifest.json', 'json');
+
+import { getEnv } from '../../env';
+const env = getEnv(app.getAppPath());
 
 export class DependencyManager {
 

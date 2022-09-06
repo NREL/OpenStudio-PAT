@@ -27,7 +27,6 @@
  **********************************************************************************************************************/
 import {shell} from 'electron';
 import jetpack from 'fs-jetpack';
-import YAML from 'yamljs';
 import VersionCompare from 'version_compare';
 
 export class RunController {

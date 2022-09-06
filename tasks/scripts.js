@@ -10,7 +10,7 @@ var utils = require('./utils');
 var $ = require('gulp-load-plugins')();
 
 var rollup = require('rollup');
-var babel = require('rollup-plugin-babel');
+const { babel } = require('@rollup/plugin-babel');
 
 var eslint = function (fix) {
   fix = !!fix;
@@ -33,45 +33,39 @@ function lintFix() {
 }
 
 var bundle = function (src, dest) {
-  var deferred = Q.defer();
-  var buildSourcemap = path.basename(dest) == 'index.module.js';
+  const buildSourcemap = path.basename(dest) == 'index.module.js';
+  const filename = path.basename(dest);
 
-  rollup.rollup({
-    entry: src,
+  return rollup.rollup({
+    input: src,
     external: ['adm-zip', 'electron', '@electron/remote', 'fs', 'fs-jetpack', 'http', 'https', 'jszip', 'os', 'path', 'remote', 'url', 'xml2js', 'archiver', 'openport', 'version_compare', 'yamljs'],
     plugins: [
-      babel({exclude: 'node_modules/**'})
+      babel({
+        babelHelpers: 'bundled',
+        exclude: 'node_modules/**'
+      })
     ]
-  }).then(function (bundle) {
-    var filename = path.basename(dest);
-    var result = bundle.generate({
+  }).then(bundle => {
+    return bundle.generate({
       format: 'cjs',
-      sourceMap: buildSourcemap,
-      sourceMapFile: filename
+      sourcemap: buildSourcemap,
+      sourcemapFile: filename
     });
+  }).then(({ output }) => {
     // Wrap code in self invoking function so the variables don't
     // pollute the global namespace.
-    var isolatedCode = '(function () {' + result.code + '\n}());';
+    const isolatedCode = '(function () {' + output[0].code + '\n}());';
     if (buildSourcemap) {
       return Q.all([
         jetpack.writeAsync(dest, isolatedCode + '\n//# sourceMappingURL=' + filename + '.map'),
-        jetpack.writeAsync(dest + '.map', result.map.toString())
+        jetpack.writeAsync(dest + '.map', output[0].map.toString())
       ]);
     } else {
       return jetpack.writeAsync(dest, isolatedCode);
     }
-  }).then(function () {
-    return gulp.src(dest, {base: '.'})
-      .pipe($.ngAnnotate())
-      .pipe(gulp.dest('.'));
-  }).then(function () {
-    deferred.resolve();
   }).catch(function (err) {
     console.error('Build: Error during rollup', err.stack);
-    deferred.reject();
   });
-
-  return deferred.promise;
 };
 
 var compileScripts = function () {

@@ -30,7 +30,6 @@ import { app } from '@electron/remote';
 import path from 'path';
 import os from 'os';
 import AdmZip from 'adm-zip';
-import YAML from 'yamljs';
 
 export class OsServer {
   constructor($q, $http, $log, $uibModal, Project, DependencyManager, Message, toastr, $translate) {
