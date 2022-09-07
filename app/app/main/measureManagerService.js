@@ -25,7 +25,7 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-import openport from 'openport';
+import portfinder from 'portfinder';
 
 export class MeasureManager {
   constructor($log, $http, $q, DependencyManager, Message) {
@@ -63,79 +63,74 @@ export class MeasureManager {
     const vm = this;
 
     // find an open port
-    openport.find(
-      {
-        startingPort: 3100,
-        endingPort: 3500,
-        avoid: [3500]
-      },
-      function(err, port) {
-        if(err) { vm.$log.error('Error locating an open port for measure manager.'); return; }
-        vm.port = port;
-        vm.$log.info('Measure Manager port: ', vm.port);
+    portfinder.getPortPromise({
+      port: 3100,
+      stopPort: 3499
+    }).then(port => {
+      vm.port = port;
+      vm.$log.info('Measure Manager port: ', vm.port);
 
-        vm.$log.info('Start Measure Manager Server: ', vm.cliPath, ' measure -s ', vm.port);
-        vm.cli = vm.spawn(vm.cliPath, ['measure', '-s', vm.port]);
-        vm.cli.stdout.on('data', (data) => {
-          // record errors
-          if (data.indexOf('<0>') !== -1) {
-            // WARNING
-            vm.$log.warn(`MeasureManager WARNING: ${data}`);
-            vm.Message.appendMeasureManagerError({type: 'warning', data: data.toString()});
-          } else if (data.indexOf('<1>') !== -1) {
-            // ERROR
-            vm.$log.error(`MeasureManager ERROR: ${data}`);
-            vm.Message.appendMeasureManagerError({type: 'error', data: data.toString()});
-          } else if(data.indexOf('<2>') !== -1) {
-            // ERROR
-            vm.$log.error(`MeasureManager ERROR: ${data}`);
-            vm.Message.appendMeasureManagerError({type: 'fatal', data: data.toString()});
-          }
-          else {
-            if (vm.Message.showDebug()) vm.$log.debug(`MeasureManager: ${data}`);
-          }
-          // check that the mm was started correctly: resolve readyDeferred
-          const str = data.toString();
-          if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
-            if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
-            vm.mmReadyDeferred.resolve();
-          }
-          // TODO: THIS IS TEMPORARY (windows):
-          else if (str.indexOf('Only one usage of each socket address') !== -1) {
-            if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
-            vm.mmReadyDeferred.resolve();
-          }
-          // TODO: THIS IS TEMPORARY (mac):
-          else if (str.indexOf('Error: Address already in use') !== -1) {
-            if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
-            vm.mmReadyDeferred.resolve();
-          }
+      vm.$log.info('Start Measure Manager Server: ', vm.cliPath, ' measure -s ', vm.port);
+      vm.cli = vm.spawn(vm.cliPath, ['measure', '-s', vm.port]);
+      vm.cli.stdout.on('data', (data) => {
+        // record errors
+        if (data.indexOf('<0>') !== -1) {
+          // WARNING
+          vm.$log.warn(`MeasureManager WARNING: ${data}`);
+          vm.Message.appendMeasureManagerError({type: 'warning', data: data.toString()});
+        } else if (data.indexOf('<1>') !== -1) {
+          // ERROR
+          vm.$log.error(`MeasureManager ERROR: ${data}`);
+          vm.Message.appendMeasureManagerError({type: 'error', data: data.toString()});
+        } else if(data.indexOf('<2>') !== -1) {
+          // ERROR
+          vm.$log.error(`MeasureManager ERROR: ${data}`);
+          vm.Message.appendMeasureManagerError({type: 'fatal', data: data.toString()});
+        }
+        else {
+          if (vm.Message.showDebug()) vm.$log.debug(`MeasureManager: ${data}`);
+        }
+        // check that the mm was started correctly: resolve readyDeferred
+        const str = data.toString();
+        if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
+          if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
+          vm.mmReadyDeferred.resolve();
+        }
+        // TODO: THIS IS TEMPORARY (windows):
+        else if (str.indexOf('Only one usage of each socket address') !== -1) {
+          if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
+          vm.mmReadyDeferred.resolve();
+        }
+        // TODO: THIS IS TEMPORARY (mac):
+        else if (str.indexOf('Error: Address already in use') !== -1) {
+          if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
+          vm.mmReadyDeferred.resolve();
+        }
 
-        });
-        vm.cli.stderr.on('data', (data) => {
-          vm.$log.info(`MeasureManager: ${data}`);
-          // check that the mm was started correctly: resolve readyDeferred
-          const str = data.toString();
-          if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
-            if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
-            vm.mmReadyDeferred.resolve();
-          }
-          // TODO: THIS IS TEMPORARY (windows):
-          else if (str.indexOf('Only one usage of each socket address') !== -1) {
-            if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
-            vm.mmReadyDeferred.resolve();
-          }
-          // TODO: THIS IS TEMPORARY (mac):
-          else if (str.indexOf('Error: Address already in use') !== -1) {
-            if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
-            vm.mmReadyDeferred.resolve();
-          }
-        });
-        vm.cli.on('close', (code) => {
-          vm.$log.info(`Measure Manager exited with code ${code}`);
-        });
-      }
-    );
+      });
+      vm.cli.stderr.on('data', (data) => {
+        vm.$log.info(`MeasureManager: ${data}`);
+        // check that the mm was started correctly: resolve readyDeferred
+        const str = data.toString();
+        if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
+          if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
+          vm.mmReadyDeferred.resolve();
+        }
+        // TODO: THIS IS TEMPORARY (windows):
+        else if (str.indexOf('Only one usage of each socket address') !== -1) {
+          if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
+          vm.mmReadyDeferred.resolve();
+        }
+        // TODO: THIS IS TEMPORARY (mac):
+        else if (str.indexOf('Error: Address already in use') !== -1) {
+          if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
+          vm.mmReadyDeferred.resolve();
+        }
+      });
+      vm.cli.on('close', (code) => {
+        vm.$log.info(`Measure Manager exited with code ${code}`);
+      });
+    }).catch(() => vm.$log.error('Error locating an open port for measure manager.'));
   }
 
   stopMeasureManager() {
