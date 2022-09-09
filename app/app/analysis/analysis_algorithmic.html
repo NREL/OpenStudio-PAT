@@ -1,7 +1,7 @@
 <div class="row">
   <div class="col-sm-12">
     <uib-accordion close-others="false">
-      <uib-accordion-group class="algorithm-custom" is-open="advancedArguments.open">
+      <div uib-accordion-group class="panel-default algorithm-custom" is-open="advancedArguments.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button"
              ng-class="{'glyphicon-chevron-down': advancedArguments.open, 'glyphicon-chevron-right': !advancedArguments.open}"></i>
@@ -84,7 +84,7 @@
             <input class="form-control" type="number" ng-model="timeoutUploadResults" ng-change="analysis.setTimeoutUploadResults(timeoutUploadResults)">
           </div>
         </div>
-      </uib-accordion-group>
+      </div>
     </uib-accordion>
   </div>
 </div>
@@ -92,7 +92,7 @@
 <div class="row">
   <div class="col-sm-12">
     <uib-accordion close-others="false">
-      <uib-accordion-group class="algorithm-custom" is-open="settings.open">
+      <div uib-accordion-group class="panel-default algorithm-custom" is-open="settings.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button"
              ng-class="{'glyphicon-chevron-down': settings.open, 'glyphicon-chevron-right': !settings.open}"></i>
@@ -138,7 +138,7 @@
           </div>
         </div>
 
-      </uib-accordion-group>
+      </div>
     </uib-accordion>
   </div>
 </div>
@@ -146,7 +146,7 @@
 <div class="row">
   <div class="col-sm-12">
     <uib-accordion close-others="false">
-      <uib-accordion-group class="algorithm-custom" is-open="filesToInclude.open">
+      <div uib-accordion-group class="panel-default algorithm-custom" is-open="filesToInclude.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button"
              ng-class="{'glyphicon-chevron-down': filesToInclude.open, 'glyphicon-chevron-right': !filesToInclude.open}"></i>
@@ -193,7 +193,7 @@
           </div>
         </div>
 
-      </uib-accordion-group>
+      </div>
     </uib-accordion>
   </div>
 </div>
@@ -201,7 +201,7 @@
 <div class="row pad-bot-20">
   <div class="col-sm-12">
     <uib-accordion close-others="false">
-      <uib-accordion-group class="algorithm-custom" is-open="serverScriptsAccordionOpen">
+      <div uib-accordion-group class="panel-default algorithm-custom" is-open="serverScriptsAccordionOpen">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button"
              ng-class="{'glyphicon-chevron-down': serverScriptsAccordionOpen, 'glyphicon-chevron-right': !serverScriptAccordionOpen}"></i>
@@ -254,7 +254,7 @@
           </div>
         </div>
 
-      </uib-accordion-group>
+      </div>
     </uib-accordion>
   </div>
 </div>
@@ -279,7 +279,7 @@
 <div class="analysis-custom">
   <div class="full-width margin-top-20">
     <uib-accordion close-others="false">
-      <uib-accordion-group ng-repeat="measure in osMeasures" class="analysis-custom" id="{{measure.instanceId}}"
+      <div uib-accordion-group ng-repeat="measure in osMeasures" class="panel-default analysis-custom" id="{{measure.instanceId}}"
                            is-open="measure.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button"
@@ -596,7 +596,7 @@
             <span class="glyphicon glyphicon-alert red-button"></span>&nbsp;<span>{{'analysis.algorithmic.warning' | translate}}</span>
           </div>
         </div>
-      </uib-accordion-group>
+      </div>
     </uib-accordion>
   </div>
 </div>
@@ -616,7 +616,7 @@
 <div class="analysis-custom">
   <div class="full-width margin-top-20">
     <uib-accordion close-others="false">
-      <uib-accordion-group ng-repeat="measure in epMeasures" class="analysis-custom" id="{{measure.instanceId}}"
+      <div uib-accordion-group ng-repeat="measure in epMeasures" class="panel-default analysis-custom" id="{{measure.instanceId}}"
                            is-open="measure.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button"
@@ -935,7 +935,7 @@
             <span class="glyphicon glyphicon-alert red-button"></span>&nbsp;<span>{{'analysis.algorithmic.warning' | translate}}</span>
           </div>
         </div>
-      </uib-accordion-group>
+      </div>
     </uib-accordion>
   </div>
 </div>
@@ -955,7 +955,7 @@
 <div class="analysis-custom">
   <div class="full-width margin-top-20">
     <uib-accordion close-others="false">
-      <uib-accordion-group ng-repeat="measure in repMeasures" class="analysis-custom" id="{{measure.instanceId}}"
+      <div uib-accordion-group ng-repeat="measure in repMeasures" class="panel-default analysis-custom" id="{{measure.instanceId}}"
                            is-open="measure.open">
         <uib-accordion-heading>
           <i class="pull-left glyphicon pad-right-5 black-button"
@@ -1275,7 +1275,7 @@
             <span class="glyphicon glyphicon-alert red-button"></span>&nbsp;<span>{{'analysis.algorithmic.warning' | translate}}</span>
           </div>
         </div>
-      </uib-accordion-group>
+      </div>
     </uib-accordion>
   </div>
 </div>

@@ -1365,26 +1365,24 @@ export class OsServer {
 
   stopAnalysis() {
     const vm = this;
-    const deferred = vm.$q.defer();
     const url = vm.selectedServerURL + '/analyses/' + vm.Project.getAnalysisID() + '/action.json';
     const params = {analysis_action: 'stop'};
 
     if (vm.analysisStatus == 'completed') {
       if (vm.Message.showDebug()) vm.$log.debug('Analysis is already completed');
-      deferred.resolve();
-    } else {
-      vm.$http.post(url, params)
-        .success((data, status, headers, config) => {
-          vm.$log.info('stop analysis Success!, status: ', status);
-          vm.setAnalysisStatus('canceled');
-          deferred.resolve(data);
-        })
-        .error((data, status, headers, config) => {
-          vm.$log.error('stop analysis error: ', data);
-          deferred.reject([]);
-        });
+      return;
     }
-    return deferred.promise;
+
+    return vm.$http.post(url, params)
+      .then(res => {
+        vm.$log.info('stop analysis Success!, status: ', res.status);
+        vm.setAnalysisStatus('canceled');
+        return res.data;
+      })
+      .catch(res => {
+        vm.$log.error('stop analysis error: ', res.data);
+        return Promise.reject([]);
+      });
   }
 
   // analysis running dialog

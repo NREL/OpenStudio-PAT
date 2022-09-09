@@ -153,7 +153,6 @@ export class MeasureManager {
   // }
   createNewMeasure(params) {
     const vm = this;
-    const deferred = vm.$q.defer();
 
     // reset MeasureManagerErrors when a new action
     vm.Message.resetMeasureManagerErrors();
@@ -161,17 +160,15 @@ export class MeasureManager {
     if (vm.Message.showDebug()) vm.$log.debug('MeasureManager::createNewMeasure');
 
     if (vm.Message.showDebug()) vm.$log.debug('MeasureManager::createNewMeasure params: ', params);
-    vm.$http.post(`${vm.url}:${vm.port}/create_measure`, params)
-      .success((data, status, headers, config) => {
-        vm.$log.info('MeasureManager::createNewMeasure reply: ', data);
-        deferred.resolve(data);
+    return vm.$http.post(`${vm.url}:${vm.port}/create_measure`, params)
+      .then(res => {
+        vm.$log.info('MeasureManager::createNewMeasure reply: ', res.data);
+        return res.data;
       })
-      .error((data, status, headers, config) => {
-        vm.$log.error('MeasureManager::createNewMeasure error: ', data);
-        deferred.reject();
+      .catch(res => {
+        vm.$log.error('MeasureManager::createNewMeasure error: ', res.data);
+        return Promise.reject();
       });
-
-    return deferred.promise;
   }
 
   // This function make a copy of a measure on the file system.
@@ -190,23 +187,20 @@ export class MeasureManager {
   // }
   duplicateMeasure(params) {
     const vm = this;
-    const deferred = vm.$q.defer();
 
     // reset MeasureManagerErrors when a new action
     vm.Message.resetMeasureManagerErrors();
 
     if (vm.Message.showDebug()) vm.$log.debug('params one more time: ', params);
-    vm.$http.post(`${vm.url}:${vm.port}/duplicate_measure`, params)
-      .success((data, status, headers, config) => {
-        vm.$log.info('Measure Manager reply: ', data);
-        deferred.resolve(data);
+    return vm.$http.post(`${vm.url}:${vm.port}/duplicate_measure`, params)
+      .then(res => {
+        vm.$log.info('Measure Manager reply: ', res.data);
+        return res.data;
       })
-      .error((data, status, headers, config) => {
-        vm.$log.error('Measure Manager DuplicateMeasure error: ', data);
-        deferred.reject();
+      .catch(res => {
+        vm.$log.error('Measure Manager DuplicateMeasure error: ', res.data);
+        return Promise.reject();
       });
-
-    return deferred.promise;
   }
 
   // Update Measures
@@ -215,104 +209,92 @@ export class MeasureManager {
   updateMeasures(measurePath) {
 
     const vm = this;
-    const deferred = vm.$q.defer();
 
     // fix path for windows
     const newMeasurePath = measurePath.replace(/\\/g, '/'); // Evan: how to normalize the path
     const params = {measures_dir: newMeasurePath};
     if (vm.Message.showDebug()) vm.$log.debug('PARAMS: ', params);
 
-    vm.$http.post(`${vm.url}:${vm.port}/update_measures`, params)
-      .success((data, status, headers, config) => {
+    return vm.$http.post(`${vm.url}:${vm.port}/update_measures`, params)
+      .then(res => {
         vm.$log.info('updateMeasures Success!');
-        // if (vm.Message.showDebug()) vm.$log.debug('Measure Manager reply: ', data);
-        deferred.resolve(data);
+        // if (vm.Message.showDebug()) vm.$log.debug('Measure Manager reply: ', res.data);
+        return res.data;
       })
-      .error((data, status, headers, config) => {
-        vm.$log.error('Measure Manager UpdateMeasures error: ', data);
-        deferred.reject([]);
+      .catch(res => {
+        vm.$log.error('Measure Manager UpdateMeasures error: ', res.data);
+        return Promise.reject([]);
       });
-
-    return deferred.promise;
   }
 
   // Returns the path to the myMeasures directory
   getMyMeasuresDir() {
     const vm = this;
-    const deferred = vm.$q.defer();
-    vm.$http.get(`${vm.url}:${vm.port}`, {
+    return vm.$http.get(`${vm.url}:${vm.port}`, {
       params: {}
     })
-      .success((data, status, headers, config) => {
-        vm.$log.info('Measure Manager getMyMeasuresDir Success!, status: ', status);
-        deferred.resolve(data);
+      .then(res => {
+        vm.$log.info('Measure Manager getMyMeasuresDir Success!, status: ', res.status);
+        return res.data;
       })
-      .error((data, status, headers, config) => {
-        vm.$log.error('Measure Manager getMyMeasuresDir Error: ', data);
-        deferred.reject([]);
+      .catch(res => {
+        vm.$log.error('Measure Manager getMyMeasuresDir Error: ', res.data);
+        return Promise.reject([]);
       });
-    return deferred.promise;
   }
 
   setMyMeasuresDir(path) {
     const vm = this;
-    const deferred = vm.$q.defer();
     const params = {my_measures_dir: path};
 
     // reset MeasureManagerErrors when a new action
     vm.Message.resetMeasureManagerErrors();
 
-    vm.$http.post(`${vm.url}:${vm.port}/set`, params)
-      .success((data, status, headers, config) => {
-        vm.$log.info('Measure Manager setMyMeasuresDir Success!, status: ', status);
-        deferred.resolve(data);
+    return vm.$http.post(`${vm.url}:${vm.port}/set`, params)
+      .then(res => {
+        vm.$log.info('Measure Manager setMyMeasuresDir Success!, status: ', res.status);
+        return res.data;
       })
-      .error((data, status, headers, config) => {
-        vm.$log.error('Measure Manager SetMyMeasuresDir Error: ', data);
-        deferred.reject([]);
+      .catch(res => {
+        vm.$log.error('Measure Manager SetMyMeasuresDir Error: ', res.data);
+        return Promise.reject([]);
       });
-    return deferred.promise;
   }
 
   // Retrieve Local BCL measures
   getLocalBCLMeasures() {
     const vm = this;
-    const deferred = vm.$q.defer();
     const params = {};
 
-    vm.$http.post(`${vm.url}:${vm.port}/bcl_measures`, params)
-      .success((data, status, headers, config) => {
-        vm.$log.info('Measure Manager bcl_measures Success!, status: ', status);
-        deferred.resolve(data);
+    return vm.$http.post(`${vm.url}:${vm.port}/bcl_measures`, params)
+      .then(res => {
+        vm.$log.info('Measure Manager bcl_measures Success!, status: ', res.status);
+        return res.data;
       })
-      .error((data, status, headers, config) => {
-        vm.$log.error('Measure Manager bcl_measures Error: ', data);
-        deferred.reject([]);
+      .catch(res => {
+        vm.$log.error('Measure Manager bcl_measures Error: ', res.data);
+        return Promise.reject([]);
       });
-    return deferred.promise;
   }
 
   // Download a measure from online BCL
   downloadBCLMeasure(uid) {
     const vm = this;
-    const deferred = vm.$q.defer();
     const params = {uid: uid};
 
     // reset MeasureManagerErrors when a new action
     vm.Message.resetMeasureManagerErrors();
 
-    vm.$http.post(`${vm.url}:${vm.port}/download_bcl_measure`, params)
-      .success((data, status, headers, config) => {
-        vm.$log.info('Measure Manager download_bcl_measure Success!, status: ', status);
-        vm.$log.info('Data: ', data);
-        deferred.resolve(data[0]);
+    return vm.$http.post(`${vm.url}:${vm.port}/download_bcl_measure`, params)
+      .then(res => {
+        vm.$log.info('Measure Manager download_bcl_measure Success!, status: ', res.status);
+        vm.$log.info('Data: ', res.data);
+        return res.data[0];
       })
-      .error((data, status, headers, config) => {
-        vm.$log.error('Measure Manager download_bcl_measure Error: ', data);
-        deferred.reject([]);
+      .catch(res => {
+        vm.$log.error('Measure Manager download_bcl_measure Error: ', res.data);
+        return Promise.reject([]);
       });
-
-    return deferred.promise;
   }
 
 
@@ -321,7 +303,6 @@ export class MeasureManager {
   // Expects a measurePath.  and osmPath if evaluating against a specific model
   computeArguments(measurePath, osmPath = null) {
     const vm = this;
-    const deferred = vm.$q.defer();
 
     // reset MeasureManagerErrors when a new action
     vm.Message.resetMeasureManagerErrors();
@@ -333,18 +314,16 @@ export class MeasureManager {
     const params = {measure_dir: measurePath, osm_path: osmPath};
     if (vm.Message.showDebug()) vm.$log.debug('computeArguments params', params);
 
-    vm.$http.post(`${vm.url}:${vm.port}/compute_arguments`, params)
-      .success((data, status, headers, config) => {
-        vm.$log.info('computeArguments Success!, status: ', status);
-        // if (vm.Message.showDebug()) vm.$log.debug('Measure Manager reply: ', data);
-        deferred.resolve(data);
+    return vm.$http.post(`${vm.url}:${vm.port}/compute_arguments`, params)
+      .then(res => {
+        vm.$log.info('computeArguments Success!, status: ', res.status);
+        // if (vm.Message.showDebug()) vm.$log.debug('Measure Manager reply: ', res.data);
+        return res.data;
       })
-      .error((data, status, headers, config) => {
-        vm.$log.error('Measure Manager ComputeArguments error: ', data);
-        deferred.reject([]);
+      .catch(res => {
+        vm.$log.error('Measure Manager ComputeArguments error: ', res.data);
+        return Promise.reject([]);
       });
-
-    return deferred.promise;
   }
 }
 
