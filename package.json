@@ -42,7 +42,7 @@
     "gulp-useref": "~3.0.5",
     "gulp-util": "~3.0.6",
     "lazypipe": "~1.0.1",
-    "lodash": "~4.6.1",
+    "lodash": "~4.17.21",
     "merge-stream": "~1.0.0",
     "q": "~1.4.1",
     "request": "^2.75.0",
