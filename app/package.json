@@ -9,7 +9,7 @@
   "dependencies": {
     "@electron/remote": "~2.0.8",
     "adm-zip": "~0.4.7",
-    "angular": "~1.5.5",
+    "angular": "~1.8.3",
     "angular-animate": "~1.5.5",
     "angular-aria": "~1.5.5",
     "angular-bootstrap-checkbox": "~0.5.0",
