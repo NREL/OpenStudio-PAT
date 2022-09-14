@@ -19,7 +19,6 @@ PAT is an electron app.
 	```
 	git clone https://github.com/NREL/OpenStudio-PAT.git
 	npm install
-	npx bower install
 	npx gulp installDeps
 	```
 
@@ -36,7 +35,7 @@ PAT is an electron app.
 	npm run build
 	```
 2. Copy the folders under `./depend` to the following directory.
-	* MacOS: `./tmp/ParametricAnalysisTool.app/Resources`
+	* MacOS: `./tmp/ParametricAnalysisTool.app/Contents/Resources`
 	* Windows: `./tmp/pat`
 3. The executable should now be ready to use.
 	* MacOS: `./tmp/ParametricAnalysisTool.app`

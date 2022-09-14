@@ -7,7 +7,6 @@ Thumbs.db
 /.idea/
 /.tmp/
 /app/spec.js
-/bower_components/
 /build/
 /build_release/
 /releases/

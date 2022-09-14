@@ -4,7 +4,6 @@ stages:
 cache:
   paths:
     - app/node_modules/
-    - bower_components/
     - node_modules/
 
 build:mac:
@@ -13,7 +12,6 @@ build:mac:
     - mac
   before_script:
     - npm install
-    - npm run bower
   script:
     - npm run release
 
