@@ -31,7 +31,7 @@ import fs from 'fs';
 import path from 'path';
 
 export class SetProject {
-  constructor($q, $log, $state, $uibModal, Project, OsServer, BCL, $translate, toastr, Message) {
+  constructor($q, $log, $state, $timeout, $uibModal, Project, OsServer, BCL, $translate, toastr, Message) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
@@ -44,6 +44,7 @@ export class SetProject {
     vm.Project = Project;
     vm.BCL = BCL;
     vm.$state = $state;
+    vm.$timeout = $timeout;
     vm.newProjectName = null;
     vm.toastr = toastr;
     vm.$translate = $translate;
@@ -194,7 +195,7 @@ export class SetProject {
               vm.$translate('toastr.projectSaved').then(translation => {
                 vm.toastr.success(translation);
               });
-              vm.$state.transitionTo('analysis', {}, {reload: true});
+              vm.$timeout(() => vm.$state.transitionTo('analysis', {}, {reload: true}));
 
               deferred.resolve('resolve');
               return deferred.promise;
@@ -284,7 +285,7 @@ export class SetProject {
               // vm.Project.setAnalysisName(vm.Project.projectName);
               vm.setProjectVariables(projectDir);
 
-              vm.$state.transitionTo('analysis', {}, {reload: true});
+              vm.$timeout(() => vm.$state.transitionTo('analysis', {}, {reload: true}));
 
               vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
 
@@ -312,7 +313,7 @@ export class SetProject {
               // vm.Project.setAnalysisName(vm.Project.projectName);
               vm.setProjectVariables(projectDir);
 
-              vm.$state.transitionTo('analysis', {}, {reload: true});
+              vm.$timeout(() => vm.$state.transitionTo('analysis', {}, {reload: true}));
 
               vm.Project.exportPAT(); // Create a pat.json file so project is considered legit
 
@@ -372,7 +373,7 @@ export class SetProject {
             // set project Variables
             vm.setProjectVariables(projectDir);
 
-            vm.$state.transitionTo('analysis', {}, {reload: true});
+            vm.$timeout(() => vm.$state.transitionTo('analysis', {}, {reload: true}));
 
             // Only start server if local server is selected?
             // New: don't reset run type or start local server
@@ -395,7 +396,7 @@ export class SetProject {
             // set project Variables anyway
             vm.setProjectVariables(projectDir);
 
-            vm.$state.transitionTo('analysis', {}, {reload: true});
+            vm.$timeout(() => vm.$state.transitionTo('analysis', {}, {reload: true}));
 
             deferred.reject('rejected');
             return deferred.promise;

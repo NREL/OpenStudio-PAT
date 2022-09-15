@@ -50,7 +50,7 @@
           <div class="bcl-custom">
             <div class="bcl-custom panel-body">
               <uib-accordion close-others="false">
-                <uib-accordion-group ng-repeat="cat1 in categories" is-open="cat1.open" class="bcl-custom">
+                <div uib-accordion-group ng-repeat="cat1 in categories" is-open="cat1.open" class="panel-default bcl-custom">
                   <uib-accordion-heading>
                     <i class="pull-left glyphicon pad-right-5" ng-class="{'glyphicon-chevron-down': cat1.open, 'glyphicon-chevron-right': !cat1.open}"></i>
                     <div class="checkbox bcl-cb">
@@ -71,7 +71,7 @@
                       </div>
                     </div>
                   </div>
-                </uib-accordion-group>
+                </div>
               </uib-accordion>
             </div>
           </div>

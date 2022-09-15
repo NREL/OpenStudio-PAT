@@ -121,7 +121,7 @@
   <div class="row">
     <div class="col-sm-12">
       <uib-accordion close-others="false">
-        <uib-accordion-group ng-repeat="datapoint in datapoints | limitTo : numberDPsToDisplay track by datapoint.id" id="{{datapoint.id}}" is-open="datapoint.open">
+        <div uib-accordion-group class="panel-default" ng-repeat="datapoint in datapoints | limitTo : numberDPsToDisplay track by datapoint.id" id="{{datapoint.id}}" is-open="datapoint.open">
           <uib-accordion-heading>
             <div class="row datapoint-header pad-top-10">
               <div class="col-sm-2">
@@ -187,7 +187,7 @@
                   <div class="col-sm-6 datapoint-id-display">Datapoint ID: {{datapoint.id}}</div>
                 </div>
                 <uib-accordion close-others="false">
-                  <uib-accordion-group ng-repeat="step in datapoint.steps | filter:filterSkipped" id="{{datapoint.id}}-{{step.name}}" is-open="step.open">
+                  <div uib-accordion-group class="panel-default" ng-repeat="step in datapoint.steps | filter:filterSkipped" id="{{datapoint.id}}-{{step.name}}" is-open="step.open">
                     <uib-accordion-heading>
                       <div class="row measure-accordion pad-bot-10">
                         <div class="col-sm-6 bold">{{step.name}}</div>
@@ -211,8 +211,8 @@
                       <div ng-repeat="item in step.result.step_warnings track by $index"><span class="orange-text">Warning: </span>{{item}}</div>
                       <div ng-repeat="item in step.result.step_info track by $index"><span class="green-text">Info: </span>{{item}}</div>
                     </div>
-                  </uib-accordion-group>
-                  <uib-accordion-group ng-if="datapoint.eplusout_err">
+                  </div>
+                  <div uib-accordion-group class="panel-default" ng-if="datapoint.eplusout_err">
                     <uib-accordion-heading>
                       <div class="row measure-accordion pad-bot-10">
                         <div class="col-sm-6 bold">EnergyPlus Results</div>
@@ -222,12 +222,12 @@
                       <div ng-bind-html="run.formatEplusErr(datapoint.eplusout_err)">
                       </div>
                     </div>
-                  </uib-accordion-group>
+                  </div>
                 </uib-accordion>
               </div>
             </div>
           </div>
-        </uib-accordion-group>
+        </div>
       </uib-accordion>
     </div>
   </div>

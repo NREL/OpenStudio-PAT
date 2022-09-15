@@ -27,7 +27,6 @@
  **********************************************************************************************************************/
 import {shell} from 'electron';
 import jetpack from 'fs-jetpack';
-import YAML from 'yamljs';
 import VersionCompare from 'version_compare';
 
 export class RunController {
@@ -826,10 +825,8 @@ export class RunController {
   stopAnalysisStatus(status = 'completed') {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('***** In runController::stopAnalysisStatus() *****');
-    if (angular.isDefined(vm.getStatus)) {
-      vm.$interval.cancel(vm.getStatus);
-      vm.getStatus = undefined;
-    }
+    vm.getStatus = undefined;
+
     // set analysis status
     vm.OsServer.setAnalysisStatus(status);
     vm.$scope.analysisStatus = vm.OsServer.getAnalysisStatus();

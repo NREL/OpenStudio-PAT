@@ -2,7 +2,7 @@
 'use strict';
 
 var Q = require('q');
-var gulpUtil = require('gulp-util');
+var fancyLog = require('fancy-log');
 var jetpack = require('fs-jetpack');
 var asar = require('asar');
 var utils = require('./utils');
@@ -92,7 +92,7 @@ var signApp = function () {
   var identity = utils.getSigningId();
   if (identity) {
     var cmd = 'codesign --deep --force --sign "' + identity + '" "' + finalAppDir.path() + '"';
-    gulpUtil.log('Signing with:', cmd);
+    fancyLog('Signing with:', cmd);
     return Q.nfcall(child_process.exec, cmd);
   } else {
     return Q();
@@ -118,7 +118,7 @@ var signApp = function () {
 //   // Delete DMG file with this name if already exists
 //   releasesDir.remove(dmgName);
 //
-//   gulpUtil.log('Packaging to DMG file...');
+//   fancyLog('Packaging to DMG file...');
 //
 //   var readyDmgPath = releasesDir.path(dmgName);
 //   appdmg({
@@ -129,7 +129,7 @@ var signApp = function () {
 //       console.error(err);
 //     })
 //     .on('finish', function () {
-//       gulpUtil.log('DMG file ready!', readyDmgPath);
+//       fancyLog('DMG file ready!', readyDmgPath);
 //       deferred.resolve();
 //     });
 //

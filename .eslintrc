@@ -1,16 +1,18 @@
 {
   "extends": "eslint:recommended",
-  "parser": "babel-eslint",
+  "parser": "@babel/eslint-parser",
+  "parserOptions": {
+    "ecmaFeatures": {
+      "modules": true
+    }
+  },
   "env": {
     "browser": true,
     "es6": true,
     "jasmine": true,
     "node": true
   },
-  "ecmaFeatures": {
-    "modules": true
-  },
-  "plugins": ["lodash"],
+  "plugins": ["angular", "lodash"],
   "globals": {
     "_": true,
     "inject": true,

@@ -592,7 +592,7 @@
         }
 
         // Parse the JSON to XML
-        var xmlText = js2xmlparser("analysis", analysis, options);
+        var xmlText = js2xmlparser.parse("analysis", analysis, options);
 
         var save_path = $scope.results_file_path;
 

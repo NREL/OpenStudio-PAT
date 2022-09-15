@@ -26,7 +26,8 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 // Electron
-import contextMenu from '../electron/context_menu'; // eslint-disable-line no-unused-vars
+import { contextMenu } from '../electron/context_menu';
+contextMenu();
 
 import {config} from './index.config';
 import {routerConfig} from './index.route';
@@ -77,6 +78,7 @@ import {StatusBarController} from '../app/status_bar/statusBarController';
 angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngResource', 'pascalprecht.translate', 'ui.router', 'ui.router.stateHelper', 'ui.bootstrap', 'ui.checkbox', 'toastr', 'ui.grid', 'ui.grid.autoResize', 'ui.grid.cellNav', 'ui.grid.edit', 'ui.grid.resizeColumns', 'ui.grid.selection', 'ui.grid.pinning'])
   .config(config)
   .config(routerConfig)
+  .config(['$locationProvider', $locationProvider => $locationProvider.hashPrefix('')])
   .run(runBlock)
   .controller('NavController', NavController)
   .controller('ModalBclController', ModalBclController)

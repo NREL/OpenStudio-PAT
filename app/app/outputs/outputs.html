@@ -10,7 +10,7 @@
       <div class="analysis-custom">
         <div class="full-width margin-top-20">
           <uib-accordion close-others="false">
-            <uib-accordion-group ng-repeat="measure in outputMeasures" class="analysis-custom" id="{{measure.name}}" is-open="measure.open">
+            <div uib-accordion-group ng-repeat="measure in outputMeasures" class="panel-default analysis-custom" id="{{measure.name}}" is-open="measure.open">
               <uib-accordion-heading>
                 <i class="pull-left glyphicon pad-right-5 black-button" ng-class="{'glyphicon-chevron-down': measure.open, 'glyphicon-chevron-right': !measure.open}"></i>
                 {{measure.display_name}}
@@ -24,7 +24,7 @@
               <div class="pad-top-10">
                 <button class="btn btn-success" ng-click="outputs.addOutputs(measure)"><translate>outputs.selectOutputs</translate></button>
               </div>
-            </uib-accordion-group>
+            </div>
           </uib-accordion>
         </div>
       </div>

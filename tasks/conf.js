@@ -5,8 +5,7 @@
  *  which are used in several places to keep good readability
  *  of the tasks
  */
-
-var $ = require('gulp-load-plugins')();
+const fancyLog = require('fancy-log');
 
 /**
  *  The main paths of your project handle these with care
@@ -21,9 +20,10 @@ exports.paths = {
 /**
  *  Common implementation for an error handler of a Gulp plugin
  */
-exports.errorHandler = function (title) {
+exports.errorHandler = async function (title) {
+  const chalk = (await import("chalk")).default;
   return function (err) {
-    $.util.log($.util.colors.red('[' + title + ']'), err.toString());
+    fancyLog(chalk.red('[' + title + ']'), err.toString());
     this.emit('end');
   };
 };

@@ -26,11 +26,11 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import { app, getCurrentWindow, Menu, MenuItem } from '@electron/remote';
-import jetpack from 'fs-jetpack';
 
-const env = jetpack.cwd(app.getAppPath()).read('env.json', 'json');
+import { getEnv } from '../env';
+const env = getEnv(app.getAppPath());
 
-(function () {
+export function contextMenu() {
   'use strict';
 
   const cut = new MenuItem({
@@ -83,4 +83,4 @@ const env = jetpack.cwd(app.getAppPath()).read('env.json', 'json');
         break;
     }
   }, false);
-}());
+}
