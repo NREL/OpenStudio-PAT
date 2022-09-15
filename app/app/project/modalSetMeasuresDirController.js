@@ -25,11 +25,10 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-import { dialog } from '@electron/remote';
 
 export class ModalSetMeasuresDirController {
 
-  constructor($q, $log, $scope, $uibModalInstance, MeasureManager, $translate, toastr, Project, Message) {
+  constructor($q, $log, $scope, $uibModalInstance, DialogHelper, MeasureManager, $translate, toastr, Project, Message) {
     'ngInject';
 
     const vm = this;
@@ -41,7 +40,7 @@ export class ModalSetMeasuresDirController {
     vm.$translate = $translate;
     vm.MeasureManager = MeasureManager;
     vm.Project = Project;
-    vm.dialog = dialog;
+    vm.dialog = DialogHelper.dialog;
     vm.Message = Message;
 
     vm.$scope.currentDir = vm.Project.getMeasuresDir().path();

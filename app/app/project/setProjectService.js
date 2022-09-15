@@ -26,12 +26,11 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-import { dialog } from '@electron/remote';
 import fs from 'fs';
 import path from 'path';
 
 export class SetProject {
-  constructor($q, $log, $state, $timeout, $uibModal, Project, OsServer, BCL, $translate, toastr, Message) {
+  constructor($q, $log, $state, $timeout, $uibModal, Project, OsServer, BCL, DialogHelper, $translate, toastr, Message) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
@@ -39,7 +38,7 @@ export class SetProject {
     vm.$uibModal = $uibModal;
     vm.fs = fs;
     vm.jetpack = jetpack;
-    vm.dialog = dialog;
+    vm.dialog = DialogHelper.dialog;
     vm.OsServer = OsServer;
     vm.Project = Project;
     vm.BCL = BCL;
@@ -229,6 +228,7 @@ export class SetProject {
       if (vm.Message.showDebug()) vm.$log.debug('newProject response:', response);
 
       // pop modal to allow user to navigate to project parent folder
+      // TODO - try out new DialogHelper service here
       vm.dialog.showOpenDialog({
         title: 'Choose New ParametricAnalysisTool Project Folder',
         properties: ['openDirectory']

@@ -25,41 +25,27 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-// This is main process of Electron, started as first thing when your
-// app starts. This script is running through entire life of your application.
-// It doesn't have any windows which you can see on screen, but we can open
-// window from here.
+import { app, dialog as eDialog } from '@electron/remote';
+import { ipcRenderer } from 'electron';
+import { getEnv } from '../../env';
 
-import { app } from 'electron';
-import createWindow from './electron/window';
-import { getEnv } from './env';
+export class DialogHelper {
+  constructor() {
+    const vm = this;
+    vm.env = getEnv(app.getAppPath());
 
-const remoteMain = require('@electron/remote/main');
-remoteMain.initialize();
+    if (vm.env.name === 'test') {
+      const MOCKED_FUNCTION_NAMES = ['showOpenDialog', 'showMessageDialog'];
 
-process.env.ELECTRON_DISABLE_SECURITY_WARNINGS = 'true';
-
-app.on('ready', () => {
-
-  const mainWindow = createWindow('main', {
-    width: 1000,
-    height: 600,
-    webPreferences: {
-      nodeIntegration: true,
-      contextIsolation: false,
-      webviewTag: true,
-      webSecurity: false // Disable the same-origin policy when using http
+      const dialog = {};
+      for (const k in eDialog) {
+        dialog[k] = MOCKED_FUNCTION_NAMES.includes(k)
+          ? (...args) => ipcRenderer.invoke(`test-dialog-${k}`, ...args)
+          : eDialog[k];
+      }
+      vm.dialog = dialog;
+    } else {
+      vm.dialog = eDialog;
     }
-  });
-  remoteMain.enable(mainWindow.webContents);
-
-  const env = getEnv(app.getAppPath());
-  if (env.name === 'development') {
-    mainWindow.loadURL('http://localhost:3000/index.html');
-    mainWindow.openDevTools();
-  } else {
-    mainWindow.loadURL('file://' + __dirname + '/index.html');
   }
-});
-
-app.on('window-all-closed', app.quit);
+}

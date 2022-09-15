@@ -71,7 +71,6 @@ export class ReportsController {
 
     // Find all possible reports
     var html_reports = [];
-    // TODO figure out why vm.env does not seem to be defined in development
     if (vm.env && (vm.env.name == 'production')) {
       // This will resolve to the path to app.asaar
       var appDir = vm.jetpack.cwd(app.getAppPath());

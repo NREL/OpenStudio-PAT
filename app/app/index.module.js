@@ -72,6 +72,7 @@ import {ServerController} from '../app/server/serverController';
 import {OpenProject} from '../app/project/openProjectService';
 import {SetProject} from '../app/project/setProjectService';
 import {Message} from '../app/project/messageService';
+import {DialogHelper} from '../app/project/dialogHelperService';
 import {StatusBar} from '../app/status_bar/statusBarService';
 import {StatusBarController} from '../app/status_bar/statusBarController';
 
@@ -121,4 +122,5 @@ angular.module('PAT', ['ngAnimate', 'ngSanitize', 'ngMessages', 'ngAria', 'ngRes
   .service('OpenProject', OpenProject)
   .service('SetProject', SetProject)
   .service('Message', Message)
+  .service('DialogHelper', DialogHelper)
   .service('StatusBar', StatusBar);
