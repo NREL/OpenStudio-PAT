@@ -12,3 +12,7 @@ Thumbs.db
 /releases/
 /tmp/
 /depend/
+/test-results/
+/playwright-report/
+/playwright/.cache/
+/playwright/.tmp/
