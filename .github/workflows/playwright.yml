@@ -22,7 +22,7 @@ jobs:
       - name: Install dependencies
         run: npm i
       - name: Run Playwright tests
-        run: npm run test
+        run: xvfb-run --auto-servernum --server-args="-screen 0 1280x960x24" -- npm run test
       - uses: actions/upload-artifact@v3
         if: always()
         with:
