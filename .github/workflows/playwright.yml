@@ -8,7 +8,7 @@ on:
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: macos-latest
+    runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -18,8 +18,10 @@ jobs:
         run: npm i
       - name: Build application
         run: npm run build -- --env=test
-      - name: Run Playwright tests
-        run: npx playwright test
+      - name: Run Playwright test
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: npx playwright test
       - uses: actions/upload-artifact@v3
         if: always()
         with:
