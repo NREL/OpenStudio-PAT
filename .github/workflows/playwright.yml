@@ -4,6 +4,12 @@ on:
     branches: "*"
   pull_request:
     branches: "*"
+
+env:
+  NODE_ENV: "development"
+  PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: true
+  DEBUG: "pw:browser*"
+
 jobs:
   test:
     timeout-minutes: 60
