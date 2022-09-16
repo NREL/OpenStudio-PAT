@@ -13,13 +13,15 @@ export class ElectronAppManager {
   }
 
   static async closeApp() {
-    if (!ElectronAppManager.isClosed) {
-      await ElectronAppManager.app.close();
-    }
+    try {
+      if (!ElectronAppManager.isClosed) {
+        await ElectronAppManager.app.close();
+      }
+    } catch {}
   }
 
   static async launchNewAppInstance() {
-    ElectronAppManager.closeApp();
+    await ElectronAppManager.closeApp();
 
     ElectronAppManager.app = await electron.launch({
       args: ['./build/background.js']

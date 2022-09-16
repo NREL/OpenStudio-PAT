@@ -1,23 +1,23 @@
 import { expect, test } from '@playwright/test';
 import { ElectronAppManager } from '../electron-app-manager';
+import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
 import {
   NewProjectModalPageObject,
   NoServerStartToastPageObject,
   SelectProjectModalPageObject
 } from '../page-objects';
 
-test.beforeEach(ElectronAppManager.launchAppIfClosed);
-test.afterAll(ElectronAppManager.closeApp);
-
-const VALID_EXISTING_PROJECT_PATH = './sample_projects/Office_HVAC';
-const VALID_NEW_PROJECT_PATH = './playwright/.tmp/Playwright__Project';
 const VALID_NEW_PROJECT_NAME = 'Playwright__Project';
 
 let selectProjPO: SelectProjectModalPageObject;
-test.beforeEach(() => {
+test.beforeEach(async () => {
+  await ElectronAppManager.launchAppIfClosed();
   selectProjPO = new SelectProjectModalPageObject(ElectronAppManager.page);
 });
-test.afterEach(() => ElectronAppManager.removeAllIpcMainListeners());
+test.afterEach(async () => {
+  await ElectronAppManager.removeAllIpcMainListeners();
+  await ElectronAppManager.closeApp();
+});
 
 test('shows the correct title and buttons', async () => {
   await selectProjPO.isOk();
@@ -41,8 +41,8 @@ test.describe('"Make New Project" button', () => {
       test.describe('when clicked and valid directory selected', () => {
         test.beforeEach(async () => {
           await ElectronAppManager.mockIpcMainHandle(
-            'test-dialog-showOpenDialog',
-            { canceled: false, filePaths: [VALID_NEW_PROJECT_PATH] }
+            IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
+            IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew
           );
           await newProjPO.nameInput.fill(VALID_NEW_PROJECT_NAME);
           await newProjPO.clickButton(newProjPO.EXPECTED_BUTTONS.CONTINUE);
@@ -63,7 +63,17 @@ test.describe('"Make New Project" button', () => {
         // TODO: write test for checking that project name is populated on first page
       });
 
-      // TODO: write test for when cancelled and/or invalid directory selected
+      // NOTE - should both modals really close here?
+      test('when clicked and file picker dialog is canceled, both modals close', async () => {
+        await ElectronAppManager.mockIpcMainHandle(
+          IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
+          IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled
+        );
+        await newProjPO.nameInput.fill(VALID_NEW_PROJECT_NAME);
+        await newProjPO.clickButton(newProjPO.EXPECTED_BUTTONS.CONTINUE);
+        await newProjPO.dialog.waitFor({ state: 'hidden' });
+        await selectProjPO.dialog.waitFor({ state: 'hidden' });
+      });
     });
 
     test.describe('"Cancel" button', () => {
@@ -80,10 +90,10 @@ test.describe('"Make New Project" button', () => {
 test.describe('"Open Existing Project" button', () => {
   test.describe('when clicked and valid directory selected', () => {
     test.beforeEach(async () => {
-      await ElectronAppManager.mockIpcMainHandle('test-dialog-showOpenDialog', {
-        canceled: false,
-        filePaths: [VALID_EXISTING_PROJECT_PATH]
-      });
+      await ElectronAppManager.mockIpcMainHandle(
+        IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
+        IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validExisting
+      );
       await selectProjPO.clickButton(
         selectProjPO.EXPECTED_BUTTONS.OPEN_EXISTING_PROJECT
       );
@@ -103,7 +113,31 @@ test.describe('"Open Existing Project" button', () => {
     // TODO: write test for checking that project name is populated on first page
   });
 
-  // TODO: write test for when cancelled and/or invalid directory selected
+  test('when clicked and invalid directory selected, modal remains open', async () => {
+    await ElectronAppManager.mockIpcMainHandle(
+      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
+      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalidExisting
+    );
+    await ElectronAppManager.mockIpcMainHandle(
+      IPC_MAIN_HANDLE_MOCKS.showMessageBox.channel,
+      IPC_MAIN_HANDLE_MOCKS.showMessageBox.ok
+    );
+    await selectProjPO.clickButton(
+      selectProjPO.EXPECTED_BUTTONS.OPEN_EXISTING_PROJECT
+    );
+    await selectProjPO.isOk();
+  });
+
+  test('when clicked and file picker dialog is canceled, modal remains open', async () => {
+    await ElectronAppManager.mockIpcMainHandle(
+      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
+      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled
+    );
+    await selectProjPO.clickButton(
+      selectProjPO.EXPECTED_BUTTONS.OPEN_EXISTING_PROJECT
+    );
+    await selectProjPO.isOk();
+  });
 });
 
 test.describe('"Cancel" button', () => {
