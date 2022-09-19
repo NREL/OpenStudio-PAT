@@ -33,8 +33,8 @@ export const EXPECTED_DETAILS_BY_PAGE: Record<string, PageDetails> = {
   REPORTS: {
     route: '/reports',
     title: 'Reports',
-    iconImgName: 'Reports',
-    iconAlt: 'reports_icon.png'
+    iconAlt: 'Reports',
+    iconImgName: 'reports_icon.png'
   },
   SERVER: {
     route: '/server',

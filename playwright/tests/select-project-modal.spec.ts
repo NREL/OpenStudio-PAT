@@ -7,6 +7,7 @@ import {
 } from '../mocks';
 import {
   AnalysisPageObject,
+  NavPageObject,
   NewProjectModalPageObject,
   NoServerStartToastPageObject,
   SelectProjectModalPageObject
@@ -42,6 +43,9 @@ test.describe('"Make New Project" button', () => {
   test.describe('"New Project" modal', () => {
     test.describe('"Continue" button', () => {
       test.describe('when clicked and valid directory selected', () => {
+        const analysisPO = new AnalysisPageObject(PROJECT_NEW.name);
+        const navPO = new NavPageObject();
+
         test.beforeEach(async () => {
           await ElectronAppManager.mockIpcMainHandle(
             IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
@@ -61,8 +65,11 @@ test.describe('"Make New Project" button', () => {
         });
 
         test('the analysis page with the project name as the title is shown', async () => {
-          const analysisPO = new AnalysisPageObject(PROJECT_NEW.name);
           await analysisPO.isOk();
+        });
+
+        test('the nav items are shown correctly', async () => {
+          await navPO.areItemsOk();
         });
       });
 
@@ -92,6 +99,9 @@ test.describe('"Make New Project" button', () => {
 
 test.describe('"Open Existing Project" button', () => {
   test.describe('when clicked and valid directory selected', () => {
+    const analysisPO = new AnalysisPageObject(PROJECT_OFFICE_HVAC.name);
+    const navPO = new NavPageObject();
+
     test.beforeEach(async () => {
       await ElectronAppManager.mockIpcMainHandle(
         IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
@@ -111,8 +121,11 @@ test.describe('"Open Existing Project" button', () => {
     });
 
     test('the analysis page with the project name as the title is shown', async () => {
-      const analysisPO = new AnalysisPageObject(PROJECT_OFFICE_HVAC.name);
       await analysisPO.isOk();
+    });
+
+    test('the nav items are shown correctly', async () => {
+      await navPO.areItemsOk();
     });
   });
 
