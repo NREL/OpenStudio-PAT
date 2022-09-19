@@ -1,21 +1,23 @@
-const VALID_NEW_PROJECT_PATH = './playwright/.tmp/Playwright__Project';
-const VALID_EXISTING_PROJECT_PATH = './sample_projects/Office_HVAC';
-const INVALID_EXISTING_PROJECT_PATH = './sample_projects/calibration_data';
+import {
+  PROJECT_INVALID,
+  PROJECT_NEW,
+  PROJECT_OFFICE_HVAC
+} from './projects.mocks';
 
 export class IPC_MAIN_HANDLE_MOCKS {
   static readonly showOpenDialog = {
     channel: 'test-dialog-showOpenDialog',
     validNew: {
       canceled: false,
-      filePaths: [VALID_NEW_PROJECT_PATH]
+      filePaths: [PROJECT_NEW.path]
     },
-    validExisting: {
+    validOfficeHVAC: {
       canceled: false,
-      filePaths: [VALID_EXISTING_PROJECT_PATH]
+      filePaths: [PROJECT_OFFICE_HVAC.path]
     },
-    invalidExisting: {
+    invalid: {
       canceled: false,
-      filePaths: [INVALID_EXISTING_PROJECT_PATH]
+      filePaths: [PROJECT_INVALID.path]
     },
     canceled: {
       canceled: true,

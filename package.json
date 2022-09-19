@@ -69,7 +69,7 @@
     "release": "./node_modules/.bin/gulp release --env=production",
     "start": "node ./tasks/start",
     "start:dist": "node ./tasks/start --env=production",
-    "test": "npm run build -- --env=test && npx playwright test"
+    "test": "npm run build -- --env=test && npx gulp tmpTestFiles && npx playwright test"
   },
   "browserslist": [
     "electron >= 20"

@@ -1,18 +1,22 @@
 import { expect, test } from '@playwright/test';
 import { ElectronAppManager } from '../electron-app-manager';
-import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
 import {
+  IPC_MAIN_HANDLE_MOCKS,
+  PROJECT_NEW,
+  PROJECT_OFFICE_HVAC
+} from '../mocks';
+import {
+  AnalysisPageObject,
   NewProjectModalPageObject,
   NoServerStartToastPageObject,
   SelectProjectModalPageObject
 } from '../page-objects';
 
-const VALID_NEW_PROJECT_NAME = 'Playwright__Project';
+const selectProjPO = new SelectProjectModalPageObject();
+const noServerStartToastPO = new NoServerStartToastPageObject();
 
-let selectProjPO: SelectProjectModalPageObject;
 test.beforeEach(async () => {
   await ElectronAppManager.launchAppIfClosed();
-  selectProjPO = new SelectProjectModalPageObject(ElectronAppManager.page);
 });
 test.afterEach(async () => {
   await ElectronAppManager.removeAllIpcMainListeners();
@@ -24,12 +28,11 @@ test('shows the correct title and buttons', async () => {
 });
 
 test.describe('"Make New Project" button', () => {
-  let newProjPO: NewProjectModalPageObject;
+  const newProjPO = new NewProjectModalPageObject();
   test.beforeEach(async () => {
     await selectProjPO.clickButton(
       selectProjPO.EXPECTED_BUTTONS.MAKE_NEW_PROJECT
     );
-    newProjPO = new NewProjectModalPageObject(ElectronAppManager.page);
   });
 
   test('when clicked, "New Project" modal opens', async () => {
@@ -44,7 +47,7 @@ test.describe('"Make New Project" button', () => {
             IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
             IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew
           );
-          await newProjPO.nameInput.fill(VALID_NEW_PROJECT_NAME);
+          await newProjPO.nameInput.fill(PROJECT_NEW.name);
           await newProjPO.clickButton(newProjPO.EXPECTED_BUTTONS.CONTINUE);
         });
 
@@ -54,13 +57,13 @@ test.describe('"Make New Project" button', () => {
         });
 
         test('"Server no longer starts by default" toast is shown', async () => {
-          const noServerStartToastPO = new NoServerStartToastPageObject(
-            ElectronAppManager.page
-          );
           await noServerStartToastPO.isOk();
         });
 
-        // TODO: write test for checking that project name is populated on first page
+        test('the analysis page with the project name as the title is shown', async () => {
+          const analysisPO = new AnalysisPageObject(PROJECT_NEW.name);
+          await analysisPO.isOk();
+        });
       });
 
       // NOTE - should both modals really close here?
@@ -69,7 +72,7 @@ test.describe('"Make New Project" button', () => {
           IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
           IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled
         );
-        await newProjPO.nameInput.fill(VALID_NEW_PROJECT_NAME);
+        await newProjPO.nameInput.fill(PROJECT_NEW.name);
         await newProjPO.clickButton(newProjPO.EXPECTED_BUTTONS.CONTINUE);
         await newProjPO.dialog.waitFor({ state: 'hidden' });
         await selectProjPO.dialog.waitFor({ state: 'hidden' });
@@ -92,7 +95,7 @@ test.describe('"Open Existing Project" button', () => {
     test.beforeEach(async () => {
       await ElectronAppManager.mockIpcMainHandle(
         IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
-        IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validExisting
+        IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC
       );
       await selectProjPO.clickButton(
         selectProjPO.EXPECTED_BUTTONS.OPEN_EXISTING_PROJECT
@@ -104,19 +107,19 @@ test.describe('"Open Existing Project" button', () => {
     });
 
     test('"Server no longer starts by default" toast is shown', async () => {
-      const noServerStartToastPO = new NoServerStartToastPageObject(
-        ElectronAppManager.page
-      );
       await noServerStartToastPO.isOk();
     });
 
-    // TODO: write test for checking that project name is populated on first page
+    test('the analysis page with the project name as the title is shown', async () => {
+      const analysisPO = new AnalysisPageObject(PROJECT_OFFICE_HVAC.name);
+      await analysisPO.isOk();
+    });
   });
 
   test('when clicked and invalid directory selected, modal remains open', async () => {
     await ElectronAppManager.mockIpcMainHandle(
       IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
-      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalidExisting
+      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalid
     );
     await ElectronAppManager.mockIpcMainHandle(
       IPC_MAIN_HANDLE_MOCKS.showMessageBox.channel,
