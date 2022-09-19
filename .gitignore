@@ -6,6 +6,7 @@ Thumbs.db
 
 /.idea/
 /.tmp/
+/.tmp-test/
 /app/spec.js
 /build/
 /build_release/

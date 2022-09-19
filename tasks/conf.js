@@ -14,7 +14,7 @@ exports.paths = {
   src: 'app',
   dist: 'build',
   tmp: '.tmp',
-  e2e: 'e2e'
+  tmpTest: '.tmp-test'
 };
 
 /**
