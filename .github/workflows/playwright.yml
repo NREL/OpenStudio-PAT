@@ -20,7 +20,7 @@ jobs:
         run: npm run build -- --env=test
       - name: Prepare tmp test files
         run: npx gulp tmpTestFiles
-      - name: Run Playwright test
+      - name: Run Playwright tests
         uses: GabrielBB/xvfb-action@v1
         with:
           run: npx playwright test

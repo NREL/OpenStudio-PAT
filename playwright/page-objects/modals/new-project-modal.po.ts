@@ -15,6 +15,6 @@ export class NewProjectModalPageObject extends ModalPageObject {
   async isOk() {
     await this.isTitleOk();
     await this.areButtonsOk();
-    expect(this.nameInput).toBeVisible();
+    await expect(this.nameInput).toBeVisible();
   }
 }
