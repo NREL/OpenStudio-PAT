@@ -1,5 +1,4 @@
 import type { PlaywrightTestConfig } from "@playwright/test";
-import { devices } from "@playwright/test";
 
 /**
  * Read environment variables from file.
@@ -13,7 +12,7 @@ import { devices } from "@playwright/test";
 const config: PlaywrightTestConfig = {
   testDir: "./playwright/tests",
   /* Maximum time one test can run for. */
-  timeout: 30_000,
+  timeout: 45_000,
   fullyParallel: true,
   expect: {
     /**

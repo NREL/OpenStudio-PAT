@@ -4,9 +4,17 @@ import {
   PROJECT_OFFICE_HVAC
 } from './projects.mocks';
 
+export interface ShowOpenDialogMock {
+  canceled: boolean;
+  filePaths: string[];
+}
+export interface ShowMessageBoxMock {
+  response: number;
+}
+
 export class IPC_MAIN_HANDLE_MOCKS {
-  static readonly showOpenDialog = {
-    channel: 'test-dialog-showOpenDialog',
+  static readonly showOpenDialogChannel = 'test-dialog-showOpenDialog';
+  static readonly showOpenDialog: Record<string, ShowOpenDialogMock> = {
     validNew: {
       canceled: false,
       filePaths: [PROJECT_NEW.path]
@@ -25,8 +33,8 @@ export class IPC_MAIN_HANDLE_MOCKS {
     }
   };
 
-  static readonly showMessageBox = {
-    channel: 'test-dialog-showMessageBox',
+  static readonly showMessageBoxChannel = 'test-dialog-showMessageBox';
+  static readonly showMessageBox: Record<string, ShowMessageBoxMock> = {
     ok: {
       response: 0
     }
