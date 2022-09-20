@@ -4,7 +4,7 @@ import { BasePageObject } from '../base.po';
 import { NavPageObject } from '../nav.po';
 
 export class PagePageObject extends BasePageObject {
-  readonly EXPECTED_PAGE_DETAILS: PageDetails;
+  private EXPECTED_PAGE_DETAILS: PageDetails;
 
   get route(): string {
     const PRE_ROUTE_STR = 'index.html#';
@@ -14,8 +14,16 @@ export class PagePageObject extends BasePageObject {
   get container(): Locator {
     return this.page.locator('main.container-fluid');
   }
-  get title(): Locator {
-    return this.container.locator('h4').first();
+
+  constructor(page: PageDetails) {
+    super();
+    this.EXPECTED_PAGE_DETAILS = page;
+  }
+
+  async getTitle(): Promise<Locator> {
+    const h4 = this.container.locator('h4').first();
+    const translate = h4.locator('translate');
+    return (await translate.count()) > 0 ? translate : h4;
   }
 
   isRouteOk() {
@@ -23,7 +31,9 @@ export class PagePageObject extends BasePageObject {
   }
 
   async isTitleOk() {
-    await expect(this.title).toHaveText(this.EXPECTED_PAGE_DETAILS.title);
+    await expect(await this.getTitle()).toHaveText(
+      this.EXPECTED_PAGE_DETAILS.title
+    );
   }
 
   async isNavOk() {
