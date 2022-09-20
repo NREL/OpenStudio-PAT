@@ -49,4 +49,11 @@ export class NavPageObject extends BasePageObject {
       await this.isItemOk(this.items.nth(n), expectedDetails);
     }
   }
+
+  async clickIcon(iconAlt: string) {
+    const anchorTag = this.items.locator('a').filter({
+      has: this.page.locator(`img[alt="${iconAlt}"]`)
+    });
+    await anchorTag.click();
+  }
 }

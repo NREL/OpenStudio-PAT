@@ -1,20 +1,34 @@
 import { expect, test } from '@playwright/test';
 import { ElectronAppManager } from '../electron-app-manager';
 import {
+  EXPECTED_DETAILS_BY_PAGE,
   IPC_MAIN_HANDLE_MOCKS,
   PROJECT_NEW,
   PROJECT_OFFICE_HVAC
 } from '../mocks';
 import {
-  AnalysisPageObject,
   NavPageObject,
   NewProjectModalPageObject,
   NoServerStartToastPageObject,
+  PagePageObject,
   SelectProjectModalPageObject
 } from '../page-objects';
+import { testNavItemsCorrect } from '../shared-tests';
 
 const selectProjPO = new SelectProjectModalPageObject();
+const navPO = new NavPageObject();
 const noServerStartToastPO = new NoServerStartToastPageObject();
+
+const testNoServerStartToast = (
+  noServerStartToastPO: NoServerStartToastPageObject
+) =>
+  test('"Server no longer starts by default" toast is shown', async () => {
+    await noServerStartToastPO.isOk();
+  });
+const testAnalysisPageShown = (analysisPO: PagePageObject) =>
+  test('"Analysis" page with project name as title is shown', async () => {
+    await analysisPO.isOk();
+  });
 
 test.beforeEach(async () => {
   await ElectronAppManager.launchAppIfClosed();
@@ -24,11 +38,11 @@ test.afterEach(async () => {
   await ElectronAppManager.closeApp();
 });
 
-test('shows the correct title and buttons', async () => {
+test('correct title and buttons are shown', async () => {
   await selectProjPO.isOk();
 });
 
-test.describe('"Make New Project" button', () => {
+test.describe('click "Make New Project" button', () => {
   const newProjPO = new NewProjectModalPageObject();
   test.beforeEach(async () => {
     await selectProjPO.clickButton(
@@ -36,16 +50,17 @@ test.describe('"Make New Project" button', () => {
     );
   });
 
-  test('when clicked, "New Project" modal opens', async () => {
-    await newProjPO.isOk();
-  });
-
   test.describe('"New Project" modal', () => {
-    test.describe('"Continue" button', () => {
-      test.describe('when clicked and valid directory selected', () => {
-        const analysisPO = new AnalysisPageObject(PROJECT_NEW.name);
-        const navPO = new NavPageObject();
+    test('is shown', async () => {
+      await newProjPO.isOk();
+    });
 
+    test.describe('click "Continue" button', () => {
+      test.describe('select valid directory', () => {
+        const analysisPO = new PagePageObject({
+          ...EXPECTED_DETAILS_BY_PAGE.ANALYSIS,
+          title: PROJECT_NEW.name
+        });
         test.beforeEach(async () => {
           await newProjPO.nameInput.fill(PROJECT_NEW.name);
           await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew);
@@ -55,22 +70,13 @@ test.describe('"Make New Project" button', () => {
           await newProjPO.dialog.waitFor({ state: 'hidden' });
           await selectProjPO.dialog.waitFor({ state: 'hidden' });
         });
-
-        test('"Server no longer starts by default" toast is shown', async () => {
-          await noServerStartToastPO.isOk();
-        });
-
-        test('the analysis page with the project name as the title is shown', async () => {
-          await analysisPO.isOk();
-        });
-
-        test('the nav items are shown correctly', async () => {
-          await navPO.areItemsOk();
-        });
+        testNoServerStartToast(noServerStartToastPO);
+        testAnalysisPageShown(analysisPO);
+        testNavItemsCorrect(navPO);
       });
 
       // NOTE - should both modals really close here?
-      test('when clicked and file picker dialog is canceled, both modals close', async () => {
+      test('cancel dialog and both modals close', async () => {
         await newProjPO.nameInput.fill(PROJECT_NEW.name);
         await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled);
 
@@ -80,8 +86,8 @@ test.describe('"Make New Project" button', () => {
       });
     });
 
-    test.describe('"Cancel" button', () => {
-      test('when clicked, "New Project" modal closes and "Select a Project" modal is displayed again', async () => {
+    test.describe('click "Cancel" button', () => {
+      test('"New Project" modal closes and "Select a Project" modal is shown again', async () => {
         await newProjPO.clickButton(selectProjPO.EXPECTED_BUTTONS.CANCEL);
         await newProjPO.dialog.waitFor({ state: 'hidden' });
 
@@ -91,11 +97,12 @@ test.describe('"Make New Project" button', () => {
   });
 });
 
-test.describe('"Open Existing Project" button', () => {
-  test.describe('when clicked and valid directory selected', () => {
-    const analysisPO = new AnalysisPageObject(PROJECT_OFFICE_HVAC.name);
-    const navPO = new NavPageObject();
-
+test.describe('click "Open Existing Project" button', () => {
+  test.describe('select valid directory', () => {
+    const analysisPO = new PagePageObject({
+      ...EXPECTED_DETAILS_BY_PAGE.ANALYSIS,
+      title: PROJECT_OFFICE_HVAC.name
+    });
     test.beforeEach(
       async () =>
         await selectProjPO.open(
@@ -106,36 +113,26 @@ test.describe('"Open Existing Project" button', () => {
     test('modal closes', async () => {
       await selectProjPO.dialog.waitFor({ state: 'hidden' });
     });
-
-    test('"Server no longer starts by default" toast is shown', async () => {
-      await noServerStartToastPO.isOk();
-    });
-
-    test('the analysis page with the project name as the title is shown', async () => {
-      await analysisPO.isOk();
-    });
-
-    test('the nav items are shown correctly', async () => {
-      await navPO.areItemsOk();
-    });
+    testNoServerStartToast(noServerStartToastPO);
+    testAnalysisPageShown(analysisPO);
+    testNavItemsCorrect(navPO);
   });
 
-  test('when clicked and invalid directory selected, modal remains open', async () => {
+  test('select invalid directory and modal remains open', async () => {
     await selectProjPO.open(
       IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalid,
       IPC_MAIN_HANDLE_MOCKS.showMessageBox.ok
     );
     await selectProjPO.isOk();
   });
-
-  test('when clicked and file picker dialog is canceled, modal remains open', async () => {
+  test('cancel dialog and modal remains open', async () => {
     await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled);
     await selectProjPO.isOk();
   });
 });
 
-test.describe('"Cancel" button', () => {
-  test('when clicked, application closes', async () => {
+test.describe('click "Cancel" button', () => {
+  test('application closes', async () => {
     await selectProjPO.clickButton(selectProjPO.EXPECTED_BUTTONS.CANCEL);
     expect(ElectronAppManager.isClosed).toBe(true);
   });
