@@ -5,6 +5,7 @@
     "@babel/core": "~7.19.1",
     "@babel/eslint-parser": "~7.19.1",
     "@babel/preset-env": "~7.19.1",
+    "@playwright/test": "~1.25.2",
     "@rollup/plugin-babel": "~5.3.1",
     "asar": "~3.2.0",
     "babel-plugin-angularjs-annotate": "~0.10.0",
@@ -43,6 +44,7 @@
     "lazypipe": "~1.0.2",
     "lodash": "~4.17.21",
     "merge-stream": "~2.0.0",
+    "prettier": "~2.7.1",
     "q": "~1.5.1",
     "request": "~2.88.2",
     "request-progress": "~3.0.0",
@@ -68,7 +70,7 @@
     "release": "./node_modules/.bin/gulp release --env=production",
     "start": "node ./tasks/start",
     "start:dist": "node ./tasks/start --env=production",
-    "test": "node ./tasks/start --env=test"
+    "test": "npm run build -- --env=test && npx playwright test"
   },
   "browserslist": [
     "electron >= 20"
