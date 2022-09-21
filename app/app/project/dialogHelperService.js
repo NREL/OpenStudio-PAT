@@ -35,7 +35,7 @@ export class DialogHelper {
     vm.env = getEnv(app.getAppPath());
 
     if (vm.env.name === 'test') {
-      const MOCKED_FUNCTION_NAMES = ['showOpenDialog', 'showMessageDialog'];
+      const MOCKED_FUNCTION_NAMES = ['showOpenDialog', 'showMessageBox'];
 
       const dialog = {};
       for (const k in eDialog) {
