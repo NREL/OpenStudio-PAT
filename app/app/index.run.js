@@ -355,6 +355,21 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
     template.unshift(fileMenu);
   }
 
-  const menu = Menu.buildFromTemplate(template);
+  const addIds = (item) => {
+    if (_.isArray(item)) {
+      return item.map((smItem) => addIds(smItem));
+    }
+
+    const newItem = _.cloneDeep(item);
+    if (item.submenu) {
+      newItem.submenu = addIds(item.submenu);
+    }
+    if (item.label) {
+      newItem.id = item.label;
+    }
+    return newItem;
+  };
+
+  const menu = Menu.buildFromTemplate(addIds(template));
   Menu.setApplicationMenu(menu);
 }
