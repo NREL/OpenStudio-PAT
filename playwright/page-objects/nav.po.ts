@@ -1,5 +1,5 @@
 import { expect, Locator } from '@playwright/test';
-import { PageDetails } from '../mocks';
+import { EXPECTED_DETAILS_BY_PAGE, PageDetails } from '../mocks';
 import { BasePageObject } from './base.po';
 
 export class NavPageObject extends BasePageObject {
@@ -40,5 +40,13 @@ export class NavPageObject extends BasePageObject {
     expect(await this.getIconImgNameFor(item)).toBe(
       expectedPageDetails.iconImgName
     );
+  }
+
+  async areItemsOk() {
+    const EXPECTED_DETAILS = Object.values(EXPECTED_DETAILS_BY_PAGE);
+    expect(await this.items.count()).toEqual(EXPECTED_DETAILS.length);
+    for (const [n, expectedDetails] of EXPECTED_DETAILS.entries()) {
+      await this.isItemOk(this.items.nth(n), expectedDetails);
+    }
   }
 }
