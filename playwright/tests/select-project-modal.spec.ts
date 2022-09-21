@@ -47,12 +47,8 @@ test.describe('"Make New Project" button', () => {
         const navPO = new NavPageObject();
 
         test.beforeEach(async () => {
-          await ElectronAppManager.mockIpcMainHandle(
-            IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
-            IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew
-          );
           await newProjPO.nameInput.fill(PROJECT_NEW.name);
-          await newProjPO.clickButton(newProjPO.EXPECTED_BUTTONS.CONTINUE);
+          await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew);
         });
 
         test('both modals close', async () => {
@@ -75,11 +71,9 @@ test.describe('"Make New Project" button', () => {
 
       // NOTE - should both modals really close here?
       test('when clicked and file picker dialog is canceled, both modals close', async () => {
-        await ElectronAppManager.mockIpcMainHandle(
-          IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
-          IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled
-        );
         await newProjPO.nameInput.fill(PROJECT_NEW.name);
+        await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled);
+
         await newProjPO.clickButton(newProjPO.EXPECTED_BUTTONS.CONTINUE);
         await newProjPO.dialog.waitFor({ state: 'hidden' });
         await selectProjPO.dialog.waitFor({ state: 'hidden' });
@@ -102,15 +96,12 @@ test.describe('"Open Existing Project" button', () => {
     const analysisPO = new AnalysisPageObject(PROJECT_OFFICE_HVAC.name);
     const navPO = new NavPageObject();
 
-    test.beforeEach(async () => {
-      await ElectronAppManager.mockIpcMainHandle(
-        IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
-        IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC
-      );
-      await selectProjPO.clickButton(
-        selectProjPO.EXPECTED_BUTTONS.OPEN_EXISTING_PROJECT
-      );
-    });
+    test.beforeEach(
+      async () =>
+        await selectProjPO.open(
+          IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC
+        )
+    );
 
     test('modal closes', async () => {
       await selectProjPO.dialog.waitFor({ state: 'hidden' });
@@ -130,28 +121,15 @@ test.describe('"Open Existing Project" button', () => {
   });
 
   test('when clicked and invalid directory selected, modal remains open', async () => {
-    await ElectronAppManager.mockIpcMainHandle(
-      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
-      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalid
-    );
-    await ElectronAppManager.mockIpcMainHandle(
-      IPC_MAIN_HANDLE_MOCKS.showMessageBox.channel,
+    await selectProjPO.open(
+      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalid,
       IPC_MAIN_HANDLE_MOCKS.showMessageBox.ok
-    );
-    await selectProjPO.clickButton(
-      selectProjPO.EXPECTED_BUTTONS.OPEN_EXISTING_PROJECT
     );
     await selectProjPO.isOk();
   });
 
   test('when clicked and file picker dialog is canceled, modal remains open', async () => {
-    await ElectronAppManager.mockIpcMainHandle(
-      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.channel,
-      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled
-    );
-    await selectProjPO.clickButton(
-      selectProjPO.EXPECTED_BUTTONS.OPEN_EXISTING_PROJECT
-    );
+    await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled);
     await selectProjPO.isOk();
   });
 });
