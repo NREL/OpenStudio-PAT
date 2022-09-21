@@ -31,15 +31,10 @@ export class NavPageObject extends BasePageObject {
     return iconImgSrc.slice(iconImgSrc.lastIndexOf('/') + 1);
   }
 
-  async isItemOk(
-    item: Locator,
-    expectedPageDetails: Omit<PageDetails, 'title'>
-  ) {
+  async isItemOk(item: Locator, expectedPageDetails: Omit<PageDetails, 'title'>) {
     expect(await this.getRouteFor(item)).toBe(expectedPageDetails.route);
     expect(await this.getIconAltFor(item)).toBe(expectedPageDetails.iconAlt);
-    expect(await this.getIconImgNameFor(item)).toBe(
-      expectedPageDetails.iconImgName
-    );
+    expect(await this.getIconImgNameFor(item)).toBe(expectedPageDetails.iconImgName);
   }
 
   async areItemsOk() {

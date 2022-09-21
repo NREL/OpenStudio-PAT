@@ -31,9 +31,7 @@ export class PagePageObject extends BasePageObject {
   }
 
   async isTitleOk() {
-    await expect(await this.getTitle()).toHaveText(
-      this.EXPECTED_PAGE_DETAILS.title
-    );
+    await expect(await this.getTitle()).toHaveText(this.EXPECTED_PAGE_DETAILS.title);
   }
 
   async isNavOk() {

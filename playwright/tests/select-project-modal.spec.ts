@@ -1,11 +1,6 @@
 import { expect, test } from '@playwright/test';
 import { ElectronAppManager } from '../electron-app-manager';
-import {
-  EXPECTED_DETAILS_BY_PAGE,
-  IPC_MAIN_HANDLE_MOCKS,
-  PROJECT_NEW,
-  PROJECT_OFFICE_HVAC
-} from '../mocks';
+import { EXPECTED_DETAILS_BY_PAGE, IPC_MAIN_HANDLE_MOCKS, PROJECT_NEW, PROJECT_OFFICE_HVAC } from '../mocks';
 import {
   NavPageObject,
   NewProjectModalPageObject,
@@ -19,9 +14,7 @@ const selectProjPO = new SelectProjectModalPageObject();
 const navPO = new NavPageObject();
 const noServerStartToastPO = new NoServerStartToastPageObject();
 
-const testNoServerStartToast = (
-  noServerStartToastPO: NoServerStartToastPageObject
-) =>
+const testNoServerStartToast = (noServerStartToastPO: NoServerStartToastPageObject) =>
   test('"Server no longer starts by default" toast is shown', async () => {
     await noServerStartToastPO.isOk();
   });
@@ -45,9 +38,7 @@ test('correct title and buttons are shown', async () => {
 test.describe('click "Make New Project" button', () => {
   const newProjPO = new NewProjectModalPageObject();
   test.beforeEach(async () => {
-    await selectProjPO.clickButton(
-      selectProjPO.EXPECTED_BUTTONS.MAKE_NEW_PROJECT
-    );
+    await selectProjPO.clickButton(selectProjPO.EXPECTED_BUTTONS.MAKE_NEW_PROJECT);
   });
 
   test.describe('"New Project" modal', () => {
@@ -103,12 +94,7 @@ test.describe('click "Open Existing Project" button', () => {
       ...EXPECTED_DETAILS_BY_PAGE.ANALYSIS,
       title: PROJECT_OFFICE_HVAC.name
     });
-    test.beforeEach(
-      async () =>
-        await selectProjPO.open(
-          IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC
-        )
-    );
+    test.beforeEach(async () => await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC));
 
     test('modal closes', async () => {
       await selectProjPO.dialog.waitFor({ state: 'hidden' });
@@ -119,10 +105,7 @@ test.describe('click "Open Existing Project" button', () => {
   });
 
   test('select invalid directory and modal remains open', async () => {
-    await selectProjPO.open(
-      IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalid,
-      IPC_MAIN_HANDLE_MOCKS.showMessageBox.ok
-    );
+    await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalid, IPC_MAIN_HANDLE_MOCKS.showMessageBox.ok);
     await selectProjPO.isOk();
   });
   test('cancel dialog and modal remains open', async () => {

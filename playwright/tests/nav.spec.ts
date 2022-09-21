@@ -1,11 +1,6 @@
 import { test } from '@playwright/test';
 import { ElectronAppManager } from '../electron-app-manager';
-import {
-  EXPECTED_DETAILS_BY_PAGE,
-  IPC_MAIN_HANDLE_MOCKS,
-  PROJECT_NEW,
-  PROJECT_OFFICE_HVAC
-} from '../mocks';
+import { EXPECTED_DETAILS_BY_PAGE, IPC_MAIN_HANDLE_MOCKS, PROJECT_NEW, PROJECT_OFFICE_HVAC } from '../mocks';
 import {
   NavPageObject,
   NewProjectModalPageObject,
@@ -26,24 +21,17 @@ test.afterEach(async () => {
   await ElectronAppManager.closeApp();
 });
 
-const PROJECT_TYPES: Record<
-  string,
-  { projectName: string; beforeEach: () => Promise<void> }
-> = {
+const PROJECT_TYPES: Record<string, { projectName: string; beforeEach: () => Promise<void> }> = {
   existing: {
     projectName: PROJECT_OFFICE_HVAC.name,
     beforeEach: async () => {
-      await selectProjPO.open(
-        IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC
-      );
+      await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC);
     }
   },
   new: {
     projectName: PROJECT_NEW.name,
     beforeEach: async () => {
-      await selectProjPO.clickButton(
-        selectProjPO.EXPECTED_BUTTONS.MAKE_NEW_PROJECT
-      );
+      await selectProjPO.clickButton(selectProjPO.EXPECTED_BUTTONS.MAKE_NEW_PROJECT);
       await newProjPO.nameInput.fill(PROJECT_NEW.name);
       await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew);
     }

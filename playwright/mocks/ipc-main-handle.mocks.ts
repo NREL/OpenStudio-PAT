@@ -1,8 +1,4 @@
-import {
-  PROJECT_INVALID,
-  PROJECT_NEW,
-  PROJECT_OFFICE_HVAC
-} from './projects.mocks';
+import { PROJECT_INVALID, PROJECT_NEW, PROJECT_OFFICE_HVAC } from './projects.mocks';
 
 export interface ShowOpenDialogMock {
   canceled: boolean;
