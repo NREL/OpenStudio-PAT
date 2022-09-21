@@ -1,8 +1,4 @@
-import {
-  ElectronApplication,
-  Page,
-  _electron as electron
-} from '@playwright/test';
+import { ElectronApplication, Page, _electron as electron } from '@playwright/test';
 
 export class ElectronAppManager {
   static app: ElectronApplication;
@@ -51,20 +47,16 @@ export class ElectronAppManager {
 
   static async mockIpcMainHandle(channel: string, returnValue: any) {
     await ElectronAppManager.app.evaluate(
-      ({ ipcMain }, params) =>
-        ipcMain.handle(params.channel, () => params.returnValue),
+      ({ ipcMain }, params) => ipcMain.handle(params.channel, () => params.returnValue),
       { channel, returnValue }
     );
   }
 
   static async removeAllIpcMainListeners(channel?: string) {
     try {
-      await ElectronAppManager.app?.evaluate(
-        ({ ipcMain }, params) => ipcMain.removeAllListeners(params.channel),
-        {
-          channel
-        }
-      );
+      await ElectronAppManager.app?.evaluate(({ ipcMain }, params) => ipcMain.removeAllListeners(params.channel), {
+        channel
+      });
     } catch {}
   }
 }

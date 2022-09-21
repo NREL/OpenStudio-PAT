@@ -30,13 +30,9 @@ export class ModalPageObject extends BasePageObject {
   }
 
   async areButtonsOk() {
-    await expect(this.buttons).toHaveCount(
-      Object.keys(this.EXPECTED_BUTTONS).length
-    );
+    await expect(this.buttons).toHaveCount(Object.keys(this.EXPECTED_BUTTONS).length);
     const allInnerTexts = await this.buttons.allInnerTexts();
-    Object.values(this.EXPECTED_BUTTONS).forEach(buttonText =>
-      expect(allInnerTexts).toContain(buttonText)
-    );
+    Object.values(this.EXPECTED_BUTTONS).forEach(buttonText => expect(allInnerTexts).toContain(buttonText));
   }
 
   async isOk() {

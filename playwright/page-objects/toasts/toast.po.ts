@@ -31,9 +31,7 @@ export class ToastPageObject extends BasePageObject {
   }
 
   async isLevelOk() {
-    await expect(this.toast).toHaveClass(
-      new RegExp(ToastLevels[this.EXPECTED_LEVEL])
-    );
+    await expect(this.toast).toHaveClass(new RegExp(ToastLevels[this.EXPECTED_LEVEL]));
   }
 
   async isOk() {
