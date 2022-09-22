@@ -3,7 +3,7 @@ import { BasePageObject } from '../base.po';
 
 export class ModalPageObject extends BasePageObject {
   readonly EXPECTED_TITLE: string;
-  readonly EXPECTED_BUTTONS: Record<string, string>;
+  readonly EXPECTED_FOOTER_BUTTONS: Record<string, string>;
 
   get dialog(): Locator {
     return this.page.locator('.modal-dialog').filter({
@@ -13,26 +13,26 @@ export class ModalPageObject extends BasePageObject {
   get title(): Locator {
     return this.dialog.locator('.modal-title');
   }
-  get buttons(): Locator {
+  get footerButtons(): Locator {
     return this.dialog.locator('.modal-footer button');
   }
 
-  getButton(buttonText: string) {
-    return this.buttons.filter({ hasText: buttonText });
+  getButton(buttonText: string, buttons = this.footerButtons) {
+    return buttons.filter({ hasText: buttonText });
   }
 
-  async clickButton(buttonText: string) {
-    return this.getButton(buttonText).click();
+  async clickButton(buttonText: string, buttons = this.footerButtons) {
+    return this.getButton(buttonText, buttons).click();
   }
 
   async isTitleOk() {
     await expect(this.title).toHaveText(this.EXPECTED_TITLE);
   }
 
-  async areButtonsOk() {
-    await expect(this.buttons).toHaveCount(Object.keys(this.EXPECTED_BUTTONS).length);
-    const allInnerTexts = await this.buttons.allInnerTexts();
-    Object.values(this.EXPECTED_BUTTONS).forEach(buttonText => expect(allInnerTexts).toContain(buttonText));
+  async areButtonsOk(EXPECTED_BUTTONS = this.EXPECTED_FOOTER_BUTTONS, buttons = this.footerButtons) {
+    await expect(buttons).toHaveCount(Object.keys(EXPECTED_BUTTONS).length);
+    const allInnerTexts = await buttons.allInnerTexts();
+    Object.values(EXPECTED_BUTTONS).forEach(buttonText => expect(allInnerTexts).toContain(buttonText));
   }
 
   async isOk() {

@@ -38,7 +38,7 @@ test('correct title and buttons are shown', async () => {
 test.describe('click "Make New Project" button', () => {
   const newProjPO = new NewProjectModalPageObject();
   test.beforeEach(async () => {
-    await selectProjPO.clickButton(selectProjPO.EXPECTED_BUTTONS.MAKE_NEW_PROJECT);
+    await selectProjPO.clickButton(selectProjPO.EXPECTED_FOOTER_BUTTONS.MAKE_NEW_PROJECT);
   });
 
   test.describe('"New Project" modal', () => {
@@ -71,7 +71,7 @@ test.describe('click "Make New Project" button', () => {
         await newProjPO.nameInput.fill(PROJECT_NEW.name);
         await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled);
 
-        await newProjPO.clickButton(newProjPO.EXPECTED_BUTTONS.CONTINUE);
+        await newProjPO.clickButton(newProjPO.EXPECTED_FOOTER_BUTTONS.CONTINUE);
         await newProjPO.dialog.waitFor({ state: 'hidden' });
         await selectProjPO.dialog.waitFor({ state: 'hidden' });
       });
@@ -79,7 +79,7 @@ test.describe('click "Make New Project" button', () => {
 
     test.describe('click "Cancel" button', () => {
       test('"New Project" modal closes and "Select a Project" modal is shown again', async () => {
-        await newProjPO.clickButton(selectProjPO.EXPECTED_BUTTONS.CANCEL);
+        await newProjPO.clickButton(selectProjPO.EXPECTED_FOOTER_BUTTONS.CANCEL);
         await newProjPO.dialog.waitFor({ state: 'hidden' });
 
         await selectProjPO.isOk();
@@ -116,7 +116,7 @@ test.describe('click "Open Existing Project" button', () => {
 
 test.describe('click "Cancel" button', () => {
   test('application closes', async () => {
-    await selectProjPO.clickButton(selectProjPO.EXPECTED_BUTTONS.CANCEL);
+    await selectProjPO.clickButton(selectProjPO.EXPECTED_FOOTER_BUTTONS.CANCEL);
     expect(ElectronAppManager.isClosed).toBe(true);
   });
 });

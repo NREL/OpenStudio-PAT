@@ -4,7 +4,7 @@ import { ModalPageObject } from './modal.po';
 
 export class ProjectModalPageObject extends ModalPageObject {
   readonly EXPECTED_TITLE: string;
-  readonly EXPECTED_BUTTONS: Record<string, string>;
+  readonly EXPECTED_FOOTER_BUTTONS: Record<string, string>;
   readonly OPEN_BUTTON_TEXT: string;
 
   async open(showOpenDialogMock?: ShowOpenDialogMock, showMessageBoxMock?: ShowMessageBoxMock) {

@@ -3,19 +3,18 @@ import { ProjectModalPageObject } from './project-modal.po';
 
 export class NewProjectModalPageObject extends ProjectModalPageObject {
   readonly EXPECTED_TITLE = 'New Project';
-  readonly EXPECTED_BUTTONS = {
+  readonly EXPECTED_FOOTER_BUTTONS = {
     CONTINUE: 'Continue',
     CANCEL: 'Cancel'
   };
-  readonly OPEN_BUTTON_TEXT = this.EXPECTED_BUTTONS.CONTINUE;
+  readonly OPEN_BUTTON_TEXT = this.EXPECTED_FOOTER_BUTTONS.CONTINUE;
 
   get nameInput(): Locator {
     return this.dialog.locator('input');
   }
 
   async isOk() {
-    await this.isTitleOk();
-    await this.areButtonsOk();
+    await super.isOk();
     await expect(this.nameInput).toBeVisible();
   }
 }

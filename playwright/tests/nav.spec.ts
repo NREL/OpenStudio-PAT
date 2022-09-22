@@ -31,7 +31,7 @@ const PROJECT_TYPES: Record<string, { projectName: string; beforeEach: () => Pro
   new: {
     projectName: PROJECT_NEW.name,
     beforeEach: async () => {
-      await selectProjPO.clickButton(selectProjPO.EXPECTED_BUTTONS.MAKE_NEW_PROJECT);
+      await selectProjPO.clickButton(selectProjPO.EXPECTED_FOOTER_BUTTONS.MAKE_NEW_PROJECT);
       await newProjPO.nameInput.fill(PROJECT_NEW.name);
       await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew);
     }
