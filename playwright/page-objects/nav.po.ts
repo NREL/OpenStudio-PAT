@@ -1,6 +1,6 @@
 import { expect, Locator } from '@playwright/test';
 import { App } from '../App';
-import { EXPECTED_DETAILS_BY_PAGE, PageDetails } from '../mocks';
+import { EXPECTED_DETAILS_BY_PAGE, PageDetails } from '../constants';
 import { BasePageObject } from './base.po';
 
 export class NavPageObject extends BasePageObject {

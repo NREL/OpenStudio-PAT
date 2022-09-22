@@ -1,6 +1,6 @@
 import { expect, Locator } from '@playwright/test';
 import { App } from '../../App';
-import { PageDetails } from '../../mocks';
+import { PageDetails } from '../../constants';
 import { BasePageObject } from '../base.po';
 import { NavPageObject } from '../nav.po';
 

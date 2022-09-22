@@ -1,6 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { App } from '../App';
-import { EXPECTED_DETAILS_BY_PAGE, IPC_MAIN_HANDLE_MOCKS, PROJECT_NEW, PROJECT_OFFICE_HVAC } from '../mocks';
+import { EXPECTED_DETAILS_BY_PAGE } from '../constants';
+import { IPC_MAIN_HANDLE_MOCKS, PROJECT_NEW, PROJECT_OFFICE_HVAC } from '../mocks';
 import {
   NavPageObject,
   NewProjectModalPageObject,

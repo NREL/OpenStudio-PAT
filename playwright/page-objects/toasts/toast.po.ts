@@ -1,13 +1,7 @@
 import { expect, Locator } from '@playwright/test';
 import { App } from '../../App';
+import { ToastLevels } from '../../constants';
 import { BasePageObject } from '../base.po';
-
-export const ToastLevels = {
-  ERROR: 'toast-error',
-  WARNING: 'toast-warning',
-  INFO: 'toast-info',
-  SUCCESS: 'toast-success'
-};
 
 export class ToastPageObject extends BasePageObject {
   readonly EXPECTED_LEVEL: string;
