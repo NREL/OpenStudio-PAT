@@ -1,10 +1,11 @@
 import { expect, Locator } from '@playwright/test';
+import { App } from '../App';
 import { EXPECTED_DETAILS_BY_PAGE, PageDetails } from '../mocks';
 import { BasePageObject } from './base.po';
 
 export class NavPageObject extends BasePageObject {
   get list(): Locator {
-    return this.page.locator('ul.nav');
+    return App.page.locator('ul.nav');
   }
 
   get items(): Locator {
@@ -47,7 +48,7 @@ export class NavPageObject extends BasePageObject {
 
   async clickIcon(iconAlt: string) {
     const anchorTag = this.items.locator('a').filter({
-      has: this.page.locator(`img[alt="${iconAlt}"]`)
+      has: App.page.locator(`img[alt="${iconAlt}"]`)
     });
     await anchorTag.click();
   }

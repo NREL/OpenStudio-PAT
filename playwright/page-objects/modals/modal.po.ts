@@ -1,4 +1,5 @@
 import { expect, Locator } from '@playwright/test';
+import { App } from '../../App';
 import { BasePageObject } from '../base.po';
 
 export class ModalPageObject extends BasePageObject {
@@ -6,8 +7,8 @@ export class ModalPageObject extends BasePageObject {
   readonly EXPECTED_FOOTER_BUTTONS: Record<string, string>;
 
   get dialog(): Locator {
-    return this.page.locator('.modal-dialog').filter({
-      has: this.page.locator('.modal-title', { hasText: this.EXPECTED_TITLE })
+    return App.page.locator('.modal-dialog').filter({
+      has: App.page.locator('.modal-title', { hasText: this.EXPECTED_TITLE })
     });
   }
   get title(): Locator {

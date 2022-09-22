@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { ElectronAppManager } from '../electron-app-manager';
+import { App } from '../App';
 import { EXPECTED_DETAILS_BY_PAGE, IPC_MAIN_HANDLE_MOCKS, PROJECT_NEW, PROJECT_OFFICE_HVAC } from '../mocks';
 import {
   NavPageObject,
@@ -23,12 +23,10 @@ const testAnalysisPageShown = (analysisPO: PagePageObject) =>
     await analysisPO.isOk();
   });
 
-test.beforeEach(async () => {
-  await ElectronAppManager.launchAppIfClosed();
-});
+test.beforeEach(App.launchIfClosed);
 test.afterEach(async () => {
-  await ElectronAppManager.removeAllIpcMainListeners();
-  await ElectronAppManager.closeApp();
+  await App.removeAllIpcMainListeners();
+  await App.close();
 });
 
 test('correct title and buttons are shown', async () => {
@@ -117,6 +115,6 @@ test.describe('click "Open Existing Project" button', () => {
 test.describe('click "Cancel" button', () => {
   test('application closes', async () => {
     await selectProjPO.clickButton(selectProjPO.EXPECTED_FOOTER_BUTTONS.CANCEL);
-    expect(ElectronAppManager.isClosed).toBe(true);
+    expect(App.isClosed).toBe(true);
   });
 });

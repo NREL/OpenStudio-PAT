@@ -1,4 +1,5 @@
 import { expect, Locator } from '@playwright/test';
+import { App } from '../../App';
 import { PageDetails } from '../../mocks';
 import { BasePageObject } from '../base.po';
 import { NavPageObject } from '../nav.po';
@@ -8,11 +9,11 @@ export class PagePageObject extends BasePageObject {
 
   get route(): string {
     const PRE_ROUTE_STR = 'index.html#';
-    const pageUrl = this.page.url();
+    const pageUrl = App.page.url();
     return pageUrl.slice(pageUrl.indexOf(PRE_ROUTE_STR) + PRE_ROUTE_STR.length);
   }
   get container(): Locator {
-    return this.page.locator('main.container-fluid');
+    return App.page.locator('main.container-fluid');
   }
 
   constructor(page: PageDetails) {

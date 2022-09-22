@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { ElectronAppManager } from '../electron-app-manager';
+import { App } from '../App';
 import { EXPECTED_DETAILS_BY_PAGE, IPC_MAIN_HANDLE_MOCKS, PROJECT_NEW, PROJECT_OFFICE_HVAC } from '../mocks';
 import {
   NavPageObject,
@@ -13,12 +13,10 @@ const navPO = new NavPageObject();
 const selectProjPO = new SelectProjectModalPageObject();
 const newProjPO = new NewProjectModalPageObject();
 
-test.beforeEach(async () => {
-  await ElectronAppManager.launchAppIfClosed();
-});
+test.beforeEach(App.launchIfClosed);
 test.afterEach(async () => {
-  await ElectronAppManager.removeAllIpcMainListeners();
-  await ElectronAppManager.closeApp();
+  await App.removeAllIpcMainListeners();
+  await App.close();
 });
 
 const PROJECT_TYPES: Record<string, { projectName: string; beforeEach: () => Promise<void> }> = {

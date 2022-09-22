@@ -1,4 +1,5 @@
 import { expect, Locator } from '@playwright/test';
+import { App } from '../../App';
 import { BasePageObject } from '../base.po';
 
 export const ToastLevels = {
@@ -13,8 +14,8 @@ export class ToastPageObject extends BasePageObject {
   readonly EXPECTED_MESSAGE: string;
 
   get toastContainer(): Locator {
-    return this.page.locator('#toast-container').filter({
-      has: this.page.locator('.toast-message', {
+    return App.page.locator('#toast-container').filter({
+      has: App.page.locator('.toast-message', {
         hasText: this.EXPECTED_MESSAGE
       })
     });

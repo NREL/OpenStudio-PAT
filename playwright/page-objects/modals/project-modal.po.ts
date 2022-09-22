@@ -1,4 +1,4 @@
-import { ElectronAppManager } from '../../electron-app-manager';
+import { App } from '../../App';
 import { IPC_MAIN_HANDLE_MOCKS, ShowMessageBoxMock, ShowOpenDialogMock } from '../../mocks';
 import { ModalPageObject } from './modal.po';
 
@@ -9,10 +9,10 @@ export class ProjectModalPageObject extends ModalPageObject {
 
   async open(showOpenDialogMock?: ShowOpenDialogMock, showMessageBoxMock?: ShowMessageBoxMock) {
     if (showOpenDialogMock !== undefined) {
-      await ElectronAppManager.mockIpcMainHandle(IPC_MAIN_HANDLE_MOCKS.showOpenDialogChannel, showOpenDialogMock);
+      await App.mockIpcMainHandle(IPC_MAIN_HANDLE_MOCKS.showOpenDialogChannel, showOpenDialogMock);
     }
     if (showMessageBoxMock !== undefined) {
-      await ElectronAppManager.mockIpcMainHandle(IPC_MAIN_HANDLE_MOCKS.showMessageBoxChannel, showMessageBoxMock);
+      await App.mockIpcMainHandle(IPC_MAIN_HANDLE_MOCKS.showMessageBoxChannel, showMessageBoxMock);
     }
 
     await this.clickButton(this.OPEN_BUTTON_TEXT);

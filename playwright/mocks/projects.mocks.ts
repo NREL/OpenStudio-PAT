@@ -1,4 +1,4 @@
-import { TMP_TEST_PATH } from '../constants';
+import { TMP_TEST_PATH } from '../paths';
 
 export interface ProjectMock {
   name: string;
