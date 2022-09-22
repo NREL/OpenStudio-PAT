@@ -60,4 +60,23 @@ export class App {
       });
     } catch {}
   }
+
+  static async getMenuItem(menuItem: string) {
+    return App.instance.evaluate(async ({ app }, params) => app.applicationMenu!.getMenuItemById(params.menuItem), {
+      menuItem
+    });
+  }
+
+  static async clickMenuItem(menuItems: string[]) {
+    return App.instance.evaluate(
+      async ({ app }, params) => {
+        let menuItem = app.applicationMenu!.getMenuItemById(params.menuItems[0]);
+        for (let i = 1; i < params.menuItems.length; ++i) {
+          menuItem = menuItem!.submenu!.getMenuItemById(params.menuItems[i]);
+        }
+        await menuItem!.click();
+      },
+      { menuItems }
+    );
+  }
 }
