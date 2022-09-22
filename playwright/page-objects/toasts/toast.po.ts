@@ -7,18 +7,15 @@ export class ToastPageObject extends BasePageObject {
   readonly EXPECTED_LEVEL: string;
   readonly EXPECTED_MESSAGE: string;
 
-  get toastContainer(): Locator {
-    return App.page.locator('#toast-container').filter({
+  get toast(): Locator {
+    return App.page.locator('#toast-container .toast', {
       has: App.page.locator('.toast-message', {
         hasText: this.EXPECTED_MESSAGE
       })
     });
   }
-  get toast(): Locator {
-    return this.toastContainer.locator('.toast');
-  }
   get message(): Locator {
-    return this.toastContainer.locator('.toast-message');
+    return this.toast.locator('.toast-message');
   }
 
   async isMessageOk() {
