@@ -34,7 +34,7 @@ import fs from 'fs';
 import archiver from 'archiver';
 
 export class Project {
-  constructor($q, $log, $http, $uibModal, DialogHelper, MeasureManager, $sce, Message, toastr, $translate) {
+  constructor($q, $log, $http, $uibModal, RemoteHelper, MeasureManager, $sce, Message, toastr, $translate) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -42,7 +42,7 @@ export class Project {
     vm.fs = fs;
     vm.jsZip = jsZip;
     vm.MeasureManager = MeasureManager;
-    vm.dialog = DialogHelper.dialog;
+    vm.dialog = RemoteHelper.dialog;
     vm.archiver = archiver;
     vm.$q = $q;
     vm.$http = $http;

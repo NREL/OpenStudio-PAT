@@ -25,27 +25,30 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-import { app, dialog as eDialog } from '@electron/remote';
+import { app, dialog as remoteDialog } from '@electron/remote';
 import { ipcRenderer } from 'electron';
 import { getEnv } from '../../env';
 
-export class DialogHelper {
+export class RemoteHelper {
   constructor() {
     const vm = this;
     vm.env = getEnv(app.getAppPath());
+    vm.populateItem('dialog', remoteDialog, ['showOpenDialog', 'showMessageBox']);
+  }
+
+  populateItem(itemName, remoteItemRef, fnsToMock) {
+    const vm = this;
 
     if (vm.env.name === 'test') {
-      const MOCKED_FUNCTION_NAMES = ['showOpenDialog', 'showMessageBox'];
-
-      const dialog = {};
-      for (const k in eDialog) {
-        dialog[k] = MOCKED_FUNCTION_NAMES.includes(k)
-          ? (...args) => ipcRenderer.invoke(`test-dialog-${k}`, ...args)
-          : eDialog[k];
+      const mockedItemRef = {};
+      for (const k in remoteItemRef) {
+        mockedItemRef[k] = fnsToMock.includes(k)
+          ? (...args) => ipcRenderer.invoke(`test-${itemName}-${k}`, ...args)
+          : remoteItemRef[k];
       }
-      vm.dialog = dialog;
+      vm[itemName] = mockedItemRef;
     } else {
-      vm.dialog = eDialog;
+      vm[itemName] = remoteItemRef;
     }
   }
 }

@@ -30,7 +30,7 @@ import fs from 'fs';
 import path from 'path';
 
 export class SetProject {
-  constructor($q, $log, $state, $timeout, $uibModal, Project, OsServer, BCL, DialogHelper, $translate, toastr, Message) {
+  constructor($q, $log, $state, $timeout, $uibModal, Project, OsServer, BCL, RemoteHelper, $translate, toastr, Message) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
@@ -38,7 +38,7 @@ export class SetProject {
     vm.$uibModal = $uibModal;
     vm.fs = fs;
     vm.jetpack = jetpack;
-    vm.dialog = DialogHelper.dialog;
+    vm.dialog = RemoteHelper.dialog;
     vm.OsServer = OsServer;
     vm.Project = Project;
     vm.BCL = BCL;
@@ -228,7 +228,7 @@ export class SetProject {
       if (vm.Message.showDebug()) vm.$log.debug('newProject response:', response);
 
       // pop modal to allow user to navigate to project parent folder
-      // TODO - try out new DialogHelper service here
+      // TODO - try out new RemoteHelper service here
       vm.dialog.showOpenDialog({
         title: 'Choose New ParametricAnalysisTool Project Folder',
         properties: ['openDirectory']

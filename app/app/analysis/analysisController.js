@@ -31,7 +31,7 @@ import path from 'path';
 
 export class AnalysisController {
 
-  constructor($log, $q, BCL, DialogHelper, Project, SetProject, $scope, $document, $uibModal, toastr, Message, $translate) {
+  constructor($log, $q, BCL, RemoteHelper, Project, SetProject, $scope, $document, $uibModal, toastr, Message, $translate) {
     'ngInject';
 
     const vm = this;
@@ -45,7 +45,7 @@ export class AnalysisController {
     vm.$scope = $scope;
     vm.$document = $document;
     vm.BCL = BCL;
-    vm.dialog = DialogHelper.dialog;
+    vm.dialog = RemoteHelper.dialog;
     vm.shell = shell;
     vm.path = path;
     vm.$translate = $translate;

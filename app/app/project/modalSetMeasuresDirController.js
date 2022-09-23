@@ -28,7 +28,7 @@
 
 export class ModalSetMeasuresDirController {
 
-  constructor($q, $log, $scope, $uibModalInstance, DialogHelper, MeasureManager, $translate, toastr, Project, Message) {
+  constructor($q, $log, $scope, $uibModalInstance, RemoteHelper, MeasureManager, $translate, toastr, Project, Message) {
     'ngInject';
 
     const vm = this;
@@ -40,7 +40,7 @@ export class ModalSetMeasuresDirController {
     vm.$translate = $translate;
     vm.MeasureManager = MeasureManager;
     vm.Project = Project;
-    vm.dialog = DialogHelper.dialog;
+    vm.dialog = RemoteHelper.dialog;
     vm.Message = Message;
 
     vm.$scope.currentDir = vm.Project.getMeasuresDir().path();

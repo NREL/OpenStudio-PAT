@@ -27,13 +27,13 @@
  **********************************************************************************************************************/
 
 export class OpenProject {
-  constructor($q, $log, $uibModal, DialogHelper, Message) {
+  constructor($q, $log, $uibModal, RemoteHelper, Message) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
     vm.$log = $log;
     vm.$uibModal = $uibModal;
-    vm.dialog = DialogHelper.dialog;
+    vm.dialog = RemoteHelper.dialog;
     vm.Message = Message;
   }
 
