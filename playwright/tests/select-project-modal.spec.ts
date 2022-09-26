@@ -7,6 +7,7 @@ import {
   NewProjectModalPageObject,
   NoServerStartToastPageObject,
   PagePageObject,
+  ProjectModalArgsPromises,
   SelectProjectModalPageObject
 } from '../page-objects';
 import { testNavItemsCorrect } from '../shared-tests';
@@ -36,9 +37,7 @@ test('correct title and buttons are shown', async () => {
 
 test.describe('click "Make New Project" button', () => {
   const newProjPO = new NewProjectModalPageObject();
-  test.beforeEach(async () => {
-    await selectProjPO.clickButton(selectProjPO.EXPECTED_FOOTER_BUTTONS.MAKE_NEW_PROJECT);
-  });
+  test.beforeEach(async () => await selectProjPO.clickButton(selectProjPO.EXPECTED_FOOTER_BUTTONS.MAKE_NEW_PROJECT));
 
   test.describe('"New Project" modal', () => {
     test('is shown', async () => {
@@ -46,15 +45,22 @@ test.describe('click "Make New Project" button', () => {
     });
 
     test.describe('click "Continue" button', () => {
+      test.beforeEach(async () => await newProjPO.nameInput.fill(PROJECT_NEW.name));
+
+      test('file dialog is shown correctly', async () => {
+        const argsPromises = await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew);
+        expect((await argsPromises.showOpenDialog)[0]).toEqual({
+          title: 'Choose New ParametricAnalysisTool Project Folder',
+          properties: ['openDirectory']
+        });
+      });
+
       test.describe('select valid directory', () => {
         const analysisPO = new PagePageObject({
           ...EXPECTED_DETAILS_BY_PAGE.ANALYSIS,
           title: PROJECT_NEW.name
         });
-        test.beforeEach(async () => {
-          await newProjPO.nameInput.fill(PROJECT_NEW.name);
-          await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew);
-        });
+        test.beforeEach(async () => await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew));
 
         test('both modals close', async () => {
           await newProjPO.dialog.waitFor({ state: 'hidden' });
@@ -67,7 +73,6 @@ test.describe('click "Make New Project" button', () => {
 
       // NOTE - should both modals really close here?
       test('cancel dialog and both modals close', async () => {
-        await newProjPO.nameInput.fill(PROJECT_NEW.name);
         await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled);
 
         await newProjPO.clickButton(newProjPO.EXPECTED_FOOTER_BUTTONS.CONTINUE);
@@ -88,6 +93,14 @@ test.describe('click "Make New Project" button', () => {
 });
 
 test.describe('click "Open Existing Project" button', () => {
+  test('file dialog is shown correctly', async () => {
+    const argsPromises = await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC);
+    expect((await argsPromises.showOpenDialog)[0]).toEqual({
+      title: 'Open ParametricAnalysisTool Project',
+      properties: ['openDirectory']
+    });
+  });
+
   test.describe('select valid directory', () => {
     const analysisPO = new PagePageObject({
       ...EXPECTED_DETAILS_BY_PAGE.ANALYSIS,
@@ -102,11 +115,29 @@ test.describe('click "Open Existing Project" button', () => {
     testAnalysisPageShown(analysisPO);
     testNavItemsCorrect(navPO);
   });
+  test.describe('select invalid directory', () => {
+    let argsPromises: ProjectModalArgsPromises;
+    test.beforeEach(async () => {
+      argsPromises = await selectProjPO.open(
+        IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalid,
+        IPC_MAIN_HANDLE_MOCKS.showMessageBox.ok
+      );
+    });
 
-  test('select invalid directory and modal remains open', async () => {
-    await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalid, IPC_MAIN_HANDLE_MOCKS.showMessageBox.ok);
-    await selectProjPO.isOk();
+    test('message box is shown correctly', async () => {
+      expect((await argsPromises.showMessageBox)[0]).toEqual({
+        type: 'info',
+        buttons: ['OK'],
+        title: 'Open ParametricAnalysisTool Project',
+        message: 'This is not a valid ParametricAnalysisTool project, as it has no file named "pat.json".'
+      });
+    });
+
+    test('modal remains open', async () => {
+      await selectProjPO.isOk();
+    });
   });
+
   test('cancel dialog and modal remains open', async () => {
     await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled);
     await selectProjPO.isOk();

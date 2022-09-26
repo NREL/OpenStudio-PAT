@@ -46,11 +46,21 @@ export class App {
     }
   }
 
-  static async mockIpcMainHandle(channel: string, returnValue: any) {
-    await App.instance.evaluate(({ ipcMain }, params) => ipcMain.handle(params.channel, () => params.returnValue), {
-      channel,
-      returnValue
-    });
+  static async mockIpcMainHandle(channel: string, returnValue?: any) {
+    return App.instance.evaluate(
+      ({ ipcMain }, params) => {
+        return new Promise<any[]>(resolve => {
+          ipcMain.handle(params.channel, (_, ...args) => {
+            resolve(args);
+            return params.returnValue;
+          });
+        });
+      },
+      {
+        channel,
+        returnValue
+      }
+    );
   }
 
   static async removeAllIpcMainListeners(channel?: string) {
