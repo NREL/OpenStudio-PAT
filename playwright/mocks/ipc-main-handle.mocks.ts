@@ -35,4 +35,6 @@ export class IPC_MAIN_HANDLE_MOCKS {
       response: 0
     }
   };
+
+  static readonly openExternalChannel = 'test-shell-openExternal';
 }

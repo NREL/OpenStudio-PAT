@@ -1,4 +1,4 @@
-import { test } from '@playwright/test';
+import { expect, test } from '@playwright/test';
 import { App } from '../App';
 import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
 import {
@@ -21,6 +21,7 @@ test.afterEach(async () => {
   await App.close();
 });
 
+// TODO - removeme after finished writing tests here!
 const wait = (ms = 3_000) => new Promise(f => setTimeout(f, ms));
 
 test.describe('no project open', async () => {
@@ -53,7 +54,7 @@ test.describe('existing project open', async () => {
 
   test.describe('"Server Tools" modal with buttons', () => {
     test('is shown', async () => {
-      await serverToolsModalPO.isOk();
+      await serverToolsModalPO.isOk(true);
     });
 
     test.describe('click "Ping Server and Set Status" button', () => {
@@ -63,6 +64,17 @@ test.describe('existing project open', async () => {
           serverToolsModalPO.bodyButtons
         );
         await serverOfflineToastPO.isOk();
+      });
+    });
+
+    test.describe('click "View Local Server" button', () => {
+      test('"http://localhost:8080" launches in external browser', async () => {
+        const argsPromise = App.mockIpcMainHandle(IPC_MAIN_HANDLE_MOCKS.openExternalChannel);
+        await serverToolsModalPO.clickButton(
+          serverToolsModalPO.EXPECTED_BODY_BUTTONS.VIEW,
+          serverToolsModalPO.bodyButtons
+        );
+        expect((await argsPromise)[0]).toBe('http://localhost:8080');
       });
     });
 
