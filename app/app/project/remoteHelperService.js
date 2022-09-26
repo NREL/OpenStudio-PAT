@@ -25,7 +25,7 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-import { app, dialog as remoteDialog } from '@electron/remote';
+import { app, dialog as remoteDialog, shell as remoteShell } from '@electron/remote';
 import { ipcRenderer } from 'electron';
 import { getEnv } from '../../env';
 
@@ -34,6 +34,7 @@ export class RemoteHelper {
     const vm = this;
     vm.env = getEnv(app.getAppPath());
     vm.populateItem('dialog', remoteDialog, ['showOpenDialog', 'showMessageBox']);
+    vm.populateItem('shell', remoteShell, ['openExternal']);
   }
 
   populateItem(itemName, remoteItemRef, fnsToMock) {

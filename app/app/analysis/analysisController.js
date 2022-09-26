@@ -26,7 +26,6 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-import {shell} from 'electron';
 import path from 'path';
 
 export class AnalysisController {
@@ -46,7 +45,7 @@ export class AnalysisController {
     vm.$document = $document;
     vm.BCL = BCL;
     vm.dialog = RemoteHelper.dialog;
-    vm.shell = shell;
+    vm.shell = RemoteHelper.shell;
     vm.path = path;
     vm.$translate = $translate;
     vm.Message = Message;

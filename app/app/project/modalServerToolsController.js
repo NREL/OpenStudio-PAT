@@ -25,11 +25,10 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-import {shell} from 'electron';
 
 export class ModalServerToolsController {
 
-  constructor($log, $scope, $uibModalInstance, OsServer, Project, $translate, toastr, Message) {
+  constructor($log, $scope, $uibModalInstance, OsServer, Project, $translate, toastr, Message, RemoteHelper) {
     'ngInject';
 
     const vm = this;
@@ -40,7 +39,7 @@ export class ModalServerToolsController {
     vm.$scope = $scope;
     vm.toastr = toastr;
     vm.$translate = $translate;
-    vm.shell = shell;
+    vm.shell = RemoteHelper.shell;
     vm.Message = Message;
 
     vm.$scope.projectDir = vm.Project.getProjectDir();

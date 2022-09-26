@@ -27,11 +27,12 @@
  **********************************************************************************************************************/
 /*global bootlint*/
 
-import { app, getGlobal, Menu, shell } from '@electron/remote';
+import { app, getGlobal, Menu } from '@electron/remote';
 
-export function runBlock($rootScope, $state, $window, $document, $translate, toastr, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log, Message) {
+export function runBlock($rootScope, $state, $window, $document, $translate, toastr, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log, Message, RemoteHelper) {
   'ngInject';
 
+  const shell = RemoteHelper.shell;
   let exitReady = false;
 
   $window.onbeforeunload = e => {
