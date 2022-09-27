@@ -2,14 +2,14 @@ import { expect } from '@playwright/test';
 import { App } from '../../App';
 import { BasePageObject } from '../base.po';
 
-export class MenuItemPageObject extends BasePageObject {
-  readonly MENUS: string[];
+export class MenuItemPO extends BasePageObject {
+  static readonly MENUS: string[];
 
-  async click() {
+  static async click() {
     return App.clickMenuItem(this.MENUS);
   }
 
-  async isOk() {
+  static async isOk() {
     const menu = await App.getMenuItem(this.MENUS[0]);
     expect(menu).toBeDefined();
     expect(menu!.label).toBe(this.MENUS[0]);

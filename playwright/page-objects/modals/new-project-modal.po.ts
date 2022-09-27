@@ -1,19 +1,19 @@
 import { expect, Locator } from '@playwright/test';
-import { ProjectModalPageObject } from './project-modal.po';
+import { ProjectModalPO } from './project-modal.po';
 
-export class NewProjectModalPageObject extends ProjectModalPageObject {
-  readonly EXPECTED_TITLE = 'New Project';
-  readonly EXPECTED_FOOTER_BUTTONS = {
+export class NewProjectModalPO extends ProjectModalPO {
+  static readonly EXPECTED_TITLE = 'New Project';
+  static readonly EXPECTED_FOOTER_BUTTONS = {
     CONTINUE: 'Continue',
     CANCEL: 'Cancel'
   };
-  readonly OPEN_BUTTON_TEXT = this.EXPECTED_FOOTER_BUTTONS.CONTINUE;
+  static readonly OPEN_BUTTON_TEXT = this.EXPECTED_FOOTER_BUTTONS.CONTINUE;
 
-  get nameInput(): Locator {
+  static get nameInput(): Locator {
     return this.dialog.locator('input');
   }
 
-  async isOk() {
+  static async isOk() {
     await super.isOk();
     await expect(this.nameInput).toBeVisible();
   }

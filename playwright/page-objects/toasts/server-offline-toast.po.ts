@@ -1,7 +1,7 @@
 import { ToastLevels } from '../../constants';
-import { ToastPageObject } from './toast.po';
+import { ToastPO } from './toast.po';
 
-export class ServerOfflineToastPageObject extends ToastPageObject {
-  EXPECTED_LEVEL = ToastLevels.ERROR;
-  EXPECTED_MESSAGE = 'Server is Offline';
+export class ServerOfflineToastPO extends ToastPO {
+  static readonly EXPECTED_LEVEL = ToastLevels.ERROR;
+  static readonly EXPECTED_MESSAGE = 'Server is Offline';
 }

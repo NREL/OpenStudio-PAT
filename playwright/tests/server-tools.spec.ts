@@ -1,87 +1,79 @@
 import { expect, test } from '@playwright/test';
 import { App } from '../App';
-import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
+import { EXPECTED_DETAILS_BY_PAGE } from '../constants';
+import { IPC_MAIN_HANDLE_MOCKS, PROJECT_OFFICE_HVAC } from '../mocks';
 import {
-  ServerToolsMenuItemPageObject,
-  SelectProjectModalPageObject,
-  ServerToolsModalPageObject,
-  ServerOfflineToastPageObject
+  ServerToolsMenuItemPO,
+  SelectProjectModalPO,
+  ServerToolsModalPO,
+  ServerOfflineToastPO,
+  PagePO
 } from '../page-objects';
+import { beforeAndAfterEachFileSetup } from './shared.spec';
 
-const selectProjPO = new SelectProjectModalPageObject();
-const serverToolsMenuItemPO = new ServerToolsMenuItemPageObject();
-const serverToolsModalPO = new ServerToolsModalPageObject();
-const serverOfflineToastPO = new ServerOfflineToastPageObject();
-
-test.beforeEach(async () => {
-  await App.launchIfClosed();
-});
-test.afterEach(async () => {
-  await App.removeAllIpcMainListeners();
-  await App.close();
-});
-
-// TODO - removeme after finished writing tests here!
-const wait = (ms = 3_000) => new Promise(f => setTimeout(f, ms));
+beforeAndAfterEachFileSetup();
 
 test.describe('no project open', async () => {
-  test.beforeEach(async () => {
-    await selectProjPO.isOk(); // effectively waits for app (and menu bar) to load
-    await serverToolsMenuItemPO.click();
-  });
-
   test.describe('"Server Tools" modal with "must open project first" message', () => {
+    test.beforeEach(async () => {
+      await SelectProjectModalPO.isOk(); // effectively waits for app (and menu bar) to load
+      await ServerToolsMenuItemPO.click();
+    });
     test('is shown', async () => {
-      await serverToolsModalPO.isOk(false);
+      await ServerToolsModalPO.isOk(false);
     });
 
     test.describe('click "OK" footer button', () => {
       test('modal closes and "Select a Project" modal is shown again', async () => {
-        await serverToolsModalPO.clickButton(serverToolsModalPO.EXPECTED_FOOTER_BUTTONS.OK);
-        await serverToolsModalPO.dialog.waitFor({ state: 'hidden' });
-
-        await selectProjPO.isOk();
+        await ServerToolsModalPO.clickButton(ServerToolsModalPO.EXPECTED_FOOTER_BUTTONS.OK);
+        await ServerToolsModalPO.dialog.waitFor({ state: 'hidden' });
+        await SelectProjectModalPO.isOk();
       });
     });
   });
 });
 
 test.describe('existing project open', async () => {
-  test.beforeEach(async () => {
-    await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC);
-    await serverToolsMenuItemPO.click();
-  });
+  test.beforeEach(async () => await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC));
 
   test.describe('"Server Tools" modal with buttons', () => {
+    test.beforeEach(async () => await ServerToolsMenuItemPO.click());
+
     test('is shown', async () => {
-      await serverToolsModalPO.isOk(true);
+      await ServerToolsModalPO.isOk(true);
     });
 
     test.describe('click "Ping Server and Set Status" button', () => {
       test('"Server is offline" toast is shown', async () => {
-        await serverToolsModalPO.clickButton(
-          serverToolsModalPO.EXPECTED_BODY_BUTTONS.PING_AND_SET_STATUS,
-          serverToolsModalPO.bodyButtons
+        await ServerToolsModalPO.clickButton(
+          ServerToolsModalPO.EXPECTED_BODY_BUTTONS.PING_AND_SET_STATUS,
+          ServerToolsModalPO.bodyButtons
         );
-        await serverOfflineToastPO.isOk();
+        await ServerOfflineToastPO.isOk();
       });
     });
 
     test.describe('click "View Local Server" button', () => {
       test('"http://localhost:8080" launches in external browser', async () => {
         const argsPromise = App.mockIpcMainHandle(IPC_MAIN_HANDLE_MOCKS.openExternalChannel);
-        await serverToolsModalPO.clickButton(
-          serverToolsModalPO.EXPECTED_BODY_BUTTONS.VIEW,
-          serverToolsModalPO.bodyButtons
+        await ServerToolsModalPO.clickButton(
+          ServerToolsModalPO.EXPECTED_BODY_BUTTONS.VIEW,
+          ServerToolsModalPO.bodyButtons
         );
         expect((await argsPromise)[0]).toBe('http://localhost:8080');
       });
     });
 
     test.describe('click "OK" footer button', () => {
-      test('modal closes', async () => {
-        await serverToolsModalPO.clickButton(serverToolsModalPO.EXPECTED_FOOTER_BUTTONS.OK);
-        await serverToolsModalPO.dialog.waitFor({ state: 'hidden' });
+      const analysisPO = new PagePO({
+        ...EXPECTED_DETAILS_BY_PAGE.ANALYSIS,
+        title: PROJECT_OFFICE_HVAC.name
+      });
+
+      test('modal closes and "Analysis" page is shown again', async () => {
+        await ServerToolsModalPO.clickButton(ServerToolsModalPO.EXPECTED_FOOTER_BUTTONS.OK);
+        await ServerToolsModalPO.dialog.waitFor({ state: 'hidden' });
+        await analysisPO.isOk();
       });
     });
   });

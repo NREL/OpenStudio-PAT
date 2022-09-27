@@ -1,8 +1,8 @@
 import { ToastLevels } from '../../constants';
-import { ToastPageObject } from './toast.po';
+import { ToastPO } from './toast.po';
 
-export class NoServerStartToastPageObject extends ToastPageObject {
-  EXPECTED_LEVEL = ToastLevels.WARNING;
-  EXPECTED_MESSAGE =
+export class NoServerStartToastPO extends ToastPO {
+  static readonly EXPECTED_LEVEL = ToastLevels.WARNING;
+  static readonly EXPECTED_MESSAGE =
     'Local Server no longer start by default.  You can start Local Server manually from the Server Tools menu.';
 }

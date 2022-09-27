@@ -3,52 +3,44 @@ import { App } from '../App';
 import { EXPECTED_DETAILS_BY_PAGE } from '../constants';
 import { IPC_MAIN_HANDLE_MOCKS, PROJECT_NEW, PROJECT_OFFICE_HVAC } from '../mocks';
 import {
-  NavPageObject,
-  NewProjectModalPageObject,
-  NoServerStartToastPageObject,
-  PagePageObject,
+  NewProjectModalPO,
+  NoServerStartToastPO,
+  PagePO,
   ProjectModalArgsPromises,
-  SelectProjectModalPageObject
+  SelectProjectModalPO
 } from '../page-objects';
-import { testNavItemsCorrect } from '../shared-tests';
+import { beforeAndAfterEachFileSetup, testNavItemsCorrect } from './shared.spec';
 
-const selectProjPO = new SelectProjectModalPageObject();
-const navPO = new NavPageObject();
-const noServerStartToastPO = new NoServerStartToastPageObject();
-
-const testNoServerStartToast = (noServerStartToastPO: NoServerStartToastPageObject) =>
+const testNoServerStartToast = () =>
   test('"Server no longer starts by default" toast is shown', async () => {
-    await noServerStartToastPO.isOk();
+    await NoServerStartToastPO.isOk();
   });
-const testAnalysisPageShown = (analysisPO: PagePageObject) =>
+const testAnalysisPageShown = (analysisPO: PagePO) =>
   test('"Analysis" page with project name as title is shown', async () => {
     await analysisPO.isOk();
   });
 
-test.beforeEach(App.launchIfClosed);
-test.afterEach(async () => {
-  await App.removeAllIpcMainListeners();
-  await App.close();
-});
+beforeAndAfterEachFileSetup();
 
 test('correct title and buttons are shown', async () => {
-  await selectProjPO.isOk();
+  await SelectProjectModalPO.isOk();
 });
 
 test.describe('click "Make New Project" button', () => {
-  const newProjPO = new NewProjectModalPageObject();
-  test.beforeEach(async () => await selectProjPO.clickButton(selectProjPO.EXPECTED_FOOTER_BUTTONS.MAKE_NEW_PROJECT));
+  test.beforeEach(
+    async () => await SelectProjectModalPO.clickButton(SelectProjectModalPO.EXPECTED_FOOTER_BUTTONS.MAKE_NEW_PROJECT)
+  );
 
   test.describe('"New Project" modal', () => {
     test('is shown', async () => {
-      await newProjPO.isOk();
+      await NewProjectModalPO.isOk();
     });
 
     test.describe('click "Continue" button', () => {
-      test.beforeEach(async () => await newProjPO.nameInput.fill(PROJECT_NEW.name));
+      test.beforeEach(async () => await NewProjectModalPO.nameInput.fill(PROJECT_NEW.name));
 
       test('file dialog is shown correctly', async () => {
-        const argsPromises = await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew);
+        const argsPromises = await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew);
         expect((await argsPromises.showOpenDialog)[0]).toEqual({
           title: 'Choose New ParametricAnalysisTool Project Folder',
           properties: ['openDirectory']
@@ -56,37 +48,37 @@ test.describe('click "Make New Project" button', () => {
       });
 
       test.describe('select valid directory', () => {
-        const analysisPO = new PagePageObject({
+        const analysisPO = new PagePO({
           ...EXPECTED_DETAILS_BY_PAGE.ANALYSIS,
           title: PROJECT_NEW.name
         });
-        test.beforeEach(async () => await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew));
+        test.beforeEach(async () => await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew));
 
         test('both modals close', async () => {
-          await newProjPO.dialog.waitFor({ state: 'hidden' });
-          await selectProjPO.dialog.waitFor({ state: 'hidden' });
+          await NewProjectModalPO.dialog.waitFor({ state: 'hidden' });
+          await SelectProjectModalPO.dialog.waitFor({ state: 'hidden' });
         });
-        testNoServerStartToast(noServerStartToastPO);
+        testNoServerStartToast();
         testAnalysisPageShown(analysisPO);
-        testNavItemsCorrect(navPO);
+        testNavItemsCorrect();
       });
 
       // NOTE - should both modals really close here?
       test('cancel dialog and both modals close', async () => {
-        await newProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled);
+        await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled);
 
-        await newProjPO.clickButton(newProjPO.EXPECTED_FOOTER_BUTTONS.CONTINUE);
-        await newProjPO.dialog.waitFor({ state: 'hidden' });
-        await selectProjPO.dialog.waitFor({ state: 'hidden' });
+        await NewProjectModalPO.clickButton(NewProjectModalPO.EXPECTED_FOOTER_BUTTONS.CONTINUE);
+        await NewProjectModalPO.dialog.waitFor({ state: 'hidden' });
+        await SelectProjectModalPO.dialog.waitFor({ state: 'hidden' });
       });
     });
 
     test.describe('click "Cancel" button', () => {
       test('"New Project" modal closes and "Select a Project" modal is shown again', async () => {
-        await newProjPO.clickButton(selectProjPO.EXPECTED_FOOTER_BUTTONS.CANCEL);
-        await newProjPO.dialog.waitFor({ state: 'hidden' });
+        await NewProjectModalPO.clickButton(SelectProjectModalPO.EXPECTED_FOOTER_BUTTONS.CANCEL);
+        await NewProjectModalPO.dialog.waitFor({ state: 'hidden' });
 
-        await selectProjPO.isOk();
+        await SelectProjectModalPO.isOk();
       });
     });
   });
@@ -94,7 +86,7 @@ test.describe('click "Make New Project" button', () => {
 
 test.describe('click "Open Existing Project" button', () => {
   test('file dialog is shown correctly', async () => {
-    const argsPromises = await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC);
+    const argsPromises = await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC);
     expect((await argsPromises.showOpenDialog)[0]).toEqual({
       title: 'Open ParametricAnalysisTool Project',
       properties: ['openDirectory']
@@ -102,23 +94,23 @@ test.describe('click "Open Existing Project" button', () => {
   });
 
   test.describe('select valid directory', () => {
-    const analysisPO = new PagePageObject({
+    const analysisPO = new PagePO({
       ...EXPECTED_DETAILS_BY_PAGE.ANALYSIS,
       title: PROJECT_OFFICE_HVAC.name
     });
-    test.beforeEach(async () => await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC));
+    test.beforeEach(async () => await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC));
 
     test('modal closes', async () => {
-      await selectProjPO.dialog.waitFor({ state: 'hidden' });
+      await SelectProjectModalPO.dialog.waitFor({ state: 'hidden' });
     });
-    testNoServerStartToast(noServerStartToastPO);
+    testNoServerStartToast();
     testAnalysisPageShown(analysisPO);
-    testNavItemsCorrect(navPO);
+    testNavItemsCorrect();
   });
   test.describe('select invalid directory', () => {
     let argsPromises: ProjectModalArgsPromises;
     test.beforeEach(async () => {
-      argsPromises = await selectProjPO.open(
+      argsPromises = await SelectProjectModalPO.open(
         IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalid,
         IPC_MAIN_HANDLE_MOCKS.showMessageBox.ok
       );
@@ -134,19 +126,19 @@ test.describe('click "Open Existing Project" button', () => {
     });
 
     test('modal remains open', async () => {
-      await selectProjPO.isOk();
+      await SelectProjectModalPO.isOk();
     });
   });
 
   test('cancel dialog and modal remains open', async () => {
-    await selectProjPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled);
-    await selectProjPO.isOk();
+    await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.canceled);
+    await SelectProjectModalPO.isOk();
   });
 });
 
 test.describe('click "Cancel" button', () => {
   test('application closes', async () => {
-    await selectProjPO.clickButton(selectProjPO.EXPECTED_FOOTER_BUTTONS.CANCEL);
+    await SelectProjectModalPO.clickButton(SelectProjectModalPO.EXPECTED_FOOTER_BUTTONS.CANCEL);
     expect(App.isClosed).toBe(true);
   });
 });

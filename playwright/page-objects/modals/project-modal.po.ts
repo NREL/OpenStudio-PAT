@@ -1,17 +1,17 @@
 import { App } from '../../App';
 import { IPC_MAIN_HANDLE_MOCKS, ShowMessageBoxMock, ShowOpenDialogMock } from '../../mocks';
-import { ModalPageObject } from './modal.po';
+import { ModalPO } from './modal.po';
 
 export interface ProjectModalArgsPromises {
   showOpenDialog?: Promise<any>;
   showMessageBox?: Promise<any>;
 }
-export class ProjectModalPageObject extends ModalPageObject {
-  readonly EXPECTED_TITLE: string;
-  readonly EXPECTED_FOOTER_BUTTONS: Record<string, string>;
-  readonly OPEN_BUTTON_TEXT: string;
+export class ProjectModalPO extends ModalPO {
+  static readonly EXPECTED_TITLE: string;
+  static readonly EXPECTED_FOOTER_BUTTONS: Record<string, string>;
+  static readonly OPEN_BUTTON_TEXT: string;
 
-  async open(showOpenDialogMock?: ShowOpenDialogMock, showMessageBoxMock?: ShowMessageBoxMock) {
+  static async open(showOpenDialogMock?: ShowOpenDialogMock, showMessageBoxMock?: ShowMessageBoxMock) {
     const argsPromises: ProjectModalArgsPromises = {};
 
     if (showOpenDialogMock !== undefined) {

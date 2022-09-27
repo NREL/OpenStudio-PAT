@@ -2,9 +2,9 @@ import { expect, Locator } from '@playwright/test';
 import { App } from '../../App';
 import { PageDetails } from '../../constants';
 import { BasePageObject } from '../base.po';
-import { NavPageObject } from '../nav.po';
+import { NavPO } from '../nav.po';
 
-export class PagePageObject extends BasePageObject {
+export class PagePO extends BasePageObject {
   private EXPECTED_PAGE_DETAILS: PageDetails;
 
   get route(): string {
@@ -36,8 +36,7 @@ export class PagePageObject extends BasePageObject {
   }
 
   async isNavOk() {
-    const navPO = new NavPageObject();
-    await navPO.isItemOk(navPO.activeItem, this.EXPECTED_PAGE_DETAILS);
+    await NavPO.isItemOk(NavPO.activeItem, this.EXPECTED_PAGE_DETAILS);
   }
 
   async isOk() {
