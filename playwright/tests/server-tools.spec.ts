@@ -33,7 +33,7 @@ test.describe('no project open', async () => {
   });
 });
 
-test.describe('existing project open', async () => {
+test.describe('open existing project', async () => {
   test.beforeEach(async () => await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC));
 
   test.describe('"Server Tools" modal with buttons', () => {

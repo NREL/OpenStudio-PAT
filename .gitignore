@@ -13,6 +13,6 @@ Thumbs.db
 /releases/
 /tmp/
 /depend/
-/playwright-report/
 /playwright-results/
 /playwright/.cache/
+/reports/

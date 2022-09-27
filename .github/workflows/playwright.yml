@@ -14,16 +14,20 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
-      - name: Install dependencies
+      - name: Install build dependencies
         run: npm i
       - name: Build application
         run: npm run build -- --env=test
+      - name: Install runtime dependencies
+        run: npx gulp installDeps
       - name: Prepare tmp test files
         run: npx gulp tmpTestFiles
       - name: Run Playwright tests
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: npx playwright test
+          run: |
+            npx playwright test
+            SERIAL=true npx playwright test
       - uses: actions/upload-artifact@v3
         if: always()
         with:
