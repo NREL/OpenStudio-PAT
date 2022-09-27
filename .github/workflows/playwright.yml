@@ -27,7 +27,7 @@ jobs:
         with:
           run: |
             npx playwright test
-            SERIAL=true npx playwright test
+            npx playwright test -c playwright-serial.config.ts
       - uses: actions/upload-artifact@v3
         if: always()
         with:
