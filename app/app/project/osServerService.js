@@ -97,6 +97,7 @@ export class OsServer {
     vm.selectedServerURL = vm.resetSelectedServerURL();
     // to run meta_cli
     vm.exec = require('child_process').exec;
+    vm.spawn = require('child_process').spawn;
     vm.localServerChild = null;
     vm.remoteServerChild = null;
 
@@ -537,34 +538,33 @@ export class OsServer {
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // start local server needs path to oscli (vm.cliPath)
-    if (vm.platform == 'win32')
-      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --worker-number=' + vm.numWorkers + ' --energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --openstudio-exe-path=' + '\"' + vm.cliPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
-    else
-      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --worker-number=' + vm.numWorkers + ' --energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --openstudio-exe-path=' + '\"' + vm.cliPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
+    vm.startServerCommand = `${vm.rubyPath} ${vm.metaCLIPath} start_local --worker-number=${vm.numWorkers} --energyplus-exe-path=${vm.energyplusEXEPath} --openstudio-exe-path=${vm.cliPath} --ruby-lib-path=${vm.openstudioBindingsDirPath} --mongo-dir=${vm.mongoDirPath} --debug ${vm.Project.projectDir.path()}`;
     vm.$log.info('start server command: ', vm.startServerCommand);
 
-    vm.localServerChild = vm.exec(vm.startServerCommand,
-      (error, stdout, stderr) => {
-        if (vm.Message.showDebug()) vm.$log.debug('exit code: ', vm.localServerChild.exitCode);
-        if (vm.Message.showDebug()) vm.$log.debug('child: ', vm.localServerChild);
-        if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
-        if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
-
-        if (vm.localServerChild.exitCode == 0) {
-          // SUCCESS
-          if (vm.Message.showDebug()) vm.$log.debug('SERVER SUCCESS');
-          // get url from local_configuration.json
-          vm.getLocalServerUrlFromFile();
-          vm.$log.info('SERVER URL: ', vm.selectedServerURL);
-          deferred.resolve(vm.localServerChild);
-        } else {
-          vm.$log.error('SERVER ERROR');
-          if (error !== null) {
-            console.log('exec error:', error);
-          }
-          deferred.reject(error);
-        }
-      });
+    const splitCommand = vm.startServerCommand.split(' ');
+    const command = splitCommand[0];
+    const args = splitCommand.slice(1);
+    vm.localServerChild = vm.spawn(command, args);
+    vm.localServerChild.stdout.on('data', (msg) => {
+      console.log('localServerChild:', msg.toString());
+    });
+    vm.localServerChild.on('close', (exitCode) => {
+      if (exitCode == 0) {
+        // SUCCESS
+        if (vm.Message.showDebug()) vm.$log.debug('SERVER SUCCESS');
+        // get url from local_configuration.json
+        vm.getLocalServerUrlFromFile();
+        vm.$log.info('SERVER URL: ', vm.selectedServerURL);
+        deferred.resolve(vm.localServerChild);
+      }
+    });
+    vm.localServerChild.on('error', (error) => {
+      vm.$log.error('SERVER ERROR');
+      if (error !== null) {
+        console.log('exec error:', error);
+      }
+      deferred.reject(error);
+    });
 
     console.log(`Child pid: ${vm.localServerChild.pid}`);
 

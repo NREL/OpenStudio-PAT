@@ -26,7 +26,6 @@ jobs:
         uses: GabrielBB/xvfb-action@v1
         with:
           run: |
-            "/home/runner/work/OpenStudio-PAT/OpenStudio-PAT/depend/ruby/bin/ruby" "/home/runner/work/OpenStudio-PAT/OpenStudio-PAT/depend/OpenStudio-server/bin/openstudio_meta" start_local --worker-number=1 --energyplus-exe-path="" --openstudio-exe-path="/home/runner/work/OpenStudio-PAT/OpenStudio-PAT/depend/OpenStudio/bin/openstudio" --ruby-lib-path="/home/runner/work/OpenStudio-PAT/OpenStudio-PAT/depend/OpenStudio/Ruby" --mongo-dir="/home/runner/work/OpenStudio-PAT/OpenStudio-PAT/depend/mongo/bin" --debug "/home/runner/work/OpenStudio-PAT/OpenStudio-PAT/.tmp-test/Office_HVAC"
             npx playwright test -c playwright-serial.config.ts
       - uses: actions/upload-artifact@v3
         if: always()
