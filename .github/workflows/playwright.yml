@@ -22,6 +22,14 @@ jobs:
         run: npx gulp installDeps
       - name: Prepare tmp test files
         run: npx gulp tmpTestFiles
+      - name: Print hostname info
+        run: |
+          echo "hostname:"
+          hostname
+          echo "hostname --short:"
+          hostname --short
+          echo "hostname --domain:"
+          hostname --domain
       - name: Run Playwright tests
         uses: GabrielBB/xvfb-action@v1
         with:
