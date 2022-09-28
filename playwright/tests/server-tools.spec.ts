@@ -1,13 +1,12 @@
 import { expect, test } from '@playwright/test';
 import { App } from '../App';
-import { EXPECTED_DETAILS_BY_PAGE } from '../constants';
 import { IPC_MAIN_HANDLE_MOCKS, PROJECT_OFFICE_HVAC } from '../mocks';
 import {
   ServerToolsMenuItemPO,
   SelectProjectModalPO,
   ServerToolsModalPO,
   ServerOfflineToastPO,
-  PagePO
+  AnalysisPO
 } from '../page-objects';
 import { beforeAndAfterEachFileSetup } from './shared.spec';
 
@@ -65,15 +64,11 @@ test.describe('open existing project', async () => {
     });
 
     test.describe('click "OK" footer button', () => {
-      const analysisPO = new PagePO({
-        ...EXPECTED_DETAILS_BY_PAGE.ANALYSIS,
-        title: PROJECT_OFFICE_HVAC.name
-      });
-
       test('modal closes and "Analysis" page is shown again', async () => {
         await ServerToolsModalPO.clickButton(ServerToolsModalPO.EXPECTED_FOOTER_BUTTONS.OK);
         await ServerToolsModalPO.dialog.waitFor({ state: 'hidden' });
-        await analysisPO.isOk();
+        AnalysisPO.EXPECTED_TITLE = PROJECT_OFFICE_HVAC.name;
+        await AnalysisPO.isOkShallow();
       });
     });
   });

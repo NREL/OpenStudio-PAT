@@ -1,11 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { App } from '../App';
-import { EXPECTED_DETAILS_BY_PAGE } from '../constants';
 import { IPC_MAIN_HANDLE_MOCKS, PROJECT_NEW, PROJECT_OFFICE_HVAC } from '../mocks';
 import {
+  AnalysisPO,
   NewProjectModalPO,
   NoServerStartToastPO,
-  PagePO,
   ProjectModalArgsPromises,
   SelectProjectModalPO
 } from '../page-objects';
@@ -15,9 +14,10 @@ const testNoServerStartToast = () =>
   test('"Server no longer starts by default" toast is shown', async () => {
     await NoServerStartToastPO.isOk();
   });
-const testAnalysisPageShown = (analysisPO: PagePO) =>
+const testAnalysisPageShown = (expectedTitle: string) =>
   test('"Analysis" page with project name as title is shown', async () => {
-    await analysisPO.isOk();
+    AnalysisPO.EXPECTED_TITLE = expectedTitle;
+    await AnalysisPO.isOkShallow();
   });
 
 beforeAndAfterEachFileSetup();
@@ -48,10 +48,6 @@ test.describe('click "Make New Project" button', () => {
       });
 
       test.describe('select valid directory', () => {
-        const analysisPO = new PagePO({
-          ...EXPECTED_DETAILS_BY_PAGE.ANALYSIS,
-          title: PROJECT_NEW.name
-        });
         test.beforeEach(async () => await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew));
 
         test('both modals close', async () => {
@@ -59,7 +55,7 @@ test.describe('click "Make New Project" button', () => {
           await SelectProjectModalPO.dialog.waitFor({ state: 'hidden' });
         });
         testNoServerStartToast();
-        testAnalysisPageShown(analysisPO);
+        testAnalysisPageShown(PROJECT_NEW.name);
         testNavItemsCorrect();
       });
 
@@ -94,17 +90,13 @@ test.describe('click "Open Existing Project" button', () => {
   });
 
   test.describe('select valid directory', () => {
-    const analysisPO = new PagePO({
-      ...EXPECTED_DETAILS_BY_PAGE.ANALYSIS,
-      title: PROJECT_OFFICE_HVAC.name
-    });
     test.beforeEach(async () => await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC));
 
     test('modal closes', async () => {
       await SelectProjectModalPO.dialog.waitFor({ state: 'hidden' });
     });
     testNoServerStartToast();
-    testAnalysisPageShown(analysisPO);
+    testAnalysisPageShown(PROJECT_OFFICE_HVAC.name);
     testNavItemsCorrect();
   });
   test.describe('select invalid directory', () => {
