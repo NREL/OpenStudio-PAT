@@ -1,9 +1,10 @@
 import type { PlaywrightTestConfig } from "@playwright/test";
 import defaultConfig from "./playwright.config";
 
-/**
- * See https://playwright.dev/docs/test-configuration.
- */
+const DEFAULT_REPORTERS: PlaywrightTestConfig["reporter"] = [
+  ["html", { outputFolder: "reports/playwright/serial" }],
+];
+
 const config: PlaywrightTestConfig = {
   ...defaultConfig,
   testIgnore: undefined,
@@ -12,8 +13,8 @@ const config: PlaywrightTestConfig = {
   timeout: 300_000,
   workers: 1,
   reporter: process.env.CI
-    ? "github"
-    : [["html", { outputFolder: "reports/playwright/serial/" }]],
+    ? [...DEFAULT_REPORTERS, ["github"]]
+    : DEFAULT_REPORTERS,
 };
 
 export default config;
