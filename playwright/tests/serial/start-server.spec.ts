@@ -11,14 +11,14 @@ export const startServerTests = () =>
           ServerToolsModalPO.EXPECTED_BODY_BUTTONS.START,
           ServerToolsModalPO.bodyButtons
         );
+        await App.waitForServerState(true);
       });
 
-      test('"Server Starting" toast is shown', async () => {
-        await ServerStartingToastPO.isOk();
-      });
+      // test('"Server Starting" toast is shown', async () => {
+      //   await ServerStartingToastPO.isOk();
+      // });
 
       test.describe('server starts', () => {
-        test.beforeAll(async () => await App.waitForServerState(true));
         test.describe('click "Ping Server and Set Status" button', () => {
           test('"Server is Alive" toast is shown', async () => {
             await ServerToolsModalPO.clickButton(
