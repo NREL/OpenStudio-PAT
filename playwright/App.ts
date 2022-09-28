@@ -91,6 +91,8 @@ export class App {
   }
 
   static async waitForServerState(shouldBeRunning = true, statusUrl = 'http://localhost:8080/status.json') {
+    console.info('* 1 - waitForServerState() called!');
+    App.page.on('console', msg => console.log(msg.text()));
     await App.page.evaluate(
       async ({ shouldBeRunning, statusUrl }) => {
         const hardWait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
@@ -98,15 +100,19 @@ export class App {
 
         while (true) {
           try {
+            console.info('* 2 - calling fetch() / checking server status!');
             const statusResponse = await fetch(statusUrl);
             if (statusResponse.ok === shouldBeRunning) {
+              console.info('*   - OK, returning!');
               return;
             }
           } catch {
             if (!shouldBeRunning) {
+              console.info('*   - OK, returning!');
               return;
             }
           }
+          console.info('* 3 - waiting...');
           await hardWait(pollDuration);
         }
       },
