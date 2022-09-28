@@ -23,19 +23,6 @@ export class App {
     App.instance = await electron.launch({
       args: [MAIN_SCRIPT_PATH]
     });
-    App.instance.on('window', async page => {
-      const filename = page.url()?.split('/').pop();
-      console.log(`Window opened: ${filename}`);
-
-      // capture errors
-      page.on('pageerror', error => {
-        console.error(error);
-      });
-      // capture console messages
-      page.on('console', msg => {
-        console.log(msg.text());
-      });
-    });
 
     App.page = await App.instance.firstWindow();
   }
