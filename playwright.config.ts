@@ -1,5 +1,9 @@
 import type { PlaywrightTestConfig } from "@playwright/test";
 
+const DEFAULT_REPORTERS: PlaywrightTestConfig["reporter"] = [
+  ["html", { outputFolder: "reports/playwright/" }],
+];
+
 const config: PlaywrightTestConfig = {
   testDir: "./playwright/tests",
   testIgnore: "serial",
@@ -12,8 +16,8 @@ const config: PlaywrightTestConfig = {
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : 5,
   reporter: process.env.CI
-    ? "github"
-    : [["html", { outputFolder: "reports/playwright/" }]],
+    ? [...DEFAULT_REPORTERS, ["github"]]
+    : DEFAULT_REPORTERS,
   use: {
     actionTimeout: 0,
     trace: "on-first-retry",
