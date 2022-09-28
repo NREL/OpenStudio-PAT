@@ -25,12 +25,10 @@ jobs:
       - name: Run Playwright tests
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: |
-            npx playwright test
-            npx playwright test -c playwright-serial.config.ts
+          run: npx playwright test
       - uses: actions/upload-artifact@v3
         if: always()
         with:
-          name: playwright-report
-          path: playwright-report/
+          name: reports
+          path: reports/playwright/
           retention-days: 30

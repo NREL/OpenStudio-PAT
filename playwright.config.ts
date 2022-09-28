@@ -1,4 +1,5 @@
 import type { PlaywrightTestConfig } from "@playwright/test";
+import { getReporter } from "./playwright/config-reporter";
 
 const config: PlaywrightTestConfig = {
   testDir: "./playwright/tests",
@@ -11,9 +12,7 @@ const config: PlaywrightTestConfig = {
   forbidOnly: !!process.env.CI,
   retries: process.env.CI ? 2 : 0,
   workers: process.env.CI ? 1 : 5,
-  reporter: process.env.CI
-    ? "github"
-    : [["html", { outputFolder: "reports/playwright/" }]],
+  reporter: getReporter(false),
   use: {
     actionTimeout: 0,
     trace: "on-first-retry",

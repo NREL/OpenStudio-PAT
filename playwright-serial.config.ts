@@ -1,5 +1,6 @@
 import type { PlaywrightTestConfig } from "@playwright/test";
 import defaultConfig from "./playwright.config";
+import { getReporter } from "./playwright/config-reporter";
 
 /**
  * See https://playwright.dev/docs/test-configuration.
@@ -11,9 +12,7 @@ const config: PlaywrightTestConfig = {
   fullyParallel: false,
   timeout: 300_000,
   workers: 1,
-  reporter: process.env.CI
-    ? "github"
-    : [["html", { outputFolder: "reports/playwright/serial/" }]],
+  reporter: getReporter(true),
 };
 
 export default config;
