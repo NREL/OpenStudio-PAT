@@ -7,10 +7,10 @@ import { SelectProjectModalPO } from '../../page-objects';
 
 test.describe.configure({ mode: 'serial' });
 test.beforeAll(async () => await App.launchIfClosed());
-test.afterAll(async () => {
-  await App.removeAllIpcMainListeners();
-  await App.close();
-});
+// test.afterAll(async () => {
+//   await App.removeAllIpcMainListeners();
+//   await App.close();
+// });
 
 test.describe('open existing project', async () => {
   test.beforeAll(async () => {
@@ -18,5 +18,5 @@ test.describe('open existing project', async () => {
   });
 
   startServerTests();
-  stopServerTests();
+  // stopServerTests();
 });
