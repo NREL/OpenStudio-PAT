@@ -546,44 +546,32 @@ export class OsServer {
     const args = splitCommand.slice(1);
     vm.localServerChild = vm.spawn(command, args);
     vm.localServerChild.stdout.on('data', (msg) => {
-      console.log('localServerChild:', msg.toString());
-    });
-    vm.localServerChild.on('close', (exitCode) => {
-      if (exitCode == 0) {
-        // SUCCESS
-        if (vm.Message.showDebug()) vm.$log.debug('SERVER SUCCESS');
-        // get url from local_configuration.json
-        vm.getLocalServerUrlFromFile();
-        vm.$log.info('SERVER URL: ', vm.selectedServerURL);
-        deferred.resolve(vm.localServerChild);
-      }
-    });
-    vm.localServerChild.on('error', (error) => {
-      vm.$log.error('SERVER ERROR');
-      if (error !== null) {
-        console.log('exec error:', error);
-      }
-      deferred.reject(error);
+      vm.$log.info('START stdout:', msg.toString());
     });
 
     console.log(`Child pid: ${vm.localServerChild.pid}`);
 
     vm.localServerChild.on('close', (code, signal) => {
+      vm.$log.info('START close!');
       console.log(`child closed due to receipt of signal ${signal} (exit code ${code})`);
     });
 
     vm.localServerChild.on('disconnect', (code, signal) => {
+      vm.$log.info('START disconnect!');
       console.log(`child disconnect due to receipt of signal ${signal} (exit code ${code})`);
     });
 
     vm.localServerChild.on('exit', (code, signal) => {
+      vm.$log.info('START exit!');
       console.log(`child exited due to receipt of signal ${signal} (exit code ${code})`);
       if (code == 0) {
+        vm.$log.info('START exit with code 0!');
         if (vm.Message.showDebug()) vm.$log.debug('Server started');
         vm.getLocalServerUrlFromFile();
         vm.$log.info('SERVER URL: ', vm.selectedServerURL);
         deferred.resolve();
       } else {
+        vm.$log.info('START exit with code 1!');
         vm.$log.error('Server failed to start');
         deferred.reject();
       }
@@ -591,10 +579,12 @@ export class OsServer {
     });
 
     vm.localServerChild.on('error', (code, signal) => {
+      vm.$log.info('START error!');
       console.log(`child error due to receipt of signal ${signal} (exit code ${code})`);
     });
 
     vm.localServerChild.on('message', (code, signal) => {
+      vm.$log.info('START message!');
       console.log(`child message due to receipt of signal ${signal} (exit code ${code})`);
     });
 

@@ -94,7 +94,7 @@ export class App {
     await App.page.evaluate(
       async ({ shouldBeRunning, statusUrl }) => {
         const hardWait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-        const pollDuration = 1_000;
+        const pollDuration = 15_000;
 
         while (true) {
           try {
