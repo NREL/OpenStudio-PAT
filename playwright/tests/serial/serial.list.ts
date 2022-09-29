@@ -2,6 +2,7 @@ import { test } from '@playwright/test';
 import { startServerTests } from './start-server.spec';
 import { stopServerTests } from './stop-server.spec';
 import { App } from '../../App';
+import { PROJECTS } from '../../constants';
 import { IPC_MAIN_HANDLE_MOCKS } from '../../mocks';
 import { SelectProjectModalPO } from '../../page-objects';
 
@@ -14,7 +15,7 @@ test.afterAll(async () => {
 
 test.describe('open existing project', async () => {
   test.beforeAll(async () => {
-    await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC);
+    await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.OFFICE_HVAC));
   });
 
   startServerTests();

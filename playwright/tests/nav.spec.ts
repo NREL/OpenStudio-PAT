@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
-import { EXPECTED_DETAILS_BY_PAGE, PAGES } from '../constants';
-import { IPC_MAIN_HANDLE_MOCKS, PROJECT_NEW, PROJECT_OFFICE_HVAC } from '../mocks';
+import { beforeAndAfterEachFileSetup, testNavItemsCorrect } from './shared.spec';
+import { EXPECTED_DETAILS_BY_PAGE, PAGES, PROJECTS } from '../constants';
+import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
 import {
   AnalysisPO,
   DesignAlternativesPO,
@@ -12,23 +13,22 @@ import {
   SelectProjectModalPO,
   ServerPO
 } from '../page-objects';
-import { beforeAndAfterEachFileSetup, testNavItemsCorrect } from './shared.spec';
 
 beforeAndAfterEachFileSetup();
 
 const PROJECT_TYPES: Record<string, { projectName: string; beforeEach: () => Promise<void> }> = {
   existing: {
-    projectName: PROJECT_OFFICE_HVAC.name,
+    projectName: PROJECTS.OFFICE_HVAC,
     beforeEach: async () => {
-      await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validOfficeHVAC);
+      await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.OFFICE_HVAC));
     }
   },
   new: {
-    projectName: PROJECT_NEW.name,
+    projectName: PROJECTS.NEW,
     beforeEach: async () => {
       await SelectProjectModalPO.clickButton(SelectProjectModalPO.EXPECTED_FOOTER_BUTTONS.MAKE_NEW_PROJECT);
-      await NewProjectModalPO.nameInput.fill(PROJECT_NEW.name);
-      await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.showOpenDialog.validNew);
+      await NewProjectModalPO.nameInput.fill(PROJECTS.NEW);
+      await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.NEW));
     }
   }
 };

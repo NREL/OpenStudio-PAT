@@ -1,4 +1,5 @@
 import { test } from '@playwright/test';
+import { describeServerToolsModalWithButtons } from './shared.spec';
 import { App } from '../../App';
 import {
   ServerToolsModalPO,
@@ -6,7 +7,6 @@ import {
   ServerStoppingToastPO,
   ServerStoppedToastPO
 } from '../../page-objects';
-import { describeServerToolsModalWithButtons } from './shared.spec';
 
 export const stopServerTests = () =>
   describeServerToolsModalWithButtons(() => {
