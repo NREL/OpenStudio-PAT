@@ -71,7 +71,7 @@ test.describe('open existing project', async () => {
         await ServerToolsModalPO.clickButton(ServerToolsModalPO.EXPECTED_FOOTER_BUTTONS.OK);
         await ServerToolsModalPO.dialog.waitFor({ state: 'hidden' });
         AnalysisPO.EXPECTED_TITLE = PROJECTS.OFFICE_HVAC;
-        await AnalysisPO.isOkShallow();
+        await AnalysisPO.isOk();
       });
     });
   });

@@ -42,19 +42,19 @@ for (const [projectType, v] of Object.entries(PROJECT_TYPES)) {
         test.beforeEach(async () => {
           if (name === PAGES.ANALYSIS) {
             AnalysisPO.EXPECTED_TITLE = v.projectName;
-            pageIsOk = async () => await AnalysisPO.isOkShallow();
+            pageIsOk = async () => await AnalysisPO.isOk();
             // Go to a different page before clicking the "Analysis" icon
             await NavPO.clickIcon(EXPECTED_DETAILS_BY_PAGE[PAGES.SERVER].iconAlt);
           } else if (name === PAGES.DESIGN_ALTERNATIVES) {
-            pageIsOk = async () => await DesignAlternativesPO.isOkShallow();
+            pageIsOk = async () => await DesignAlternativesPO.isOk();
           } else if (name === PAGES.OUTPUTS) {
-            pageIsOk = async () => await OutputsPO.isOkShallow();
+            pageIsOk = async () => await OutputsPO.isOk();
           } else if (name === PAGES.RUN) {
-            pageIsOk = async () => await RunPO.isOkShallow();
+            pageIsOk = async () => await RunPO.isOk();
           } else if (name === PAGES.REPORTS) {
-            pageIsOk = async () => await ReportsPO.isOkShallow();
+            pageIsOk = async () => await ReportsPO.isOk();
           } else if (name === PAGES.SERVER) {
-            pageIsOk = async () => await ServerPO.isOkShallow();
+            pageIsOk = async () => await ServerPO.isOk();
           }
 
           await NavPO.clickIcon(page.iconAlt);

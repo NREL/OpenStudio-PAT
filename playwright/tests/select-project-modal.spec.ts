@@ -18,7 +18,7 @@ const testNoServerStartToast = () =>
 const testAnalysisPageShown = (expectedTitle: string) =>
   test('"Analysis" page with project name as title is shown', async () => {
     AnalysisPO.EXPECTED_TITLE = expectedTitle;
-    await AnalysisPO.isOkShallow();
+    await AnalysisPO.isOk();
   });
 
 beforeAndAfterEachFileSetup();

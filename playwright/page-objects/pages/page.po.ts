@@ -34,7 +34,7 @@ export class PagePO extends BasePageObject {
     await NavPO.isItemOk(NavPO.activeItem, EXPECTED_DETAILS_BY_PAGE[this.EXPECTED_PAGE]);
   }
 
-  static async isOkShallow() {
+  static async isOk() {
     this.isRouteOk();
     await this.isTitleOk();
     await this.isNavOk();
