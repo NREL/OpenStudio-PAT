@@ -30,6 +30,12 @@ jobs:
       - uses: actions/upload-artifact@v3
         if: always()
         with:
+          name: tmp-test-files
+          path: .tmp-test/
+          retention-days: 5
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
           name: reports
           path: reports/playwright/
-          retention-days: 30
+          retention-days: 5
