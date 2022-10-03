@@ -3,8 +3,6 @@ import { describeServerToolsModalWithButtons } from './shared.spec';
 import { App } from '../../App';
 import { ServerToolsModalPO, ServerAliveToastPO, ServerStartingToastPO } from '../../page-objects';
 
-const hardWait = (ms = 10_000) => new Promise(resolve => setTimeout(resolve, ms));
-
 export const startServerTests = () =>
   describeServerToolsModalWithButtons(() => {
     test.describe('click "Start Local Server" button', () => {
@@ -30,7 +28,6 @@ export const startServerTests = () =>
               ServerToolsModalPO.bodyButtons
             );
             await ServerAliveToastPO.isOk();
-            await hardWait();
           });
         });
       });

@@ -18,7 +18,6 @@ export const stopServerTests = () =>
           ServerToolsModalPO.EXPECTED_BODY_BUTTONS.STOP,
           ServerToolsModalPO.bodyButtons
         );
-        serverStoppedPromise = App.waitForServerState(false);
       });
 
       test('"Server Stopping" toast is shown', async () => {
@@ -26,7 +25,7 @@ export const stopServerTests = () =>
       });
 
       test.describe('server stops', () => {
-        test.beforeAll(async () => await serverStoppedPromise);
+        test.beforeAll(async () => await App.waitForServerState(false));
 
         test('"Server Stopped" toast is shown', async () => {
           await ServerStoppedToastPO.isOk();
