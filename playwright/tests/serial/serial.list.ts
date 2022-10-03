@@ -6,6 +6,8 @@ import { PROJECTS } from '../../constants';
 import { IPC_MAIN_HANDLE_MOCKS } from '../../mocks';
 import { SelectProjectModalPO } from '../../page-objects';
 
+const hardWait = (ms = 10_000) => new Promise(resolve => setTimeout(resolve, ms));
+
 test.describe.configure({ mode: 'serial' });
 test.beforeAll(async () => await App.launchIfClosed());
 test.afterAll(async () => {
@@ -18,6 +20,7 @@ test.describe('open existing project', async () => {
     await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.OFFICE_HVAC));
   });
 
-  // startServerTests();
+  startServerTests();
+  await hardWait();
   stopServerTests();
 });
