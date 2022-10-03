@@ -1,3 +1,4 @@
+import { Locator } from '@playwright/test';
 import { ModalPO } from './modal.po';
 
 export class DeleteResultsModalPO extends ModalPO {
@@ -12,6 +13,10 @@ export class DeleteResultsModalPO extends ModalPO {
     newRunOnSelected:
       'Running a new analysis will delete your local results for the selected datapoints.  Are you sure you want to continue?'
   };
+
+  static get bodyText(): Locator {
+    return this.dialog.locator('.modal-text span[aria-hidden=false] translate');
+  }
 
   static async isOk() {
     await super.isOk();

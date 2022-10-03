@@ -15,7 +15,7 @@ export class ModalPO extends BasePageObject {
     return this.dialog.locator('.modal-title');
   }
   static get bodyText(): Locator {
-    return this.dialog.locator('.modal-text span[aria-hidden=false] translate');
+    return this.dialog.locator('.modal-text translate');
   }
   static get footerButtons(): Locator {
     return this.dialog.locator('.modal-footer button');
