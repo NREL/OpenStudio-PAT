@@ -7,7 +7,7 @@ const config: PlaywrightTestConfig = {
   testIgnore: undefined,
   testMatch: "serial/serial.list.ts",
   fullyParallel: false,
-  timeout: 300_000,
+  timeout: 600_000,
   workers: 1,
   retries: 0,
   reporter: getReporter(true),

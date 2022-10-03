@@ -13,6 +13,7 @@ export const stopServerTests = () =>
     test.describe('click "Stop Local Server" button', () => {
       let serverStoppedPromise: Promise<void>;
       test.beforeAll(async () => {
+        App.page.on('console', msg => console.log(msg.text()));
         await ServerToolsModalPO.clickButton(
           ServerToolsModalPO.EXPECTED_BODY_BUTTONS.STOP,
           ServerToolsModalPO.bodyButtons

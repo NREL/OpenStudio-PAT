@@ -18,6 +18,6 @@ test.describe('open existing project', async () => {
     await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.OFFICE_HVAC));
   });
 
-  startServerTests();
+  // startServerTests();
   stopServerTests();
 });
