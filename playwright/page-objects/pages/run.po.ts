@@ -1,4 +1,5 @@
 import { expect, Locator } from '@playwright/test';
+import { App } from '../../App';
 import { DATAPOINT_STATE, PAGES } from '../../constants';
 import { PagePO } from './page.po';
 
@@ -14,6 +15,10 @@ export class RunPO extends PagePO {
     EXPORT_OSA: 'Export OSA',
     SELECT_ALL: 'Select All',
     CLEAR_SELECTIONS: 'Clear Selections'
+  };
+  static readonly EXPECTED_PROGRESS_BAR_TEXT = {
+    ANALYSIS_STARTED: 'Analysis started',
+    ANALYSIS_COMPLETED: 'Analysis completed'
   };
 
   static get selectedRunType(): Locator {
@@ -33,6 +38,18 @@ export class RunPO extends PagePO {
     return this.container.locator('#analysisName');
   }
 
+  static get progressBar(): Locator {
+    return this.container.locator('.progress-bar');
+  }
+
+  static get runDetailDivs(): Locator {
+    return this.container.locator('> div > div > div.tab-text');
+  }
+
+  static get runStatus(): Locator {
+    return this.runDetailDivs.filter({ has: App.page.locator('label', { hasText: 'Analysis Status' }) });
+  }
+
   static get datapoints(): Locator {
     return this.container.locator('.run-datapoints .panel-group > div[is-open="datapoint.open"]');
   }
@@ -43,6 +60,15 @@ export class RunPO extends PagePO {
 
   static async clickButton(buttonText: string) {
     return this.getButton(buttonText).click();
+  }
+
+  static async getProgressBarPercent() {
+    return Number(await this.progressBar.getAttribute('aria-valuenow'));
+  }
+
+  static async getRunID() {
+    const idElem = this.runDetailDivs.filter({ has: App.page.locator('label', { hasText: 'ID' }) });
+    return (await idElem.innerText()).replace('ID', '').trim();
   }
 
   static getNameFor(datapoint: Locator): Locator {
