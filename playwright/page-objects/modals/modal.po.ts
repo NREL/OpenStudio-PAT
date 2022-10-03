@@ -14,6 +14,9 @@ export class ModalPO extends BasePageObject {
   static get title(): Locator {
     return this.dialog.locator('.modal-title');
   }
+  static get bodyText(): Locator {
+    return this.dialog.locator('.modal-text translate');
+  }
   static get footerButtons(): Locator {
     return this.dialog.locator('.modal-footer button');
   }
@@ -28,6 +31,10 @@ export class ModalPO extends BasePageObject {
 
   static async isTitleOk() {
     await expect(this.title).toHaveText(this.EXPECTED_TITLE);
+  }
+
+  static async isBodyTextOk(EXPECTED_BODY_TEXT: string) {
+    await expect(this.bodyText).toHaveText(EXPECTED_BODY_TEXT);
   }
 
   static async areButtonsOk(EXPECTED_BUTTONS = this.EXPECTED_FOOTER_BUTTONS, buttons = this.footerButtons) {

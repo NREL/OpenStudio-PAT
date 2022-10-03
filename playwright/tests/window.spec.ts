@@ -1,6 +1,6 @@
 import { expect, test } from '@playwright/test';
-import { App } from '../App';
 import { beforeAndAfterEachFileSetup } from './shared.spec';
+import { App } from '../App';
 
 beforeAndAfterEachFileSetup();
 

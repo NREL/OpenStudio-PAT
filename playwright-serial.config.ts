@@ -1,9 +1,6 @@
 import type { PlaywrightTestConfig } from "@playwright/test";
 import defaultConfig from "./playwright.config";
-
-const DEFAULT_REPORTERS: PlaywrightTestConfig["reporter"] = [
-  ["html", { outputFolder: "reports/playwright/serial" }],
-];
+import { getReporter } from "./playwright/config-reporter";
 
 const config: PlaywrightTestConfig = {
   ...defaultConfig,
@@ -13,9 +10,7 @@ const config: PlaywrightTestConfig = {
   timeout: 300_000,
   workers: 1,
   retries: 0,
-  reporter: process.env.CI
-    ? [...DEFAULT_REPORTERS, ["github"]]
-    : DEFAULT_REPORTERS,
+  reporter: getReporter(true),
 };
 
 export default config;

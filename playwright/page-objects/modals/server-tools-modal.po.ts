@@ -15,9 +15,6 @@ export class ServerToolsModalPO extends ModalPO {
 
   static readonly EXPECTED_TEXT_WHEN_PROJECT_NOT_OPENED = 'You must open a project first';
 
-  static get bodyText(): Locator {
-    return this.dialog.locator('.modal-text translate');
-  }
   static get bodyButtons(): Locator {
     return this.dialog.locator('.modal-body button:not(.modal-footer button)');
   }
@@ -31,7 +28,7 @@ export class ServerToolsModalPO extends ModalPO {
   static async isOk(isProjectOpen = true) {
     await super.isOk();
     if (!isProjectOpen) {
-      await expect(this.bodyText).toHaveText(this.EXPECTED_TEXT_WHEN_PROJECT_NOT_OPENED);
+      await this.isBodyTextOk(this.EXPECTED_TEXT_WHEN_PROJECT_NOT_OPENED);
     } else {
       await this.areButtonsOk(this.EXPECTED_BODY_BUTTONS, this.bodyButtons);
     }

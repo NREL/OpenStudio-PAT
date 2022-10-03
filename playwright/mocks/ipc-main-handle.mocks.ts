@@ -1,4 +1,4 @@
-import { PROJECT_INVALID, PROJECT_NEW, PROJECT_OFFICE_HVAC } from './projects.mocks';
+import { PROJECTS, PROJECT_PATHS, PROJECT_PATH_INVALID } from '../constants';
 
 export interface ShowOpenDialogMock {
   canceled: boolean;
@@ -10,24 +10,22 @@ export interface ShowMessageBoxMock {
 
 export class IPC_MAIN_HANDLE_MOCKS {
   static readonly showOpenDialogChannel = 'test-dialog-showOpenDialog';
-  static readonly showOpenDialog: Record<string, ShowOpenDialogMock> = {
-    validNew: {
-      canceled: false,
-      filePaths: [PROJECT_NEW.path]
-    },
-    validOfficeHVAC: {
-      canceled: false,
-      filePaths: [PROJECT_OFFICE_HVAC.path]
-    },
+  static readonly showOpenDialog: Record<'invalid' | 'canceled', ShowOpenDialogMock> = {
     invalid: {
       canceled: false,
-      filePaths: [PROJECT_INVALID.path]
+      filePaths: [PROJECT_PATH_INVALID]
     },
     canceled: {
       canceled: true,
       filePaths: []
     }
   };
+  static getShowOpenDialogFor(project: PROJECTS): ShowOpenDialogMock {
+    return {
+      canceled: false,
+      filePaths: [PROJECT_PATHS[project]]
+    };
+  }
 
   static readonly showMessageBoxChannel = 'test-dialog-showMessageBox';
   static readonly showMessageBox: Record<string, ShowMessageBoxMock> = {

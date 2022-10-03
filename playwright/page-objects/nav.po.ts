@@ -32,7 +32,7 @@ export class NavPO extends BasePageObject {
     return iconImgSrc.slice(iconImgSrc.lastIndexOf('/') + 1);
   }
 
-  static async isItemOk(item: Locator, expectedPageDetails: Omit<PageDetails, 'title'>) {
+  static async isItemOk(item: Locator, expectedPageDetails: PageDetails) {
     expect(await this.getRouteFor(item)).toBe(expectedPageDetails.route);
     expect(await this.getIconAltFor(item)).toBe(expectedPageDetails.iconAlt);
     expect(await this.getIconImgNameFor(item)).toBe(expectedPageDetails.iconImgName);

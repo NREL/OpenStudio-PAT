@@ -1,7 +1,7 @@
 import { test } from '@playwright/test';
+import { describeServerToolsModalWithButtons } from './shared.spec';
 import { App } from '../../App';
 import { ServerToolsModalPO, ServerAliveToastPO, ServerStartingToastPO } from '../../page-objects';
-import { describeServerToolsModalWithButtons } from './shared.spec';
 
 export const startServerTests = () =>
   describeServerToolsModalWithButtons(() => {

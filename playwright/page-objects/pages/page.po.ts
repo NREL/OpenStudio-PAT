@@ -1,45 +1,40 @@
 import { expect, Locator } from '@playwright/test';
 import { App } from '../../App';
-import { PageDetails } from '../../constants';
+import { EXPECTED_DETAILS_BY_PAGE, PAGES } from '../../constants';
 import { BasePageObject } from '../base.po';
 import { NavPO } from '../nav.po';
 
 export class PagePO extends BasePageObject {
-  private EXPECTED_PAGE_DETAILS: PageDetails;
+  static readonly EXPECTED_PAGE: PAGES;
 
-  get route(): string {
+  static get route(): string {
     const PRE_ROUTE_STR = 'index.html#';
     const pageUrl = App.page.url();
     return pageUrl.slice(pageUrl.indexOf(PRE_ROUTE_STR) + PRE_ROUTE_STR.length);
   }
-  get container(): Locator {
+  static get container(): Locator {
     return App.page.locator('main.container-fluid');
   }
 
-  constructor(page: PageDetails) {
-    super();
-    this.EXPECTED_PAGE_DETAILS = page;
-  }
-
-  async getTitle(): Promise<Locator> {
+  static async getTitle(): Promise<Locator> {
     const h4 = this.container.locator('h4').first();
     const translate = h4.locator('translate');
     return (await translate.count()) > 0 ? translate : h4;
   }
 
-  isRouteOk() {
-    expect(this.route).toBe(this.EXPECTED_PAGE_DETAILS.route);
+  static isRouteOk() {
+    expect(this.route).toBe(EXPECTED_DETAILS_BY_PAGE[this.EXPECTED_PAGE].route);
   }
 
-  async isTitleOk() {
-    await expect(await this.getTitle()).toHaveText(this.EXPECTED_PAGE_DETAILS.title);
+  static async isTitleOk() {
+    expect(await this.getTitle()).toHaveText(this.EXPECTED_PAGE);
   }
 
-  async isNavOk() {
-    await NavPO.isItemOk(NavPO.activeItem, this.EXPECTED_PAGE_DETAILS);
+  static async isNavOk() {
+    await NavPO.isItemOk(NavPO.activeItem, EXPECTED_DETAILS_BY_PAGE[this.EXPECTED_PAGE]);
   }
 
-  async isOk() {
+  static async isOk() {
     this.isRouteOk();
     await this.isTitleOk();
     await this.isNavOk();
