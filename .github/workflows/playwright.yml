@@ -8,12 +8,12 @@ on:
 jobs:
   test:
     timeout-minutes: 60
-    runs-on: ubuntu-latest
+    runs-on: ubuntu-18.04
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
         with:
-          node-version: 18
+          node-version: 16
       - name: Install build dependencies
         run: npm i
       - name: Build application
@@ -31,4 +31,4 @@ jobs:
         with:
           name: reports
           path: reports/playwright/
-          retention-days: 30
+          retention-days: 5
