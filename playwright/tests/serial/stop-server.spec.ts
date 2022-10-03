@@ -23,7 +23,10 @@ export const stopServerTests = () =>
       });
 
       test.describe('server stops', () => {
-        test.beforeAll(async () => await App.waitForServerState(false));
+        test.beforeAll(async () => {
+          App.page.on('console', msg => console.log(msg.text()));
+          await App.waitForServerState(false);
+        });
 
         test('"Server Stopped" toast is shown', async () => {
           await ServerStoppedToastPO.isOk();
