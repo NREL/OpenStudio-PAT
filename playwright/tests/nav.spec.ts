@@ -1,9 +1,9 @@
 import { test } from '@playwright/test';
-import { beforeAndAfterEachFileSetup, describeProjects, testNavItemsCorrect } from './shared.spec';
+import { appHooksSetup, describeProjects, testNavItemsCorrect } from './shared.spec';
 import { EXPECTED_DETAILS_BY_PAGE, PAGES, PROJECTS } from '../constants';
 import { AnalysisPO, DesignAlternativesPO, NavPO, OutputsPO, ReportsPO, RunPO, ServerPO } from '../page-objects';
 
-beforeAndAfterEachFileSetup();
+appHooksSetup();
 
 describeProjects((CURRENT_PROJECT: PROJECTS) => {
   for (const [name, page] of Object.entries(EXPECTED_DETAILS_BY_PAGE)) {

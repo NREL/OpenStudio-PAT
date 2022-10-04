@@ -1,9 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { beforeAndAfterEachFileSetup, describeProjects } from './shared.spec';
+import { appHooksSetup, describeProjects } from './shared.spec';
 import { EXPECTED_DATAPOINTS_STATE, EXPECTED_DETAILS_BY_PAGE, PAGES } from '../constants';
 import { RunPO, NavPO } from '../page-objects';
 
-beforeAndAfterEachFileSetup();
+appHooksSetup();
 
 describeProjects(CURRENT_PROJECT => {
   test.describe('"Run" page', () => {

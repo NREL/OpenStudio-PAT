@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { beforeAndAfterEachFileSetup, testNavItemsCorrect } from './shared.spec';
+import { appHooksSetup, testNavItemsCorrect } from './shared.spec';
 import { App } from '../App';
 import { PROJECTS } from '../constants';
 import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
@@ -21,7 +21,7 @@ const testAnalysisPageShown = (expectedTitle: string) =>
     await AnalysisPO.isOk();
   });
 
-beforeAndAfterEachFileSetup();
+appHooksSetup();
 
 test('correct title and buttons are shown', async () => {
   await SelectProjectModalPO.isOk();

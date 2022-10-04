@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { beforeAndAfterEachFileSetup, describeProjects } from './shared.spec';
+import { appHooksSetup, describeProjects } from './shared.spec';
 import { App } from '../App';
 import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
 import {
@@ -10,7 +10,7 @@ import {
   AnalysisPO
 } from '../page-objects';
 
-beforeAndAfterEachFileSetup();
+appHooksSetup();
 
 test.describe('no project open', async () => {
   test.describe('"Server Tools" modal with "must open project first" message', () => {
