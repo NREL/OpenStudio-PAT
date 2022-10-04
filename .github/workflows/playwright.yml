@@ -18,7 +18,14 @@ jobs:
         run: npm i
       - name: Build application
         run: npm run build -- --env=test
+      - name: Cache runtime dependencies
+        id: cache-runtime-deps
+        uses: actions/cache@v3
+        with:
+          path: depend/
+          key: ${{ runner.os }}-${{ hashFiles('manifest.json') }}
       - name: Install runtime dependencies
+        if: ${{ steps.cache-runtime-deps.outputs.cache-hit != 'true' }}
         run: npx gulp installDeps
       - name: Prepare tmp test files
         run: npx gulp tmpTestFiles
