@@ -6,7 +6,7 @@ const EXTENDED_EXPECT_TIMEOUT = {
   timeout: 5 * 60_000 // 5 minutes
 };
 
-export const runAnalysisTests = (CURRENT_PROJECT: PROJECTS) =>
+export const runPageTests = (CURRENT_PROJECT: PROJECTS) =>
   test.describe('"Run" page', () => {
     test.beforeAll(async () => await NavPO.clickIcon(EXPECTED_DETAILS_BY_PAGE[PAGES.RUN].iconAlt));
 

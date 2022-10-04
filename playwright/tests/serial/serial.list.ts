@@ -1,6 +1,7 @@
 import { test } from '@playwright/test';
-import { runAnalysisTests } from './run-analysis.spec';
+import { runPageTests } from './run-page.spec';
 import { saveProjectTests } from './save-project.spec';
+import { serverPageTests } from './server-page.spec';
 import { startServerTests } from './start-server.spec';
 import { stopServerTests } from './stop-server.spec';
 import { appHooksSetup, describeProjects, Hook, PROJECT_SETUP_DETAILS } from '../shared.spec';
@@ -12,7 +13,8 @@ appHooksSetup(Hook.all);
 describeProjects(
   CURRENT_PROJECT => {
     startServerTests();
-    runAnalysisTests(CURRENT_PROJECT);
+    serverPageTests();
+    runPageTests(CURRENT_PROJECT);
     if (!process.env.CI) {
       stopServerTests();
     }
