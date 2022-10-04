@@ -16,13 +16,11 @@ jobs:
           node-version: 17
           cache: npm
           cache-dependency-path: "**/package-lock.json"
-      - name: Install build dependencies (./package-lock.json)
+      - name: Install build dependencies (package-lock.json)
         run: npm ci
-      - name: Install build dependencies (./app/package-lock.json)
+      - name: Install build dependencies (app/package-lock.json)
         working-directory: app
         run: npm ci
-      - name: Build application
-        run: npm run build -- --env=test
       - name: Cache runtime dependencies
         id: cache-runtime-deps
         uses: actions/cache@v3
@@ -32,12 +30,16 @@ jobs:
       - name: Install runtime dependencies
         if: ${{ steps.cache-runtime-deps.outputs.cache-hit != 'true' }}
         run: npx gulp installDeps
+      - name: Build application
+        run: npm run build -- --env=test
       - name: Prepare tmp test files
         run: npx gulp tmpTestFiles
-      - name: Run Playwright tests
+      - name: Run playwright tests
         uses: GabrielBB/xvfb-action@v1
         with:
-          run: npx playwright test -c playwright-serial.config.ts
+          run: |
+            npx playwright test
+            npx playwright test -c playwright-serial.config.ts
       - uses: actions/upload-artifact@v3
         if: always()
         with:

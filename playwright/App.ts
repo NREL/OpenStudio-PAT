@@ -78,30 +78,26 @@ export class App {
   }
 
   static async waitForServerState(shouldBeRunning = true, statusUrl = 'http://localhost:8080/status.json') {
-    try {
-      await App.page.evaluate(
-        async ({ shouldBeRunning, statusUrl }) => {
-          const hardWait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
-          const pollDuration = 1_000;
+    await App.page.evaluate(
+      async ({ shouldBeRunning, statusUrl }) => {
+        const hardWait = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
+        const pollDuration = 1_000;
 
-          while (true) {
-            try {
-              const statusResponse = await fetch(statusUrl);
-              if (statusResponse.ok === shouldBeRunning) {
-                return;
-              }
-            } catch {
-              if (!shouldBeRunning) {
-                return;
-              }
+        while (true) {
+          try {
+            const statusResponse = await fetch(statusUrl);
+            if (statusResponse.ok === shouldBeRunning) {
+              return;
             }
-            await hardWait(pollDuration);
+          } catch {
+            if (!shouldBeRunning) {
+              return;
+            }
           }
-        },
-        { shouldBeRunning, statusUrl }
-      );
-    } catch (e) {
-      console.warn('Exception thrown in waitForServerState:', e);
-    }
+          await hardWait(pollDuration);
+        }
+      },
+      { shouldBeRunning, statusUrl }
+    );
   }
 }
