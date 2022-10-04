@@ -1,6 +1,10 @@
 import { expect, test } from '@playwright/test';
 import { EXPECTED_DATAPOINTS_STATE, EXPECTED_DETAILS_BY_PAGE, PAGES, PROJECTS } from '../../constants';
-import { NavPO, RunPO, DeleteResultsModalPO, SaveMenuItemPO } from '../../page-objects';
+import { NavPO, RunPO, DeleteResultsModalPO } from '../../page-objects';
+
+const EXTENDED_EXPECT_TIMEOUT = {
+  timeout: 5 * 60_000 // 5 minutes
+};
 
 export const runAnalysisTests = (CURRENT_PROJECT: PROJECTS) =>
   test.describe('"Run" page', () => {
@@ -29,7 +33,10 @@ export const runAnalysisTests = (CURRENT_PROJECT: PROJECTS) =>
           );
 
           test('run is queued', async () => {
-            await expect(RunPO.progressBar).toHaveText(RunPO.EXPECTED_PROGRESS_BAR_TEXT.ANALYSIS_STARTED);
+            await expect(RunPO.progressBar).toHaveText(
+              RunPO.EXPECTED_PROGRESS_BAR_TEXT.ANALYSIS_STARTED,
+              EXTENDED_EXPECT_TIMEOUT
+            );
             const percent = await RunPO.getProgressBarPercent();
             expect(percent).toBeGreaterThan(0);
             expect(percent).toBeLessThan(100);
@@ -37,14 +44,15 @@ export const runAnalysisTests = (CURRENT_PROJECT: PROJECTS) =>
           });
 
           test('run starts', async () => {
-            expect(RunPO.runStatus).toContainText('started', { timeout: 90_000 });
+            expect(RunPO.runStatus).toContainText('started', EXTENDED_EXPECT_TIMEOUT);
             expect((await RunPO.getRunID()).length).toBeGreaterThan(0);
           });
 
           test('run completes', async () => {
-            await expect(RunPO.progressBar).toHaveText(RunPO.EXPECTED_PROGRESS_BAR_TEXT.ANALYSIS_COMPLETED, {
-              timeout: 180_000
-            });
+            await expect(RunPO.progressBar).toHaveText(
+              RunPO.EXPECTED_PROGRESS_BAR_TEXT.ANALYSIS_COMPLETED,
+              EXTENDED_EXPECT_TIMEOUT
+            );
             expect(await RunPO.getProgressBarPercent()).toBe(100);
             await expect(RunPO.runStatus).toContainText('completed');
           });
