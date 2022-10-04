@@ -22,6 +22,8 @@ test.describe(setupDetails.description, async () => {
 
   startServerTests();
   runAnalysisTests(CURRENT_PROJECT);
-  // stopServerTests();
+  if (!process.env.CI) {
+    stopServerTests();
+  }
   saveProjectTests();
 });
