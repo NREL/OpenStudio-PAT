@@ -29,7 +29,9 @@ export const runAnalysisTests = (CURRENT_PROJECT: PROJECTS) =>
           );
 
           test('run is queued', async () => {
-            await expect(RunPO.progressBar).toHaveText(RunPO.EXPECTED_PROGRESS_BAR_TEXT.ANALYSIS_STARTED);
+            await expect(RunPO.progressBar).toHaveText(RunPO.EXPECTED_PROGRESS_BAR_TEXT.ANALYSIS_STARTED, {
+              timeout: 30_000
+            });
             const percent = await RunPO.getProgressBarPercent();
             expect(percent).toBeGreaterThan(0);
             expect(percent).toBeLessThan(100);
