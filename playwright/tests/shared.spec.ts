@@ -33,6 +33,12 @@ export const PROJECT_SETUP_DETAILS: ProjectSetupDetails = {
       await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.OFFICE_HVAC));
     }
   },
+  [PROJECTS.OFFICE_STUDY]: {
+    description: 'open Office_Study project',
+    beforeHook: async () => {
+      await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.OFFICE_STUDY));
+    }
+  },
   [PROJECTS.NEW]: {
     description: 'make new project',
     beforeHook: async () => {
