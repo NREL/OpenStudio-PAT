@@ -1,5 +1,5 @@
 import { test } from '@playwright/test';
-import { appHooksSetup, describeProjects } from './shared.spec';
+import { appHooksSetup, describeProjects, testServerPage } from './shared.spec';
 import { EXPECTED_DETAILS_BY_PAGE, Page } from '../constants';
 import { NavPO, ServerPO } from '../page-objects';
 
@@ -11,7 +11,8 @@ describeProjects(() => {
 
     test('is shown', async () => {
       await ServerPO.isOk();
-      await ServerPO.isInState(false, 'local');
     });
+
+    testServerPage(false);
   });
 });

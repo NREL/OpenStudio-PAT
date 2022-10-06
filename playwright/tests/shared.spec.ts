@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import { App } from '../App';
 import { Projects } from '../constants';
 import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
-import { NavPO, NewProjectModalPO, SelectProjectModalPO } from '../page-objects';
+import { NavPO, NewProjectModalPO, SelectProjectModalPO, ServerPO } from '../page-objects';
 
 export enum Hook {
   each = 'each',
@@ -65,4 +65,25 @@ export const describeProjects = (
 export const testNavItemsCorrect = () =>
   test('nav items are correct', async () => {
     await NavPO.areItemsOk();
+  });
+
+export const testServerPage = (isServerRunning: boolean) =>
+  test.describe(`server is ${isServerRunning ? '' : 'NOT '}running`, () => {
+    test(`status is "${isServerRunning ? ServerPO.STATUS_STARTED : ServerPO.STATUS_STOPPED}"`, async () => {
+      await ServerPO.isStatusOk(isServerRunning);
+    });
+
+    test(`type is "${ServerPO.TYPE_LOCAL}"`, async () => {
+      await ServerPO.isTypeOk(ServerPO.TYPE_LOCAL);
+    });
+
+    test(`url is "${isServerRunning ? ServerPO.LOCALHOST_URL : ''}"`, async () => {
+      await ServerPO.isTypeOk(ServerPO.TYPE_LOCAL);
+    });
+
+    test.describe('webview', async () => {
+      test(`is ${isServerRunning ? '' : 'NOT '}shown`, async () => {
+        await ServerPO.isWebviewOk(isServerRunning, ServerPO.LOCALHOST_URL);
+      });
+    });
   });

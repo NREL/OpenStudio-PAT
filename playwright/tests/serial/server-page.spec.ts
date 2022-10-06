@@ -1,4 +1,5 @@
 import { test } from '@playwright/test';
+import { testServerPage } from '../shared.spec';
 import { EXPECTED_DETAILS_BY_PAGE, Page } from '../../constants';
 import { NavPO, ServerPO } from '../../page-objects';
 
@@ -8,6 +9,7 @@ export const serverPageTests = () =>
 
     test('is shown', async () => {
       await ServerPO.isOk();
-      await ServerPO.isInState(true, 'local');
     });
+
+    testServerPage(true);
   });

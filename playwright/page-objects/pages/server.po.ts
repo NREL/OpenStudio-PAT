@@ -12,7 +12,7 @@ export class ServerPO extends PagePO {
   static readonly STATUS_STARTED = 'started';
   static readonly STATUS_STOPPED = 'stopped';
   static readonly TYPE_LOCAL = 'local';
-  static readonly URL = 'http://localhost:8080';
+  static readonly LOCALHOST_URL = 'http://localhost:8080';
 
   static get infoDivs(): Locator {
     return this.container.locator('div:nth-child(2) > div');
@@ -38,19 +38,12 @@ export class ServerPO extends PagePO {
     expect(await this.getInfo(InfoLabels.URL)).toBe(expectedUrl);
   }
 
-  static async isWebviewOk(isServerRunning: boolean, expectedSrc: string) {
+  static async isWebviewOk(isServerRunning: boolean, expectedUrl: string) {
     if (isServerRunning) {
       await expect(this.webview).toBeVisible();
-      await expect(this.webview).toHaveAttribute('src', expectedSrc);
+      await expect(this.webview).toHaveAttribute('src', `${expectedUrl}/`);
     } else {
       await expect(this.webview).toBeHidden();
     }
-  }
-
-  static async isInState(isServerRunning: boolean, type: string) {
-    await this.isStatusOk(isServerRunning);
-    await this.isTypeOk(type);
-    await this.isURLOk(isServerRunning ? this.URL : '');
-    await this.isWebviewOk(isServerRunning, `${this.URL}/`);
   }
 }
