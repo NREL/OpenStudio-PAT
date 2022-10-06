@@ -5,7 +5,7 @@ import { serverPageTests } from './server-page.spec';
 import { startServerTests } from './start-server.spec';
 import { stopServerTests } from './stop-server.spec';
 import { appHooksSetup, describeProjects, Hook, PROJECT_SETUP_DETAILS } from '../shared.spec';
-import { PROJECTS } from '../../constants';
+import { Projects } from '../../constants';
 
 test.describe.configure({ mode: 'serial' });
 appHooksSetup(Hook.all);
@@ -20,6 +20,6 @@ describeProjects(
     }
     saveProjectTests();
   },
-  { [PROJECTS.OFFICE_HVAC]: PROJECT_SETUP_DETAILS[PROJECTS.OFFICE_HVAC] },
+  { [Projects.OFFICE_HVAC]: PROJECT_SETUP_DETAILS[Projects.OFFICE_HVAC] },
   Hook.all
 );

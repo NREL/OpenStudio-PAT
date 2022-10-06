@@ -1,6 +1,6 @@
-import { PAGES } from '../../constants';
+import { Page } from '../../constants';
 import { PagePO } from './page.po';
 
 export class ReportsPO extends PagePO {
-  static readonly EXPECTED_PAGE = PAGES.REPORTS;
+  static readonly EXPECTED_PAGE = Page.REPORTS;
 }

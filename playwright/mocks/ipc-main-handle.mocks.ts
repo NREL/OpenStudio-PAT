@@ -1,4 +1,4 @@
-import { PROJECTS, PROJECT_PATHS, PROJECT_PATH_INVALID } from '../constants';
+import { Projects, PROJECT_PATHS, PROJECT_PATH_INVALID } from '../constants';
 
 export interface ShowOpenDialogMock {
   canceled: boolean;
@@ -20,7 +20,7 @@ export class IPC_MAIN_HANDLE_MOCKS {
       filePaths: []
     }
   };
-  static getShowOpenDialogFor(project: PROJECTS): ShowOpenDialogMock {
+  static getShowOpenDialogFor(project: Projects): ShowOpenDialogMock {
     return {
       canceled: false,
       filePaths: [PROJECT_PATHS[project]]

@@ -1,6 +1,6 @@
 import { expect, Locator } from '@playwright/test';
 import { App } from '../../App';
-import { AnalysisType, DATAPOINT_STATE, PAGES } from '../../constants';
+import { AnalysisType, DatapointState, Page } from '../../constants';
 import { PagePO } from './page.po';
 
 export enum RunTypes {
@@ -9,7 +9,7 @@ export enum RunTypes {
 }
 
 export class RunPO extends PagePO {
-  static readonly EXPECTED_PAGE = PAGES.RUN;
+  static readonly EXPECTED_PAGE = Page.RUN;
   static readonly EXPECTED_RUN_TYPES = {
     [RunTypes.LOCAL]: 'Run Locally',
     [RunTypes.CLOUD]: 'Run on Cloud'
@@ -108,7 +108,7 @@ export class RunPO extends PagePO {
     await expect(this.analysisName).toHaveValue(expectedAnalysisName);
   }
 
-  static async isDatapointOk(datapoint: Locator, expectedDatapoint: DATAPOINT_STATE) {
+  static async isDatapointOk(datapoint: Locator, expectedDatapoint: DatapointState) {
     await expect(this.getNameFor(datapoint)).toHaveText(expectedDatapoint.name);
 
     const checkbox = this.getCheckboxButtonFor(datapoint);
@@ -119,7 +119,7 @@ export class RunPO extends PagePO {
         );
   }
 
-  static async areDatapointsOk(expectedDatapoints: DATAPOINT_STATE[]) {
+  static async areDatapointsOk(expectedDatapoints: DatapointState[]) {
     expect(await this.datapoints.count()).toEqual(expectedDatapoints.length);
     for (const expectedDatapoint of expectedDatapoints) {
       await this.isDatapointOk(this.getDatapointWithName(expectedDatapoint.name), expectedDatapoint);
@@ -142,7 +142,7 @@ export class RunPO extends PagePO {
     selectedRunType: RunTypes,
     isServerRunning: boolean,
     analysisName: string,
-    expectedDatapoints: DATAPOINT_STATE[],
+    expectedDatapoints: DatapointState[],
     expectedAnalysisType: AnalysisType
   ) {
     await this.isSelectedRunTypeOk(selectedRunType);

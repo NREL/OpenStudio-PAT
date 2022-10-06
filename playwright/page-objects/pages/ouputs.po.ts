@@ -1,9 +1,9 @@
 import { expect, Locator } from '@playwright/test';
-import { AnalysisType, PAGES } from '../../constants';
+import { AnalysisType, Page } from '../../constants';
 import { PagePO } from './page.po';
 
 export class OutputsPO extends PagePO {
-  static readonly EXPECTED_PAGE = PAGES.OUTPUTS;
+  static readonly EXPECTED_PAGE = Page.OUTPUTS;
   static readonly EXPECTED_NO_OUTPUTS_MSG = 'There are no outputs to set in Manual mode.';
   static readonly EXPECTED_ADD_MEASURE_TEXT = 'Add Measure';
 

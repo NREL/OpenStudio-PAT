@@ -1,11 +1,11 @@
 import { expect, Locator } from '@playwright/test';
 import { App } from '../../App';
-import { EXPECTED_DETAILS_BY_PAGE, PAGES } from '../../constants';
+import { EXPECTED_DETAILS_BY_PAGE, Page } from '../../constants';
 import { BasePageObject } from '../base.po';
 import { NavPO } from '../nav.po';
 
 export class PagePO extends BasePageObject {
-  static readonly EXPECTED_PAGE: PAGES;
+  static readonly EXPECTED_PAGE: Page;
 
   static get route(): string {
     const PRE_ROUTE_STR = 'index.html#';

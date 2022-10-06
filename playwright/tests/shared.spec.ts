@@ -1,6 +1,6 @@
 import { test } from '@playwright/test';
 import { App } from '../App';
-import { PROJECTS } from '../constants';
+import { Projects } from '../constants';
 import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
 import { NavPO, NewProjectModalPO, SelectProjectModalPO } from '../page-objects';
 
@@ -24,40 +24,40 @@ export const appHooksSetup = (hook = Hook.each) => {
   }
 };
 
-export type ProjectSetupDetails = Record<PROJECTS, { description: string; beforeHook: () => Promise<void> }>;
+export type ProjectSetupDetails = Record<Projects, { description: string; beforeHook: () => Promise<void> }>;
 
 export const PROJECT_SETUP_DETAILS: ProjectSetupDetails = {
-  [PROJECTS.OFFICE_HVAC]: {
+  [Projects.OFFICE_HVAC]: {
     description: 'open Office_HVAC project',
     beforeHook: async () => {
-      await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.OFFICE_HVAC));
+      await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.OFFICE_HVAC));
     }
   },
-  [PROJECTS.OFFICE_STUDY]: {
+  [Projects.OFFICE_STUDY]: {
     description: 'open Office_Study project',
     beforeHook: async () => {
-      await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.OFFICE_STUDY));
+      await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.OFFICE_STUDY));
     }
   },
-  [PROJECTS.NEW]: {
+  [Projects.NEW]: {
     description: 'make new project',
     beforeHook: async () => {
       await SelectProjectModalPO.clickButton(SelectProjectModalPO.EXPECTED_FOOTER_BUTTONS.MAKE_NEW_PROJECT);
-      await NewProjectModalPO.nameInput.fill(PROJECTS.NEW);
-      await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.NEW));
+      await NewProjectModalPO.nameInput.fill(Projects.NEW);
+      await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.NEW));
     }
   }
 };
 
 export const describeProjects = (
-  tests: (CURRENT_PROJECT: PROJECTS) => void,
+  tests: (CURRENT_PROJECT: Projects) => void,
   projectSetupDetails: Partial<ProjectSetupDetails> = PROJECT_SETUP_DETAILS,
   hook = Hook.each
 ) => {
   for (const [CURRENT_PROJECT, setupDetails] of Object.entries(projectSetupDetails)) {
     test.describe(setupDetails.description, () => {
       hook === Hook.each ? test.beforeEach(setupDetails.beforeHook) : test.beforeAll(setupDetails.beforeHook);
-      tests(CURRENT_PROJECT as PROJECTS);
+      tests(CURRENT_PROJECT as Projects);
     });
   }
 };

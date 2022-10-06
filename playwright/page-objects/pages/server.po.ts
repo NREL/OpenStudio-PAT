@@ -1,5 +1,5 @@
 import { expect, Locator } from '@playwright/test';
-import { PAGES } from '../../constants';
+import { Page } from '../../constants';
 import { PagePO } from './page.po';
 
 enum InfoLabels {
@@ -8,7 +8,7 @@ enum InfoLabels {
   URL = 'URL:'
 }
 export class ServerPO extends PagePO {
-  static readonly EXPECTED_PAGE = PAGES.SERVER;
+  static readonly EXPECTED_PAGE = Page.SERVER;
   static readonly STATUS_STARTED = 'started';
   static readonly STATUS_STOPPED = 'stopped';
   static readonly TYPE_LOCAL = 'local';

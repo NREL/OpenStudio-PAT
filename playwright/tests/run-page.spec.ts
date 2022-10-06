@@ -5,7 +5,7 @@ import {
   EXPECTED_ANALYSIS_TYPE_BY_PROJECT,
   EXPECTED_DATAPOINTS_BY_PROJECT,
   EXPECTED_DETAILS_BY_PAGE,
-  PAGES
+  Page
 } from '../constants';
 import { NavPO, RunPO, RunTypes } from '../page-objects';
 
@@ -13,7 +13,7 @@ appHooksSetup();
 
 describeProjects(CURRENT_PROJECT => {
   test.describe('"Run" page', () => {
-    test.beforeEach(async () => await NavPO.clickIcon(EXPECTED_DETAILS_BY_PAGE[PAGES.RUN].iconAlt));
+    test.beforeEach(async () => await NavPO.clickIcon(EXPECTED_DETAILS_BY_PAGE[Page.RUN].iconAlt));
 
     test('is shown', async () => {
       await RunPO.isOk();

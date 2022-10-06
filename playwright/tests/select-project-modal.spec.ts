@@ -1,7 +1,7 @@
 import { expect, test } from '@playwright/test';
 import { appHooksSetup, testNavItemsCorrect } from './shared.spec';
 import { App } from '../App';
-import { PROJECTS } from '../constants';
+import { Projects } from '../constants';
 import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
 import {
   AnalysisPO,
@@ -38,10 +38,10 @@ test.describe('click "Make New Project" button', () => {
     });
 
     test.describe('click "Continue" button', () => {
-      test.beforeEach(async () => await NewProjectModalPO.nameInput.fill(PROJECTS.NEW));
+      test.beforeEach(async () => await NewProjectModalPO.nameInput.fill(Projects.NEW));
 
       test('file dialog is shown correctly', async () => {
-        const argsPromises = await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.NEW));
+        const argsPromises = await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.NEW));
         expect((await argsPromises.showOpenDialog)[0]).toEqual({
           title: 'Choose New ParametricAnalysisTool Project Folder',
           properties: ['openDirectory']
@@ -50,7 +50,7 @@ test.describe('click "Make New Project" button', () => {
 
       test.describe('select valid directory', () => {
         test.beforeEach(
-          async () => await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.NEW))
+          async () => await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.NEW))
         );
 
         test('both modals close', async () => {
@@ -58,7 +58,7 @@ test.describe('click "Make New Project" button', () => {
           await SelectProjectModalPO.dialog.waitFor({ state: 'hidden' });
         });
         testNoServerStartToast();
-        testAnalysisPageShown(PROJECTS.NEW);
+        testAnalysisPageShown(Projects.NEW);
         testNavItemsCorrect();
       });
 
@@ -86,7 +86,7 @@ test.describe('click "Make New Project" button', () => {
 test.describe('click "Open Existing Project" button', () => {
   test('file dialog is shown correctly', async () => {
     const argsPromises = await SelectProjectModalPO.open(
-      IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.OFFICE_HVAC)
+      IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.OFFICE_HVAC)
     );
     expect((await argsPromises.showOpenDialog)[0]).toEqual({
       title: 'Open ParametricAnalysisTool Project',
@@ -96,14 +96,14 @@ test.describe('click "Open Existing Project" button', () => {
 
   test.describe('select valid directory', () => {
     test.beforeEach(
-      async () => await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(PROJECTS.OFFICE_HVAC))
+      async () => await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.OFFICE_HVAC))
     );
 
     test('modal closes', async () => {
       await SelectProjectModalPO.dialog.waitFor({ state: 'hidden' });
     });
     testNoServerStartToast();
-    testAnalysisPageShown(PROJECTS.OFFICE_HVAC);
+    testAnalysisPageShown(Projects.OFFICE_HVAC);
     testNavItemsCorrect();
   });
   test.describe('select invalid directory', () => {

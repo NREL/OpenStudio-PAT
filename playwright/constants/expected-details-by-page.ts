@@ -4,7 +4,7 @@ export interface PageDetails {
   iconImgName: string;
 }
 
-export enum PAGES {
+export enum Page {
   ANALYSIS = 'Analysis',
   DESIGN_ALTERNATIVES = 'Design Alternatives',
   OUTPUTS = 'Outputs',
@@ -13,33 +13,33 @@ export enum PAGES {
   SERVER = 'Server'
 }
 
-export const EXPECTED_DETAILS_BY_PAGE: Record<PAGES, PageDetails> = {
-  [PAGES.ANALYSIS]: {
+export const EXPECTED_DETAILS_BY_PAGE: Record<Page, PageDetails> = {
+  [Page.ANALYSIS]: {
     route: '/analysis',
     iconAlt: 'Analysis',
     iconImgName: 'measure_icon.png'
   },
-  [PAGES.DESIGN_ALTERNATIVES]: {
+  [Page.DESIGN_ALTERNATIVES]: {
     route: '/design_alternatives',
     iconAlt: 'Design Alternatives',
     iconImgName: 'design_alts_icon.png'
   },
-  [PAGES.OUTPUTS]: {
+  [Page.OUTPUTS]: {
     route: '/outputs',
     iconAlt: 'Outputs',
     iconImgName: 'outputs_icon.png'
   },
-  [PAGES.RUN]: {
+  [Page.RUN]: {
     route: '/run',
     iconAlt: 'Run',
     iconImgName: 'run_icon.png'
   },
-  [PAGES.REPORTS]: {
+  [Page.REPORTS]: {
     route: '/reports',
     iconAlt: 'Reports',
     iconImgName: 'reports_icon.png'
   },
-  [PAGES.SERVER]: {
+  [Page.SERVER]: {
     route: '/server',
     iconAlt: 'Server',
     iconImgName: 'server_icon.png'
