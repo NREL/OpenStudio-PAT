@@ -1,12 +1,7 @@
 import { expect, test } from '@playwright/test';
-import {
-  EXPECTED_ANALYSIS_TYPE_BY_PROJECT,
-  EXPECTED_DATAPOINTS_BY_PROJECT,
-  EXPECTED_DETAILS_BY_PAGE,
-  Page,
-  Projects
-} from '../../constants';
-import { DeleteResultsModalPO, NavPO, RunPO, RunTypes } from '../../page-objects';
+import { EXPECTED_DETAILS_BY_PAGE, Page, Projects } from '../../constants';
+import { DeleteResultsModalPO, NavPO, RunPO } from '../../page-objects';
+import { testRunPage } from '../shared.spec';
 
 const EXTENDED_EXPECT_TIMEOUT = {
   timeout: 5 * 60_000 // 5 minutes
@@ -16,16 +11,7 @@ export const runPageTests = (CURRENT_PROJECT: Projects) =>
   test.describe('"Run" page', () => {
     test.beforeAll(async () => await NavPO.clickIcon(EXPECTED_DETAILS_BY_PAGE[Page.RUN].iconAlt));
 
-    test('is shown', async () => {
-      await RunPO.isOk();
-      await RunPO.isInState(
-        RunTypes.LOCAL,
-        true,
-        CURRENT_PROJECT,
-        EXPECTED_DATAPOINTS_BY_PROJECT[CURRENT_PROJECT],
-        EXPECTED_ANALYSIS_TYPE_BY_PROJECT[CURRENT_PROJECT]
-      );
-    });
+    testRunPage(true, CURRENT_PROJECT);
 
     test('progress bar is 0%', async () => {
       expect(await RunPO.getProgressBarPercent()).toBe(0);

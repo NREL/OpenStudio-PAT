@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { appHooksSetup, describeProjects } from './shared.spec';
+import { appHooksSetup, describeProjects, testRunPage } from './shared.spec';
 import {
   AnalysisType,
   EXPECTED_ANALYSIS_TYPE_BY_PROJECT,
@@ -7,7 +7,7 @@ import {
   EXPECTED_DETAILS_BY_PAGE,
   Page
 } from '../constants';
-import { NavPO, RunPO, RunTypes } from '../page-objects';
+import { NavPO, RunPO } from '../page-objects';
 
 appHooksSetup();
 
@@ -15,16 +15,7 @@ describeProjects(CURRENT_PROJECT => {
   test.describe('"Run" page', () => {
     test.beforeEach(async () => await NavPO.clickIcon(EXPECTED_DETAILS_BY_PAGE[Page.RUN].iconAlt));
 
-    test('is shown', async () => {
-      await RunPO.isOk();
-      await RunPO.isInState(
-        RunTypes.LOCAL,
-        false,
-        CURRENT_PROJECT,
-        EXPECTED_DATAPOINTS_BY_PROJECT[CURRENT_PROJECT],
-        EXPECTED_ANALYSIS_TYPE_BY_PROJECT[CURRENT_PROJECT]
-      );
-    });
+    testRunPage(false, CURRENT_PROJECT);
 
     test.describe('"Select All" button', () => {
       if (

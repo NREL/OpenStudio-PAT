@@ -137,18 +137,4 @@ export class RunPO extends PagePO {
       await expect(this.algNoLocalMsg).toBeHidden();
     }
   }
-
-  static async isInState(
-    selectedRunType: RunTypes,
-    isServerRunning: boolean,
-    analysisName: string,
-    expectedDatapoints: DatapointState[],
-    expectedAnalysisType: AnalysisType
-  ) {
-    await this.isSelectedRunTypeOk(selectedRunType);
-    await this.isServerStatusOk(isServerRunning);
-    await this.isAnalysisNameOk(analysisName);
-    await this.areDatapointsOk(expectedDatapoints);
-    await this.isAlgNoLocalMsgOk(selectedRunType, expectedAnalysisType);
-  }
 }

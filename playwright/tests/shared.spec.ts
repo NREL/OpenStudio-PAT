@@ -1,8 +1,13 @@
 import { test } from '@playwright/test';
 import { App } from '../App';
-import { Projects } from '../constants';
+import {
+  AnalysisType,
+  EXPECTED_ANALYSIS_TYPE_BY_PROJECT,
+  EXPECTED_DATAPOINTS_BY_PROJECT,
+  Projects
+} from '../constants';
 import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
-import { NavPO, NewProjectModalPO, SelectProjectModalPO, ServerPO } from '../page-objects';
+import { NavPO, NewProjectModalPO, RunPO, RunTypes, SelectProjectModalPO, ServerPO } from '../page-objects';
 
 export enum Hook {
   each = 'each',
@@ -67,7 +72,39 @@ export const testNavItemsCorrect = () =>
     await NavPO.areItemsOk();
   });
 
-export const testServerPage = (isServerRunning: boolean) =>
+export const testRunPage = (isServerRunning: boolean, CURRENT_PROJECT: Projects) => {
+  test('is shown', async () => {
+    await RunPO.isOk();
+  });
+
+  test(`selected run type is "${RunPO.EXPECTED_RUN_TYPES[RunTypes.LOCAL]}"`, async () => {
+    await RunPO.isSelectedRunTypeOk(RunTypes.LOCAL);
+  });
+
+  test(`server status icon is a ${isServerRunning ? 'green checkmark' : 'red x'}`, async () => {
+    await RunPO.isServerStatusOk(isServerRunning);
+  });
+
+  test(`analysis name is "${CURRENT_PROJECT}"`, async () => {
+    await RunPO.isAnalysisNameOk(CURRENT_PROJECT);
+  });
+
+  test(`${EXPECTED_DATAPOINTS_BY_PROJECT[CURRENT_PROJECT].length} datapoints are shown correctly`, async () => {
+    await RunPO.areDatapointsOk(EXPECTED_DATAPOINTS_BY_PROJECT[CURRENT_PROJECT]);
+  });
+
+  test(`"No algorithmic on local" is ${
+    EXPECTED_ANALYSIS_TYPE_BY_PROJECT[CURRENT_PROJECT] === AnalysisType.ALGORITHMIC ? '' : 'NOT '
+  }shown`, async () => {
+    await RunPO.isAlgNoLocalMsgOk(RunTypes.LOCAL, EXPECTED_ANALYSIS_TYPE_BY_PROJECT[CURRENT_PROJECT]);
+  });
+};
+
+export const testServerPage = (isServerRunning: boolean) => {
+  test('is shown', async () => {
+    await ServerPO.isOk();
+  });
+
   test.describe(`server is ${isServerRunning ? '' : 'NOT '}running`, () => {
     test(`status is "${isServerRunning ? ServerPO.STATUS_STARTED : ServerPO.STATUS_STOPPED}"`, async () => {
       await ServerPO.isStatusOk(isServerRunning);
@@ -87,3 +124,4 @@ export const testServerPage = (isServerRunning: boolean) =>
       });
     });
   });
+};
