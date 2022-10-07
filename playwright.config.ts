@@ -10,8 +10,8 @@ const config: PlaywrightTestConfig = {
     timeout: 5_000,
   },
   forbidOnly: !!process.env.CI,
+  workers: process.env.CI ? 1 : 4,
   retries: process.env.CI ? 2 : 0,
-  workers: process.env.CI ? 1 : 5,
   reporter: getReporter(false),
   use: {
     actionTimeout: 0,

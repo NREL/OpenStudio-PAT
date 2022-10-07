@@ -7,7 +7,7 @@ import {
   AnalysisPO,
   NewProjectModalPO,
   NoServerStartToastPO,
-  ProjectModalArgsPromises,
+  ProjectModalArgs,
   SelectProjectModalPO
 } from '../page-objects';
 
@@ -41,8 +41,8 @@ test.describe('click "Make New Project" button', () => {
       test.beforeEach(async () => await NewProjectModalPO.nameInput.fill(Projects.NEW));
 
       test('file dialog is shown correctly', async () => {
-        const argsPromises = await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.NEW));
-        expect((await argsPromises.showOpenDialog)[0]).toEqual({
+        const args = await NewProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.NEW));
+        expect(args.showOpenDialog[0]).toEqual({
           title: 'Choose New ParametricAnalysisTool Project Folder',
           properties: ['openDirectory']
         });
@@ -85,10 +85,8 @@ test.describe('click "Make New Project" button', () => {
 
 test.describe('click "Open Existing Project" button', () => {
   test('file dialog is shown correctly', async () => {
-    const argsPromises = await SelectProjectModalPO.open(
-      IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.OFFICE_HVAC)
-    );
-    expect((await argsPromises.showOpenDialog)[0]).toEqual({
+    const args = await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.OFFICE_HVAC));
+    expect(args.showOpenDialog[0]).toEqual({
       title: 'Open ParametricAnalysisTool Project',
       properties: ['openDirectory']
     });
@@ -107,16 +105,16 @@ test.describe('click "Open Existing Project" button', () => {
     testNavItemsCorrect();
   });
   test.describe('select invalid directory', () => {
-    let argsPromises: ProjectModalArgsPromises;
+    let args: ProjectModalArgs;
     test.beforeEach(async () => {
-      argsPromises = await SelectProjectModalPO.open(
+      args = await SelectProjectModalPO.open(
         IPC_MAIN_HANDLE_MOCKS.showOpenDialog.invalid,
         IPC_MAIN_HANDLE_MOCKS.showMessageBox.ok
       );
     });
 
     test('message box is shown correctly', async () => {
-      expect((await argsPromises.showMessageBox)[0]).toEqual({
+      expect(args.showMessageBox[0]).toEqual({
         type: 'info',
         buttons: ['OK'],
         title: 'Open ParametricAnalysisTool Project',

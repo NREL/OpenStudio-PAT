@@ -57,7 +57,9 @@ describeProjects(CURRENT_PROJECT => {
           ServerToolsModalPO.EXPECTED_BODY_BUTTONS.VIEW,
           ServerToolsModalPO.bodyButtons
         );
-        expect((await argsPromise)[0]).toBe('http://localhost:8080');
+        const args = (await argsPromise) ?? [];
+        App.removeAllIpcMainListeners();
+        expect(args[0]).toBe('http://localhost:8080');
       });
     });
 

@@ -2,9 +2,9 @@ import { App } from '../../App';
 import { IPC_MAIN_HANDLE_MOCKS, ShowMessageBoxMock, ShowOpenDialogMock } from '../../mocks';
 import { ModalPO } from './modal.po';
 
-export interface ProjectModalArgsPromises {
-  showOpenDialog?: Promise<any>;
-  showMessageBox?: Promise<any>;
+export interface ProjectModalArgs {
+  showOpenDialog?: any;
+  showMessageBox?: any;
 }
 export class ProjectModalPO extends ModalPO {
   static readonly EXPECTED_TITLE: string;
@@ -12,23 +12,22 @@ export class ProjectModalPO extends ModalPO {
   static readonly OPEN_BUTTON_TEXT: string;
 
   static async open(showOpenDialogMock?: ShowOpenDialogMock, showMessageBoxMock?: ShowMessageBoxMock) {
-    const argsPromises: ProjectModalArgsPromises = {};
+    const args: ProjectModalArgs = {};
 
     if (showOpenDialogMock !== undefined) {
-      argsPromises.showOpenDialog = App.mockIpcMainHandle(
-        IPC_MAIN_HANDLE_MOCKS.showOpenDialogChannel,
-        showOpenDialogMock
-      );
+      args.showOpenDialog = App.mockIpcMainHandle(IPC_MAIN_HANDLE_MOCKS.showOpenDialogChannel, showOpenDialogMock);
     }
     if (showMessageBoxMock !== undefined) {
-      argsPromises.showMessageBox = App.mockIpcMainHandle(
-        IPC_MAIN_HANDLE_MOCKS.showMessageBoxChannel,
-        showMessageBoxMock
-      );
+      args.showMessageBox = App.mockIpcMainHandle(IPC_MAIN_HANDLE_MOCKS.showMessageBoxChannel, showMessageBoxMock);
     }
 
     await this.clickButton(this.OPEN_BUTTON_TEXT);
 
-    return argsPromises;
+    for (const key in args) {
+      args[key] = await args[key];
+    }
+    await App.removeAllIpcMainListeners();
+
+    return args;
   }
 }
