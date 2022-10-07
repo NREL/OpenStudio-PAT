@@ -15,6 +15,9 @@ export class PagePO extends BasePageObject {
   static get container(): Locator {
     return App.page.locator('main.container-fluid');
   }
+  static get webview(): Locator {
+    return this.container.locator('webview');
+  }
 
   static async getTitle(): Promise<Locator> {
     const h4 = this.container.locator('h4').first();

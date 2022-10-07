@@ -17,9 +17,6 @@ export class ServerPO extends PagePO {
   static get infoDivs(): Locator {
     return this.container.locator('div:nth-child(2) > div');
   }
-  static get webview(): Locator {
-    return this.container.locator('webview');
-  }
 
   static async getInfo(label: InfoLabels) {
     const infoElem = this.infoDivs.filter({ hasText: label });
