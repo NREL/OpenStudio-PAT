@@ -1,4 +1,4 @@
-import { AnalysisType, EXPECTED_ANALYSIS_TYPE_BY_PROJECT } from './expected-analysis-type-by-project';
+import { AnalysisType, EXPECTED_ANALYSIS_BY_PROJECT } from './expected-analysis-by-project';
 import { DatapointState, EXPECTED_DATAPOINTS_BY_PROJECT } from './expected-datapoints-by-project';
 import { Projects } from './projects';
 
@@ -14,18 +14,16 @@ export type DesignAltDetails = Record<DesignAltColumn, string>;
 const EXPECTED_SEED_MODEL_BY_PROJECT: Partial<Record<Projects, string>> = {
   [Projects.OFFICE_HVAC]: 'proto.osm'
 };
-const EXPECTED_WEATHER_FILE_BY_PROJECT: Partial<Record<Projects, string | undefined>> = {
-  [Projects.OFFICE_HVAC]: 'USA_CO_Golden-NREL.724666_TMY3.epw'
-};
 
 const generateExpectedDesignAltsByProject = () => {
   const generated = {};
-  for (const project in EXPECTED_DATAPOINTS_BY_PROJECT) {
-    if (EXPECTED_ANALYSIS_TYPE_BY_PROJECT[project] === AnalysisType.MANUAL) {
+  for (const _project in EXPECTED_DATAPOINTS_BY_PROJECT) {
+    const project = _project as Projects;
+    if (EXPECTED_ANALYSIS_BY_PROJECT[project].type === AnalysisType.MANUAL) {
       generated[project] = EXPECTED_DATAPOINTS_BY_PROJECT[project].map((datapoint: DatapointState) => ({
         [DesignAltColumn.name]: datapoint.name,
         [DesignAltColumn.seedModel]: EXPECTED_SEED_MODEL_BY_PROJECT[project] ?? '',
-        [DesignAltColumn.locationOrWeatherFile]: EXPECTED_WEATHER_FILE_BY_PROJECT[project] ?? '',
+        [DesignAltColumn.locationOrWeatherFile]: EXPECTED_ANALYSIS_BY_PROJECT[project].defaultWeatherFile ?? '',
         [DesignAltColumn.description]: ''
       }));
     } else {

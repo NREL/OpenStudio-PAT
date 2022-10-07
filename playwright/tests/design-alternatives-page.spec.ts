@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import { appHooksSetup, describeProjects } from './shared.spec';
 import {
   AnalysisType,
-  EXPECTED_ANALYSIS_TYPE_BY_PROJECT,
+  EXPECTED_ANALYSIS_BY_PROJECT,
   EXPECTED_DESIGN_ALTS_BY_PROJECT,
   EXPECTED_DETAILS_BY_PAGE,
   Page
@@ -12,7 +12,7 @@ import { DesignAlternativesPO, NavPO } from '../page-objects';
 appHooksSetup();
 
 describeProjects(CURRENT_PROJECT => {
-  const ANALYSIS_TYPE = EXPECTED_ANALYSIS_TYPE_BY_PROJECT[CURRENT_PROJECT];
+  const ANALYSIS_TYPE = EXPECTED_ANALYSIS_BY_PROJECT[CURRENT_PROJECT].type;
   test.describe('"Design Alternatives" page', () => {
     test.beforeEach(async () => await NavPO.clickIcon(EXPECTED_DETAILS_BY_PAGE[Page.DESIGN_ALTERNATIVES].iconAlt));
 

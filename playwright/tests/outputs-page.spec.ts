@@ -2,7 +2,7 @@ import { test } from '@playwright/test';
 import { appHooksSetup, describeProjects } from './shared.spec';
 import {
   AnalysisType,
-  EXPECTED_ANALYSIS_TYPE_BY_PROJECT,
+  EXPECTED_ANALYSIS_BY_PROJECT,
   EXPECTED_DETAILS_BY_PAGE,
   EXPECTED_MEASURE_OUTPUTS_BY_PROJECT,
   Page
@@ -12,7 +12,7 @@ import { NavPO, OutputsPO } from '../page-objects';
 appHooksSetup();
 
 describeProjects(CURRENT_PROJECT => {
-  const ANALYSIS_TYPE = EXPECTED_ANALYSIS_TYPE_BY_PROJECT[CURRENT_PROJECT];
+  const ANALYSIS_TYPE = EXPECTED_ANALYSIS_BY_PROJECT[CURRENT_PROJECT].type;
   test.describe('"Outputs" page', () => {
     test.beforeEach(async () => await NavPO.clickIcon(EXPECTED_DETAILS_BY_PAGE[Page.OUTPUTS].iconAlt));
 

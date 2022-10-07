@@ -1,11 +1,6 @@
 import { test } from '@playwright/test';
 import { App } from '../App';
-import {
-  AnalysisType,
-  EXPECTED_ANALYSIS_TYPE_BY_PROJECT,
-  EXPECTED_DATAPOINTS_BY_PROJECT,
-  Projects
-} from '../constants';
+import { AnalysisType, EXPECTED_ANALYSIS_BY_PROJECT, EXPECTED_DATAPOINTS_BY_PROJECT, Projects } from '../constants';
 import { IPC_MAIN_HANDLE_MOCKS } from '../mocks';
 import { NavPO, NewProjectModalPO, RunPO, RunTypes, SelectProjectModalPO, ServerPO } from '../page-objects';
 
@@ -93,9 +88,9 @@ export const testRunPage = (isServerRunning: boolean, CURRENT_PROJECT: Projects)
   });
 
   test(`"No algorithmic on local" is ${
-    EXPECTED_ANALYSIS_TYPE_BY_PROJECT[CURRENT_PROJECT] === AnalysisType.ALGORITHMIC ? '' : 'NOT '
+    EXPECTED_ANALYSIS_BY_PROJECT[CURRENT_PROJECT].type === AnalysisType.ALGORITHMIC ? '' : 'NOT '
   }shown`, async () => {
-    await RunPO.isAlgNoLocalMsgOk(RunTypes.LOCAL, EXPECTED_ANALYSIS_TYPE_BY_PROJECT[CURRENT_PROJECT]);
+    await RunPO.isAlgNoLocalMsgOk(RunTypes.LOCAL, EXPECTED_ANALYSIS_BY_PROJECT[CURRENT_PROJECT].type);
   });
 };
 
