@@ -29,23 +29,20 @@ export const appHooksSetup = (hook = Hook.each) => {
   }
 };
 
-export type ProjectSetupDetails = Record<Projects, { description: string; beforeHook: () => Promise<void> }>;
+export type ProjectSetupDetails = Record<Projects, { beforeHook: () => Promise<void> }>;
 
 export const PROJECT_SETUP_DETAILS: ProjectSetupDetails = {
   [Projects.OFFICE_HVAC]: {
-    description: 'open Office_HVAC project',
     beforeHook: async () => {
       await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.OFFICE_HVAC));
     }
   },
   [Projects.OFFICE_STUDY]: {
-    description: 'open Office_Study project',
     beforeHook: async () => {
       await SelectProjectModalPO.open(IPC_MAIN_HANDLE_MOCKS.getShowOpenDialogFor(Projects.OFFICE_STUDY));
     }
   },
   [Projects.NEW]: {
-    description: 'make new project',
     beforeHook: async () => {
       await SelectProjectModalPO.clickButton(SelectProjectModalPO.EXPECTED_FOOTER_BUTTONS.MAKE_NEW_PROJECT);
       await NewProjectModalPO.nameInput.fill(Projects.NEW);
@@ -56,12 +53,14 @@ export const PROJECT_SETUP_DETAILS: ProjectSetupDetails = {
 
 export const describeProjects = (
   tests: (CURRENT_PROJECT: Projects) => void,
-  projectSetupDetails: Partial<ProjectSetupDetails> = PROJECT_SETUP_DETAILS,
+  projects: Projects[] = Object.keys(PROJECT_SETUP_DETAILS) as Projects[],
   hook = Hook.each
 ) => {
-  for (const [CURRENT_PROJECT, setupDetails] of Object.entries(projectSetupDetails)) {
-    test.describe(setupDetails.description, () => {
-      hook === Hook.each ? test.beforeEach(setupDetails.beforeHook) : test.beforeAll(setupDetails.beforeHook);
+  for (const CURRENT_PROJECT of projects) {
+    test.describe(CURRENT_PROJECT, () => {
+      hook === Hook.each
+        ? test.beforeEach(PROJECT_SETUP_DETAILS[CURRENT_PROJECT].beforeHook)
+        : test.beforeAll(PROJECT_SETUP_DETAILS[CURRENT_PROJECT].beforeHook);
       tests(CURRENT_PROJECT as Projects);
     });
   }

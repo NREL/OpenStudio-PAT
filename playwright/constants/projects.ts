@@ -3,7 +3,7 @@ import { TMP_TEST_PATH } from '../paths';
 export enum Projects {
   OFFICE_HVAC = 'Office_HVAC',
   OFFICE_STUDY = 'Office_Study',
-  NEW = 'Playwright_Project'
+  NEW = 'New_Project'
 }
 
 export const PROJECT_PATHS: Record<Projects, string> = {
