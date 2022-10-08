@@ -5,7 +5,7 @@ import { NavPO, ReportsPO } from '../page-objects';
 
 appHooksSetup();
 
-const testReportsViewSelectDropdown = (expectedReportView: ReportView) =>
+const testReportsViewSelectDropdown = () =>
   test.describe('view select dropdown', () => {
     test('is shown with the expected options', async () => {
       await ReportsPO.isViewSelectDropdownOk();
@@ -28,7 +28,7 @@ describeProjects(() => {
     });
 
     test.describe('default state', () => {
-      testReportsViewSelectDropdown(ReportView.SUMMARY_TABLE);
+      testReportsViewSelectDropdown();
       testReportsWebView(ReportView.SUMMARY_TABLE);
     });
 
@@ -42,7 +42,7 @@ describeProjects(() => {
           await ReportsPO.selectView(reportView);
         });
 
-        testReportsViewSelectDropdown(reportView);
+        testReportsViewSelectDropdown();
         testReportsWebView(reportView);
       });
     }
