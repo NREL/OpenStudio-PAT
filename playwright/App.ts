@@ -1,5 +1,5 @@
 import { ElectronApplication, Page, _electron as electron } from '@playwright/test';
-import { MAIN_SCRIPT_PATH } from './paths';
+import { MAIN_SCRIPT_PATH } from './constants';
 
 export class App {
   static instance: ElectronApplication;

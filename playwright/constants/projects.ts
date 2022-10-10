@@ -1,4 +1,4 @@
-import { TMP_TEST_PATH } from '../paths';
+import { TMP_TEST_PATH } from './paths';
 
 export enum Projects {
   OFFICE_HVAC = 'Office_HVAC',
