@@ -15,6 +15,7 @@ describeProjects(
     startServerTests();
     serverPageTests();
     runPageTests(CURRENT_PROJECT);
+    // Only stop server when running locally since the server stop command times out in GitHub Actions
     if (!process.env.CI) {
       stopServerTests();
     }
