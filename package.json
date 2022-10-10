@@ -69,7 +69,12 @@
     "release": "./node_modules/.bin/gulp release --env=production",
     "start": "node ./tasks/start",
     "start:dist": "node ./tasks/start --env=production",
-    "test": "npm run build -- --env=test && npx gulp tmpTestFiles && npx playwright test && npx playwright test -c playwright-serial.config.ts"
+    "test:build": "npm run build -- --env=test",
+    "test:tmpFiles": "npx gulp tmpTestFiles",
+    "test:setup": "npm run test:build && npm run test:tmpFiles",
+    "test:parallel": "npx playwright test",
+    "test:serial": "npx playwright test -c playwright-serial.config.ts",
+    "test": "npm run test:setup && npm run test:parallel && npm run test:serial"
   },
   "browserslist": [
     "electron >= 20"

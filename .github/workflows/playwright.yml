@@ -31,15 +31,15 @@ jobs:
         if: ${{ steps.cache-runtime-deps.outputs.cache-hit != 'true' }}
         run: npx gulp installDeps
       - name: Build application
-        run: npm run build -- --env=test
+        run: npm run test:build
       - name: Prepare tmp test files
-        run: npx gulp tmpTestFiles
+        run: npm run test:tmpFiles
       - name: Run playwright tests
         uses: GabrielBB/xvfb-action@v1
         with:
           run: |
-            npx playwright test
-            npx playwright test -c playwright-serial.config.ts
+            npm run test:parallel
+            npm run test:serial
       - uses: actions/upload-artifact@v3
         if: always()
         with:
