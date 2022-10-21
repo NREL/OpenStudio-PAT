@@ -67,6 +67,12 @@ If you haven't already installed the project dependencies, follow steps 1 & 2 of
 npm run test
 ```
 
+To specify number of workers (default is 4) and retries to handle the parallel tests issue described below, use this command, for example:
+
+```
+npm run test --workers=2 --retries=2
+```
+
 The `test` script runs the following commands in order:
 
 1. `test:setup`, which runs:
