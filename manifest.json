@@ -1,5 +1,4 @@
 {
- * Use new Rubocop OpenStudio rules from S3 (version 4)
   "endpoint": "https://openstudio-resources.s3.amazonaws.com/pat-dependencies3/",
   "energyplus": [{
     "name": "EnergyPlus-22.2.0-win32.tar.gz",
