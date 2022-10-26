@@ -1,17 +1,18 @@
 {
+ * Use new Rubocop OpenStudio rules from S3 (version 4)
   "endpoint": "https://openstudio-resources.s3.amazonaws.com/pat-dependencies3/",
   "energyplus": [{
-    "name": "EnergyPlus-22.1.0-win32.tar.gz",
+    "name": "EnergyPlus-22.2.0-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "energyplus"
   }, {
-    "name": "EnergyPlus-22.1.0-darwin.tar.gz",
+    "name": "EnergyPlus-22.2.0-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "energyplus"
   }, {
-    "name": "EnergyPlus-22.1.0-linux.tar.gz",
+    "name": "EnergyPlus-22.2.0-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "energyplus"
@@ -60,33 +61,33 @@
     "type": "mongo"
   }],
   "openstudio": [{
-    "name": "OpenStudio-3.4.0-Windows.tar.gz",
+    "name": "OpenStudio-3.5.0-rc1-Windows.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.4.0-Darwin.tar.gz",
+    "name": "OpenStudio-3.5.0-rc1-Darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.4.0-Linux.tar.gz",
+    "name": "OpenStudio-3.5.0-rc1-Linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio"
   }],
   "openstudioServer": [{
-    "name": "OpenStudio-server-88db5b902e-win32.tar.gz",
+    "name": "OpenStudio-server-a98b4b3dff-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-88db5b902e-darwin.tar.gz",
+    "name": "OpenStudio-server-a98b4b3dff-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-88db5b902e-linux.tar.gz",
+    "name": "OpenStudio-server-a98b4b3dff-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio-server"
