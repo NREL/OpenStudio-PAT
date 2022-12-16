@@ -113,8 +113,8 @@ function nodeModules() {
 }
 
 async function clean() {
-  const { deleteAsync } = await import('del');
-  return deleteAsync([path.join(conf.paths.dist, '/'), path.join(conf.paths.tmp, '/')]);
+  await jetpack.removeAsync(conf.paths.dist);
+  await jetpack.removeAsync(conf.paths.tmp);
 }
 
 function environment() {

@@ -26,11 +26,10 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-import { shell } from '@electron/remote';
 
 export class ModalBclController {
 
-  constructor($log, $q, $uibModalInstance, $timeout, $uibModal, uiGridConstants, $scope, $translate, toastr, BCL, params, Project, MeasureManager, Message) {
+  constructor($log, $q, $uibModalInstance, $timeout, $uibModal, uiGridConstants, $scope, $translate, toastr, BCL, params, Project, MeasureManager, Message, RemoteHelper) {
     'ngInject';
 
     const vm = this;
@@ -45,7 +44,7 @@ export class ModalBclController {
     vm.Project = Project;
     vm.toastr = toastr;
     vm.jetpack = jetpack;
-    vm.shell = shell;
+    vm.shell = RemoteHelper.shell;
     vm.params = params;
     vm.$translate = $translate;
     vm.MeasureManager = MeasureManager;

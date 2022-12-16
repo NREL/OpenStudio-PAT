@@ -54,16 +54,11 @@ app.on('ready', () => {
   remoteMain.enable(mainWindow.webContents);
 
   const env = getEnv(app.getAppPath());
-  if (env.name === 'test') {
-    mainWindow.loadURL('file://' + __dirname + '/spec.html');
-  } else if (env.name === 'development') {
+  if (env.name === 'development') {
     mainWindow.loadURL('http://localhost:3000/index.html');
+    mainWindow.openDevTools();
   } else {
     mainWindow.loadURL('file://' + __dirname + '/index.html');
-  }
-
-  if (env.name !== 'production') {
-    mainWindow.openDevTools();
   }
 });
 

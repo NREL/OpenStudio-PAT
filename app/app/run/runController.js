@@ -25,13 +25,12 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-import {shell} from 'electron';
 import jetpack from 'fs-jetpack';
 import VersionCompare from 'version_compare';
 
 export class RunController {
 
-  constructor($log, Project, OsServer, $scope, $interval, $timeout, $uibModal, $q, $translate, toastr, $sce, Message) {
+  constructor($log, Project, OsServer, $scope, $interval, $timeout, $uibModal, $q, $translate, toastr, $sce, Message, RemoteHelper) {
 
     'ngInject';
 
@@ -46,7 +45,7 @@ export class RunController {
     vm.OsServer = OsServer;
     vm.toastr = toastr;
     vm.$translate = $translate;
-    vm.shell = shell;
+    vm.shell = RemoteHelper.shell;
     vm.jetpack = jetpack;
     vm.VersionCompare = VersionCompare;
     vm.$sce = $sce;

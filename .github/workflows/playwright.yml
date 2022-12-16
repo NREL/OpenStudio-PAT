@@ -1,0 +1,48 @@
+name: Playwright Tests
+on:
+  push:
+    branches: "*"
+  pull_request:
+    branches: "*"
+
+jobs:
+  test:
+    timeout-minutes: 60
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 17
+          cache: npm
+          cache-dependency-path: "**/package-lock.json"
+      - name: Install build dependencies (package-lock.json)
+        run: npm ci
+      - name: Install build dependencies (app/package-lock.json)
+        working-directory: app
+        run: npm ci
+      - name: Cache runtime dependencies
+        id: cache-runtime-deps
+        uses: actions/cache@v3
+        with:
+          path: depend/
+          key: ${{ runner.os }}-${{ hashFiles('manifest.json') }}
+      - name: Install runtime dependencies
+        if: ${{ steps.cache-runtime-deps.outputs.cache-hit != 'true' }}
+        run: npx gulp installDeps
+      - name: Build application
+        run: npm run test:build
+      - name: Prepare tmp test files
+        run: npm run test:tmpFiles
+      - name: Run playwright tests
+        uses: GabrielBB/xvfb-action@v1
+        with:
+          run: |
+            npm run test:parallel
+            npm run test:serial
+      - uses: actions/upload-artifact@v3
+        if: always()
+        with:
+          name: reports
+          path: reports/playwright/
+          retention-days: 30

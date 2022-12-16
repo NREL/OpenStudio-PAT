@@ -27,11 +27,12 @@
  **********************************************************************************************************************/
 /*global bootlint*/
 
-import { app, getGlobal, Menu, shell } from '@electron/remote';
+import { app, getGlobal, Menu } from '@electron/remote';
 
-export function runBlock($rootScope, $state, $window, $document, $translate, toastr, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log, Message) {
+export function runBlock($rootScope, $state, $window, $document, $translate, toastr, MeasureManager, DependencyManager, Project, BCL, OsServer, SetProject, OpenProject, $log, Message, RemoteHelper) {
   'ngInject';
 
+  const shell = RemoteHelper.shell;
   let exitReady = false;
 
   $window.onbeforeunload = e => {
@@ -355,6 +356,21 @@ export function runBlock($rootScope, $state, $window, $document, $translate, toa
     template.unshift(fileMenu);
   }
 
-  const menu = Menu.buildFromTemplate(template);
+  const addIds = (item) => {
+    if (_.isArray(item)) {
+      return item.map((smItem) => addIds(smItem));
+    }
+
+    const newItem = _.cloneDeep(item);
+    if (item.submenu) {
+      newItem.submenu = addIds(item.submenu);
+    }
+    if (item.label) {
+      newItem.id = item.label;
+    }
+    return newItem;
+  };
+
+  const menu = Menu.buildFromTemplate(addIds(template));
   Menu.setApplicationMenu(menu);
 }

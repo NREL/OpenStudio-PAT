@@ -6,9 +6,13 @@ Thumbs.db
 
 /.idea/
 /.tmp/
+/.tmp-test/
 /app/spec.js
 /build/
 /build_release/
 /releases/
 /tmp/
 /depend/
+/playwright-results/
+/playwright/.cache/
+/reports/

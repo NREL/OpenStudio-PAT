@@ -26,13 +26,11 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-import { dialog } from '@electron/remote';
-import {shell} from 'electron';
 import path from 'path';
 
 export class AnalysisController {
 
-  constructor($log, $q, BCL, Project, SetProject, $scope, $document, $uibModal, toastr, Message, $translate) {
+  constructor($log, $q, BCL, RemoteHelper, Project, SetProject, $scope, $document, $uibModal, toastr, Message, $translate) {
     'ngInject';
 
     const vm = this;
@@ -46,8 +44,8 @@ export class AnalysisController {
     vm.$scope = $scope;
     vm.$document = $document;
     vm.BCL = BCL;
-    vm.dialog = dialog;
-    vm.shell = shell;
+    vm.dialog = RemoteHelper.dialog;
+    vm.shell = RemoteHelper.shell;
     vm.path = path;
     vm.$translate = $translate;
     vm.Message = Message;

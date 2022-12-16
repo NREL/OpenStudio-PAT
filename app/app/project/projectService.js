@@ -28,13 +28,13 @@
 import jetpack from 'fs-jetpack';
 //import os from 'os';
 import path from 'path';
-import { app, dialog } from '@electron/remote';
+import { app } from '@electron/remote';
 import jsZip from 'jszip';
 import fs from 'fs';
 import archiver from 'archiver';
 
 export class Project {
-  constructor($q, $log, $http, $uibModal, MeasureManager, $sce, Message, toastr, $translate) {
+  constructor($q, $log, $http, $uibModal, RemoteHelper, MeasureManager, $sce, Message, toastr, $translate) {
     'ngInject';
     const vm = this;
     vm.$log = $log;
@@ -42,7 +42,7 @@ export class Project {
     vm.fs = fs;
     vm.jsZip = jsZip;
     vm.MeasureManager = MeasureManager;
-    vm.dialog = dialog;
+    vm.dialog = RemoteHelper.dialog;
     vm.archiver = archiver;
     vm.$q = $q;
     vm.$http = $http;
