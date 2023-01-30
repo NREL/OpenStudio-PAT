@@ -1062,6 +1062,8 @@ export class Project {
     // MEASURE DETAILS
     let analysis_variables = 0;
 
+
+
     let measure_count = 0;
     _.forEach(vm.measures, (measure) => {
       // for algorithmic workflows, don't add SKIPPED measure to JSON
@@ -1112,7 +1114,7 @@ export class Project {
               }
               else if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.value)) {
                 // Make sure that argument is "complete"
-                var_count += 1;
+                measure_count += 1;
                 m.arguments.push(argument);
               } else {
                 vm.$log.error('Not pushing partial argument to json.  Fix partial argument: ', argument);
