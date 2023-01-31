@@ -3395,19 +3395,24 @@ export class Project {
 
   }
 
-  setGemfile() {
+  setGemfile(name) {
     const vm = this;
+    vm.gemfile = name;
+    vm.$log.info('gemfile setting to ', name);
     if (angular.isDefined(vm.gemfileDir)) {
       if (vm.jetpack.exists(vm.gemfileDir.cwd())) {
-        if (vm.gemfileDir.exists('Gemfile')) { 
-          vm.gemfile = 'Gemfile';
+        if (vm.gemfileDir.exists('Gemfile')) {
           vm.$log.info('Gemfile found in', vm.gemfileDir.cwd());
         }
-        else vm.$log.info('No Gemfile found in ', vm.gemfileDir.cwd());
+        else { 
+          vm.$log.info('Gemfile not found in', vm.gemfileDir.cwd(), 'setting to false');
+          vm.gemfile = false;
+        }
       }
     }
 
   }
+  
 
   setSeedsDropdownOptions() {
     const vm = this;
