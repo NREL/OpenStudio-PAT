@@ -37,15 +37,6 @@
                     ng-change="analysis.setDownloadZIP(downloadZIP)"></select>
             </div>
           </div>
-          <div class="col-sm-4 pad-bot-20">
-            <label class="medium-label" translate>analysis.gemfile</label>
-            <span class="badge badge-info" title="{{'analysis.algorithmic.helpGemfile' | translate}}">&nbsp;?&nbsp;</span>
-            <div class="input-group">
-              <select class="form-control inline form-control-smaller-width"
-                    ng-options="o.value as o.label for o in analysis.gemfileTypes" ng-model="gemfile"
-                    ng-change="analysis.setGemfile(gemfile)"></select>
-            </div>
-          </div>
         </div>
         <div class="row pad-bot-10">
           <div class="col-sm-4 pad-bot-20">
@@ -91,6 +82,17 @@
             <label class="medium-label" translate>analysis.timeoutUploadResults</label>
             <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutUploadResults' | translate}}">&nbsp;?&nbsp;</span>
             <input class="form-control" type="number" ng-model="timeoutUploadResults" ng-change="analysis.setTimeoutUploadResults(timeoutUploadResults)">
+          </div>
+        </div>
+        <div class="row pad-bot-10">
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.gemfile</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpGemfile' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.gemfileTypes" ng-model="gemfile"
+                    ng-change="analysis.setGemfile(gemfile)"></select>
+            </div>
           </div>
         </div>
       </div>
