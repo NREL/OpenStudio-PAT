@@ -1,3 +1,108 @@
+<div class="row">
+  <div class="col-sm-12">
+    <uib-accordion close-others="false">
+      <div uib-accordion-group class="panel-default algorithm-custom" is-open="advancedArguments.open">
+        <uib-accordion-heading>
+          <i class="pull-left glyphicon pad-right-5 black-button"
+             ng-class="{'glyphicon-chevron-down': advancedArguments.open, 'glyphicon-chevron-right': !advancedArguments.open}"></i>
+          <translate>analysis.advancedArguments</translate>
+          <span class="badge badge-info" title="{{'analysis.helpAdvancedArguments' | translate}}">&nbsp;?&nbsp;</span>
+        </uib-accordion-heading>
+
+        <div class="row pad-bot-10">
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.cliDebug</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpCLIDebug' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.cliDebugTypes" ng-model="cliDebug"
+                    ng-change="analysis.setCliDebug(cliDebug)"></select>
+            </div>
+          </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.cliVerbose</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpCLIVerbose' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.cliVerboseTypes" ng-model="cliVerbose"
+                    ng-change="analysis.setCliVerbose(cliVerbose)"></select>
+            </div>
+          </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.downloadZIP</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpDownloadZIP' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.downloadZIPTypes" ng-model="downloadZIP"
+                    ng-change="analysis.setDownloadZIP(downloadZIP)"></select>
+            </div>
+          </div>
+        </div>
+        <div class="row pad-bot-10">
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.downloadOSW</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpDownloadOSW' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.downloadOSWTypes" ng-model="downloadOSW"
+                    ng-change="analysis.setDownloadOSW(downloadOSW)"></select>
+            </div>
+          </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.downloadOSM</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpDownloadOSM' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.downloadOSMTypes" ng-model="downloadOSM"
+                    ng-change="analysis.setDownloadOSM(downloadOSM)"></select>
+            </div>
+          </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.downloadReports</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpDownloadReports' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.downloadReportsTypes" ng-model="downloadReports"
+                    ng-change="analysis.setDownloadReports(downloadReports)"></select>
+            </div>
+          </div>
+        </div>
+        <div class="row pad-bot-10">
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.timeoutWorkflow</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutWorkflow' | translate}}">&nbsp;?&nbsp;</span>
+            <input class="form-control" type="number" ng-model="timeoutWorkflow" ng-change="analysis.setTimeoutWorkflow(timeoutWorkflow)">
+          </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.timeoutInitWorker</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutInitWorker' | translate}}">&nbsp;?&nbsp;</span>
+            <input class="form-control" type="number" ng-model="timeoutInitWorker" ng-change="analysis.setTimeoutInitWorker(timeoutInitWorker)">
+          </div>
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.timeoutUploadResults</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpTimeoutUploadResults' | translate}}">&nbsp;?&nbsp;</span>
+            <input class="form-control" type="number" ng-model="timeoutUploadResults" ng-change="analysis.setTimeoutUploadResults(timeoutUploadResults)">
+          </div>
+        </div>
+        <div class="row pad-bot-10">
+          <div class="col-sm-4 pad-bot-20">
+            <label class="medium-label" translate>analysis.gemfile</label>
+            <span class="badge badge-info" title="{{'analysis.algorithmic.helpGemfile' | translate}}">&nbsp;?&nbsp;</span>
+            <div class="input-group">
+              <select class="form-control inline form-control-smaller-width"
+                    ng-options="o.value as o.label for o in analysis.gemfileTypes" ng-model="gemfile"
+                    ng-change="analysis.setGemfile(gemfile)"></select>
+            </div>
+          </div>
+        </div>
+      </div>
+    </uib-accordion>
+  </div>
+</div>
+
+
+
+
 <div class="row pad-bot-20">
   <div class="col-sm-6"><h4><translate>analysis.manual.projectMeasuresAndOptions</translate> <span class="badge badge-info margin-left-5" title="{{'analysis.helpProjectyMeasuresAndOptions' | translate}}">&nbsp;?&nbsp;</span></h4></div>
   <div class="col-sm-2 col-md-offset-2">

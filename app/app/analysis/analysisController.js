@@ -59,6 +59,7 @@ export class AnalysisController {
     vm.downloadOSWTypes = vm.Project.getDownloadOSWTypes();
     vm.downloadOSMTypes = vm.Project.getDownloadOSMTypes();
     vm.downloadZIPTypes = vm.Project.getDownloadZIPTypes();
+    vm.gemfileTypes = vm.Project.getGemfileTypes();
     vm.$scope.seeds = vm.Project.getSeeds();
     vm.$scope.weatherFiles = vm.Project.getWeatherFiles();
 
@@ -68,6 +69,7 @@ export class AnalysisController {
     vm.$scope.downloadOSW = vm.Project.getDownloadOSW();
     vm.$scope.downloadOSM = vm.Project.getDownloadOSM();
     vm.$scope.downloadZIP = vm.Project.getDownloadZIP();
+    vm.$scope.gemfile = vm.Project.getGemfile();
     vm.$scope.timeoutWorkflow = vm.Project.getTimeoutWorkflow();
     vm.$scope.timeoutUploadResults = vm.Project.getTimeoutUploadResults();
     vm.$scope.timeoutInitWorker = vm.Project.getTimeoutInitWorker();
@@ -1071,6 +1073,15 @@ export class AnalysisController {
     vm.setIsModified();
     if (vm.Message.showDebug()) vm.$log.debug('Setting DownloadZIP to: ', vm.$scope.downloadZIP);
     vm.Project.setDownloadZIP(vm.$scope.downloadZIP);
+  }
+
+  setGemfile(value) {
+    const vm = this;
+    if (vm.Message.showDebug()) vm.$log.debug('In setGemfile in analysis');
+    vm.$scope.gemfile = value;
+    vm.setIsModified();
+    if (vm.Message.showDebug()) vm.$log.debug('Setting Gemfile to: ', vm.$scope.gemfile);
+    vm.Project.setGemfile(vm.$scope.gemfile);
   }
 
   setTimeoutWorkflow(value) {
