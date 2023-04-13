@@ -259,7 +259,7 @@
         analysis.simulation_software = "OpenStudio";
 
         // alternatives
-        var alts = [];
+        var alts = {alternative: []};
         _($scope.results).forEach(function (run) {
 
           // Skip any run not selected for export
@@ -299,7 +299,7 @@
           alt.characteristics = chars;
 
           // find all measures that are in this alternative
-          var measures = [];
+          var measures = {measure: []};
           _(run.steps).forEach(function (step) {
 
             // skip measures that were set to "none"
@@ -334,7 +334,7 @@
             measure.description = step.description;
             measure.initial_condition = step.result.step_initial_condition;
             measure.final_condition = step.result.step_final_condition;
-            measures.push(measure);
+            measures.measure.push(measure);
           });
           alt.measures = measures;
 
@@ -391,7 +391,7 @@
           alt.results = {};
 
           // cash_flows
-          var cashFlows = [];
+          var cashFlows = {cash_flow: []};
           _(cashFlowTypes).forEach(function (flowType) {
             var cashFlow = {};
             // type
@@ -400,22 +400,22 @@
               cashFlow.type = output.value;
             }
             // yearly values
-            var values = [];
+            var values = {year:[]};
             for (var k = 1; k < 100; k++) {
               var output = _.find(vals, {'name': "cash_flows_" + flowType.toLowerCase() + "_year_" + k});
               if (output) {
-                values.push(output.value);
+                values.year.push(output.value);
               }
             }
 
             // special case for year1 capital costs
             if (flowType.toLowerCase() == 'capital'){
               // replace year 1 value with value from table
-              values[0] = run.capitalCostYear1;
+              values.year[0] = run.capitalCostYear1;
             }
 
             cashFlow.values = values;
-            cashFlows.push(cashFlow);
+            cashFlows.cash_flow.push(cashFlow);
           });
           alt.results.cash_flows = cashFlows;
 
@@ -528,7 +528,7 @@
           alt.results.monthly.demand = monthlyDemand;
 
           // checks
-          alt.checks = [];
+          alt.checks = {check: []};
 
           // find all the unique IDs of the qaqc checks
           qaqcIDs = [];
@@ -563,10 +563,10 @@
               }
             });
             check.flag = checkFlags;
-            alt.checks.push(check);
+            alt.checks.check.push(check);
           });
 
-          alts.push(alt);
+          alts.alternative.push(alt);
 
         });
         analysis.alternatives = alts;

@@ -88,7 +88,6 @@ export class AnalysisController {
     });
     if (vm.Message.showDebug()) vm.$log.debug('****ANALYSIS TAB****');
     if (vm.Message.showDebug()) vm.$log.debug('ANALYSIS MEASURES RETRIEVED: ', vm.$scope.measures);
-
     vm.$scope.osMeasures = [];
     vm.$scope.epMeasures = [];
     vm.$scope.repMeasures = [];
@@ -419,6 +418,7 @@ export class AnalysisController {
     const types = [type];
     // save pretty options (will be needed to load back)
     vm.Project.savePrettyOptions();
+
     vm.BCL.openBCLModal(types, [], false).then(() => {
       // reset data
       vm.$scope.measures = vm.Project.getMeasuresAndOptions();
@@ -1579,22 +1579,12 @@ export class AnalysisController {
         arg.inputs.discreteVariables = _.isNil(arg.inputs.discreteVariables) ? [] : arg.inputs.discreteVariables;
 
         // calculate default value
+        // some measures expect a specific behavior when defaultValue is not present
+        // we can't set it to arbitrary values like 0:
         let defaultValue = null;
         if (_.isNil(arg.inputs.default_value)) {
           if (_.isNil(arg.default_value)) {
-            if (arg.type == 'Integer' || arg.type == 'Double') {
-              defaultValue = 0;
-            } else if (arg.type == 'Boolean') {
-              defaultValue = true;
-            } else if (arg.type == 'String') {
-              defaultValue = '';
-            } else if (arg.type == 'Choice') {
-              if (!_.isNil(arg.choice_display_names) && arg.choice_display_names.length && arg.required) {
-                defaultValue = arg.choice_display_names[0];
-              } else {
-                defaultValue = '';
-              }
-            }
+            defaultValue = null;
           } else {
             defaultValue = arg.default_value;
           }
