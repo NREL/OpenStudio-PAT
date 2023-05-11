@@ -3,7 +3,7 @@
   "productName": "ParametricAnalysisTool",
   "identifier": "gov.nrel.openstudio.pat",
   "description": "OpenStudio Parametric Analysis Tool",
-  "version": "3.5.2",
+  "version": "3.6.0",
   "author": "National Renewable Energy Laboratory",
   "main": "background.js",
   "dependencies": {
