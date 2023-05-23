@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.14.0)
 cmake_policy(SET CMP0048 NEW)
 
 
-project(ParametricAnalysisTool VERSION 3.6.0)
+project(ParametricAnalysisTool VERSION 3.6.1)
 
 
 find_package(Git)
