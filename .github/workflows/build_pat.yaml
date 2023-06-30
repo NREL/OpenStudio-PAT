@@ -71,7 +71,9 @@ jobs:
           #echo CMAKE_GENERATOR='Visual Studio 16 2019' >> $GITHUB_ENV
           #echo CMAKE_GENERATOR_PLATFORM=x64 >> $GITHUB_ENV
           # C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise
-          MSVC_DIR=$(cmd.exe /c "vswhere -products * -requires Microsoft.Component.MSBuild -property installationPath -latest")
+          # Command below no longer working and returning the version number. 
+          # MSVC_DIR=$(cmd.exe /c "vswhere -products * -requires Microsoft.Component.MSBuild -property installationPath -latest")
+          MSVC_DIR="C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
           echo "Latest is: $MSVC_DIR"
           echo "MSVC_DIR=$MSVC_DIR" >> $GITHUB_ENV
           # add folder containing vcvarsall.bat
