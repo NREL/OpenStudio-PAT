@@ -59,9 +59,18 @@ export class MeasureManager {
     return vm.mmReadyDeferred.promise;
   }
 
+  sleep(milliseconds) {
+    var start = new Date().getTime();
+    for (var i = 0; i < 1e7; i++) {
+      if ((new Date().getTime() - start) > milliseconds){
+        break;
+      }
+    }
+  }
+
   startMeasureManager() {
     const vm = this;
-
+    let str = '';
     // find an open port
     portfinder.getPortPromise({
       port: 3100,
@@ -70,12 +79,16 @@ export class MeasureManager {
       vm.port = port;
       vm.$log.info('Measure Manager port: ', vm.port);
 
-      vm.$log.info('Start Measure Manager Server: ', vm.cliPath, ' measure -s ', vm.port);
-      vm.cli = vm.spawn(vm.cliPath, ['measure', '-s', vm.port]);
+      vm.$log.info('Start Measure Manager Server: ', vm.cliPath, 'labs measure -s ', vm.port);
+      console.log(vm.cliPath, 'labs measure -s ', vm.port)
+      let the_cmd = vm.cliPath + ' labs';
+      vm.cli = vm.spawn(vm.cliPath, ['labs', 'measure', '-s', vm.port], { cwd: '.', stdio : 'pipe' });
       vm.cli.stdout.on('data', (data) => {
         // record errors
         if (data.indexOf('<0>') !== -1) {
           // WARNING
+          // KF Note: I think the "labs command is experimental warning will/should show up 
+          // here. that might not be good.
           vm.$log.warn(`MeasureManager WARNING: ${data}`);
           vm.Message.appendMeasureManagerError({type: 'warning', data: data.toString()});
         } else if (data.indexOf('<1>') !== -1) {
@@ -88,10 +101,11 @@ export class MeasureManager {
           vm.Message.appendMeasureManagerError({type: 'fatal', data: data.toString()});
         }
         else {
-          if (vm.Message.showDebug()) vm.$log.debug(`MeasureManager: ${data}`);
+         if (vm.Message.showDebug()) vm.$log.debug(`MeasureManager: ${data}`);
         }
+        
         // check that the mm was started correctly: resolve readyDeferred
-        const str = data.toString();
+        str = data.toString();
         if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
           if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
           vm.mmReadyDeferred.resolve();
@@ -106,12 +120,17 @@ export class MeasureManager {
           if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
           vm.mmReadyDeferred.resolve();
         }
-
+        else if (str.indexOf('Serving on: ') !== -1) {
+          // KF Note: I would expect that we end up here (if the warning isn't picked up)
+          // but we don't seem to get here when we should
+          console.log("LABS command Serving on... detected. MM is running!")
+          vm.mmReadyDeferred.resolve();
+        }
       });
       vm.cli.stderr.on('data', (data) => {
         vm.$log.info(`MeasureManager: ${data}`);
         // check that the mm was started correctly: resolve readyDeferred
-        const str = data.toString();
+        str = data.toString();
         if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
           if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
           vm.mmReadyDeferred.resolve();
@@ -127,10 +146,40 @@ export class MeasureManager {
           vm.mmReadyDeferred.resolve();
         }
       });
+      vm.cli.on('error', (err) => {
+        console.log('Failed to start measure manager');
+      }); 
+      vm.cli.on('message', (msg) => {
+        console.log(`child message due to receipt of signal ${msg}`);
+      });
+
       vm.cli.on('close', (code) => {
         vm.$log.info(`Measure Manager exited with code ${code}`);
       });
-    }).catch(() => vm.$log.error('Error locating an open port for measure manager.'));
+      vm.cli.on('exit', (code) => {
+        if (code !== 0) {
+          const msg = `Failed with code = ${code}`;
+        }
+      });
+
+      // KF Note: new labs MM is not returning anything at all (or in time) but it is 
+      // up and running. sleep 2 second and then try to use it
+      vm.sleep(2 * 1000);
+      let the_url = vm.url + ":" + vm.port;
+      console.log("Measure Manager URL: ", the_url)
+      vm.$http.get(the_url)
+      .then(res => {
+        vm.$log.info('MeasureManager status: ', res.data);
+        console.log("MM pinged and it seemed started!")
+        vm.mmReadyDeferred.resolve();
+      })
+      .catch(res => {
+        vm.$log.error('MeasureManager is not up and running: ', res.data);
+      });
+
+    }).catch((err) => {
+      vm.$log.error('Error locating an open port for measure manager.')
+    });
   }
 
   stopMeasureManager() {
@@ -230,6 +279,7 @@ export class MeasureManager {
   // Returns the path to the myMeasures directory
   getMyMeasuresDir() {
     const vm = this;
+    console.log("GetMyMeasuresDir url: ", `${vm.url}:${vm.port}`)
     return vm.$http.get(`${vm.url}:${vm.port}`, {
       params: {}
     })
@@ -249,7 +299,6 @@ export class MeasureManager {
 
     // reset MeasureManagerErrors when a new action
     vm.Message.resetMeasureManagerErrors();
-
     return vm.$http.post(`${vm.url}:${vm.port}/set`, params)
       .then(res => {
         vm.$log.info('Measure Manager setMyMeasuresDir Success!, status: ', res.status);
@@ -289,7 +338,9 @@ export class MeasureManager {
       .then(res => {
         vm.$log.info('Measure Manager download_bcl_measure Success!, status: ', res.status);
         vm.$log.info('Data: ', res.data);
-        return res.data[0];
+        // KAF: format of res.data has changed with labs MM
+        //return res.data[0];
+        return res.data
       })
       .catch(res => {
         vm.$log.error('Measure Manager download_bcl_measure Error: ', res.data);
