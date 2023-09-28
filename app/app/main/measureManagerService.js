@@ -80,15 +80,11 @@ export class MeasureManager {
       vm.$log.info('Measure Manager port: ', vm.port);
 
       vm.$log.info('Start Measure Manager Server: ', vm.cliPath, 'labs measure -s ', vm.port);
-      console.log(vm.cliPath, 'labs measure -s ', vm.port)
       let the_cmd = vm.cliPath + ' labs';
       vm.cli = vm.spawn(vm.cliPath, ['labs', 'measure', '-s', vm.port], { cwd: '.', stdio : 'pipe' });
       vm.cli.stdout.on('data', (data) => {
         // record errors
         if (data.indexOf('<0>') !== -1) {
-          // WARNING
-          // KF Note: I think the "labs command is experimental warning will/should show up 
-          // here. that might not be good.
           vm.$log.warn(`MeasureManager WARNING: ${data}`);
           vm.Message.appendMeasureManagerError({type: 'warning', data: data.toString()});
         } else if (data.indexOf('<1>') !== -1) {
@@ -107,23 +103,22 @@ export class MeasureManager {
         // check that the mm was started correctly: resolve readyDeferred
         str = data.toString();
         if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
-          if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
+          vm.$log.info('Found WEBrick Start, MeasureManager is running');
           vm.mmReadyDeferred.resolve();
         }
         // TODO: THIS IS TEMPORARY (windows):
         else if (str.indexOf('Only one usage of each socket address') !== -1) {
-          if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
+          vm.$log.info('WEBrick already running...assuming MeasureManager is already up');
           vm.mmReadyDeferred.resolve();
         }
         // TODO: THIS IS TEMPORARY (mac):
         else if (str.indexOf('Error: Address already in use') !== -1) {
-          if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
+          vm.$log.info('WEBrick already running...assuming MeasureManager is already running');
           vm.mmReadyDeferred.resolve();
         }
-        else if (str.indexOf('Serving on: ') !== -1) {
-          // KF Note: I would expect that we end up here (if the warning isn't picked up)
-          // but we don't seem to get here when we should
-          console.log("LABS command Serving on... detected. MM is running!")
+        else if (str.indexOf('MeasureManager Ready') !== -1) {
+          // New labs command MeasureManager
+          vm.$log.info("LABS command 'MeasureManagerReady' detected. MeasureManager is running!");
           vm.mmReadyDeferred.resolve();
         }
       });
@@ -160,21 +155,6 @@ export class MeasureManager {
         if (code !== 0) {
           const msg = `Failed with code = ${code}`;
         }
-      });
-
-      // KF Note: new labs MM is not returning anything at all (or in time) but it is 
-      // up and running. sleep 2 second and then try to use it
-      vm.sleep(2 * 1000);
-      let the_url = vm.url + ":" + vm.port;
-      console.log("Measure Manager URL: ", the_url)
-      vm.$http.get(the_url)
-      .then(res => {
-        vm.$log.info('MeasureManager status: ', res.data);
-        console.log("MM pinged and it seemed started!")
-        vm.mmReadyDeferred.resolve();
-      })
-      .catch(res => {
-        vm.$log.error('MeasureManager is not up and running: ', res.data);
       });
 
     }).catch((err) => {
@@ -279,7 +259,6 @@ export class MeasureManager {
   // Returns the path to the myMeasures directory
   getMyMeasuresDir() {
     const vm = this;
-    console.log("GetMyMeasuresDir url: ", `${vm.url}:${vm.port}`)
     return vm.$http.get(`${vm.url}:${vm.port}`, {
       params: {}
     })
