@@ -76,17 +76,17 @@
     "type": "OpenStudio"
   }],
   "openstudioServer": [{
-    "name": "OpenStudio-server-d1cdc34435-win32.tar.gz",
+    "name": "OpenStudio-server-fb64b32e47-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-d1cdc34435-darwin.tar.gz",
+    "name": "OpenStudio-server-fb64b32e47-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-d1cdc34435-linux.tar.gz",
+    "name": "OpenStudio-server-fb64b32e47-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio-server"
