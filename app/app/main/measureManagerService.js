@@ -71,7 +71,7 @@ export class MeasureManager {
       vm.$log.info('Measure Manager port: ', vm.port);
 
       vm.$log.info('Start Measure Manager Server: ', vm.cliPath, ' measure -s ', vm.port);
-      vm.cli = vm.spawn(vm.cliPath, ['measure', '-s', vm.port]);
+      vm.cli = vm.spawn(vm.cliPath, ['classic', 'measure', '-s', vm.port]);
       vm.cli.stdout.on('data', (data) => {
         // record errors
         if (data.indexOf('<0>') !== -1) {
