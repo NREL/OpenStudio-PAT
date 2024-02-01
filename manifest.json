@@ -1,17 +1,17 @@
 {
   "endpoint": "https://openstudio-resources.s3.amazonaws.com/pat-dependencies3/",
   "energyplus": [{
-    "name": "EnergyPlus-23.1.0-win32.tar.gz",
+    "name": "EnergyPlus-23.2.0-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "energyplus"
   }, {
-    "name": "EnergyPlus-23.1.0-darwin.tar.gz",
+    "name": "EnergyPlus-23.2.0-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "energyplus"
   }, {
-    "name": "EnergyPlus-23.1.0-linux.tar.gz",
+    "name": "EnergyPlus-23.2.0-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "energyplus"
