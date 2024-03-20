@@ -54,19 +54,19 @@ jobs:
           sudo apt update
           sudo apt install cmake
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          curl -L -O https://download.qt.io/official_releases/qt-installer-framework/4.3.0/QtInstallerFramework-macOS-x64-4.3.0.dmg
-          hdiutil attach -mountpoint ./qtfiw_installer QtInstallerFramework-macOS-x64-4.3.0.dmg
+          curl -L -O https://download.qt.io/official_releases/qt-installer-framework/4.6.1/QtInstallerFramework-macOS-x64-4.6.1.dmg
+          hdiutil attach -mountpoint ./qtfiw_installer QtInstallerFramework-macOS-x64-4.6.1.dmg
           echo "ls ./qtfiw_installer"
-          sudo ./qtfiw_installer/QtInstallerFramework-macOS-x64-4.3.0.app/Contents/MacOS/QtInstallerFramework-macOS-x64-4.3.0 --verbose --script ./ci/install_script_qtifw.qs
-          ls ~/Qt/QtIFW-4.3.0 || true
-          echo "~/Qt/QtIFW-4.3.0/bin/" >> $GITHUB_PATH
+          sudo ./qtfiw_installer/QtInstallerFramework-macOS-x64-4.6.1.app/Contents/MacOS/QtInstallerFramework-macOS-x64-4.6.1 --verbose --script ./ci/install_script_qtifw.qs
+          ls ~/Qt/QtIFW-4.6.1 || true
+          echo "~/Qt/QtIFW-4.6.1/bin/" >> $GITHUB_PATH
           echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.MACOSX_DEPLOYMENT_TARGET }} >> $GITHUB_ENV  
           # echo CMAKE_MACOSX_DEPLOYMENT_TARGET='-DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET' >> $GITHUB_ENV
         elif [ "$RUNNER_OS" == "Windows" ]; then
-          curl -L -O https://download.qt.io/official_releases/qt-installer-framework/4.3.0/QtInstallerFramework-windows-x86-4.3.0.exe
-          ./QtInstallerFramework-windows-x86-4.3.0.exe --verbose --script ./ci/install_script_qtifw.qs
+          curl -L -O https://download.qt.io/official_releases/qt-installer-framework/4.6.1/QtInstallerFramework-windows-x86-4.6.1.exe
+          ./QtInstallerFramework-windows-x86-4.6.1.exe --verbose --script ./ci/install_script_qtifw.qs
           dir "C:/Qt/"
-          echo "C:/Qt/QtIFW-4.3.0/bin" >> $GITHUB_PATH
+          echo "C:/Qt/QtIFW-4.6.1/bin" >> $GITHUB_PATH
           #echo "Setting CMAKE_GENERATOR options equivalent to ='-G \"Visual Studio 16 2019\" -A x64'"
           #echo CMAKE_GENERATOR='Visual Studio 16 2019' >> $GITHUB_ENV
           #echo CMAKE_GENERATOR_PLATFORM=x64 >> $GITHUB_ENV
