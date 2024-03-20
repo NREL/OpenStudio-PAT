@@ -26,7 +26,7 @@ jobs:
           node-version: 18
           allow_failure: false
         - name: macOS
-          os: macos-11
+          os: macos-13
           node-version: 18
           allow_failure: false
           MACOSX_DEPLOYMENT_TARGET: 10.15
