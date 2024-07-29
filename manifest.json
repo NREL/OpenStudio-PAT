@@ -1,17 +1,17 @@
 {
   "endpoint": "https://openstudio-resources.s3.amazonaws.com/pat-dependencies3/",
   "energyplus": [{
-    "name": "EnergyPlus-23.2.0-win32.tar.gz",
+    "name": "EnergyPlus-24.1.0-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "energyplus"
   }, {
-    "name": "EnergyPlus-23.2.0-darwin.tar.gz",
+    "name": "EnergyPlus-24.1.0-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "energyplus"
   }, {
-    "name": "EnergyPlus-23.2.0-linux.tar.gz",
+    "name": "EnergyPlus-24.1.0-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "energyplus"
@@ -28,17 +28,17 @@
     "type": "perl"
   }],
   "ruby": [{
-    "name": "ruby-2.7.2-win32.tar.gz",
+    "name": "ruby-3.2.2-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "ruby"
   }, {
-    "name": "ruby-2.7.2-darwin.tar.gz",
+    "name": "ruby-3.2.2-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "ruby"
   }, {
-    "name": "ruby-2.7.2-linux.tar.gz",
+    "name": "ruby-3.2.2-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "ruby"
@@ -60,33 +60,33 @@
     "type": "mongo"
   }],
   "openstudio": [{
-    "name": "OpenStudio-3.7.0-Windows.tar.gz",
+    "name": "OpenStudio-3.8.0-Windows.tar",
     "platform": "win32",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.7.0-Darwin.tar.gz",
+    "name": "OpenStudio-3.8.0-Darwin.tar",
     "platform": "darwin",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.7.0-Linux.tar.gz",
+    "name": "OpenStudio-3.8.0-Linux.tar",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio"
   }],
   "openstudioServer": [{
-    "name": "OpenStudio-server-fb64b32e47-win32.tar.gz",
+    "name": "OpenStudio-server-00939d8868-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-fb64b32e47-darwin.tar.gz",
+    "name": "OpenStudio-server-00939d8868-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-fb64b32e47-linux.tar.gz",
+    "name": "OpenStudio-server-00939d8868-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio-server"
