@@ -60,17 +60,17 @@
     "type": "mongo"
   }],
   "openstudio": [{
-    "name": "OpenStudio-3.8.0-Windows.tar",
+    "name": "OpenStudio-3.8.0-Windows.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.8.0-Darwin.tar",
+    "name": "OpenStudio-3.8.0-Darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.8.0-Linux.tar",
+    "name": "OpenStudio-3.8.0-Linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio"
