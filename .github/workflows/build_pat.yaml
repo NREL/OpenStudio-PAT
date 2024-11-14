@@ -131,5 +131,6 @@ jobs:
       with:
         name: PAT-Installer-${{ matrix.name }}
         path: ./build/ParametricAnalysisTool-*
+        name: OpenStudio-PAT-{{ matrix.name }}-${{ github.sha }}
 
 
