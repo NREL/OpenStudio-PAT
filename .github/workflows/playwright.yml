@@ -10,8 +10,8 @@ jobs:
     timeout-minutes: 60
     runs-on: ubuntu-20.04
     steps:
-      - uses: actions/checkout@v3
-      - uses: actions/setup-node@v3
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 17
           cache: npm
@@ -23,7 +23,7 @@ jobs:
         run: npm ci
       - name: Cache runtime dependencies
         id: cache-runtime-deps
-        uses: actions/cache@v3
+        uses: actions/cache@v4
         with:
           path: depend/
           key: ${{ runner.os }}-${{ hashFiles('manifest.json') }}
@@ -35,7 +35,7 @@ jobs:
       - name: Prepare tmp test files
         run: npm run test:tmpFiles
       - name: Run playwright tests
-        uses: GabrielBB/xvfb-action@v1
+        uses: coactions/setup-xvfb@v1
         with:
           run: |
             npm run test:parallel
