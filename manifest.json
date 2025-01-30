@@ -81,12 +81,12 @@
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-142417c15d-darwin.tar.gz",
+    "name": "OpenStudio-server-7560053e73-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-00939d8868-linux.tar.gz",
+    "name": "OpenStudio-server-7560053e73-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio-server"
