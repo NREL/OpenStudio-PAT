@@ -32,7 +32,7 @@
     "platform": "win32",
     "arch": "x64",
     "type": "ruby"
-  }, {
+  },  {
     "name": "ruby-3.2.2-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
