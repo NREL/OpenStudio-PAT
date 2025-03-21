@@ -48,7 +48,7 @@
     "platform": "win32",
     "arch": "x64",
     "type": "mongo"
-  }, {
+  },{
     "name": "mongodb-6.0.8-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
