@@ -61,7 +61,6 @@ export class MeasureManager {
 
   startMeasureManager() {
     const vm = this;
-
     // find an open port
     portfinder.getPortPromise({
       port: 3100,
@@ -70,12 +69,11 @@ export class MeasureManager {
       vm.port = port;
       vm.$log.info('Measure Manager port: ', vm.port);
 
-      vm.$log.info('Start Measure Manager Server: ', vm.cliPath, ' measure -s ', vm.port);
-      vm.cli = vm.spawn(vm.cliPath, ['classic', 'measure', '-s', vm.port]);
+      vm.$log.info('Start Measure Manager Server: ', vm.cliPath, 'measure -s ', vm.port);
+      vm.cli = vm.spawn(vm.cliPath, ['measure', '-s', vm.port], { cwd: '.', stdio : 'pipe' });
       vm.cli.stdout.on('data', (data) => {
         // record errors
         if (data.indexOf('<0>') !== -1) {
-          // WARNING
           vm.$log.warn(`MeasureManager WARNING: ${data}`);
           vm.Message.appendMeasureManagerError({type: 'warning', data: data.toString()});
         } else if (data.indexOf('<1>') !== -1) {
@@ -83,54 +81,49 @@ export class MeasureManager {
           vm.$log.error(`MeasureManager ERROR: ${data}`);
           vm.Message.appendMeasureManagerError({type: 'error', data: data.toString()});
         } else if(data.indexOf('<2>') !== -1) {
-          // ERROR
+          // FATAL
           vm.$log.error(`MeasureManager ERROR: ${data}`);
           vm.Message.appendMeasureManagerError({type: 'fatal', data: data.toString()});
-        }
-        else {
-          if (vm.Message.showDebug()) vm.$log.debug(`MeasureManager: ${data}`);
-        }
-        // check that the mm was started correctly: resolve readyDeferred
-        const str = data.toString();
-        if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
-          if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
-          vm.mmReadyDeferred.resolve();
-        }
-        // TODO: THIS IS TEMPORARY (windows):
-        else if (str.indexOf('Only one usage of each socket address') !== -1) {
-          if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
-          vm.mmReadyDeferred.resolve();
-        }
-        // TODO: THIS IS TEMPORARY (mac):
-        else if (str.indexOf('Error: Address already in use') !== -1) {
-          if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...assuming MeasureManager is already up');
-          vm.mmReadyDeferred.resolve();
+        } else {
+          if (vm.Message.showDebug()) {
+            vm.$log.debug(`MeasureManager: ${data}`);
+          }
         }
 
-      });
-      vm.cli.stderr.on('data', (data) => {
-        vm.$log.info(`MeasureManager: ${data}`);
         // check that the mm was started correctly: resolve readyDeferred
         const str = data.toString();
-        if (str.indexOf('WEBrick::HTTPServer#start: pid=') !== -1) {
-          if (vm.Message.showDebug()) vm.$log.debug('Found WEBrick Start!, resolve promise');
-          vm.mmReadyDeferred.resolve();
-        }
-        // TODO: THIS IS TEMPORARY (windows):
-        else if (str.indexOf('Only one usage of each socket address') !== -1) {
-          if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
-          vm.mmReadyDeferred.resolve();
-        }
-        // TODO: THIS IS TEMPORARY (mac):
-        else if (str.indexOf('Error: Address already in use') !== -1) {
-          if (vm.Message.showDebug()) vm.$log.debug('WEBrick already running...using tempMeasureManager');
+        if ((str.indexOf('Accepting requests on:') !== -1) ||
+            (str.indexOf('MeasureManager Ready') !== -1)) {
+          vm.$log.info('Found MeasureManager Start, MeasureManager is running');
           vm.mmReadyDeferred.resolve();
         }
       });
+      vm.cli.stderr.on('data', (data) => {
+        // C++ CLI printing errors when requests fail on stderr, eg when post
+        // data is missing:
+        // [2024-11-14T13:32:17+01:00] "POST /compute_arguments HTTP/1.1" 400
+        vm.$log.error(`MeasureManager: ${data}`);
+      });
+      vm.cli.on('error', (err) => {
+        console.log('Failed to start measure manager');
+      });
+      vm.cli.on('message', (msg) => {
+        console.log(`child message due to receipt of signal ${msg}`);
+      });
+
       vm.cli.on('close', (code) => {
         vm.$log.info(`Measure Manager exited with code ${code}`);
       });
-    }).catch(() => vm.$log.error('Error locating an open port for measure manager.'));
+      vm.cli.on('exit', (code) => {
+        if (code !== 0) {
+          const msg = `Failed with code = ${code}`;
+          console.log(msg);
+        }
+      });
+
+    }).catch((err) => {
+      vm.$log.error('Error locating an open port for measure manager.');
+    });
   }
 
   stopMeasureManager() {
@@ -249,7 +242,6 @@ export class MeasureManager {
 
     // reset MeasureManagerErrors when a new action
     vm.Message.resetMeasureManagerErrors();
-
     return vm.$http.post(`${vm.url}:${vm.port}/set`, params)
       .then(res => {
         vm.$log.info('Measure Manager setMyMeasuresDir Success!, status: ', res.status);
@@ -289,7 +281,10 @@ export class MeasureManager {
       .then(res => {
         vm.$log.info('Measure Manager download_bcl_measure Success!, status: ', res.status);
         vm.$log.info('Data: ', res.data);
-        return res.data[0];
+        // Classic (Ruby) CLI uses to return a single-element list
+        // C++ CLI returns the element directly
+        //return res.data[0];
+        return res.data
       })
       .catch(res => {
         vm.$log.error('Measure Manager download_bcl_measure Error: ', res.data);
