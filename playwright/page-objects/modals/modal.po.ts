@@ -30,6 +30,9 @@ export class ModalPO extends BasePageObject {
   }
 
   static async isTitleOk() {
+    // wait for the .modal-title locator to become visible
+    await this.title.waitFor({ state: 'visible' });
+    // then assert its text
     await expect(this.title).toHaveText(this.EXPECTED_TITLE);
   }
 
