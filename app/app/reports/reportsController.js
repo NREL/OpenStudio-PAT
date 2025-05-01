@@ -121,7 +121,7 @@ export class ReportsController {
       // pass data into webview when dom is ready
       angular.element(document).ready(() => {
         vm.passData();
-      })
+      });
     };
 
     // Uncomment this to view webview developer tools to debug project reports
@@ -132,7 +132,7 @@ export class ReportsController {
     // pass data into webview when dom is ready
     angular.element(document).ready(() => {
       vm.passData();
-    })
+    });
   }
 
   // Opens the developer tools for the webview

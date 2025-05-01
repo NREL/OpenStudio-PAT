@@ -284,7 +284,7 @@ export class MeasureManager {
         // Classic (Ruby) CLI uses to return a single-element list
         // C++ CLI returns the element directly
         //return res.data[0];
-        return res.data
+        return res.data;
       })
       .catch(res => {
         vm.$log.error('Measure Manager download_bcl_measure Error: ', res.data);
