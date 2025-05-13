@@ -3,6 +3,11 @@
 </div>
 
 <div class="modal-body">
+  <div class="col-sm-8 modal-text pad-bot-20">
+    <label class="medium-label" translate>serverTools.numberWorkers</label>
+    <input class="form-control" type="number" ng-model="numWorkers" ng-change="modal.setNumWorkers(numWorkers)">
+    <span translate>serverTools.numberCores</span>: {{numCores}}</span>
+  </div>
   <div class="row pad-bot-20">
     <div class="col-sm-12 modal-text" ng-if="projectDir != null">
       <button type="button" class="btn btn-success" ng-click="modal.startLocalServer()" translate>serverTools.start</button>
