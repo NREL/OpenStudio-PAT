@@ -94,10 +94,6 @@ export class DependencyManager {
           return prefixPath.path('mongo/bin/mongod' + exeExt);
         } else if (name == 'ENERGYPLUS_EXE_PATH') {
           return prefixPath.path('EnergyPlus/energyplus' + exeExt);
-        } else if (name == 'perlEXEPath') {
-          return prefixPath.path('Perl/perl/bin/perl' + exeExt);
-        } else if (name == 'OS_RAYPATH') {
-          return prefixPath.path('Radiance');
         }
       } else {
         prefixPath = jetpack.cwd(app.getPath('exe'), '../..', 'Resources');
@@ -114,10 +110,6 @@ export class DependencyManager {
           return prefixPath.path('mongo/bin/mongod' + exeExt);
         } else if (name == 'ENERGYPLUS_EXE_PATH') {
           return prefixPath.path('EnergyPlus/energyplus' + exeExt);
-        } else if (name == 'perlEXEPath') {
-          return prefixPath.path('Perl/perl/bin/perl' + exeExt);
-        } else if (name == 'OS_RAYPATH') {
-          return prefixPath.path('Radiance');
         }
       }
     } else {
@@ -146,10 +138,6 @@ export class DependencyManager {
       } else if (name == 'ENERGYPLUS_EXE_PATH') {
         // No default for EP. OpenStudio will look for ENERGYPLUS_EXE_PATH env var and then in the default, global location.
         return '';
-      } else if (name == 'PERL_EXE_PATH') {
-        return prefixPath.path('Perl/perl/bin/perl' + exeExt);
-      } else if (name == 'OS_RAYPATH') {
-        return prefixPath.path('Radiance');
       }
     }
   }
