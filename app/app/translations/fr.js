@@ -61,7 +61,9 @@ export default {
     stop: 'Arrêter le serveur local',
     ping: 'Requête Ping au Serveur et définir l\'état',
     viewServer: 'View Local Server',
-    noProject: 'Vous devez d\'abord ouvrir un projet'
+    noProject: 'Vous devez d\'abord ouvrir un projet',
+    numberWorkers: 'Nombre de travailleurs à utiliser pour le serveur',
+    numberCores: 'Nombre total de coeurs disponibles sur la machine'
   },
   setMeasuresDir: {
     title: 'Répertoire de MesMesures',
@@ -87,11 +89,11 @@ export default {
     updatingMeasureLocal: 'Updating measure in your local BCL!',
     updatingMeasureProject: 'Updating measure in your project!',
     designAltNameError: 'Cannot change design alternative name:  selected name is not unique',
-    startLocalServer: 'Starting Local Server...this make take a while',
+    startLocalServer: 'Starting Local Server...this may take a while',
     localStartInProgressBeforeStop: 'Local Server start is in progress for this project, and must complete before it can be stopped...this may take a few minutes',
     connectedServer: 'Connected to server!',
     connectedServerError: 'Error: server did not start',
-    stopLocalServer: 'Stopping Local Server...this make take a while',
+    stopLocalServer: 'Stopping Local Server...this may take a while',
     stoppedServer: 'Server stopped successfully!',
     stoppedServerError: 'Error: server could not be stopped',
     serverAlive: 'Server is Alive',
