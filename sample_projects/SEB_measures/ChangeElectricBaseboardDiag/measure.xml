@@ -1,9 +1,10 @@
+<?xml version="1.0"?>
 <measure>
-  <schema_version>3.0</schema_version>
+  <schema_version>3.1</schema_version>
   <name>change_electric_baseboard_diag</name>
   <uid>325cd385-bbaf-4f4f-adb2-8eb928c2de9d</uid>
-  <version_id>1835d0eb-f2d2-49d9-a828-558a919b9841</version_id>
-  <version_modified>20170321T143325Z</version_modified>
+  <version_id>54f52a3b-dbb6-4996-97ee-21d90330dd02</version_id>
+  <version_modified>2025-05-13T22:08:58Z</version_modified>
   <xml_checksum>45097B60</xml_checksum>
   <class_name>ChangeElectricBaseboardDiag</class_name>
   <display_name>Change Electric Baseboard</display_name>
@@ -36,8 +37,8 @@
       <default_value>1500</default_value>
     </argument>
   </arguments>
-  <outputs/>
-  <provenances/>
+  <outputs />
+  <provenances />
   <tags>
     <tag>Envelope.Form</tag>
   </tags>
@@ -55,12 +56,6 @@
   </attributes>
   <files>
     <file>
-      <filename>change_electric_baseboard_test.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>test</usage_type>
-      <checksum>A7A48F1C</checksum>
-    </file>
-    <file>
       <version>
         <software_program>OpenStudio</software_program>
         <identifier>1.5.3</identifier>
@@ -69,7 +64,13 @@
       <filename>measure.rb</filename>
       <filetype>rb</filetype>
       <usage_type>script</usage_type>
-      <checksum>985BA55C</checksum>
+      <checksum>B90ECEB7</checksum>
+    </file>
+    <file>
+      <filename>change_electric_baseboard_test.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>test</usage_type>
+      <checksum>A7A48F1C</checksum>
     </file>
   </files>
 </measure>

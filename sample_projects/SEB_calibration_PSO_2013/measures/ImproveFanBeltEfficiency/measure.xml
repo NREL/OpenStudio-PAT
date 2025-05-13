@@ -1,19 +1,20 @@
+<?xml version="1.0"?>
 <measure>
-  <schema_version>3.0</schema_version>
+  <schema_version>3.1</schema_version>
   <name>improve_fan_belt_efficiency</name>
   <uid>724ef0bb-49ab-4697-bcab-09a8846a3714</uid>
-  <version_id>1adbc719-13af-407d-ab5c-7bf2544a193e</version_id>
-  <version_modified>20170320T192150Z</version_modified>
+  <version_id>2661bf5e-656c-474c-8519-a92937455a29</version_id>
+  <version_modified>2025-05-13T22:08:59Z</version_modified>
   <xml_checksum>F78494F2</xml_checksum>
   <class_name>ImproveFanBeltEfficiency</class_name>
   <display_name>Improve Fan Belt Efficiency</display_name>
-  <description>The assessment team observed opportunities for fan belt improvements on HVAC fan drives. These motors are asynchronous induction motors.&#xd;&#xd;&#xd;&#xd;&#xd;
-&#xd;&#xd;&#xd;&#xd;&#xd;
-Improvements in belt efficiency result in energy savings at the motor. The three common belt efficiency measures are belt tightening (1%-5% savings per motor), replace standard v-belts with cogged v-belts (2% savings per motor), and replace standard belts with synchronous belts (3% savings per motor).&#xd;&#xd;&#xd;&#xd;&#xd;
-&#xd;&#xd;&#xd;&#xd;&#xd;
-Well-adjusted belts run cooler, last longer, and operate at higher efficiency than standard belts. The belts associated with the largest motors, longest run times, and that are run closest to full load should be given priority when making replacements.&#xd;&#xd;&#xd;&#xd;&#xd;
+  <description>The assessment team observed opportunities for fan belt improvements on HVAC fan drives. These motors are asynchronous induction motors.
+
+Improvements in belt efficiency result in energy savings at the motor. The three common belt efficiency measures are belt tightening (1%-5% savings per motor), replace standard v-belts with cogged v-belts (2% savings per motor), and replace standard belts with synchronous belts (3% savings per motor).
+
+Well-adjusted belts run cooler, last longer, and operate at higher efficiency than standard belts. The belts associated with the largest motors, longest run times, and that are run closest to full load should be given priority when making replacements.
   </description>
-  <modeler_description>This measure alters fans on all or a single air loop in the building. The three belt ECMs options are then exposed as three user argument fields with a default populated for each. The range of efficiency improvements will be listed in the user argument description. The three user arguments will be summed and added to the existing motor efficiency. The cost arguments are user arguments that are also populated with a default.  If arguments are left blank, the user is notified that the model has not changed in the run manager. A warning is issued if the motor efficiency >96% and an error is issued if efficiency is >100%.</modeler_description>
+  <modeler_description>This measure alters fans on all or a single air loop in the building. The three belt ECMs options are then exposed as three user argument fields with a default populated for each. The range of efficiency improvements will be listed in the user argument description. The three user arguments will be summed and added to the existing motor efficiency. The cost arguments are user arguments that are also populated with a default.  If arguments are left blank, the user is notified that the model has not changed in the run manager. A warning is issued if the motor efficiency &gt;96% and an error is issued if efficiency is &gt;100%.</modeler_description>
   <arguments>
     <argument>
       <name>object</name>
@@ -21,10 +22,10 @@ Well-adjusted belts run cooler, last longer, and operate at higher efficiency th
       <type>Choice</type>
       <required>true</required>
       <model_dependent>false</model_dependent>
-      <default_value>*All Air Loops*</default_value>
+      <default_value>{77accec2-feb7-442c-8f88-1c37ac82665c}</default_value>
       <choices>
         <choice>
-          <value>{7cf735ed-c091-4efb-a7d2-d18b50d984d6}</value>
+          <value>{77accec2-feb7-442c-8f88-1c37ac82665c}</value>
           <display_name>*All Air Loops*</display_name>
         </choice>
       </choices>
@@ -130,8 +131,8 @@ Well-adjusted belts run cooler, last longer, and operate at higher efficiency th
       <default_value>1</default_value>
     </argument>
   </arguments>
-  <outputs/>
-  <provenances/>
+  <outputs />
+  <provenances />
   <tags>
     <tag>HVAC.Distribution</tag>
   </tags>
@@ -149,6 +150,29 @@ Well-adjusted belts run cooler, last longer, and operate at higher efficiency th
   </attributes>
   <files>
     <file>
+      <version>
+        <software_program>OpenStudio</software_program>
+        <identifier>1.0.3</identifier>
+        <min_compatible>1.0.3</min_compatible>
+      </version>
+      <filename>measure.rb</filename>
+      <filetype>rb</filetype>
+      <usage_type>script</usage_type>
+      <checksum>6D94B096</checksum>
+    </file>
+    <file>
+      <filename>0320_ModelWithHVAC_01/files/USA_IL_Chicago-OHare.Intl.AP.725300_TMY3.epw</filename>
+      <filetype>epw</filetype>
+      <usage_type>test</usage_type>
+      <checksum>3B177CE0</checksum>
+    </file>
+    <file>
+      <filename>0320_ModelWithHVAC_01/run.db</filename>
+      <filetype>db</filetype>
+      <usage_type>test</usage_type>
+      <checksum>1B15A7A5</checksum>
+    </file>
+    <file>
       <filename>0320_ModelWithHVAC_01.osm</filename>
       <filetype>osm</filetype>
       <usage_type>test</usage_type>
@@ -159,17 +183,6 @@ Well-adjusted belts run cooler, last longer, and operate at higher efficiency th
       <filetype>rb</filetype>
       <usage_type>test</usage_type>
       <checksum>6FC6DAA3</checksum>
-    </file>
-    <file>
-      <version>
-        <software_program>OpenStudio</software_program>
-        <identifier>1.0.3</identifier>
-        <min_compatible>1.0.3</min_compatible>
-      </version>
-      <filename>measure.rb</filename>
-      <filetype>rb</filetype>
-      <usage_type>script</usage_type>
-      <checksum>6D94B096</checksum>
     </file>
   </files>
 </measure>
