@@ -16,17 +16,6 @@
     "arch": "x64",
     "type": "energyplus"
   }],
-  "perl": [{
-    "name": "perl-5.16.2-win32.tar.gz",
-    "platform": "win32",
-    "arch": "x64",
-    "type": "perl"
-  }, {
-    "name": "ruby-5.16.2-darwin.tar.gz",
-    "platform": "darwin",
-    "arch": "x64",
-    "type": "perl"
-  }],
   "ruby": [{
     "name": "ruby-3.2.2-win32.tar.gz",
     "platform": "win32",
