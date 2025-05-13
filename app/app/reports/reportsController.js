@@ -51,7 +51,6 @@ export class ReportsController {
     vm.$scope.datapoints = vm.Project.getDatapoints();
     if (vm.Message.showDebug()) vm.$log.debug('DATAPOINTS: ', vm.$scope.datapoints);
     vm.testResults = vm.$scope.datapoints;
-
     // get algorithmic results
     vm.selectedAnalysisType = vm.Project.getAnalysisType();
     vm.algorithmic_results = [];
@@ -71,7 +70,6 @@ export class ReportsController {
 
     // Find all possible reports
     var html_reports = [];
-    // TODO figure out why vm.env does not seem to be defined in development
     if (vm.env && (vm.env.name == 'production')) {
       // This will resolve to the path to app.asaar
       var appDir = vm.jetpack.cwd(app.getAppPath());
@@ -120,17 +118,21 @@ export class ReportsController {
           wv.attr('src', vm.$scope.selectedReportURL);
         }
       });
-      //pass data into webview when dom is ready
-      angular.element(document).on('ready', vm.passData);
+      // pass data into webview when dom is ready
+      angular.element(document).ready(() => {
+        vm.passData();
+      });
     };
 
     // Uncomment this to view webview developer tools to debug project reports
     // if (vm.env != 'production') {
-    //  vm.openWebViewDevTools();
+    //   vm.openWebViewDevTools();
     // }
 
-    //pass data into webview when dom is ready
-    angular.element(document).on('ready', vm.passData);
+    // pass data into webview when dom is ready
+    angular.element(document).ready(() => {
+      vm.passData();
+    });
   }
 
   // Opens the developer tools for the webview

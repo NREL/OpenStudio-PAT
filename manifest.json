@@ -1,17 +1,17 @@
 {
   "endpoint": "https://openstudio-resources.s3.amazonaws.com/pat-dependencies3/",
   "energyplus": [{
-    "name": "EnergyPlus-22.2.0-win32.tar.gz",
+    "name": "EnergyPlus-24.2.0-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "energyplus"
   }, {
-    "name": "EnergyPlus-22.2.0-darwin.tar.gz",
+    "name": "EnergyPlus-24.2.0-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "energyplus"
   }, {
-    "name": "EnergyPlus-22.2.0-linux.tar.gz",
+    "name": "EnergyPlus-24.2.0-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "energyplus"
@@ -28,65 +28,65 @@
     "type": "perl"
   }],
   "ruby": [{
-    "name": "ruby-2.7.2-win32.tar.gz",
+    "name": "ruby-3.2.2-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "ruby"
   }, {
-    "name": "ruby-2.7.2-darwin.tar.gz",
+    "name": "ruby-3.2.2-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "ruby"
   }, {
-    "name": "ruby-2.7.2-linux.tar.gz",
+    "name": "ruby-3.2.2-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "ruby"
   }],
   "mongo": [{
-    "name": "mongodb-4.4.2-win32.tar.gz",
+    "name": "mongodb-6.0.8-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "mongo"
-  }, {
-    "name": "mongodb-4.4.2-darwin.tar.gz",
+  },{
+    "name": "mongodb-6.0.8-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "mongo"
   }, {
-    "name": "mongodb-4.4.2-linux.tar.gz",
+    "name": "mongodb-6.0.8-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "mongo"
   }],
   "openstudio": [{
-    "name": "OpenStudio-3.5.0-Windows.tar.gz",
+    "name": "OpenStudio-3.9.0-Windows.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.5.0-Darwin.tar.gz",
+    "name": "OpenStudio-3.9.0-Darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.5.0-Linux.tar.gz",
+    "name": "OpenStudio-3.9.0-Linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio"
   }],
   "openstudioServer": [{
-    "name": "OpenStudio-server-1d5df050f8-win32.tar.gz",
+    "name": "OpenStudio-server-415ae851b8-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-1d5df050f8-darwin.tar.gz",
+    "name": "OpenStudio-server-415ae851b8-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-1d5df050f8-linux.tar.gz",
+    "name": "OpenStudio-server-415ae851b8-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio-server"

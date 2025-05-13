@@ -26,11 +26,10 @@
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
 import jetpack from 'fs-jetpack';
-import { shell } from '@electron/remote';
 
 export class ModalBclController {
 
-  constructor($log, $q, $uibModalInstance, $timeout, $uibModal, uiGridConstants, $scope, $translate, toastr, BCL, params, Project, MeasureManager, Message) {
+  constructor($log, $q, $uibModalInstance, $timeout, $uibModal, uiGridConstants, $scope, $translate, toastr, BCL, params, Project, MeasureManager, Message, RemoteHelper) {
     'ngInject';
 
     const vm = this;
@@ -45,7 +44,7 @@ export class ModalBclController {
     vm.Project = Project;
     vm.toastr = toastr;
     vm.jetpack = jetpack;
-    vm.shell = shell;
+    vm.shell = RemoteHelper.shell;
     vm.params = params;
     vm.$translate = $translate;
     vm.MeasureManager = MeasureManager;
@@ -432,6 +431,8 @@ export class ModalBclController {
     const vm = this;
     if (vm.Message.showDebug()) vm.$log.debug('ModalBCL::addToProject');
 
+    console.log("this measure is being added to project: ", measure);
+
     // prevent user from closing modal until measure is done getting added
     vm.$scope.addInProgress = true;
 
@@ -451,6 +452,7 @@ export class ModalBclController {
     // set default seed (and use to compute arguments
     measure.seed = vm.Project.getDefaultSeed();
     vm.Project.computeMeasureArguments(measure).then(response => {
+      console.log("in BCL modal computerMeasureArgs: ", response);
       measure = response;
       if (vm.Message.showDebug()) vm.$log.debug('New Measure with computed args: ', measure);
       const project_measure = angular.copy(measure);
