@@ -8,7 +8,7 @@ on:
     branches:
       -  '*'
     tags:
-      - '*' 
+      - '*'
 
 jobs:
   pat_build:
@@ -26,7 +26,7 @@ jobs:
           node-version: 18
           allow_failure: false
         - name: macOS
-          os: macos-10.15
+          os: macos-13
           node-version: 18
           allow_failure: false
           MACOSX_DEPLOYMENT_TARGET: 10.15
@@ -39,10 +39,10 @@ jobs:
 
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
 
     - name: Set up Node ${{ matrix.node-version }}
-      uses: actions/setup-node@v3
+      uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
 
@@ -54,16 +54,16 @@ jobs:
           sudo apt update
           sudo apt install cmake
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          curl -L -O https://download.qt.io/official_releases/qt-installer-framework/4.3.0/QtInstallerFramework-macOS-x64-4.3.0.dmg
+          curl -L -O https://download.qt.io/archive/qt-installer-framework/4.3.0/QtInstallerFramework-macOS-x64-4.3.0.dmg
           hdiutil attach -mountpoint ./qtfiw_installer QtInstallerFramework-macOS-x64-4.3.0.dmg
           echo "ls ./qtfiw_installer"
           sudo ./qtfiw_installer/QtInstallerFramework-macOS-x64-4.3.0.app/Contents/MacOS/QtInstallerFramework-macOS-x64-4.3.0 --verbose --script ./ci/install_script_qtifw.qs
           ls ~/Qt/QtIFW-4.3.0 || true
           echo "~/Qt/QtIFW-4.3.0/bin/" >> $GITHUB_PATH
-          echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.MACOSX_DEPLOYMENT_TARGET }} >> $GITHUB_ENV  
+          echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.MACOSX_DEPLOYMENT_TARGET }} >> $GITHUB_ENV
           # echo CMAKE_MACOSX_DEPLOYMENT_TARGET='-DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET' >> $GITHUB_ENV
         elif [ "$RUNNER_OS" == "Windows" ]; then
-          curl -L -O https://download.qt.io/official_releases/qt-installer-framework/4.3.0/QtInstallerFramework-windows-x86-4.3.0.exe
+          curl -L -O https://download.qt.io/archive/qt-installer-framework/4.3.0/QtInstallerFramework-windows-x86-4.3.0.exe
           ./QtInstallerFramework-windows-x86-4.3.0.exe --verbose --script ./ci/install_script_qtifw.qs
           dir "C:/Qt/"
           echo "C:/Qt/QtIFW-4.3.0/bin" >> $GITHUB_PATH
@@ -71,12 +71,18 @@ jobs:
           #echo CMAKE_GENERATOR='Visual Studio 16 2019' >> $GITHUB_ENV
           #echo CMAKE_GENERATOR_PLATFORM=x64 >> $GITHUB_ENV
           # C:\Program Files (x86)\Microsoft Visual Studio\2019\Enterprise
-          MSVC_DIR=$(cmd.exe /c "vswhere -products * -requires Microsoft.Component.MSBuild -property installationPath -latest")
+          # Command below no longer working and returning the version number.
+          # MSVC_DIR=$(cmd.exe /c "vswhere -products * -requires Microsoft.Component.MSBuild -property installationPath -latest")
+          MSVC_DIR="C:\Program Files\Microsoft Visual Studio\2022\Enterprise"
           echo "Latest is: $MSVC_DIR"
           echo "MSVC_DIR=$MSVC_DIR" >> $GITHUB_ENV
           # add folder containing vcvarsall.bat
           echo "$MSVC_DIR\VC\Auxiliary\Build" >> $GITHUB_PATH
         fi;
+
+        N=$(nproc 2>/dev/null || sysctl -n hw.logicalcpu)
+        echo "There are $N threads available"
+        echo "N=$N" >> $GITHUB_ENV
 
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
@@ -90,8 +96,8 @@ jobs:
         echo "Using vcvarsall to initialize the development environment"
         call vcvarsall.bat x64
         cmake -G "Visual Studio 17 2022" -A x64 ..
-        cmake --build . --target package -j 2 --config Release
-      
+        cmake --build . --target package -j ${{ env.N }} --config Release
+
     - name: Configure CMake & build (Linux)
       working-directory: ./build
       if: runner.os == 'Linux'
@@ -106,7 +112,7 @@ jobs:
               -DCPACK_BINARY_STGZ=OFF \
               -DCPACK_BINARY_TBZ2=OFF \
               ../
-        cmake --build . --target package -j 2
+        cmake --build . --target package -j $N
 
     - name: Configure CMake & build (macOS)
       working-directory: ./build
@@ -118,11 +124,13 @@ jobs:
               -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
               -DCMAKE_BUILD_TYPE=Release \
               ../
-        cmake --build . --target package -j 2
+        cmake --build . --target package -j $N
 
     - name: Save artifact
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v4
       with:
+        name: PAT-Installer-${{ matrix.name }}
         path: ./build/ParametricAnalysisTool-*
+        #name: OpenStudio-PAT-{{ matrix.name }}-${{ github.sha }}
 
-  
+

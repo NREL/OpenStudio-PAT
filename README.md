@@ -1,15 +1,23 @@
 Parametric Analysis Tool (PAT)
 ==============
 
-The Parametric Analysis Tool (PAT) is part of the OpenStudio collection of software tools.
+The Parametric Analysis Tool (PAT) is part of the OpenStudio collection of software tools. It is an electron app.
 
 For more information and documentation on OpenStudio, visit the [OpenStudio website](https://www.openstudio.net/) or the [OpenStudio GitHub](https://github.com/NREL/OpenStudio) repo.  User support is available via the community moderated question and answer resource [unmethours.com](https://unmethours.com/questions/).
 
-If you find a bug, you can help us by [submitting an issue](https://github.com/NREL/OpenStudio-PAT/issues).  Guidelines for issue submission and prioritization can be found on the [OpenStudio wiki](https://github.com/NREL/OpenStudio/wiki/Issue-Prioritization). 
+If you find a bug, you can help us by [submitting an issue](https://github.com/NREL/OpenStudio-PAT/issues).  Guidelines for issue submission and prioritization can be found on the [OpenStudio wiki](https://github.com/NREL/OpenStudio/wiki/Issue-Prioritization).
+
+<br />
+
+# Testing
+
+[![Playwright Tests](https://github.com/NREL/OpenStudio-PAT/actions/workflows/playwright.yml/badge.svg)](https://github.com/NREL/OpenStudio-PAT/actions/workflows/playwright.yml)
+
+PAT uses [playwright](https://playwright.dev/) to conduct automated E2E testing. For more information, please see the [TESTING.md](TESTING.md) file.
+
+<br />
 
 # Development
-
-PAT is an electron app. 
 
 ## Getting started
 

@@ -25,16 +25,15 @@
  *  AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
  *  ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  **********************************************************************************************************************/
-import { dialog } from '@electron/remote';
 
 export class OpenProject {
-  constructor($q, $log, $uibModal, Message) {
+  constructor($q, $log, $uibModal, RemoteHelper, Message) {
     'ngInject';
     const vm = this;
     vm.$q = $q;
     vm.$log = $log;
     vm.$uibModal = $uibModal;
-    vm.dialog = dialog;
+    vm.dialog = RemoteHelper.dialog;
     vm.Message = Message;
   }
 
