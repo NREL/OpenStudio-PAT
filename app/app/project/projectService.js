@@ -61,6 +61,7 @@ export class Project {
     vm.downloadOSMTypes = [{value: false, label: 'false'}, {value: true, label: 'true'}];
     vm.downloadOSWTypes = [{value: false, label: 'false'}, {value: true, label: 'true'}];
     vm.downloadZIPTypes = [{value: false, label: 'false'}, {value: true, label: 'true'}];
+    vm.gemfileTypes = [{value: false, label: 'false'}, {value: true, label: 'true'}];
 
     vm.numberDPsToDisplay = 150;
 
@@ -95,12 +96,14 @@ export class Project {
     vm.downloadOSW = null;
     vm.downloadOSM = null;
     vm.downloadZIP = null;
+    vm.gemfile = null;
     vm.timeoutWorkflow = null;
     vm.timeoutUploadResults = null;
     vm.timeoutInitWorker = null;
     vm.reportType = null;
     vm.runType = vm.runTypes[0];
     vm.samplingMethod = vm.samplingMethods[0];
+    vm.numberWorkers = null;
     vm.rubyMD5 = null;
     vm.mongoMD5 = null;
     vm.openstudioServerMD5 = null;
@@ -179,6 +182,8 @@ export class Project {
     vm.downloadOSW = true;
     vm.downloadOSM = true;
     vm.downloadZIP = true;
+    vm.gemfile = false;
+    vm.numberWorkers = 1;
     vm.timeoutWorkflow = 28800;
     vm.timeoutUploadResults = 28800;
     vm.timeoutInitWorker = 28800;
@@ -262,6 +267,7 @@ export class Project {
         vm.downloadOSW = vm.pat.downloadOSW ? vm.pat.downloadOSW : vm.downloadOSW;
         vm.downloadOSM = vm.pat.downloadOSM ? vm.pat.downloadOSM : vm.downloadOSM;
         vm.downloadZIP = vm.pat.downloadZIP ? vm.pat.downloadZIP : vm.downloadZIP;
+        vm.gemfile = vm.pat.gemfile ? vm.pat.gemfile : vm.gemfile;
         vm.timeoutWorkflow = vm.pat.timeoutWorkflow ? vm.pat.timeoutWorkflow : vm.timeoutWorkflow;
         vm.timeoutUploadResults = vm.pat.timeoutUploadResults ? vm.pat.timeoutUploadResults : vm.timeoutUploadResults;
         vm.timeoutInitWorker = vm.pat.timeoutInitWorker ? vm.pat.timeoutInitWorker : vm.timeoutInitWorker;
@@ -280,6 +286,7 @@ export class Project {
         vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
         vm.remoteSettings = vm.pat.remoteSettings ? vm.pat.remoteSettings : vm.remoteSettings;
         vm.serverScripts = vm.pat.serverScripts ? vm.pat.serverScripts : vm.serverScripts;
+        vm.numberWorkers = vm.pat.numberWorkers ? vm.pat.numberWorkers : vm.numberWorkers;
 
         // filesToInclude
         // convert paths to platform-specific delimiters
@@ -539,6 +546,10 @@ export class Project {
         prefix: 'weather'
       });
 
+      archive.glob('Gemfile', {
+        cwd: vm.gemfileDir.path()
+      });
+
       // add server scripts (if they exist)
       _.forEach(vm.serverScripts, (script, type) => {
         if (script.file) {
@@ -601,6 +612,8 @@ export class Project {
     vm.osa.analysis.download_osw = vm.downloadOSW;
     vm.osa.analysis.download_osm = vm.downloadOSM;
     vm.osa.analysis.download_zip = vm.downloadZIP;
+    // add Gemfile
+    vm.osa.analysis.gemfile = vm.gemfile;
     // add timeout args to OSA
     vm.osa.analysis.run_workflow_timeout = vm.timeoutWorkflow;
     vm.osa.analysis.upload_results_timeout = vm.timeoutUploadResults;
@@ -1052,6 +1065,8 @@ export class Project {
     // MEASURE DETAILS
     let analysis_variables = 0;
 
+
+
     let measure_count = 0;
     _.forEach(vm.measures, (measure) => {
       // for algorithmic workflows, don't add SKIPPED measure to JSON
@@ -1102,7 +1117,7 @@ export class Project {
               }
               else if (argument.display_name && argument.display_name_short && argument.name && argument.value_type && !_.isNil(argument.value)) {
                 // Make sure that argument is "complete"
-                var_count += 1;
+                measure_count += 1;
                 m.arguments.push(argument);
               } else {
                 vm.$log.error('Not pushing partial argument to json.  Fix partial argument: ', argument);
@@ -1532,6 +1547,7 @@ export class Project {
     vm.pat.downloadOSW = vm.downloadOSW;
     vm.pat.downloadOSM = vm.downloadOSM;
     vm.pat.downloadZIP = vm.downloadZIP;
+    vm.pat.gemfile = vm.gemfile;
     vm.pat.timeoutWorkflow = vm.timeoutWorkflow;
     vm.pat.timeoutUploadResults = vm.timeoutUploadResults;
     vm.pat.timeoutInitWorker = vm.timeoutInitWorker;
@@ -1549,6 +1565,7 @@ export class Project {
     vm.pat.openstudioServerMD5 = vm.openstudioServerMD5;
     vm.pat.openstudioCLIMD5 = vm.openstudioCLIMD5;
     vm.pat.openstudioMD5 = vm.openstudioMD5;
+    vm.pat.numberWorkers = vm.numberWorkers;
 
     // measures and options
     vm.pat.measures = vm.measures;
@@ -1700,6 +1717,7 @@ export class Project {
     vm.projectMeasuresDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/measures'));
     vm.seedDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/seeds'));
     vm.weatherDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/weather'));
+    vm.gemfileDir = jetpack.dir(path.resolve(vm.projectDir.path()));  
 
     // initializeProject will also create the basic folder structure, if it is missing
     vm.initializeProject();
@@ -1768,6 +1786,16 @@ export class Project {
     return vm.numberDPsToDisplay;
   }
 
+  getNumberWorkers() {
+    const vm = this;
+    return vm.numberWorkers;
+  }
+
+  setNumberWorkers(num) {
+    const vm = this;
+    vm.numberWorkers = num;
+  }
+
   getSeedDir() {
     const vm = this;
     return vm.seedDir;
@@ -1776,6 +1804,11 @@ export class Project {
   getWeatherDir() {
     const vm = this;
     return vm.weatherDir;
+  }
+
+  getGemfileDir() {
+    const vm = this;
+    return vm.gemfileDir;
   }
 
   getMongoDir() {
@@ -3272,6 +3305,11 @@ export class Project {
     return vm.downloadReportsTypes;
   }
 
+  getGemfileTypes() {
+    const vm = this;
+    return vm.gemfileTypes;
+  }
+
   getDownloadOSWTypes() {
     const vm = this;
     return vm.downloadOSWTypes;
@@ -3332,6 +3370,12 @@ export class Project {
     return vm.weatherFiles;
   }
 
+  getGemfile() {
+    const vm = this;
+    return vm.gemfile;
+  }
+
+
   setSeeds() {
     const vm = this;
 
@@ -3364,6 +3408,25 @@ export class Project {
     }
 
   }
+
+  setGemfile(name) {
+    const vm = this;
+    vm.gemfile = name;
+    vm.$log.info('gemfile setting to ', name);
+    if (angular.isDefined(vm.gemfileDir)) {
+      if (vm.jetpack.exists(vm.gemfileDir.cwd())) {
+        if (vm.gemfileDir.exists('Gemfile')) {
+          vm.$log.info('Gemfile found in', vm.gemfileDir.cwd());
+        }
+        else { 
+          vm.$log.info('Gemfile not found in', vm.gemfileDir.cwd(), 'setting to false');
+          vm.gemfile = false;
+        }
+      }
+    }
+
+  }
+  
 
   setSeedsDropdownOptions() {
     const vm = this;

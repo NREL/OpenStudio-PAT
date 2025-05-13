@@ -61,7 +61,9 @@ export default {
     stop: 'Arrêter le serveur local',
     ping: 'Requête Ping au Serveur et définir l\'état',
     viewServer: 'View Local Server',
-    noProject: 'Vous devez d\'abord ouvrir un projet'
+    noProject: 'Vous devez d\'abord ouvrir un projet',
+    numberWorkers: 'Nombre de travailleurs à utiliser pour le serveur',
+    numberCores: 'Nombre total de coeurs disponibles sur la machine'
   },
   setMeasuresDir: {
     title: 'Répertoire de MesMesures',

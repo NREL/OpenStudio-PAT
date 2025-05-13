@@ -48,6 +48,15 @@ export class ModalServerToolsController {
     }
     if (vm.Message.showDebug()) vm.$log.debug('Project dir: ', vm.$scope.projectDir);
 
+    vm.$scope.numCores = vm.OsServer.getNumberCores();
+    vm.$scope.numWorkers = vm.Project.getNumberWorkers();
+
+  }
+
+  setNumWorkers(numWkrs){
+    // set this so OsServer can access it when starting local server
+    const vm = this;
+    vm.Project.setNumberWorkers(numWkrs);
   }
 
   getLocalServer() {
