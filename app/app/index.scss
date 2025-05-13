@@ -367,7 +367,9 @@ select {
 }
 
 .ui-grid-category {
-  text-align: center;border-right: 0px;box-shadow: -1px 1px #d4d4d4
+  text-align: center;
+  border-right: 0px;
+  box-shadow: -1px 0px #d4d4d4
 }
 
 /* this allows no trim of whitespace at front or end of strings in editable grid cells */

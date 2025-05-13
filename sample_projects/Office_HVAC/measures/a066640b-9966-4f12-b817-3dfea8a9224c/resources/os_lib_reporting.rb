@@ -700,7 +700,7 @@ module OsLib_Reporting
       end
       value_source_units = 'COP'
       value_target_units = 'COP'
-      value_ip = component.ratedCOP.get
+      value_ip = component.ratedCOP
       value_ip_neat = OpenStudio.toNeatString(value_ip, 2, true)
       description = 'Rated COP'
       data_arrays << [component.iddObject.name, sizing_ip_neat, sizing_target_units, description, value_ip_neat, value_target_units, '']
@@ -719,7 +719,7 @@ module OsLib_Reporting
       end
       value_source_units = 'COP'
       value_target_units = 'COP'
-      value_ip = component.ratedHighSpeedCOP.get
+      value_ip = component.ratedHighSpeedCOP
       value_ip_neat = OpenStudio.toNeatString(value_ip, 2, true)
       description = 'Rated COP'
       data_arrays << ["#{component.iddObject.name} - HighSpeed", sizing_ip_neat, sizing_target_units, description, value_ip_neat, value_target_units, '']
@@ -735,7 +735,7 @@ module OsLib_Reporting
       end
       value_source_units = 'COP'
       value_target_units = 'COP'
-      value_ip = component.ratedLowSpeedCOP.get
+      value_ip = component.ratedLowSpeedCOP
       value_ip_neat = OpenStudio.toNeatString(value_ip, 2, true)
       description = 'Rated COP'
       data_arrays << ["#{component.iddObject.name} (cont) - LowSpeed", sizing_ip_neat, sizing_target_units, description, value_ip_neat, value_target_units, '']
