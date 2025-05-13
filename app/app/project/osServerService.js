@@ -47,12 +47,12 @@ export class OsServer {
     vm.$translate = $translate;
     vm.toastr = toastr;
 
-    // set number of workers
+    // set number of workers from project.
     vm.numCores = os.cpus().length;
-    vm.numWorkers = 1;
-    if (vm.numCores) {
-      vm.numWorkers = vm.numCores == 1 ? 1 : (vm.numCores - 1);
-    }
+    vm.numWorkers = vm.Project.getNumberWorkers();
+    // if (vm.numCores) {
+    //   vm.numWorkers = vm.numCores == 1 ? 1 : (vm.numCores - 1);
+    // }
     vm.$log.info('Number of cores: ', vm.numCores);
     vm.$log.info('Number of workers set to: ', vm.numWorkers);
 
@@ -84,6 +84,7 @@ export class OsServer {
   initializeServer() {
     const vm = this;
     vm.numberDPsToDisplay = vm.Project.getNumberDPsToDisplay();
+    vm.numWorkers = vm.Project.getNumberWorkers();
     vm.localServerURL = 'http://localhost:8080';  // default URL.  will be reset when starting server
     vm.serverStatuses = {local: 'stopped', remote: 'stopped'};  // started, stopped, error?
     vm.analysisStatus = '';  // '', starting, started, in progress, queued, completed, error, canceled
@@ -263,9 +264,9 @@ export class OsServer {
 
   }
 
-  getNumWorkers() {
+  getNumberCores() {
     const vm = this;
-    return vm.numWorkers;
+    return vm.numCores;
   }
 
   getSelectedServerURL() {
@@ -534,6 +535,9 @@ export class OsServer {
     if (vm.Message.showDebug()) vm.$log.debug('***** In osServerService::localServer() *****');
     // See "https://github.com/NREL/OpenStudio-server/tree/dockerize-osw/server/spec/files/batch_datapoints" for test files
     const deferred = vm.$q.defer();
+
+    // refetch numWorkers in case it has changed in serverTools modal
+    vm.numWorkers = vm.Project.getNumberWorkers();
 
     // run META CLI will return status code: 0 = success, 1 = failure
     // start local server needs path to oscli (vm.cliPath)
