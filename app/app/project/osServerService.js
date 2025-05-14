@@ -545,28 +545,32 @@ export class OsServer {
       vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --worker-number=' + vm.numWorkers + ' --energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --openstudio-exe-path=' + '\"' + vm.cliPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
     vm.$log.info('start server command: ', vm.startServerCommand);
 
-    vm.localServerChild = vm.exec(vm.startServerCommand,
-      (error, stdout, stderr) => {
-        if (vm.Message.showDebug()) vm.$log.debug('exit code: ', vm.localServerChild.exitCode);
-        if (vm.Message.showDebug()) vm.$log.debug('child: ', vm.localServerChild);
-        if (vm.Message.showDebug()) vm.$log.debug('stdout: ', stdout);
-        if (vm.Message.showDebug()) vm.$log.debug('stderr: ', stderr);
+    // fire off start_local and capture the child immediately
+    vm.localServerChild = vm.exec(vm.startServerCommand);
 
-        if (vm.localServerChild.exitCode == 0) {
-          // SUCCESS
-          if (vm.Message.showDebug()) vm.$log.debug('SERVER SUCCESS');
-          // get url from local_configuration.json
-          vm.getLocalServerUrlFromFile();
-          vm.$log.info('SERVER URL: ', vm.selectedServerURL);
-          deferred.resolve(vm.localServerChild);
-        } else {
-          vm.$log.error('SERVER ERROR');
-          if (error !== null) {
-            console.log('exec error:', error);
-          }
-          deferred.reject(error);
-        }
-      });
+    // stream its stdout in real time
+    vm.localServerChild.stdout.on('data', chunk => {
+      const line = chunk.toString().trim();
+      if (line) console.log('[openstudio_meta stdout]', line);
+    });
+
+    // stream its stderr in real time
+    vm.localServerChild.stderr.on('data', chunk => {
+      const line = chunk.toString().trim();
+      if (line) console.error('[openstudio_meta stderr]', line);
+    });
+
+    // when it finally exits, resolve or reject
+    vm.localServerChild.on('exit', (code) => {
+      if (code === 0) {
+        vm.getLocalServerUrlFromFile();
+        vm.$log.info('SERVER URL: ', vm.selectedServerURL);
+        deferred.resolve(vm.localServerChild);
+      } else {
+        vm.$log.error('SERVER ERROR (exit code ' + code + ')');
+        deferred.reject(new Error('start_local exited with ' + code));
+      }
+    });
 
     console.log(`Child pid: ${vm.localServerChild.pid}`);
 
