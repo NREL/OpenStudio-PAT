@@ -49,7 +49,7 @@
     "request-progress": "~3.0.0",
     "rollup": "~2.79.1",
     "sass": "~1.55.0",
-    "tar-fs": "~2.1.1",
+    "tar-fs": "~2.1.2",
     "through2": "~4.0.2",
     "tree-kill": "~1.2.2",
     "uglify-save-license": "~0.4.1",
