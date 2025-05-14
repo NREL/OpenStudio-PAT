@@ -103,6 +103,7 @@ export class Project {
     vm.reportType = null;
     vm.runType = vm.runTypes[0];
     vm.samplingMethod = vm.samplingMethods[0];
+    vm.numberWorkers = null;
     vm.rubyMD5 = null;
     vm.mongoMD5 = null;
     vm.openstudioServerMD5 = null;
@@ -182,6 +183,7 @@ export class Project {
     vm.downloadOSM = true;
     vm.downloadZIP = true;
     vm.gemfile = false;
+    vm.numberWorkers = 1;
     vm.timeoutWorkflow = 28800;
     vm.timeoutUploadResults = 28800;
     vm.timeoutInitWorker = 28800;
@@ -284,6 +286,7 @@ export class Project {
         vm.datapoints = vm.pat.datapoints ? vm.pat.datapoints : vm.datapoints;
         vm.remoteSettings = vm.pat.remoteSettings ? vm.pat.remoteSettings : vm.remoteSettings;
         vm.serverScripts = vm.pat.serverScripts ? vm.pat.serverScripts : vm.serverScripts;
+        vm.numberWorkers = vm.pat.numberWorkers ? vm.pat.numberWorkers : vm.numberWorkers;
 
         // filesToInclude
         // convert paths to platform-specific delimiters
@@ -1562,6 +1565,7 @@ export class Project {
     vm.pat.openstudioServerMD5 = vm.openstudioServerMD5;
     vm.pat.openstudioCLIMD5 = vm.openstudioCLIMD5;
     vm.pat.openstudioMD5 = vm.openstudioMD5;
+    vm.pat.numberWorkers = vm.numberWorkers;
 
     // measures and options
     vm.pat.measures = vm.measures;
@@ -1780,6 +1784,16 @@ export class Project {
   getNumberDPsToDisplay() {
     const vm = this;
     return vm.numberDPsToDisplay;
+  }
+
+  getNumberWorkers() {
+    const vm = this;
+    return vm.numberWorkers;
+  }
+
+  setNumberWorkers(num) {
+    const vm = this;
+    vm.numberWorkers = num;
   }
 
   getSeedDir() {

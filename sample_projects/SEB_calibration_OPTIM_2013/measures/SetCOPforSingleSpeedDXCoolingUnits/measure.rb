@@ -236,9 +236,9 @@ class SetCOPforSingleSpeedDXCoolingUnits < OpenStudio::Ruleset::ModelUserScript
 
           #change and report high speed cop
           initial_cop = hVACComponent.ratedCOP
-          if not initial_cop.empty?
-            runner.registerInfo("Changing the Rated COP from #{initial_cop.get} to #{cop} for single speed dx unit '#{hVACComponent.name}' on air loop '#{air_loop.name}'")
-            initial_cop_values << initial_cop.get
+          if not initial_cop.nil?
+            runner.registerInfo("Changing the Rated COP from #{initial_cop} to #{cop} for single speed dx unit '#{hVACComponent.name}' on air loop '#{air_loop.name}'")
+            initial_cop_values << initial_cop
             optionalDoubleCOP = OpenStudio::OptionalDouble.new(cop)
             hVACComponent.setRatedCOP(optionalDoubleCOP)
           else

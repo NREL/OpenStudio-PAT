@@ -1,3 +1,4 @@
+import path from 'path';
 import { expect, Locator } from '@playwright/test';
 import { EXPECTED_REPORT_VIEWS, Page, ReportView } from '../../constants';
 import { PagePO } from './page.po';
@@ -34,6 +35,6 @@ export class ReportsPO extends PagePO {
 
     const expectedSrc = `${this.EXPECTED_SRC_FOLDER}${expectedSelectedView}.html`;
     const wvSrc = (await this.webview.getAttribute('src'))?.slice(-1 * expectedSrc.length);
-    expect(wvSrc).toBe(expectedSrc);
+    expect(path.normalize(wvSrc)).toBe(path.normalize(expectedSrc));
   }
 }
