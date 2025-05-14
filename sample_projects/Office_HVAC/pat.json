@@ -3014,7 +3014,7 @@
             "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
             "step_errors": [],
             "step_files": [
-              "/Users/lbrackne/Documents/OpenStudio/Office_HVAC/temp_data/analysis_a4cd8f2d-7f0f-4005-bb52-f70dbcc29e72/data_point_068ca7d7-85f2-4713-ae18-dade15550436/run/005_f8e23017-894d-4bdf-977f-37e3961e6f42/report.html"
+              "/Users/lbrackne/Documents/OpenStudio/Office_HVAC/temp_data/analysis_a4cd8f2d-7f0f-4005-bb52-f70dbcc29e72/data_point_068ca7d7-85f2-4713-ae18-dade15550436/run/005_5b4d387a-f537-4693-a9eb-6192957b6c1b/report.html"
             ],
             "step_final_condition": "Generated report with 21 sections to ./report.html.",
             "step_info": [],
@@ -4365,7 +4365,7 @@
             "zone_summary_section": true
           },
           "description": "Option 1 Description",
-          "measure_dir_name": "f8e23017-894d-4bdf-977f-37e3961e6f42",
+          "measure_dir_name": "5b4d387a-f537-4693-a9eb-6192957b6c1b",
           "name": "Report",
           "result": {
             "completed_at": "20170330T141430Z",
@@ -4383,7 +4383,7 @@
             "stdout": "[OpenStudio.Measure] <0> OSArgumentVector is deprecated, use OpenStudio::Measure::OSArgumentVector instead.\n",
             "step_errors": [],
             "step_files": [
-              "/Users/lbrackne/Documents/OpenStudio/Office_HVAC/temp_data/analysis_a4cd8f2d-7f0f-4005-bb52-f70dbcc29e72/data_point_74cb9370-588e-4ec5-bce3-bc448847e693/run/005_f8e23017-894d-4bdf-977f-37e3961e6f42/report.html"
+              "/Users/lbrackne/Documents/OpenStudio/Office_HVAC/temp_data/analysis_a4cd8f2d-7f0f-4005-bb52-f70dbcc29e72/data_point_74cb9370-588e-4ec5-bce3-bc448847e693/run/005_5b4d387a-f537-4693-a9eb-6192957b6c1b/report.html"
             ],
             "step_final_condition": "Generated report with 21 sections to ./report.html.",
             "step_info": [],
@@ -5732,7 +5732,7 @@
             "zone_summary_section": true
           },
           "description": "Option 1 Description",
-          "measure_dir_name": "f8e23017-894d-4bdf-977f-37e3961e6f42",
+          "measure_dir_name": "5b4d387a-f537-4693-a9eb-6192957b6c1b",
           "name": "Report",
           "result": {
             "completed_at": "20170330T141553Z",

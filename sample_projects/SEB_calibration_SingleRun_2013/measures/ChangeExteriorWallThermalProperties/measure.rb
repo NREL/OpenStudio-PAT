@@ -46,14 +46,14 @@ class ChangeExteriorWallThermalProperties < OpenStudio::Ruleset::ModelUserScript
     #check the input arguments for percentage input or problomatically small values
     arg_in = [r_value_mult, solar_abs_mult, thermal_mass_mult]
     arg_in_d = ["R-value multiplier","Solar absorptance multiplier", "Thermal mass multiplier"]
-    arg_flag = FALSE
+    arg_flag = false
     arg_in.each_with_index do |arg, arg_index|
       if arg.round(2) == 0
         runner.registerError("#{arg_in_d[arg_index]} was set equal to #{arg}. Please input a value greater that 1*e-2.")
-        arg_flag = TRUE
+        arg_flag = true
       elsif arg < 0
         runner.registerError("#{arg_in_d[arg_index]} was set equal to #{arg}. Please input a number greater than zero. Remember a multiplier, not a percentage, is being specified.")
-        arg_flag = TRUE
+        arg_flag = true
       elsif arg >= 3
         runner.registerWarning("#{arg_in_d[arg_index]} was set equal to #{arg}. Please ensure that the desired value was entered as a multiplier, not a percentage.")
       end

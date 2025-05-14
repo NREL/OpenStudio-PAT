@@ -668,7 +668,12 @@ class CalibrationReportsEnhanced20 < OpenStudio::Ruleset::ReportingUserScript
     File.open("./guideline.json","w") do |f|
       f.write(ngrid_result.to_json)
     end
-
+    File.open("./report_xml_file.xml","w") do |f|
+      f.write(ngrid_result.to_json)
+    end
+    File.open("./mat_file.mat","w") do |f|
+      f.write(ngrid_result.to_json)
+    end
     return true
 
   end #end the run method
