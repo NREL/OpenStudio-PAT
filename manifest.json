@@ -1,17 +1,17 @@
 {
   "endpoint": "https://openstudio-resources.s3.amazonaws.com/pat-dependencies3/",
   "energyplus": [{
-    "name": "EnergyPlus-24.2.0-win32.tar.gz",
+    "name": "EnergyPlus-25.1.0-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "energyplus"
   }, {
-    "name": "EnergyPlus-24.2.0-darwin.tar.gz",
+    "name": "EnergyPlus-25.1.0-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "energyplus"
   }, {
-    "name": "EnergyPlus-24.2.0-linux.tar.gz",
+    "name": "EnergyPlus-25.1.0-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "energyplus"
@@ -49,33 +49,33 @@
     "type": "mongo"
   }],
   "openstudio": [{
-    "name": "OpenStudio-3.9.0-Windows.tar.gz",
+    "name": "OpenStudio-3.10.0-Windows.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.9.0-Darwin.tar.gz",
+    "name": "OpenStudio-3.10.0-Darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "openstudio"
   }, {
-    "name": "OpenStudio-3.9.0-Linux.tar.gz",
+    "name": "OpenStudio-3.10.0-Linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio"
   }],
   "openstudioServer": [{
-    "name": "OpenStudio-server-415ae851b8-win32.tar.gz",
+    "name": "OpenStudio-server-5873e0d21d-win32.tar.gz",
     "platform": "win32",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-415ae851b8-darwin.tar.gz",
+    "name": "OpenStudio-server-5873e0d21d-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
     "type": "OpenStudio-server"
   }, {
-    "name": "OpenStudio-server-415ae851b8-linux.tar.gz",
+    "name": "OpenStudio-server-5873e0d21d-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
     "type": "OpenStudio-server"
