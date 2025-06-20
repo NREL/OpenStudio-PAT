@@ -31,7 +31,7 @@ jobs:
           allow_failure: false
           MACOSX_DEPLOYMENT_TARGET: 10.15
           SDKROOT: /Applications/Xcode_11.7.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
-          DEVELOPER_DIR: /Applications/Xcode_11.7.app/Contents/Developer
+          DEVELOPER_DIR: /Applications/Xcode_13.2.1.app/Contents/Developer
         - name: Windows_2022
           os: windows-2022
           node-version: 18
