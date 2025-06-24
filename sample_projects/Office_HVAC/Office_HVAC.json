@@ -11,7 +11,7 @@
           "measure_type": "RubyMeasure",
           "measure_definition_class_name": "AedgOfficeHvacFanCoilDoas",
           "measure_definition_directory": "./measures/ad5974a4-c190-4399-9b06-4da7e102c080",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_HVAC/measures/ad5974a4-c190-4399-9b06-4da7e102c080",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-b\\sample_projects\\Office_HVAC\\measures\\ad5974a4-c190-4399-9b06-4da7e102c080",
           "measure_definition_display_name": "AedgOfficeHvacFanCoilDoas",
           "measure_definition_name": "aedg_office_hvac_fan_coil_doas",
           "measure_definition_name_xml": null,
@@ -21,24 +21,6 @@
           "version_uuid": "3850860d-c4b4-4b99-823f-5ec0bbacdd4e",
           "description": "Measure replaces existing HVAC system (if any) with a Fan Coil with DOAS HVAC system (one DOAS per floor).  The fan coil with DOAS system (centralized DOAS, with zone level conditioning) is applied to all space types.  In select cases, the user is given the option to preserve existing HVAC schedules.  In other cases, new schedules are generated that align with AEDG recommendations.  The resulting HVAC system reflects the HVAC recommendations of the 50% Small and Medium Office AEDG.",
           "taxonomy": "HVAC.Whole System",
-          "arguments": [
-            {
-              "display_name": "This space type should be part of a ceiling return air plenum.",
-              "display_name_short": "ceilingReturnPlenumSpaceType",
-              "name": "ceilingReturnPlenumSpaceType",
-              "value_type": "string",
-              "default_value": "Office WholeBuilding - Sm Office",
-              "value": "Office WholeBuilding - Sm Office"
-            },
-            {
-              "display_name": "Total Cost for HVAC System ($).",
-              "display_name_short": "costTotalHVACSystem",
-              "name": "costTotalHVACSystem",
-              "value_type": "double",
-              "default_value": 4000,
-              "value": 4000
-            }
-          ],
           "variables": [
             {
               "argument": {
@@ -112,7 +94,7 @@
                 ],
                 "type": "discrete"
               },
-              "workflow_index": 0
+              "workflow_index": 2
             },
             {
               "argument": {
@@ -184,27 +166,9 @@
                   }
                 ]
               },
-              "workflow_index": 1
+              "workflow_index": 3
             }
           ],
-          "workflow_index": 0
-        },
-        {
-          "name": "aedg_office_hvac_vav_dx",
-          "display_name": "AedgOfficeHvacVavDx",
-          "measure_type": "RubyMeasure",
-          "measure_definition_class_name": "AedgOfficeHvacVavDx",
-          "measure_definition_directory": "./measures/750e74e3-ebb1-45c9-a463-9563d1137d03",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_HVAC/measures/750e74e3-ebb1-45c9-a463-9563d1137d03",
-          "measure_definition_display_name": "AedgOfficeHvacVavDx",
-          "measure_definition_name": "aedg_office_hvac_vav_dx",
-          "measure_definition_name_xml": null,
-          "measure_definition_uuid": "ffdf05ce-34c2-498e-9ca8-4ef8fe3a9af5",
-          "measure_definition_version_uuid": "9f791c8c-4419-45b4-8f84-71589a63cfc6",
-          "uuid": "ffdf05ce-34c2-498e-9ca8-4ef8fe3a9af5",
-          "version_uuid": "9f791c8c-4419-45b4-8f84-71589a63cfc6",
-          "description": "Measure replaces existing HVAC system (if any) with a high efficiency multizone variable air volume (VAV) HVAC system (one system per floor).  The multizone VAV system (centralized cooling with zone level heating) is applied to all space types.  In select cases, the user is given the option to preserve existing HVAC schedules.  In other cases, new schedules are generated that align with AEDG recommendations.  The resulting HVAC system reflects the HVAC recommendations of the 50% Small and Medium Office AEDG.",
-          "taxonomy": "HVAC.Whole System",
           "arguments": [
             {
               "display_name": "This space type should be part of a ceiling return air plenum.",
@@ -219,10 +183,28 @@
               "display_name_short": "costTotalHVACSystem",
               "name": "costTotalHVACSystem",
               "value_type": "double",
-              "default_value": 4000,
+              "default_value": 0,
               "value": 4000
             }
           ],
+          "workflow_index": 0
+        },
+        {
+          "name": "aedg_office_hvac_vav_dx",
+          "display_name": "AedgOfficeHvacVavDx",
+          "measure_type": "RubyMeasure",
+          "measure_definition_class_name": "AedgOfficeHvacVavDx",
+          "measure_definition_directory": "./measures/750e74e3-ebb1-45c9-a463-9563d1137d03",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-b\\sample_projects\\Office_HVAC\\measures\\750e74e3-ebb1-45c9-a463-9563d1137d03",
+          "measure_definition_display_name": "AedgOfficeHvacVavDx",
+          "measure_definition_name": "aedg_office_hvac_vav_dx",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "ffdf05ce-34c2-498e-9ca8-4ef8fe3a9af5",
+          "measure_definition_version_uuid": "9f791c8c-4419-45b4-8f84-71589a63cfc6",
+          "uuid": "ffdf05ce-34c2-498e-9ca8-4ef8fe3a9af5",
+          "version_uuid": "9f791c8c-4419-45b4-8f84-71589a63cfc6",
+          "description": "Measure replaces existing HVAC system (if any) with a high efficiency multizone variable air volume (VAV) HVAC system (one system per floor).  The multizone VAV system (centralized cooling with zone level heating) is applied to all space types.  In select cases, the user is given the option to preserve existing HVAC schedules.  In other cases, new schedules are generated that align with AEDG recommendations.  The resulting HVAC system reflects the HVAC recommendations of the 50% Small and Medium Office AEDG.",
+          "taxonomy": "HVAC.Whole System",
           "variables": [
             {
               "argument": {
@@ -296,7 +278,7 @@
                 ],
                 "type": "discrete"
               },
-              "workflow_index": 0
+              "workflow_index": 2
             },
             {
               "argument": {
@@ -368,27 +350,9 @@
                   }
                 ]
               },
-              "workflow_index": 1
+              "workflow_index": 3
             }
           ],
-          "workflow_index": 1
-        },
-        {
-          "name": "aedg_office_hvac_radiant_doas",
-          "display_name": "AedgOfficeHvacRadiantDoas",
-          "measure_type": "RubyMeasure",
-          "measure_definition_class_name": "AedgOfficeHvacRadiantDoas",
-          "measure_definition_directory": "./measures/13d5289f-43f6-4c51-a890-d3542daa7be0",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_HVAC/measures/13d5289f-43f6-4c51-a890-d3542daa7be0",
-          "measure_definition_display_name": "AedgOfficeHvacRadiantDoas",
-          "measure_definition_name": "aedg_office_hvac_radiant_doas",
-          "measure_definition_name_xml": null,
-          "measure_definition_uuid": "3d7edb7b-aeff-4a59-87f2-138766b48c11",
-          "measure_definition_version_uuid": "5590e265-8ed7-46d6-84af-079f604ee71e",
-          "uuid": "3d7edb7b-aeff-4a59-87f2-138766b48c11",
-          "version_uuid": "5590e265-8ed7-46d6-84af-079f604ee71e",
-          "description": "Measure replaces existing HVAC system (if any) with a Radiant Heating and Cooling with DOAS HVAC system (one DOAS per floor).  The radiant with DOAS system (centralized DOAS, with zone level conditioning) is applied to all space types.  In select cases, the user is given the option to preserve existing HVAC schedules.  In other cases, new schedules are generated that align with AEDG recommendations.  The resulting HVAC system reflects the HVAC recommendations of the 50% Small and Medium Office AEDG.",
-          "taxonomy": "HVAC.Whole System",
           "arguments": [
             {
               "display_name": "This space type should be part of a ceiling return air plenum.",
@@ -403,18 +367,28 @@
               "display_name_short": "costTotalHVACSystem",
               "name": "costTotalHVACSystem",
               "value_type": "double",
-              "default_value": 10000,
-              "value": 10000
-            },
-            {
-              "display_name": "Apply recommended availability and ventilation schedules for air handlers?",
-              "display_name_short": "remake_schedules",
-              "name": "remake_schedules",
-              "value_type": "boolean",
-              "default_value": true,
-              "value": true
+              "default_value": 0,
+              "value": 4000
             }
           ],
+          "workflow_index": 1
+        },
+        {
+          "name": "aedg_office_hvac_radiant_doas",
+          "display_name": "AedgOfficeHvacRadiantDoas",
+          "measure_type": "RubyMeasure",
+          "measure_definition_class_name": "AedgOfficeHvacRadiantDoas",
+          "measure_definition_directory": "./measures/13d5289f-43f6-4c51-a890-d3542daa7be0",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-b\\sample_projects\\Office_HVAC\\measures\\13d5289f-43f6-4c51-a890-d3542daa7be0",
+          "measure_definition_display_name": "AedgOfficeHvacRadiantDoas",
+          "measure_definition_name": "aedg_office_hvac_radiant_doas",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "3d7edb7b-aeff-4a59-87f2-138766b48c11",
+          "measure_definition_version_uuid": "5590e265-8ed7-46d6-84af-079f604ee71e",
+          "uuid": "3d7edb7b-aeff-4a59-87f2-138766b48c11",
+          "version_uuid": "5590e265-8ed7-46d6-84af-079f604ee71e",
+          "description": "Measure replaces existing HVAC system (if any) with a Radiant Heating and Cooling with DOAS HVAC system (one DOAS per floor).  The radiant with DOAS system (centralized DOAS, with zone level conditioning) is applied to all space types.  In select cases, the user is given the option to preserve existing HVAC schedules.  In other cases, new schedules are generated that align with AEDG recommendations.  The resulting HVAC system reflects the HVAC recommendations of the 50% Small and Medium Office AEDG.",
+          "taxonomy": "HVAC.Whole System",
           "variables": [
             {
               "argument": {
@@ -488,27 +462,9 @@
                 ],
                 "type": "discrete"
               },
-              "workflow_index": 0
+              "workflow_index": 3
             }
           ],
-          "workflow_index": 2
-        },
-        {
-          "name": "aedg_office_hvac_vav_ch_w",
-          "display_name": "AedgOfficeHvacVavChW",
-          "measure_type": "RubyMeasure",
-          "measure_definition_class_name": "AedgOfficeHvacVavChW",
-          "measure_definition_directory": "./measures/54185015-71f9-4397-b3f2-b0f3254fbc54",
-          "measure_definition_directory_local": "/Users/lbrackne/Documents/OpenStudio/Office_HVAC/measures/54185015-71f9-4397-b3f2-b0f3254fbc54",
-          "measure_definition_display_name": "AedgOfficeHvacVavChW",
-          "measure_definition_name": "aedg_office_hvac_vav_ch_w",
-          "measure_definition_name_xml": null,
-          "measure_definition_uuid": "28e4e4fb-a10a-4f85-82f9-c4ad2dd3cf12",
-          "measure_definition_version_uuid": "d96bbbef-c5ad-49f5-9825-2e8c998a5def",
-          "uuid": "28e4e4fb-a10a-4f85-82f9-c4ad2dd3cf12",
-          "version_uuid": "d96bbbef-c5ad-49f5-9825-2e8c998a5def",
-          "description": "Measure replaces existing HVAC system (if any) with a high efficiency multizone variable air volume (VAV) HVAC system (one system per floor).  The multizone VAV system (centralized cooling with zone level heating) is applied to all space types.  In select cases, the user is given the option to preserve existing HVAC schedules.  In other cases, new schedules are generated that align with AEDG recommendations.  The resulting HVAC system reflects the HVAC recommendations of the 50% Small and Medium Office AEDG.",
-          "taxonomy": "HVAC.Whole System",
           "arguments": [
             {
               "display_name": "This space type should be part of a ceiling return air plenum.",
@@ -523,8 +479,8 @@
               "display_name_short": "costTotalHVACSystem",
               "name": "costTotalHVACSystem",
               "value_type": "double",
-              "default_value": 3500,
-              "value": 3500
+              "default_value": 0,
+              "value": 10000
             },
             {
               "display_name": "Apply recommended availability and ventilation schedules for air handlers?",
@@ -535,6 +491,24 @@
               "value": true
             }
           ],
+          "workflow_index": 2
+        },
+        {
+          "name": "aedg_office_hvac_vav_ch_w",
+          "display_name": "AedgOfficeHvacVavChW",
+          "measure_type": "RubyMeasure",
+          "measure_definition_class_name": "AedgOfficeHvacVavChW",
+          "measure_definition_directory": "./measures/54185015-71f9-4397-b3f2-b0f3254fbc54",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-b\\sample_projects\\Office_HVAC\\measures\\54185015-71f9-4397-b3f2-b0f3254fbc54",
+          "measure_definition_display_name": "AedgOfficeHvacVavChW",
+          "measure_definition_name": "aedg_office_hvac_vav_ch_w",
+          "measure_definition_name_xml": null,
+          "measure_definition_uuid": "28e4e4fb-a10a-4f85-82f9-c4ad2dd3cf12",
+          "measure_definition_version_uuid": "d96bbbef-c5ad-49f5-9825-2e8c998a5def",
+          "uuid": "28e4e4fb-a10a-4f85-82f9-c4ad2dd3cf12",
+          "version_uuid": "d96bbbef-c5ad-49f5-9825-2e8c998a5def",
+          "description": "Measure replaces existing HVAC system (if any) with a high efficiency multizone variable air volume (VAV) HVAC system (one system per floor).  The multizone VAV system (centralized cooling with zone level heating) is applied to all space types.  In select cases, the user is given the option to preserve existing HVAC schedules.  In other cases, new schedules are generated that align with AEDG recommendations.  The resulting HVAC system reflects the HVAC recommendations of the 50% Small and Medium Office AEDG.",
+          "taxonomy": "HVAC.Whole System",
           "variables": [
             {
               "argument": {
@@ -608,7 +582,33 @@
                 ],
                 "type": "discrete"
               },
-              "workflow_index": 0
+              "workflow_index": 3
+            }
+          ],
+          "arguments": [
+            {
+              "display_name": "This space type should be part of a ceiling return air plenum.",
+              "display_name_short": "ceilingReturnPlenumSpaceType",
+              "name": "ceilingReturnPlenumSpaceType",
+              "value_type": "string",
+              "default_value": "Office WholeBuilding - Sm Office",
+              "value": "Office WholeBuilding - Sm Office"
+            },
+            {
+              "display_name": "Total Cost for HVAC System ($).",
+              "display_name_short": "costTotalHVACSystem",
+              "name": "costTotalHVACSystem",
+              "value_type": "double",
+              "default_value": 0,
+              "value": 3500
+            },
+            {
+              "display_name": "Apply recommended availability and ventilation schedules for air handlers?",
+              "display_name_short": "remake_schedules",
+              "name": "remake_schedules",
+              "value_type": "boolean",
+              "default_value": true,
+              "value": true
             }
           ],
           "workflow_index": 3
@@ -619,7 +619,7 @@
           "measure_type": "EnergyPlusMeasure",
           "measure_definition_class_name": "XcelEDATariffSelectionandModelSetup",
           "measure_definition_directory": "./measures/3ccda33f-1aea-4d7e-a6dc-5113b7ce6719",
-          "measure_definition_directory_local": "/Users/lbrackne/BCL/c5ab60e9-b8e5-4653-a502-5ed030f1335d/3ccda33f-1aea-4d7e-a6dc-5113b7ce6719",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-b\\sample_projects\\Office_HVAC\\measures\\3ccda33f-1aea-4d7e-a6dc-5113b7ce6719",
           "measure_definition_display_name": "XcelEDATariffSelectionandModelSetup",
           "measure_definition_name": "xcel_eda_tariff_selectionand_model_setup",
           "measure_definition_name_xml": null,
@@ -629,6 +629,7 @@
           "version_uuid": "0233e26b-9ce6-45c9-8f2b-86d30472bb66",
           "description": "Add the selected Xcel utility rate, as well as set the timestep and lifecycle costing parameters as required by the Xcel EDA program.",
           "taxonomy": "Economics.Life Cycle Cost Analysis",
+          "variables": [],
           "arguments": [
             {
               "display_name": "Select an Electricity Tariff.",
@@ -647,7 +648,6 @@
               "value": "Small CG"
             }
           ],
-          "variables": [],
           "workflow_index": 4
         },
         {
@@ -656,7 +656,7 @@
           "measure_type": "ReportingMeasure",
           "measure_definition_class_name": "OpenStudioResults",
           "measure_definition_directory": "./measures/5b4d387a-f537-4693-a9eb-6192957b6c1b",
-          "measure_definition_directory_local": "/Users/lbrackne/BCL/a25386cd-60e4-46bc-8b11-c755f379d916/5b4d387a-f537-4693-a9eb-6192957b6c1b",
+          "measure_definition_directory_local": "C:\\Projects\\OS-PAT-b\\sample_projects\\Office_HVAC\\measures\\5b4d387a-f537-4693-a9eb-6192957b6c1b",
           "measure_definition_display_name": "OpenStudio Results",
           "measure_definition_name": "openstudio_results",
           "measure_definition_name_xml": null,
@@ -666,6 +666,7 @@
           "version_uuid": "96d48c9c-dd58-4ace-b2b0-0a2b36fd603d",
           "description": "This measure creates high level tables and charts pulling both from model inputs and EnergyPlus results. It has building level information as well as detail on space types, thermal zones, HVAC systems, envelope characteristics, and economics. Click the heading above a chart to view a table of the chart data.",
           "taxonomy": "Reporting.QAQC",
+          "variables": [],
           "arguments": [
             {
               "display_name": "Model Summary",
@@ -836,7 +837,6 @@
               "value": true
             }
           ],
-          "variables": [],
           "workflow_index": 5
         }
       ],
@@ -1081,6 +1081,16 @@
       "path": "./weather/USA_CO_Golden-NREL.724666_TMY3.epw"
     },
     "file_format_version": 1,
+    "cli_debug": "",
+    "cli_verbose": "",
+    "download_reports": true,
+    "download_osw": true,
+    "download_osm": true,
+    "download_zip": true,
+    "gemfile": false,
+    "run_workflow_timeout": 28800,
+    "upload_results_timeout": 28800,
+    "initialize_worker_timeout": 28800,
     "server_scripts": {}
   }
 }
