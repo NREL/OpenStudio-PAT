@@ -165,7 +165,9 @@ if (argv.exclude) {
 const manifest = jetpack.read('manifest.json', 'json');
 
 const platform = os.platform();
-const arch = os.arch();
+const arch = process.env.CMAKE_OSX_ARCHITECTURES || os.arch();
+
+console.log(`Building for platform: ${platform}, architecture: ${arch}`);
 
 function downloadDeps() {
 
@@ -174,8 +176,16 @@ function downloadDeps() {
 
   console.log('Dependencies: ' + dependencies.sort().join(', '));
   var tasks = dependencies.map(depend => {
-    const fileInfo = _.find(manifest[depend], {platform: platform});
-    const fileName = fileInfo.name;
+    const fileInfo = _.find(manifest[depend], {platform: platform, arch: arch});
+    let actualFileInfo = fileInfo;
+    if (!fileInfo) {
+      console.warn(`No dependency found for ${depend} on ${platform}/${arch}, falling back to x64`);
+      actualFileInfo = _.find(manifest[depend], {platform: platform, arch: 'x64'});
+      if (!actualFileInfo) {
+        throw new Error(`No dependency found for ${depend} on ${platform}`);
+      }
+    }
+    const fileName = actualFileInfo.name;
 
     // Note JM 2018-09-13: Allow other resources in case AWS isn't up to date
     // and for easier testing of new deps
@@ -202,8 +212,16 @@ function downloadDeps() {
 
 function extractDeps() {
   var tasks = dependencies.map(depend => {
-    const fileInfo = _.find(manifest[depend], {platform: platform});
-    const fileName = fileInfo.name;
+    const fileInfo = _.find(manifest[depend], {platform: platform, arch: arch});
+    let actualFileInfo = fileInfo;
+    if (!fileInfo) {
+      console.warn(`No dependency found for ${depend} on ${platform}/${arch}, falling back to x64`);
+      actualFileInfo = _.find(manifest[depend], {platform: platform, arch: 'x64'});
+      if (!actualFileInfo) {
+        throw new Error(`No dependency found for ${depend} on ${platform}`);
+      }
+    }
+    const fileName = actualFileInfo.name;
 
     if( fileName.includes("http") ) {
       var destName = fileName.replace(/^.*[\\\/]/, '');
@@ -215,7 +233,7 @@ function extractDeps() {
     // Usually deps are properly zipped to that the extracted root folder
     // is adequately named, but when using absolute http:// resources (not
     // packaged specifically by us), we must rename to ensure it's correct
-    var properName = fileInfo.type;
+    var properName = actualFileInfo.type;
 
     // What we do is to extract to properName and remove the leading (root)
     // directory level
@@ -243,8 +261,16 @@ function extractDeps() {
 
 function cleanDeps() {
   var tasks = dependencies.map(depend => {
-    const fileInfo = _.find(manifest[depend], {platform: platform});
-    const fileName = fileInfo.name;
+    const fileInfo = _.find(manifest[depend], {platform: platform, arch: arch});
+    let actualFileInfo = fileInfo;
+    if (!fileInfo) {
+      console.warn(`No dependency found for ${depend} on ${platform}/${arch}, falling back to x64`);
+      actualFileInfo = _.find(manifest[depend], {platform: platform, arch: 'x64'});
+      if (!actualFileInfo) {
+        throw new Error(`No dependency found for ${depend} on ${platform}`);
+      }
+    }
+    const fileName = actualFileInfo.name;
 
     if( fileName.includes("http") ) {
       var destName = fileName.replace(/^.*[\\\/]/, '');

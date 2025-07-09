@@ -19,19 +19,26 @@ jobs:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
       matrix:
-        name: [Ubuntu, macOS, Windows_2022]
+        name: [Ubuntu, macOS-Intel, macOS-ARM, Windows_2022]
         include:
         - name: Ubuntu
           os: ubuntu-22.04
           node-version: 18
           allow_failure: false
-        - name: macOS
+        - name: macOS-Intel
           os: macos-13
           node-version: 18
           allow_failure: false
+          arch: x86_64
           MACOSX_DEPLOYMENT_TARGET: 10.15
-          SDKROOT: /Applications/Xcode_11.7.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
-          DEVELOPER_DIR: /Applications/Xcode_13.2.1.app/Contents/Developer
+          SDKROOT: /Applications/Xcode_15.2.app
+        - name: macOS-ARM
+          os: macos-14
+          node-version: 18
+          allow_failure: false
+          arch: arm64
+          MACOSX_DEPLOYMENT_TARGET: 12.1
+          SDKROOT: /Applications/Xcode_15.2.app
         - name: Windows_2022
           os: windows-2022
           node-version: 18
@@ -54,6 +61,7 @@ jobs:
           sudo apt update
           sudo apt install cmake
         elif [ "$RUNNER_OS" == "macOS" ]; then
+          # Note that the macOS-x64 installer works for both Intel and ARM runners
           curl -L -O https://download.qt.io/archive/qt-installer-framework/4.3.0/QtInstallerFramework-macOS-x64-4.3.0.dmg
           hdiutil attach -mountpoint ./qtfiw_installer QtInstallerFramework-macOS-x64-4.3.0.dmg
           echo "ls ./qtfiw_installer"
@@ -61,7 +69,8 @@ jobs:
           ls ~/Qt/QtIFW-4.3.0 || true
           echo "~/Qt/QtIFW-4.3.0/bin/" >> $GITHUB_PATH
           echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.MACOSX_DEPLOYMENT_TARGET }} >> $GITHUB_ENV
-          # echo CMAKE_MACOSX_DEPLOYMENT_TARGET='-DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET' >> $GITHUB_ENV
+          echo SDKROOT=${{ matrix.SDKROOT }} >> $GITHUB_ENV
+          echo CMAKE_MACOSX_DEPLOYMENT_TARGET='-DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET' >> $GITHUB_ENV
         elif [ "$RUNNER_OS" == "Windows" ]; then
           curl -L -O https://download.qt.io/archive/qt-installer-framework/4.3.0/QtInstallerFramework-windows-x86-4.3.0.exe
           ./QtInstallerFramework-windows-x86-4.3.0.exe --verbose --script ./ci/install_script_qtifw.qs
@@ -120,10 +129,15 @@ jobs:
       shell: bash
       run: |
         set -x
-        cmake -DCMAKE_OSX_DEPLOYMENT_TARGET=11 \
-              -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
-              -DCMAKE_BUILD_TYPE=Release \
-              ../
+        if [ "${{ matrix.arch }}" = "arm64" ]; then
+          cmake -DCMAKE_OSX_ARCHITECTURES="arm64" \
+                -DCMAKE_BUILD_TYPE=Release \
+                ../
+        else
+          cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" \
+                -DCMAKE_BUILD_TYPE=Release \
+                ../
+        fi
         cmake --build . --target package -j $N
 
     - name: Save artifact
