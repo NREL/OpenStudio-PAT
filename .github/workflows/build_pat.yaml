@@ -73,11 +73,11 @@ jobs:
           # Install Qt Installer Framework
           python -m aqt install-tool -O ${{ github.workspace }}/Qt/ mac desktop tools_ifw
           
-          # Find the actual installed version directory
+          # Find the actual installed version directory and add to PATH
           QT_IFW_DIR=$(find ${{ github.workspace }}/Qt/Tools/QtInstallerFramework -maxdepth 1 -type d -name "*" | head -1)
           if [ -d "$QT_IFW_DIR" ]; then
             echo "Qt Installer Framework installed successfully at: $QT_IFW_DIR"
-            echo "$QT_IFW_DIR/bin/" >> $GITHUB_PATH
+            echo "$QT_IFW_DIR/bin" >> $GITHUB_PATH
           else
             echo "Qt Installer Framework installation failed"
             exit 1
@@ -86,7 +86,7 @@ jobs:
         elif [ "$RUNNER_OS" == "Windows" ]; then
           # Create and activate Python virtual environment
           python3 -m venv venv
-          source venv/bin/activate
+          source venv/Scripts/activate
           
           # Upgrade pip and install aqtinstall
           pip install --upgrade pip
@@ -98,7 +98,7 @@ jobs:
           # Install Qt Installer Framework
           python -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_ifw
           
-          # Find the actual installed version directory
+          # Find the actual installed version directory and add to PATH
           QT_IFW_DIR=$(find ${{ github.workspace }}/Qt/Tools/QtInstallerFramework -maxdepth 1 -type d -name "*" | head -1)
           if [ -d "$QT_IFW_DIR" ]; then
             echo "Qt Installer Framework installed successfully at: $QT_IFW_DIR"
@@ -161,16 +161,19 @@ jobs:
       run: |
         set -x
         if [ "${{ matrix.arch }}" = "arm64" ]; then
+          CMAKE_OSX_ARCHITECTURES=arm64
           cmake -DCMAKE_OSX_ARCHITECTURES="arm64" \
                 -DCMAKE_OSX_DEPLOYMENT_TARGET="${{ matrix.MACOSX_DEPLOYMENT_TARGET }}" \
                 -DCMAKE_BUILD_TYPE=Release \
                 ../
         else
+          CMAKE_OSX_ARCHITECTURES=x86_64
           cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" \
                 -DCMAKE_OSX_DEPLOYMENT_TARGET="${{ matrix.MACOSX_DEPLOYMENT_TARGET }}" \
                 -DCMAKE_BUILD_TYPE=Release \
                 ../
         fi
+        export CMAKE_OSX_ARCHITECTURES
         cmake --build . --target package -j $N
 
     - name: Save artifact
