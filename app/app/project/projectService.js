@@ -568,7 +568,7 @@ export class Project {
 
           if (!file.unpackDirName) {
             // use same name if no name is provided
-            file.unpackDirName = file.dirToInclude.replace(/^.*[\\\/]/, '');
+            file.unpackDirName = file.dirToInclude.replace(/^.*[\\/]/, '');
           }
           const absPath = path.resolve(vm.projectDir.path(), file.dirToInclude);
           if (vm.Message.showDebug()) vm.$log.debug('RESOLVED PATH: ', absPath, ' unpack DIR: ', file.unpackDirName);
@@ -1709,7 +1709,7 @@ export class Project {
 
     vm.setProjectDir(projectDir);
     if (vm.Message.showDebug()) vm.$log.debug('in set project: projectDir: ', vm.projectDir.path());
-    vm.setProjectName(projectDir.path().replace(/^.*[\\\/]/, ''));
+    vm.setProjectName(projectDir.path().replace(/^.*[\\/]/, ''));
     if (vm.Message.showDebug()) vm.$log.debug('project name: ', vm.projectName);
 
     vm.mongoDir = jetpack.dir(path.resolve(vm.projectDir.path() + '/data/db'));

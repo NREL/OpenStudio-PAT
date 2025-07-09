@@ -342,7 +342,7 @@ export class AnalysisController {
         }],
         onRegisterApi: function (gridApi) {
           vm.gridApis[measure.instanceId] = gridApi;
-          gridApi.edit.on.afterCellEdit(vm.$scope, function (rowEntity, colDef, newValue, oldValue) {
+          gridApi.edit.on.afterCellEdit(vm.$scope, (rowEntity, colDef, newValue, oldValue) => {
             if (newValue != oldValue) {
               // if (vm.Message.showDebug()) vm.$log.debug('CELL has changed in: ', measure.instanceId, ' old val: ', oldValue, ' new val: ', newValue);
               if (vm.Message.showDebug()) vm.$log.debug('rowEntity: ', rowEntity);
@@ -357,7 +357,7 @@ export class AnalysisController {
                 vm.$log.error(`Cannot change cell to value: ${newValue}. ${rowEntity.name} is not a variable.  Setting value to first option's value.`);
                 // TODO: need a user toastr here?
                 // set to value of firstOption
-                let firstOptionId = vm.getFirstOptionId(rowEntity);
+                const firstOptionId = vm.getFirstOptionId(rowEntity);
                 rowEntity[colDef.name] = rowEntity[firstOptionId];
               }
             }
@@ -959,7 +959,7 @@ export class AnalysisController {
       const opt = vm.getDefaultOptionColDef();
       opt.display_name = _.startCase(option.id);
       opt.field = option.id;
-      opt.instanceId = measure.instanceId;  // explicitly set this just in case
+      opt.instanceId = measure.instanceId; // explicitly set this just in case
       vm.$scope.gridOptions[measure.instanceId].columnDefs.push(opt);
     } else {
       vm.$log.error('option id does not match expected format (option_<ID>)');
@@ -1229,7 +1229,7 @@ export class AnalysisController {
       if (!_.isEmpty(result.filePaths)) {
         const scriptPath = result.filePaths[0];
         if (vm.Message.showDebug()) vm.$log.debug('script path:', scriptPath);
-        let scriptFilename = scriptPath.replace(/^.*[\\\/]/, '');  // old name
+        let scriptFilename = scriptPath.replace(/^.*[\\/]/, ''); // old name
         // rename to initialize.sh or finalize.sh
         if (_.includes(type, 'initialization')) {
           scriptFilename = 'initialize.sh';
@@ -1264,7 +1264,7 @@ export class AnalysisController {
     vm.jetpack.remove(vm.Project.getProjectDir().path('scripts', newType, vm.$scope.serverScripts[type].file));
     vm.jetpack.remove(vm.Project.getProjectDir().path('scripts', newType, _.replace(vm.$scope.serverScripts[type].file, '.sh', '.args')));
     vm.$scope.serverScripts[type].file = null;
- 
+
   }
 
   addScriptArgument(type) {
@@ -1299,7 +1299,7 @@ export class AnalysisController {
         // copy and select the file
         const seedModelPath = result.filePaths[0];
         if (vm.Message.showDebug()) vm.$log.debug('Seed Model:', seedModelPath);
-        const seedModelFilename = seedModelPath.replace(/^.*[\\\/]/, '');
+        const seedModelFilename = seedModelPath.replace(/^.*[\\/]/, '');
         vm.jetpack.copy(seedModelPath, vm.Project.getProjectDir().path('seeds/' + seedModelFilename), {overwrite: true});
         if (vm.Message.showDebug()) vm.$log.debug('Seed Model name: ', seedModelFilename);
         // update seeds
@@ -1351,7 +1351,7 @@ export class AnalysisController {
         // copy and select the file
         const weatherFilePath = result.filePaths[0];
         if (vm.Message.showDebug()) vm.$log.debug('Weather File:', weatherFilePath);
-        const weatherFilename = weatherFilePath.replace(/^.*[\\\/]/, '');
+        const weatherFilename = weatherFilePath.replace(/^.*[\\/]/, '');
         // TODO: for now this isn't set to overwrite (if file already exists in project, it won't copy the new one
         vm.jetpack.copy(weatherFilePath, vm.Project.getProjectDir().path('weather/' + weatherFilename));
         if (vm.Message.showDebug()) vm.$log.debug('Weather file name: ', weatherFilename);
@@ -1568,8 +1568,8 @@ export class AnalysisController {
         arg.display_name_short = arg.display_name_short ? arg.display_name_short : arg.name;
         if (!arg.inputs) arg.inputs = {};
         // name and displayName should be already defined
-        arg.inputs.relationship = _.isNil(arg.inputs.relationship) ? null : arg.inputs.relationship; 
-        arg.inputs.choiceDisplayNames = _.isNil(arg.choice_display_names) ? [] : arg.choice_display_names;  
+        arg.inputs.relationship = _.isNil(arg.inputs.relationship) ? null : arg.inputs.relationship;
+        arg.inputs.choiceDisplayNames = _.isNil(arg.choice_display_names) ? [] : arg.choice_display_names;
         arg.inputs.variableSetting = _.isNil(arg.inputs.variableSetting) ? 'Argument' : arg.inputs.variableSetting;
         if (arg.inputs.variableSetting == 'Discrete' || arg.inputs.variableSetting == 'Pivot') {
           arg.inputs.distribution = _.isNil(arg.inputs.distribution) ? 'Discrete' : arg.inputs.distribution;

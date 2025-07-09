@@ -192,7 +192,7 @@ function downloadDeps() {
     if( fileName.includes("http") ) {
       // Already a URI
       var uri = fileName;
-      var destName = fileName.replace(/^.*[\\\/]/, '');
+      var destName = fileName.replace(/^.*[\\/]/, '');
     } else {
       // Need to concat endpoint (AWS) with the fileName
       var uri = manifest.endpoint + fileName;
@@ -224,7 +224,7 @@ function extractDeps() {
     const fileName = actualFileInfo.name;
 
     if( fileName.includes("http") ) {
-      var destName = fileName.replace(/^.*[\\\/]/, '');
+      var destName = fileName.replace(/^.*[\\/]/, '');
     } else {
       var destName = fileName;
     }
@@ -273,7 +273,7 @@ function cleanDeps() {
     const fileName = actualFileInfo.name;
 
     if( fileName.includes("http") ) {
-      var destName = fileName.replace(/^.*[\\\/]/, '');
+      var destName = fileName.replace(/^.*[\\/]/, '');
     } else {
       var destName = fileName;
     }

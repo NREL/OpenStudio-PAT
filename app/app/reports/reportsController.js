@@ -82,10 +82,10 @@ export class ReportsController {
       var report = {};
       if (vm.os.platform() == 'win32') {
         report.name = html_report.split('\\').pop().replace('.html', '');
-        report.url = html_report.replace('app\\app\\', 'app\\');//).replace("\\","/");
+        report.url = html_report.replace('app\\app\\', 'app\\');
       } else {
         report.name = html_report.split('/').pop().replace('.html', '');
-        report.url = html_report.replace('app/app/', 'app/');//).replace("\\","/");
+        report.url = html_report.replace('app/app/', 'app/');
         if (vm.Message.showDebug()) vm.$log.debug('REPORT name: ', report.name);
         if (vm.Message.showDebug()) vm.$log.debug('REPORT url: ', report.url);
       }
