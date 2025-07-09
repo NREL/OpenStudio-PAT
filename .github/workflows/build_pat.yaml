@@ -60,8 +60,20 @@ jobs:
           sudo apt install cmake
         elif [ "$RUNNER_OS" == "macOS" ]; then
           # Install Qt Installer Framework using aqtinstall (more reliable than DMG)
-          pip install aqtinstall
-          python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ mac desktop tools_ifw
+          # Use the same Python version for both installation and execution
+          PYTHON_CMD=$(which python3)
+          echo "Using Python: $PYTHON_CMD"
+          $PYTHON_CMD --version
+          
+          # Install aqtinstall using the same Python version
+          $PYTHON_CMD -m pip install aqtinstall
+          
+          # Verify installation
+          $PYTHON_CMD -m pip show aqtinstall
+          
+          # Install Qt Installer Framework
+          $PYTHON_CMD -m aqt install-tool -O ${{ github.workspace }}/Qt/ mac desktop tools_ifw
+          
           # Find the actual installed version directory
           QT_IFW_DIR=$(find ${{ github.workspace }}/Qt/Tools/QtInstallerFramework -maxdepth 1 -type d -name "*" | head -1)
           if [ -d "$QT_IFW_DIR" ]; then
@@ -74,8 +86,20 @@ jobs:
           echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.MACOSX_DEPLOYMENT_TARGET }} >> $GITHUB_ENV
         elif [ "$RUNNER_OS" == "Windows" ]; then
           # Install Qt Installer Framework using aqtinstall (more reliable)
-          pip install aqtinstall
-          python3 -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_ifw
+          # Use the same Python version for both installation and execution
+          PYTHON_CMD=$(which python3)
+          echo "Using Python: $PYTHON_CMD"
+          $PYTHON_CMD --version
+          
+          # Install aqtinstall using the same Python version
+          $PYTHON_CMD -m pip install aqtinstall
+          
+          # Verify installation
+          $PYTHON_CMD -m pip show aqtinstall
+          
+          # Install Qt Installer Framework
+          $PYTHON_CMD -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_ifw
+          
           # Find the actual installed version directory
           QT_IFW_DIR=$(find ${{ github.workspace }}/Qt/Tools/QtInstallerFramework -maxdepth 1 -type d -name "*" | head -1)
           if [ -d "$QT_IFW_DIR" ]; then
@@ -114,7 +138,7 @@ jobs:
         echo "Using vcvarsall to initialize the development environment"
         call vcvarsall.bat x64
         cmake -G "Visual Studio 17 2022" -A x64 ..
-        cmake --build . --target package -j $N --config Release
+        cmake --build . --target package -j %N% --config Release
 
     - name: Configure CMake & build (Linux)
       working-directory: ./build
