@@ -126,6 +126,13 @@ jobs:
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
 
+    - name: Clean up potentially corrupted dependency files
+      shell: bash
+      run: |
+        # Remove any existing OpenStudio-server files that might be corrupted
+        find depend/ -name "OpenStudio-server-*" -type f -delete 2>/dev/null || true
+        echo "Cleaned up any existing OpenStudio-server dependency files"
+
 
     - name: Configure CMake & build (Windows)
       working-directory: ./build
