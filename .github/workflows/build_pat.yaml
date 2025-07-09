@@ -59,20 +59,19 @@ jobs:
           sudo apt update
           sudo apt install cmake
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          # Install Qt Installer Framework using aqtinstall (more reliable than DMG)
-          # Use the same Python version for both installation and execution
-          PYTHON_CMD=$(which python3)
-          echo "Using Python: $PYTHON_CMD"
-          $PYTHON_CMD --version
+          # Create and activate Python virtual environment
+          python3 -m venv venv
+          source venv/bin/activate
           
-          # Install aqtinstall using the same Python version
-          $PYTHON_CMD -m pip install aqtinstall
+          # Upgrade pip and install aqtinstall
+          pip install --upgrade pip
+          pip install aqtinstall
           
           # Verify installation
-          $PYTHON_CMD -m pip show aqtinstall
+          pip show aqtinstall
           
           # Install Qt Installer Framework
-          $PYTHON_CMD -m aqt install-tool -O ${{ github.workspace }}/Qt/ mac desktop tools_ifw
+          python -m aqt install-tool -O ${{ github.workspace }}/Qt/ mac desktop tools_ifw
           
           # Find the actual installed version directory
           QT_IFW_DIR=$(find ${{ github.workspace }}/Qt/Tools/QtInstallerFramework -maxdepth 1 -type d -name "*" | head -1)
@@ -85,20 +84,19 @@ jobs:
           fi
           echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.MACOSX_DEPLOYMENT_TARGET }} >> $GITHUB_ENV
         elif [ "$RUNNER_OS" == "Windows" ]; then
-          # Install Qt Installer Framework using aqtinstall (more reliable)
-          # Use the same Python version for both installation and execution
-          PYTHON_CMD=$(which python3)
-          echo "Using Python: $PYTHON_CMD"
-          $PYTHON_CMD --version
+          # Create and activate Python virtual environment
+          python3 -m venv venv
+          source venv/bin/activate
           
-          # Install aqtinstall using the same Python version
-          $PYTHON_CMD -m pip install aqtinstall
+          # Upgrade pip and install aqtinstall
+          pip install --upgrade pip
+          pip install aqtinstall
           
           # Verify installation
-          $PYTHON_CMD -m pip show aqtinstall
+          pip show aqtinstall
           
           # Install Qt Installer Framework
-          $PYTHON_CMD -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_ifw
+          python -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_ifw
           
           # Find the actual installed version directory
           QT_IFW_DIR=$(find ${{ github.workspace }}/Qt/Tools/QtInstallerFramework -maxdepth 1 -type d -name "*" | head -1)
