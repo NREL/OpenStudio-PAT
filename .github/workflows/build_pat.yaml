@@ -46,34 +46,6 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    # - name: Configure AWS credentials
-    #   uses: aws-actions/configure-aws-credentials@v4
-    #   with:
-    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-    #     aws-region: us-east-1
-    #   continue-on-error: true
-
-    - name: Test dependency accessibility
-      shell: bash
-      run: |
-        echo "Testing dependency download accessibility..."
-        # Test if we can download dependencies without AWS credentials
-        if [ "${{ runner.os }}" == "Linux" ]; then
-          TEST_FILE="ruby-3.2.2-linux.tar.gz"
-        elif [ "${{ runner.os }}" == "macOS" ]; then
-          if [ "${{ matrix.arch }}" = "arm64" ]; then
-            TEST_FILE="ruby-3.2.2-darwin-arm64.tar.gz"
-          else
-            TEST_FILE="ruby-3.2.2-darwin.tar.gz"
-          fi
-        elif [ "${{ runner.os }}" == "Windows" ]; then
-          TEST_FILE="ruby-3.2.2-win32.tar.gz"
-        fi
-        
-        echo "Testing download of: $TEST_FILE"
-        curl -I "https://openstudio-resources.s3.amazonaws.com/pat-dependencies3/$TEST_FILE" && echo "Dependencies accessible!" || echo "Dependencies may require authentication, continuing..."
-
     - name: Set up Node ${{ matrix.node-version }}
       uses: actions/setup-node@v4
       with:
@@ -87,100 +59,25 @@ jobs:
           sudo apt update
           sudo apt install cmake
         elif [ "$RUNNER_OS" == "macOS" ]; then
-          # Create and activate Python virtual environment
-          python3 -m venv venv
-          source venv/bin/activate
-          
-          # Upgrade pip and install aqtinstall
-          pip install --upgrade pip
-          pip install aqtinstall
-          
-          # Verify installation
-          pip show aqtinstall
-          
-          # Install Qt Installer Framework
+          # Install Qt Installer Framework using aqtinstall
+          python3 -m pip install aqtinstall
           python -m aqt install-tool -O "${{ github.workspace }}/Qt/" mac desktop tools_ifw
           
-          # Find the actual installed version directory and add to PATH
-          QT_IFW_BASE="${{ github.workspace }}/Qt/Tools/QtInstallerFramework"
-          echo "Looking for Qt IFW in: $QT_IFW_BASE"
-          ls -la "$QT_IFW_BASE" || echo "QtInstallerFramework directory not found"
-          
-          # Look for version-specific subdirectories
-          QT_IFW_DIR=""
-          if [ -d "$QT_IFW_BASE" ]; then
-            for subdir in "$QT_IFW_BASE"/*; do
-              if [ -d "$subdir" ] && [ -f "$subdir/bin/binarycreator" ]; then
-                QT_IFW_DIR="$subdir"
-                break
-              fi
-            done
-          fi
-          
-          # If not found in subdirectory, check direct bin path
-          if [ -z "$QT_IFW_DIR" ] && [ -f "$QT_IFW_BASE/bin/binarycreator" ]; then
-            QT_IFW_DIR="$QT_IFW_BASE"
-          fi
-          
+          # Add Qt IFW to PATH
+          QT_IFW_DIR=$(find "${{ github.workspace }}/Qt/Tools/QtInstallerFramework" -name "bin" -type d | head -1)
           if [ -n "$QT_IFW_DIR" ]; then
-            echo "Qt Installer Framework found at: $QT_IFW_DIR"
-            echo "$QT_IFW_DIR/bin" >> $GITHUB_PATH
-            # Also set as environment variable for later verification
-            echo "QT_IFW_BIN_PATH=$QT_IFW_DIR/bin" >> $GITHUB_ENV
-          else
-            echo "ERROR: Qt Installer Framework binarycreator not found"
-            echo "Available structure in $QT_IFW_BASE:"
-            find "$QT_IFW_BASE" -name "*binary*" -type f 2>/dev/null || echo "No binarycreator found"
-            exit 1
+            echo "$QT_IFW_DIR" >> $GITHUB_PATH
           fi
           echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.MACOSX_DEPLOYMENT_TARGET }} >> $GITHUB_ENV
         elif [ "$RUNNER_OS" == "Windows" ]; then
-          # Create and activate Python virtual environment
-          python3 -m venv venv
-          source venv/Scripts/activate
-          
-          # Install aqtinstall (skip pip upgrade on Windows to avoid permission issues)
-          pip install aqtinstall
-          
-          # Verify installation
-          pip show aqtinstall
-          
-          # Install Qt Installer Framework
+          # Install Qt Installer Framework using aqtinstall
+          python3 -m pip install aqtinstall
           python -m aqt install-tool -O "${{ github.workspace }}/Qt/" windows desktop tools_ifw
           
-          # Find the actual installed version directory and add to PATH
-          QT_IFW_BASE="${{ github.workspace }}/Qt/Tools/QtInstallerFramework"
-          
-          # List the actual structure for debugging
-          echo "Qt Installer Framework structure:"
-          ls -la "$QT_IFW_BASE" || echo "QtInstallerFramework directory not found"
-          
-          # Look for binarycreator.exe in various possible locations
-          BINARYCREATOR_PATH=""
-          
-          # Check if there's a version-specific subdirectory
-          for subdir in "$QT_IFW_BASE"/*; do
-            if [ -d "$subdir" ] && [ -f "$subdir/bin/binarycreator.exe" ]; then
-              BINARYCREATOR_PATH="$subdir/bin"
-              break
-            fi
-          done
-          
-          # If not found, check direct bin path
-          if [ -z "$BINARYCREATOR_PATH" ] && [ -f "$QT_IFW_BASE/bin/binarycreator.exe" ]; then
-            BINARYCREATOR_PATH="$QT_IFW_BASE/bin"
-          fi
-          
-          if [ -n "$BINARYCREATOR_PATH" ]; then
-            echo "Qt Installer Framework binarycreator found at: $BINARYCREATOR_PATH"
-            echo "$BINARYCREATOR_PATH" >> $GITHUB_PATH
-            # Also set as environment variable for later use
-            echo "QT_IFW_BIN_PATH=$BINARYCREATOR_PATH" >> $GITHUB_ENV
-          else
-            echo "ERROR: Qt Installer Framework binarycreator.exe not found"
-            echo "Available files in $QT_IFW_BASE:"
-            find "$QT_IFW_BASE" -name "*.exe" -type f || echo "No .exe files found"
-            exit 1
+          # Add Qt IFW to PATH
+          QT_IFW_DIR=$(find "${{ github.workspace }}/Qt/Tools/QtInstallerFramework" -name "bin" -type d | head -1)
+          if [ -n "$QT_IFW_DIR" ]; then
+            echo "$QT_IFW_DIR" >> $GITHUB_PATH
           fi
           #echo "Setting CMAKE_GENERATOR options equivalent to ='-G \"Visual Studio 16 2019\" -A x64'"
           #echo CMAKE_GENERATOR='Visual Studio 16 2019' >> $GITHUB_ENV
@@ -202,79 +99,17 @@ jobs:
     - name: Create Build Directory
       run: cmake -E make_directory ./build/
 
-    - name: Clean up potentially corrupted dependency files
-      shell: bash
-      run: |
-        # Create depend directory if it doesn't exist
-        mkdir -p depend/
-        
-        # Remove any existing OpenStudio-server files that might be corrupted
-        echo "Cleaning up OpenStudio-server files..."
-        find depend/ -name "OpenStudio-server-*" -type f -delete 2>/dev/null || true
-        
-        # Also clean up any partial downloads or temp files
-        find depend/ -name "*.tmp" -type f -delete 2>/dev/null || true
-        find depend/ -name "*.part" -type f -delete 2>/dev/null || true
-        
-        # Clean up any corrupted gzip files by testing them
-        for file in depend/*.tar.gz; do
-          if [ -f "$file" ]; then
-            echo "Testing $file..."
-            if ! gzip -t "$file" 2>/dev/null; then
-              echo "Removing corrupted file: $file"
-              rm -f "$file"
-            fi
-          fi
-        done
-        
-        echo "Cleanup completed. Current depend/ contents:"
-        ls -la depend/ || echo "depend/ directory is empty"
-
 
 
 
     - name: Configure CMake & build (Windows)
       working-directory: ./build
       if: runner.os == 'Windows'
-      shell: pwsh
+      shell: cmd
       run: |
-        Write-Host "Using vcvarsall to initialize the development environment"
-        cmd /c "vcvarsall.bat x64 && set" | ForEach-Object {
-          if ($_ -match "^([^=]+)=(.*)$") {
-            [System.Environment]::SetEnvironmentVariable($matches[1], $matches[2])
-          }
-        }
-        
-        # Add Qt Installer Framework to PATH using the environment variable set earlier
-        $qtIfwBin = $env:QT_IFW_BIN_PATH
-        if ($qtIfwBin -and (Test-Path "$qtIfwBin\binarycreator.exe")) {
-          Write-Host "Adding Qt IFW to PATH: $qtIfwBin"
-          $env:PATH = "$qtIfwBin;$env:PATH"
-        } else {
-          Write-Host "Warning: Qt Installer Framework binarycreator.exe not found in expected location: $qtIfwBin"
-          # Try to find it manually as fallback
-          $qtIfwBase = "${{ github.workspace }}\Qt\Tools\QtInstallerFramework"
-          if (Test-Path $qtIfwBase) {
-            $subDirs = Get-ChildItem -Path $qtIfwBase -Directory | Where-Object { Test-Path "$($_.FullName)\bin\binarycreator.exe" }
-            if ($subDirs) {
-              $qtIfwBin = "$($subDirs[0].FullName)\bin"
-              Write-Host "Found Qt IFW at: $qtIfwBin"
-              $env:PATH = "$qtIfwBin;$env:PATH"
-            }
-          }
-        }
-        
-        # Verify binarycreator is available
-        try {
-          $binaryCreatorPath = (Get-Command binarycreator -ErrorAction SilentlyContinue).Source
-          Write-Host "binarycreator found at: $binaryCreatorPath"
-        } catch {
-          Write-Host "ERROR: binarycreator not found in PATH"
-          Write-Host "Current PATH: $env:PATH"
-        }
-        
+        call vcvarsall.bat x64
         cmake -G "Visual Studio 17 2022" -A x64 ..
-        cmake --build . --target package -j $env:N --config Release
+        cmake --build . --target package -j %N% --config Release
 
     - name: Configure CMake & build (Linux)
       working-directory: ./build
@@ -298,29 +133,7 @@ jobs:
       shell: bash
       run: |
         set -x
-        
-        # Verify binarycreator is available
-        if ! command -v binarycreator &> /dev/null; then
-          echo "ERROR: binarycreator not found in PATH"
-          echo "Current PATH: $PATH"
-          echo "QT_IFW_BIN_PATH: $QT_IFW_BIN_PATH"
-          if [ -n "$QT_IFW_BIN_PATH" ]; then
-            echo "Adding QT_IFW_BIN_PATH to PATH and retrying..."
-            export PATH="$QT_IFW_BIN_PATH:$PATH"
-            if ! command -v binarycreator &> /dev/null; then
-              echo "ERROR: binarycreator still not found after adding QT_IFW_BIN_PATH"
-              ls -la "$QT_IFW_BIN_PATH" || echo "QT_IFW_BIN_PATH directory does not exist"
-              exit 1
-            fi
-          else
-            echo "ERROR: QT_IFW_BIN_PATH not set"
-            exit 1
-          fi
-        fi
-        echo "binarycreator found at: $(which binarycreator)"
         if [ "${{ matrix.arch }}" = "arm64" ]; then
-          CMAKE_OSX_ARCHITECTURES=arm64
-          export CMAKE_OSX_ARCHITECTURES
           export MATRIX_ARCH=arm64
           echo "MATRIX_ARCH=arm64" >> $GITHUB_ENV
           cmake -DCMAKE_OSX_ARCHITECTURES="arm64" \
@@ -328,8 +141,6 @@ jobs:
                 -DCMAKE_BUILD_TYPE=Release \
                 ../
         else
-          CMAKE_OSX_ARCHITECTURES=x86_64
-          export CMAKE_OSX_ARCHITECTURES
           export MATRIX_ARCH=x86_64
           echo "MATRIX_ARCH=x86_64" >> $GITHUB_ENV
           cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" \
