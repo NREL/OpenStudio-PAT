@@ -282,7 +282,8 @@ function extractDeps() {
     }
     
     // Check file size
-    const fileSize = jetpack.inspect(sourceFile, {size: true}).size;
+    const fileStats = jetpack.inspect(sourceFile);
+    const fileSize = fileStats ? fileStats.size : 0;
     console.log(`File size: ${fileSize} bytes`);
     
     // Try to verify the file integrity before extraction
