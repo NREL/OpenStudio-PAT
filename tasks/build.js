@@ -231,53 +231,54 @@ function downloadDeps() {
     }
 
     console.log(`Downloading ${depend}: ${uri} -> ${destName}`);
-    return new Promise((resolve, reject) => {
-      const stream = progress(request({uri: uri, timeout: 30000})) // Increased timeout from 5000 to 30000ms
-        .on('progress', state => {
-          console.log(`Downloading ${depend}, ${(state.percent * 100).toFixed(0)}%`);
-        })
-        .on('error', err => {
-          console.error(`Error downloading ${depend}: ${err.message}`);
-          reject(err);
-        })
-        .on('response', response => {
-          // Check for HTTP errors (like 403 Forbidden)
-          if (response.statusCode >= 400) {
-            console.error(`HTTP ${response.statusCode} error downloading ${depend} from ${uri}`);
-            reject(new Error(`HTTP ${response.statusCode} error downloading ${depend}`));
-            return;
-          }
-          
-          // Check expected file size (should be larger than 1KB for valid files)
-          const contentLength = parseInt(response.headers['content-length']);
-          if (contentLength && contentLength < 1024) {
-            console.error(`File ${destName} appears too small (${contentLength} bytes), likely an error page`);
-            reject(new Error(`Downloaded file ${destName} appears corrupted (too small: ${contentLength} bytes)`));
-            return;
-          }
-        })
-        .pipe(source(destName))
-        .pipe(gulp.dest(destination));
-      
-      stream.on('end', () => {
-        // Validate downloaded file size
-        const downloadedPath = path.join(destination, destName);
-        if (jetpack.exists(downloadedPath)) {
-          const fileStats = jetpack.inspect(downloadedPath);
-          const fileSize = fileStats ? fileStats.size : 0;
-          if (fileSize < 1024) {
-            console.error(`Downloaded file ${destName} is too small (${fileSize} bytes), removing`);
-            jetpack.remove(downloadedPath);
-            reject(new Error(`Downloaded file ${destName} appears corrupted (too small: ${fileSize} bytes)`));
-            return;
-          }
-          console.log(`Successfully downloaded ${depend}: ${fileSize} bytes`);
+    
+    // Return stream for merge-stream compatibility, but add enhanced error handling
+    const requestStream = progress(request({uri: uri, timeout: 30000})) // Increased timeout from 5000 to 30000ms
+      .on('progress', state => {
+        console.log(`Downloading ${depend}, ${(state.percent * 100).toFixed(0)}%`);
+      })
+      .on('error', err => {
+        console.error(`Error downloading ${depend}: ${err.message}`);
+      })
+      .on('response', response => {
+        // Check for HTTP errors (like 403 Forbidden)
+        if (response.statusCode >= 400) {
+          console.error(`HTTP ${response.statusCode} error downloading ${depend} from ${uri}`);
+          requestStream.emit('error', new Error(`HTTP ${response.statusCode} error downloading ${depend}`));
+          return;
         }
-        resolve();
+        
+        // Check expected file size (should be larger than 1KB for valid files)
+        const contentLength = parseInt(response.headers['content-length']);
+        if (contentLength && contentLength < 1024) {
+          console.error(`File ${destName} appears too small (${contentLength} bytes), likely an error page`);
+          requestStream.emit('error', new Error(`Downloaded file ${destName} appears corrupted (too small: ${contentLength} bytes)`));
+          return;
+        }
       });
-      
-      stream.on('error', reject);
+
+    const downloadStream = requestStream
+      .pipe(source(destName))
+      .pipe(gulp.dest(destination));
+    
+    // Add post-download validation
+    downloadStream.on('end', () => {
+      // Validate downloaded file size
+      const downloadedPath = path.join(destination, destName);
+      if (jetpack.exists(downloadedPath)) {
+        const fileStats = jetpack.inspect(downloadedPath);
+        const fileSize = fileStats ? fileStats.size : 0;
+        if (fileSize < 1024) {
+          console.error(`Downloaded file ${destName} is too small (${fileSize} bytes), removing`);
+          jetpack.remove(downloadedPath);
+          downloadStream.emit('error', new Error(`Downloaded file ${destName} appears corrupted (too small: ${fileSize} bytes)`));
+          return;
+        }
+        console.log(`Successfully downloaded ${depend}: ${fileSize} bytes`);
+      }
     });
+    
+    return downloadStream;
   });
 
   return merge(tasks);
