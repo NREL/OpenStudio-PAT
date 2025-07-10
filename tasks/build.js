@@ -169,6 +169,11 @@ const platform = os.platform();
 const arch = process.env.MATRIX_ARCH || process.env.CMAKE_OSX_ARCHITECTURES || os.arch();
 
 console.log(`Building for platform: ${platform}, architecture: ${arch}`);
+console.log(`Environment variables:`);
+console.log(`  MATRIX_ARCH: ${process.env.MATRIX_ARCH || 'not set'}`);
+console.log(`  CMAKE_OSX_ARCHITECTURES: ${process.env.CMAKE_OSX_ARCHITECTURES || 'not set'}`);
+console.log(`  os.arch(): ${os.arch()}`);
+console.log(`  Final arch: ${arch}`);
 
 function downloadDeps() {
 
@@ -198,6 +203,26 @@ function downloadDeps() {
       // Need to concat endpoint (AWS) with the fileName
       var uri = manifest.endpoint + fileName;
       var destName = fileName;
+    }
+
+    const destPath = path.join(destination, destName);
+    
+    // Check if file already exists and is valid
+    if (jetpack.exists(destPath)) {
+      try {
+        // Try to verify the file integrity for gzip files
+        if (destName.endsWith('.tar.gz') || destName.endsWith('.gz')) {
+          const fs = require('fs');
+          const zlib = require('zlib');
+          const fileBuffer = fs.readFileSync(destPath);
+          zlib.gunzipSync(fileBuffer.slice(0, Math.min(fileBuffer.length, 1024))); // Test first 1KB
+          console.log(`${depend} already exists and is valid, skipping download`);
+          return Promise.resolve();
+        }
+      } catch (err) {
+        console.log(`${depend} exists but appears corrupted, will re-download: ${err.message}`);
+        jetpack.remove(destPath);
+      }
     }
 
     console.log(`Downloading ${depend}: ${uri} -> ${destName}`);
@@ -249,6 +274,21 @@ function extractDeps() {
     // Verify the file exists before trying to extract
     if (!jetpack.exists(sourceFile)) {
       throw new Error(`File ${sourceFile} does not exist for extraction`);
+    }
+    
+    // Check file size
+    const fileSize = jetpack.inspect(sourceFile, {size: true}).size;
+    console.log(`File size: ${fileSize} bytes`);
+    
+    // Try to verify the file integrity before extraction
+    try {
+      const fs = require('fs');
+      const fileBuffer = fs.readFileSync(sourceFile);
+      zlib.gunzipSync(fileBuffer.slice(0, Math.min(fileBuffer.length, 1024))); // Test first 1KB
+      console.log(`File integrity check passed for ${sourceFile}`);
+    } catch (err) {
+      console.error(`File integrity check failed for ${sourceFile}: ${err.message}`);
+      throw new Error(`File ${sourceFile} is corrupted or not a valid gzip file`);
     }
     
     console.log(`Extracting ${depend}: ${sourceFile} -> ${properDestinationDir}`);

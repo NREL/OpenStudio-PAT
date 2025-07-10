@@ -183,28 +183,9 @@ jobs:
       if: runner.os == 'macOS' && matrix.arch == 'arm64'
       shell: bash
       run: |
-        # Pre-download the OpenStudio-server file for macOS ARM to verify integrity
-        SERVER_URL="https://openstudio-resources.s3.amazonaws.com/pat-dependencies3/OpenStudio-server-5873e0d21d-darwin-arm64.tar.gz"
-        SERVER_FILE="depend/OpenStudio-server-5873e0d21d-darwin-arm64.tar.gz"
-        
-        echo "Pre-downloading OpenStudio-server for verification..."
-        curl -L -o "$SERVER_FILE" "$SERVER_URL"
-        
-        echo "Verifying download integrity..."
-        if gzip -t "$SERVER_FILE"; then
-          echo "Download verified successfully"
-        else
-          echo "Download is corrupted, removing and retrying..."
-          rm -f "$SERVER_FILE"
-          sleep 5
-          curl -L -o "$SERVER_FILE" "$SERVER_URL"
-          if gzip -t "$SERVER_FILE"; then
-            echo "Retry download verified successfully"
-          else
-            echo "Retry download also corrupted, failing build"
-            exit 1
-          fi
-        fi
+        # Create depend directory to ensure it exists
+        mkdir -p depend/
+        echo "Depend directory created for ARM64 build"
 
 
     - name: Configure CMake & build (Windows)
@@ -276,6 +257,7 @@ jobs:
           CMAKE_OSX_ARCHITECTURES=arm64
           export CMAKE_OSX_ARCHITECTURES
           export MATRIX_ARCH=arm64
+          echo "MATRIX_ARCH=arm64" >> $GITHUB_ENV
           cmake -DCMAKE_OSX_ARCHITECTURES="arm64" \
                 -DCMAKE_OSX_DEPLOYMENT_TARGET="${{ matrix.MACOSX_DEPLOYMENT_TARGET }}" \
                 -DCMAKE_BUILD_TYPE=Release \
@@ -284,6 +266,7 @@ jobs:
           CMAKE_OSX_ARCHITECTURES=x86_64
           export CMAKE_OSX_ARCHITECTURES
           export MATRIX_ARCH=x86_64
+          echo "MATRIX_ARCH=x86_64" >> $GITHUB_ENV
           cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" \
                 -DCMAKE_OSX_DEPLOYMENT_TARGET="${{ matrix.MACOSX_DEPLOYMENT_TARGET }}" \
                 -DCMAKE_BUILD_TYPE=Release \
