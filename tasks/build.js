@@ -165,7 +165,19 @@ if (argv.exclude) {
 const manifest = jetpack.read('manifest.json', 'json');
 
 const platform = os.platform();
-const arch = os.arch();
+// Priority: MATRIX_ARCH (set by workflow) > CMAKE_OSX_ARCHITECTURES > os.arch()
+const cmakeArch = process.env.CMAKE_OSX_ARCHITECTURES ? process.env.CMAKE_OSX_ARCHITECTURES.split(';')[0] : null;
+const arch = process.env.MATRIX_ARCH || cmakeArch || os.arch();
+
+// Helper function for manifest lookup with arch fallback
+function getActualFileInfo(manifest, depend, platform, arch) {
+  const fileInfo = _.find(manifest[depend], {platform, arch});
+  if (fileInfo) return fileInfo;
+  console.warn(`No dependency found for ${depend} on ${platform}/${arch}, falling back to x64`);
+  const fallback = _.find(manifest[depend], {platform, arch: 'x64'});
+  if (!fallback) throw new Error(`No dependency found for ${depend} on ${platform}`);
+  return fallback;
+}
 
 function downloadDeps() {
 
@@ -174,7 +186,7 @@ function downloadDeps() {
 
   console.log('Dependencies: ' + dependencies.sort().join(', '));
   var tasks = dependencies.map(depend => {
-    const fileInfo = _.find(manifest[depend], {platform: platform});
+    const fileInfo = getActualFileInfo(manifest, depend, platform, arch);
     const fileName = fileInfo.name;
 
     // Note JM 2018-09-13: Allow other resources in case AWS isn't up to date
@@ -182,16 +194,29 @@ function downloadDeps() {
     if( fileName.includes("http") ) {
       // Already a URI
       var uri = fileName;
-      var destName = fileName.replace(/^.*[\\\/]/, '');
+      var destName = fileName.replace(/^.*[\\/]/, '');
     } else {
       // Need to concat endpoint (AWS) with the fileName
-      var uri = manifest.endpoint + fileName;
+      // Properly encode the filename to handle special characters like + 
+      var uri = manifest.endpoint + encodeURIComponent(fileName);
       var destName = fileName;
     }
 
-    return progress(request({uri: uri, timeout: 5000}))
+    console.log(`Downloading ${depend} from ${uri}...`);
+
+    return progress(request({
+      uri: uri, 
+      timeout: 30000, // Increased timeout for ARM64 dependencies which may be larger
+      followRedirect: true,
+      maxRedirects: 5
+    }))
       .on('progress', state => {
         console.log(`Downloading ${depend}, ${(state.percent * 100).toFixed(0)}%`);
+      })
+      .on('error', (err) => {
+        console.error(`Download error for ${depend}: ${err.message}`);
+        console.error(`URI: ${uri}`);
+        throw new Error(`Failed to download ${depend}: ${err.message}`);
       })
       .pipe(source(destName))
       .pipe(gulp.dest(destination));
@@ -202,11 +227,11 @@ function downloadDeps() {
 
 function extractDeps() {
   var tasks = dependencies.map(depend => {
-    const fileInfo = _.find(manifest[depend], {platform: platform});
+    const fileInfo = getActualFileInfo(manifest, depend, platform, arch);
     const fileName = fileInfo.name;
 
     if( fileName.includes("http") ) {
-      var destName = fileName.replace(/^.*[\\\/]/, '');
+      var destName = fileName.replace(/^.*[\\/]/, '');
     } else {
       var destName = fileName;
     }
@@ -221,8 +246,31 @@ function extractDeps() {
     // directory level
     const properDestinationDir = path.join(destination, properName);
     jetpack.remove(properDestinationDir);
-    return jetpack.createReadStream(path.join(destination, destName))
+    
+    const filePath = path.join(destination, destName);
+    console.log(`Extracting ${depend} from ${filePath}...`);
+    
+    // Verify file exists before attempting extraction
+    if (!jetpack.exists(filePath)) {
+      throw new Error(`Dependency file not found: ${filePath}`);
+    }
+    
+    // Check file size to detect incomplete downloads
+    const fileStats = jetpack.inspect(filePath);
+    if (!fileStats || fileStats.size === 0) {
+      throw new Error(`Dependency file is empty or corrupted: ${filePath} (size: ${fileStats ? fileStats.size : 'unknown'})`);
+    }
+    
+    console.log(`File ${destName} size: ${fileStats.size} bytes`);
+    
+    return jetpack.createReadStream(filePath)
       .pipe(zlib.createGunzip())
+      .on('error', (err) => {
+        console.error(`Error extracting ${depend}: ${err.message}`);
+        console.error(`File path: ${filePath}`);
+        console.error(`File size: ${fileStats.size} bytes`);
+        throw new Error(`Extraction failed for ${depend}: ${err.message}. File may be corrupted.`);
+      })
       .pipe(tar.extract(properDestinationDir, {
         strip: 1,
         // There is a bug in tar-fs where, because stripped files & directories
@@ -234,25 +282,96 @@ function extractDeps() {
         ignore: (__, header) => {
           return header.name.length === 0;
         }
-      }));
+      }))
+      .on('error', (err) => {
+        console.error(`Error during tar extraction for ${depend}: ${err.message}`);
+        throw err;
+      });
   });
 
   const tasksAsPromises = tasks.map(task => new Promise((resolve, reject) => task.on('finish', resolve).on('error', reject)));
   return Promise.all(tasksAsPromises);
 }
 
-function cleanDeps() {
+function verifyDeps() {
+  console.log('Verifying downloaded dependencies...');
   var tasks = dependencies.map(depend => {
-    const fileInfo = _.find(manifest[depend], {platform: platform});
+    const fileInfo = getActualFileInfo(manifest, depend, platform, arch);
     const fileName = fileInfo.name;
 
     if( fileName.includes("http") ) {
-      var destName = fileName.replace(/^.*[\\\/]/, '');
+      var destName = fileName.replace(/^.*[\\/]/, '');
     } else {
       var destName = fileName;
     }
 
-    return gulp.src(path.join(destination, fileName), {read: false})
+    const filePath = path.join(destination, destName);
+    
+    return new Promise((resolve, reject) => {
+      if (!jetpack.exists(filePath)) {
+        reject(new Error(`Dependency file not found: ${filePath}`));
+        return;
+      }
+      
+      const fileStats = jetpack.inspect(filePath);
+      if (!fileStats || fileStats.size === 0) {
+        reject(new Error(`Dependency file is empty: ${filePath}`));
+        return;
+      }
+      
+      console.log(`✓ ${depend}: ${destName} (${fileStats.size} bytes)`);
+      
+      // Test gzip header for compressed files
+      if (destName.endsWith('.tar.gz') || destName.endsWith('.tgz')) {
+        const stream = jetpack.createReadStream(filePath);
+        const chunks = [];
+        
+        stream.on('data', chunk => {
+          chunks.push(chunk);
+          if (chunks.length === 1) {
+            // Check gzip magic number (1f 8b)
+            const buffer = chunk;
+            if (buffer.length >= 2 && buffer[0] === 0x1f && buffer[1] === 0x8b) {
+              console.log(`✓ ${depend}: Valid gzip header detected`);
+              stream.destroy();
+              resolve();
+            } else {
+              stream.destroy();
+              reject(new Error(`Invalid gzip header in ${destName}. Expected magic bytes 1f 8b, got ${buffer[0].toString(16)} ${buffer[1].toString(16)}`));
+            }
+          }
+        });
+        
+        stream.on('error', (err) => {
+          reject(new Error(`Error reading ${destName}: ${err.message}`));
+        });
+        
+        stream.on('end', () => {
+          if (chunks.length === 0) {
+            reject(new Error(`No data read from ${destName}`));
+          }
+        });
+      } else {
+        resolve();
+      }
+    });
+  });
+
+  return Promise.all(tasks);
+}
+
+function cleanDeps() {
+  var tasks = dependencies.map(depend => {
+    const fileInfo = getActualFileInfo(manifest, depend, platform, arch);
+    const fileName = fileInfo.name;
+
+    if( fileName.includes("http") ) {
+      var destName = fileName.replace(/^.*[\\/]/, '');
+    } else {
+      var destName = fileName;
+    }
+
+    return gulp.src(path.join(destination, destName), {read: false})
       .pipe(gulpClean());
   });
 
@@ -262,4 +381,8 @@ function cleanDeps() {
 exports.build = gulp.series(gulp.parallel(html, fonts, nodeModules, other, environment), finalizeBuild);
 exports.clean = clean;
 exports.copyManifest = copyManifest;
-exports.installDeps = gulp.series(downloadDeps, extractDeps, cleanDeps);
+exports.installDeps = gulp.series(downloadDeps, verifyDeps, extractDeps, cleanDeps);
+exports.downloadDeps = downloadDeps;
+exports.verifyDeps = verifyDeps;
+exports.extractDeps = extractDeps;
+exports.cleanDeps = cleanDeps;
