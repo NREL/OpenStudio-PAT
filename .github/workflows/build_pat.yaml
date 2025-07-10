@@ -60,7 +60,7 @@ jobs:
           sudo apt install cmake
         elif [ "$RUNNER_OS" == "macOS" ]; then
           # Install Qt Installer Framework using aqtinstall
-          python3 -m pip install aqtinstall
+          python3 -m pip install --break-system-packages aqtinstall
           python -m aqt install-tool -O "${{ github.workspace }}/Qt/" mac desktop tools_ifw
           
           # Add Qt IFW to PATH
@@ -71,7 +71,7 @@ jobs:
           echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.MACOSX_DEPLOYMENT_TARGET }} >> $GITHUB_ENV
         elif [ "$RUNNER_OS" == "Windows" ]; then
           # Install Qt Installer Framework using aqtinstall
-          python3 -m pip install aqtinstall
+          python3 -m pip install --break-system-packages aqtinstall
           python -m aqt install-tool -O "${{ github.workspace }}/Qt/" windows desktop tools_ifw
           
           # Add Qt IFW to PATH
