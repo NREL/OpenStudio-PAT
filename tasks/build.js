@@ -179,12 +179,40 @@ function getActualFileInfo(manifest, depend, platform, arch) {
   return fallback;
 }
 
+// Retry wrapper for critical operations
+function withRetry(operation, maxRetries = 3, delay = 1000) {
+  return new Promise((resolve, reject) => {
+    let attempts = 0;
+    
+    function attempt() {
+      attempts++;
+      operation()
+        .then(resolve)
+        .catch(err => {
+          if (attempts >= maxRetries) {
+            console.error(`Operation failed after ${maxRetries} attempts:`, err.message);
+            reject(err);
+          } else {
+            console.warn(`Attempt ${attempts} failed, retrying in ${delay}ms...`);
+            setTimeout(attempt, delay);
+          }
+        });
+    }
+    
+    attempt();
+  });
+}
+
 function downloadDeps() {
 
   // List the dependencies to download here
   // These should correspond to keys in the manifest
+  // Enhanced with better error handling, logging, and progress reporting
 
   console.log('Dependencies: ' + dependencies.sort().join(', '));
+  console.log(`Platform: ${platform}, Architecture: ${arch}`);
+  console.log(`Destination: ${destination}`);
+  
   var tasks = dependencies.map(depend => {
     const fileInfo = getActualFileInfo(manifest, depend, platform, arch);
     const fileName = fileInfo.name;
@@ -201,9 +229,39 @@ function downloadDeps() {
       var destName = fileName;
     }
 
-    return progress(request({uri: uri, timeout: 5000}))
+    console.log(`Downloading ${depend}: ${uri}`);
+    
+    const requestOptions = {
+      uri: uri, 
+      timeout: 30000, // Increased timeout to 30 seconds
+      headers: {
+        'User-Agent': 'OpenStudio-PAT-Builder/1.0'
+      }
+    };
+
+    return progress(request(requestOptions))
       .on('progress', state => {
-        console.log(`Downloading ${depend}, ${(state.percent * 100).toFixed(0)}%`);
+        const percent = (state.percent * 100).toFixed(1);
+        const speed = state.speed ? `(${(state.speed / 1024 / 1024).toFixed(2)} MB/s)` : '';
+        console.log(`Downloading ${depend}: ${percent}% ${speed}`);
+      })
+      .on('error', err => {
+        console.error(`Error downloading ${depend} from ${uri}:`, err.message);
+        if (err.code === 'ETIMEDOUT') {
+          console.error(`Download timeout for ${depend}. Check network connection or try again.`);
+        } else if (err.code === 'ENOTFOUND') {
+          console.error(`Host not found for ${depend}. Check the URL: ${uri}`);
+        }
+      })
+      .on('response', response => {
+        console.log(`Response for ${depend}: ${response.statusCode} ${response.statusMessage}`);
+        if (response.statusCode !== 200) {
+          console.error(`HTTP ${response.statusCode} for ${depend}: ${uri}`);
+        }
+        if (response.headers['content-length']) {
+          const sizeMB = (parseInt(response.headers['content-length']) / 1024 / 1024).toFixed(2);
+          console.log(`Expected size for ${depend}: ${sizeMB} MB`);
+        }
       })
       .pipe(source(destName))
       .pipe(gulp.dest(destination));
@@ -223,6 +281,24 @@ function extractDeps() {
       var destName = fileName;
     }
 
+    // File integrity check before extraction
+    const filePath = path.join(destination, destName);
+    const fileStats = jetpack.inspect(filePath, { checksum: 'md5' });
+    
+    if (!fileStats) {
+      throw new Error(`Downloaded file not found: ${filePath}`);
+    }
+    
+    console.log(`Extracting ${depend}:`);
+    console.log(`  File: ${destName}`);
+    console.log(`  Size: ${(fileStats.size / 1024 / 1024).toFixed(2)} MB`);
+    console.log(`  MD5: ${fileStats.md5}`);
+    
+    // Basic size validation (warn if file is suspiciously small)
+    if (fileStats.size < 1024) { // Less than 1KB
+      console.warn(`Warning: ${depend} file is very small (${fileStats.size} bytes). This may indicate a download error.`);
+    }
+
     // Note JM 2018-0913:
     // Usually deps are properly zipped to that the extracted root folder
     // is adequately named, but when using absolute http:// resources (not
@@ -233,8 +309,20 @@ function extractDeps() {
     // directory level
     const properDestinationDir = path.join(destination, properName);
     jetpack.remove(properDestinationDir);
-    return jetpack.createReadStream(path.join(destination, destName))
+    
+    console.log(`  Extracting to: ${properDestinationDir}`);
+    
+    return jetpack.createReadStream(filePath)
+      .on('error', err => {
+        console.error(`Error reading ${depend} file: ${err.message}`);
+        throw err;
+      })
       .pipe(zlib.createGunzip())
+      .on('error', err => {
+        console.error(`Error decompressing ${depend}: ${err.message}`);
+        console.error(`This may indicate file corruption. Try re-downloading the dependency.`);
+        throw err;
+      })
       .pipe(tar.extract(properDestinationDir, {
         strip: 1,
         // There is a bug in tar-fs where, because stripped files & directories
@@ -246,7 +334,14 @@ function extractDeps() {
         ignore: (__, header) => {
           return header.name.length === 0;
         }
-      }));
+      }))
+      .on('error', err => {
+        console.error(`Error extracting ${depend}: ${err.message}`);
+        throw err;
+      })
+      .on('finish', () => {
+        console.log(`Successfully extracted ${depend}`);
+      });
   });
 
   const tasksAsPromises = tasks.map(task => new Promise((resolve, reject) => task.on('finish', resolve).on('error', reject)));
