@@ -102,12 +102,35 @@ jobs:
           python -m aqt install-tool -O "${{ github.workspace }}/Qt/" mac desktop tools_ifw
           
           # Find the actual installed version directory and add to PATH
-          QT_IFW_DIR=$(find "${{ github.workspace }}/Qt/Tools/QtInstallerFramework" -maxdepth 1 -type d -name "*" | head -1)
-          if [ -d "$QT_IFW_DIR" ]; then
-            echo "Qt Installer Framework installed successfully at: $QT_IFW_DIR"
+          QT_IFW_BASE="${{ github.workspace }}/Qt/Tools/QtInstallerFramework"
+          echo "Looking for Qt IFW in: $QT_IFW_BASE"
+          ls -la "$QT_IFW_BASE" || echo "QtInstallerFramework directory not found"
+          
+          # Look for version-specific subdirectories
+          QT_IFW_DIR=""
+          if [ -d "$QT_IFW_BASE" ]; then
+            for subdir in "$QT_IFW_BASE"/*; do
+              if [ -d "$subdir" ] && [ -f "$subdir/bin/binarycreator" ]; then
+                QT_IFW_DIR="$subdir"
+                break
+              fi
+            done
+          fi
+          
+          # If not found in subdirectory, check direct bin path
+          if [ -z "$QT_IFW_DIR" ] && [ -f "$QT_IFW_BASE/bin/binarycreator" ]; then
+            QT_IFW_DIR="$QT_IFW_BASE"
+          fi
+          
+          if [ -n "$QT_IFW_DIR" ]; then
+            echo "Qt Installer Framework found at: $QT_IFW_DIR"
             echo "$QT_IFW_DIR/bin" >> $GITHUB_PATH
+            # Also set as environment variable for later verification
+            echo "QT_IFW_BIN_PATH=$QT_IFW_DIR/bin" >> $GITHUB_ENV
           else
-            echo "Qt Installer Framework installation failed"
+            echo "ERROR: Qt Installer Framework binarycreator not found"
+            echo "Available structure in $QT_IFW_BASE:"
+            find "$QT_IFW_BASE" -name "*binary*" -type f 2>/dev/null || echo "No binarycreator found"
             exit 1
           fi
           echo MACOSX_DEPLOYMENT_TARGET=${{ matrix.MACOSX_DEPLOYMENT_TARGET }} >> $GITHUB_ENV
@@ -275,6 +298,26 @@ jobs:
       shell: bash
       run: |
         set -x
+        
+        # Verify binarycreator is available
+        if ! command -v binarycreator &> /dev/null; then
+          echo "ERROR: binarycreator not found in PATH"
+          echo "Current PATH: $PATH"
+          echo "QT_IFW_BIN_PATH: $QT_IFW_BIN_PATH"
+          if [ -n "$QT_IFW_BIN_PATH" ]; then
+            echo "Adding QT_IFW_BIN_PATH to PATH and retrying..."
+            export PATH="$QT_IFW_BIN_PATH:$PATH"
+            if ! command -v binarycreator &> /dev/null; then
+              echo "ERROR: binarycreator still not found after adding QT_IFW_BIN_PATH"
+              ls -la "$QT_IFW_BIN_PATH" || echo "QT_IFW_BIN_PATH directory does not exist"
+              exit 1
+            fi
+          else
+            echo "ERROR: QT_IFW_BIN_PATH not set"
+            exit 1
+          fi
+        fi
+        echo "binarycreator found at: $(which binarycreator)"
         if [ "${{ matrix.arch }}" = "arm64" ]; then
           CMAKE_OSX_ARCHITECTURES=arm64
           export CMAKE_OSX_ARCHITECTURES
