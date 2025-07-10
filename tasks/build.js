@@ -166,16 +166,8 @@ const manifest = jetpack.read('manifest.json', 'json');
 
 const platform = os.platform();
 // Priority: MATRIX_ARCH (set by workflow) > CMAKE_OSX_ARCHITECTURES > os.arch()
-// Handle multi-architecture CMAKE_OSX_ARCHITECTURES by taking the first architecture
 const cmakeArch = process.env.CMAKE_OSX_ARCHITECTURES ? process.env.CMAKE_OSX_ARCHITECTURES.split(';')[0] : null;
 const arch = process.env.MATRIX_ARCH || cmakeArch || os.arch();
-
-console.log(`Building for platform: ${platform}, architecture: ${arch}`);
-console.log(`Environment variables:`);
-console.log(`  MATRIX_ARCH: ${process.env.MATRIX_ARCH || 'not set'}`);
-console.log(`  CMAKE_OSX_ARCHITECTURES: ${process.env.CMAKE_OSX_ARCHITECTURES || 'not set'}`);
-console.log(`  os.arch(): ${os.arch()}`);
-console.log(`  Final arch: ${arch}`);
 
 function downloadDeps() {
 
@@ -207,78 +199,12 @@ function downloadDeps() {
       var destName = fileName;
     }
 
-    const destPath = path.join(destination, destName);
-    
-    // Check if file already exists and is valid
-    if (jetpack.exists(destPath)) {
-      try {
-        // Try to verify the file integrity for gzip files
-        if (destName.endsWith('.tar.gz') || destName.endsWith('.gz')) {
-          const fs = require('fs');
-          const fileBuffer = fs.readFileSync(destPath);
-          
-          // More thorough integrity check - test the entire file
-          zlib.gunzipSync(fileBuffer);
-          console.log(`${depend} already exists and is valid, skipping download`);
-          return Promise.resolve();
-        }
-        console.log(`${depend} already exists, skipping download`);
-        return Promise.resolve();
-      } catch (err) {
-        console.log(`${depend} exists but appears corrupted, will re-download: ${err.message}`);
-        jetpack.remove(destPath);
-      }
-    }
-
-    console.log(`Downloading ${depend}: ${uri} -> ${destName}`);
-    
-    // Return stream for merge-stream compatibility, but add enhanced error handling
-    const requestStream = progress(request({uri: uri, timeout: 30000})) // Increased timeout from 5000 to 30000ms
+    return progress(request({uri: uri, timeout: 5000}))
       .on('progress', state => {
         console.log(`Downloading ${depend}, ${(state.percent * 100).toFixed(0)}%`);
       })
-      .on('error', err => {
-        console.error(`Error downloading ${depend}: ${err.message}`);
-      })
-      .on('response', response => {
-        // Check for HTTP errors (like 403 Forbidden)
-        if (response.statusCode >= 400) {
-          console.error(`HTTP ${response.statusCode} error downloading ${depend} from ${uri}`);
-          requestStream.emit('error', new Error(`HTTP ${response.statusCode} error downloading ${depend}`));
-          return;
-        }
-        
-        // Check expected file size (should be larger than 1KB for valid files)
-        const contentLength = parseInt(response.headers['content-length']);
-        if (contentLength && contentLength < 1024) {
-          console.error(`File ${destName} appears too small (${contentLength} bytes), likely an error page`);
-          requestStream.emit('error', new Error(`Downloaded file ${destName} appears corrupted (too small: ${contentLength} bytes)`));
-          return;
-        }
-      });
-
-    const downloadStream = requestStream
       .pipe(source(destName))
       .pipe(gulp.dest(destination));
-    
-    // Add post-download validation
-    downloadStream.on('end', () => {
-      // Validate downloaded file size
-      const downloadedPath = path.join(destination, destName);
-      if (jetpack.exists(downloadedPath)) {
-        const fileStats = jetpack.inspect(downloadedPath);
-        const fileSize = fileStats ? fileStats.size : 0;
-        if (fileSize < 1024) {
-          console.error(`Downloaded file ${destName} is too small (${fileSize} bytes), removing`);
-          jetpack.remove(downloadedPath);
-          downloadStream.emit('error', new Error(`Downloaded file ${destName} appears corrupted (too small: ${fileSize} bytes)`));
-          return;
-        }
-        console.log(`Successfully downloaded ${depend}: ${fileSize} bytes`);
-      }
-    });
-    
-    return downloadStream;
   });
 
   return merge(tasks);
@@ -312,63 +238,25 @@ function extractDeps() {
     // What we do is to extract to properName and remove the leading (root)
     // directory level
     const properDestinationDir = path.join(destination, properName);
-    const sourceFile = path.join(destination, destName);
-    
-    // Verify the file exists before trying to extract
-    if (!jetpack.exists(sourceFile)) {
-      throw new Error(`File ${sourceFile} does not exist for extraction`);
-    }
-    
-    // Check file size
-    const fileStats = jetpack.inspect(sourceFile);
-    const fileSize = fileStats ? fileStats.size : 0;
-    console.log(`File size: ${fileSize} bytes`);
-    
-    // Try to verify the file integrity before extraction
-    try {
-      const fs = require('fs');
-      const fileBuffer = fs.readFileSync(sourceFile);
-      
-      // More thorough integrity check - test the entire file
-      zlib.gunzipSync(fileBuffer);
-      console.log(`File integrity check passed for ${sourceFile}`);
-    } catch (err) {
-      console.error(`File integrity check failed for ${sourceFile}: ${err.message}`);
-      throw new Error(`File ${sourceFile} is corrupted or not a valid gzip file: ${err.message}`);
-    }
-    
-    console.log(`Extracting ${depend}: ${sourceFile} -> ${properDestinationDir}`);
     jetpack.remove(properDestinationDir);
-    
-    return new Promise((resolve, reject) => {
-      const stream = jetpack.createReadStream(sourceFile)
-        .pipe(zlib.createGunzip())
-        .pipe(tar.extract(properDestinationDir, {
-          strip: 1,
-          // There is a bug in tar-fs where, because stripped files & directories
-          // are given an empty header.name, having multiple stripped items
-          // results in having multiple headers with the same (empty) name,
-          // causing the extraction to either fail or hang.
-          //
-          // We avoid this issue by ignoring stripped items (ie, items with empty names)
-          ignore: (__, header) => {
-            return header.name.length === 0;
-          }
-        }));
-      
-      stream.on('finish', () => {
-        console.log(`Successfully extracted ${depend}`);
-        resolve();
-      });
-      
-      stream.on('error', (err) => {
-        console.error(`Error extracting ${depend} from ${sourceFile}: ${err.message}`);
-        reject(err);
-      });
-    });
+    return jetpack.createReadStream(path.join(destination, destName))
+      .pipe(zlib.createGunzip())
+      .pipe(tar.extract(properDestinationDir, {
+        strip: 1,
+        // There is a bug in tar-fs where, because stripped files & directories
+        // are given an empty header.name, having multiple stripped items
+        // results in having multiple headers with the same (empty) name,
+        // causing the extraction to either fail or hang.
+        //
+        // We avoid this issue by ignoring stripped items (ie, items with empty names)
+        ignore: (__, header) => {
+          return header.name.length === 0;
+        }
+      }));
   });
 
-  return Promise.all(tasks);
+  const tasksAsPromises = tasks.map(task => new Promise((resolve, reject) => task.on('finish', resolve).on('error', reject)));
+  return Promise.all(tasksAsPromises);
 }
 
 function cleanDeps() {
@@ -390,7 +278,7 @@ function cleanDeps() {
       var destName = fileName;
     }
 
-    return gulp.src(path.join(destination, fileName), {read: false})
+    return gulp.src(path.join(destination, destName), {read: false})
       .pipe(gulpClean());
   });
 
