@@ -71,10 +71,10 @@ jobs:
           pip show aqtinstall
           
           # Install Qt Installer Framework
-          python -m aqt install-tool -O ${{ github.workspace }}/Qt/ mac desktop tools_ifw
+          python -m aqt install-tool -O "${{ github.workspace }}/Qt/" mac desktop tools_ifw
           
           # Find the actual installed version directory and add to PATH
-          QT_IFW_DIR=$(find ${{ github.workspace }}/Qt/Tools/QtInstallerFramework -maxdepth 1 -type d -name "*" | head -1)
+          QT_IFW_DIR=$(find "${{ github.workspace }}/Qt/Tools/QtInstallerFramework" -maxdepth 1 -type d -name "*" | head -1)
           if [ -d "$QT_IFW_DIR" ]; then
             echo "Qt Installer Framework installed successfully at: $QT_IFW_DIR"
             echo "$QT_IFW_DIR/bin" >> $GITHUB_PATH
@@ -95,10 +95,10 @@ jobs:
           pip show aqtinstall
           
           # Install Qt Installer Framework
-          python -m aqt install-tool -O ${{ github.workspace }}/Qt/ windows desktop tools_ifw
+          python -m aqt install-tool -O "${{ github.workspace }}/Qt/" windows desktop tools_ifw
           
           # Find the actual installed version directory and add to PATH
-          QT_IFW_DIR=$(find ${{ github.workspace }}/Qt/Tools/QtInstallerFramework -maxdepth 1 -type d -name "*" | head -1)
+          QT_IFW_DIR=$(find "${{ github.workspace }}/Qt/Tools/QtInstallerFramework" -maxdepth 1 -type d -name "*" | head -1)
           if [ -d "$QT_IFW_DIR" ]; then
             echo "Qt Installer Framework installed successfully at: $QT_IFW_DIR"
             echo "$QT_IFW_DIR/bin" >> $GITHUB_PATH
