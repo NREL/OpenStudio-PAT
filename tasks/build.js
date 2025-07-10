@@ -165,7 +165,19 @@ if (argv.exclude) {
 const manifest = jetpack.read('manifest.json', 'json');
 
 const platform = os.platform();
-const arch = os.arch();
+// Priority: MATRIX_ARCH (set by workflow) > CMAKE_OSX_ARCHITECTURES > os.arch()
+const cmakeArch = process.env.CMAKE_OSX_ARCHITECTURES ? process.env.CMAKE_OSX_ARCHITECTURES.split(';')[0] : null;
+const arch = process.env.MATRIX_ARCH || cmakeArch || os.arch();
+
+// Helper function for manifest lookup with arch fallback
+function getActualFileInfo(manifest, depend, platform, arch) {
+  const fileInfo = _.find(manifest[depend], {platform, arch});
+  if (fileInfo) return fileInfo;
+  console.warn(`No dependency found for ${depend} on ${platform}/${arch}, falling back to x64`);
+  const fallback = _.find(manifest[depend], {platform, arch: 'x64'});
+  if (!fallback) throw new Error(`No dependency found for ${depend} on ${platform}`);
+  return fallback;
+}
 
 function downloadDeps() {
 
@@ -174,7 +186,7 @@ function downloadDeps() {
 
   console.log('Dependencies: ' + dependencies.sort().join(', '));
   var tasks = dependencies.map(depend => {
-    const fileInfo = _.find(manifest[depend], {platform: platform});
+    const fileInfo = getActualFileInfo(manifest, depend, platform, arch);
     const fileName = fileInfo.name;
 
     // Note JM 2018-09-13: Allow other resources in case AWS isn't up to date
@@ -182,7 +194,7 @@ function downloadDeps() {
     if( fileName.includes("http") ) {
       // Already a URI
       var uri = fileName;
-      var destName = fileName.replace(/^.*[\\\/]/, '');
+      var destName = fileName.replace(/^.*[\\/]/, '');
     } else {
       // Need to concat endpoint (AWS) with the fileName
       var uri = manifest.endpoint + fileName;
@@ -202,11 +214,11 @@ function downloadDeps() {
 
 function extractDeps() {
   var tasks = dependencies.map(depend => {
-    const fileInfo = _.find(manifest[depend], {platform: platform});
+    const fileInfo = getActualFileInfo(manifest, depend, platform, arch);
     const fileName = fileInfo.name;
 
     if( fileName.includes("http") ) {
-      var destName = fileName.replace(/^.*[\\\/]/, '');
+      var destName = fileName.replace(/^.*[\\/]/, '');
     } else {
       var destName = fileName;
     }
@@ -243,16 +255,16 @@ function extractDeps() {
 
 function cleanDeps() {
   var tasks = dependencies.map(depend => {
-    const fileInfo = _.find(manifest[depend], {platform: platform});
+    const fileInfo = getActualFileInfo(manifest, depend, platform, arch);
     const fileName = fileInfo.name;
 
     if( fileName.includes("http") ) {
-      var destName = fileName.replace(/^.*[\\\/]/, '');
+      var destName = fileName.replace(/^.*[\\/]/, '');
     } else {
       var destName = fileName;
     }
 
-    return gulp.src(path.join(destination, fileName), {read: false})
+    return gulp.src(path.join(destination, destName), {read: false})
       .pipe(gulpClean());
   });
 
