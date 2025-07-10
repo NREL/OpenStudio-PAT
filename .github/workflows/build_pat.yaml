@@ -46,12 +46,33 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v4
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+    # - name: Configure AWS credentials
+    #   uses: aws-actions/configure-aws-credentials@v4
+    #   with:
+    #     aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+    #     aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+    #     aws-region: us-east-1
+    #   continue-on-error: true
+
+    - name: Test dependency accessibility
+      shell: bash
+      run: |
+        echo "Testing dependency download accessibility..."
+        # Test if we can download dependencies without AWS credentials
+        if [ "${{ runner.os }}" == "Linux" ]; then
+          TEST_FILE="ruby-3.2.2-linux.tar.gz"
+        elif [ "${{ runner.os }}" == "macOS" ]; then
+          if [ "${{ matrix.arch }}" = "arm64" ]; then
+            TEST_FILE="ruby-3.2.2-darwin-arm64.tar.gz"
+          else
+            TEST_FILE="ruby-3.2.2-darwin.tar.gz"
+          fi
+        elif [ "${{ runner.os }}" == "Windows" ]; then
+          TEST_FILE="ruby-3.2.2-win32.tar.gz"
+        fi
+        
+        echo "Testing download of: $TEST_FILE"
+        curl -I "https://openstudio-resources.s3.amazonaws.com/pat-dependencies3/$TEST_FILE" && echo "Dependencies accessible!" || echo "Dependencies may require authentication, continuing..."
 
     - name: Set up Node ${{ matrix.node-version }}
       uses: actions/setup-node@v4
