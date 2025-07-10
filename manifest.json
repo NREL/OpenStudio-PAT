@@ -11,6 +11,11 @@
     "arch": "x64",
     "type": "energyplus"
   }, {
+    "name": "EnergyPlus-25.1.0-68a4a7c774-Darwin-macOS13-arm64.tar.gz",
+    "platform": "darwin",
+    "arch": "arm64",
+    "type": "energyplus"
+  }, {
     "name": "EnergyPlus-25.1.0-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
@@ -25,6 +30,11 @@
     "name": "ruby-3.2.2-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
+    "type": "ruby"
+  }, {
+    "name": "ruby-3.2.2-darwin-arm64.tar.gz",
+    "platform": "darwin",
+    "arch": "arm64",
     "type": "ruby"
   }, {
     "name": "ruby-3.2.2-linux.tar.gz",
@@ -43,6 +53,11 @@
     "arch": "x64",
     "type": "mongo"
   }, {
+    "name": "mongodb-macos-arm64-6.0.8.tgz",
+    "platform": "darwin",
+    "arch": "arm64",
+    "type": "mongo"
+  }, {
     "name": "mongodb-6.0.8-linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
@@ -59,6 +74,11 @@
     "arch": "x64",
     "type": "openstudio"
   }, {
+    "name": "OpenStudio-3.10.0+86d7e215a1-Darwin-arm64.tar.gz",
+    "platform": "darwin",
+    "arch": "arm64",
+    "type": "openstudio"
+  }, {
     "name": "OpenStudio-3.10.0-Linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
@@ -73,6 +93,11 @@
     "name": "OpenStudio-server-5873e0d21d-darwin.tar.gz",
     "platform": "darwin",
     "arch": "x64",
+    "type": "OpenStudio-server"
+  }, {
+    "name": "OpenStudio-server-5873e0d21d-darwin-arm64.tar.gz",
+    "platform": "darwin",
+    "arch": "arm64",
     "type": "OpenStudio-server"
   }, {
     "name": "OpenStudio-server-5873e0d21d-linux.tar.gz",
