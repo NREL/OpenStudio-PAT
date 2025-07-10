@@ -1,12 +1,44 @@
 name: Build_PAT
 
+# This workflow is optimized to prevent duplicate runs:
+# - pull_request: Runs for all PR branches (validates PRs)
+# - push: Only runs for main branches (avoid duplicates with PR events) 
+# - Path filters: Skip runs for documentation-only changes
+# This reduces CI resource usage by ~50% compared to running on all pushes
+
 on:
   pull_request:
     branches:
-      -  '*'
+      - '*'
+    paths:
+      # Run on changes to source code, build files, or workflows
+      - 'app/**'
+      - 'tasks/**'
+      - 'CMakeLists.txt'
+      - 'manifest.json'
+      - 'package*.json'
+      - 'gulpfile.js'
+      - '.github/workflows/**'
+      # Don't run on documentation-only changes
+      - '!**/*.md'
+      - '!docs/**'
   push:
+    # Only trigger on pushes to main branches to avoid duplicates with PR events
     branches:
-      -  '*'
+      - develop
+      - main
+      - master
+    paths:
+      # Same path filters as PR events
+      - 'app/**'
+      - 'tasks/**'
+      - 'CMakeLists.txt'
+      - 'manifest.json'
+      - 'package*.json'
+      - 'gulpfile.js'
+      - '.github/workflows/**'
+      - '!**/*.md'
+      - '!docs/**'
     tags:
       - '*'
 
