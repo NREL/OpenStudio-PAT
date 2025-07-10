@@ -16,3 +16,13 @@ Thumbs.db
 /playwright-results/
 /playwright/.cache/
 /reports/
+
+# Claude Code and Claude Flow
+/.claude/
+/.hive-mind/
+/.swarm/
+claude-flow
+claude-flow.bat
+claude-flow.ps1
+hive-mind-prompt-*.txt
+CLAUDE.md
