@@ -165,7 +165,8 @@ if (argv.exclude) {
 const manifest = jetpack.read('manifest.json', 'json');
 
 const platform = os.platform();
-const arch = process.env.CMAKE_OSX_ARCHITECTURES || os.arch();
+// Priority: MATRIX_ARCH (set by workflow) > CMAKE_OSX_ARCHITECTURES > os.arch()
+const arch = process.env.MATRIX_ARCH || process.env.CMAKE_OSX_ARCHITECTURES || os.arch();
 
 console.log(`Building for platform: ${platform}, architecture: ${arch}`);
 
@@ -199,9 +200,14 @@ function downloadDeps() {
       var destName = fileName;
     }
 
+    console.log(`Downloading ${depend}: ${uri} -> ${destName}`);
     return progress(request({uri: uri, timeout: 5000}))
       .on('progress', state => {
         console.log(`Downloading ${depend}, ${(state.percent * 100).toFixed(0)}%`);
+      })
+      .on('error', err => {
+        console.error(`Error downloading ${depend}: ${err.message}`);
+        throw err;
       })
       .pipe(source(destName))
       .pipe(gulp.dest(destination));
@@ -238,25 +244,45 @@ function extractDeps() {
     // What we do is to extract to properName and remove the leading (root)
     // directory level
     const properDestinationDir = path.join(destination, properName);
+    const sourceFile = path.join(destination, destName);
+    
+    // Verify the file exists before trying to extract
+    if (!jetpack.exists(sourceFile)) {
+      throw new Error(`File ${sourceFile} does not exist for extraction`);
+    }
+    
+    console.log(`Extracting ${depend}: ${sourceFile} -> ${properDestinationDir}`);
     jetpack.remove(properDestinationDir);
-    return jetpack.createReadStream(path.join(destination, destName))
-      .pipe(zlib.createGunzip())
-      .pipe(tar.extract(properDestinationDir, {
-        strip: 1,
-        // There is a bug in tar-fs where, because stripped files & directories
-        // are given an empty header.name, having multiple stripped items
-        // results in having multiple headers with the same (empty) name,
-        // causing the extraction to either fail or hang.
-        //
-        // We avoid this issue by ignoring stripped items (ie, items with empty names)
-        ignore: (__, header) => {
-          return header.name.length === 0;
-        }
-      }));
+    
+    return new Promise((resolve, reject) => {
+      const stream = jetpack.createReadStream(sourceFile)
+        .pipe(zlib.createGunzip())
+        .pipe(tar.extract(properDestinationDir, {
+          strip: 1,
+          // There is a bug in tar-fs where, because stripped files & directories
+          // are given an empty header.name, having multiple stripped items
+          // results in having multiple headers with the same (empty) name,
+          // causing the extraction to either fail or hang.
+          //
+          // We avoid this issue by ignoring stripped items (ie, items with empty names)
+          ignore: (__, header) => {
+            return header.name.length === 0;
+          }
+        }));
+      
+      stream.on('finish', () => {
+        console.log(`Successfully extracted ${depend}`);
+        resolve();
+      });
+      
+      stream.on('error', (err) => {
+        console.error(`Error extracting ${depend} from ${sourceFile}: ${err.message}`);
+        reject(err);
+      });
+    });
   });
 
-  const tasksAsPromises = tasks.map(task => new Promise((resolve, reject) => task.on('finish', resolve).on('error', reject)));
-  return Promise.all(tasksAsPromises);
+  return Promise.all(tasks);
 }
 
 function cleanDeps() {

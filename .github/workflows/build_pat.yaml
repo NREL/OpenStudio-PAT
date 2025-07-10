@@ -274,18 +274,21 @@ jobs:
         set -x
         if [ "${{ matrix.arch }}" = "arm64" ]; then
           CMAKE_OSX_ARCHITECTURES=arm64
+          export CMAKE_OSX_ARCHITECTURES
+          export MATRIX_ARCH=arm64
           cmake -DCMAKE_OSX_ARCHITECTURES="arm64" \
                 -DCMAKE_OSX_DEPLOYMENT_TARGET="${{ matrix.MACOSX_DEPLOYMENT_TARGET }}" \
                 -DCMAKE_BUILD_TYPE=Release \
                 ../
         else
           CMAKE_OSX_ARCHITECTURES=x86_64
+          export CMAKE_OSX_ARCHITECTURES
+          export MATRIX_ARCH=x86_64
           cmake -DCMAKE_OSX_ARCHITECTURES="x86_64" \
                 -DCMAKE_OSX_DEPLOYMENT_TARGET="${{ matrix.MACOSX_DEPLOYMENT_TARGET }}" \
                 -DCMAKE_BUILD_TYPE=Release \
                 ../
         fi
-        export CMAKE_OSX_ARCHITECTURES
         cmake --build . --target package -j $N
 
     - name: Save artifact
