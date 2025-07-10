@@ -231,7 +231,7 @@ function downloadDeps() {
     }
 
     console.log(`Downloading ${depend}: ${uri} -> ${destName}`);
-    return progress(request({uri: uri, timeout: 5000}))
+    return progress(request({uri: uri, timeout: 30000})) // Increased timeout from 5000 to 30000ms
       .on('progress', state => {
         console.log(`Downloading ${depend}, ${(state.percent * 100).toFixed(0)}%`);
       })

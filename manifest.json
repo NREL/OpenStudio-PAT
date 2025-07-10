@@ -11,7 +11,7 @@
     "arch": "x64",
     "type": "energyplus"
   }, {
-    "name": "EnergyPlus-25.1.0-darwin-arm64.tar.gz",
+    "name": "EnergyPlus-25.1.0-68a4a7c774-Darwin-macOS13-arm64.tar.gz",
     "platform": "darwin",
     "arch": "arm64",
     "type": "energyplus"
@@ -53,7 +53,7 @@
     "arch": "x64",
     "type": "mongo"
   }, {
-    "name": "mongodb-6.0.8-darwin-arm64.tar.gz",
+    "name": "mongodb-macos-arm64-6.0.8.tgz",
     "platform": "darwin",
     "arch": "arm64",
     "type": "mongo"
