@@ -213,12 +213,15 @@ function downloadDeps() {
         // Try to verify the file integrity for gzip files
         if (destName.endsWith('.tar.gz') || destName.endsWith('.gz')) {
           const fs = require('fs');
-          const zlib = require('zlib');
           const fileBuffer = fs.readFileSync(destPath);
-          zlib.gunzipSync(fileBuffer.slice(0, Math.min(fileBuffer.length, 1024))); // Test first 1KB
+          
+          // More thorough integrity check - test the entire file
+          zlib.gunzipSync(fileBuffer);
           console.log(`${depend} already exists and is valid, skipping download`);
           return Promise.resolve();
         }
+        console.log(`${depend} already exists, skipping download`);
+        return Promise.resolve();
       } catch (err) {
         console.log(`${depend} exists but appears corrupted, will re-download: ${err.message}`);
         jetpack.remove(destPath);
@@ -284,11 +287,13 @@ function extractDeps() {
     try {
       const fs = require('fs');
       const fileBuffer = fs.readFileSync(sourceFile);
-      zlib.gunzipSync(fileBuffer.slice(0, Math.min(fileBuffer.length, 1024))); // Test first 1KB
+      
+      // More thorough integrity check - test the entire file
+      zlib.gunzipSync(fileBuffer);
       console.log(`File integrity check passed for ${sourceFile}`);
     } catch (err) {
       console.error(`File integrity check failed for ${sourceFile}: ${err.message}`);
-      throw new Error(`File ${sourceFile} is corrupted or not a valid gzip file`);
+      throw new Error(`File ${sourceFile} is corrupted or not a valid gzip file: ${err.message}`);
     }
     
     console.log(`Extracting ${depend}: ${sourceFile} -> ${properDestinationDir}`);

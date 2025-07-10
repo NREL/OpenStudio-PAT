@@ -179,13 +179,7 @@ jobs:
         echo "Cleanup completed. Current depend/ contents:"
         ls -la depend/ || echo "depend/ directory is empty"
 
-    - name: Pre-download and verify OpenStudio-server (macOS ARM only)
-      if: runner.os == 'macOS' && matrix.arch == 'arm64'
-      shell: bash
-      run: |
-        # Create depend directory to ensure it exists
-        mkdir -p depend/
-        echo "Depend directory created for ARM64 build"
+
 
 
     - name: Configure CMake & build (Windows)
