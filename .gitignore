@@ -21,6 +21,7 @@ Thumbs.db
 /.claude/
 /.hive-mind/
 /.swarm/
+/memory/
 claude-flow
 claude-flow.bat
 claude-flow.ps1
