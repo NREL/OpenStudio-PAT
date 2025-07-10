@@ -77,7 +77,7 @@
     "name": "OpenStudio-3.10.0-Linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
-    "type": "openstudio"
+    "type": "OpenStudio"
   }],
   "openstudioServer": [{
     "name": "OpenStudio-server-5873e0d21d-win32.tar.gz",
