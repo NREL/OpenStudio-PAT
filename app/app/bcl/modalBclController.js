@@ -706,7 +706,7 @@ export class ModalBclController {
             _.forEach(_.keys(exampleArgForOptions), (key) => {
               if (_.startsWith(key, 'option_')) {
                 // create an option with default value
-                arg[key] = Object.prototype.hasOwnProperty.call(arg, 'default_value') ? arg.default_value : null;
+                arg[key] = arg.hasOwnProperty('default_value') ? arg.default_value : null;
               }
             });
             // add variable key and default to false

@@ -181,7 +181,7 @@ export class OsServer {
     const vm = this;
     const deferred = vm.$q.defer();
 
-    const command = '"' + vm.cliPath + '" openstudio_version';
+    const command = '\"' + vm.cliPath + '\" openstudio_version';
     vm.$log.info('get openstudio version command: ', command);
 
     const child = vm.exec(command,
@@ -540,9 +540,9 @@ export class OsServer {
     // run META CLI will return status code: 0 = success, 1 = failure
     // start local server needs path to oscli (vm.cliPath)
     if (vm.platform == 'win32')
-      vm.startServerCommand = '"' + vm.rubyPath + '" "' + vm.metaCLIPath + '"' + ' start_local --worker-number=' + vm.numWorkers + ' --energyplus-exe-path=' + '"' + vm.energyplusEXEPath + '"' + ' --openstudio-exe-path=' + '"' + vm.cliPath + '"' + ' --ruby-lib-path=' + '"' + vm.openstudioBindingsDirPath + '"' + ' --mongo-dir=' + '"' + vm.mongoDirPath + '" --debug "' + vm.Project.projectDir.path() + '"';
+      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --worker-number=' + vm.numWorkers + ' --energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --openstudio-exe-path=' + '\"' + vm.cliPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
     else
-      vm.startServerCommand = '"' + vm.rubyPath + '" "' + vm.metaCLIPath + '"' + ' start_local --worker-number=' + vm.numWorkers + ' --energyplus-exe-path=' + '"' + vm.energyplusEXEPath + '"' + ' --openstudio-exe-path=' + '"' + vm.cliPath + '"' + ' --ruby-lib-path=' + '"' + vm.openstudioBindingsDirPath + '"' + ' --mongo-dir=' + '"' + vm.mongoDirPath + '" --debug "' + vm.Project.projectDir.path() + '"';
+      vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --worker-number=' + vm.numWorkers + ' --energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --openstudio-exe-path=' + '\"' + vm.cliPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
     vm.$log.info('start server command: ', vm.startServerCommand);
 
     // fire off start_local and capture the child immediately
@@ -717,7 +717,7 @@ export class OsServer {
         if (vm.Message.showDebug()) vm.$log.debug('vm.Project:', vm.Project);
         if (vm.Message.showDebug()) vm.$log.debug('vm.Project.projectDir:', vm.Project.projectDir.path());
 
-        vm.stopServerCommand = '"' + vm.rubyPath + '" "' + vm.metaCLIPath + '"' + ' stop_local ' + '"' + vm.Project.projectDir.path() + '"';
+        vm.stopServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' stop_local ' + '\"' + vm.Project.projectDir.path() + '\"';
         vm.$log.info('stop server command: ', vm.stopServerCommand);
 
         // do nothing if server is stopped and start is not in progress
