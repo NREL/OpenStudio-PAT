@@ -74,6 +74,11 @@
     "arch": "x64",
     "type": "openstudio"
   }, {
+    "name": "OpenStudio-3.10.0+86d7e215a1-Darwin-arm64.tar.gz",
+    "platform": "darwin",
+    "arch": "arm64",
+    "type": "openstudio"
+  }, {
     "name": "OpenStudio-3.10.0-Linux.tar.gz",
     "platform": "linux",
     "arch": "x64",
