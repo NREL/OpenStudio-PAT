@@ -166,7 +166,9 @@ const manifest = jetpack.read('manifest.json', 'json');
 
 const platform = os.platform();
 // Priority: MATRIX_ARCH (set by workflow) > CMAKE_OSX_ARCHITECTURES > os.arch()
-const arch = process.env.MATRIX_ARCH || process.env.CMAKE_OSX_ARCHITECTURES || os.arch();
+// Handle multi-architecture CMAKE_OSX_ARCHITECTURES by taking the first architecture
+const cmakeArch = process.env.CMAKE_OSX_ARCHITECTURES ? process.env.CMAKE_OSX_ARCHITECTURES.split(';')[0] : null;
+const arch = process.env.MATRIX_ARCH || cmakeArch || os.arch();
 
 console.log(`Building for platform: ${platform}, architecture: ${arch}`);
 console.log(`Environment variables:`);
