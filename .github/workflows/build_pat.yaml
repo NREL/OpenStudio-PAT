@@ -2,11 +2,14 @@ name: Build_PAT
 
 on:
   pull_request:
-    branches:
-      -  '*'
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
   push:
     branches:
-      -  '*'
+      - develop
     tags:
       - '*'
 
@@ -22,16 +25,16 @@ jobs:
         name: [Ubuntu, macOS, Windows_2022]
         include:
         - name: Ubuntu
-          os: ubuntu-22.04
+          os: ubuntu-24.04
           node-version: 18
           allow_failure: false
         - name: macOS
-          os: macos-13
+          os: macos-15-intel
           node-version: 18
           allow_failure: false
-          MACOSX_DEPLOYMENT_TARGET: 10.15
-          SDKROOT: /Applications/Xcode_11.7.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
-          DEVELOPER_DIR: /Applications/Xcode_13.2.1.app/Contents/Developer
+          MACOSX_DEPLOYMENT_TARGET: "12.1"
+          SDKROOT: /Applications/Xcode.app/Contents/Developer/Platforms/MacOSX.platform/Developer/SDKs/MacOSX.sdk
+          DEVELOPER_DIR: /Applications/Xcode.app/Contents/Developer
         - name: Windows_2022
           os: windows-2022
           node-version: 18

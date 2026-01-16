@@ -185,7 +185,7 @@ function downloadDeps() {
       var destName = fileName.replace(/^.*[\\\/]/, '');
     } else {
       // Need to concat endpoint (AWS) with the fileName
-      var uri = manifest.endpoint + fileName;
+      var uri = manifest.endpoint + encodeURIComponent(fileName);
       var destName = fileName;
     }
 
