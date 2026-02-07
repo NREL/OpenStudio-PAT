@@ -20,9 +20,12 @@ export class App {
   static async launchNewInstance() {
     await App.close();
 
-    App.instance = await electron.launch({
-      args: [MAIN_SCRIPT_PATH]
-    });
+    const args = [MAIN_SCRIPT_PATH];
+    if (process.env.CI) {
+      args.unshift('--no-sandbox');
+    }
+
+    App.instance = await electron.launch({ args });
 
     App.page = await App.instance.firstWindow();
   }
