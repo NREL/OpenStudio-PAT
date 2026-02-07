@@ -12,11 +12,11 @@ appHooksSetup(Hook.all);
 
 describeProjects(
   CURRENT_PROJECT => {
-    startServerTests();
-    serverPageTests();
-    runPageTests(CURRENT_PROJECT);
-    // Only stop server when running locally since the server stop command times out in GitHub Actions
+    // Only run server-dependent tests locally since server commands time out in GitHub Actions
     if (!process.env.CI) {
+      startServerTests();
+      serverPageTests();
+      runPageTests(CURRENT_PROJECT);
       stopServerTests();
     }
     saveProjectTests();
