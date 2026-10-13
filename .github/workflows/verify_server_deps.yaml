@@ -123,7 +123,7 @@ jobs:
           exit $fail
 
       - name: No Homebrew paths in psych.bundle
-        if: runner.os == 'macOS'
+        if: ${{ !cancelled() && runner.os == 'macOS' }}
         run: |
           set -u
           bundles=$(find "$DEPS_DIR/OpenStudio-server" -name 'psych.bundle')
@@ -141,7 +141,7 @@ jobs:
           exit $fail
 
       - name: Load psych.bundle with bundled ruby
-        if: runner.os == 'macOS'
+        if: ${{ !cancelled() && runner.os == 'macOS' }}
         run: |
           set -u
           # The bundled ruby and server gems are x86_64-only; arm64 runners need Rosetta.
