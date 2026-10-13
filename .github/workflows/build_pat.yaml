@@ -13,11 +13,21 @@ on:
     tags:
       - '*'
 
+# Cancel superseded PR runs; never cancel develop/tag runs that publish installers
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event_name == 'pull_request' && format('pr-{0}', github.event.pull_request.number) || github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   pat_build:
     name: Build ${{ matrix.name }}
     runs-on: ${{ matrix.os }}
     continue-on-error: ${{ matrix.allow_failure }}
+    env:
+      # PRs: build the app + installDeps (PAT target) everywhere; the slow installer
+      # packaging (IFW, ~27 min macOS / ~35 min Windows) runs only in the Ubuntu deb smoke job.
+      # push to develop and tags: full packaging on every OS.
+      BUILD_TARGET: ${{ (github.event_name == 'pull_request' && matrix.name != 'Ubuntu') && 'PAT' || 'package' }}
     strategy:
       # fail-fast: Default is true, switch to false to allow one platform to fail and still run others
       fail-fast: false
@@ -48,6 +58,10 @@ jobs:
       uses: actions/setup-node@v4
       with:
         node-version: ${{ matrix.node-version }}
+        cache: npm
+        cache-dependency-path: |
+          package-lock.json
+          app/package-lock.json
 
     - name: Install System dependencies
       shell: bash
@@ -99,7 +113,7 @@ jobs:
         echo "Using vcvarsall to initialize the development environment"
         call vcvarsall.bat x64
         cmake -G "Visual Studio 17 2022" -A x64 ..
-        cmake --build . --target package -j ${{ env.N }} --config Release
+        cmake --build . --target %BUILD_TARGET% -j ${{ env.N }} --config Release
 
     - name: Configure CMake & build (Linux)
       working-directory: ./build
@@ -115,7 +129,7 @@ jobs:
               -DCPACK_BINARY_STGZ=OFF \
               -DCPACK_BINARY_TBZ2=OFF \
               ../
-        cmake --build . --target package -j $N
+        cmake --build . --target "$BUILD_TARGET" -j $N
 
     - name: Configure CMake & build (macOS)
       working-directory: ./build
@@ -127,9 +141,10 @@ jobs:
               -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
               -DCMAKE_BUILD_TYPE=Release \
               ../
-        cmake --build . --target package -j $N
+        cmake --build . --target "$BUILD_TARGET" -j $N
 
     - name: Save artifact
+      if: github.event_name != 'pull_request'
       uses: actions/upload-artifact@v4
       with:
         name: PAT-Installer-${{ matrix.name }}
