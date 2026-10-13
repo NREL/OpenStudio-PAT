@@ -99,7 +99,9 @@ jobs:
         echo "Using vcvarsall to initialize the development environment"
         call vcvarsall.bat x64
         cmake -G "Visual Studio 17 2022" -A x64 ..
-        cmake --build . --target package -j ${{ env.N }} --config Release
+        echo T_PAT_START %DATE% %TIME%
+        cmake --build . --target PAT -j ${{ env.N }} --config Release
+        echo T_PAT_END %DATE% %TIME%
 
     - name: Configure CMake & build (Linux)
       working-directory: ./build
@@ -115,7 +117,9 @@ jobs:
               -DCPACK_BINARY_STGZ=OFF \
               -DCPACK_BINARY_TBZ2=OFF \
               ../
-        cmake --build . --target package -j $N
+        date
+        time cmake --build . --target PAT -j $N
+        date
 
     - name: Configure CMake & build (macOS)
       working-directory: ./build
@@ -127,7 +131,17 @@ jobs:
               -DCMAKE_OSX_ARCHITECTURES="arm64;x86_64" \
               -DCMAKE_BUILD_TYPE=Release \
               ../
-        cmake --build . --target package -j $N
+        date
+        time cmake --build . --target PAT -j $N
+        date
+
+    - name: Package (timed)
+      working-directory: ./build
+      shell: bash
+      run: |
+        date
+        time cmake --build . --target package -j $N --config Release
+        date
 
     - name: Save artifact
       uses: actions/upload-artifact@v4

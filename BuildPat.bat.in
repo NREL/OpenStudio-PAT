@@ -4,7 +4,11 @@ setx GYP_MSVS_VERSION 2022
 
 cd ${CMAKE_SOURCE_DIR}
 cmd /C "${NPM_COMMAND}" config set msvs_version 2022 --location=global
+echo T_NPMINSTALL_START %TIME%
 cmd /C "${NPM_COMMAND}" install --msvs_version=2022
+echo T_RELEASE_START %TIME%
 cmd /C "${NPM_COMMAND}" run release
+echo T_GULP_START %TIME%
 "${CMAKE_SOURCE_DIR}/node_modules/.bin/gulp" installDeps --prefix="${CMAKE_SOURCE_DIR}/tmp/pat"
+echo T_BAT_END %TIME%
 cd %BUILD_DIR%
