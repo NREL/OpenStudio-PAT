@@ -5,7 +5,7 @@ name: Verify_Server_Deps
 #
 # EXPECTED TO FAIL on develop until these PRs merge:
 #   #332 nested OpenStudio-server tarball unwrap  -> "Server deps" job (openstudio_meta / leftover tar.gz)
-#   #333 libyaml relink for darwin                -> "libyaml" job (psych.bundle links /usr/local/opt or /opt/homebrew)
+#   #333 libyaml relink for darwin                -> macOS "Server deps" jobs (psych.bundle links /usr/local/opt or /opt/homebrew)
 #   #331 server pre-flight check                  -> "Pre-flight" job (marker check)
 # Once merged, branches of those PRs should merge develop to pick up this workflow.
 #
@@ -14,6 +14,16 @@ on:
   pull_request:
     branches:
       - develop
+    paths:
+      - manifest.json
+      - tasks/**
+      - install_operations.qs
+      - gulpfile.js
+      - CMakeLists.txt
+      - app/app/project/osServerService.js
+      - package.json
+      - package-lock.json
+      - .github/workflows/verify_server_deps.yaml
     types:
       - opened
       - synchronize
@@ -40,16 +50,9 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        include:
-          - name: Windows
-            os: windows-latest
-          - name: Ubuntu
-            os: ubuntu-latest
-          # macos-13 is retired by GitHub; macos-15-intel is the Intel runner used by build_pat.yaml
-          - name: macOS Intel
-            os: macos-15-intel
-          - name: macOS arm64
-            os: macos-14
+        # Nested tarball handling only affects darwin/linux, so Windows is added on workflow_dispatch only.
+        # macos-13 is retired by GitHub; macos-15-intel is the Intel runner used by build_pat.yaml.
+        include: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '[{"name":"Windows","os":"windows-latest"},{"name":"Ubuntu","os":"ubuntu-latest"},{"name":"macOS Intel","os":"macos-15-intel"},{"name":"macOS arm64","os":"macos-14"}]' || '[{"name":"Ubuntu","os":"ubuntu-latest"},{"name":"macOS Intel","os":"macos-15-intel"},{"name":"macOS arm64","os":"macos-14"}]') }}
     steps:
       - uses: actions/checkout@v4
 
@@ -61,9 +64,22 @@ jobs:
             package-lock.json
             app/package-lock.json
 
-      # root postinstall runs `cd app && npm install`
+      - name: Remove Homebrew libyaml
+        if: runner.os == 'macOS'
+        run: |
+          brew uninstall --ignore-dependencies libyaml || true
+          for p in /usr/local/opt/libyaml/lib/libyaml-0.2.dylib /opt/homebrew/opt/libyaml; do
+            if [ -e "$p" ]; then echo "::error::$p still present"; exit 1; fi
+          done
+          echo "libyaml absent from Homebrew prefixes"
+
+      # gulp installDeps only needs root devDependencies; skip the electron binary download and
+      # the root postinstall (`cd app && npm install`) via --ignore-scripts.
       - name: npm ci
-        run: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm ci --ignore-scripts
 
       - name: Install deps
         run: npx gulp installDeps
@@ -106,42 +122,8 @@ jobs:
           done
           exit $fail
 
-  libyaml:
-    name: libyaml linkage (${{ matrix.name }})
-    runs-on: ${{ matrix.os }}
-    timeout-minutes: 45
-    strategy:
-      fail-fast: false
-      matrix:
-        include:
-          - name: macOS Intel
-            os: macos-15-intel
-          - name: macOS arm64
-            os: macos-14
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-          cache: npm
-          cache-dependency-path: |
-            package-lock.json
-            app/package-lock.json
-
-      - name: Remove Homebrew libyaml
-        run: |
-          brew uninstall --ignore-dependencies libyaml || true
-          for p in /usr/local/opt/libyaml/lib/libyaml-0.2.dylib /opt/homebrew/opt/libyaml; do
-            if [ -e "$p" ]; then echo "::error::$p still present"; exit 1; fi
-          done
-          echo "libyaml absent from Homebrew prefixes"
-
-      - run: npm ci
-
-      - run: npx gulp installDeps
-
       - name: No Homebrew paths in psych.bundle
+        if: runner.os == 'macOS'
         run: |
           set -u
           bundles=$(find "$DEPS_DIR/OpenStudio-server" -name 'psych.bundle')
@@ -159,6 +141,7 @@ jobs:
           exit $fail
 
       - name: Load psych.bundle with bundled ruby
+        if: runner.os == 'macOS'
         run: |
           set -u
           # The bundled ruby and server gems are x86_64-only; arm64 runners need Rosetta.
