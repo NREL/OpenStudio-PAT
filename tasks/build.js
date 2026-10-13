@@ -200,35 +200,62 @@ function downloadDeps() {
   return merge(tasks);
 }
 
-// Some artifacts are double-archived: after stripping the outer layer the
-// destination holds a single nested .tar.gz and no bin/ directory.
-function unwrapNestedTarball(dir) {
+const { pipeline } = require('stream');
+const { promisify } = require('util');
+const pipelineAsync = promisify(pipeline);
+
+function extractTarball(file, dir, options) {
+  return pipelineAsync(
+    jetpack.createReadStream(file),
+    zlib.createGunzip(),
+    tar.extract(dir, options)
+  );
+}
+
+// There is a bug in tar-fs where, because stripped files & directories
+// are given an empty header.name, having multiple stripped items
+// results in having multiple headers with the same (empty) name,
+// causing the extraction to either fail or hang.
+//
+// We avoid this issue by ignoring stripped items (ie, items with empty names)
+const stripOptions = {
+  strip: 1,
+  ignore: (__, header) => header.name.length === 0
+};
+
+// The OpenStudio-server artifact may be double-archived: after stripping the
+// outer layer the destination holds a single nested .tar.gz and no bin/.
+// The inner tarball is extracted to a staging dir first so its root can be
+// verified (OpenStudio-server/) before anything is moved into place.
+async function unwrapNestedServerTarball(dir) {
   if (!jetpack.exists(dir) || jetpack.exists(path.join(dir, 'bin'))) {
-    return Promise.resolve();
+    return;
   }
-  const entries = jetpack.list(dir) || [];
-  const tarballs = entries.filter(e => /\.(tar\.gz|tgz)$/i.test(e));
+  const tarballs = (jetpack.list(dir) || []).filter(e => /\.(tar\.gz|tgz)$/i.test(e));
   if (tarballs.length !== 1) {
-    return Promise.resolve();
+    return;
   }
   const inner = path.join(dir, tarballs[0]);
-  return new Promise((resolve, reject) => {
-    jetpack.createReadStream(inner)
-      .pipe(zlib.createGunzip())
-      .pipe(tar.extract(dir, {
-        strip: 1,
-        ignore: (__, header) => header.name.length === 0
-      }))
-      .on('finish', () => {
-        jetpack.remove(inner);
-        resolve();
-      })
-      .on('error', reject);
-  });
+  const staging = path.join(dir, '.nested-extract');
+  jetpack.remove(staging);
+  try {
+    await extractTarball(inner, staging, {});
+    const roots = jetpack.list(staging) || [];
+    if (roots.length !== 1 || roots[0] !== 'OpenStudio-server') {
+      throw new Error('Unexpected layout in nested tarball ' + tarballs[0] + ': ' + roots.join(', '));
+    }
+    const root = path.join(staging, roots[0]);
+    (jetpack.list(root) || []).forEach(entry => {
+      jetpack.move(path.join(root, entry), path.join(dir, entry), {overwrite: true});
+    });
+    jetpack.remove(inner);
+  } finally {
+    jetpack.remove(staging);
+  }
 }
 
 function extractDeps() {
-  var tasks = dependencies.map(depend => {
+  var tasks = dependencies.map(async depend => {
     const fileInfo = _.find(manifest[depend], {platform: platform});
     const fileName = fileInfo.name;
 
@@ -248,23 +275,10 @@ function extractDeps() {
     // directory level
     const properDestinationDir = path.join(destination, properName);
     jetpack.remove(properDestinationDir);
-    const extraction = jetpack.createReadStream(path.join(destination, destName))
-      .pipe(zlib.createGunzip())
-      .pipe(tar.extract(properDestinationDir, {
-        strip: 1,
-        // There is a bug in tar-fs where, because stripped files & directories
-        // are given an empty header.name, having multiple stripped items
-        // results in having multiple headers with the same (empty) name,
-        // causing the extraction to either fail or hang.
-        //
-        // We avoid this issue by ignoring stripped items (ie, items with empty names)
-        ignore: (__, header) => {
-          return header.name.length === 0;
-        }
-      }));
-    return new Promise((resolve, reject) => {
-      extraction.on('finish', resolve).on('error', reject);
-    }).then(() => unwrapNestedTarball(properDestinationDir));
+    await extractTarball(path.join(destination, destName), properDestinationDir, stripOptions);
+    if (depend === 'openstudioServer') {
+      await unwrapNestedServerTarball(properDestinationDir);
+    }
   });
 
   return Promise.all(tasks);
