@@ -545,7 +545,28 @@ export class OsServer {
       vm.startServerCommand = '\"' + vm.rubyPath + '\" \"' + vm.metaCLIPath + '\"' + ' start_local --worker-number=' + vm.numWorkers + ' --energyplus-exe-path=' + '\"' + vm.energyplusEXEPath + '\"' + ' --openstudio-exe-path=' + '\"' + vm.cliPath + '\"' + ' --ruby-lib-path=' + '\"' + vm.openstudioBindingsDirPath + '\"' + ' --mongo-dir=' + '\"' + vm.mongoDirPath + '\" --debug \"' + vm.Project.projectDir.path() + '\"';
     vm.$log.info('start server command: ', vm.startServerCommand);
 
+    // pre-flight: make sure the required executables/files exist before spawning
+    const required = {
+      'Ruby': vm.rubyPath,
+      'openstudio_meta': vm.metaCLIPath,
+      'OpenStudio CLI': vm.cliPath,
+      'EnergyPlus': vm.energyplusEXEPath,
+      'Mongo directory': vm.mongoDirPath,
+      'OpenStudio Ruby bindings directory': vm.openstudioBindingsDirPath
+    };
+    const missing = Object.keys(required).filter(k => !required[k] || !jetpack.exists(required[k]))
+      .map(k => k + ': ' + (required[k] || '(path not set)'));
+    if (missing.length > 0) {
+      const msg = 'Cannot start local server; required file(s) not found: ' + missing.join('; ');
+      vm.$log.error(msg);
+      console.error(msg);
+      vm.toastr.error(msg, 'Server failed to start', {timeOut: 0, extendedTimeOut: 0, closeButton: true});
+      deferred.reject(new Error(msg));
+      return deferred.promise;
+    }
+
     // fire off start_local and capture the child immediately
+    let stderrTail = '';
     vm.localServerChild = vm.exec(vm.startServerCommand);
 
     // stream its stdout in real time
@@ -558,6 +579,8 @@ export class OsServer {
     vm.localServerChild.stderr.on('data', chunk => {
       const line = chunk.toString().trim();
       if (line) console.error('[openstudio_meta stderr]', line);
+      stderrTail = (stderrTail + chunk.toString()).slice(-2000);
+      vm.$log.error('[openstudio_meta stderr] ' + chunk.toString().trim());
     });
 
     // when it finally exits, resolve or reject
@@ -567,8 +590,8 @@ export class OsServer {
         vm.$log.info('SERVER URL: ', vm.selectedServerURL);
         deferred.resolve(vm.localServerChild);
       } else {
-        vm.$log.error('SERVER ERROR (exit code ' + code + ')');
-        deferred.reject(new Error('start_local exited with ' + code));
+        vm.$log.error('SERVER ERROR (exit code ' + code + ')' + (stderrTail ? ': ' + stderrTail.trim() : ''));
+        deferred.reject(new Error('start_local exited with ' + code + (stderrTail ? ': ' + stderrTail.trim() : '')));
       }
     });
 
