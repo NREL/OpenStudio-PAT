@@ -109,13 +109,28 @@ async function fixLibyaml() {
     return;
   }
 
-  const bundles = findFiles(serverDir, 'psych.bundle').filter(b => missingLibyamlRef(b));
+  const allBundles = findFiles(serverDir, 'psych.bundle');
+  if (allBundles.length === 0) {
+    const nested = fs.readdirSync(serverDir).filter(f => /\.(tar\.gz|tgz)$/i.test(f));
+    const detail = nested.length > 0
+      ? `it still contains an unextracted nested archive (${nested.join(', ')}); run "gulp installDeps" with the nested-tarball unwrap fix (#329)`
+      : 'no psych.bundle was found';
+    throw new Error(`fixLibyaml: ${serverDir} exists but ${detail}`);
+  }
+
+  const bundles = allBundles.filter(b => missingLibyamlRef(b));
   if (bundles.length === 0) {
     console.log('fixLibyaml: no psych.bundle with an external libyaml reference, nothing to do');
     return;
   }
 
   const archs = archsOf(bundles[0]);
+  for (const bundle of bundles) {
+    const other = archsOf(bundle);
+    if (other.slice().sort().join() !== archs.slice().sort().join()) {
+      throw new Error(`fixLibyaml: psych.bundle architectures differ (${bundles[0]}: ${archs.join(',')} vs ${bundle}: ${other.join(',')})`);
+    }
+  }
   const libDir = path.join(serverDir, 'lib');
   fs.mkdirSync(libDir, { recursive: true });
   const dylib = path.join(libDir, DYLIB_NAME);
