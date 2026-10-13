@@ -200,6 +200,33 @@ function downloadDeps() {
   return merge(tasks);
 }
 
+// Some artifacts are double-archived: after stripping the outer layer the
+// destination holds a single nested .tar.gz and no bin/ directory.
+function unwrapNestedTarball(dir) {
+  if (!jetpack.exists(dir) || jetpack.exists(path.join(dir, 'bin'))) {
+    return Promise.resolve();
+  }
+  const entries = jetpack.list(dir) || [];
+  const tarballs = entries.filter(e => /\.(tar\.gz|tgz)$/i.test(e));
+  if (tarballs.length !== 1) {
+    return Promise.resolve();
+  }
+  const inner = path.join(dir, tarballs[0]);
+  return new Promise((resolve, reject) => {
+    jetpack.createReadStream(inner)
+      .pipe(zlib.createGunzip())
+      .pipe(tar.extract(dir, {
+        strip: 1,
+        ignore: (__, header) => header.name.length === 0
+      }))
+      .on('finish', () => {
+        jetpack.remove(inner);
+        resolve();
+      })
+      .on('error', reject);
+  });
+}
+
 function extractDeps() {
   var tasks = dependencies.map(depend => {
     const fileInfo = _.find(manifest[depend], {platform: platform});
@@ -221,7 +248,7 @@ function extractDeps() {
     // directory level
     const properDestinationDir = path.join(destination, properName);
     jetpack.remove(properDestinationDir);
-    return jetpack.createReadStream(path.join(destination, destName))
+    const extraction = jetpack.createReadStream(path.join(destination, destName))
       .pipe(zlib.createGunzip())
       .pipe(tar.extract(properDestinationDir, {
         strip: 1,
@@ -235,10 +262,12 @@ function extractDeps() {
           return header.name.length === 0;
         }
       }));
+    return new Promise((resolve, reject) => {
+      extraction.on('finish', resolve).on('error', reject);
+    }).then(() => unwrapNestedTarball(properDestinationDir));
   });
 
-  const tasksAsPromises = tasks.map(task => new Promise((resolve, reject) => task.on('finish', resolve).on('error', reject)));
-  return Promise.all(tasksAsPromises);
+  return Promise.all(tasks);
 }
 
 function cleanDeps() {
