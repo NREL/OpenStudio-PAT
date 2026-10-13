@@ -550,10 +550,11 @@ export class OsServer {
       'Ruby': vm.rubyPath,
       'openstudio_meta': vm.metaCLIPath,
       'OpenStudio CLI': vm.cliPath,
-      'EnergyPlus': vm.energyplusEXEPath,
       'Mongo directory': vm.mongoDirPath,
       'OpenStudio Ruby bindings directory': vm.openstudioBindingsDirPath
     };
+    // EnergyPlus path is intentionally '' when OpenStudio should locate it itself
+    if (vm.energyplusEXEPath) required['EnergyPlus'] = vm.energyplusEXEPath;
     const missing = Object.keys(required).filter(k => !required[k] || !jetpack.exists(required[k]))
       .map(k => k + ': ' + (required[k] || '(path not set)'));
     if (missing.length > 0) {
@@ -567,6 +568,7 @@ export class OsServer {
 
     // fire off start_local and capture the child immediately
     let stderrTail = '';
+    let settled = false;
     vm.localServerChild = vm.exec(vm.startServerCommand);
 
     // stream its stdout in real time
@@ -584,7 +586,19 @@ export class OsServer {
     });
 
     // when it finally exits, resolve or reject
+    vm.localServerChild.once('error', err => {
+      const msg = 'Local server process error: ' + (err && err.message ? err.message : err);
+      vm.$log.error(msg);
+      vm.toastr.error(msg, 'Server failed to start', {timeOut: 0, extendedTimeOut: 0, closeButton: true});
+      if (!settled) {
+        settled = true;
+        deferred.reject(new Error(msg));
+      }
+    });
+
     vm.localServerChild.on('exit', (code) => {
+      if (settled) return;
+      settled = true;
       if (code === 0) {
         vm.getLocalServerUrlFromFile();
         vm.$log.info('SERVER URL: ', vm.selectedServerURL);
