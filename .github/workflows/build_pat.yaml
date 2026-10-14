@@ -1,6 +1,7 @@
 name: Build_PAT
 
 on:
+  workflow_dispatch:
   pull_request:
     types:
       - opened
@@ -72,7 +73,8 @@ jobs:
           sudo apt install cmake
         elif [ "$RUNNER_OS" == "macOS" ]; then
           if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
-            curl -L -O https://download.qt.io/archive/qt-installer-framework/4.3.0/QtInstallerFramework-macOS-x64-4.3.0.dmg
+            curl -fL -O https://download.qt.io/archive/qt-installer-framework/4.3.0/QtInstallerFramework-macOS-x64-4.3.0.dmg
+            echo "8c72d42414071d4f2c60825613f90fd52cd42a63e72a76b0c391fdd13d9ed0be  QtInstallerFramework-macOS-x64-4.3.0.dmg" | shasum -a 256 -c -
             hdiutil attach -mountpoint ./qtfiw_installer QtInstallerFramework-macOS-x64-4.3.0.dmg
             echo "ls ./qtfiw_installer"
             sudo ./qtfiw_installer/QtInstallerFramework-macOS-x64-4.3.0.app/Contents/MacOS/QtInstallerFramework-macOS-x64-4.3.0 --verbose --script ./ci/install_script_qtifw.qs
@@ -83,7 +85,8 @@ jobs:
           # echo CMAKE_MACOSX_DEPLOYMENT_TARGET='-DCMAKE_OSX_DEPLOYMENT_TARGET=$MACOSX_DEPLOYMENT_TARGET' >> $GITHUB_ENV
         elif [ "$RUNNER_OS" == "Windows" ]; then
           if [ "$GITHUB_EVENT_NAME" != "pull_request" ]; then
-            curl -L -O https://download.qt.io/archive/qt-installer-framework/4.3.0/QtInstallerFramework-windows-x86-4.3.0.exe
+            curl -fL -O https://download.qt.io/archive/qt-installer-framework/4.3.0/QtInstallerFramework-windows-x86-4.3.0.exe
+            echo "b8857048b2bb9eb0b390c78d99e858a036d671fa83c6a8c58c66548decde6bc7  QtInstallerFramework-windows-x86-4.3.0.exe" | sha256sum -c -
             ./QtInstallerFramework-windows-x86-4.3.0.exe --verbose --script ./ci/install_script_qtifw.qs
             dir "C:/Qt/"
             echo "C:/Qt/QtIFW-4.3.0/bin" >> $GITHUB_PATH
