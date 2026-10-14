@@ -143,7 +143,7 @@ jobs:
       - name: Load psych.bundle with bundled ruby
         if: ${{ !cancelled() && runner.os == 'macOS' }}
         run: |
-          set -u
+          set -eu
           # The bundled ruby and server gems are x86_64-only; arm64 runners need Rosetta.
           RUN=""
           if [ "$(uname -m)" = "arm64" ]; then
@@ -155,14 +155,15 @@ jobs:
           fi
           RUBY="$PWD/$DEPS_DIR/ruby/bin/ruby"
           $RUN "$RUBY" -v
-          bundle=$(find "$PWD/$DEPS_DIR/OpenStudio-server" -name psych.bundle | head -1)
-          libdir=$(dirname "$bundle")
-          # psych.rb may live next to the bundle or in a sibling lib/ (gem layout); add both to -I
-          gemlib=$(dirname "$libdir")
-          echo "bundle=$bundle"
-          # Caveat: if the bundle sits in an extensions dir without psych.rb, the ruby stdlib psych.rb
-          # is used and loads whichever psych.bundle comes first on the load path; -I forces ours first.
-          $RUN "$RUBY" -I "$libdir" -I "$gemlib" -e 'require "psych"; puts Psych::LIBYAML_VERSION; puts YAML.load("a: 1").inspect; puts $LOADED_FEATURES.grep(/psych\.bundle/)'
+          while IFS= read -r bundle; do
+            libdir=$(dirname "$bundle")
+            # psych.rb may live next to the bundle or in a sibling lib/ (gem layout); add both to -I
+            gemlib=$(dirname "$libdir")
+            echo "bundle=$bundle"
+            # Caveat: if the bundle sits in an extensions dir without psych.rb, the ruby stdlib psych.rb
+            # is used and loads whichever psych.bundle comes first on the load path; -I forces ours first.
+            $RUN "$RUBY" -I "$libdir" -I "$gemlib" -e 'require "psych"; puts Psych::LIBYAML_VERSION; puts YAML.load("a: 1").inspect; expected = File.expand_path(ARGV.fetch(0)); abort "expected #{expected} in $LOADED_FEATURES" unless $LOADED_FEATURES.any? { |feature| File.expand_path(feature) == expected }; puts expected' "$bundle"
+          done < <(find "$PWD/$DEPS_DIR/OpenStudio-server" -name psych.bundle)
 
   preflight:
     name: Pre-flight (osServerService.js)
