@@ -155,6 +155,7 @@ jobs:
 
     # Starts the built app bundle in the repo's Electron; does not test the packaged installer layout
     - name: Electron startup smoke test
+      timeout-minutes: 3
       shell: bash
       env:
         PAT_SMOKE_TEST: "1"
