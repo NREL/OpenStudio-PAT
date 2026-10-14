@@ -53,9 +53,9 @@ jobs:
         # macos-13 is retired by GitHub; macos-15-intel is the Intel runner used by build_pat.yaml.
         include: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '[{"name":"Windows","os":"windows-latest"},{"name":"Ubuntu","os":"ubuntu-latest"},{"name":"macOS Intel","os":"macos-15-intel"},{"name":"macOS arm64","os":"macos-14"}]' || '[{"name":"Ubuntu","os":"ubuntu-latest"},{"name":"macOS Intel","os":"macos-15-intel"},{"name":"macOS arm64","os":"macos-14"}]') }}
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
-      - uses: actions/setup-node@v4
+      - uses: actions/setup-node@v6
         with:
           node-version: 18
           cache: npm
