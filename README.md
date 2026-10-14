@@ -38,9 +38,9 @@ PAT uses [playwright](https://playwright.dev/) to conduct automated E2E testing.
 <br />
 
 ## Building PAT Executable (MacOS / Windows)
-1. Run the build script.
+1. Run the release script to build and package the application into `./tmp`.
 	```
-	npm run build
+	npm run release
 	```
 2. Copy the folders under `./depend` to the following directory.
 	* MacOS: `./tmp/ParametricAnalysisTool.app/Contents/Resources`
@@ -61,7 +61,7 @@ We tested our Linux-specific instructions on Ubuntu 22.04, but they should also 
 	* Linux: Run `sudo apt install g++`
 
 2. Install [CMake](https://cmake.org/) if you don't have it already. We tested with v3.24.0.
-	* MacOS: Run `brew install cmake` to install it using [homewbrew](https://github.com/Homebrew) or download it with [the official installer](https://cmake.org/download/)
+	* MacOS: Run `brew install cmake` to install it using [Homebrew](https://brew.sh/) or download it with [the official installer](https://cmake.org/download/)
 	* Windows: Download it with [the official installer](https://cmake.org/download/)
 	* Linux: Run `sudo apt install cmake`
 
@@ -74,10 +74,10 @@ We tested our Linux-specific instructions on Ubuntu 22.04, but they should also 
 			```
 		* Windows: Search for and select "View advanced system settings" from the start menu. Click the "Environment variables..." button, edit the "Path" variable, and add the following path:
 			```
-			C:\Qt\Qt-4.4.1\bin
+			C:\Qt\QtIFW-4.4.1\bin
 			```
 
-5. Generate the cmake files.
+4. Generate the cmake files.
 	* Open a terminal window and `cd` to the `OpenStudio-PAT` project root.
 	* Run the following commands to create a new "build" folder and `cd` into it.
 		```
@@ -105,7 +105,7 @@ We tested our Linux-specific instructions on Ubuntu 22.04, but they should also 
 				../
 			```
 
-6. Run the appropriate command to build PAT. The `-j` option sets the maximum number of processes to use.
+5. Run the appropriate command to build PAT. The `-j` option sets the maximum number of processes to use.
 	* MacOS:
 		```
 		make -j 8 package
@@ -119,7 +119,7 @@ We tested our Linux-specific instructions on Ubuntu 22.04, but they should also 
 		cmake --build . --target package -j 8
 		```
 
-7. The installer package should now be ready to use.
+6. The installer package should now be ready to use.
 	* MacOS: `./build/ParametricAnalysisTool-x.x.x-Darwin.dmg`
 	* Windows: `./build/ParametricAnalysisTool-x.x.x-Windows.exe`
 	* Linux: `./build/ParametricAnalysisTool-x.x.x-Linux.deb`
