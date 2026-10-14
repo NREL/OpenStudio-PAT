@@ -21,7 +21,7 @@ PAT uses [playwright](https://playwright.dev/) to conduct automated E2E testing.
 
 ## Getting started
 
-1. Install node v18.7.0 and npm v8 if you don't have them already. You can [use these commands](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm#checking-your-version-of-npm-and-nodejs) to check if they are installed. If you don't have them, you can download them with a [Node version manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm#checking-your-version-of-npm-and-nodejs) (recommended), an OS-compatible [package manager](https://nodejs.org/en/download/package-manager/), or a [pre-built installer](https://nodejs.org/en/download/current/).
+1. Install node v24 (the current LTS; npm 11 ships with it) if you don't have them already. You can [use these commands](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm#checking-your-version-of-npm-and-nodejs) to check if they are installed. If you don't have them, you can download them with a [Node version manager](https://docs.npmjs.com/downloading-and-installing-node-js-and-npm#checking-your-version-of-npm-and-nodejs) (recommended), an OS-compatible [package manager](https://nodejs.org/en/download/package-manager/), or a [pre-built installer](https://nodejs.org/en/download/current/).
 
 2. Use the following commands to clone the PAT repo and install all dependencies:
 	```
