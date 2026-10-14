@@ -86,7 +86,7 @@ function fonts() {
   const NPM_FONT_DIRS = ['bootstrap-sass', 'angular-ui-grid'];
   const FONT_EXTENSIONS_GLOB = '/**/*.{eot,svg,ttf,woff,woff2}';
 
-  return gulp.src(NPM_FONT_DIRS.map(fontDir => utils.mapNpmFilePath(`${fontDir}${FONT_EXTENSIONS_GLOB}`)))
+  return gulp.src(NPM_FONT_DIRS.map(fontDir => utils.mapNpmFilePath(`${fontDir}${FONT_EXTENSIONS_GLOB}`)), { encoding: false })
     .pipe($.flatten())
     .pipe(gulp.dest(path.join(conf.paths.dist, '/fonts/')));
 }
@@ -96,7 +96,7 @@ function other() {
     path.join(conf.paths.src, '/**/*'),
     path.join('!' + conf.paths.src, '/node_modules/**/*'),
     path.join('!' + conf.paths.src, '/**/*.{html,css,js,scss}')
-  ])
+  ], { encoding: false })
     .pipe($.filter(file => file.stat.isFile()))
     .pipe(rename(p => {
       if (p.dirname.startsWith(conf.paths.src)) {
@@ -107,7 +107,7 @@ function other() {
 }
 
 function nodeModules() {
-  return gulp.src(path.join(conf.paths.src, '/node_modules/**/*'), {base: conf.paths.src})
+  return gulp.src(path.join(conf.paths.src, '/node_modules/**/*'), {base: conf.paths.src, encoding: false})
     .pipe($.filter(file => file.stat.isFile()))
     .pipe(gulp.dest(path.join(conf.paths.dist, '/')));
 }
