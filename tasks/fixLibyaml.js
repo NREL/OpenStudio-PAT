@@ -1,10 +1,13 @@
 'use strict';
 
-// Issue #315: on macOS the OpenStudio-server psych.bundle files are linked
-// against the Homebrew libyaml (/usr/local/opt/libyaml/...), which doesn't
-// exist on most machines. None of the dependency artifacts ship a libyaml
-// dylib, so we build one from the pinned upstream source, place it inside the
-// server, and rewrite psych.bundle to load it relative to itself.
+// Issue #315: on macOS the OpenStudio-server psych.bundle and puma_http11.bundle
+// files are linked against Intel Homebrew dylibs (/usr/local/opt/libyaml/... and
+// /usr/local/opt/openssl@3/...) which don't exist on most machines:
+// 1. None of the dependency artifacts ship a libyaml dylib, so we build one from
+//    the pinned upstream source, place it inside the server, and rewrite
+//    psych.bundle to load it relative to itself.
+// 2. puma_http11.bundle links external libssl/libcrypto, so we recompile it
+//    from the bundled gem C source without external OpenSSL dylib dependencies.
 
 const os = require('os');
 const path = require('path');
@@ -68,6 +71,81 @@ function missingLibyamlRef(bundle) {
   return null;
 }
 
+// Returns true if the bundle links a non-system libssl or libcrypto dylib
+function hasExternalOpensslRef(bundle) {
+  const lines = run('otool', ['-L', bundle]).split('\n').slice(1);
+  for (const line of lines) {
+    const ref = line.trim().split(' ')[0];
+    if (/lib(ssl|crypto).*\.dylib$/.test(ref) && !ref.startsWith('@') && !ref.startsWith('/usr/lib/')) {
+      return true;
+    }
+  }
+  return false;
+}
+
+function findRubyHeaders(rubyDir) {
+  const incRoot = path.join(rubyDir, 'include');
+  if (!fs.existsSync(incRoot)) return null;
+  const verDir = fs.readdirSync(incRoot).find(d => d.startsWith('ruby-') && !d.startsWith('._'));
+  if (!verDir) return null;
+  const hdrDir = path.join(incRoot, verDir);
+  const archDir = fs.readdirSync(hdrDir).find(d => d.includes('darwin') && !d.startsWith('._'));
+  if (!archDir) return null;
+  return { hdrDir, archHdrDir: path.join(hdrDir, archDir) };
+}
+
+function fixPumaHttp11(serverDir, depDir) {
+  const allPumaBundles = findFiles(serverDir, 'puma_http11.bundle');
+  const pumaBundles = allPumaBundles.filter(b => hasExternalOpensslRef(b));
+  if (pumaBundles.length === 0) {
+    console.log('fixLibyaml: no puma_http11.bundle with an external openssl reference, nothing to do');
+    return;
+  }
+
+  const rubyDir = fs.existsSync(path.join(depDir, 'ruby'))
+    ? path.join(depDir, 'ruby')
+    : path.join(conf.paths.dist, '..', 'depend', 'ruby');
+  const headers = findRubyHeaders(rubyDir);
+  if (!headers) {
+    throw new Error(`fixLibyaml: ruby headers not found under ${rubyDir}/include`);
+  }
+
+  const extDirs = findFiles(serverDir, 'puma_http11.c').map(f => path.dirname(f));
+  if (extDirs.length === 0) {
+    throw new Error(`fixLibyaml: puma_http11.c source not found under ${serverDir}`);
+  }
+  const extDir = extDirs[0];
+  const sources = ['http11_parser.c', 'mini_ssl.c', 'puma_http11.c'].map(f => path.join(extDir, f));
+
+  const archs = archsOf(pumaBundles[0]);
+  const archFlags = [].concat(...archs.map(a => ['-arch', a]));
+  const workDir = fs.mkdtempSync(path.join(path.dirname(serverDir), '.puma-build-'));
+  try {
+    const outBundle = path.join(workDir, 'puma_http11.bundle');
+    console.log(`fixLibyaml: rebuilding puma_http11.bundle (${archs.join(',')}) without external openssl`);
+    run('clang', [
+      '-dynamic', '-bundle', '-O3', '-fno-fast-math', '-fno-common', '-fPIC', '-pipe',
+      ...archFlags,
+      '-mmacosx-version-min=10.13',
+      '-D_XOPEN_SOURCE', '-D_DARWIN_C_SOURCE', '-D_DARWIN_UNLIMITED_SELECT', '-D_REENTRANT',
+      '-I' + extDir,
+      '-I' + headers.archHdrDir,
+      '-I' + path.join(headers.hdrDir, 'ruby', 'backward'),
+      '-I' + headers.hdrDir,
+      '-Wl,-undefined,dynamic_lookup',
+      '-o', outBundle,
+      ...sources
+    ]);
+    for (const bundle of pumaBundles) {
+      fs.copyFileSync(outBundle, bundle);
+      run('codesign', ['--force', '--sign', '-', bundle]);
+      console.log(`fixLibyaml: rebuilt ${path.relative(serverDir, bundle)}`);
+    }
+  } finally {
+    fs.rmSync(workDir, { recursive: true, force: true });
+  }
+}
+
 function archsOf(file) {
   return run('lipo', ['-archs', file]).trim().split(/\s+/);
 }
@@ -121,39 +199,40 @@ async function fixLibyaml() {
   const bundles = allBundles.filter(b => missingLibyamlRef(b));
   if (bundles.length === 0) {
     console.log('fixLibyaml: no psych.bundle with an external libyaml reference, nothing to do');
-    return;
-  }
-
-  const archs = archsOf(bundles[0]);
-  for (const bundle of bundles) {
-    const other = archsOf(bundle);
-    if (other.slice().sort().join() !== archs.slice().sort().join()) {
-      throw new Error(`fixLibyaml: psych.bundle architectures differ (${bundles[0]}: ${archs.join(',')} vs ${bundle}: ${other.join(',')})`);
+  } else {
+    const archs = archsOf(bundles[0]);
+    for (const bundle of bundles) {
+      const other = archsOf(bundle);
+      if (other.slice().sort().join() !== archs.slice().sort().join()) {
+        throw new Error(`fixLibyaml: psych.bundle architectures differ (${bundles[0]}: ${archs.join(',')} vs ${bundle}: ${other.join(',')})`);
+      }
     }
-  }
-  const libDir = path.join(serverDir, 'lib');
-  fs.mkdirSync(libDir, { recursive: true });
-  const dylib = path.join(libDir, DYLIB_NAME);
+    const libDir = path.join(serverDir, 'lib');
+    fs.mkdirSync(libDir, { recursive: true });
+    const dylib = path.join(libDir, DYLIB_NAME);
 
-  if (!fs.existsSync(dylib)) {
-    const workDir = fs.mkdtempSync(path.join(path.dirname(serverDir), '.libyaml-build-'));
-    try {
-      console.log(`fixLibyaml: building libyaml ${LIBYAML_VERSION} (${archs.join(',')})`);
-      await buildLibyaml(archs, dylib, workDir);
-    } finally {
-      fs.rmSync(workDir, { recursive: true, force: true });
+    if (!fs.existsSync(dylib)) {
+      const workDir = fs.mkdtempSync(path.join(path.dirname(serverDir), '.libyaml-build-'));
+      try {
+        console.log(`fixLibyaml: building libyaml ${LIBYAML_VERSION} (${archs.join(',')})`);
+        await buildLibyaml(archs, dylib, workDir);
+      } finally {
+        fs.rmSync(workDir, { recursive: true, force: true });
+      }
     }
+
+    for (const bundle of bundles) {
+      const oldRef = missingLibyamlRef(bundle);
+      const rel = path.relative(path.dirname(bundle), dylib);
+      run('install_name_tool', ['-change', oldRef, '@loader_path/' + rel, bundle]);
+      // install_name_tool invalidates any signature; arm64 requires one
+      run('codesign', ['--force', '--sign', '-', bundle]);
+      console.log(`fixLibyaml: patched ${path.relative(serverDir, bundle)}`);
+    }
+    run('codesign', ['--force', '--sign', '-', dylib]);
   }
 
-  for (const bundle of bundles) {
-    const oldRef = missingLibyamlRef(bundle);
-    const rel = path.relative(path.dirname(bundle), dylib);
-    run('install_name_tool', ['-change', oldRef, '@loader_path/' + rel, bundle]);
-    // install_name_tool invalidates any signature; arm64 requires one
-    run('codesign', ['--force', '--sign', '-', bundle]);
-    console.log(`fixLibyaml: patched ${path.relative(serverDir, bundle)}`);
-  }
-  run('codesign', ['--force', '--sign', '-', dylib]);
+  fixPumaHttp11(serverDir, depDir);
 }
 
 exports.fixLibyaml = fixLibyaml;
