@@ -1,0 +1,174 @@
+name: Verify_Server_Deps
+
+# Verifies `gulp installDeps` output (OpenStudio-server extraction, libyaml linkage on macOS)
+# and the local-server pre-flight check.
+#
+# EXPECTED TO FAIL on develop until these PRs merge:
+#   #332 nested OpenStudio-server tarball unwrap  -> "Server deps" job (openstudio_meta / leftover tar.gz)
+#   #333 libyaml relink for darwin                -> macOS "Server deps" jobs (psych.bundle links /usr/local/opt or /opt/homebrew)
+# Once merged, branches of those PRs should merge develop to pick up this workflow.
+#
+# No push trigger on purpose (avoids duplicate runs, see #312).
+on:
+  pull_request:
+    branches:
+      - develop
+    paths:
+      - manifest.json
+      - tasks/**
+      - install_operations.qs
+      - gulpfile.js
+      - CMakeLists.txt
+      - app/app/project/osServerService.js
+      - package.json
+      - package-lock.json
+      - .github/workflows/verify_server_deps.yaml
+    types:
+      - opened
+      - synchronize
+      - reopened
+      - ready_for_review
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
+
+env:
+  # gulp installDeps extracts to <repo>/depend (tasks/build.js: path.join(conf.paths.dist, '..', 'depend'))
+  DEPS_DIR: depend
+
+jobs:
+  server_deps:
+    name: Server deps (${{ matrix.name }})
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 45
+    strategy:
+      fail-fast: false
+      matrix:
+        # Nested tarball handling only affects darwin/linux, so Windows is added on workflow_dispatch only.
+        # macos-13 is retired by GitHub; macos-15-intel is the Intel runner used by build_pat.yaml.
+        include: ${{ fromJSON(github.event_name == 'workflow_dispatch' && '[{"name":"Windows","os":"windows-latest"},{"name":"Ubuntu","os":"ubuntu-latest"},{"name":"macOS Intel","os":"macos-15-intel"},{"name":"macOS arm64","os":"macos-14"}]' || '[{"name":"Ubuntu","os":"ubuntu-latest"},{"name":"macOS Intel","os":"macos-15-intel"},{"name":"macOS arm64","os":"macos-14"}]') }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 18
+          cache: npm
+          cache-dependency-path: |
+            package-lock.json
+            app/package-lock.json
+
+      - name: Remove Homebrew libyaml
+        if: runner.os == 'macOS'
+        run: |
+          brew uninstall --ignore-dependencies libyaml || true
+          for p in /usr/local/opt/libyaml/lib/libyaml-0.2.dylib /opt/homebrew/opt/libyaml; do
+            if [ -e "$p" ]; then echo "::error::$p still present"; exit 1; fi
+          done
+          echo "libyaml absent from Homebrew prefixes"
+
+      # gulp installDeps only needs root devDependencies; skip the electron binary download and
+      # the root postinstall (`cd app && npm install`) via --ignore-scripts.
+      - name: npm ci
+        env:
+          ELECTRON_SKIP_BINARY_DOWNLOAD: '1'
+          PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD: '1'
+        run: npm ci --ignore-scripts
+
+      - name: Install deps
+        run: npx gulp installDeps
+
+      - name: Assert extracted layout
+        shell: bash
+        run: |
+          set -u
+          fail=0
+          d="$DEPS_DIR"
+          ls -la "$d" || true
+
+          if [ -e "$d/OpenStudio-server/bin/openstudio_meta" ]; then
+            echo "OK openstudio_meta"
+          else
+            echo "::error::$d/OpenStudio-server/bin/openstudio_meta missing (nested tarball not unwrapped? see #332)"
+            find "$d/OpenStudio-server" -maxdepth 3 | head -50
+            fail=1
+          fi
+
+          left=$(find "$d/OpenStudio-server" -name '*.tar.gz' 2>/dev/null || true)
+          if [ -n "$left" ]; then
+            echo "::error::leftover tarballs in OpenStudio-server:"; echo "$left"; fail=1
+          fi
+
+          if [ -e "$d/ruby/bin/ruby" ] || [ -e "$d/ruby/bin/ruby.exe" ]; then
+            echo "OK ruby"
+          else
+            echo "::error::ruby/bin/ruby(.exe) missing"; fail=1
+          fi
+
+          if [ -e "$d/mongo/bin/mongod" ] || [ -e "$d/mongo/bin/mongod.exe" ]; then
+            echo "OK mongo/bin/mongod"
+          else
+            echo "::error::$d/mongo/bin/mongod(.exe) missing (see #330)"
+            find "$d/mongo" -maxdepth 3 2>/dev/null || true
+            fail=1
+          fi
+
+          # case-insensitive: manifest type is "OpenStudio" on linux, "openstudio" elsewhere
+          for name in mongo energyplus openstudio; do
+            dir=$(find "$d" -maxdepth 1 -mindepth 1 -type d -iname "$name" | head -1)
+            if [ -n "$dir" ] && [ -n "$(ls -A "$dir")" ]; then
+              echo "OK $name ($dir)"
+            else
+              echo "::error::$name dir missing or empty"; fail=1
+            fi
+          done
+          exit $fail
+
+      - name: No Homebrew paths in psych.bundle
+        if: ${{ !cancelled() && runner.os == 'macOS' }}
+        run: |
+          set -u
+          bundles=$(find "$DEPS_DIR/OpenStudio-server" -name 'psych.bundle')
+          if [ -z "$bundles" ]; then
+            echo "::error::no psych.bundle found under $DEPS_DIR/OpenStudio-server"; exit 1
+          fi
+          fail=0
+          while IFS= read -r b; do
+            echo "== $b"
+            otool -L "$b"
+            if otool -L "$b" | grep -E '/usr/local/opt|/opt/homebrew'; then
+              echo "::error::$b links against Homebrew path (#333)"; fail=1
+            fi
+          done <<< "$bundles"
+          exit $fail
+
+      - name: Load psych.bundle with bundled ruby
+        if: ${{ !cancelled() && runner.os == 'macOS' }}
+        run: |
+          set -eu
+          # The bundled ruby and server gems are x86_64-only; arm64 runners need Rosetta.
+          RUN=""
+          if [ "$(uname -m)" = "arm64" ]; then
+            softwareupdate --install-rosetta --agree-to-license || true
+            if ! arch -x86_64 /usr/bin/true 2>/dev/null; then
+              echo "::error::Rosetta unavailable; cannot execute x86_64 bundled ruby"; exit 1
+            fi
+            RUN="arch -x86_64"
+          fi
+          RUBY="$PWD/$DEPS_DIR/ruby/bin/ruby"
+          $RUN "$RUBY" -v
+          while IFS= read -r bundle; do
+            libdir=$(dirname "$bundle")
+            # psych.rb may live next to the bundle or in a sibling lib/ (gem layout); add both to -I
+            gemlib=$(dirname "$libdir")
+            echo "bundle=$bundle"
+            # Caveat: if the bundle sits in an extensions dir without psych.rb, the ruby stdlib psych.rb
+            # is used and loads whichever psych.bundle comes first on the load path; -I forces ours first.
+            $RUN "$RUBY" -I "$libdir" -I "$gemlib" -e 'require "psych"; puts Psych::LIBYAML_VERSION; puts YAML.load("a: 1").inspect; expected = File.expand_path(ARGV.fetch(0)); abort "expected #{expected} in $LOADED_FEATURES" unless $LOADED_FEATURES.any? { |feature| File.expand_path(feature) == expected }; puts expected' "$bundle"
+          done < <(find "$PWD/$DEPS_DIR/OpenStudio-server" -name psych.bundle)
+
