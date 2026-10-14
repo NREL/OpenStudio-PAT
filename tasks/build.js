@@ -272,10 +272,12 @@ function extractDeps() {
     var properName = fileInfo.type;
 
     // What we do is to extract to properName and remove the leading (root)
-    // directory level
+    // directory level, unless the archive (such as MongoDB 8.x) already puts
+    // bin/ directly at the archive root without a wrapper directory.
     const properDestinationDir = path.join(destination, properName);
     jetpack.remove(properDestinationDir);
-    await extractTarball(path.join(destination, destName), properDestinationDir, stripOptions);
+    const extractOptions = depend === 'mongo' ? {} : stripOptions;
+    await extractTarball(path.join(destination, destName), properDestinationDir, extractOptions);
     if (depend === 'openstudioServer') {
       await unwrapNestedServerTarball(properDestinationDir);
     }

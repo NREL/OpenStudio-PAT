@@ -6,7 +6,6 @@ name: Verify_Server_Deps
 # EXPECTED TO FAIL on develop until these PRs merge:
 #   #332 nested OpenStudio-server tarball unwrap  -> "Server deps" job (openstudio_meta / leftover tar.gz)
 #   #333 libyaml relink for darwin                -> macOS "Server deps" jobs (psych.bundle links /usr/local/opt or /opt/homebrew)
-#   #331 server pre-flight check                  -> "Pre-flight" job (marker check)
 # Once merged, branches of those PRs should merge develop to pick up this workflow.
 #
 # No push trigger on purpose (avoids duplicate runs, see #312).
@@ -111,6 +110,14 @@ jobs:
             echo "::error::ruby/bin/ruby(.exe) missing"; fail=1
           fi
 
+          if [ -e "$d/mongo/bin/mongod" ] || [ -e "$d/mongo/bin/mongod.exe" ]; then
+            echo "OK mongo/bin/mongod"
+          else
+            echo "::error::$d/mongo/bin/mongod(.exe) missing (see #330)"
+            find "$d/mongo" -maxdepth 3 2>/dev/null || true
+            fail=1
+          fi
+
           # case-insensitive: manifest type is "OpenStudio" on linux, "openstudio" elsewhere
           for name in mongo energyplus openstudio; do
             dir=$(find "$d" -maxdepth 1 -mindepth 1 -type d -iname "$name" | head -1)
@@ -165,28 +172,3 @@ jobs:
             $RUN "$RUBY" -I "$libdir" -I "$gemlib" -e 'require "psych"; puts Psych::LIBYAML_VERSION; puts YAML.load("a: 1").inspect; expected = File.expand_path(ARGV.fetch(0)); abort "expected #{expected} in $LOADED_FEATURES" unless $LOADED_FEATURES.any? { |feature| File.expand_path(feature) == expected }; puts expected' "$bundle"
           done < <(find "$PWD/$DEPS_DIR/OpenStudio-server" -name psych.bundle)
 
-  preflight:
-    name: Pre-flight (osServerService.js)
-    runs-on: ubuntu-latest
-    timeout-minutes: 10
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 18
-
-      # The file uses ES module imports (Electron/webpack), so check it as a module.
-      - name: Syntax check
-        run: node --input-type=module --check < app/app/project/osServerService.js
-
-      # Full execution needs Electron (@electron/remote) and Angular DI, so only the presence of
-      # the pre-flight block (#331) is asserted. Expected to fail on develop until #331 merges.
-      - name: Pre-flight logic present
-        run: |
-          f=app/app/project/osServerService.js
-          grep -q "required file(s) not found" "$f" && grep -q "pre-flight" "$f" || {
-            echo "::error::server pre-flight check not found in $f (#331 not merged?)"; exit 1; }
-          for k in "'Ruby'" "'openstudio_meta'" "'OpenStudio CLI'" "'Mongo directory'" "'OpenStudio Ruby bindings directory'" "'EnergyPlus'"; do
-            grep -q "$k" "$f" || { echo "::error::pre-flight does not check $k"; exit 1; }
-          done
