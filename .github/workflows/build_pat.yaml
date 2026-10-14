@@ -153,6 +153,20 @@ jobs:
               ../
         cmake --build . --target "$BUILD_TARGET" -j $N
 
+    # Starts the built app bundle in the repo's Electron; does not test the packaged installer layout
+    - name: Electron startup smoke test
+      timeout-minutes: 3
+      shell: bash
+      env:
+        PAT_SMOKE_TEST: "1"
+      run: |
+        if [ "$RUNNER_OS" == "Linux" ]; then
+          sudo apt-get install -y xvfb
+          xvfb-run -a npx electron --no-sandbox build
+        else
+          npx electron build
+        fi
+
     - name: Save artifact
       if: github.event_name != 'pull_request'
       uses: actions/upload-artifact@v6
