@@ -218,23 +218,25 @@ function extractDeps() {
     var properName = fileInfo.type;
 
     // What we do is to extract to properName and remove the leading (root)
-    // directory level
+    // directory level, unless the archive (such as MongoDB 8.x) already puts
+    // bin/ directly at the archive root without a wrapper directory.
     const properDestinationDir = path.join(destination, properName);
     jetpack.remove(properDestinationDir);
+    const extractOptions = depend === 'mongo' ? {} : {
+      strip: 1,
+      // There is a bug in tar-fs where, because stripped files & directories
+      // are given an empty header.name, having multiple stripped items
+      // results in having multiple headers with the same (empty) name,
+      // causing the extraction to either fail or hang.
+      //
+      // We avoid this issue by ignoring stripped items (ie, items with empty names)
+      ignore: (__, header) => {
+        return header.name.length === 0;
+      }
+    };
     return jetpack.createReadStream(path.join(destination, destName))
       .pipe(zlib.createGunzip())
-      .pipe(tar.extract(properDestinationDir, {
-        strip: 1,
-        // There is a bug in tar-fs where, because stripped files & directories
-        // are given an empty header.name, having multiple stripped items
-        // results in having multiple headers with the same (empty) name,
-        // causing the extraction to either fail or hang.
-        //
-        // We avoid this issue by ignoring stripped items (ie, items with empty names)
-        ignore: (__, header) => {
-          return header.name.length === 0;
-        }
-      }));
+      .pipe(tar.extract(properDestinationDir, extractOptions));
   });
 
   const tasksAsPromises = tasks.map(task => new Promise((resolve, reject) => task.on('finish', resolve).on('error', reject)));
