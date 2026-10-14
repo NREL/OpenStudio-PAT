@@ -186,6 +186,6 @@ jobs:
           f=app/app/project/osServerService.js
           grep -q "required file(s) not found" "$f" && grep -q "pre-flight" "$f" || {
             echo "::error::server pre-flight check not found in $f (#331 not merged?)"; exit 1; }
-          for k in "'Ruby'" "'openstudio_meta'" "'OpenStudio CLI'" "'Mongo directory'"; do
+          for k in "'Ruby'" "'openstudio_meta'" "'OpenStudio CLI'" "'Mongo directory'" "'OpenStudio Ruby bindings directory'" "'EnergyPlus'"; do
             grep -q "$k" "$f" || { echo "::error::pre-flight does not check $k"; exit 1; }
           done
