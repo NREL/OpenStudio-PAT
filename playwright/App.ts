@@ -20,9 +20,13 @@ export class App {
   static async launchNewInstance() {
     await App.close();
 
-    App.instance = await electron.launch({
-      args: [MAIN_SCRIPT_PATH]
-    });
+    const args = [MAIN_SCRIPT_PATH];
+    // GitHub Actions Ubuntu runners lack the setuid chrome-sandbox helper Electron needs
+    if (process.env.CI && process.platform === 'linux') {
+      args.unshift('--no-sandbox');
+    }
+
+    App.instance = await electron.launch({ args });
 
     App.page = await App.instance.firstWindow();
   }
