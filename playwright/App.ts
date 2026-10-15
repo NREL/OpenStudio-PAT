@@ -21,7 +21,8 @@ export class App {
     await App.close();
 
     const args = [MAIN_SCRIPT_PATH];
-    if (process.env.CI) {
+    // GitHub Actions Ubuntu runners lack the setuid chrome-sandbox helper Electron needs
+    if (process.env.CI && process.platform === 'linux') {
       args.unshift('--no-sandbox');
     }
 
